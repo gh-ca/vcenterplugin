@@ -5,17 +5,17 @@
   <div class="detail-content">
     <div>
       <clr-tabs>
-        <clr-tab>
+        <clr-tab >
           <button clrTabLink id="conf" (click)="changeTab('conf')">{{'storage.detail.conf.configuration' | translate}}</button>
-          <clr-tab-content id="configuration" *clrIfActive="true">
+          <clr-tab-content id="configuration" *clrIfActive="true" >
             <table class="table table-noborder" *ngIf="detail" [clrLoading]="detailLoading">
               <tr>
                 <td class="left">{{'storage.detail.conf.name' | translate}}</td>
-                <td class="left">{{detail.name}}</td>
+                <td class="left">{{detail.name?detail.name:'--'}}</td>
                 <td class="left">{{'storage.detail.conf.ip' | translate}}</td>
-                <td class="left">{{detail.ip}}</td>
+                <td class="left">{{detail.ip?detail.ip:'--'}}</td>
                 <td class="left">{{'storage.detail.conf.sn' | translate}}</td>
-                <td class="left">{{detail.sn}}</td>
+                <td class="left">{{detail.sn?detail.sn:'--'}}</td>
               </tr>
               <tr>
                 <td class="left">{{'storage.detail.conf.status' | translate}}</td>
@@ -37,18 +37,18 @@
               </span>
                 </td>
                 <td class="left">{{'storage.detail.conf.fv' | translate}}</td>
-                <td class="left">{{detail.productVersion}}</td>
+                <td class="left">{{detail.productVersion?detail.productVersion:'--'}}</td>
                 <td class="left">{{'storage.detail.conf.pv' | translate}}</td>
-                <td class="left">{{detail.patchVersion}}</td>
+                <td class="left">{{detail.patchVersion?detail.patchVersion:'--'}}</td>
               </tr>
               <tr>
                 <td class="left">{{'storage.detail.conf.vendor' | translate}}</td>
-                <td class="left">{{detail.vendor}}</td>
+                <td class="left">{{detail.vendor?detail.vendor:'--'}}</td>
                 <td class="left">{{'storage.detail.conf.model' | translate}}</td>
-                <td class="left">{{detail.model}}</td>
+                <td class="left">{{detail.model?detail.model:'--'}}</td>
                 <td class="left">{{'storage.detail.conf.az' | translate}}</td>
                 <td class="left" *ngIf="detail.azIds">{{detail.azIds.length>0?detail.azIds:'--'}}</td>
-                <td class="left" *ngIf="detail.azIds != null">--</td>
+                <!--<td class="left" *ngIf="detail.azIds != null">&#45;&#45;</td>-->
               </tr>
               <tr>
                 <td class="left">{{'storage.detail.conf.wp' | translate}}</td>
@@ -57,14 +57,14 @@
                 <td class="left over_flow" title="{{detail.location !=null?detail.location:'--'}}" style="width: 11rem;display: inline-block;">{{detail.location !=null?detail.location:'--'}}</td>
               </tr>
             </table>
-            <div *ngIf="!detail" style="height: 50%">
-
-              <cds-alert-group type="light" size="sm">
-                <cds-alert *ngIf="!detailLoading" status="warning">{{'errorMsg.cantFindData' | translate}}</cds-alert>
-                <cds-alert *ngIf="detailLoading" status="loading">{{'vmfs.loadingTips' | translate}}</cds-alert>
-              </cds-alert-group>
+              <div *ngIf="!detail">
+                <cds-alert-group type="light" size="lg">
+                  <cds-alert *ngIf="!detailLoading" status="warning">{{'errorMsg.cantFindData' | translate}}</cds-alert>
+                  <img [hidden]="!detailLoading" src="./assets/images/loading.gif" style="width: 20px;height: 20px">
+                  <cds-alert *ngIf="detailLoading" status="loading">{{'vmfs.loadingTips' | translate}}</cds-alert>
+                </cds-alert-group>
             </div>
-            <clr-tabs>
+            <clr-tabs *ngIf="detail">
               <!--Storage Pools-->
               <clr-tab>
                 <button clrTabLink id="storage" (click)="changeTab('pool')">{{'storage.detail.storagePool.storagePool' | translate}}</button>
@@ -110,7 +110,7 @@
                           <storage-pool-type-filter #storagePoolTypeFilter></storage-pool-type-filter>
                         </clr-dg-filter>
                       </clr-dg-column>
-                      <clr-dg-column [hidden]="poolRadio!=='table1'" [clrDgField]="'serviceLevelName'">{{'storage.detail.storagePool.serviceLevel' | translate}}</clr-dg-column>
+                      <clr-dg-column style="width: 250px" [hidden]="poolRadio!=='table1'" [clrDgField]="'serviceLevelName'">{{'storage.detail.storagePool.serviceLevel' | translate}}</clr-dg-column>
                       <clr-dg-column [hidden]="poolRadio!=='table1'" [clrDgField]="'raidLevel'">{{'storage.detail.storagePool.raidLevel' | translate}}</clr-dg-column>
 
                       <clr-dg-column [hidden]="poolRadio!=='table2'" class="hideFilter" [clrDgField]="'totalCapacity'">{{'storage.detail.storagePool.totalCap' | translate}}</clr-dg-column>
@@ -149,7 +149,7 @@
                           <span *ngIf="item.mediaType == 'block'">{{'enum.type.block' | translate}}</span>
                           <span *ngIf="item.mediaType == 'block/file'">{{'enum.type.blockAndFile' | translate}}</span>
                         </clr-dg-cell>
-                        <clr-dg-cell [hidden]="poolRadio!=='table1'">{{formatArry(item.serviceLevelName)}}</clr-dg-cell>
+                        <clr-dg-cell title="{{formatArry(item.serviceLevelName)}}" class="over_flow" [hidden]="poolRadio!=='table1'">{{formatArry(item.serviceLevelName)}}</clr-dg-cell>
                         <clr-dg-cell [hidden]="poolRadio!=='table1'">
                           {{item.raidLevel}}
                         </clr-dg-cell>
@@ -167,9 +167,9 @@
                           {{(item.subscribedCapacity/item.totalCapacity*100).toFixed(2)}}%
                         </clr-dg-cell>
 
-                        <clr-dg-cell [hidden]="poolRadio!=='table3'">{{item.maxLatency?item.maxLatency.toFixed(2):0.00}}</clr-dg-cell>
-                        <clr-dg-cell [hidden]="poolRadio!=='table3'">{{item.maxIops?item.maxIops.toFixed(1):0.0}}</clr-dg-cell>
-                        <clr-dg-cell [hidden]="poolRadio!=='table3'">{{item.maxBandwidth?item.maxBandwidth.toFixed(1):0.0}}</clr-dg-cell>
+                        <clr-dg-cell [hidden]="poolRadio!=='table3'">{{item.maxLatency!=null?item.maxLatency.toFixed(2):'--'}}</clr-dg-cell>
+                        <clr-dg-cell [hidden]="poolRadio!=='table3'">{{item.maxIops!=null?item.maxIops.toFixed(1):'--'}}</clr-dg-cell>
+                        <clr-dg-cell [hidden]="poolRadio!=='table3'">{{item.maxBandwidth!=null?item.maxBandwidth.toFixed(1):'--'}}</clr-dg-cell>
                       </clr-dg-row>
                       <clr-dg-footer>
                         <clr-dg-pagination #pagination [clrDgPageSize]="10" [clrDgTotalItems]="poolTotal">
@@ -235,7 +235,7 @@
                           <vol-pool-filter #volStoragePoolFilter (change)="volQueryChange(null, null, null);"></vol-pool-filter>
                         </clr-dg-filter>
                       </clr-dg-column>
-                      <clr-dg-column [hidden]="volumeRadio!=='table1'">
+                      <clr-dg-column  style="width: 150px" [hidden]="volumeRadio!=='table1'">
                         {{'storage.detail.volumes.serviceLevel' | translate}}
                         <clr-dg-filter [clrDgFilter]="volServiceLevelFilter">
                           <vol-serviceLevel-filter #volServiceLevelFilter (change)="volQueryChange(null, null, null);"></vol-serviceLevel-filter>
@@ -303,7 +303,7 @@
                           <span *ngIf="item.attached">{{'enum.status.mapped' | translate}}</span>
                         </clr-dg-cell>
                         <clr-dg-cell [hidden]="volumeRadio!=='table1'">{{item.storagePoolName}}</clr-dg-cell>
-                        <clr-dg-cell [hidden]="volumeRadio!=='table1'">{{item.serviceLevelName}}</clr-dg-cell>
+                        <clr-dg-cell title="{{item.serviceLevelName}}" class="over_flow" [hidden]="volumeRadio!=='table1'">{{item.serviceLevelName}}</clr-dg-cell>
 <!--                        <clr-dg-cell [hidden]="volumeRadio!=='table1'">-->
 <!--                          <span *ngIf="item.protectionStatus">{{'enum.status.protected' | translate}}</span>-->
 <!--                          <span *ngIf="!item.protectionStatus">{{'enum.status.unprotected' | translate}}</span>-->
@@ -487,7 +487,7 @@
                     <clr-datagrid [clrDgLoading]="dtreeIsLoading">
                       <clr-dg-column [clrDgField]="'name'">{{'storage.detail.dtrees.name' | translate}}</clr-dg-column>
                       <clr-dg-column [clrDgField]="'fsName'">{{'storage.detail.dtrees.ofs' | translate}}</clr-dg-column>
-                      <clr-dg-column [clrDgField]="'tierName'">{{'storage.detail.dtrees.osl' | translate}}</clr-dg-column>
+                      <clr-dg-column style="width: 250px" [clrDgField]="'tierName'">{{'storage.detail.dtrees.osl' | translate}}</clr-dg-column>
                       <clr-dg-column>
                         {{'storage.detail.dtrees.secMod' | translate}}
                         <clr-dg-filter [clrDgFilter]="dtreeSecModFilter">
@@ -505,7 +505,7 @@
                       <clr-dg-row  *clrDgItems="let item of dtrees" [clrDgItem]="item">
                         <clr-dg-cell class="over_flow">{{item.name}}</clr-dg-cell>
                         <clr-dg-cell class="over_flow">{{item.fsName}}</clr-dg-cell>
-                        <clr-dg-cell class="over_flow">{{item.tierName!=null?item.tierName!=''?item.tierName:'--':'--'}}</clr-dg-cell>
+                        <clr-dg-cell title="{{item.tierName!=null?item.tierName!=''?item.tierName:'--':'--'}}" class="over_flow">{{item.tierName!=null?item.tierName!=''?item.tierName:'--':'--'}}</clr-dg-cell>
                         <clr-dg-cell class="over_flow">
                           <span *ngIf="item.securityStyle=='mixed'">Mixed</span>
                           <span *ngIf="item.securityStyle=='native'">Native</span>
@@ -550,13 +550,13 @@
                         <clr-dg-column [clrDgField]="'sharePath'">{{'storage.detail.shares.sharePath' | translate}}</clr-dg-column>
                         <clr-dg-column [clrDgField]="'fsName'">{{'storage.detail.shares.ofs' | translate}}</clr-dg-column>
                         <clr-dg-column [clrDgField]="'owningDtreeName'">{{'storage.detail.shares.od' | translate}}</clr-dg-column>
-                        <clr-dg-column [clrDgField]="'tierName'">{{'storage.detail.shares.osl' | translate}}</clr-dg-column>
+                        <clr-dg-column style="width: 250px" [clrDgField]="'tierName'">{{'storage.detail.shares.osl' | translate}}</clr-dg-column>
                         <clr-dg-row  *clrDgItems="let item of shares" [clrDgItem]="item">
                           <clr-dg-cell class="over_flow">{{item.name}}</clr-dg-cell>
                           <clr-dg-cell class="over_flow">{{item.sharePath}}</clr-dg-cell>
                           <clr-dg-cell class="over_flow">{{item.fsName}}</clr-dg-cell>
-                          <clr-dg-cell class="over_flow">{{item.owningDtreeName!=null?item.owningDtreeName:'--'}}</clr-dg-cell>
-                          <clr-dg-cell class="over_flow">{{item.tierName!=null?item.tierName:'--'}}</clr-dg-cell>
+                          <clr-dg-cell class="over_flow">{{item.owningDtreeName!=null?item.owningDtreeName!=''?item.owningDtreeName:'--':'--'}}</clr-dg-cell>
+                          <clr-dg-cell title="{{item.tierName!=null?item.tierName:'--'}}" class="over_flow">{{item.tierName!=null?item.tierName!=''?item.tierName:'--':'--'}}</clr-dg-cell>
                         </clr-dg-row>
                         <clr-dg-footer>
                           <clr-dg-pagination #paginationST [clrDgPageSize]="10" [clrDgTotalItems]="shareTotal">

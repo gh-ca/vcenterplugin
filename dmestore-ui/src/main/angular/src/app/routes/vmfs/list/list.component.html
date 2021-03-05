@@ -75,7 +75,7 @@
         <device-filter #deviceFilter></device-filter>
       </clr-dg-filter>
     </clr-dg-column>
-    <clr-dg-column [hidden]="radioCheck!=='list'" [clrDgField]="'serviceLevelName'">
+    <clr-dg-column style="width: 250px;" [hidden]="radioCheck!=='list'" [clrDgField]="'serviceLevelName'">
       {{'vmfs.serviceLevelName' | translate}}
       <clr-dg-filter [clrDgFilter]="serviceLevelFilter">
         <serviceLevel-filter #serviceLevelFilter></serviceLevel-filter>
@@ -141,7 +141,7 @@
       <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='list'">{{formatCapacity(item.freeSpace, true)}}</clr-dg-cell>
       <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='list'">{{formatCapacity(item.reserveCapacity, true)}}</clr-dg-cell>
       <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='list'">{{item.device}}</clr-dg-cell>
-      <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='list'">{{item.serviceLevelName}}</clr-dg-cell>
+      <clr-dg-cell title="{{item.serviceLevelName}}" class="over_flow" [hidden]="radioCheck!=='list'">{{item.serviceLevelName}}</clr-dg-cell>
 <!--      <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='list'">-->
 <!--        <span *ngIf="item.vmfsProtected">-->
 <!--          <img src="./assets/images/icon-unprotected.svg">{{'vmfs.protectionStatus.protected' | translate}}-->
@@ -405,7 +405,7 @@
             <clr-select-container class="selectClass">
               <label style="color: #9F9F9F;">{{'vmfs.storageDevice' | translate}}</label>
               <select clrSelect  [(ngModel)]="form.storage_id" name="storage_id" (ngModelChange)="getStoragePoolsByStorId();" required>
-                <option *ngFor="let item of storageList" value="{{item.id}}">{{item.name}}</option>
+                <option *ngFor="let item of storageList" value="{{item.id}}">{{item.name+'('+item.ip+')'}}</option>
               </select>
               <clr-control-error>{{'validations.required' | translate}}</clr-control-error>
             </clr-select-container>
@@ -1001,7 +1001,7 @@
         <clr-input-container style="height: 4rem;">
           <label style="color: #9F9F9F;">{{'vmfs.expandSize' | translate}}</label>
           <div clrInput style="float: left;position: relative;">
-            <input clrInput min="0" style="width: 70%;border-bottom: none" type="number" [(ngModel)]="expandForm.vo_add_capacity" name="vo_add_capacity" 
+            <input clrInput min="0" style="width: 70%;border-bottom: none" type="number" [(ngModel)]="expandForm.vo_add_capacity" name="vo_add_capacity"
                    (blur)="expandOnblur();" required/>
             <select class="capacity" (change)="expandForm.vo_add_capacity = null;" [(ngModel)]="expandForm.capacityUnit" clrInput style="width: 30%;border: 1px solid #DDDDDD;position: absolute;bottom: 3px;"  name="capacityUnit" >
               <option value="TB">TB</option>
