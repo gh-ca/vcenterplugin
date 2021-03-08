@@ -111,7 +111,7 @@ export class NfsComponent implements OnInit {
   deduplicationShow = false; // 重复数据删除 true 支持 false 不支持
   compressionShow = false; // 数据压缩 true 支持 false 不支持
   latencyIsSelect = false; // 时延为下拉框
-
+  dorado= false;//是否是V6设备
   shareNameContainsCN = false; // 共享名称包含中文
 
   errMessage = '';
@@ -249,9 +249,7 @@ export class NfsComponent implements OnInit {
     });
   }
   modifyCommit(){
-    console.log('提交参数：');
     this.updateNfs.name=this.updateNfs.nfsName;
-    console.log(this.updateNfs);
     this.remoteSrv.updateNfs(this.updateNfs).subscribe((result: any) => {
       if (result.code === '200'){
         this.modifyShow = false;
@@ -339,6 +337,12 @@ export class NfsComponent implements OnInit {
       this.addCompressionShow();
       this.addDeduplicationShow();
       this.addLatencyChoose();
+      const storages=this.storageList.filter(item=>item.id==this.addForm.storagId);
+      this.dorado=storages[0].storageTypeShow.dorado;
+      //如果是v6就不显示自动扩容选项
+      if(this.dorado){
+        this.addForm.autoSizeEnable=undefined;
+      }
       // const storagePoolMap = this.storagePoolMap.filter(item => item.storageId == this.addForm.storagId);
 
       // const storagePoolList = storagePoolMap[0].storagePoolList;
