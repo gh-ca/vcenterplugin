@@ -18,7 +18,7 @@
 package com.huawei.vmware.util;
 
 
-import com.huawei.vmware.mo.DatacenterMO;
+import com.huawei.vmware.mo.DatacenterMoObj;
 import com.huawei.vmware.mo.DatastoreFile;
 import com.vmware.connection.helpers.builders.ObjectSpecBuilder;
 import com.vmware.connection.helpers.builders.PropertyFilterSpecBuilder;
@@ -247,7 +247,7 @@ public class VmwareContext {
             return null;
         }
 
-        DatacenterMO dcMo = datacenterVmwareMoFactory.build(this, tokens[0]);
+        DatacenterMoObj dcMo = datacenterVmwareMoFactory.build(this, tokens[0]);
         if (dcMo.getMor() == null) {
             logger.error("Unable to locate the datacenter specified in path: " + inventoryPath);
             return null;

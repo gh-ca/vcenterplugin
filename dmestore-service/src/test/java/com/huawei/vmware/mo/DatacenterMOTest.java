@@ -36,7 +36,7 @@ public class DatacenterMOTest {
     private ManagedObjectReference mor;
 
     @InjectMocks
-    private DatacenterMO datacenterMo;
+    private DatacenterMoObj datacenterMo;
 
     private VmwareClient vmwareClient;
 

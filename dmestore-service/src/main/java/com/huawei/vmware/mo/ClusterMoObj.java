@@ -37,8 +37,8 @@ import org.slf4j.LoggerFactory;
  * @author Administrator
  * @since 2020-12-11
  */
-public class ClusterMo extends BaseMo implements VmwareHypervisorHost {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ClusterMo.class);
+public class ClusterMoObj extends BaseMoObj implements VmwareHypervisorHost {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ClusterMoObj.class);
 
     private static final String VIRTUAL_MACHINE = "VirtualMachine";
 
@@ -56,7 +56,7 @@ public class ClusterMo extends BaseMo implements VmwareHypervisorHost {
      * @param context    context
      * @param morCluster morCluster
      */
-    public ClusterMo(VmwareContext context, ManagedObjectReference morCluster) {
+    public ClusterMoObj(VmwareContext context, ManagedObjectReference morCluster) {
         super(context, morCluster);
     }
 
@@ -96,7 +96,7 @@ public class ClusterMo extends BaseMo implements VmwareHypervisorHost {
         return false;
     }
 
-    private String getRestartPriorityForVm(VirtualMachineMo vmMo) throws Exception {
+    private String getRestartPriorityForVm(VirtualMachineMoObj vmMo) throws Exception {
         if (vmMo == null) {
             return null;
         }
@@ -128,7 +128,7 @@ public class ClusterMo extends BaseMo implements VmwareHypervisorHost {
     }
 
     @Override
-    public void setRestartPriorityForVm(VirtualMachineMo vmMo, String priority) throws Exception {
+    public void setRestartPriorityForVm(VirtualMachineMoObj vmMo, String priority) throws Exception {
         if (vmMo == null || StringUtil.isBlank(priority)) {
             return;
         }
@@ -170,14 +170,14 @@ public class ClusterMo extends BaseMo implements VmwareHypervisorHost {
             context.waitForTaskProgressDone(morTask);
         } else {
             LOGGER.error(
-                "Set restart priority failed for VM: " + vmMo.getName() + " due to " + TaskMo.getTaskFailureInfo(
+                "Set restart priority failed for VM: " + vmMo.getName() + " due to " + TaskMoObj.getTaskFailureInfo(
                     context, morTask));
         }
     }
 
     @Override
     public ManagedObjectReference getHyperHostDatacenter() throws Exception {
-        Pair<DatacenterMo, String> dcPair = DatacenterMo.getOwnerDatacenter(getContext(), getMor());
+        Pair<DatacenterMoObj, String> dcPair = DatacenterMoObj.getOwnerDatacenter(getContext(), getMor());
         return dcPair.first().getMor();
     }
 
@@ -192,12 +192,12 @@ public class ClusterMo extends BaseMo implements VmwareHypervisorHost {
     }
 
     @Override
-    public synchronized List<VirtualMachineMo> listVmsOnHyperHost(String vmName) throws Exception {
-        List<VirtualMachineMo> vms = new ArrayList<>();
+    public synchronized List<VirtualMachineMoObj> listVmsOnHyperHost(String vmName) throws Exception {
+        List<VirtualMachineMoObj> vms = new ArrayList<>();
         List<ManagedObjectReference> hosts = context.getVimClient().getDynamicProperty(mor, HOST_PROPERTY);
         if (hosts != null && hosts.size() > 0) {
             for (ManagedObjectReference morHost : hosts) {
-                HostMo hostMo = hostFactory.build(context, morHost);
+                HostMoObj hostMo = hostFactory.build(context, morHost);
                 vms.addAll(hostMo.listVmsOnHyperHost(vmName));
             }
         }
@@ -205,7 +205,7 @@ public class ClusterMo extends BaseMo implements VmwareHypervisorHost {
     }
 
     @Override
-    public VirtualMachineMo findVmOnHyperHost(String name) throws Exception {
+    public VirtualMachineMoObj findVmOnHyperHost(String name) throws Exception {
         int key = getCustomFieldKey(VIRTUAL_MACHINE, CustomFieldConstants.CLOUD_VM_INTERNAL_NAME);
         String instanceNameCustomField = "value[" + key + "]";
         ObjectContent[] ocs = getVmPropertiesOnHyperHost(new String[] {"name", instanceNameCustomField});
@@ -311,7 +311,7 @@ public class ClusterMo extends BaseMo implements VmwareHypervisorHost {
         List<ManagedObjectReference> hosts = context.getVimClient().getDynamicProperty(mor, HOST_PROPERTY);
         if (hosts != null && hosts.size() > 0) {
             for (ManagedObjectReference morHost : hosts) {
-                HostMo hostMo = new HostMo(context, morHost);
+                HostMoObj hostMo = new HostMoObj(context, morHost);
                 hostMo.unmountDatastore(datastoremo);
             }
         }
@@ -322,7 +322,7 @@ public class ClusterMo extends BaseMo implements VmwareHypervisorHost {
         throws Exception {
         List<ManagedObjectReference> hosts = context.getVimClient().getDynamicProperty(mor, HOST_PROPERTY);
         if (hosts != null && hosts.size() > 0) {
-            return new HostMo(context, hosts.get(0)).getHyperHostNetworkSummary(esxServiceConsolePort);
+            return new HostMoObj(context, hosts.get(0)).getHyperHostNetworkSummary(esxServiceConsolePort);
         }
         return null;
     }

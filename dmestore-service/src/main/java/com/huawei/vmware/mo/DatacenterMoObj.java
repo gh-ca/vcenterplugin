@@ -24,8 +24,8 @@ import java.util.List;
  * @since 2020-12-01
  *
  **/
-public class DatacenterMo extends BaseMo {
-    private static final Logger LOGGER = LoggerFactory.getLogger(DatacenterMo.class);
+public class DatacenterMoObj extends BaseMoObj {
+    private static final Logger LOGGER = LoggerFactory.getLogger(DatacenterMoObj.class);
     private static final String NAME = "name";
     private static final String DATACENTER_TYPE = "Datacenter";
 
@@ -35,7 +35,7 @@ public class DatacenterMo extends BaseMo {
      * @param context context
      * @param morDc morDc
      */
-    public DatacenterMo(VmwareContext context, ManagedObjectReference morDc) {
+    public DatacenterMoObj(VmwareContext context, ManagedObjectReference morDc) {
         super(context, morDc);
     }
 
@@ -46,7 +46,7 @@ public class DatacenterMo extends BaseMo {
      * @param dcName dcName
      * @throws Exception Exception
      */
-    public DatacenterMo(VmwareContext context, String dcName) throws Exception {
+    public DatacenterMoObj(VmwareContext context, String dcName) throws Exception {
         super(context, null);
 
         mor = this.context.getVimClient().getDecendentMoRef(this.context.getRootFolder(), DATACENTER_TYPE, dcName);
@@ -120,7 +120,7 @@ public class DatacenterMo extends BaseMo {
      * @return Pair
      * @throws Exception Exception
      */
-    public static Pair<DatacenterMo, String> getOwnerDatacenter(VmwareContext context, ManagedObjectReference morEntity)
+    public static Pair<DatacenterMoObj, String> getOwnerDatacenter(VmwareContext context, ManagedObjectReference morEntity)
         throws Exception {
         PropertySpec propertySpec = new PropertySpec();
         propertySpec.setType(DATACENTER_TYPE);
@@ -153,6 +153,6 @@ public class DatacenterMo extends BaseMo {
         assert ocs.get(0).getPropSet().get(0).getVal() != null;
 
         String dcName = ocs.get(0).getPropSet().get(0).getVal().toString();
-        return new Pair<>(new DatacenterMo(context, ocs.get(0).getObj()), dcName);
+        return new Pair<>(new DatacenterMoObj(context, ocs.get(0).getObj()), dcName);
     }
 }

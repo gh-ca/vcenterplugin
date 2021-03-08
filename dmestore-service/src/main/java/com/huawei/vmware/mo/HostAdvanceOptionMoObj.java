@@ -12,14 +12,14 @@ import java.util.List;
  * @author Administrator
  * @since 2020-12-11
  */
-public class HostAdvanceOptionMo extends BaseMo {
+public class HostAdvanceOptionMoObj extends BaseMoObj {
     /**
      * HostAdvanceOptionMO
      *
      * @param context context
      * @param morFirewallSystem morFirewallSystem
      */
-    public HostAdvanceOptionMo(VmwareContext context, ManagedObjectReference morFirewallSystem) {
+    public HostAdvanceOptionMoObj(VmwareContext context, ManagedObjectReference morFirewallSystem) {
         super(context, morFirewallSystem);
     }
 

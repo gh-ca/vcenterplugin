@@ -23,9 +23,9 @@ import java.util.List;
  * @author Administrator
  * @since 2020-12-11
  */
-public class DatastoreMo extends BaseMo {
+public class DatastoreMoObj extends BaseMoObj {
     private String name;
-    private Pair<DatacenterMo, String> ownerDc;
+    private Pair<DatacenterMoObj, String> ownerDc;
 
     /**
      * DatastoreMO
@@ -33,7 +33,7 @@ public class DatastoreMo extends BaseMo {
      * @param context context
      * @param morDatastore morDatastore
      */
-    public DatastoreMo(VmwareContext context, ManagedObjectReference morDatastore) {
+    public DatastoreMoObj(VmwareContext context, ManagedObjectReference morDatastore) {
         super(context, morDatastore);
     }
 
@@ -44,7 +44,7 @@ public class DatastoreMo extends BaseMo {
      * @param morType morType
      * @param morValue morValue
      */
-    public DatastoreMo(VmwareContext context, String morType, String morValue) {
+    public DatastoreMoObj(VmwareContext context, String morType, String morValue) {
         super(context, morType, morValue);
     }
 
@@ -55,7 +55,7 @@ public class DatastoreMo extends BaseMo {
      * @param dsName dsName
      * @throws Exception Exception
      */
-    public DatastoreMo(VmwareContext context, String dsName) throws Exception {
+    public DatastoreMoObj(VmwareContext context, String dsName) throws Exception {
         super(context, null);
         mor = this.context.getVimClient().getDecendentMoRef(this.context.getRootFolder(), "Datastore", dsName);
     }
@@ -125,7 +125,7 @@ public class DatastoreMo extends BaseMo {
      * @return Pair
      * @throws Exception Exception
      */
-    public Pair<DatacenterMo, String> getOwnerDatacenter() throws Exception {
+    public Pair<DatacenterMoObj, String> getOwnerDatacenter() throws Exception {
         if (ownerDc != null) {
             return ownerDc;
         }
@@ -165,7 +165,7 @@ public class DatastoreMo extends BaseMo {
         assert ocs.get(0).getObj() != null;
         assert ocs.get(0).getPropSet() != null;
         String dcName = ocs.get(0).getPropSet().get(0).getVal().toString();
-        ownerDc = new Pair<>(new DatacenterMo(context, ocs.get(0).getObj()), dcName);
+        ownerDc = new Pair<>(new DatacenterMoObj(context, ocs.get(0).getObj()), dcName);
         return ownerDc;
     }
 
@@ -195,7 +195,7 @@ public class DatastoreMo extends BaseMo {
         ManagedObjectReference morDestDs, String destFilePath, ManagedObjectReference morDestDc, boolean forceOverwrite)
         throws Exception {
         String srcDsName = getName();
-        DatastoreMo destDsMo = new DatastoreMo(context, morDestDs);
+        DatastoreMoObj destDsMo = new DatastoreMoObj(context, morDestDs);
         String destDsName = destDsMo.getName();
 
         ManagedObjectReference morFileManager = context.getServiceContent().getFileManager();

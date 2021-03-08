@@ -50,7 +50,7 @@ public class VirtualMachineMOTest {
     private VimPortType service;
 
     @InjectMocks
-    private VirtualMachineMO virtualMachineMO;
+    private VirtualMachineMoObj virtualMachineMO;
 
     @Before
     public void setUp() throws Exception {

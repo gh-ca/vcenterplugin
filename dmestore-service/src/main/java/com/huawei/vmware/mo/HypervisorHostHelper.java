@@ -23,8 +23,8 @@ public class HypervisorHostHelper {
      * @param instanceNameCustomField instanceNameCustomField
      * @return VirtualMachineMO
      */
-    public static VirtualMachineMO findVmFromObjectContent(VmwareContext context, ObjectContent[] ocs, String name,
-                                                           String instanceNameCustomField) {
+    public static VirtualMachineMoObj findVmFromObjectContent(VmwareContext context, ObjectContent[] ocs, String name,
+                                                              String instanceNameCustomField) {
         if (ocs != null && ocs.length > 0) {
             for (ObjectContent oc : ocs) {
                 String vmNameInvCenter = null;
@@ -41,7 +41,7 @@ public class HypervisorHostHelper {
                         }
                         if ((vmNameInvCenter != null && name.equalsIgnoreCase(vmNameInvCenter)) || (
                             vmInternalCsName != null && name.equalsIgnoreCase(vmInternalCsName))) {
-                            VirtualMachineMO vmMo = new VirtualMachineMO(context, oc.getObj());
+                            VirtualMachineMoObj vmMo = new VirtualMachineMoObj(context, oc.getObj());
                             return vmMo;
                         }
                     }

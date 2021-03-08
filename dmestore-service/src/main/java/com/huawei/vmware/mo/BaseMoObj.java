@@ -12,7 +12,7 @@ import com.vmware.vim25.ManagedObjectReference;
  * @author Administrator
  * @since 2020-12-11
  */
-public class BaseMo {
+public class BaseMoObj {
     protected VmwareContext context;
     protected ManagedObjectReference mor;
 
@@ -24,7 +24,7 @@ public class BaseMo {
      * @param context context
      * @param mor mor
      */
-    public BaseMo(VmwareContext context, ManagedObjectReference mor) {
+    public BaseMoObj(VmwareContext context, ManagedObjectReference mor) {
         assert context != null;
 
         this.context = context;
@@ -38,7 +38,7 @@ public class BaseMo {
      * @param morType morType
      * @param morValue morValue
      */
-    public BaseMo(VmwareContext context, String morType, String morValue) {
+    public BaseMoObj(VmwareContext context, String morType, String morValue) {
         assert context != null;
         assert morType != null;
         assert morValue != null;
@@ -95,7 +95,7 @@ public class BaseMo {
      * @throws Exception Exception
      */
     public void setCustomFieldValue(String fieldName, String value) throws Exception {
-        CustomFieldsManagerMo cfmMo = new CustomFieldsManagerMo(context,
+        CustomFieldsManagerMoObj cfmMo = new CustomFieldsManagerMoObj(context,
             context.getServiceContent().getCustomFieldsManager());
         int key = getCustomFieldKey(fieldName);
         if (key == 0) {
@@ -136,7 +136,7 @@ public class BaseMo {
     public int getCustomFieldKey(String morType, String fieldName) throws Exception {
         assert morType != null;
 
-        CustomFieldsManagerMo cfmMo = new CustomFieldsManagerMo(context,
+        CustomFieldsManagerMoObj cfmMo = new CustomFieldsManagerMoObj(context,
             context.getServiceContent().getCustomFieldsManager());
 
         return cfmMo.getCustomFieldKey(morType, fieldName);

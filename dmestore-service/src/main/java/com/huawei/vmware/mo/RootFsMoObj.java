@@ -14,14 +14,14 @@ import java.util.List;
  * @author Administrator
  * @since 2020-12-11
  */
-public class RootFsMo extends BaseMo {
+public class RootFsMoObj extends BaseMoObj {
     /**
      * RootFsMO
      *
      * @param context context
      * @param mor     mor
      */
-    public RootFsMo(VmwareContext context, ManagedObjectReference mor) {
+    public RootFsMoObj(VmwareContext context, ManagedObjectReference mor) {
         super(context, mor);
     }
 
@@ -73,12 +73,12 @@ public class RootFsMo extends BaseMo {
      * @return HostMO
      * @throws Exception Exception
      */
-    public HostMo findHostById(String id) throws Exception {
-        HostMo objmo = null;
+    public HostMoObj findHostById(String id) throws Exception {
+        HostMoObj objmo = null;
         List<Pair<ManagedObjectReference, String>> objs = getAllHostOnRootFs();
         if (objs != null && objs.size() > 0) {
             for (Pair<ManagedObjectReference, String> obj : objs) {
-                HostMo submo = new HostMo(context, obj.first());
+                HostMoObj submo = new HostMoObj(context, obj.first());
                 if (id.equals(submo.getMor().getValue())) {
                     objmo = submo;
                     break;
@@ -95,12 +95,12 @@ public class RootFsMo extends BaseMo {
      * @return ClusterMO
      * @throws Exception Exception
      */
-    public ClusterMo findClusterById(String id) throws Exception {
-        ClusterMo objmo = null;
+    public ClusterMoObj findClusterById(String id) throws Exception {
+        ClusterMoObj objmo = null;
         List<Pair<ManagedObjectReference, String>> objs = getAllClusterOnRootFs();
         if (objs != null && objs.size() > 0) {
             for (Pair<ManagedObjectReference, String> obj : objs) {
-                ClusterMo submo = new ClusterMo(context, obj.first());
+                ClusterMoObj submo = new ClusterMoObj(context, obj.first());
                 if (id.equals(submo.getMor().getValue())) {
                     objmo = submo;
                     break;
