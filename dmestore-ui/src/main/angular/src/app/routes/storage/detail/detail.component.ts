@@ -275,15 +275,18 @@ export class DetailComponent implements OnInit, AfterViewInit {
   }
 
   changeTab(page: string){
-   // this.gs.loading = false;
+   console.log('点击：',page);
     if (page === 'conf'){
       this.poolRadio='table1';
       this.getStorageDetail(false);
     }
     if (page === 'pool'){
+      this.poolRadio='table1';
+      this.cdr.detectChanges();
       this.getStoragePoolList(false);
     }
     if (page === 'volume'){
+      //this.volumeRadio='table1';
       this.getStorageVolumeList(false);
     }
     if (page === 'fs'){
