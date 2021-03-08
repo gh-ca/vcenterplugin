@@ -32,8 +32,8 @@ import java.util.List;
  * @author Administrator
  * @since 2020-12-11
  */
-public class HostDatastoreSystemMO extends BaseMO {
-    private static final Logger LOG = LoggerFactory.getLogger(HostDatastoreSystemMO.class);
+public class HostDatastoreSystemMoObj extends BaseMoObj {
+    private static final Logger LOG = LoggerFactory.getLogger(HostDatastoreSystemMoObj.class);
 
     /**
      * HostDatastoreSystemMO
@@ -41,7 +41,7 @@ public class HostDatastoreSystemMO extends BaseMO {
      * @param context context
      * @param morHostDatastore morHostDatastore
      */
-    public HostDatastoreSystemMO(VmwareContext context, ManagedObjectReference morHostDatastore) {
+    public HostDatastoreSystemMoObj(VmwareContext context, ManagedObjectReference morHostDatastore) {
         super(context, morHostDatastore);
     }
 
@@ -52,7 +52,7 @@ public class HostDatastoreSystemMO extends BaseMO {
      * @return List
      * @throws Exception Exception
      */
-    public List<VmfsDatastoreOption> queryVmfsDatastoreExpandOptions(DatastoreMO datastoreMo) throws Exception {
+    public List<VmfsDatastoreOption> queryVmfsDatastoreExpandOptions(DatastoreMoObj datastoreMo) throws Exception {
         return context.getService().queryVmfsDatastoreExpandOptions(mor, datastoreMo.getMor());
     }
 
@@ -63,7 +63,7 @@ public class HostDatastoreSystemMO extends BaseMO {
      * @param vmfsDatastoreExpandSpec vmfsDatastoreExpandSpec
      * @throws Exception Exception
      */
-    public void expandVmfsDatastore(DatastoreMO datastoreMo, VmfsDatastoreExpandSpec vmfsDatastoreExpandSpec)
+    public void expandVmfsDatastore(DatastoreMoObj datastoreMo, VmfsDatastoreExpandSpec vmfsDatastoreExpandSpec)
         throws Exception {
         context.getService().expandVmfsDatastore(mor, datastoreMo.getMor(), vmfsDatastoreExpandSpec);
     }

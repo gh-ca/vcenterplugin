@@ -1,6 +1,6 @@
 package com.huawei.vmware.util;
 
-import com.huawei.vmware.mo.DatastoreMO;
+import com.huawei.vmware.mo.DatastoreMoObj;
 
 import com.vmware.vim25.ManagedObjectReference;
 
@@ -41,7 +41,7 @@ public class DatastoreVmwareMoFactory {
      * @return DatastoreMO
      * @throws Exception Exception
      */
-    public DatastoreMO build(VmwareContext context, ManagedObjectReference morDatastore) throws Exception {
-        return new DatastoreMO(context, morDatastore);
+    public DatastoreMoObj build(VmwareContext context, ManagedObjectReference morDatastore) throws Exception {
+        return new DatastoreMoObj(context, morDatastore);
     }
 }

@@ -37,7 +37,7 @@ public class RootFsMOTest {
     private VimPortType service;
 
     @InjectMocks
-    private RootFsMO rootFsMO;
+    private RootFsMoObj rootFsMO;
 
     @Before
     public void setUp() throws Exception {

@@ -79,7 +79,7 @@ public interface VmwareHypervisorHost {
      * @param priority .
      * @throws Exception .
      */
-    void setRestartPriorityForVm(VirtualMachineMO vmMo, String priority)
+    void setRestartPriorityForVm(VirtualMachineMoObj vmMo, String priority)
         throws Exception;
 
 
@@ -114,7 +114,7 @@ public interface VmwareHypervisorHost {
      * @return List<VirtualMachineMO>.
      * @throws Exception .
      */
-    List<VirtualMachineMO> listVmsOnHyperHost(String name) throws Exception;
+    List<VirtualMachineMoObj> listVmsOnHyperHost(String name) throws Exception;
 
     /**
      * findVmOnHyperHost.
@@ -123,7 +123,7 @@ public interface VmwareHypervisorHost {
      * @return VirtualMachineMO.
      * @throws Exception .
      */
-    VirtualMachineMO findVmOnHyperHost(String name) throws Exception;
+    VirtualMachineMoObj findVmOnHyperHost(String name) throws Exception;
 
     /**
      * getVmPropertiesOnHyperHost.

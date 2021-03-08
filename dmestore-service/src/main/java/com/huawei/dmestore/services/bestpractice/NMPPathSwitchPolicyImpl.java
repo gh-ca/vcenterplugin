@@ -3,8 +3,8 @@ package com.huawei.dmestore.services.bestpractice;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.huawei.dmestore.utils.VCSDKUtils;
-import com.huawei.vmware.mo.HostMO;
-import com.huawei.vmware.mo.HostStorageSystemMO;
+import com.huawei.vmware.mo.HostMoObj;
+import com.huawei.vmware.mo.HostStorageSystemMoObj;
 import com.huawei.vmware.util.VmwareContext;
 import com.vmware.vim25.*;
 
@@ -85,8 +85,8 @@ public class NMPPathSwitchPolicyImpl extends BaseBestPracticeService implements 
         }
         ManagedObjectReference mor = vcsdkUtils.getVcConnectionHelper().objectId2Mor(objectId);
         VmwareContext context = vcsdkUtils.getVcConnectionHelper().getServerContext(objectId);
-        HostMO hostMo = this.getHostMoFactory().build(context, mor);
-        HostStorageSystemMO hostStorageSystemMo = hostMo.getHostStorageSystemMo();
+        HostMoObj hostMo = this.getHostMoFactory().build(context, mor);
+        HostStorageSystemMoObj hostStorageSystemMo = hostMo.getHostStorageSystemMo();
         List<HostMultipathInfoLogicalUnit> lunList = getLuns(vcsdkUtils, objectId);
         if (lunList != null && lunList.size() > 0) {
             ExecutorService executor = Executors.newFixedThreadPool(lunList.size());
@@ -112,8 +112,8 @@ public class NMPPathSwitchPolicyImpl extends BaseBestPracticeService implements 
     private List<HostMultipathInfoLogicalUnit> getLuns(VCSDKUtils vcsdkUtils, String objectId) throws Exception {
         ManagedObjectReference mor = vcsdkUtils.getVcConnectionHelper().objectId2Mor(objectId);
         VmwareContext context = vcsdkUtils.getVcConnectionHelper().getServerContext(objectId);
-        HostMO hostMo = this.getHostMoFactory().build(context, mor);
-        HostStorageSystemMO hostStorageSystemMo = hostMo.getHostStorageSystemMo();
+        HostMoObj hostMo = this.getHostMoFactory().build(context, mor);
+        HostStorageSystemMoObj hostStorageSystemMo = hostMo.getHostStorageSystemMo();
         HostStorageDeviceInfo deviceInfo = hostStorageSystemMo.getStorageDeviceInfo();
         HostMultipathInfo hostMultipathInfo = deviceInfo.getMultipathInfo();
         List<HostMultipathInfoLogicalUnit> lunList = hostMultipathInfo.getLun();

@@ -15,32 +15,32 @@ public class BaseSmartQos {
     /**
      * latency .
      */
-    private Integer latency;
+    private int latency;
 
     /**
      * maxbandwidth .
      */
-    private Integer maxbandwidth;
+    private int maxbandwidth;
 
     /**
      * maxiops .
      */
-    private Integer maxiops;
+    private int maxiops;
 
     /**
      * minbandwidth .
      */
-    private Integer minbandwidth;
+    private int minbandwidth;
 
     /**
      * miniops .
      */
-    private Integer miniops;
+    private int miniops;
 
     /**
      * enabled .
      */
-    private Boolean enabled;
+    private boolean enabled;
 
     /**
      * latencyUnit .
@@ -70,7 +70,7 @@ public class BaseSmartQos {
      *
      * @return .
      */
-    public Boolean getEnabled() {
+    public boolean getEnabled() {
         return enabled;
     }
 
@@ -79,7 +79,7 @@ public class BaseSmartQos {
      *
      * @param param .
      */
-    public void setEnabled(final Boolean param) {
+    public void isEnabled(final boolean param) {
         this.enabled = param;
     }
 
@@ -106,7 +106,7 @@ public class BaseSmartQos {
      *
      * @return .
      */
-    public Integer getLatency() {
+    public int getLatency() {
         return latency;
     }
 
@@ -115,7 +115,7 @@ public class BaseSmartQos {
      *
      * @param param .
      */
-    public void setLatency(final Integer param) {
+    public void setLatency(final int param) {
         this.latency = param;
     }
 
@@ -124,7 +124,7 @@ public class BaseSmartQos {
      *
      * @return .
      */
-    public Integer getMaxbandwidth() {
+    public int getMaxbandwidth() {
         return maxbandwidth;
     }
 
@@ -133,7 +133,7 @@ public class BaseSmartQos {
      *
      * @param param .
      */
-    public void setMaxbandwidth(final Integer param) {
+    public void setMaxbandwidth(final int param) {
         this.maxbandwidth = param;
     }
 
@@ -142,7 +142,7 @@ public class BaseSmartQos {
      *
      * @return .
      */
-    public Integer getMaxiops() {
+    public int getMaxiops() {
         return maxiops;
     }
 
@@ -151,7 +151,7 @@ public class BaseSmartQos {
      *
      * @param param .
      */
-    public void setMaxiops(final Integer param) {
+    public void setMaxiops(final int param) {
         this.maxiops = param;
     }
 
@@ -160,7 +160,7 @@ public class BaseSmartQos {
      *
      * @return .
      */
-    public Integer getMinbandwidth() {
+    public int getMinbandwidth() {
         return minbandwidth;
     }
 
@@ -169,7 +169,7 @@ public class BaseSmartQos {
      *
      * @param param .
      */
-    public void setMinbandwidth(final Integer param) {
+    public void setMinbandwidth(final int param) {
         this.minbandwidth = param;
     }
 
@@ -178,7 +178,7 @@ public class BaseSmartQos {
      *
      * @return .
      */
-    public Integer getMiniops() {
+    public int getMiniops() {
         return miniops;
     }
 
@@ -187,7 +187,7 @@ public class BaseSmartQos {
      *
      * @param param .
      */
-    public void setMiniops(final Integer param) {
+    public void setMiniops(final int param) {
         this.miniops = param;
     }
 }

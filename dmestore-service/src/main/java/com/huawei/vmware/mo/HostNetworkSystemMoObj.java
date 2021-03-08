@@ -13,14 +13,14 @@ import com.vmware.vim25.ManagedObjectReference;
  * @author Administrator
  * @since 2020-12-11
  */
-public class HostNetworkSystemMO extends BaseMO {
+public class HostNetworkSystemMoObj extends BaseMoObj {
     /**
      * HostNetworkSystemMO
      *
      * @param context context
      * @param morNetworkSystem morNetworkSystem
      */
-    public HostNetworkSystemMO(VmwareContext context, ManagedObjectReference morNetworkSystem) {
+    public HostNetworkSystemMoObj(VmwareContext context, ManagedObjectReference morNetworkSystem) {
         super(context, morNetworkSystem);
     }
 

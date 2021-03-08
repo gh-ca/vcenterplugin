@@ -14,8 +14,8 @@ import org.slf4j.LoggerFactory;
  * @author Administrator
  * @since 2020-12-11
  */
-public class TaskMO extends BaseMO {
-    private static final Logger logger = LoggerFactory.getLogger(TaskMO.class);
+public class TaskMoObj extends BaseMoObj {
+    private static final Logger logger = LoggerFactory.getLogger(TaskMoObj.class);
 
     /**
      * TaskMO
@@ -23,7 +23,7 @@ public class TaskMO extends BaseMO {
      * @param context context
      * @param morTask morTask
      */
-    public TaskMO(VmwareContext context, ManagedObjectReference morTask) {
+    public TaskMoObj(VmwareContext context, ManagedObjectReference morTask) {
         super(context, morTask);
     }
 

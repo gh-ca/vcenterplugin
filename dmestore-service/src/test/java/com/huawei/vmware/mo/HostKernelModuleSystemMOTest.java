@@ -35,7 +35,7 @@ public class HostKernelModuleSystemMOTest {
     private VimPortType service;
 
     @InjectMocks
-    private HostKernelModuleSystemMO hostKernelModuleSystemMO;
+    private HostKernelModuleSystemMoObj hostKernelModuleSystemMO;
 
     @Before
     public void setUp() throws Exception {

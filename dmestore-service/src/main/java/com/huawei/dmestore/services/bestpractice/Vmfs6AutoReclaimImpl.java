@@ -2,8 +2,8 @@ package com.huawei.dmestore.services.bestpractice;
 
 import com.huawei.dmestore.constant.DmeConstants;
 import com.huawei.dmestore.utils.VCSDKUtils;
-import com.huawei.vmware.mo.DatastoreMO;
-import com.huawei.vmware.mo.HostMO;
+import com.huawei.vmware.mo.DatastoreMoObj;
+import com.huawei.vmware.mo.HostMoObj;
 import com.huawei.vmware.util.Pair;
 import com.huawei.vmware.util.VmwareContext;
 
@@ -20,6 +20,9 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Vmfs6AutoReclaimImpl
  *
@@ -27,6 +30,8 @@ import java.util.concurrent.Executors;
  * @since 2020-11-30
  **/
 public class Vmfs6AutoReclaimImpl extends BaseBestPracticeService implements BestPracticeService {
+    protected final Logger logger = LoggerFactory.getLogger(BaseBestPracticeService.class);
+
     @Override
     public String getHostSetting() {
         return "VMFS-6 Auto Reclaim";
@@ -90,12 +95,12 @@ public class Vmfs6AutoReclaimImpl extends BaseBestPracticeService implements Bes
     private List<VmfsDatastoreInfo> getVmfs6DatastoreInfo(VCSDKUtils vcsdkUtils, String objectId) throws Exception {
         ManagedObjectReference mor = vcsdkUtils.getVcConnectionHelper().objectId2Mor(objectId);
         VmwareContext context = vcsdkUtils.getVcConnectionHelper().getServerContext(objectId);
-        HostMO hostMo = this.getHostMoFactory().build(context, mor);
+        HostMoObj hostMo = this.getHostMoFactory().build(context, mor);
         List<VmfsDatastoreInfo> list = new ArrayList<>();
         List<Pair<ManagedObjectReference, String>> datastoreMountsOnHost = hostMo.getDatastoreMountsOnHost();
         for (Pair<ManagedObjectReference, String> pair : datastoreMountsOnHost) {
             ManagedObjectReference dsMor = pair.first();
-            DatastoreMO datastoreMo = this.getDatastoreMoFactory().build(context, dsMor);
+            DatastoreMoObj datastoreMo = this.getDatastoreMoFactory().build(context, dsMor);
             DatastoreSummary summary = datastoreMo.getSummary();
             if (summary.getType().equalsIgnoreCase(DmeConstants.STORE_TYPE_VMFS)) {
                 VmfsDatastoreInfo vmfsDatastoreInfo = datastoreMo.getVmfsDatastoreInfo();
@@ -114,7 +119,7 @@ public class Vmfs6AutoReclaimImpl extends BaseBestPracticeService implements Bes
     public void update(VCSDKUtils vcsdkUtils, String objectId) throws Exception {
         ManagedObjectReference mor = vcsdkUtils.getVcConnectionHelper().objectId2Mor(objectId);
         VmwareContext context = vcsdkUtils.getVcConnectionHelper().getServerContext(objectId);
-        HostMO hostMo = this.getHostMoFactory().build(context, mor);
+        HostMoObj hostMo = this.getHostMoFactory().build(context, mor);
         List<VmfsDatastoreInfo> list = getVmfs6DatastoreInfo(vcsdkUtils, objectId);
         if (list.size() > 0) {
             ExecutorService executor = Executors.newFixedThreadPool(list.size());
@@ -127,7 +132,7 @@ public class Vmfs6AutoReclaimImpl extends BaseBestPracticeService implements Bes
                         try {
                             hostMo.getHostStorageSystemMo().updateVmfsUnmapPriority(uuid, (String) getRecommendValue());
                         } catch (Exception exception) {
-                            LOGGER.error("updateVmfsUnmapPriority error!hostObjectId={},vmfsName={}", objectId,
+                            logger.error("updateVmfsUnmapPriority error!hostObjectId={},vmfsName={}", objectId,
                                 hostVmfsVolume.getName());
                             exception.printStackTrace();
                         }

@@ -54,7 +54,7 @@ public class ClusterMOTest {
     private VimPortType service;
 
     @InjectMocks
-    ClusterMO clusterMO;
+    ClusterMoObj clusterMO;
 
     @Before
     public void setUp() throws Exception {
@@ -95,7 +95,7 @@ public class ClusterMOTest {
     public void setRestartPriorityForVm() throws Exception {
         String priority = "high";
         String vmName = "123";
-        VirtualMachineMO vmMo = mock(VirtualMachineMO.class);
+        VirtualMachineMoObj vmMo = mock(VirtualMachineMoObj.class);
         ManagedObjectReference vmMor = mock(ManagedObjectReference.class);
         when(vmMo.getMor()).thenReturn(vmMor);
         when(vmMor.getType()).thenReturn("VirtualMachine");
@@ -159,10 +159,10 @@ public class ClusterMOTest {
         hosts.add(host);
         when(vmwareClient.getDynamicProperty(anyObject(), eq("host"))).thenReturn(hosts);
 
-        HostMO hostMo = mock(HostMO.class);
+        HostMoObj hostMo = mock(HostMoObj.class);
         when(hostFactory.build(anyObject(), anyString())).thenReturn(hostMo);
-        List<VirtualMachineMO> vms = new ArrayList<>();
-        VirtualMachineMO vm = mock(VirtualMachineMO.class);
+        List<VirtualMachineMoObj> vms = new ArrayList<>();
+        VirtualMachineMoObj vm = mock(VirtualMachineMoObj.class);
         vms.add(vm);
         when(hostMo.listVmsOnHyperHost(vmName)).thenReturn(vms);
         try {

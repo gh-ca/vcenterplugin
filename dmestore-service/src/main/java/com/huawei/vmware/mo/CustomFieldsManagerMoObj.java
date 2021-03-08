@@ -13,14 +13,14 @@ import java.util.List;
  * @author Administrator
  * @since 2020-12-11
  */
-public class CustomFieldsManagerMO extends BaseMO {
+public class CustomFieldsManagerMoObj extends BaseMoObj {
     /**
      * CustomFieldsManagerMO
      *
      * @param context context
      * @param mor mor
      */
-    public CustomFieldsManagerMO(VmwareContext context, ManagedObjectReference mor) {
+    public CustomFieldsManagerMoObj(VmwareContext context, ManagedObjectReference mor) {
         super(context, mor);
     }
 

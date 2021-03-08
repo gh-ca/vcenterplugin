@@ -1,5 +1,6 @@
 package com.huawei.dmestore.task;
 
+import com.huawei.dmestore.exception.DmeException;
 import com.huawei.dmestore.services.DmeRelationInstanceService;
 
 import org.quartz.JobExecutionContext;
@@ -30,7 +31,7 @@ public class BackGroundRefreshResourceInstanceTask implements StatefulJob {
             ((DmeRelationInstanceService) obj).refreshResourceInstance();
             long end = System.currentTimeMillis();
             consume = end - start;
-        } catch (Exception e) {
+        } catch (DmeException e) {
             LOGGER.error("refreshResourceInstance error", e);
         }
         LOGGER.info("refreshResourceInstance end comsum:{}ms.", consume);

@@ -39,7 +39,7 @@ public class CustomFieldsManagerMOTest {
     private VimPortType service;
 
     @InjectMocks
-    private CustomFieldsManagerMO customFieldsManagerMO;
+    private CustomFieldsManagerMoObj customFieldsManagerMO;
 
     @Before
     public void setUp() throws Exception {

@@ -52,7 +52,7 @@ public class HostDatastoreSystemMOTest {
     private VimPortType service;
 
     @InjectMocks
-    private HostDatastoreSystemMO hostDatastoreSystemMO;
+    private HostDatastoreSystemMoObj hostDatastoreSystemMO;
 
     @Before
     public void setUp() throws Exception {
@@ -104,7 +104,7 @@ public class HostDatastoreSystemMOTest {
 
     @Test
     public void queryVmfsDatastoreExpandOptions() throws Exception {
-        DatastoreMO datastoreMo = mock(DatastoreMO.class);
+        DatastoreMoObj datastoreMo = mock(DatastoreMoObj.class);
         List<VmfsDatastoreOption> list = new ArrayList<>();
         when(service.queryVmfsDatastoreExpandOptions(anyObject(), anyObject())).thenReturn(list);
         hostDatastoreSystemMO.queryVmfsDatastoreExpandOptions(datastoreMo);
@@ -112,7 +112,7 @@ public class HostDatastoreSystemMOTest {
 
     @Test
     public void expandVmfsDatastore() throws Exception {
-        DatastoreMO datastoreMo = mock(DatastoreMO.class);
+        DatastoreMoObj datastoreMo = mock(DatastoreMoObj.class);
         VmfsDatastoreExpandSpec vmfsDatastoreExpandSpec = mock(VmfsDatastoreExpandSpec.class);
         when(service.expandVmfsDatastore(anyObject(), anyObject(), anyObject())).thenReturn(
             mock(ManagedObjectReference.class));

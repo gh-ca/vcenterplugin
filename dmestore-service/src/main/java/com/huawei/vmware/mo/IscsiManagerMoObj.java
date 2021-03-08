@@ -12,14 +12,14 @@ import java.util.List;
  * @author Administrator
  * @since 2020-12-11
  */
-public class IscsiManagerMO extends BaseMO {
+public class IscsiManagerMoObj extends BaseMoObj {
     /**
      * IscsiManagerMO
      *
      * @param context context
      * @param morFirewallSystem morFirewallSystem
      */
-    public IscsiManagerMO(VmwareContext context, ManagedObjectReference morFirewallSystem) {
+    public IscsiManagerMoObj(VmwareContext context, ManagedObjectReference morFirewallSystem) {
         super(context, morFirewallSystem);
     }
 

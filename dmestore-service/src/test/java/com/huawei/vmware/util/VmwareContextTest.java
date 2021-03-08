@@ -4,7 +4,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
-import com.huawei.vmware.mo.DatacenterMO;
+import com.huawei.vmware.mo.DatacenterMoObj;
+
 import com.vmware.vim25.ManagedObjectReference;
 import com.vmware.vim25.TaskInfo;
 
@@ -30,14 +31,14 @@ public class VmwareContextTest {
     @Mock
     VmwareClient vimClient;
     ManagedObjectReference managedObjectReference;
-    DatacenterMO datacenterMO;
+    DatacenterMoObj datacenterMO;
 
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
         managedObjectReference = spy(ManagedObjectReference.class);
         managedObjectReference.setValue("321");
-        datacenterMO = mock(DatacenterMO.class);
+        datacenterMO = mock(DatacenterMoObj.class);
         vimClient = mock(VmwareClient.class);
     }
 
