@@ -423,7 +423,7 @@
               <option value="true">{{'nfs.enable' | translate}}</option>
             </select>
           </clr-select-container>
-          <clr-toggle-wrapper >
+          <clr-toggle-wrapper *ngIf="!dorado" >
             <label>{{'nfs.capAuto' | translate}}</label>
             <input type="checkbox" clrToggle [(ngModel)]="addForm.autoSizeEnable" name="autoSizeEnable"/>
           </clr-toggle-wrapper>
