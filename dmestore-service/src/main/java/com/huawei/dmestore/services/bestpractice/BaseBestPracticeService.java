@@ -1,8 +1,8 @@
 package com.huawei.dmestore.services.bestpractice;
 
 import com.huawei.dmestore.utils.VCSDKUtils;
-import com.huawei.vmware.mo.HostAdvanceOptionMoObj;
-import com.huawei.vmware.mo.HostMoObj;
+import com.huawei.vmware.mo.HostAdvanceOptionMo;
+import com.huawei.vmware.mo.HostMo;
 import com.huawei.vmware.util.DatastoreVmwareMoFactory;
 import com.huawei.vmware.util.HostVmwareFactory;
 import com.huawei.vmware.util.VmwareContext;
@@ -60,7 +60,7 @@ public class BaseBestPracticeService {
         if (check(vcsdkUtils, objectId, hostSetting, recommendValue)) {
             return;
         }
-        HostMoObj hostMo = this.getHostMoFactory().build(context, mor);
+        HostMo hostMo = this.getHostMoFactory().build(context, mor);
         List<OptionValue> values = hostMo.getHostAdvanceOptionMo().queryOptions(hostSetting);
         for (OptionValue value : values) {
             value.setValue(recommendValue);
@@ -82,8 +82,8 @@ public class BaseBestPracticeService {
                                      final String hostSetting) throws Exception {
         ManagedObjectReference mor = vcsdkUtils.getVcConnectionHelper().objectId2Mor(objectId);
         VmwareContext context = vcsdkUtils.getVcConnectionHelper().getServerContext(objectId);
-        HostMoObj hostMo = this.getHostMoFactory().build(context, mor);
-        HostAdvanceOptionMoObj hostAdvanceOptionMo = hostMo.getHostAdvanceOptionMo();
+        HostMo hostMo = this.getHostMoFactory().build(context, mor);
+        HostAdvanceOptionMo hostAdvanceOptionMo = hostMo.getHostAdvanceOptionMo();
         List<OptionValue> values = hostAdvanceOptionMo.queryOptions(hostSetting);
         for (OptionValue value : values) {
             return value.getValue();
@@ -124,7 +124,7 @@ public class BaseBestPracticeService {
         throws Exception {
         ManagedObjectReference mor = vcsdkUtils.getVcConnectionHelper().objectId2Mor(objectId);
         VmwareContext context = vcsdkUtils.getVcConnectionHelper().getServerContext(objectId);
-        HostMoObj hostMo = this.getHostMoFactory().build(context, mor);
+        HostMo hostMo = this.getHostMoFactory().build(context, mor);
         String modlueOption = hostMo.getHostKernelModuleSystemMo().queryConfiguredModuleOptionString(moduleName);
         String[] modlues = modlueOption.split("=");
         return modlues[1];
@@ -147,7 +147,7 @@ public class BaseBestPracticeService {
         }
         ManagedObjectReference mor = vcsdkUtils.getVcConnectionHelper().objectId2Mor(objectId);
         VmwareContext context = vcsdkUtils.getVcConnectionHelper().getServerContext(objectId);
-        HostMoObj hostMo = this.getHostMoFactory().build(context, mor);
+        HostMo hostMo = this.getHostMoFactory().build(context, mor);
         String options = optionName + "=" + recommendValue;
         hostMo.getHostKernelModuleSystemMo().updateModuleOptionString(moduleName, options);
         hostMo.getHostStorageSystemMo().refreshStorageSystem();

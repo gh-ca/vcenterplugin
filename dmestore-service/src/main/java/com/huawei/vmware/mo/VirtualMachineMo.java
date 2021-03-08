@@ -40,8 +40,8 @@ import java.util.Map;
  * @author xxxx
  * @since 2020-12-11
  **/
-public class VirtualMachineMoObj extends BaseMoObj {
-    private static final Logger logger = LoggerFactory.getLogger(VirtualMachineMoObj.class);
+public class VirtualMachineMo extends BaseMo {
+    private static final Logger logger = LoggerFactory.getLogger(VirtualMachineMo.class);
 
     private final String configDeviceStr = "config.hardware.device";
 
@@ -57,7 +57,7 @@ public class VirtualMachineMoObj extends BaseMoObj {
      * @param context context
      * @param morVm   morVm
      */
-    public VirtualMachineMoObj(VmwareContext context, ManagedObjectReference morVm) {
+    public VirtualMachineMo(VmwareContext context, ManagedObjectReference morVm) {
         super(context, morVm);
     }
 
@@ -67,8 +67,8 @@ public class VirtualMachineMoObj extends BaseMoObj {
      * @return Pair
      * @throws Exception Exception
      */
-    public Pair<DatacenterMoObj, String> getOwnerDatacenter() throws Exception {
-        return DatacenterMoObj.getOwnerDatacenter(context, mor);
+    public Pair<DatacenterMo, String> getOwnerDatacenter() throws Exception {
+        return DatacenterMo.getOwnerDatacenter(context, mor);
     }
 
     /**
@@ -77,9 +77,9 @@ public class VirtualMachineMoObj extends BaseMoObj {
      * @return HostMO
      * @throws Exception Exception
      */
-    public HostMoObj getRunningHost() throws Exception {
+    public HostMo getRunningHost() throws Exception {
         VirtualMachineRuntimeInfo runtimeInfo = getRuntimeInfo();
-        return new HostMoObj(context, runtimeInfo.getHost());
+        return new HostMo(context, runtimeInfo.getHost());
     }
 
     /**
@@ -200,7 +200,7 @@ public class VirtualMachineMoObj extends BaseMoObj {
 
         if (!result) {
             throw new Exception(
-                "Unable to create disk " + vmdkDatastorePath + " due to " + TaskMoObj.getTaskFailureInfo(context,
+                "Unable to create disk " + vmdkDatastorePath + " due to " + TaskMo.getTaskFailureInfo(context,
                     morTask));
         }
 
@@ -295,7 +295,7 @@ public class VirtualMachineMoObj extends BaseMoObj {
      * @throws Exception Exception
      */
     public Pair<VmdkFileDescriptor, byte[]> getVmdkFileInfo(String vmdkDatastorePath) throws Exception {
-        Pair<DatacenterMoObj, String> dcPair = getOwnerDatacenter();
+        Pair<DatacenterMo, String> dcPair = getOwnerDatacenter();
         String url = context.composeDatastoreBrowseUrl(dcPair.second(), vmdkDatastorePath);
         byte[] content = context.getResourceContent(url);
         VmdkFileDescriptor descriptor = new VmdkFileDescriptor();

@@ -36,7 +36,7 @@ public class IscsiManagerMOTest {
     private VimPortType service;
 
     @InjectMocks
-    private IscsiManagerMoObj iscsiManagerMO;
+    private IscsiManagerMo iscsiManagerMO;
 
     @Before
     public void setUp() throws Exception {

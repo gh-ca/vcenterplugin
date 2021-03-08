@@ -1,6 +1,6 @@
 package com.huawei.vmware.util;
 
-import com.huawei.vmware.mo.VirtualMachineMoObj;
+import com.huawei.vmware.mo.VirtualMachineMo;
 
 import com.vmware.vim25.ManagedObjectReference;
 
@@ -40,7 +40,7 @@ public class VirtualMachineMoFactorys {
      * @param morVm morVm
      * @return VirtualMachineMO
      */
-    public VirtualMachineMoObj build(VmwareContext context, ManagedObjectReference morVm) {
-        return new VirtualMachineMoObj(context, morVm);
+    public VirtualMachineMo build(VmwareContext context, ManagedObjectReference morVm) {
+        return new VirtualMachineMo(context, morVm);
     }
 }
