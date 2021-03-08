@@ -629,7 +629,9 @@
     "toBeConnected": "To be connected",
     "ports": "Please Select Storage Device Ports",
     "portNullMessage": "Port is not be Empty!",
-    "establishConnect": "Establish an iSCSI connection"
+    "establishConnect": "Establish an iSCSI connection",
+    "showCol": "Display Column",
+    "selectAll": "Select All"
   },
   "rdm": {
     "name": "Name",
