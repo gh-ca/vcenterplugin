@@ -38,7 +38,7 @@ public class TaskMOTest {
     private VimPortType service;
 
     @InjectMocks
-    private TaskMoObj taskMO;
+    private TaskMo taskMO;
 
     @Before
     public void setUp() throws Exception {
@@ -60,6 +60,6 @@ public class TaskMOTest {
         when(fault.getLocalizedMessage()).thenReturn("adf");
         MethodFault methodFault = mock(MethodFault.class);
         when(fault.getFault()).thenReturn(methodFault);
-        TaskMoObj.getTaskFailureInfo(context, mor);
+        TaskMo.getTaskFailureInfo(context, mor);
     }
 }

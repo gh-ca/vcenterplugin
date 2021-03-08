@@ -1,6 +1,6 @@
 package com.huawei.vmware.util;
 
-import com.huawei.vmware.mo.ClusterMoObj;
+import com.huawei.vmware.mo.ClusterMo;
 
 import com.vmware.vim25.ManagedObjectReference;
 
@@ -41,7 +41,7 @@ public class ClusterVmwareMoFactory {
      * @return ClusterMO
      * @throws Exception Exception
      */
-    public ClusterMoObj build(VmwareContext context, ManagedObjectReference morCluster) throws Exception {
-        return new ClusterMoObj(context, morCluster);
+    public ClusterMo build(VmwareContext context, ManagedObjectReference morCluster) throws Exception {
+        return new ClusterMo(context, morCluster);
     }
 }

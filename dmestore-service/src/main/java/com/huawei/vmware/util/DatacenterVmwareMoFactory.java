@@ -1,6 +1,6 @@
 package com.huawei.vmware.util;
 
-import com.huawei.vmware.mo.DatacenterMoObj;
+import com.huawei.vmware.mo.DatacenterMo;
 
 /**
  * DatacenterMOFactory
@@ -39,7 +39,7 @@ public class DatacenterVmwareMoFactory {
      * @return DatacenterMO
      * @throws Exception Exception
      */
-    public DatacenterMoObj build(VmwareContext context, String dcName) throws Exception {
-        return new DatacenterMoObj(context, dcName);
+    public DatacenterMo build(VmwareContext context, String dcName) throws Exception {
+        return new DatacenterMo(context, dcName);
     }
 }

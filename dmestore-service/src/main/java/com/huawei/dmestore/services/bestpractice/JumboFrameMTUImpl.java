@@ -1,8 +1,8 @@
 package com.huawei.dmestore.services.bestpractice;
 
 import com.huawei.dmestore.utils.VCSDKUtils;
-import com.huawei.vmware.mo.HostMoObj;
-import com.huawei.vmware.mo.HostNetworkSystemMoObj;
+import com.huawei.vmware.mo.HostMo;
+import com.huawei.vmware.mo.HostNetworkSystemMo;
 import com.huawei.vmware.util.VmwareContext;
 
 import com.vmware.vim25.HostNetworkConfig;
@@ -44,7 +44,7 @@ public class JumboFrameMTUImpl extends BaseBestPracticeService implements BestPr
     public Object getCurrentValue(VCSDKUtils vcsdkUtils, String objectId) throws Exception {
         ManagedObjectReference mor = vcsdkUtils.getVcConnectionHelper().objectId2Mor(objectId);
         VmwareContext context = vcsdkUtils.getVcConnectionHelper().getServerContext(objectId);
-        HostMoObj hostMo = this.getHostMoFactory().build(context, mor);
+        HostMo hostMo = this.getHostMoFactory().build(context, mor);
         HostNetworkConfig networkConfig = hostMo.getHostNetworkSystemMo().getNetworkConfig();
         List<HostVirtualNicConfig> list = networkConfig.getVnic();
         for (HostVirtualNicConfig config : list) {
@@ -81,7 +81,7 @@ public class JumboFrameMTUImpl extends BaseBestPracticeService implements BestPr
     private boolean check(VCSDKUtils vcsdkUtils, String objectId, Object recommendValue) throws Exception {
         ManagedObjectReference mor = vcsdkUtils.getVcConnectionHelper().objectId2Mor(objectId);
         VmwareContext context = vcsdkUtils.getVcConnectionHelper().getServerContext(objectId);
-        HostMoObj hostMo = this.getHostMoFactory().build(context, mor);
+        HostMo hostMo = this.getHostMoFactory().build(context, mor);
         HostNetworkConfig networkConfig = hostMo.getHostNetworkSystemMo().getNetworkConfig();
         if (networkConfig == null) {
             return true;
@@ -112,8 +112,8 @@ public class JumboFrameMTUImpl extends BaseBestPracticeService implements BestPr
         if (check(vcsdkUtils, objectId, recommendValue)) {
             return;
         }
-        HostMoObj hostMo = this.getHostMoFactory().build(context, mor);
-        HostNetworkSystemMoObj hostNetworkSystemMo = hostMo.getHostNetworkSystemMo();
+        HostMo hostMo = this.getHostMoFactory().build(context, mor);
+        HostNetworkSystemMo hostNetworkSystemMo = hostMo.getHostNetworkSystemMo();
         HostNetworkConfig networkConfig = hostNetworkSystemMo.getNetworkConfig();
         List<HostVirtualNicConfig> list = networkConfig.getVnic();
         ExecutorService singleThreadExecutor = Executors.newFixedThreadPool(list.size());

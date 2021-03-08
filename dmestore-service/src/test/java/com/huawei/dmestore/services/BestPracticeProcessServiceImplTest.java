@@ -115,8 +115,8 @@ public class BestPracticeProcessServiceImplTest {
         when(vcConnectionHelpers.objectId2Mor(objectId)).thenReturn(mor);
         VmwareContext context = mock(VmwareContext.class);
         when(vcConnectionHelpers.getServerContext(objectId)).thenReturn(context);
-        HostMoObj hostMo = mock(HostMoObj.class);
-        DatastoreMoObj datastoreMo = mock(DatastoreMoObj.class);
+        HostMo hostMo = mock(HostMo.class);
+        DatastoreMo datastoreMo = mock(DatastoreMo.class);
         HostVmwareFactory hostVmwareFactory = mock(HostVmwareFactory.class);
         DatastoreVmwareMoFactory datastoreVmwareMoFactory = mock(DatastoreVmwareMoFactory.class);
         for (BestPracticeService service : bestPracticeServiceList) {
@@ -132,7 +132,7 @@ public class BestPracticeProcessServiceImplTest {
             when(service.getDatastoreMoFactory()).thenReturn(datastoreVmwareMoFactory);
             when(datastoreVmwareMoFactory.build(context, dsMor)).thenReturn(datastoreMo);
         }
-        HostAdvanceOptionMoObj hostAdvanceOptionMO = mock(HostAdvanceOptionMoObj.class);
+        HostAdvanceOptionMo hostAdvanceOptionMO = mock(HostAdvanceOptionMo.class);
         when(hostMo.getHostAdvanceOptionMo()).thenReturn(hostAdvanceOptionMO);
         List<OptionValue> optionValueList = new ArrayList<>();
         OptionValue optionValue = mock(OptionValue.class);
@@ -141,11 +141,11 @@ public class BestPracticeProcessServiceImplTest {
         doNothing().when(hostAdvanceOptionMO).updateOptions(anyList());
         when(optionValue.getValue()).thenReturn("--");
         doNothing().when(optionValue).setValue(anyObject());
-        HostKernelModuleSystemMoObj hostKernelModuleSystemMO = mock(HostKernelModuleSystemMoObj.class);
+        HostKernelModuleSystemMo hostKernelModuleSystemMO = mock(HostKernelModuleSystemMo.class);
         when(hostMo.getHostKernelModuleSystemMo()).thenReturn(hostKernelModuleSystemMO);
         when(hostKernelModuleSystemMO.queryConfiguredModuleOptionString(anyString())).thenReturn("aa=5");
         doNothing().when(hostKernelModuleSystemMO).updateModuleOptionString(anyString(), anyString());
-        HostStorageSystemMoObj hostStorageSystemMo = mock(HostStorageSystemMoObj.class);
+        HostStorageSystemMo hostStorageSystemMo = mock(HostStorageSystemMo.class);
         when(hostMo.getHostStorageSystemMo()).thenReturn(hostStorageSystemMo);
         doNothing().when(hostStorageSystemMo).setMultipathLunPolicy(anyString(), anyObject());
 
@@ -172,7 +172,7 @@ public class BestPracticeProcessServiceImplTest {
         when(spec.getMtu()).thenReturn(10);
         doNothing().when(spec).setMtu(anyInt());
 
-        HostNetworkSystemMoObj hostNetworkSystemMo = mock(HostNetworkSystemMoObj.class);
+        HostNetworkSystemMo hostNetworkSystemMo = mock(HostNetworkSystemMo.class);
         when(hostMo.getHostNetworkSystemMo()).thenReturn(hostNetworkSystemMo);
         doNothing().when(hostNetworkSystemMo).updateVirtualSwitch(anyString(), anyObject());
         HostNetworkConfig networkConfig = mock(HostNetworkConfig.class);

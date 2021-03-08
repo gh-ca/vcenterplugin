@@ -2,8 +2,8 @@ package com.huawei.dmestore.services.bestpractice;
 
 import com.huawei.dmestore.constant.DmeConstants;
 import com.huawei.dmestore.utils.VCSDKUtils;
-import com.huawei.vmware.mo.DatastoreMoObj;
-import com.huawei.vmware.mo.HostMoObj;
+import com.huawei.vmware.mo.DatastoreMo;
+import com.huawei.vmware.mo.HostMo;
 import com.huawei.vmware.util.Pair;
 import com.huawei.vmware.util.VmwareContext;
 
@@ -95,12 +95,12 @@ public class Vmfs6AutoReclaimImpl extends BaseBestPracticeService implements Bes
     private List<VmfsDatastoreInfo> getVmfs6DatastoreInfo(VCSDKUtils vcsdkUtils, String objectId) throws Exception {
         ManagedObjectReference mor = vcsdkUtils.getVcConnectionHelper().objectId2Mor(objectId);
         VmwareContext context = vcsdkUtils.getVcConnectionHelper().getServerContext(objectId);
-        HostMoObj hostMo = this.getHostMoFactory().build(context, mor);
+        HostMo hostMo = this.getHostMoFactory().build(context, mor);
         List<VmfsDatastoreInfo> list = new ArrayList<>();
         List<Pair<ManagedObjectReference, String>> datastoreMountsOnHost = hostMo.getDatastoreMountsOnHost();
         for (Pair<ManagedObjectReference, String> pair : datastoreMountsOnHost) {
             ManagedObjectReference dsMor = pair.first();
-            DatastoreMoObj datastoreMo = this.getDatastoreMoFactory().build(context, dsMor);
+            DatastoreMo datastoreMo = this.getDatastoreMoFactory().build(context, dsMor);
             DatastoreSummary summary = datastoreMo.getSummary();
             if (summary.getType().equalsIgnoreCase(DmeConstants.STORE_TYPE_VMFS)) {
                 VmfsDatastoreInfo vmfsDatastoreInfo = datastoreMo.getVmfsDatastoreInfo();
@@ -119,7 +119,7 @@ public class Vmfs6AutoReclaimImpl extends BaseBestPracticeService implements Bes
     public void update(VCSDKUtils vcsdkUtils, String objectId) throws Exception {
         ManagedObjectReference mor = vcsdkUtils.getVcConnectionHelper().objectId2Mor(objectId);
         VmwareContext context = vcsdkUtils.getVcConnectionHelper().getServerContext(objectId);
-        HostMoObj hostMo = this.getHostMoFactory().build(context, mor);
+        HostMo hostMo = this.getHostMoFactory().build(context, mor);
         List<VmfsDatastoreInfo> list = getVmfs6DatastoreInfo(vcsdkUtils, objectId);
         if (list.size() > 0) {
             ExecutorService executor = Executors.newFixedThreadPool(list.size());
