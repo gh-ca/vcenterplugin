@@ -42,7 +42,7 @@ export class NfsAddComponent implements OnInit{
   deduplicationShow = false; // 重复数据删除 true 支持 false 不支持
   compressionShow = false; // 数据压缩 true 支持 false 不支持
   latencyIsSelect = false; // 时延为下拉框
-
+  dorado= false;
   shareNameContainsCN = false; // 共享名称包含中文
 
   // 添加页面窗口
@@ -186,7 +186,11 @@ export class NfsAddComponent implements OnInit{
       this.addCompressionShow();
       this.addDeduplicationShow();
       this.addLatencyChoose();
-
+      const storages=this.storageList.filter(item=>item.id==this.addForm.storagId);
+      this.dorado=storages[0].storageTypeShow.dorado;
+      if (this.dorado){
+        this.addForm.autoSizeEnable=undefined;
+      }
       const storagePoolMap = this.storagePoolMap.filter(item => item.storageId == this.addForm.storagId);
 
       const storagePoolList = storagePoolMap[0].storagePoolList;
