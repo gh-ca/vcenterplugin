@@ -19,14 +19,14 @@ import java.util.List;
  * @author Administrator
  * @since 2020-12-11
  */
-public class HostStorageSystemMO extends BaseMO {
+public class HostStorageSystemMo extends BaseMo {
     /**
      * HostStorageSystemMO
      *
      * @param context context
      * @param morHostDatastore morHostDatastore
      */
-    public HostStorageSystemMO(VmwareContext context, ManagedObjectReference morHostDatastore) {
+    public HostStorageSystemMo(VmwareContext context, ManagedObjectReference morHostDatastore) {
         super(context, morHostDatastore);
     }
 
