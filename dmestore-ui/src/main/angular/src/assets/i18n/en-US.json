@@ -145,7 +145,10 @@
       "provisionType":"Provision Type",
       "appSce":"Application Scenario",
       "dataDed":"Data Deduplication",
-      "dataCom":"Data Compression"
+      "dataCom":"Data Compression",
+      "database":"database",
+      "vm":"VM",
+      "userDefine":"user_defined"
     },
     "mount":{
       "mount":"Mount",
