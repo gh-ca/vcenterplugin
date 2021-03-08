@@ -504,7 +504,7 @@ export class RdmComponent implements OnInit {
    * 切换存储：资源分配类型初始化
    */
   allocationTypeShowInit() {
-    this.configModel.tuning.alloctype = null;
+    this.configModel.tuning.alloctype = 'thin';
     const storageTypeShow = this.storageDevices.filter(item => item.id == this.configModel.storageId);
     this.allocationTypeShow =  storageTypeShow[0].storageTypeShow.allocationTypeShow == 1;
   }

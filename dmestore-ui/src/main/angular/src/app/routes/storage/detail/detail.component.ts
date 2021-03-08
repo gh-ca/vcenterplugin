@@ -325,7 +325,10 @@ export class DetailComponent implements OnInit, AfterViewInit {
           this.detail = r.data;
 
           this.detail.location = this.HTMLDecode(this.detail.location);
-
+          // 如果是V6设备可得容量单位为M，此处修改为G
+          if(this.detail.storageTypeShow.dorado) {
+            this.detail.totalEffectiveCapacity = this.detail.totalEffectiveCapacity/1024;
+          }
           this.storageDetailTag = this.detail.storageTypeShow.storageDetailTag;
         }else{
         }
@@ -342,6 +345,10 @@ export class DetailComponent implements OnInit, AfterViewInit {
           if (r.code === '200'){
             this.detail = r.data;
             this.detail.location = this.HTMLDecode(this.detail.location);
+            // 如果是V6设备可得容量单位为M，此处修改为G
+            if(this.detail.storageTypeShow.dorado) {
+              this.detail.totalEffectiveCapacity = this.detail.totalEffectiveCapacity/1024;
+            }
             this.getStoragePoolList(true);
             this.cdr.detectChanges();
           }

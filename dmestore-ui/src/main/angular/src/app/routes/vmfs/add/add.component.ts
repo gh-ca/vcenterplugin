@@ -986,7 +986,7 @@ export class AddComponent implements OnInit{
    * 添加页面 资源调优thick展示与隐藏
    */
   addAllocationTypeShowInit() {
-    this.form.alloctype = '';
+    this.form.alloctype = 'thin';
     const allocationTypeShow = this.getAllocationTypeShow(this.form.storage_id);
     this.showAlloctypeThick = allocationTypeShow == 1;
   }
