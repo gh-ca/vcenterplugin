@@ -1,5 +1,5 @@
 <div>
-  <clr-modal [clrModalOpen]="viewPage=='expand_plugin'" [clrModalClosable]="false">
+  <clr-modal  [clrModalOpen]="viewPage=='expand_plugin'" [clrModalClosable]="false">
     <h3 class="modal-title">{{'menu.expand' | translate}}</h3>
     <div class="modal-body">
       <form  clrForm>
@@ -18,8 +18,8 @@
           <label>{{'nfs.expandSize' | translate}}</label>
           <div clrInput style="float: left;position: relative;">
             <input clrInput style="width: 70%;border-bottom: none" type="number" min="0" [(ngModel)]="newCapacity" name="newCapacity" #number="ngModel"
-                   onkeyup="this.value.match(/\d+(\.\d{0,2})?/)? this.value.match(/\d+(\.\d{0,2})?/)[0] : ''" required/>
-            <select class="capacity" [(ngModel)]="unit" clrInput style="width: 30%;border: 1px solid #DDDDDD;position: absolute;bottom: 3px;"  name="unit" >
+                   onkeyup="this.value.match(/\d+(\.\d{0,2})?/)? this.value.match(/\d+(\.\d{0,2})?/)[0] : ''" (blur)="checkCapacity();"  required/>
+            <select class="capacity" [(ngModel)]="unit" clrInput style="width: 30%;border: 1px solid #DDDDDD;position: absolute;bottom: 3px;"  name="unit" (change)="checkCapacity();">
               <option value="TB">TB</option>
               <option value="GB">GB</option>
               <!--<option value="MB">MB</option>-->
@@ -27,6 +27,17 @@
             </select>
           </div>
         </clr-input-container>
+        <clr-control-helper *ngIf="!capacityErr">
+          <div class="errorTips" readonly >
+            <clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{'nfs.expand.capacityErr' | translate}}
+          </div>
+        </clr-control-helper>
+        <clr-control-helper>
+          <div readonly style="height: 25px;font-size: small">
+            <span>{{'nfs.expand.minCapTip' | translate}}</span><br>
+            <span>{{'nfs.expand.maxCapTip' | translate}}</span>
+          </div>
+        </clr-control-helper>
       </form>
     </div>
     <div class="modal-footer">
@@ -51,9 +62,9 @@
         <clr-input-container>
           <label>{{'nfs.expandSize' | translate}}</label>
           <div clrInput style="float: left;position: relative;">
-            <input clrInput style="width: 70%;border-bottom: none" type="number" min="0" [(ngModel)]="newCapacity" name="newCapacity" #number="ngModel"
+            <input clrInput style="width: 70%;border-bottom: none" type="number" min="0" (blur)="checkCapacity();" [(ngModel)]="newCapacity" name="newCapacity" #number="ngModel"
                    onkeyup="this.value.match(/\d+(\.\d{0,2})?/)? this.value.match(/\d+(\.\d{0,2})?/)[0] : ''" required/>
-            <select class="capacity" [(ngModel)]="unit" clrInput style="width: 30%;border: 1px solid #DDDDDD;position: absolute;bottom: 3px;"  name="unit" >
+            <select class="capacity" [(ngModel)]="unit" clrInput style="width: 30%;border: 1px solid #DDDDDD;position: absolute;bottom: 3px;"  name="unit" (change)="checkCapacity();" >
               <option value="TB">TB</option>
               <option value="GB">GB</option>
               <!--<option value="MB">MB</option>-->
@@ -61,6 +72,17 @@
             </select>
           </div>
         </clr-input-container>
+        <clr-control-helper *ngIf="!capacityErr">
+          <div class="errorTips" readonly >
+            <clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{'nfs.expand.capacityErr' | translate}}
+          </div>
+        </clr-control-helper>
+        <clr-control-helper>
+          <div readonly style="height: 25px;font-size: small">
+            <span>{{'nfs.expand.minCapTip' | translate}}</span><br>
+            <span>{{'nfs.expand.maxCapTip' | translate}}</span>
+          </div>
+        </clr-control-helper>
       </form>
     </div>
     <div class="modal-footer">

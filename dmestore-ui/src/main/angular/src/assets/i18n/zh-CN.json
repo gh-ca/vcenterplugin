@@ -171,6 +171,11 @@
     },
     "reduce": {
       "success": "缩容成功！"
+    },
+    "expand":{
+      "capacityErr":"输入超过容量限制!",
+      "maxCapTip":"最大容量限制：16384 TB",
+      "minCapTip":"最小容量限制：1 GB"
     }
   },
   "vmfs": {

@@ -171,6 +171,9 @@
     },
     "reduce": {
       "success": "Successfully reduce!"
+    },
+    "expand":{
+      "capacityErr":"超过最大容量限制：16384TB!"
     }
   },
   "vmfs": {

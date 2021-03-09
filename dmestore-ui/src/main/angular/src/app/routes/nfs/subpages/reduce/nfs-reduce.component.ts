@@ -20,6 +20,7 @@ export class NfsReduceComponent implements OnInit{
   modalHandleLoading = false; // 数据处理loading
   fsId:string;
   reduceSuccessShow = false;// 缩容成功窗口
+  capacityErr= true;
   constructor(private reduceService: NfsReduceService, private gs: GlobalsService,
               private activatedRoute: ActivatedRoute,private router:Router, private cdr: ChangeDetectorRef){
   }
@@ -62,6 +63,8 @@ export class NfsReduceComponent implements OnInit{
     this.gs.getClientSdk().modal.close();
   }
   reduceCommit(){
+    let v=this.checkCapacity();
+    if(!v) return;
     this.modalHandleLoading=true;
     let capacity;
     switch (this.unit) {
@@ -115,5 +118,30 @@ export class NfsReduceComponent implements OnInit{
     }else{
       this.closeModel();
     }
+  }
+  checkCapacity(){
+    let capacity;
+    switch (this.unit) {
+      case 'TB':
+        capacity = this.newCapacity * 1024;
+        break;
+      default: // 默认GB 不变
+        capacity = this.newCapacity;
+        break;
+    }
+    if (capacity<1){
+      this.newCapacity=0;
+      this.capacityErr=false;
+      return false;
+    }
+    if (capacity>16777216){
+      this.newCapacity=0;
+      this.capacityErr=false;
+      return false;
+    }else{
+      this.capacityErr=true;
+      return true;
+    }
+
   }
 }
