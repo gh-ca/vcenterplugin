@@ -166,6 +166,7 @@ export interface VmfsInfo {
   wwn: string;
   usedCapacity: number; // 使用容量
   capacityUsage: number; // 利用率
+  storageId:string;
 }
 // 存储
 export interface StorageList {
