@@ -97,6 +97,10 @@ public class VmfsDataInfo {
      * dme中wwn.
      **/
     private String wwn;
+    /**
+     * 存储设备Id
+     */
+    private String storageId;
 
     /**
      * getObjectid .
@@ -492,5 +496,13 @@ public class VmfsDataInfo {
      */
     public void setWwn(final String param) {
         this.wwn = param;
+    }
+
+    public String getStorageId() {
+        return storageId;
+    }
+
+    public void setStorageId(String storageId) {
+        this.storageId = storageId;
     }
 }
