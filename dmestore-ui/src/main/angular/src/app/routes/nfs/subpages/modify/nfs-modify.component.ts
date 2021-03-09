@@ -59,8 +59,8 @@ export class NfsModifyComponent implements OnInit{
     if(this.pluginFlag==null){
       //入口来至Vcenter
       const ctx = this.gs.getClientSdk().app.getContextObjects();
-      // this.objectId=ctx[0].id;
-      this.objectId="urn:vmomi:Datastore:datastore-10020:674908e5-ab21-4079-9cb1-596358ee5dd1";
+      this.objectId=ctx[0].id;
+      // this.objectId="urn:vmomi:Datastore:datastore-10020:674908e5-ab21-4079-9cb1-596358ee5dd1";
     }
     this.modifyService.getNfsDetailById(this.objectId).subscribe((result: any) => {
       if (this.pluginFlag){
