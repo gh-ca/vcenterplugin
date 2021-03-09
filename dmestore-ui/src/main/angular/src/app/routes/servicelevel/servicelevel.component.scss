@@ -51,3 +51,6 @@
 .hideFilter ::ng-deep clr-dg-string-filter{
   display: none;
 }
+::ng-deep .datagrid-table .datagrid-column .datagrid-filter-toggle{
+  margin: auto;
+}

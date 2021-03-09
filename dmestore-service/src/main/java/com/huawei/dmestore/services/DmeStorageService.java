@@ -91,10 +91,12 @@ public interface DmeStorageService {
      * list FileSystem
      *
      * @param storageId storage id
+     * @param pageNo pageNo
+     * @param pageSize pageSize
      * @return List
      * @throws DmeException when error
      */
-    List<FileSystem> getFileSystems(String storageId) throws DmeException;
+    List<FileSystem> getFileSystems(String storageId,Integer pageNo, Integer pageSize) throws DmeException;
 
     /**
      * list dtree

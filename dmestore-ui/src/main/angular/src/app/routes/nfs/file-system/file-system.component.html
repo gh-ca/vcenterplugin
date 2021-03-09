@@ -14,13 +14,12 @@
     <tr>
       <td class="left">{{'nfs.fs.storagePool' | translate}}</td>
       <td class="left">{{fsDetail.storagePoolName}}</td>
-
-      <td class="left">{{'nfs.fs.controller' | translate}}</td>
-      <td class="left">{{fsDetail.controller}}</td>
-    </tr>
-    <tr>
       <td class="left">{{'nfs.fs.provisionType' | translate}}</td>
       <td class="left">{{fsDetail.provisionType}}</td>
+    </tr>
+    <tr *ngIf="!fsDetail.isDorado">
+      <td class="left">{{'nfs.fs.controller' | translate}}</td>
+      <td class="left">{{fsDetail.controller}}</td>
       <td class="left">{{'nfs.fs.appSce' | translate}}</td>
       <td class="left">{{fsDetail.applicationScenario}}</td>
     </tr>

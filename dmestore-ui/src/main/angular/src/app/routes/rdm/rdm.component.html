@@ -154,7 +154,7 @@
         <clr-select-container class="selectClass">
           <label style="color: #9F9F9F;">{{'rdm.storage' | translate}}<span style="color: red">*</span></label>:
           <select clrSelect  [(ngModel)]="configModel.storageId" name="storageId" required (ngModelChange)="loadStoragePool(configModel.storageId);">
-            <option *ngFor="let item of storageDevices" value="{{item.id}}">{{item.name}}</option>
+            <option *ngFor="let item of storageDevices" value="{{item.id}}">{{item.name+'('+item.ip+')'}}</option>
           </select>
           <clr-control-error>{{'validations.required' | translate}}</clr-control-error>
         </clr-select-container>

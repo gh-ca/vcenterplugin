@@ -198,7 +198,7 @@ public class VmRdmServiceImplTest {
         customizeVolumeTuningForCreate.setDedupeEnabled(false);
         SmartQosForRdmCreate smartQosForRdmCreate = new SmartQosForRdmCreate();
         smartQosForRdmCreate.setControlPolicy("321");
-        smartQosForRdmCreate.setEnabled(true);
+        smartQosForRdmCreate.isEnabled(true);
         smartQosForRdmCreate.setLatency(1);
         smartQosForRdmCreate.setLatencyUnit("321");
         smartQosForRdmCreate.setMaxbandwidth(21);

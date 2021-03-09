@@ -97,8 +97,8 @@
 ::ng-deep clr-icon {
   display: inline-block;
   margin: 0;
-  height: 20px;
-  width: 20px;
+  //height: 20px;
+  //width: 20px;
   vertical-align: middle;
   fill: currentColor;
 }
@@ -257,8 +257,8 @@ input[type=number] {
 ::ng-deep clr-icon {
   display: inline-block;
   margin: 0;
-  height: 20px;
-  width: 20px;
+  //height: 20px;
+  //width: 20px;
   vertical-align: middle;
   fill: currentColor;
 }
@@ -388,4 +388,7 @@ input[type=number] {
 }
 .hideFilter ::ng-deep clr-dg-string-filter{
   display: none;
+}
+::ng-deep .datagrid-table .datagrid-column .datagrid-filter-toggle{
+  margin: auto;
 }

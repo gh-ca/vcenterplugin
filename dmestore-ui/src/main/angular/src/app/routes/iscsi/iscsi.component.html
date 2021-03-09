@@ -23,15 +23,56 @@
       <ng-container>
         <clr-datagrid [(clrDgSelected)]="configModel.ethPorts"  [clrDgLoading]="portLoading">
 
-          <clr-dg-column [clrDgField]="'location'">{{'iscsi.location' | translate}}</clr-dg-column>
-          <clr-dg-column [clrDgField]="'portName'">{{'iscsi.portName' | translate}}</clr-dg-column>
-          <clr-dg-column [clrDgField]="'mac'">{{'iscsi.mac' | translate}}</clr-dg-column>
-          <clr-dg-column [clrDgField]="'maxSpeed'">{{'iscsi.maxSpeed' | translate}}</clr-dg-column>
-          <clr-dg-column [clrDgField]="'mgmtIp'">{{'iscsi.ip4' | translate}}</clr-dg-column>
-          <clr-dg-column [clrDgField]="'mgmtIpv6'">{{'iscsi.ip6' | translate}}</clr-dg-column>
-          <clr-dg-column [clrDgField]="'speed'">{{'iscsi.speed' | translate}}</clr-dg-column>
-          <clr-dg-column [clrDgField]="'status'">{{'iscsi.hStatus' | translate}}</clr-dg-column>
-          <clr-dg-column [clrDgField]="'connectStatus'">{{'iscsi.cStatus' | translate}}</clr-dg-column>
+          <clr-dg-column [clrDgField]="'location'">
+            <ng-container *clrDgHideableColumn="{hidden: false}" >
+              {{'iscsi.location' | translate}}
+            </ng-container>
+          </clr-dg-column>
+          <clr-dg-column [clrDgField]="'portName'">
+            <ng-container *clrDgHideableColumn="{hidden: false}" >
+              {{'iscsi.portName' | translate}}
+            </ng-container>
+          </clr-dg-column>
+          <clr-dg-column [clrDgField]="'mac'">
+            <ng-container *clrDgHideableColumn="{hidden: false}" >
+              {{'iscsi.mac' | translate}}
+            </ng-container>
+          </clr-dg-column>
+          <clr-dg-column [clrDgField]="'maxSpeed'">
+            <ng-container *clrDgHideableColumn="{hidden: false}" >
+              {{'iscsi.maxSpeed' | translate}}
+            </ng-container>
+          </clr-dg-column>
+          <clr-dg-column [clrDgField]="'mgmtIp'">
+            <ng-container *clrDgHideableColumn="{hidden: false}" >
+              {{'iscsi.ip4' | translate}}
+            </ng-container>
+          </clr-dg-column>
+          <clr-dg-column [clrDgField]="'mgmtIpv6'">
+            <ng-container *clrDgHideableColumn="{hidden: false}" >
+              {{'iscsi.ip6' | translate}}
+            </ng-container>
+          </clr-dg-column>
+          <clr-dg-column class="hideFilter" [clrDgField]="'speed'">
+            <ng-container *clrDgHideableColumn="{hidden: false}" >
+              {{'iscsi.speed' | translate}}
+            </ng-container>
+          </clr-dg-column>
+          <clr-dg-column [clrDgField]="'status'">
+            <ng-container *clrDgHideableColumn="{hidden: false}" >
+              {{'iscsi.hStatus' | translate}}
+            </ng-container>
+          </clr-dg-column>
+          <clr-dg-column class="hideFilter" [clrDgField]="'connectStatusType'">
+            <ng-container *clrDgHideableColumn="{hidden: false}" >
+              {{'iscsi.cStatus' | translate}}
+            </ng-container>
+          </clr-dg-column>
+          <clr-dg-column class="hideFilter" [clrDgField]="'connectStatusType'">
+            <ng-container *clrDgHideableColumn="{hidden: false}" >
+              {{'iscsi.cStatusType' | translate}}
+            </ng-container>
+          </clr-dg-column>
 
           <clr-dg-row *clrDgItems="let item of portList"  [clrDgItem]="item" [clrDgSelectable]="item.connectStatus == 'true'">
             <clr-dg-cell>{{item.location}}</clr-dg-cell>
@@ -58,15 +99,25 @@
             </clr-dg-cell>
             <clr-dg-cell>{{item.status}}</clr-dg-cell>
             <clr-dg-cell>
-              <span *ngIf="item.connectStatus == 'true'">
-                <span class="color-square" [style.backgroundColor]="'green'"></span>
+              <span *ngIf="item.connectStatusType == '1'">
+                <span class="color-square" [style.backgroundColor]="'red'"></span>
               </span>
-              <span *ngIf="item.connectStatus == 'false' || item.mgmtIp == '' || item.mgmtIp == null">
-                 <span class="color-square" [style.backgroundColor]="'red'"></span>
+              <span *ngIf="item.connectStatusType == '2'">
+                 <span class="color-square" [style.backgroundColor]="'#FEE273'"></span>
               </span>
-              <span *ngIf="item.connectStatus == '' && item.mgmtIp != ''">
-                 <img src="./assets/images/loading.gif"  width="20px" height="20px">
+              <span *ngIf="item.connectStatusType == '3'">
+                 <span class="color-square" [style.backgroundColor]="'green'"></span>
               </span>
+              <span *ngIf="item.connectStatusType == '4'">
+                 <span class="color-square" [style.backgroundColor]="'#79C6E6'"></span>
+              </span>
+            </clr-dg-cell>
+            <clr-dg-cell>
+              <span *ngIf="!item.connectStatusType">--</span>
+              <span *ngIf="item.connectStatusType == '1'">{{'iscsi.phyPortNotConn' | translate}}</span>
+              <span *ngIf="item.connectStatusType == '2'">{{'iscsi.ipUnreachable' | translate}}</span>
+              <span *ngIf="item.connectStatusType == '3'">{{'iscsi.connected' | translate}}</span>
+              <span *ngIf="item.connectStatusType == '4'">{{'iscsi.toBeConnected' | translate}}</span>
             </clr-dg-cell>
           </clr-dg-row>
 
@@ -77,6 +128,9 @@
               of {{pagination.totalItems}}
             </clr-dg-pagination>
           </clr-dg-footer>-->
+          <clr-dg-footer>
+            <clr-dg-column-toggle (click)="footerTranslate();"></clr-dg-column-toggle>
+          </clr-dg-footer>
 
         </clr-datagrid>
       </ng-container>

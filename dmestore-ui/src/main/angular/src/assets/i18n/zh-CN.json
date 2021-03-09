@@ -145,7 +145,10 @@
       "provisionType":"供应类型",
       "appSce":"应用场景",
       "dataDed":"重删",
-      "dataCom":"压缩"
+      "dataCom":"压缩",
+      "database":"数据库",
+      "vm":"虚拟机",
+      "userDefine":"用户自定义"
     },
     "mount":{
       "mount":"挂载",
@@ -457,7 +460,7 @@
         "totalCap":"总容量",
         "proType":"分配类型",
         "capUsage":"已使用容量",
-        "ownSto":"所属存储",
+        "ownSto":"所属存储池",
         "nfs":"NFS",
         "cifs":"CIFS",
         "dtree":"Dtree",
@@ -619,9 +622,16 @@
     "speed": "工作速率(Mbps)",
     "hStatus": "健康状态",
     "cStatus": "连接状态",
+    "cStatusType": "连接状态类型",
+    "phyPortNotConn": "物理端口未连接",
+    "ipUnreachable": "IP无法到达",
+    "connected": "已连接",
+    "toBeConnected": "待连接",
     "ports": "请选择存储设备的以太网端口",
     "portNullMessage": "端口不能为空！",
-    "establishConnect": "建立iSCSI连接"
+    "establishConnect": "建立iSCSI连接",
+    "showCol": "展示列",
+    "selectAll": "全选"
   },
   "rdm": {
     "name": "名称",
@@ -816,7 +826,8 @@
     },
     "type":{
       "block":"块",
-      "file":"文件"
+      "file":"文件",
+      "blockAndFile": "块/文件"
     }
   },
   "errorMsg":{

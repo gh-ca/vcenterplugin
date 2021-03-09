@@ -9,14 +9,14 @@ import com.vmware.vim25.ManagedObjectReference;
  * @author Administrator
  * @since 2020-12-02
  */
-public class HostKernelModuleSystemMO extends BaseMO {
+public class HostKernelModuleSystemMo extends BaseMo {
     /**
      * HostKernelModuleSystemMO
      *
      * @param context context
      * @param morFirewallSystem morFirewallSystem
      */
-    public HostKernelModuleSystemMO(VmwareContext context, ManagedObjectReference morFirewallSystem) {
+    public HostKernelModuleSystemMo(VmwareContext context, ManagedObjectReference morFirewallSystem) {
         super(context, morFirewallSystem);
     }
 

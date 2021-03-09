@@ -199,30 +199,34 @@ public class NfsOperationController extends BaseController {
                 tuning.put(COMPRESSION_ENABLED_FIELD, requestParams.get("compressionEnabled"));
                 tuning.put(DEDUPLICATION_ENABLED_FIELD, requestParams.get("deduplicationEnabled"));
             }
-
-            String capacitymode = (Boolean) requestParams.get(AUTO_SIZE_ENABLE_REQUEST_FIELD)
-                ? CapacityAutonegotiation.CAPACITY_MODE_AUTO : defaultCapacitymode;
-            if (!"grow_off".equalsIgnoreCase(capacitymode)) {
-                capacityAutonegotiation.put("capacity_recycle_mode", "expand_capacity");
-                capacityAutonegotiation.put("auto_grow_threshold_percent", 85);
-                capacityAutonegotiation.put("auto_shrink_threshold_percent", 50);
-                capacityAutonegotiation.put("max_auto_size", 16777216);
-                capacityAutonegotiation.put("min_auto_size", 16777216);
-                capacityAutonegotiation.put("auto_size_increment", 1024);
-                capacityAutonegotiation.put(AUTO_SIZE_ENABLE_FIELD, requestParams.get(AUTO_SIZE_ENABLE_REQUEST_FIELD));
+            if (!storageTypeShow.getDorado()) {
+                String capacitymode = (Boolean) requestParams.get(AUTO_SIZE_ENABLE_REQUEST_FIELD)
+                    ? CapacityAutonegotiation.CAPACITY_MODE_AUTO : defaultCapacitymode;
+                if (!"grow_off".equalsIgnoreCase(capacitymode)) {
+                    capacityAutonegotiation.put("capacity_recycle_mode", "expand_capacity");
+                    capacityAutonegotiation.put("auto_grow_threshold_percent", 85);
+                    capacityAutonegotiation.put("auto_shrink_threshold_percent", 50);
+                    capacityAutonegotiation.put("max_auto_size", 16777216);
+                    capacityAutonegotiation.put("min_auto_size", 16777216);
+                    capacityAutonegotiation.put("auto_size_increment", 1024);
+                    capacityAutonegotiation.put(AUTO_SIZE_ENABLE_FIELD, requestParams.get(AUTO_SIZE_ENABLE_REQUEST_FIELD));
+                }
+                capacityAutonegotiation.put(ADJUSTING_MODE_FIELD, capacitymode);
             }
-            capacityAutonegotiation.put(ADJUSTING_MODE_FIELD, capacitymode);
         } else {
             tuning.put(ALLOCATION_TYPE_FIELD, THIN_FIELD);
             if (storageTypeShow.getDeduplicationShow() || storageTypeShow.getCompressionShow()) {
                 tuning.put(COMPRESSION_ENABLED_FIELD, false);
                 tuning.put(DEDUPLICATION_ENABLED_FIELD, false);
             }
-            //capacityAutonegotiation.put(AUTO_SIZE_ENABLE_FIELD, false);
-            capacityAutonegotiation.put(ADJUSTING_MODE_FIELD, defaultCapacitymode);
+            if (!storageTypeShow.getDorado()) {
+                capacityAutonegotiation.put(ADJUSTING_MODE_FIELD, defaultCapacitymode);
+            }
+        }
+        if (capacityAutonegotiation.size() != 0) {
+            targetParams.put("capacity_autonegotiation", capacityAutonegotiation);
         }
         targetParams.put("tuning", tuning);
-        targetParams.put("capacity_autonegotiation", capacityAutonegotiation);
     }
 
     public StorageTypeShow isDorado(String storageId) throws DmeException {
@@ -368,7 +372,6 @@ public class NfsOperationController extends BaseController {
         param.put("file_system_id", params.get("fileSystemId"));
         param.put("nfs_share_id", params.get("shareId"));
         param.put("name", params.get("fsName"));
-        parseAutoSizeEnable(params.get(AUTO_SIZE_ENABLE_REQUEST_FIELD), params, param);
         Map<String, Object> tuning = new HashMap<>(DmeConstants.COLLECTION_CAPACITY_16);
         String deviceId = ToolUtils.getStr(params.get("deviceId"));
         if (!StringUtils.isEmpty(deviceId)) {
@@ -382,6 +385,9 @@ public class NfsOperationController extends BaseController {
                 if (compressionEnabled!=null) {
                     tuning.put(COMPRESSION_ENABLED_FIELD, compressionEnabled);
                 }
+            }
+            if (!storageTypeShow.getDorado()) {
+                parseAutoSizeEnable(params.get(AUTO_SIZE_ENABLE_REQUEST_FIELD), params, param);
             }
         }
         Object thin = params.get(THIN_FIELD);

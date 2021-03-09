@@ -346,7 +346,7 @@ public class DmeStorageServiceImplTest {
         Map<String, Object> params = new HashMap<>();
         params.put("storage_id", storageId);
         when(dmeAccessService.access(url, HttpMethod.POST, gson.toJson(params))).thenReturn(responseEntity);
-        List<FileSystem> fileSystems = dmeStorageService.getFileSystems(storageId);
+        List<FileSystem> fileSystems = dmeStorageService.getFileSystems(storageId, null, null);
         System.out.println(fileSystems);
     }
 

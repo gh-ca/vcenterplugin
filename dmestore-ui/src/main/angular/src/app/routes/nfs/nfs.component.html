@@ -136,7 +136,7 @@
           <label>{{'nfs.storeageDevice' | translate}}</label>
           <select class="inputWidth100Percent" clrSelect (ngModelOptions)="storageList" [(ngModel)]="addForm.storagId"
                   name="storagId" class="clr-select" (change)="selectStoragePool()" formControlName="storagId" required>
-            <option *ngFor="let item of storageList" value="{{item.id}}">{{item.name}}</option>
+            <option *ngFor="let item of storageList" value="{{item.id}}">{{item.name+'('+item.ip+')'}}</option>
           </select>
           <clr-control-error>{{'errorMsg.require' | translate}}</clr-control-error>
         </clr-select-container>
@@ -423,7 +423,7 @@
               <option value="true">{{'nfs.enable' | translate}}</option>
             </select>
           </clr-select-container>
-          <clr-toggle-wrapper >
+          <clr-toggle-wrapper *ngIf="!dorado" >
             <label>{{'nfs.capAuto' | translate}}</label>
             <input type="checkbox" clrToggle [(ngModel)]="addForm.autoSizeEnable" name="autoSizeEnable"/>
           </clr-toggle-wrapper>

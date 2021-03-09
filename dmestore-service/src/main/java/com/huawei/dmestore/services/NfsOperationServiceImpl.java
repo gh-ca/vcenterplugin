@@ -403,7 +403,9 @@ public class NfsOperationServiceImpl implements NfsOperationService {
             // 扩容
             if (dataSpace != null && Double.compare(changeCapacity, dataSpace) == 1) {
                 LOG.info("The expansion exceeds the available storage pool capacity!");
-                changeCapacity = dataSpace;
+                //所阔容量不受存储池容量大小限制
+                //changeCapacity = dataSpace;
+                changeCapacity = changeCapacity;
             }
             exchangedCapacity = changeCapacity + currentCapacity;
         } else if (!isExpand) {
@@ -658,7 +660,8 @@ public class NfsOperationServiceImpl implements NfsOperationService {
         List<LogicPorts> logicPorts = dmeStorageService.getLogicPorts(storageId);
         if (logicPorts != null) {
             for (LogicPorts logicPort : logicPorts) {
-                if (logicPort!=null && !StringUtils.isEmpty(currentPortId)&& logicPort.getId().equalsIgnoreCase(currentPortId)) {
+                if (logicPort != null && !StringUtils.isEmpty(currentPortId) &&
+                    logicPort.getId().equalsIgnoreCase(currentPortId)) {
                     mgmt = logicPort.getMgmtIp();
                     logicName = logicPort.getName();
                     break;
@@ -802,7 +805,7 @@ public class NfsOperationServiceImpl implements NfsOperationService {
 
     private String getStorageModel(String storageId) throws DmeException {
         StorageDetail storageDetail = dmeStorageService.getStorageDetail(storageId);
-        return storageDetail.getModel() +" "+ storageDetail.getProductVersion();
+        return storageDetail.getModel() + " " + storageDetail.getProductVersion();
     }
 
     // 查询指定share,获取共享在存储设备上的id

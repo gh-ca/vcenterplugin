@@ -429,7 +429,7 @@
                   <object>
                      <root>
                         <actionUrl>/ui/dmestore/index.html?view=iscsi</actionUrl>
-                        <dialogTitle>ISCSI</dialogTitle>
+                        <dialogTitle>#{hostMenu.iscsi}</dialogTitle>
                         <dialogSize>1800,600</dialogSize>
                      </root>
                   </object>

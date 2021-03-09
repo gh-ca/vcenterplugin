@@ -100,7 +100,6 @@ public class EthPortInfo {
 
     /**
      * 连接状态类型. 1-物理端口未连接，2-ip无法到达，3-已连接，4-待连接
-     * 优先级：2-》1-》4-》3
      **/
     private Integer connectStatusType;
 

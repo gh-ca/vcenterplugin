@@ -145,7 +145,10 @@
       "provisionType":"Provision Type",
       "appSce":"Application Scenario",
       "dataDed":"Data Deduplication",
-      "dataCom":"Data Compression"
+      "dataCom":"Data Compression",
+      "database":"database",
+      "vm":"VM",
+      "userDefine":"user_defined"
     },
     "mount":{
       "mount":"Mount",
@@ -457,7 +460,7 @@
         "proType":"Provisioning Type",
         "totalCap":"Total Capacity",
         "capUsage":"Capacity Usage",
-        "ownSto":"Owning Storage",
+        "ownSto":"Owning Storage Pool",
         "nfs":"NFS",
         "cifs":"CIFS",
         "dtree":"Dtree",
@@ -619,9 +622,16 @@
     "speed": "Working Rate(Mbps)",
     "hStatus": "Health Status",
     "cStatus": "Connect Status",
+    "cStatusType": "Connection status type",
+    "phyPortNotConn": "The physical port is not connected",
+    "ipUnreachable": "IP unreachable",
+    "connected": "Connected",
+    "toBeConnected": "To be connected",
     "ports": "Please Select Storage Device Ports",
     "portNullMessage": "Port is not be Empty!",
-    "establishConnect": "Establish an iSCSI connection"
+    "establishConnect": "Establish an iSCSI connection",
+    "showCol": "Display Column",
+    "selectAll": "Select All"
   },
   "rdm": {
     "name": "Name",
@@ -816,7 +826,8 @@
      },
      "type":{
       "block":"Block",
-      "file":"File"
+      "file":"File",
+      "blockAndFile": "Block/File"
      }
   },
   "errorMsg":{

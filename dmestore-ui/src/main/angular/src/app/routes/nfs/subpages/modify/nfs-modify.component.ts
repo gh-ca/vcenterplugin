@@ -38,7 +38,7 @@ export class NfsModifyComponent implements OnInit{
   isThin = false; // true 展示重删压缩、false隐藏重删压缩
 
   getDataFaild = false; // 获取nfs数据异常
-
+  dorado= false;//是否是V6设备
 
 
   constructor(private modifyService: NfsModifyService, private cdr: ChangeDetectorRef,
@@ -95,6 +95,10 @@ export class NfsModifyComponent implements OnInit{
                 this.deduplicationShow = storageTypeShow.deduplicationShow;
                 this.compressionShow = storageTypeShow.compressionShow;
                 this.latencyIsSelect = qosTag == 1;
+                this.dorado=storageTypeShow.dorado;
+                if (this.dorado){
+                  this.updateNfs.autoSizeEnable=undefined;
+                }
               }
             }
             this.modalLoading=false;
