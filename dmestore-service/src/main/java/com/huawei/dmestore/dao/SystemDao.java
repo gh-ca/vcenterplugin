@@ -36,7 +36,7 @@ public class SystemDao extends H2DataBaseDao {
     /**
      * 判断表是否存在，不存在则创建表
      *
-     * @param tableName 表名
+     * @param tableName      表名
      * @param createTableSql 创建表的SQL
      * @throws SQLException SQLException
      */
@@ -97,11 +97,22 @@ public class SystemDao extends H2DataBaseDao {
     }
 
     public void cleanAllData() {
+        cleanAllData(false);
+    }
+
+    public void cleanAllData(boolean isDisconnectDme) {
         Connection con = null;
         PreparedStatement ps1 = null;
         try {
             con = getConnection();
             for (String table : DpSqlFileConstants.ALL_TABLES) {
+                // 断开DME连接不能清除任务和vCenter表数据
+                if (isDisconnectDme) {
+                    if (table.equalsIgnoreCase(DpSqlFileConstants.DP_DME_TASK_INFO) ||
+                        table.equalsIgnoreCase(DpSqlFileConstants.DP_DME_VCENTER_INFO)) {
+                        continue;
+                    }
+                }
                 try {
                     ps1 = con.prepareStatement("DELETE FROM " + table);
                     ps1.execute();
@@ -115,6 +126,7 @@ public class SystemDao extends H2DataBaseDao {
             closeConnection(con, ps1, null);
         }
     }
+
     public void dropAllTable() {
         Connection con = null;
         PreparedStatement ps1 = null;
