@@ -854,7 +854,8 @@
     "numberAndLetter":"只能输入数字和字母!",
     "cantFindData": "抱歉未查询到相关数据！",
     "getDataFailed": "获取数据失败！",
-    "cantChangeServiceLevel": "该设备为自定义类型，不支持DME存储策略变更操作！"
+    "cantChangeServiceLevel": "该设备为自定义类型，不支持DME存储策略变更操作！",
+    "iposMaxMinTips": "只能为1到999999999的整数。"
   },
   "page": {
     "perPage": "每页",

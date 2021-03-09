@@ -45,6 +45,12 @@ export class NfsAddComponent implements OnInit{
   dorado= false;
   shareNameContainsCN = false; // 共享名称包含中文
 
+  bandWidthMaxErrTips = false;// 带宽上限错误提示
+  bandWidthMinErrTips = false;// 带宽下限错误提示
+  iopsMaxErrTips = false;// IOPS上限错误提示
+  iopsMinErrTips = false;// IOPS下限错误提示
+  latencyErrTips = false;// 时延错误提示
+
   // 添加页面窗口
   @ViewChild('wizard') wizard: ClrWizard;
   @ViewChild('addPageOne') addPageOne: ClrWizardPage;
@@ -279,6 +285,11 @@ export class NfsAddComponent implements OnInit{
         objVal = '';
       }
     }
+    if (objVal > 999999999){
+      objVal = '';
+    } else if (objVal < 1) {
+      objVal = '';
+    }
     if (type === 'add') {
       switch (operationType) {
         case 'maxbandwidth':
@@ -297,6 +308,68 @@ export class NfsAddComponent implements OnInit{
           this.addForm.latency = objVal;
           break;
       }
+    }
+    this.iopsErrTips(objVal, operationType);
+  }
+  /**
+   * iops错误提示
+   * @param objVal
+   * @param operationType
+   */
+  iopsErrTips(objVal:string, operationType:string) {
+    if (operationType) {
+      switch (operationType) {
+        case 'maxbandwidth':
+          if (objVal == '' && this.addForm.maxBandwidthChoose) {
+            this.bandWidthMaxErrTips = true;
+          }else {
+            this.bandWidthMaxErrTips = false;
+          }
+          break;
+        case 'maxiops':
+          if (objVal == '' && this.addForm.maxIopsChoose) {
+            this.iopsMaxErrTips = true;
+          }else {
+            this.iopsMaxErrTips = false;
+          }
+          break;
+        case 'minbandwidth':
+          if (objVal == '' && this.addForm.minBandwidthChoose) {
+            this.bandWidthMinErrTips = true;
+          }else {
+            this.bandWidthMinErrTips = false;
+          }
+          break;
+        case 'miniops':
+          if (objVal == '' && this.addForm.minIopsChoose) {
+            this.iopsMinErrTips = true;
+          }else {
+            this.iopsMinErrTips = false;
+          }
+          break;
+        default:
+          if (objVal == '' && this.addForm.latencyChoose) {
+            this.latencyErrTips = true;
+          }else {
+            this.latencyErrTips = false;
+          }
+          break;
+      }
+    }
+  }
+
+  /**
+   * 初始化IOPS错误提示
+   */
+  initIopsErrTips(upper:boolean, lower:boolean) {
+    if (upper) {
+      this.bandWidthMaxErrTips = false;
+      this.iopsMaxErrTips = false;
+    }
+    if (lower) {
+      this.bandWidthMinErrTips = false;
+      this.iopsMinErrTips = false;
+      this.latencyErrTips = false;
     }
   }
   matchErr=false;
@@ -556,6 +629,7 @@ export class NfsAddComponent implements OnInit{
     if (lowerObj) {
       lowerChecked = lowerObj.checked;
     }
+    this.initIopsErrTips(upperChecked, lowerChecked);
     if (isUpper) {
       if(upperChecked) {
         form.control_policyUpper = '1';
