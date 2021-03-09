@@ -20,6 +20,7 @@ export class NfsExpandComponent implements OnInit{
   modalLoading = false; // 数据加载loading
   modalHandleLoading = false; // 数据处理loading
   expandSuccessShow = false; // 扩容成功提示
+  capacityErr= true;
   constructor(private expandService: NfsExpandService, private gs: GlobalsService,
               private activatedRoute: ActivatedRoute,private router:Router, private cdr: ChangeDetectorRef){
   }
@@ -50,6 +51,8 @@ export class NfsExpandComponent implements OnInit{
       }
   }
   expandData(){
+    let v=this.checkCapacity();
+    if(!v) return;
     this.modalHandleLoading=true;
     let capacity;
     switch (this.unit) {
@@ -114,5 +117,30 @@ export class NfsExpandComponent implements OnInit{
     }else{
       this.closeModel();
     }
+  }
+  checkCapacity(){
+    let capacity;
+    switch (this.unit) {
+      case 'TB':
+        capacity = this.newCapacity * 1024;
+        break;
+      default: // 默认GB 不变
+        capacity = this.newCapacity;
+        break;
+    }
+    if (capacity<1){
+      this.newCapacity=0;
+      this.capacityErr=false;
+      return false;
+    }
+    if (capacity>16777216){
+      this.newCapacity=0;
+      this.capacityErr=false;
+      return false;
+    }else{
+      this.capacityErr=true;
+      return true;
+    }
+
   }
 }
