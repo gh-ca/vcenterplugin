@@ -334,6 +334,7 @@
                     {{'vmfs.unitM' | translate}}
                   </label>
                 </clr-checkbox-wrapper>
+                <clr-control-helper *ngIf="bandWidthMaxErrTips" style="color: red"><clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{'errorMsg.iposMaxMinTips' | translate}}</clr-control-helper>
               </clr-checkbox-container>
               <!-- 交通管制对象 IOPS 上限-->
               <clr-checkbox-container *ngIf="addForm.control_policyUpper == '1'">
@@ -346,6 +347,7 @@
                            [(ngModel)]="addForm.maxIops" (blur)="qosBlur('add', 'maxiops');"/>
                   </label>
                 </clr-checkbox-wrapper>
+                <clr-control-helper *ngIf="iopsMaxErrTips" style="color: red"><clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{'errorMsg.iposMaxMinTips' | translate}}</clr-control-helper>
               </clr-checkbox-container>
 
               <div *ngIf="!hiddenLowerFlag">
@@ -362,6 +364,7 @@
                       {{'vmfs.unitM' | translate}}
                     </label>
                   </clr-checkbox-wrapper>
+                  <clr-control-helper *ngIf="bandWidthMinErrTips" style="color: red"><clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{'errorMsg.iposMaxMinTips' | translate}}</clr-control-helper>
                 </clr-checkbox-container>
                 <!-- 交通管制对象 IOPS 下限-->
                 <clr-checkbox-container *ngIf="addForm.control_policyLower == '0'">
@@ -374,6 +377,7 @@
                              [(ngModel)]="addForm.minIops" (blur)="qosBlur('add', 'miniops');"/>
                     </label>
                   </clr-checkbox-wrapper>
+                  <clr-control-helper *ngIf="iopsMinErrTips" style="color: red"><clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{'errorMsg.iposMaxMinTips' | translate}}</clr-control-helper>
                 </clr-checkbox-container>
                 <!-- 交通管制对象 latency 时延-->
                 <clr-checkbox-container *ngIf="addForm.control_policyLower == '0'">
@@ -397,6 +401,7 @@
                       {{'vmfs.latencyUnitUs' | translate}}
                     </label>
                   </clr-checkbox-wrapper>
+                  <clr-control-helper *ngIf="latencyErrTips" style="color: red"><clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{'errorMsg.iposMaxMinTips' | translate}}</clr-control-helper>
                 </clr-checkbox-container>
               </div>
             </div>

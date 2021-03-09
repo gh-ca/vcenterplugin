@@ -169,6 +169,12 @@ export class VmfsListComponent implements OnInit {
 
   isFirstLoadChartData = true;
 
+  bandWidthMaxErrTips = false;// 带宽上限错误提示
+  bandWidthMinErrTips = false;// 带宽下限错误提示
+  iopsMaxErrTips = false;// IOPS上限错误提示
+  iopsMinErrTips = false;// IOPS下限错误提示
+  latencyErrTips = false;// 时延错误提示
+
 
   ngOnInit() {
     // 列表数据
@@ -181,6 +187,7 @@ export class VmfsListComponent implements OnInit {
     this.modifyNameChanged = false;
     // 初始化form
     this.modifyForm = new GetForm().getEditForm();
+    this.initIopsErrTips(true, true);
     console.log('this.rowSelected[0]', this.modifyForm );
     if (this.rowSelected.length === 1) {
       this.modalLoading = false;
@@ -630,6 +637,8 @@ export class VmfsListComponent implements OnInit {
 
     // 初始化服务等级数据
     this.setServiceLevelList();
+
+    this.initIopsErrTips(true, true);
 
     // 初始化存储池
     this.storagePoolList = [];
@@ -1487,7 +1496,7 @@ export class VmfsListComponent implements OnInit {
    * @param operationType add modify
    * @param valType
    */
-  qosBlur(type:String, operationType:string) {
+  qosBlur(type:string, operationType:string) {
 
     let objVal;
     if (type === 'add') {
@@ -1528,12 +1537,19 @@ export class VmfsListComponent implements OnInit {
       }
     }
     if (objVal && objVal !== '') {
-      if (objVal.toString().match(/\d+(\.\d{0,2})?/)) {
-        objVal = objVal.toString().match(/\d+(\.\d{0,2})?/)[0];
+      debugger
+      if (objVal.toString().match( /^[1-9]\d*$/)) {
+        objVal = objVal.toString().match(/^[1-9]\d*$/)[0];
       } else {
         objVal = '';
       }
     }
+    if (objVal > 999999999){
+      objVal = '';
+    } else if (objVal < 1) {
+      objVal = '';
+    }
+
     if (type === 'add') {
       switch (operationType) {
         case 'maxbandwidth':
@@ -1570,6 +1586,110 @@ export class VmfsListComponent implements OnInit {
           this.modifyForm.latency = objVal;
           break;
       }
+    }
+
+    this.iopsErrTips(objVal, operationType, type);
+  }
+
+  /**
+   * iops错误提示
+   * @param objVal
+   * @param operationType
+   */
+  iopsErrTips(objVal:string, operationType:string, type:string) {
+    if (operationType) {
+      if (type == 'add') {
+        switch (operationType) {
+          case 'maxbandwidth':
+            if (objVal == '' && this.form.maxbandwidthChoose) {
+              this.bandWidthMaxErrTips = true;
+            }else {
+              this.bandWidthMaxErrTips = false;
+            }
+            break;
+          case 'maxiops':
+            if (objVal == '' && this.form.maxiopsChoose) {
+              this.iopsMaxErrTips = true;
+            }else {
+              this.iopsMaxErrTips = false;
+            }
+            break;
+          case 'minbandwidth':
+            if (objVal == '' && this.form.minbandwidthChoose) {
+              this.bandWidthMinErrTips = true;
+            }else {
+              this.bandWidthMinErrTips = false;
+            }
+            break;
+          case 'miniops':
+            if (objVal == '' && this.form.miniopsChoose) {
+              this.iopsMinErrTips = true;
+            }else {
+              this.iopsMinErrTips = false;
+            }
+            break;
+          default:
+            if (objVal == '' && this.form.latencyChoose) {
+              this.latencyErrTips = true;
+            }else {
+              this.latencyErrTips = false;
+            }
+            break;
+        }
+      } else {
+        switch (operationType) {
+          case 'max_bandwidth':
+            if (objVal == '' && this.modifyForm.maxbandwidthChoose) {
+              this.bandWidthMaxErrTips = true;
+            }else {
+              this.bandWidthMaxErrTips = false;
+            }
+            break;
+          case 'max_iops':
+            if (objVal == '' && this.modifyForm.maxiopsChoose) {
+              this.iopsMaxErrTips = true;
+            }else {
+              this.iopsMaxErrTips = false;
+            }
+            break;
+          case 'min_bandwidth':
+            if (objVal == '' && this.modifyForm.minbandwidthChoose) {
+              this.bandWidthMinErrTips = true;
+            }else {
+              this.bandWidthMinErrTips = false;
+            }
+            break;
+          case 'min_iops':
+            if (objVal == '' && this.modifyForm.miniopsChoose) {
+              this.iopsMinErrTips = true;
+            }else {
+              this.iopsMinErrTips = false;
+            }
+            break;
+          default:
+            if (objVal == '' && this.modifyForm.latencyChoose) {
+              this.latencyErrTips = true;
+            }else {
+              this.latencyErrTips = false;
+            }
+            break;
+        }
+      }
+    }
+  }
+
+  /**
+   * 初始化IOPS错误提示
+   */
+  initIopsErrTips(upper:boolean, lower:boolean){
+    if (upper) {
+      this.bandWidthMaxErrTips = false;
+      this.iopsMaxErrTips = false;
+    }
+    if (lower) {
+      this.bandWidthMinErrTips = false;
+      this.iopsMinErrTips = false;
+      this.latencyErrTips = false;
     }
   }
 
@@ -2047,6 +2167,7 @@ export class VmfsListComponent implements OnInit {
     if (lowerObj) {
       lowerChecked = lowerObj.checked;
     }
+    this.initIopsErrTips(upperChecked, lowerChecked);
     if (isUpper) {
       if(upperChecked) {
         form.control_policyUpper = '1';

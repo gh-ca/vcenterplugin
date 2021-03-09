@@ -51,6 +51,12 @@ export class ModifyComponent implements OnInit{
   showWorkLoadFlag = false; // 应用类型展示
   latencyIsSelect = false; // 时延为下拉框
 
+  bandWidthMaxErrTips = false;// 带宽上限错误提示
+  bandWidthMinErrTips = false;// 带宽下限错误提示
+  iopsMaxErrTips = false;// IOPS上限错误提示
+  iopsMinErrTips = false;// IOPS下限错误提示
+  latencyErrTips = false;// 时延错误提示
+
   ngOnInit(): void {
     this.initData();
   }
@@ -76,7 +82,7 @@ export class ModifyComponent implements OnInit{
         } else {
           const ctx = this.globalsService.getClientSdk().app.getContextObjects();
           this.objectId = ctx[0].id;
-          // this.objectId = "urn:vmomi:Datastore:datastore-4022:674908e5-ab21-4079-9cb1-596358ee5dd1";
+          // this.objectId = "urn:vmomi:Datastore:datastore-10017:674908e5-ab21-4079-9cb1-596358ee5dd1";
         }
 
         // 获取vmfs数据
@@ -208,6 +214,11 @@ export class ModifyComponent implements OnInit{
         objVal = '';
       }
     }
+    if (objVal > 999999999){
+      objVal = '';
+    } else if (objVal < 1) {
+      objVal = '';
+    }
     switch (operationType) {
       case 'max_bandwidth':
         this.modifyForm.max_bandwidth = objVal;
@@ -225,6 +236,7 @@ export class ModifyComponent implements OnInit{
         this.modifyForm.latency = objVal;
         break;
     }
+    this.iopsErrTips(objVal, operationType);
   }
 
   /**
@@ -441,6 +453,7 @@ export class ModifyComponent implements OnInit{
     if (lowerObj) {
       lowerChecked = lowerObj.checked;
     }
+    this.initIopsErrTips(upperChecked, lowerChecked);
     if (isUpper) {
       if(upperChecked) {
         form.control_policyUpper = '1';
@@ -463,6 +476,68 @@ export class ModifyComponent implements OnInit{
         form.control_policyUpper = undefined;
         upperObj.checked = false;
       }
+    }
+  }
+
+  /**
+   * iops错误提示
+   * @param objVal
+   * @param operationType
+   */
+  iopsErrTips(objVal:string, operationType:string) {
+    if (operationType) {
+      switch (operationType) {
+        case 'max_bandwidth':
+          if (objVal == '' && this.modifyForm.maxbandwidthChoose) {
+            this.bandWidthMaxErrTips = true;
+          }else {
+            this.bandWidthMaxErrTips = false;
+          }
+          break;
+        case 'max_iops':
+          if (objVal == '' && this.modifyForm.maxiopsChoose) {
+            this.iopsMaxErrTips = true;
+          }else {
+            this.iopsMaxErrTips = false;
+          }
+          break;
+        case 'min_bandwidth':
+          if (objVal == '' && this.modifyForm.minbandwidthChoose) {
+            this.bandWidthMinErrTips = true;
+          }else {
+            this.bandWidthMinErrTips = false;
+          }
+          break;
+        case 'min_iops':
+          if (objVal == '' && this.modifyForm.miniopsChoose) {
+            this.iopsMinErrTips = true;
+          }else {
+            this.iopsMinErrTips = false;
+          }
+          break;
+        default:
+          if (objVal == '' && this.modifyForm.latencyChoose) {
+            this.latencyErrTips = true;
+          }else {
+            this.latencyErrTips = false;
+          }
+          break;
+      }
+    }
+  }
+
+  /**
+   * 初始化IOPS错误提示
+   */
+  initIopsErrTips(upper:boolean, lower:boolean){
+    if (upper) {
+      this.bandWidthMaxErrTips = false;
+      this.iopsMaxErrTips = false;
+    }
+    if (lower) {
+      this.bandWidthMinErrTips = false;
+      this.iopsMinErrTips = false;
+      this.latencyErrTips = false;
     }
   }
 }
