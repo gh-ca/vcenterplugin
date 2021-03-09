@@ -120,7 +120,7 @@ export class DeviceFilter implements ClrDatagridFilterInterface<VmfsInfo>, OnIni
     if (this.device === '') {
       return true;
     } else {
-      const  storageId = item.storageId.toLowerCase();
+      const  storageId = item.deviceId.replace(/-/g, '').toLowerCase();
       return this.device == storageId;
     }
   }
