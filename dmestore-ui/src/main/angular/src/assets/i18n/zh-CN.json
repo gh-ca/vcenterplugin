@@ -794,6 +794,7 @@
       "connected":"已连接",
       "creating":"创建中",
       "normal":"正常",
+      "abnormal":"故障",
       "mapping":"映射中",
       "unmapping":"解除映射中",
       "deleting":"删除中",

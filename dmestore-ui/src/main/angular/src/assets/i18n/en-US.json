@@ -792,6 +792,7 @@
        "connected":"Connected",
        "creating":"Creating",
        "normal":"Normal",
+       "abnormal":"Abnormal",
        "mapping":"Mapping",
        "unmapping":"Unmapping",
        "deleting":"Deleting",
