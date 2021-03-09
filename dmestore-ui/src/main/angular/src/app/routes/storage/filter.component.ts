@@ -534,32 +534,12 @@ export class VolProtectionStatusFilter implements ClrDatagridFilterInterface<Vol
           <label>{{'vmfs.filter.all' | translate}}</label>
         </clr-radio-wrapper>
         <clr-radio-wrapper>
-          <input type="radio" clrRadio name="fsStatus" (change)="changeFunc($event)" [(ngModel)]="fsStatus" value="creating" />
-          <label>{{'enum.status.creating' | translate}}</label>
-        </clr-radio-wrapper>
-        <clr-radio-wrapper>
           <input type="radio" clrRadio name="fsStatus" (change)="changeFunc($event)" [(ngModel)]="fsStatus" value="normal" />
           <label>{{'enum.status.normal' | translate}}</label>
         </clr-radio-wrapper>
         <clr-radio-wrapper>
-          <input type="radio" clrRadio name="fsStatus" (change)="changeFunc($event)" [(ngModel)]="fsStatus" value="mapping" />
-          <label>{{'enum.status.mapping' | translate}}</label>
-        </clr-radio-wrapper>
-        <clr-radio-wrapper>
-          <input type="radio" clrRadio name="fsStatus" (change)="changeFunc($event)" [(ngModel)]="fsStatus" value="unmapping" />
-          <label>{{'enum.status.unmapping' | translate}}</label>
-        </clr-radio-wrapper>
-        <clr-radio-wrapper>
-          <input type="radio" clrRadio name="fsStatus" (change)="changeFunc($event)" [(ngModel)]="fsStatus" value="deleting" />
-          <label>{{'enum.status.deleting' | translate}}</label>
-        </clr-radio-wrapper>
-        <clr-radio-wrapper>
-          <input type="radio" clrRadio name="fsStatus" (change)="changeFunc($event)" [(ngModel)]="fsStatus" value="error" />
-          <label>{{'enum.status.error' | translate}}</label>
-        </clr-radio-wrapper>
-        <clr-radio-wrapper>
-          <input type="radio" clrRadio name="fsStatus" (change)="changeFunc($event)" [(ngModel)]="fsStatus" value="expanding" />
-          <label>{{'enum.status.expanding' | translate}}</label>
+          <input type="radio" clrRadio name="fsStatus" (change)="changeFunc($event)" [(ngModel)]="fsStatus" value="faulty" />
+          <label>{{'enum.status.fault' | translate}}</label>
         </clr-radio-wrapper>
       </clr-radio-container>
   `,
@@ -844,7 +824,11 @@ export class DiskStatusFilter implements ClrDatagridFilterInterface<StorageDisk>
       return true;
     } else {
       const  quota = item.status.toString();
-      return quota.toLowerCase().indexOf(this.status.toLowerCase()) >= 0;
+      if (this.status == 'fault') {
+        return quota.toLowerCase().indexOf('offline') >= 0 || quota.toLowerCase().indexOf(this.status.toLowerCase()) >= 0;
+      } else {
+        return quota.toLowerCase().indexOf(this.status.toLowerCase()) >= 0;
+      }
     }
   }
 

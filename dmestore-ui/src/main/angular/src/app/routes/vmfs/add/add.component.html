@@ -378,7 +378,6 @@
         <clr-select-container class="selectClass">
           <label style="color: #9F9F9F;">{{'vmfs.provisioningType' | translate}}</label>
           <select clrSelect [(ngModel)]="form.alloctype" name="alloctype">
-            <option value="">{{'tips.select' | translate}}</option>
             <option value="thin">thin</option>
             <option [hidden]="!showAlloctypeThick" value="thick">thick</option>
           </select>
