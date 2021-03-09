@@ -148,7 +148,7 @@
       "dataCom":"压缩",
       "database":"数据库",
       "vm":"虚拟机",
-      "userDefine":"用户自定义"
+      "userDefine":"自定义"
     },
     "mount":{
       "mount":"挂载",
