@@ -105,14 +105,12 @@ public class SystemDao extends H2DataBaseDao {
         PreparedStatement ps1 = null;
         try {
             con = getConnection();
-            for (String table : DpSqlFileConstants.ALL_TABLES) {
+            String[] clearTables = DpSqlFileConstants.ALL_TABLES;
+            if (isDisconnectDme) {
                 // 断开DME连接不能清除任务和vCenter表数据
-                if (isDisconnectDme) {
-                    if (table.equalsIgnoreCase(DpSqlFileConstants.DP_DME_TASK_INFO) ||
-                        table.equalsIgnoreCase(DpSqlFileConstants.DP_DME_VCENTER_INFO)) {
-                        continue;
-                    }
-                }
+                clearTables = DpSqlFileConstants.DISCONNECT_TABLES;
+            }
+            for (String table : clearTables) {
                 try {
                     ps1 = con.prepareStatement("DELETE FROM " + table);
                     ps1.execute();
