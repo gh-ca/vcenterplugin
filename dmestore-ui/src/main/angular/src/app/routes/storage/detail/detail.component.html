@@ -492,10 +492,7 @@
                         <clr-dg-cell class="over_flow">{{item.fsName}}</clr-dg-cell>
                         <clr-dg-cell title="{{item.tierName!=null?item.tierName!=''?item.tierName:'--':'--'}}" class="over_flow">{{item.tierName!=null?item.tierName!=''?item.tierName:'--':'--'}}</clr-dg-cell>
                         <clr-dg-cell class="over_flow">
-                          <span *ngIf="item.securityStyle=='mixed'">Mixed</span>
-                          <span *ngIf="item.securityStyle=='native'">Native</span>
-                          <span *ngIf="item.securityStyle=='ntfs'">NTFS</span>
-                          <span *ngIf="item.securityStyle=='unix'">UNIX</span>
+                          <span *ngIf="item.securityStyle">{{item.securityStyle}}</span>
                           <span *ngIf="!item.securityStyle||item.securityStyle==''">--</span>
                         </clr-dg-cell>
                         <clr-dg-cell class="over_flow">{{item.nfsCount}}</clr-dg-cell>

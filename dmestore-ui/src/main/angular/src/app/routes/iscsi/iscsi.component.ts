@@ -128,7 +128,9 @@ export class IscsiComponent implements OnInit, AfterViewInit {
           //   item.connectStatus = '';
           // });
           // 端口列表中不展示名称为MGMT和MAINTENANCE的端口
-          this.portList = result.data.filter(item => item.portName.toLowerCase() != 'mgmt' && item.portName.toLowerCase() != 'maintenance');
+          debugger
+          this.portList = result.data.filter(item => item.portName.toLowerCase() != 'mgmt'
+            && item.portName.toLowerCase() != 'maintenance' && item.mgmtIp);
           this.portTotal = result.data.length;
           // 连通状态
           this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法

@@ -19,7 +19,7 @@
       </form>
     </div>
     <div style="margin-top: 20px">
-      <p style="margin-top: 2%">{{'iscsi.ports' | translate}}<span style="color: red">*</span></p>
+      <p style="margin-top: 2%">{{'iscsi.ports' | translate}}<span style="color: red">*</span>&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: red">{{'iscsi.hideIpTips' | translate}}</span></p>
       <ng-container>
         <clr-datagrid [(clrDgSelected)]="configModel.ethPorts"  [clrDgLoading]="portLoading">
 
@@ -74,7 +74,7 @@
             </ng-container>
           </clr-dg-column>
 
-          <clr-dg-row *clrDgItems="let item of portList"  [clrDgItem]="item" [clrDgSelectable]="item.connectStatus == 'true'">
+          <clr-dg-row *clrDgItems="let item of portList"  [clrDgItem]="item" [clrDgSelectable]="item.connectStatusType == '4'">
             <clr-dg-cell>{{item.location}}</clr-dg-cell>
             <clr-dg-cell>{{item.portName}}</clr-dg-cell>
             <clr-dg-cell>
