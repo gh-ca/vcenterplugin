@@ -31,7 +31,7 @@
           <label></label>
           <clr-checkbox-wrapper>
             <input type="checkbox" clrCheckbox [(ngModel)]="updateNfs.sameName" name="sameName" />
-            <label>{{'nfs.modifySameName' | translate}}</label>
+            <label  style="width: 280px;">{{'nfs.modifySameName' | translate}}</label>
           </clr-checkbox-wrapper>
         </clr-checkbox-container>
         <clr-input-container *ngIf="!updateNfs.sameName">
@@ -57,7 +57,7 @@
 <!--        </clr-input-container>-->
         <!--qos-->
         <clr-toggle-wrapper>
-          <label>{{'nfs.qosPolicy' | translate}}</label>
+          <label  style="width: 100px;">{{'nfs.qosPolicy' | translate}}</label>
           <input type="checkbox" clrToggle name="qosFlag" (change)="qoSFlagChange(updateNfs);" [(ngModel)]="updateNfs.qosFlag"/>
         </clr-toggle-wrapper>
         <div *ngIf="updateNfs.qosFlag">
@@ -68,12 +68,12 @@
             <!--上限-->
             <clr-checkbox-wrapper>
               <input type="checkbox" id="editControl_policyUpper" clrCheckbox (change)="controlPolicyChangeFunc('editControl_policyUpper', 'editControl_policyLower', true, updateNfs, true);" name="control_policyUpper" />
-              <label>{{'vmfs.upperLimitControl' | translate}}</label>
+              <label  style="width: 100px;">{{'vmfs.upperLimitControl' | translate}}</label>
             </clr-checkbox-wrapper>
             <!--下限-->
             <clr-checkbox-wrapper *ngIf="!hiddenLowerFlag">
               <input type="checkbox" id="editControl_policyLower" clrCheckbox (change)="controlPolicyChangeFunc('editControl_policyUpper', 'editControl_policyLower', true, updateNfs, false);" name="control_policyLower" />
-              <label>{{'vmfs.lowerLimitControl' | translate}}</label>
+              <label style="width: 100px;">{{'vmfs.lowerLimitControl' | translate}}</label>
             </clr-checkbox-wrapper>
           </clr-checkbox-container>
 
@@ -83,7 +83,7 @@
               <label style="color: #9F9F9F;">{{'vmfs.trafficControlObject' | translate}}</label>
               <clr-checkbox-wrapper>
                 <input type="checkbox" [(ngModel)]="updateNfs.maxBandwidthChoose" name="maxbandwidthChoose" clrCheckbox/>
-                <label>
+                <label  style="width: 200px;">
                   {{'vmfs.bandwidthLimitUpper' | translate}}
                   <input type="number" min="0" [(readOnly)]="!updateNfs.maxBandwidthChoose" class="inputOneLine" name="maxBandwidth"
                          [(ngModel)]="updateNfs.maxBandwidth" (blur)="qosBlur('add', 'maxbandwidth');"/>
@@ -97,7 +97,7 @@
               <label></label>
               <clr-checkbox-wrapper>
                 <input type="checkbox" [(ngModel)]="updateNfs.maxIopsChoose" name="maxiopsChoose" clrCheckbox/>
-                <label>
+                <label style="width: 200px;">
                   {{'vmfs.IOPSLimitUpper' | translate}}
                   <input type="number" min="0" [(readOnly)]="!updateNfs.maxIopsChoose" class="inputOneLine" name="maxIops"
                          [(ngModel)]="updateNfs.maxIops" (blur)="qosBlur('add', 'maxiops');"/>
@@ -112,7 +112,7 @@
                 <label *ngIf="updateNfs.control_policyLower == '0' && updateNfs.control_policyUpper == '1'" style="color: #9F9F9F;"></label>
                 <clr-checkbox-wrapper>
                   <input type="checkbox" [(ngModel)]="updateNfs.minBandwidthChoose" name="minbandwidthChoose" clrCheckbox/>
-                  <label>
+                  <label  style="width: 200px;">
                     {{'vmfs.bandwidthLimitLower' | translate}}
                     <input type="number" min="0" [(readOnly)]="!updateNfs.minBandwidthChoose" class="inputOneLine"
                            name="minBandwidth" [(ngModel)]="updateNfs.minBandwidth" (blur)="qosBlur('add', 'minbandwidth');"/>
@@ -126,7 +126,7 @@
                 <label></label>
                 <clr-checkbox-wrapper>
                   <input type="checkbox" [(ngModel)]="updateNfs.minIopsChoose" name="minbandwidthChoose" clrCheckbox/>
-                  <label>
+                  <label style="width: 200px;">
                     {{'vmfs.IOPSLimitLower' | translate}}
                     <input type="number" min="0" [(readOnly)]="!updateNfs.minIopsChoose" class="inputOneLine" name="minIops"
                            [(ngModel)]="updateNfs.minIops" (blur)="qosBlur('add', 'miniops');"/>
@@ -139,7 +139,7 @@
                 <label></label>
                 <clr-checkbox-wrapper *ngIf="!latencyIsSelect">
                   <input type="checkbox" [(ngModel)]="updateNfs.latencyChoose" name="latencyChoose" clrCheckbox/>
-                  <label>
+                  <label style="width: 200px;">
                     {{'vmfs.latencyMax' | translate}}
                     <input type="number" min="0" [(readOnly)]="!updateNfs.latencyChoose" class="inputOneLine" name="latency"
                            [(ngModel)]="updateNfs.latency" (blur)="qosBlur('add', 'latency');"/>{{'vmfs.latencyUnit' | translate}}
@@ -147,7 +147,7 @@
                 </clr-checkbox-wrapper>
                 <clr-checkbox-wrapper *ngIf="latencyIsSelect">
                   <input type="checkbox" [(ngModel)]="updateNfs.latencyChoose" name="latencyChoose" clrCheckbox/>
-                  <label style="width: 190px;">
+                  <label style="width: 200px;">
                     {{'vmfs.latencyMax' | translate}}
                     <select [(disabled)]="!updateNfs.latencyChoose" [(ngModel)]="updateNfs.latency" name="latency" style="height: 1.2rem;width: 54%;border: none;border-bottom: 1px solid;border-bottom-color: var(--clr-forms-border-color, #b3b3b3);">
                       <option value="500">500</option>
@@ -163,7 +163,7 @@
         </div>
         <!--thin-->
         <clr-toggle-wrapper>
-          <label> {{'nfs.thin' | translate}}</label>
+          <label style="width: 100px;"> {{'nfs.thin' | translate}}</label>
           <input type="checkbox" name="thin" clrToggle [(ngModel)]="updateNfs.thin"/>
         </clr-toggle-wrapper>
         <!--重删-->
@@ -185,7 +185,7 @@
           </select>
         </clr-select-container>
         <clr-toggle-wrapper *ngIf="!dorado">
-          <label>{{'nfs.capAuto' | translate}}</label>
+          <label style="width: 100px;">{{'nfs.capAuto' | translate}}</label>
           <input type="checkbox" clrToggle [(ngModel)]="updateNfs.autoSizeEnable" name="autoSizeEnable"/>
         </clr-toggle-wrapper>
       </form>
@@ -227,7 +227,7 @@
           <label></label>
           <clr-checkbox-wrapper>
             <input type="checkbox" clrCheckbox [(ngModel)]="updateNfs.sameName" name="sameName" />
-            <label>{{'nfs.modifySameName' | translate}}</label>
+            <label  style="width: 280px;">{{'nfs.modifySameName' | translate}}</label>
           </clr-checkbox-wrapper>
         </clr-checkbox-container>
         <clr-input-container *ngIf="!updateNfs.sameName">
@@ -253,7 +253,7 @@
 <!--        </clr-input-container>-->
         <!--qos-->
         <clr-toggle-wrapper>
-          <label>{{'nfs.qosPolicy' | translate}}</label>
+          <label  style="width: 100px;">{{'nfs.qosPolicy' | translate}}</label>
           <input type="checkbox" clrToggle name="qosFlag" (change)="qoSFlagChange(updateNfs);" [(ngModel)]="updateNfs.qosFlag"/>
         </clr-toggle-wrapper>
         <div *ngIf="updateNfs.qosFlag">
@@ -263,12 +263,12 @@
             <!--上限-->
             <clr-checkbox-wrapper>
               <input type="checkbox" id="editControl_policyUpper" clrCheckbox (change)="controlPolicyChangeFunc('editControl_policyUpper', 'editControl_policyLower', true, updateNfs, true);" name="control_policyUpper" />
-              <label>{{'vmfs.upperLimitControl' | translate}}</label>
+              <label style="width: 100px;">{{'vmfs.upperLimitControl' | translate}}</label>
             </clr-checkbox-wrapper>
             <!--下限-->
             <clr-checkbox-wrapper *ngIf="!hiddenLowerFlag">
               <input type="checkbox" id="editControl_policyLower" clrCheckbox (change)="controlPolicyChangeFunc('editControl_policyUpper', 'editControl_policyLower', true, updateNfs, false);" name="control_policyLower" />
-              <label>{{'vmfs.lowerLimitControl' | translate}}</label>
+              <label style="width: 100px;">{{'vmfs.lowerLimitControl' | translate}}</label>
             </clr-checkbox-wrapper>
           </clr-checkbox-container>
 
@@ -278,7 +278,7 @@
               <label style="color: #9F9F9F;">{{'vmfs.trafficControlObject' | translate}}</label>
               <clr-checkbox-wrapper>
                 <input type="checkbox" [(ngModel)]="updateNfs.maxBandwidthChoose" name="maxbandwidthChoose" clrCheckbox/>
-                <label>
+                <label style="width: 200px;">
                   {{'vmfs.bandwidthLimitUpper' | translate}}
                   <input type="number" min="0" [(readOnly)]="!updateNfs.maxBandwidthChoose" class="inputOneLine" name="maxBandwidth"
                          [(ngModel)]="updateNfs.maxBandwidth" (blur)="qosBlur('add', 'maxbandwidth');"/>
@@ -292,7 +292,7 @@
               <label></label>
               <clr-checkbox-wrapper>
                 <input type="checkbox" [(ngModel)]="updateNfs.maxIopsChoose" name="maxiopsChoose" clrCheckbox/>
-                <label>
+                <label style="width: 200px;">
                   {{'vmfs.IOPSLimitUpper' | translate}}
                   <input type="number" min="0" [(readOnly)]="!updateNfs.maxIopsChoose" class="inputOneLine" name="maxIops"
                          [(ngModel)]="updateNfs.maxIops" (blur)="qosBlur('add', 'maxiops');"/>
@@ -307,7 +307,7 @@
                 <label *ngIf="updateNfs.control_policyLower == '0' && updateNfs.control_policyUpper == '1'" style="color: #9F9F9F;"></label>
                 <clr-checkbox-wrapper>
                   <input type="checkbox" [(ngModel)]="updateNfs.minBandwidthChoose" name="minbandwidthChoose" clrCheckbox/>
-                  <label>
+                  <label style="width: 200px;">
                     {{'vmfs.bandwidthLimitLower' | translate}}
                     <input type="number" min="0" [(readOnly)]="!updateNfs.minBandwidthChoose" class="inputOneLine"
                            name="minBandwidth" [(ngModel)]="updateNfs.minBandwidth" (blur)="qosBlur('add', 'minbandwidth');"/>
@@ -321,7 +321,7 @@
                 <label></label>
                 <clr-checkbox-wrapper>
                   <input type="checkbox" [(ngModel)]="updateNfs.minIopsChoose" name="minbandwidthChoose" clrCheckbox/>
-                  <label>
+                  <label style="width: 200px;">
                     {{'vmfs.IOPSLimitLower' | translate}}
                     <input type="number" min="0" [(readOnly)]="!updateNfs.minIopsChoose" class="inputOneLine" name="minIops"
                            [(ngModel)]="updateNfs.minIops" (blur)="qosBlur('add', 'miniops');"/>
@@ -334,7 +334,7 @@
                 <label></label>
                 <clr-checkbox-wrapper *ngIf="!latencyIsSelect">
                   <input type="checkbox" [(ngModel)]="updateNfs.latencyChoose" name="latencyChoose" clrCheckbox/>
-                  <label>
+                  <label style="width: 200px;">
                     {{'vmfs.latencyMax' | translate}}
                     <input type="number" min="0" [(readOnly)]="!updateNfs.latencyChoose" class="inputOneLine" name="latency"
                            [(ngModel)]="updateNfs.latency" (blur)="qosBlur('add', 'latency');"/>{{'vmfs.latencyUnit' | translate}}
@@ -342,7 +342,7 @@
                 </clr-checkbox-wrapper>
                 <clr-checkbox-wrapper *ngIf="latencyIsSelect">
                   <input type="checkbox" [(ngModel)]="updateNfs.latencyChoose" name="latencyChoose" clrCheckbox/>
-                  <label style="width: 190px;">
+                  <label style="width: 200px;">
                     {{'vmfs.latencyMax' | translate}}
                     <select [(disabled)]="!updateNfs.latencyChoose" [(ngModel)]="updateNfs.latency" name="latency" style="height: 1.2rem;width: 54%;border: none;border-bottom: 1px solid;border-bottom-color: var(--clr-forms-border-color, #b3b3b3);">
                       <option value="500">500</option>
@@ -358,7 +358,7 @@
         </div>
         <!--thin-->
         <clr-toggle-wrapper>
-          <label> {{'nfs.thin' | translate}}</label>
+          <label style="width: 100px;"> {{'nfs.thin' | translate}}</label>
           <input type="checkbox" name="thin" clrToggle [(ngModel)]="updateNfs.thin"/>
         </clr-toggle-wrapper>
         <!--重删-->
@@ -379,8 +379,8 @@
             <option value="true">{{'nfs.enable' | translate}}</option>
           </select>
         </clr-select-container>
-        <clr-toggle-wrapper >
-          <label>{{'nfs.capAuto' | translate}}</label>
+        <clr-toggle-wrapper *ngIf="!dorado" >
+          <label style="width: 200px;">{{'nfs.capAuto' | translate}}</label>
           <input type="checkbox" clrToggle [(ngModel)]="updateNfs.autoSizeEnable" name="autoSizeEnable"/>
         </clr-toggle-wrapper>
       </form>
