@@ -1319,14 +1319,22 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                         if (statisticObject != null) {
                             Storage storage = new Storage();
                             storage.setId(storageId);
-                            storage.setMaxBandwidth(ToolUtils.jsonToDou(
-                                statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORDEVICE_BANDWIDTH)));
-                            storage.setMaxCpuUtilization(ToolUtils.jsonToDou(
-                                statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORDEVICE_CPUUSAGE)));
-                            storage.setMaxLatency(ToolUtils.jsonToDou(
-                                statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORDEVICE_RESPONSETIME)));
-                            storage.setMaxOps(ToolUtils.jsonToDou(
-                                statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORDEVICE_THROUGHPUT)));
+                            if (statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORDEVICE_BANDWIDTH) != null) {
+                                storage.setMaxBandwidth(ToolUtils.jsonToDou(
+                                    statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORDEVICE_BANDWIDTH)));
+                            }
+                            if (statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORDEVICE_CPUUSAGE) != null) {
+                                storage.setMaxCpuUtilization(ToolUtils.jsonToDou(
+                                    statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORDEVICE_CPUUSAGE)));
+                            }
+                            if (statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORDEVICE_RESPONSETIME) != null) {
+                                storage.setMaxLatency(ToolUtils.jsonToDou(
+                                    statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORDEVICE_RESPONSETIME)));
+                            }
+                            if (statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORDEVICE_THROUGHPUT) != null) {
+                                storage.setMaxOps(ToolUtils.jsonToDou(
+                                    statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORDEVICE_THROUGHPUT)));
+                            }
                             relists.add(storage);
                         }
                     }
@@ -1356,12 +1364,19 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                         if (statisticObject != null) {
                             StoragePool sp = new StoragePool();
                             sp.setId(storagePoolId);
-                            sp.setMaxIops(ToolUtils.jsonToFloat(
-                                statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORAGEPOOL_THROUGHPUT)));
-                            sp.setMaxBandwidth(ToolUtils.jsonToFloat(
-                                statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORAGEPOOL_BANDWIDTH)));
-                            sp.setMaxLatency(ToolUtils.jsonToFloat(
-                                statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORAGEPOOL_RESPONSETIME)));
+                            if (statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORAGEPOOL_THROUGHPUT) != null) {
+                                sp.setMaxIops(ToolUtils.jsonToFloat(
+                                    statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORAGEPOOL_THROUGHPUT)));
+                            }
+                            if (statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORAGEPOOL_BANDWIDTH) != null) {
+                                sp.setMaxBandwidth(ToolUtils.jsonToFloat(
+                                    statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORAGEPOOL_BANDWIDTH)));
+                            }
+                            if (statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORAGEPOOL_RESPONSETIME) !=
+                                null) {
+                                sp.setMaxLatency(ToolUtils.jsonToFloat(
+                                    statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORAGEPOOL_RESPONSETIME)));
+                            }
                             relists.add(sp);
                         }
                     }
@@ -1392,14 +1407,22 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                         if (statisticObject != null) {
                             StorageControllers sp = new StorageControllers();
                             sp.setId(storagecontrollerid);
-                            sp.setIops(ToolUtils.jsonToFloat(
-                                statisticObject.get(DmeIndicatorConstants.COUNTER_ID_CONTROLLER_THROUGHPUT)));
-                            sp.setBandwith(ToolUtils.jsonToFloat(
-                                statisticObject.get(DmeIndicatorConstants.COUNTER_ID_CONTROLLER_BANDWIDTH)));
-                            sp.setLantency(ToolUtils.jsonToFloat(
-                                statisticObject.get(DmeIndicatorConstants.COUNTER_ID_CONTROLLER_RESPONSETIME)));
-                            sp.setCpuUsage(ToolUtils.jsonToFloat(
-                                statisticObject.get(DmeIndicatorConstants.COUNTER_ID_CONTROLLER_CPUUSAGE)));
+                            if (statisticObject.get(DmeIndicatorConstants.COUNTER_ID_CONTROLLER_THROUGHPUT) != null) {
+                                sp.setIops(ToolUtils.jsonToFloat(
+                                    statisticObject.get(DmeIndicatorConstants.COUNTER_ID_CONTROLLER_THROUGHPUT)));
+                            }
+                            if (statisticObject.get(DmeIndicatorConstants.COUNTER_ID_CONTROLLER_BANDWIDTH) != null) {
+                                sp.setBandwith(ToolUtils.jsonToFloat(
+                                    statisticObject.get(DmeIndicatorConstants.COUNTER_ID_CONTROLLER_BANDWIDTH)));
+                            }
+                            if (statisticObject.get(DmeIndicatorConstants.COUNTER_ID_CONTROLLER_RESPONSETIME) != null) {
+                                sp.setLantency(ToolUtils.jsonToFloat(
+                                    statisticObject.get(DmeIndicatorConstants.COUNTER_ID_CONTROLLER_RESPONSETIME)));
+                            }
+                            if (statisticObject.get(DmeIndicatorConstants.COUNTER_ID_CONTROLLER_CPUUSAGE) != null) {
+                                sp.setCpuUsage(ToolUtils.jsonToFloat(
+                                    statisticObject.get(DmeIndicatorConstants.COUNTER_ID_CONTROLLER_CPUUSAGE)));
+                            }
                             relists.add(sp);
                         }
                     }
@@ -1429,23 +1452,19 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                         if (statisticObject != null) {
                             StorageDisk sp = new StorageDisk();
                             sp.setId(storageDiskId);
-                            if (ToolUtils.jsonToFloat(
-                                statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORAGEPORT_THROUGHPUT)) != 0.0f) {
+                            if (statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORAGEPORT_THROUGHPUT) != null) {
                                 sp.setIops(ToolUtils.jsonToFloat(
                                     statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORAGEPORT_THROUGHPUT)));
                             }
-                            if (ToolUtils.jsonToFloat(
-                                statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORAGEPORT_BANDWIDTH)) != 0.0f) {
+                            if (statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORAGEPORT_BANDWIDTH) != null) {
                                 sp.setBandwith(ToolUtils.jsonToFloat(
                                     statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORAGEPORT_BANDWIDTH)));
                             }
-                            if (ToolUtils.jsonToFloat(
-                                statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORAGEPORT_RESPONSETIME)) != 0.0f) {
+                            if (statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORAGEPORT_RESPONSETIME) != null) {
                                 sp.setLantency(ToolUtils.jsonToFloat(
                                     statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORAGEPORT_RESPONSETIME)));
                             }
-                            if (ToolUtils.jsonToFloat(
-                                statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORAGEPORT_UTILITY)) != 0.0f) {
+                            if (statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORAGEPORT_UTILITY) != null) {
                                 sp.setUseage(ToolUtils.jsonToFloat(
                                     statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORAGEPORT_UTILITY)));
                             }
@@ -1477,14 +1496,22 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                     if (statisticObject != null) {
                         StoragePort sp = new StoragePort();
                         sp.setId(storagePortId);
-                        sp.setIops(ToolUtils.jsonToFloat(
-                            statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORAGEPORT_THROUGHPUT)));
-                        sp.setBandwith(ToolUtils.jsonToFloat(
-                            statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORAGEPORT_BANDWIDTH)));
-                        sp.setLantency(ToolUtils.jsonToFloat(
-                            statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORAGEPORT_RESPONSETIME)));
-                        sp.setUseage(ToolUtils.jsonToFloat(
-                            statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORAGEPORT_UTILITY)));
+                        if (statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORAGEPORT_THROUGHPUT)!=null){
+                            sp.setIops(ToolUtils.jsonToFloat(
+                                statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORAGEPORT_THROUGHPUT)));
+                        }
+                        if (statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORAGEPORT_BANDWIDTH) != null) {
+                            sp.setBandwith(ToolUtils.jsonToFloat(
+                                statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORAGEPORT_BANDWIDTH)));
+                        }
+                        if (statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORAGEPORT_RESPONSETIME) != null) {
+                            sp.setLantency(ToolUtils.jsonToFloat(
+                                statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORAGEPORT_RESPONSETIME)));
+                        }
+                        if (statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORAGEPORT_UTILITY) != null) {
+                            sp.setUseage(ToolUtils.jsonToFloat(
+                                statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORAGEPORT_UTILITY)));
+                        }
                         relists.add(sp);
                     }
                 }
@@ -1513,12 +1540,18 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                         if (statisticObject != null) {
                             Volume sp = new Volume();
                             sp.setWwn(wwnid);
-                            sp.setIops(ToolUtils.jsonToFloat(
-                                statisticObject.get(DmeIndicatorConstants.COUNTER_ID_VOLUME_THROUGHPUT)));
-                            sp.setBandwith(ToolUtils.jsonToFloat(
-                                statisticObject.get(DmeIndicatorConstants.COUNTER_ID_VOLUME_BANDWIDTH)));
-                            sp.setLantency(ToolUtils.jsonToFloat(
-                                statisticObject.get(DmeIndicatorConstants.COUNTER_ID_VOLUME_RESPONSETIME)));
+                            if (statisticObject.get(DmeIndicatorConstants.COUNTER_ID_VOLUME_THROUGHPUT) != null) {
+                                sp.setIops(ToolUtils.jsonToFloat(
+                                    statisticObject.get(DmeIndicatorConstants.COUNTER_ID_VOLUME_THROUGHPUT)));
+                            }
+                            if (statisticObject.get(DmeIndicatorConstants.COUNTER_ID_VOLUME_BANDWIDTH) != null) {
+                                sp.setBandwith(ToolUtils.jsonToFloat(
+                                    statisticObject.get(DmeIndicatorConstants.COUNTER_ID_VOLUME_BANDWIDTH)));
+                            }
+                            if (statisticObject.get(DmeIndicatorConstants.COUNTER_ID_VOLUME_RESPONSETIME) != null) {
+                                sp.setLantency(ToolUtils.jsonToFloat(
+                                    statisticObject.get(DmeIndicatorConstants.COUNTER_ID_VOLUME_RESPONSETIME)));
+                            }
                             relists.add(sp);
                         }
                     }
