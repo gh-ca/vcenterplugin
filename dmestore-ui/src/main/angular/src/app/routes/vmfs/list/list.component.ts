@@ -267,7 +267,10 @@ export class VmfsListComponent implements OnInit {
 
   // 修改 处理
   modifyHandleFunc() {
-
+    if (this.bandWidthMaxErrTips || this.iopsMaxErrTips
+      || this.bandWidthMinErrTips || this.iopsMinErrTips || this.latencyErrTips) {
+      return;
+    }
     // 设置修改的卷名称以及修改后的名称
     if (this.modifyForm.isSameName) {
       this.modifyForm.newVoName = this.modifyForm.name;
@@ -680,6 +683,11 @@ export class VmfsListComponent implements OnInit {
   }
   // 添加vmfs 处理
   addVmfsHanlde() {
+    if (this.bandWidthMaxErrTips || this.iopsMaxErrTips
+      || this.bandWidthMinErrTips || this.iopsMinErrTips || this.latencyErrTips) {
+      return;
+    }
+
     const selectResult = this.serviceLevelList.find(item => item.show === true);
     if ((this.levelCheck === 'level' && selectResult && selectResult.totalCapacity !== 0) || this.levelCheck !== 'level') { // 选择服务等级
       if (selectResult) {
@@ -2213,6 +2221,35 @@ export class VmfsListComponent implements OnInit {
   addSameBtnChangeFunc(obj) {
     if (this.form.isSameName) {
       this.form.volumeName = this.form.name
+    }
+  }
+  resetQosFlag(objValue:boolean, operationType:string) {
+    switch (operationType) {
+      case 'maxbandwidth':
+        if(!objValue) {
+          this.bandWidthMaxErrTips = false;
+        }
+        break;
+      case 'maxiops':
+        if(!objValue) {
+          this.iopsMaxErrTips = false;
+        }
+        break;
+      case 'minbandwidth':
+        if(!objValue) {
+          this.bandWidthMinErrTips = false;
+        }
+        break;
+      case 'miniops':
+        if(!objValue) {
+          this.iopsMinErrTips = false;
+        }
+        break;
+      default:
+        if(!objValue) {
+          this.latencyErrTips = false;
+        }
+        break;
     }
   }
 }
