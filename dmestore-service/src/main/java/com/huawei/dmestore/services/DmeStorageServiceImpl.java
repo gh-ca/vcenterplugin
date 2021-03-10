@@ -1132,7 +1132,11 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         storagePort.setSfpStatus(ToolUtils.jsonToStr(element.get("sfpStatus")));
         storagePort.setLogicalType(ToolUtils.jsonToStr(element.get(LOGICAL_TYPE)));
         storagePort.setNumOfInitiators(ToolUtils.jsonToInt(element.get("numOfInitiators")));
-        storagePort.setSpeed(ToolUtils.jsonToInt(element.get(SPEED)));
+        if (element.get(SPEED) != null) {
+            storagePort.setSpeed(ToolUtils.jsonToInt(element.get(SPEED)));
+        } else {
+            storagePort.setSpeed(null);
+        }
         storagePort.setMaxSpeed(ToolUtils.jsonToInt(element.get("maxSpeed")));
         storagePort.setStorageDeviceId(ToolUtils.jsonToStr(element.get(STORAGE_DEVICE_ID)));
         performanceParse(storagePortMap, storagePort);
