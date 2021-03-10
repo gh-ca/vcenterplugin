@@ -74,7 +74,8 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   disconnectFailedFlag = false; // 断开连接失败
   disconnectHandleLoading = false;// 断开连接处理提示
 
-
+  passwordShow= false;
+  inputType= "text";
   connectForm = new FormGroup({
     port: new FormControl('', [
         Validators.required,
@@ -290,6 +291,8 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
 
   showPop(){
     this.popShow = true;
+    this.passwordShow=false;
+    this.inputType="password";
     this.resetForm();
   }
 
@@ -338,5 +341,15 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
       }
       this.cdr.detectChanges();
     });
+  }
+
+  showOrHide(){
+    if(this.passwordShow){
+      this.passwordShow=false;
+      this.inputType="password";
+    }else {
+      this.passwordShow=true;
+      this.inputType="type";
+    }
   }
 }
