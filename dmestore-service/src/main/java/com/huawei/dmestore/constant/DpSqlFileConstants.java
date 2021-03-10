@@ -155,14 +155,6 @@ public final class DpSqlFileConstants {
             + "'0 0 0/6 * * ?', 'syncServiceLevel', 'syncServiceLevel');";
 
     /**
-     * DP_DME_TASK_DATA_SYNCBESTPRACTISE_SQL.
-     */
-    public static final String DP_DME_TASK_DATA_SYNCBESTPRACTISE_SQL =
-        "INSERT INTO DP_DME_TASK_INFO (ID, CLASS_NAME, CRON, JOB_NAME, METHOD )  " + "VALUES (2, "
-            + "'com.huawei.dmestore.task.BackgroundCheckBestPractiseTask', "
-            + "'0 0 2 1/1 * ?', 'syncCheckBestPractise'," + " 'syncCheckBestPractise');";
-
-    /**
      * DP_DME_TASK_DATA_SCANDATASTORE_SQL.
      */
     public static final String DP_DME_TASK_DATA_SCANDATASTORE_SQL =
@@ -207,10 +199,11 @@ public final class DpSqlFileConstants {
         + "\"STATE\"  BOOLEAN, " + "\"CREATE_TIME\"  datetime NOT NULL, " + "\"PUSH_EVENT\"  BOOLEAN, "
         + "\"PUSH_EVENT_LEVEL\"  integer, " + "\"HOST_PORT\"  integer default 443, "
         + "CONSTRAINT UNIQUE_DP_HOST_IP UNIQUE (HOST_IP) " + ");";
-
     /**
-     * DPSqlFileConstant .
+     * DP_DME_TASK_DATA_SYNCBESTPRACTISE_SQL.
      */
-    private DpSqlFileConstants() {
-    }
+    public static final String DP_DME_TASK_DATA_SYNCBESTPRACTISE_SQL =
+        "INSERT INTO DP_DME_TASK_INFO (ID, CLASS_NAME, CRON, JOB_NAME, METHOD )  " + "VALUES (2, "
+            + "'com.huawei.dmestore.task.BackgroundCheckBestPractiseTask', "
+            + "'0 0 2 1/1 * ?', 'syncCheckBestPractise'," + " 'syncCheckBestPractise');";
 }
