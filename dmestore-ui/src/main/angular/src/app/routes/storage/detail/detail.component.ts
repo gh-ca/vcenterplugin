@@ -321,6 +321,7 @@ export class DetailComponent implements OnInit, AfterViewInit {
       this.detailLoading = true;
       this.detailService.getStorageDetail(this.storageId).subscribe((r: any) => {
        // this.gs.loading = false; = false;
+        this.detailLoading = false;
         if (r.code === '200'){
           this.detail = r.data;
 
@@ -332,7 +333,6 @@ export class DetailComponent implements OnInit, AfterViewInit {
           this.storageDetailTag = this.detail.storageTypeShow.storageDetailTag;
         }else{
         }
-        this.detailLoading = false;
         this.getStoragePoolList(true);
         this.cdr.detectChanges();
       });
@@ -340,8 +340,10 @@ export class DetailComponent implements OnInit, AfterViewInit {
       // 此处防止重复切换tab每次都去后台请求数据
       if (this.detail === null){
         // this.gs.loading = false;=true;
+        this.detailLoading = true;
         this.detailService.getStorageDetail(this.storageId).subscribe((r: any) => {
          // this.gs.loading = false;
+          this.detailLoading = false;
           if (r.code === '200'){
             this.detail = r.data;
             this.detail.location = this.HTMLDecode(this.detail.location);
@@ -349,9 +351,10 @@ export class DetailComponent implements OnInit, AfterViewInit {
             if(this.detail.storageTypeShow.dorado) {
               this.detail.totalEffectiveCapacity = this.detail.totalEffectiveCapacity/1024;
             }
+            this.storageDetailTag = this.detail.storageTypeShow.storageDetailTag;
             this.getStoragePoolList(true);
-            this.cdr.detectChanges();
           }
+          this.cdr.detectChanges();
         });
       }
     }
@@ -380,8 +383,12 @@ export class DetailComponent implements OnInit, AfterViewInit {
     return  str;
   }
   refreshStoragePool() {
-    this.storagePoolStatusFilter.initStatus();
-    this.storagePoolTypeFilter.initType();
+    if (this.storagePoolStatusFilter) {
+      this.storagePoolStatusFilter.initStatus();
+    }
+    if (this.storagePoolTypeFilter) {
+      this.storagePoolTypeFilter.initType();
+    }
     this.getStoragePoolList(true);
   }
   getStoragePoolList(fresh: boolean){
@@ -421,8 +428,19 @@ export class DetailComponent implements OnInit, AfterViewInit {
          // this.gs.loading = false;
           if (r.code === '200'){
             this.storagePool = r.data;
+            // 设置容量个利用率
+            this.storagePool.forEach(item => {
+              item.capUsage = item.consumedCapacity/item.totalCapacity * 100;
+              item.supRate = item.subscribedCapacity/item.totalCapacity*100
+            });
+            // 如果是v6设备存储池的类型为Block/File
+            if (this.detail.storageTypeShow.dorado){
+              this.storagePool.forEach(item => item.mediaType = "block/file");
+            }
             const allName = this.storagePool.map(item => item.name);
-            this.volStoragePoolFilter.initAllName(allName);
+            if (this.volStoragePoolFilter) {
+              this.volStoragePoolFilter.initAllName(allName);
+            }
             this.poolTotal=this.storagePool.length==null?0:this.storagePool.length;
             this.storageListInitHandle();
             this.initCapacity();
@@ -529,11 +547,22 @@ export class DetailComponent implements OnInit, AfterViewInit {
     });
   }
   refreshVolList() {
-    this.volStatusFilter.initStatus();
-    this.portTypeFilter.initType();
-    this.mapStatusFilter.initStatus();
-    this.volStoragePoolFilter.initPoolNameStatus();
-    this.volServiceLevelFilter.initServiceLevel();
+    if (this.volStatusFilter) {
+      this.volStatusFilter.initStatus();
+    }
+    if (this.portTypeFilter) {
+      this.portTypeFilter.initType();
+    }
+    if (this.mapStatusFilter) {
+      this.mapStatusFilter.initStatus();
+    }
+    if (this.volStoragePoolFilter) {
+      this.volStoragePoolFilter.initPoolNameStatus();
+    }
+    if (this.volServiceLevelFilter) {
+      this.volServiceLevelFilter.initServiceLevel();
+    }
+
     // this.volProtectionStatusFilter.initProtectionStatus();
     // 清空查询条件
     this.clearVolSearchInfo();
@@ -627,8 +656,13 @@ export class DetailComponent implements OnInit, AfterViewInit {
     });
   }
   refreshFileSystem() {
-    this.fsStatusFilter.initStatus();
-    this.fsTypeFilter.initType();
+    if (this.fsStatusFilter) {
+      this.fsStatusFilter.initStatus();
+    }
+    if (this.fsTypeFilter) {
+      this.fsTypeFilter.initType();
+    }
+
     this.getFileSystemList(true);
   }
   getFileSystemList(fresh: boolean){
@@ -658,8 +692,13 @@ export class DetailComponent implements OnInit, AfterViewInit {
     }
   }
   refreshDtree() {
-    this.dtreeSecModFilter.initSecMod();
-    this.dtreeQuotaFilter.initQuota();
+    if (this.dtreeSecModFilter) {
+      this.dtreeSecModFilter.initSecMod();
+    }
+    if (this.dtreeQuotaFilter) {
+      this.dtreeQuotaFilter.initQuota();
+    }
+
     this.getDtreeList(true);
   }
   getDtreeList(fresh: boolean){
@@ -1259,9 +1298,16 @@ export class DetailComponent implements OnInit, AfterViewInit {
    */
   clearVolSearchInfo() {
     this.volName = null;
-    this.volStatusFilter.initStatus();
-    this.portTypeFilter.initType();
-    this.mapStatusFilter.initStatus();
+    if (this.volStatusFilter) {
+      this.volStatusFilter.initStatus();
+    }
+    if (this.portTypeFilter) {
+      this.portTypeFilter.initType();
+    }
+    if (this.mapStatusFilter) {
+      this.mapStatusFilter.initStatus();
+    }
+
     this.volSortDir = null;
     this.volSortKey = null;
     this.volReqParam = null;

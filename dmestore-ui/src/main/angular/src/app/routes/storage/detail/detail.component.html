@@ -7,7 +7,7 @@
       <clr-tabs>
         <clr-tab >
           <button clrTabLink id="conf" (click)="changeTab('conf')">{{'storage.detail.conf.configuration' | translate}}</button>
-          <clr-tab-content id="configuration" *clrIfActive="true" >
+          <clr-tab-content id="configuration">
             <table class="table table-noborder" *ngIf="detail" [clrLoading]="detailLoading">
               <tr>
                 <td class="left">{{'storage.detail.conf.name' | translate}}</td>
@@ -68,7 +68,7 @@
               <!--Storage Pools-->
               <clr-tab>
                 <button clrTabLink id="storage" (click)="changeTab('pool')">{{'storage.detail.storagePool.storagePool' | translate}}</button>
-                <clr-tab-content id="storagePool" *clrIfActive="true">
+                <clr-tab-content id="storagePool">
                   <div class="detail-margin-top">
                     <!-- 头部按钮组 -->
                     <div class="gh-btngroup-header">
