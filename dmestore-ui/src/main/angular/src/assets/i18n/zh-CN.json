@@ -638,7 +638,8 @@
     "portNullMessage": "端口不能为空！",
     "establishConnect": "建立iSCSI连接",
     "showCol": "展示列",
-    "selectAll": "全选"
+    "selectAll": "全选",
+    "hideIpTips": "注：以下数据将不包含IP为空的数据！"
   },
   "rdm": {
     "name": "名称",
