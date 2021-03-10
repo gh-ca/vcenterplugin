@@ -353,4 +353,9 @@ input[type=number] {
   color: white;
   font-weight: bolder;
 }
-
+input::-ms-clear{
+  display: none;
+}
+body {
+  -ms-overflow-style:scrollbar;
+}
