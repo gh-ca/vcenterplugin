@@ -224,7 +224,7 @@
         <label>{{'overview.password' | translate}}</label>
         <!--<input clrInput formControlName="password" name="password" [(ngModel)]="connectModel.password" />-->
         <div clrInput style="float: left;position: relative;width: 82%">
-          <input clrInput style="width: 90%" formControlName="password" name="password"type="{{inputType}}" [(ngModel)]="connectModel.password" required/>
+          <input clrInput style="width: 90%" oncopy="return false" onpaste="return false" oncut="return false" formControlName="password" name="password"type="{{inputType}}" [(ngModel)]="connectModel.password" required/>
           <clr-icon *ngIf="passwordShow" shape="eye" (click)="showOrHide();"></clr-icon>
           <clr-icon *ngIf="!passwordShow"shape="eye-hide" (click)="showOrHide();"></clr-icon>
         </div>
