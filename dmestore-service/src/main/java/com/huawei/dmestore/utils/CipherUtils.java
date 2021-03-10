@@ -3,6 +3,8 @@ package com.huawei.dmestore.utils;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 import sun.misc.BASE64Decoder;
 import sun.misc.BASE64Encoder;
 
@@ -16,20 +18,29 @@ import javax.crypto.spec.SecretKeySpec;
 /**
  * Utils to encrypt/decrypt eSight password string
  */
+
 public class CipherUtils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CipherUtils.class);
 
     private static final int IV_SIZE = 16;
 
-    private static final String KEY = "668DAFB758034A97";
+    private  String multitypeutil;
 
-    public static String encryptString(String sSrc) {
-
-        return aesEncode(sSrc, KEY);
+    public String getMultitypeutil() {
+        return multitypeutil;
     }
 
-    public static String aesEncode(String sSrc, String key) {
+    public void setMultitypeutil(String multitypeutil) {
+        this.multitypeutil = multitypeutil;
+    }
+
+    public  String encryptString(String sSrc) {
+
+        return aesEncode(sSrc, multitypeutil);
+    }
+
+    public  String aesEncode(String sSrc, String key) {
         try {
             Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
             byte[] raw;
@@ -48,11 +59,11 @@ public class CipherUtils {
         return null;
     }
 
-    public static String decryptString(String sSrc) {
-        return aesDncode(sSrc, KEY);
+    public  String decryptString(String sSrc) {
+        return aesDncode(sSrc, multitypeutil);
     }
 
-    public static String aesDncode(String sSrc, String key) {
+    public  String aesDncode(String sSrc, String key) {
         try {
             byte[] raw = key.getBytes("utf-8");
             SecretKeySpec skeySpec = new SecretKeySpec(raw, "AES");
