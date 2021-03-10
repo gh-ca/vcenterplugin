@@ -503,7 +503,7 @@
                     </label>
                   </clr-checkbox-wrapper>
                   <clr-control-helper *ngIf="bandWidthMinErrTips" style="color: red"><clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{'errorMsg.iposMaxMinTips' | translate}}</clr-control-helper>
-                  <clr-control-helper *ngIf="!bandWidthMinErrTips && !form.minbandwidthChoose && form.minbandwidth">{{'errorMsg.require' | translate}}</clr-control-helper>
+                  <clr-control-helper *ngIf="!bandWidthMinErrTips && form.minbandwidthChoose && !form.minbandwidth">{{'errorMsg.require' | translate}}</clr-control-helper>
                 </clr-checkbox-container>
                 <!-- 交通管制对象 IOPS 下限-->
                 <clr-checkbox-container *ngIf="form.control_policyLower === '0'">
@@ -690,7 +690,8 @@
 
             <!-- 交通管制对象 带宽 下限-->
             <clr-checkbox-container *ngIf="modifyForm.control_policyLower === '0'">
-              <label style="color: #9F9F9F;">{{'vmfs.trafficControlObject' | translate}}</label>
+              <label *ngIf="modifyForm.control_policyLower == '0' && modifyForm.control_policyUpper != '1'" style="color: #9F9F9F;">{{'vmfs.trafficControlObject' | translate}}</label>
+              <label *ngIf="modifyForm.control_policyLower == '0' && modifyForm.control_policyUpper == '1'" style="color: #9F9F9F;"></label>
               <clr-checkbox-wrapper>
                 <input type="checkbox" [(ngModel)]="modifyForm.minbandwidthChoose" (ngModelChange)="resetQosFlag(modifyForm.minbandwidthChoose, 'minbandwidth')" name="minbandwidthChoose" clrCheckbox/>
                 <label>
