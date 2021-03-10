@@ -76,7 +76,7 @@ public class DmeStorageController extends BaseController {
      * getStoragePools
      *
      * @param storageId storageId
-     * @param mediaType mediaType
+     * @param mediaType mediaType {all,block,file,block-and-file}
      * @return ResponseBodyBean
      */
     @GetMapping("/storagepools")

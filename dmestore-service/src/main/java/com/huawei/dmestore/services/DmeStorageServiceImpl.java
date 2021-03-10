@@ -362,12 +362,13 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                     String type = ToolUtils.jsonToStr(element.get("type"));
                     storagePool.setMediaType(type);
 
-                    // 查询"block"类型的则返回全部类型不是"file"的。查询"file"类型的返回不是"block"类型的
-                    if (mediaType.equals("block") && !type.equals("file")) {
+                    if (mediaType.equalsIgnoreCase("block") && type.equalsIgnoreCase("block")) {
                         resList.add(storagePool);
-                    } else if (mediaType.equals("file") && !type.equals("block")) {
+                    } else if (mediaType.equalsIgnoreCase("file") && type.equalsIgnoreCase("file")) {
                         resList.add(storagePool);
-                    } else if ("all".equals(mediaType)) {
+                    } else if (mediaType.equalsIgnoreCase("block-and-file") && type.equalsIgnoreCase("block-and-file")) {
+                        resList.add(storagePool);
+                    } else if ("all".equalsIgnoreCase(mediaType)) {
                         resList.add(storagePool);
                     }
                 }
