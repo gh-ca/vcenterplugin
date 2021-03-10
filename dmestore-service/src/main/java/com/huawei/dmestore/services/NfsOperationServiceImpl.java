@@ -785,9 +785,10 @@ public class NfsOperationServiceImpl implements NfsOperationService {
         JsonObject tuning = fsDetail.get(TUNING).getAsJsonObject();
         resultMap.put("compressionEnabled", ToolUtils.jsonToBoo(tuning.get("compression_enabled")));
         resultMap.put("deduplicationEnabled", ToolUtils.jsonToBoo(tuning.get("deduplication_enabled")));
-        String smartQos = ToolUtils.jsonToStr(tuning.get("smart_qos"));
-        if (!StringUtils.isEmpty(smartQos)) {
-            smartQosParse(resultMap, smartQos);
+        //String smartQos = ToolUtils.jsonToStr(tuning.get("smart_qos"));
+        JsonObject smartQos = tuning.get("smart_qos").getAsJsonObject();
+        if (smartQos != null) {
+            smartQosParse(resultMap, gson.toJson(smartQos));
         } else {
             resultMap.put("qosFlag", false);
         }
