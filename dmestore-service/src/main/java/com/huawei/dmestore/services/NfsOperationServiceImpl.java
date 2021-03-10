@@ -781,6 +781,7 @@ public class NfsOperationServiceImpl implements NfsOperationService {
         resultMap.put("autoSizeEnable", ToolUtils.jsonToBoo(json.get("auto_size_enable")));
         boolean isThin = (THIN_FIELD.equalsIgnoreCase(ToolUtils.jsonToStr(fsDetail.get("alloc_type")))) ? true : false;
         resultMap.put(THIN_FIELD, isThin);
+        resultMap.put("capacity",ToolUtils.jsonToDou(fsDetail.get("capacity")));
         JsonObject tuning = fsDetail.get(TUNING).getAsJsonObject();
         resultMap.put("compressionEnabled", ToolUtils.jsonToBoo(tuning.get("compression_enabled")));
         resultMap.put("deduplicationEnabled", ToolUtils.jsonToBoo(tuning.get("deduplication_enabled")));

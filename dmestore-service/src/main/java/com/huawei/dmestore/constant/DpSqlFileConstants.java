@@ -160,7 +160,7 @@ public final class DpSqlFileConstants {
     public static final String DP_DME_TASK_DATA_SYNCBESTPRACTISE_SQL =
         "INSERT INTO DP_DME_TASK_INFO (ID, CLASS_NAME, CRON, JOB_NAME, METHOD )  " + "VALUES (2, "
             + "'com.huawei.dmestore.task.BackgroundCheckBestPractiseTask', "
-            + "'0 0 2 * * ?', 'syncCheckBestPractise'," + " 'syncCheckBestPractise');";
+            + "'0 0 2 1/1 * ?', 'syncCheckBestPractise'," + " 'syncCheckBestPractise');";
 
     /**
      * DP_DME_TASK_DATA_SCANDATASTORE_SQL.

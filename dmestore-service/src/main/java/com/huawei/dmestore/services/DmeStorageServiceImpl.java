@@ -1,6 +1,8 @@
 package com.huawei.dmestore.services;
 
 import com.google.gson.*;
+import com.vmware.vim.binding.vmodl.name;
+
 import com.huawei.dmestore.constant.DmeConstants;
 import com.huawei.dmestore.constant.DmeIndicatorConstants;
 import com.huawei.dmestore.dao.DmeVmwareRalationDao;
@@ -1427,14 +1429,26 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                         if (statisticObject != null) {
                             StorageDisk sp = new StorageDisk();
                             sp.setId(storageDiskId);
-                            sp.setIops(ToolUtils.jsonToFloat(
-                                statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORAGEDISK_READTHROUGHPUT)));
-                            sp.setBandwith(ToolUtils.jsonToFloat(
-                                statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORAGEDISK_BANDWIDTH)));
-                            sp.setLantency(ToolUtils.jsonToFloat(
-                                statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORAGEDISK_RESPONSETIME)));
-                            sp.setUseage(ToolUtils.jsonToFloat(
-                                statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORAGEDISK_UTILITY)));
+                            if (ToolUtils.jsonToFloat(
+                                statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORAGEPORT_THROUGHPUT)) != 0.0f) {
+                                sp.setIops(ToolUtils.jsonToFloat(
+                                    statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORAGEPORT_THROUGHPUT)));
+                            }
+                            if (ToolUtils.jsonToFloat(
+                                statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORAGEPORT_BANDWIDTH)) != 0.0f) {
+                                sp.setBandwith(ToolUtils.jsonToFloat(
+                                    statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORAGEPORT_BANDWIDTH)));
+                            }
+                            if (ToolUtils.jsonToFloat(
+                                statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORAGEPORT_RESPONSETIME)) != 0.0f) {
+                                sp.setLantency(ToolUtils.jsonToFloat(
+                                    statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORAGEPORT_RESPONSETIME)));
+                            }
+                            if (ToolUtils.jsonToFloat(
+                                statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORAGEPORT_UTILITY)) != 0.0f) {
+                                sp.setUseage(ToolUtils.jsonToFloat(
+                                    statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORAGEPORT_UTILITY)));
+                            }
                             relists.add(sp);
                         }
                     }

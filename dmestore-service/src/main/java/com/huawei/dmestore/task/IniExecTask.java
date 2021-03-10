@@ -1,5 +1,7 @@
 package com.huawei.dmestore.task;
 
+import com.huawei.dmestore.exception.VcenterException;
+import com.huawei.dmestore.services.BestPracticeProcessServiceImpl;
 import com.huawei.dmestore.services.SystemServiceImpl;
 
 import org.slf4j.Logger;
@@ -36,6 +38,9 @@ public class IniExecTask implements ApplicationListener<ContextRefreshedEvent> {
     @Autowired
     private SystemServiceImpl systemService;
 
+    @Autowired
+    private BestPracticeProcessServiceImpl bestPracticeProcessService;
+
 
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
@@ -53,7 +58,12 @@ public class IniExecTask implements ApplicationListener<ContextRefreshedEvent> {
             @Override
             public void run() {
                 LOG.info("--->ini Scan Datastore Task...start");
-                backgroundScanDatastoreTask.scanDatastore();
+                try {
+                    backgroundScanDatastoreTask.scanDatastore();
+                    bestPracticeProcessService.check(null);
+                } catch (VcenterException e) {
+                    e.printStackTrace();
+                }
                 LOG.info("--->ini Scan Datastore Task...end");
             }
         }, daLay, TimeUnit.SECONDS);
