@@ -194,8 +194,12 @@ export class NfsAddComponent implements OnInit{
       this.addLatencyChoose();
       const storages=this.storageList.filter(item=>item.id==this.addForm.storagId);
       this.dorado=storages[0].storageTypeShow.dorado;
+      let mediaType;
       if (this.dorado){
         this.addForm.autoSizeEnable=undefined;
+        mediaType = 'block-and-file';
+      } else {
+        mediaType = 'file';
       }
       const storagePoolMap = this.storagePoolMap.filter(item => item.storageId == this.addForm.storagId);
 
@@ -204,7 +208,7 @@ export class NfsAddComponent implements OnInit{
 
       // 选择存储后获取存储池
       // if (!storagePoolList) {
-        this.storageService.getStoragePoolListByStorageId("file",this.addForm.storagId)
+        this.storageService.getStoragePoolListByStorageId(mediaType,this.addForm.storagId)
           .subscribe((r: any) => {
             if (r.code === '200'){
               this.storagePools = r.data;

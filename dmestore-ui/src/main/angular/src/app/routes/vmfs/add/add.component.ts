@@ -371,9 +371,17 @@ export class AddComponent implements OnInit{
 
       const storagePoolList = storagePoolMap[0].storagePoolList;
       const workloads = storagePoolMap[0].workloadList;
+      const storages=this.storageList.filter(item=>item.id==this.form.storage_id)[0];
+      const dorado = storages.storageTypeShow.dorado;
+      let mediaType;
+      if (dorado) { // v6设备
+        mediaType = 'block-and-file';
+      } else { // V5设备
+        mediaType = 'block';
+      }
       // 获取存储池数据
       // if (!storagePoolList) {
-        this.remoteSrv.getStoragePoolsByStorId(this.form.storage_id, 'block').subscribe((result: any) => {
+        this.remoteSrv.getStoragePoolsByStorId(this.form.storage_id, mediaType).subscribe((result: any) => {
           console.log('storagePools', result);
           console.log('result.code === \'200\' && result.data !== null', result.code === '200' && result.data !== null);
           if (result.code === '200' && result.data !== null) {

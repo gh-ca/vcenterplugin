@@ -205,4 +205,9 @@ input[type=number] {
   height: 100vh;
   max-height: none;
 }
-
+input::-ms-clear{
+  display: none;
+}
+body {
+  -ms-overflow-style:scrollbar;
+}
