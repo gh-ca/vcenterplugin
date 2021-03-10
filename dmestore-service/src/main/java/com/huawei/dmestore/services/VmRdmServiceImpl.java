@@ -398,7 +398,11 @@ public class VmRdmServiceImpl implements VmRdmService {
 
     private Map<String, Object> tuningParse(CustomizeVolumeTuningForCreate tuningBean) {
         Map<String, Object> tuning = new HashMap<>();
-        putNotNull(tuning, "alloction_type", tuningBean.getAlloctype());
+        if (tuningBean.getAlloctype() != null) {
+            putNotNull(tuning, "alloction_type", tuningBean.getAlloctype());
+        } else {
+            tuning.put("alloction_type", "thin");
+        }
         putNotNull(tuning, "smart_tier", DmeConstants.SMART_TIER.get(tuningBean.getSmarttier()));
         putNotNull(tuning, "workload_type_raw_id", tuningBean.getWorkloadTypeId());
         putNotNull(tuning, "compression_enabled", tuningBean.getCompressionEnabled());
@@ -407,11 +411,24 @@ public class VmRdmServiceImpl implements VmRdmService {
         SmartQosForRdmCreate smartqosBean = tuningBean.getSmartqos();
         if (smartqosBean != null) {
             Map<String, Object> smartqos = new HashMap<>(MAP_DEFAULT_CAPACITY);
-            putNotNull(smartqos, "latency", smartqosBean.getLatency());
-            putNotNull(smartqos, "max_bandwidth", smartqosBean.getMaxbandwidth());
-            putNotNull(smartqos, "max_iops", smartqosBean.getMaxiops());
-            putNotNull(smartqos, "min_bandwidth", smartqosBean.getMinbandwidth());
-            putNotNull(smartqos, "min_iops", smartqosBean.getMiniops());
+            if (smartqosBean.getLatency() != 0) {
+                putNotNull(smartqos, "latency", smartqosBean.getLatency());
+            }
+            if (smartqosBean.getLatency() != 0) {
+                putNotNull(smartqos, "latency", smartqosBean.getLatency());
+            }
+            if (smartqosBean.getMaxbandwidth() != 0) {
+                putNotNull(smartqos, "max_bandwidth", smartqosBean.getMaxbandwidth());
+            }
+            if (smartqosBean.getMaxiops() != 0) {
+                putNotNull(smartqos, "max_iops", smartqosBean.getMaxiops());
+            }
+            if (smartqosBean.getMinbandwidth() != 0) {
+                putNotNull(smartqos, "min_bandwidth", smartqosBean.getMinbandwidth());
+            }
+            if (smartqosBean.getMiniops() != 0) {
+                putNotNull(smartqos, "min_iops", smartqosBean.getMiniops());
+            }
             tuning.put("smart_qos", smartqos);
         }
 
