@@ -65,6 +65,12 @@ export class RdmComponent implements OnInit {
 
   // matchErr = false; // 名称校验
 
+  bandWidthMaxErrTips = false;// 带宽上限错误提示
+  bandWidthMinErrTips = false;// 带宽下限错误提示
+  iopsMaxErrTips = false;// IOPS上限错误提示
+  iopsMinErrTips = false;// IOPS下限错误提示
+  latencyErrTips = false;// 时延错误提示
+
 
   constructor(private cdr: ChangeDetectorRef,
               private http: HttpClient,
@@ -340,6 +346,7 @@ export class RdmComponent implements OnInit {
     if (lowerObj) {
       lowerChecked = lowerObj.checked;
     }
+    this.initIopsErrTips(upperChecked, lowerChecked);
     if (isUpper) {
       if(upperChecked) {
         form.flagInfo.control_policyUpper = '1';
@@ -504,7 +511,7 @@ export class RdmComponent implements OnInit {
    * 切换存储：资源分配类型初始化
    */
   allocationTypeShowInit() {
-    this.configModel.tuning.alloctype = null;
+    this.configModel.tuning.alloctype = 'thin';
     const storageTypeShow = this.storageDevices.filter(item => item.id == this.configModel.storageId);
     this.allocationTypeShow =  storageTypeShow[0].storageTypeShow.allocationTypeShow == 1;
   }
@@ -562,6 +569,128 @@ export class RdmComponent implements OnInit {
       }
     }
   }
+  /**
+   * 带宽 blur
+   * @param type
+   * @param operationType add modify
+   * @param valType
+   */
+  qosBlur(operationType:string) {
+
+    let objVal;
+    switch (operationType) {
+      case 'maxbandwidth':
+        objVal = this.configModel.tuning.smartqos.maxbandwidth;
+        break;
+      case 'maxiops':
+        objVal = this.configModel.tuning.smartqos.maxiops;
+        break;
+      case 'minbandwidth':
+        objVal = this.configModel.tuning.smartqos.minbandwidth;
+        break;
+      case 'miniops':
+        objVal = this.configModel.tuning.smartqos.miniops;
+        break;
+      default:
+        objVal = this.configModel.tuning.smartqos.latency;
+        break;
+    }
+    if (objVal && objVal !== '') {
+
+      if (objVal.toString().match( /^[1-9]\d*$/)) {
+        objVal = objVal.toString().match(/^[1-9]\d*$/)[0];
+      } else {
+        objVal = '';
+      }
+    }
+    if (objVal > 999999999){
+      objVal = '';
+    } else if (objVal < 1) {
+      objVal = '';
+    }
+
+      switch (operationType) {
+        case 'maxbandwidth':
+          this.configModel.tuning.smartqos.maxbandwidth = objVal;
+          break;
+        case 'maxiops':
+          this.configModel.tuning.smartqos.maxiops = objVal;
+          break;
+        case 'minbandwidth':
+          this.configModel.tuning.smartqos.minbandwidth = objVal;
+          break;
+        case 'miniops':
+          this.configModel.tuning.smartqos.miniops = objVal;
+          break;
+        default:
+          this.configModel.tuning.smartqos.latency = objVal;
+          break;
+      }
+    this.iopsErrTips(objVal, operationType);
+  }
+
+  /**
+   * iops错误提示
+   * @param objVal
+   * @param operationType
+   */
+  iopsErrTips(objVal:string, operationType:string) {
+    if (operationType) {
+        switch (operationType) {
+          case 'maxbandwidth':
+            if (objVal == '' && this.configModel.flagInfo.maxBandwidthChoose) {
+              this.bandWidthMaxErrTips = true;
+            }else {
+              this.bandWidthMaxErrTips = false;
+            }
+            break;
+          case 'maxiops':
+            if (objVal == '' && this.configModel.flagInfo.maxIopsChoose) {
+              this.iopsMaxErrTips = true;
+            }else {
+              this.iopsMaxErrTips = false;
+            }
+            break;
+          case 'minbandwidth':
+            if (objVal == '' && this.configModel.flagInfo.minBandwidthChoose) {
+              this.bandWidthMinErrTips = true;
+            }else {
+              this.bandWidthMinErrTips = false;
+            }
+            break;
+          case 'miniops':
+            if (objVal == '' && this.configModel.flagInfo.minIopsChoose) {
+              this.iopsMinErrTips = true;
+            }else {
+              this.iopsMinErrTips = false;
+            }
+            break;
+          default:
+            if (objVal == '' && this.configModel.flagInfo.latencyChoose) {
+              this.latencyErrTips = true;
+            }else {
+              this.latencyErrTips = false;
+            }
+            break;
+        }
+    }
+  }
+
+  /**
+   * 初始化IOPS错误提示
+   */
+  initIopsErrTips(upper:boolean, lower:boolean){
+    if (upper) {
+      this.bandWidthMaxErrTips = false;
+      this.iopsMaxErrTips = false;
+    }
+    if (lower) {
+      this.bandWidthMinErrTips = false;
+      this.iopsMinErrTips = false;
+      this.latencyErrTips = false;
+    }
+  }
+
 }
 
 

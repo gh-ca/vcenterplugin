@@ -215,7 +215,7 @@ export class ServicelevelComponent implements OnInit, AfterViewInit, OnDestroy {
         }
         const allName = this.storagePoolList.map(item => item.storageName);
         // 设置设备名称过滤相关
-        this.sLSPStorageNameFilter.setStorageNameFilter(allName)
+        // this.sLSPStorageNameFilter.setStorageNameFilter(allName)
         this.storagePoolList.forEach(item => item.usedCapacity = Number(((item.consumedCapacity)/item.totalCapacity * 100).toFixed(2)));
         this.storagePoolTotal = this.storagePoolList.length;
         this.storeagePoolIsloading = false;

@@ -220,10 +220,15 @@
         <label>{{'overview.user' | translate}}</label>
         <input clrInput formControlName="username" type="text" [(ngModel)]="connectModel.userName" name="username" />
       </clr-input-container>
-      <clr-password-container>
+      <clr-input-container>
         <label>{{'overview.password' | translate}}</label>
-        <input clrPassword formControlName="password" name="password" [(ngModel)]="connectModel.password" />
-      </clr-password-container>
+        <!--<input clrInput formControlName="password" name="password" [(ngModel)]="connectModel.password" />-->
+        <div clrInput style="float: left;position: relative;width: 82%">
+          <input clrInput style="width: 90%" formControlName="password" name="password"type="{{inputType}}" [(ngModel)]="connectModel.password" required/>
+          <clr-icon *ngIf="passwordShow" shape="eye" (click)="showOrHide();"></clr-icon>
+          <clr-icon *ngIf="!passwordShow"shape="eye-hide" (click)="showOrHide();"></clr-icon>
+        </div>
+      </clr-input-container>
     </form>
   </div>
   <div class="modal-footer">

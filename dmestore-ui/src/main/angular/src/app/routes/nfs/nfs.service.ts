@@ -136,6 +136,7 @@ export class UpdateNfs{
   shareId: string;
   name: string;
   deviceId: string;
+  capacity:number;
   constructor(){
     this.sameName=true;
   }
@@ -379,7 +380,7 @@ export class MakePerformance {
       }
       this.remoteSrv.getLineChartData(url, params).subscribe((result: any) => {
         console.log('chartData: ', title, result);
-        if (result.code === '200' && result.data !== null && result.data !== null) {
+        if (result.code === '200' && result.data && result.data[objIds[0]]) {
           const resData = result.data;
           // 设置标题
           chart.title.text = title;
@@ -431,10 +432,11 @@ export class MakePerformance {
               chart.series[1].data.push({value: value, symbol: 'none'});
             }
           });
-          resolve(chart);
+
         } else {
           console.log('get chartData fail: ', result.description);
         }
+        resolve(chart);
       });
     });
   }
@@ -468,7 +470,7 @@ export class MakePerformance {
         chart.title.text = title;
         // 设置副标题
         chart.title.subtext = subtext;
-        if (result.code === '200' && result.data !== null && result.data !== null) {
+        if (result.code === '200' && result.data && result.data[objIds[0]]) {
           let resData = result.data;
           if (result.data){
             resData = result.data
@@ -853,7 +855,12 @@ export class MakePerformance {
           }
           case 'perfDensity': // LUN I/O密度（IOPS/TB）
             {
-              const density = item.throughput/(item.totalCapacity/1024);
+              let density;
+              if (item.totalCapacity != '0') {
+                density = item.throughput/(item.totalCapacity/1024);
+              } else {
+                density = 0;
+              }
               chart.series[0].data.push({value: Number(density.toFixed(3)), symbol: 'none'});
               break;
             }
@@ -871,7 +878,12 @@ export class MakePerformance {
             }
           case 'perfStoragePoolDetails':// 存储池I/O密度(IOPS/TB)
           {
-            const density = item.throughput/(item.totalCapacity/1024);
+            let density;
+            if (item.totalCapacity != '0') {
+              density = item.throughput/(item.totalCapacity/1024);
+            } else {
+              density = 0;
+            }
             chart.series[0].data.push({value: Number(density.toFixed(3)), symbol: 'none'});
             break;
           }
