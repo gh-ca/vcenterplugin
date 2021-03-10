@@ -596,7 +596,7 @@ export class RdmComponent implements OnInit {
         break;
     }
     if (objVal && objVal !== '') {
-      debugger
+
       if (objVal.toString().match( /^[1-9]\d*$/)) {
         objVal = objVal.toString().match(/^[1-9]\d*$/)[0];
       } else {

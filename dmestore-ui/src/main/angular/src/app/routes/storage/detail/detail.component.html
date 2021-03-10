@@ -7,7 +7,7 @@
       <clr-tabs>
         <clr-tab >
           <button clrTabLink id="conf" (click)="changeTab('conf')">{{'storage.detail.conf.configuration' | translate}}</button>
-          <clr-tab-content id="configuration" *clrIfActive="true" >
+          <clr-tab-content id="configuration">
             <table class="table table-noborder" *ngIf="detail" [clrLoading]="detailLoading">
               <tr>
                 <td class="left">{{'storage.detail.conf.name' | translate}}</td>
@@ -68,7 +68,7 @@
               <!--Storage Pools-->
               <clr-tab>
                 <button clrTabLink id="storage" (click)="changeTab('pool')">{{'storage.detail.storagePool.storagePool' | translate}}</button>
-                <clr-tab-content id="storagePool" *clrIfActive="true">
+                <clr-tab-content id="storagePool">
                   <div class="detail-margin-top">
                     <!-- 头部按钮组 -->
                     <div class="gh-btngroup-header">
@@ -741,7 +741,14 @@
                   <td>
                     <clr-select-container>
                       <select clrSelect (ngModelOptions)="ranges" [(ngModel)]="selectRange" name="defaultSelect" class="clr-select" (change)="changeFunc()">
-                        <option *ngFor="let item of ranges" value="{{item.key}}">{{item.value}}</option>
+                        <option value="LAST_5_MINUTE">{{'chart.select.last5Minute'|translate}}</option>
+                        <option value="LAST_1_HOUR">{{'chart.select.last1Hour'|translate}}</option>
+                        <option value="LAST_1_DAY">{{'chart.select.last1Day'|translate}}</option>
+                        <option value="LAST_1_WEEK">{{'chart.select.last1Week'|translate}}</option>
+                        <option value="LAST_1_MONTH">{{'chart.select.last1Month'|translate}}</option>
+                        <option value="LAST_1_QUARTER">{{'chart.select.last1Quarter'|translate}}</option>
+                        <option value="HALF_1_YEAR">{{'chart.select.half1Year'|translate}}</option>
+                        <option value="LAST_1_YEAR">{{'chart.select.last1Year'|translate}}</option>
                       </select>
                     </clr-select-container>
                   </td>
@@ -1045,17 +1052,13 @@
                                 <clr-dg-cell class="over_flow">
                                   <span *ngIf="item.healthStatus == 'unknown'">{{'enum.status.unknown' | translate}}</span>
                                   <span *ngIf="item.healthStatus == 'normal'">{{'enum.status.normal' | translate}}</span>
-                                  <span *ngIf="item.healthStatus == 'faulty'">{{'enum.status.faulty' | translate}}</span>
-                                  <span *ngIf="item.healthStatus == 'about to fail'">{{'enum.status.aboutToFail' | translate}}</span>
-                                  <span *ngIf="item.healthStatus == 'partially damaged'">{{'enum.status.partiallyDamaged' | translate}}</span>
+                                  <span *ngIf="item.healthStatus == 'abnormal'">{{'enum.status.abnormal' | translate}}</span>
                                   <span *ngIf="!item.healthStatus">--</span>
                                 </clr-dg-cell>
                                 <clr-dg-cell class="over_flow">
                                   <span *ngIf="item.runningStatus == 'unknown'">{{'enum.status.unknown' | translate}}</span>
-                                  <span *ngIf="item.runningStatus == 'normal'">{{'enum.status.normal' | translate}}</span>
-                                  <span *ngIf="item.runningStatus == 'running'">{{'enum.status.running' | translate}}</span>
-                                  <span *ngIf="item.runningStatus == 'link up'">{{'enum.status.linkUp' | translate}}</span>
-                                  <span *ngIf="item.runningStatus == 'link down'">{{'enum.status.linkDown' | translate}}</span>
+                                  <span *ngIf="item.runningStatus == 'connected'">{{'enum.status.connected' | translate}}</span>
+                                  <span *ngIf="item.runningStatus == 'disconnected'">{{'enum.status.disconnected' | translate}}</span>
                                   <span *ngIf="!item.runningStatus">--</span>
                                 </clr-dg-cell>
                                 <clr-dg-cell class="over_flow">{{item.mtu}}</clr-dg-cell>

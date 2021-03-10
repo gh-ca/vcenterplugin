@@ -65,14 +65,14 @@ export class ServiceLevelComponent implements OnInit{
           const ctx = this.globalsService.getClientSdk().app.getContextObjects();
           console.log('ctx', ctx);
           this.objectId = ctx[0].id;
-          // this.objectId = "urn:vmomi:Datastore:datastore-4006:674908e5-ab21-4079-9cb1-596358ee5dd1";
+          // this.objectId = "urn:vmomi:Datastore:datastore-10019:674908e5-ab21-4079-9cb1-596358ee5dd1";
 
         }
 
         // todo 获取vmfs数据
         this.remoteSrv.getVmfsById(this.objectId).subscribe((result:any) => {
           if (result.code === '200' && null != result.data) {
-            this.vmfsInfo = result.data;
+            this.vmfsInfo = result.data[0];
             if (this.vmfsInfo.serviceLevelName){
               this.remoteSrv.getStorageById(this.objectId).subscribe((result: any) => {
                 if (result.code === '200' && null != result.data) {

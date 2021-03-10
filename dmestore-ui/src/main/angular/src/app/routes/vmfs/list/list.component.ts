@@ -1537,7 +1537,6 @@ export class VmfsListComponent implements OnInit {
       }
     }
     if (objVal && objVal !== '') {
-      debugger
       if (objVal.toString().match( /^[1-9]\d*$/)) {
         objVal = objVal.toString().match(/^[1-9]\d*$/)[0];
       } else {
