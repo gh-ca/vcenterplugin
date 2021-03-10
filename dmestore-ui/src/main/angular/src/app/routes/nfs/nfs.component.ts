@@ -279,6 +279,10 @@ export class NfsComponent implements OnInit {
   }
 
   addNfs(){
+    if (this.bandWidthMaxErrTips || this.iopsMaxErrTips
+      || this.bandWidthMinErrTips || this.iopsMinErrTips || this.latencyErrTips) {
+      return;
+    }
     //
     this.modalHandleLoading=true;
 
@@ -1005,5 +1009,35 @@ export class NfsComponent implements OnInit {
       return unescape(r[2]);
     }
     return null;
+  }
+
+  resetQosFlag(objValue:boolean, operationType:string) {
+    switch (operationType) {
+      case 'maxbandwidth':
+        if(!objValue) {
+          this.bandWidthMaxErrTips = false;
+        }
+        break;
+      case 'maxiops':
+        if(!objValue) {
+          this.iopsMaxErrTips = false;
+        }
+        break;
+      case 'minbandwidth':
+        if(!objValue) {
+          this.bandWidthMinErrTips = false;
+        }
+        break;
+      case 'miniops':
+        if(!objValue) {
+          this.iopsMinErrTips = false;
+        }
+        break;
+      default:
+        if(!objValue) {
+          this.latencyErrTips = false;
+        }
+        break;
+    }
   }
 }

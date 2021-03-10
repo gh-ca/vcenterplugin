@@ -128,6 +128,10 @@ export class NfsAddComponent implements OnInit{
     this.wizard.open();
   }
   addNfs(){
+    if (this.bandWidthMaxErrTips || this.iopsMaxErrTips
+      || this.bandWidthMinErrTips || this.iopsMinErrTips || this.latencyErrTips) {
+      return;
+    }
     //
     this.modalHandleLoading=true;
 
@@ -733,6 +737,35 @@ export class NfsAddComponent implements OnInit{
     this.addForm.latency = null;
     const qosTag = this.getStorageQosTag(this.addForm.storagId);
     this.latencyIsSelect = qosTag == 1;
+  }
+  resetQosFlag(objValue:boolean, operationType:string) {
+    switch (operationType) {
+      case 'maxbandwidth':
+        if(!objValue) {
+          this.bandWidthMaxErrTips = false;
+        }
+        break;
+      case 'maxiops':
+        if(!objValue) {
+          this.iopsMaxErrTips = false;
+        }
+        break;
+      case 'minbandwidth':
+        if(!objValue) {
+          this.bandWidthMinErrTips = false;
+        }
+        break;
+      case 'miniops':
+        if(!objValue) {
+          this.iopsMinErrTips = false;
+        }
+        break;
+      default:
+        if(!objValue) {
+          this.latencyErrTips = false;
+        }
+        break;
+    }
   }
 }
 

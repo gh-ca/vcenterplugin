@@ -148,6 +148,10 @@ export class ModifyComponent implements OnInit{
    * 修改
    */
   modifyHandleFunc() {
+    if (this.bandWidthMaxErrTips || this.iopsMaxErrTips
+      || this.bandWidthMinErrTips || this.iopsMinErrTips || this.latencyErrTips) {
+      return;
+    }
     // 设置修改的卷名称以及修改后的名称
     if (this.modifyForm.isSameName) {
       this.modifyForm.newVoName = this.modifyForm.name;
@@ -538,6 +542,35 @@ export class ModifyComponent implements OnInit{
       this.bandWidthMinErrTips = false;
       this.iopsMinErrTips = false;
       this.latencyErrTips = false;
+    }
+  }
+  resetQosFlag(objValue:boolean, operationType:string) {
+    switch (operationType) {
+      case 'maxbandwidth':
+        if(!objValue) {
+          this.bandWidthMaxErrTips = false;
+        }
+        break;
+      case 'maxiops':
+        if(!objValue) {
+          this.iopsMaxErrTips = false;
+        }
+        break;
+      case 'minbandwidth':
+        if(!objValue) {
+          this.bandWidthMinErrTips = false;
+        }
+        break;
+      case 'miniops':
+        if(!objValue) {
+          this.iopsMinErrTips = false;
+        }
+        break;
+      default:
+        if(!objValue) {
+          this.latencyErrTips = false;
+        }
+        break;
     }
   }
 }
