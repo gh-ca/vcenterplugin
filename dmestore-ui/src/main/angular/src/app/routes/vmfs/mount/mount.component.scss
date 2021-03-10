@@ -193,3 +193,9 @@
 .hideFilter ::ng-deep clr-dg-string-filter{
   display: none;
 }
+input::-ms-clear{
+  display: none;
+}
+body {
+  -ms-overflow-style:scrollbar;
+}

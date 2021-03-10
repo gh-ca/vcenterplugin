@@ -919,7 +919,7 @@
                                   <span *ngIf="!item.status">--</span>
                                 </clr-dg-cell>
                                 <clr-dg-cell class="over_flow">{{item.wwn}}</clr-dg-cell>
-                                <clr-dg-cell class="over_flow">{{item.speed}}</clr-dg-cell>
+                                <clr-dg-cell class="over_flow">{{item.speed!=null?item.iops.toFixed(2):'--'}}</clr-dg-cell>
                                 <clr-dg-cell class="over_flow">{{item.iops!=null?item.iops.toFixed(2):'--'}}</clr-dg-cell>
                                 <clr-dg-cell class="over_flow">{{item.lantency!=null?item.lantency.toFixed(2):'--'}}</clr-dg-cell>
                                 <clr-dg-cell class="over_flow">{{item.bandwith!=null?item.bandwith.toFixed(2):'--'}}</clr-dg-cell>

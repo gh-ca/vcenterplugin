@@ -39,3 +39,9 @@
   border: none;
   color: red;
 }
+input::-ms-clear{
+  display: none;
+}
+body {
+  -ms-overflow-style:scrollbar;
+}

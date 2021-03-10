@@ -263,7 +263,15 @@ export class RdmComponent implements OnInit {
     console.log("this.ownershipController", this.ownershipController);
     this.storagePools = null;
     this.configModel.poolRawId = null;
-    this.http.get('dmestorage/storagepools', {params: {storageId, mediaType: "block"}}).subscribe((result: any) => {
+    const storage=this.storageDevices.filter(item=>item.id==storageId);
+    const dorado=storage[0].storageTypeShow.dorado;
+    let mediaType;
+    if (dorado){
+      mediaType = 'block-and-file';
+    } else {
+      mediaType = 'block';
+    }
+    this.http.get('dmestorage/storagepools', {params: {storageId, mediaType: mediaType}}).subscribe((result: any) => {
       this.slLoading = false;
       if (result.code === '200'){
         this.storagePools = result.data;

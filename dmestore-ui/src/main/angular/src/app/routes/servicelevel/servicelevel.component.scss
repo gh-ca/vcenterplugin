@@ -54,3 +54,9 @@
 ::ng-deep .datagrid-table .datagrid-column .datagrid-filter-toggle{
   margin: auto;
 }
+input::-ms-clear{
+  display: none;
+}
+body {
+  -ms-overflow-style:scrollbar;
+}

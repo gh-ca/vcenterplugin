@@ -176,6 +176,7 @@
       "capacityErr":"Input exceeds capacity limit!",
       "maxCapTip":"Maximum capacity limit：16384 TB",
       "minCapTip":"Minimum capacity limit：",
+      "expandErrTips":"The minimum disk expansion capacity is 1GB, and the expanded capacity cannot be greater than 16384TB!",
       "reduceThinTips": "The disk type is Thin, and the modified capacity must not be less than ",
       "reduceThickTips": "The disk type is Thick, and the modified capacity must not be less than "
     }
@@ -639,7 +640,7 @@
     "establishConnect": "Establish an iSCSI connection",
     "showCol": "Display Column",
     "selectAll": "Select All",
-    "hideIpTips": "Note: The following data will not include the data with empty IP!"
+    "hideIpTips": "Note: The following data will not include data with empty IPv4 addresses!"
   },
   "rdm": {
     "name": "Name",
@@ -836,7 +837,7 @@
      "type":{
       "block":"Block",
       "file":"File",
-      "blockAndFile": "Block/File"
+      "blockAndFile": "Block And File"
      }
   },
   "errorMsg":{
