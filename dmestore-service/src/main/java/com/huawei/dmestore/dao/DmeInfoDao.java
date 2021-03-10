@@ -18,6 +18,16 @@ import java.sql.SQLException;
  * @since 2020-09-02
  **/
 public class DmeInfoDao extends H2DataBaseDao {
+    private CipherUtils cipherUtils;
+
+    public CipherUtils getCipherUtils() {
+        return cipherUtils;
+    }
+
+    public void setCipherUtils(CipherUtils cipherUtils) {
+        this.cipherUtils = cipherUtils;
+    }
+
     public int addDmeInfo(DmeInfo dmeInfo) throws DmeException {
         Connection con = null;
         PreparedStatement ps = null;
@@ -31,7 +41,7 @@ public class DmeInfoDao extends H2DataBaseDao {
             ps.setString(DpSqlFileConstants.DIGIT_1, dmeInfo.getHostIp());
             ps.setInt(DpSqlFileConstants.DIGIT_2, dmeInfo.getHostPort());
             ps.setString(DpSqlFileConstants.DIGIT_3, dmeInfo.getUserName());
-            ps.setString(DpSqlFileConstants.DIGIT_4, CipherUtils.encryptString(dmeInfo.getPassword()));
+            ps.setString(DpSqlFileConstants.DIGIT_4, cipherUtils.encryptString(dmeInfo.getPassword()));
             int row = ps.executeUpdate();
             rs = ps.getGeneratedKeys();
             if (rs.next()) {
@@ -61,7 +71,7 @@ public class DmeInfoDao extends H2DataBaseDao {
                 dmeInfo.setHostIp(rs.getString("HOSTIP"));
                 dmeInfo.setHostPort(rs.getInt("HOSTPORT"));
                 dmeInfo.setUserName(rs.getString("USERNAME"));
-                dmeInfo.setPassword(CipherUtils.decryptString(rs.getString("PASSWORD")));
+                dmeInfo.setPassword(cipherUtils.decryptString(rs.getString("PASSWORD")));
                 dmeInfo.setCreateTime(rs.getTimestamp("CREATETIME"));
                 dmeInfo.setUpdateTime(rs.getTimestamp("UPDATETIME"));
                 dmeInfo.setState(rs.getInt("STATE"));
