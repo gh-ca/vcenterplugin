@@ -866,7 +866,7 @@ export class DiskStatusFilter implements ClrDatagridFilterInterface<StorageDisk>
         <label>SSD</label>
       </clr-radio-wrapper>
       <clr-radio-wrapper>
-        <input type="radio" clrRadio name="type" (change)="changeFunc($event)" [(ngModel)]="type" value="NL-SAS"/>
+        <input type="radio" clrRadio name="type" (change)="changeFunc($event)" [(ngModel)]="type" value="NL_SAS"/>
         <label>NL-SAS</label>
       </clr-radio-wrapper>
       <clr-radio-wrapper>
