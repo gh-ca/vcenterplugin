@@ -773,22 +773,25 @@ public class NfsOperationServiceImpl implements NfsOperationService {
     private String fsDetailPrase(Map<String, Object> resultMap, String fileSystemId,
                                  ResponseEntity<String> responseTuning) {
         String fsname;
-        JsonObject fsDetail = gson.fromJson(responseTuning.getBody(), JsonObject.class);
-        resultMap.put("fsName", ToolUtils.jsonToStr(fsDetail.get(NAME_FIELD)));
-        fsname = ToolUtils.jsonToStr(fsDetail.get(NAME_FIELD));
+        //JsonObject fsDetail = gson.fromJson(responseTuning.getBody(), JsonObject.class);
+        JsonObject object = new JsonParser().parse(responseTuning.getBody()).getAsJsonObject();
+        resultMap.put("fsName", ToolUtils.jsonToStr(object.get(NAME_FIELD)));
+        fsname = ToolUtils.jsonToStr(object.get(NAME_FIELD));
         resultMap.put("fileSystemId", fileSystemId);
-        JsonObject json = fsDetail.get("capacity_auto_negotiation").getAsJsonObject();
+        JsonObject json = object.get("capacity_auto_negotiation").getAsJsonObject();
         resultMap.put("autoSizeEnable", ToolUtils.jsonToBoo(json.get("auto_size_enable")));
-        boolean isThin = (THIN_FIELD.equalsIgnoreCase(ToolUtils.jsonToStr(fsDetail.get("alloc_type")))) ? true : false;
+        boolean isThin = (THIN_FIELD.equalsIgnoreCase(ToolUtils.jsonToStr(object.get("alloc_type")))) ? true : false;
         resultMap.put(THIN_FIELD, isThin);
-        resultMap.put("capacity",ToolUtils.jsonToDou(fsDetail.get("capacity")));
-        JsonObject tuning = fsDetail.get(TUNING).getAsJsonObject();
+        resultMap.put("capacity",ToolUtils.jsonToDou(object.get("capacity")));
+        JsonObject tuning = object.get(TUNING).getAsJsonObject();
         resultMap.put("compressionEnabled", ToolUtils.jsonToBoo(tuning.get("compression_enabled")));
         resultMap.put("deduplicationEnabled", ToolUtils.jsonToBoo(tuning.get("deduplication_enabled")));
-        //String smartQos = ToolUtils.jsonToStr(tuning.get("smart_qos"));
-        JsonObject smartQos = tuning.get("smart_qos").getAsJsonObject();
-        if (smartQos != null) {
-            smartQosParse(resultMap, gson.toJson(smartQos));
+        boolean qos = tuning.get("smart_qos").isJsonNull();
+        if (!qos) {
+            JsonObject smartQos = tuning.get("smart_qos").getAsJsonObject();
+            if (smartQos != null) {
+                smartQosParse(resultMap, gson.toJson(smartQos));
+            }
         } else {
             resultMap.put("qosFlag", false);
         }
