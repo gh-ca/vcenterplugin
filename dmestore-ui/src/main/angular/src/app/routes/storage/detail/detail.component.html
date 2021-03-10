@@ -310,9 +310,9 @@
 <!--                        </clr-dg-cell>-->
                         <clr-dg-cell [hidden]="volumeRadio!=='table1'">{{item.datastores}}</clr-dg-cell>
 
-                        <clr-dg-cell [hidden]="volumeRadio!=='table2'">{{item.lantency}}</clr-dg-cell>
-                        <clr-dg-cell [hidden]="volumeRadio!=='table2'">{{item.iops}}</clr-dg-cell>
-                        <clr-dg-cell [hidden]="volumeRadio!=='table2'">{{item.bandwith}}</clr-dg-cell>
+                        <clr-dg-cell [hidden]="volumeRadio!=='table2'">{{item.lantency!=null?item.lantency.toFixed(2):'--'}}</clr-dg-cell>
+                        <clr-dg-cell [hidden]="volumeRadio!=='table2'">{{item.iops!=null?item.iops.toFixed(2):'--'}}</clr-dg-cell>
+                        <clr-dg-cell [hidden]="volumeRadio!=='table2'">{{item.bandwith!=null?item.bandwith.toFixed(2):'--'}}</clr-dg-cell>
                       </clr-dg-row>
 <!--                      <clr-dg-footer>-->
 <!--                        <clr-dg-pagination  #paginationVolume [clrDgPageSize]="10" [clrDgTotalItems]="volumeTotal">-->
@@ -492,10 +492,7 @@
                         <clr-dg-cell class="over_flow">{{item.fsName}}</clr-dg-cell>
                         <clr-dg-cell title="{{item.tierName!=null?item.tierName!=''?item.tierName:'--':'--'}}" class="over_flow">{{item.tierName!=null?item.tierName!=''?item.tierName:'--':'--'}}</clr-dg-cell>
                         <clr-dg-cell class="over_flow">
-                          <span *ngIf="item.securityStyle=='mixed'">Mixed</span>
-                          <span *ngIf="item.securityStyle=='native'">Native</span>
-                          <span *ngIf="item.securityStyle=='ntfs'">NTFS</span>
-                          <span *ngIf="item.securityStyle=='unix'">UNIX</span>
+                          <span *ngIf="item.securityStyle">{{item.securityStyle}}</span>
                           <span *ngIf="!item.securityStyle||item.securityStyle==''">--</span>
                         </clr-dg-cell>
                         <clr-dg-cell class="over_flow">{{item.nfsCount}}</clr-dg-cell>
@@ -873,10 +870,10 @@
                           </clr-dg-cell>
                           <clr-dg-cell class="over_flow">{{item.diskDomain}}</clr-dg-cell>
                           <clr-dg-cell class="over_flow">{{item.speed}}</clr-dg-cell>
-                          <clr-dg-cell class="over_flow">{{item.iops}}</clr-dg-cell>
-                          <clr-dg-cell class="over_flow">{{item.lantency}}</clr-dg-cell>
-                          <clr-dg-cell class="over_flow">{{item.bandwith}}</clr-dg-cell>
-                          <clr-dg-cell class="over_flow">{{item.useage}}</clr-dg-cell>
+                          <clr-dg-cell class="over_flow">{{item.iops!=null?item.iops.toFixed(2):'--'}}</clr-dg-cell>
+                          <clr-dg-cell class="over_flow">{{item.lantency!=null?item.lantency.toFixed(2):'--'}}</clr-dg-cell>
+                          <clr-dg-cell class="over_flow">{{item.bandwith!=null?item.bandwith.toFixed(2):'--'}}</clr-dg-cell>
+                          <clr-dg-cell class="over_flow">{{item.useage!=null?item.useage.toFixed(2):'--'}}</clr-dg-cell>
                         </clr-dg-row>
                         <clr-dg-footer>
                           <clr-dg-pagination #paginationDisk [clrDgPageSize]="10" [clrDgTotalItems]="diskTotal">
@@ -923,10 +920,10 @@
                                 </clr-dg-cell>
                                 <clr-dg-cell class="over_flow">{{item.wwn}}</clr-dg-cell>
                                 <clr-dg-cell class="over_flow">{{item.speed}}</clr-dg-cell>
-                                <clr-dg-cell class="over_flow">{{item.iops}}</clr-dg-cell>
-                                <clr-dg-cell class="over_flow">{{item.lantency}}</clr-dg-cell>
-                                <clr-dg-cell class="over_flow">{{item.bandwith}}</clr-dg-cell>
-                                <clr-dg-cell class="over_flow">{{item.useage}}</clr-dg-cell>
+                                <clr-dg-cell class="over_flow">{{item.iops!=null?item.iops.toFixed(2):'--'}}</clr-dg-cell>
+                                <clr-dg-cell class="over_flow">{{item.lantency!=null?item.lantency.toFixed(2):'--'}}</clr-dg-cell>
+                                <clr-dg-cell class="over_flow">{{item.bandwith!=null?item.bandwith.toFixed(2):'--'}}</clr-dg-cell>
+                                <clr-dg-cell class="over_flow">{{item.useage!=null?item.useage.toFixed(2):'--'}}</clr-dg-cell>
                               </clr-dg-row>
                               <clr-dg-footer>
                                 <clr-dg-pagination #paginationPort [clrDgPageSize]="10" [clrDgTotalItems]="fcTotal">

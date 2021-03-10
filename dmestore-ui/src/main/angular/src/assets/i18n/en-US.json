@@ -638,7 +638,8 @@
     "portNullMessage": "Port is not be Empty!",
     "establishConnect": "Establish an iSCSI connection",
     "showCol": "Display Column",
-    "selectAll": "Select All"
+    "selectAll": "Select All",
+    "hideIpTips": "Note: The following data will not include the data with empty IP!"
   },
   "rdm": {
     "name": "Name",
