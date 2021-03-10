@@ -175,7 +175,9 @@
     "expand":{
       "capacityErr":"输入超过容量限制!",
       "maxCapTip":"最大容量限制：16384 TB",
-      "minCapTip":"最小容量限制：1 GB"
+      "minCapTip":"最小容量限制：",
+      "reduceThinTips": "该磁盘类型为Thin类型，修改后的容量不得小于1GB。",
+      "reduceThickTips": "该磁盘类型为Thick类型，修改后的容量不得小于3GB。"
     }
   },
   "vmfs": {

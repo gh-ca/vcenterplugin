@@ -403,7 +403,9 @@ export class DetailComponent implements OnInit, AfterViewInit {
             this.storagePool.forEach(item => item.mediaType = "block/file");
           }
           const allName = this.storagePool.map(item => item.name);
-          this.volStoragePoolFilter.initAllName(allName);
+          if (this.volStoragePoolFilter) {
+            this.volStoragePoolFilter.initAllName(allName);
+          }
           this.poolTotal=this.storagePool.length==null?0:this.storagePool.length;
           this.storageListInitHandle();
           this.initCapacity();
@@ -958,7 +960,7 @@ export class DetailComponent implements OnInit, AfterViewInit {
         end_time: endTime,
       }
       this.nfsService.getLineChartData(url, params).subscribe((result: any) => {
-        if (result.code === '200' && result.data !== null && result.data !== null) {
+        if (result.code === '200' && result.data && result.data[objIds[0]]) {
           const resData = result.data;
           // 设置标题
           chart.title.text = title;
@@ -992,10 +994,10 @@ export class DetailComponent implements OnInit, AfterViewInit {
               chart.series[1].data.push({value: Number(item[key]), symbol: 'none'});
             }
           });
-          resolve(chart);
         } else {
           console.log('get chartData fail: ', result.description);
         }
+        resolve(chart);
       });
     });
   }

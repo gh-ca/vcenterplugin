@@ -173,7 +173,11 @@
       "success": "Successfully reduce!"
     },
     "expand":{
-      "capacityErr":"超过最大容量限制：16384TB!"
+      "capacityErr":"Input exceeds capacity limit!",
+      "maxCapTip":"Maximum capacity limit：16384 TB",
+      "minCapTip":"Minimum capacity limit：",
+      "reduceThinTips": "The disk type is Thin, and the modified capacity must not be less than ",
+      "reduceThickTips": "The disk type is Thick, and the modified capacity must not be less than "
     }
   },
   "vmfs": {

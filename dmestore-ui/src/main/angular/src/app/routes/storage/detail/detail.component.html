@@ -741,7 +741,14 @@
                   <td>
                     <clr-select-container>
                       <select clrSelect (ngModelOptions)="ranges" [(ngModel)]="selectRange" name="defaultSelect" class="clr-select" (change)="changeFunc()">
-                        <option *ngFor="let item of ranges" value="{{item.key}}">{{item.value}}</option>
+                        <option value="LAST_5_MINUTE">{{'chart.select.last5Minute'|translate}}</option>
+                        <option value="LAST_1_HOUR">{{'chart.select.last1Hour'|translate}}</option>
+                        <option value="LAST_1_DAY">{{'chart.select.last1Day'|translate}}</option>
+                        <option value="LAST_1_WEEK">{{'chart.select.last1Week'|translate}}</option>
+                        <option value="LAST_1_MONTH">{{'chart.select.last1Month'|translate}}</option>
+                        <option value="LAST_1_QUARTER">{{'chart.select.last1Quarter'|translate}}</option>
+                        <option value="HALF_1_YEAR">{{'chart.select.half1Year'|translate}}</option>
+                        <option value="LAST_1_YEAR">{{'chart.select.last1Year'|translate}}</option>
                       </select>
                     </clr-select-container>
                   </td>
