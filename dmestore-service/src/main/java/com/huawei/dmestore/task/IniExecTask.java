@@ -66,7 +66,7 @@ public class IniExecTask implements ApplicationListener<ContextRefreshedEvent> {
                     bestPracticeProcessService.check(null);
                     LOG.info("--->ini Scan Best Practice Task...end");
                 } catch (VcenterException e) {
-                    e.printStackTrace();
+                    LOG.error("初始化任务失败：", e.getMessage());
                 }
             }
         }, daLay, TimeUnit.SECONDS);
