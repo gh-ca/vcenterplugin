@@ -121,7 +121,8 @@
 
           <!-- 交通管制对象 带宽 下限-->
           <clr-checkbox-container *ngIf="modifyForm.control_policyLower === '0'">
-            <label style="color: #9F9F9F;">{{'vmfs.trafficControlObject' | translate}}</label>
+            <label *ngIf="modifyForm.control_policyLower == '0' && modifyForm.control_policyUpper != '1'" style="color: #9F9F9F;">{{'vmfs.trafficControlObject' | translate}}</label>
+            <label *ngIf="modifyForm.control_policyLower == '0' && modifyForm.control_policyUpper == '1'" style="color: #9F9F9F;"></label>
             <clr-checkbox-wrapper>
               <input type="checkbox" [(ngModel)]="modifyForm.minbandwidthChoose" (ngModelChange)="resetQosFlag(modifyForm.minbandwidthChoose, 'minbandwidth')" name="minbandwidthChoose" clrCheckbox/>
               <label>
