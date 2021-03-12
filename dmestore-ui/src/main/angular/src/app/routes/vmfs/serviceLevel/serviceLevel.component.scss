@@ -189,6 +189,6 @@
 input::-ms-clear{
   display: none;
 }
-body {
+::ng-deep .datagrid {
   -ms-overflow-style:scrollbar;
 }
