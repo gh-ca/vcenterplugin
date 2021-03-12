@@ -70,6 +70,16 @@ export class NfsService {
   getLineChartData(url:string, params = {}) {
     return this.http.post(url, params);
   }
+
+  /**
+   * 数据集的统计：数据获取
+   * @param url
+   * @param params
+   */
+  getDataSetsData(url:string) {
+    return this.http.get(url);
+  }
+
 }
 export interface List {
   name: string;    // 名称
@@ -126,6 +136,7 @@ export class UpdateNfs{
   shareId: string;
   name: string;
   deviceId: string;
+  capacity:number;
   constructor(){
     this.sameName=true;
   }
@@ -369,7 +380,7 @@ export class MakePerformance {
       }
       this.remoteSrv.getLineChartData(url, params).subscribe((result: any) => {
         console.log('chartData: ', title, result);
-        if (result.code === '200' && result.data !== null && result.data !== null) {
+        if (result.code === '200' && result.data && result.data[objIds[0]]) {
           const resData = result.data;
           // 设置标题
           chart.title.text = title;
@@ -421,10 +432,11 @@ export class MakePerformance {
               chart.series[1].data.push({value: value, symbol: 'none'});
             }
           });
-          resolve(chart);
+
         } else {
           console.log('get chartData fail: ', result.description);
         }
+        resolve(chart);
       });
     });
   }
@@ -458,7 +470,7 @@ export class MakePerformance {
         chart.title.text = title;
         // 设置副标题
         chart.title.subtext = subtext;
-        if (result.code === '200' && result.data !== null && result.data !== null) {
+        if (result.code === '200' && result.data && result.data[objIds[0]]) {
           let resData = result.data;
           if (result.data){
             resData = result.data
@@ -758,5 +770,218 @@ export class MakePerformance {
   getVolByName(name: string, volumeInfoList: VolumeInfo[]){
     const volumeInfo = volumeInfoList.filter(item  => item.name === name)[0];
     return volumeInfo;
+  }
+
+  /**
+   * 数据集的统计: 设置折线图
+   * @param height
+   * @param title
+   * @param subtext
+   * @param range
+   * @param url
+   * @param serviceLevelId
+   * @param chartType 类型 可选
+   * @param dataNames 指标名称
+   * @param dataValues 指标变量名 可选
+   */
+  setDataSetsChart(height: number, title: string, subtext: string, range: string, url: string, serviceLevelId:string, chartType:string ,dataNames:string[], dataValues:string[]){
+    // 生成chart optiond对象
+    const chart:ChartOptions = this.getDataSetsCharts(height, title, subtext, dataNames);
+    // 查询数据并设置echart
+    return new Promise((resolve, reject) => {
+      url += '?serviceLevelId=' + serviceLevelId + '&interval=' + range;
+      this.remoteSrv.getDataSetsData(url).subscribe((result: any) => {
+        console.log('chartData: ', title, result);
+        // 设置标题
+        chart.title.text = title;
+        // 设置副标题
+        chart.title.subtext = subtext;
+        if (result.code == '200' && result.data) {
+          let resData = result.data
+          const seriesData = resData.datas;
+          // 设置X轴
+          this.setDataSetsXAxis(seriesData, chart);
+         // 设置数据
+          this.setDataSetsDatas(seriesData, chart, chartType, dataValues);
+        } else {
+          console.log('get chartData fail: ', result.description);
+        }
+        resolve(chart);
+      });
+    });
+  }
+
+  /**
+   * 数据集的统计: 设置折线图X轴坐标
+   * @param data
+   * @param chart
+   */
+  setDataSetsXAxis(data: any[], chart:ChartOptions){
+    data.forEach(item =>{
+      const timestamp = item.timestamp;
+      const date = new Date(timestamp);
+      const dateStr = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate() + ' ' + date.getHours() + ':' + date.getMinutes();
+      chart.xAxis.data.push(dateStr);
+    });
+  }
+
+  /**
+   * 数据集的统计: 数据格式化
+   * @param data
+   * @param chart
+   * @param type 类型 statLun：LUN容量趋势、statStoragePool：存储池容量趋势、
+   * responseTime：LUN最大I/O响应时间（ms）、perfDensity：LUN I/O密度（IOPS/TB）、
+   * perfLUNIOPS：LUN总吞吐量（IOPS）、perfBandwidth：LUN总带宽（MB/s）、
+   * perfStoragePoolDetails：存储池I/O密度(IOPS/TB)
+   * @param dataValues
+   */
+  setDataSetsDatas(data: any[], chart:ChartOptions, type, dataValues:string[]) {
+    data.forEach(item => {
+      if (type) {
+        switch (type) {
+          case 'statStoragePool':// 存储池容量趋势
+          {
+            const usedCapacity = item.usedCapacity/1024;
+            const totalCapacity = item.totalCapacity/1024;
+            chart.series[0].data.push({value: Number(usedCapacity.toFixed(3)), symbol: 'none'});
+            chart.series[1].data.push({value: Number(totalCapacity.toFixed(3)), symbol: 'none'});
+            break;
+          }
+          case 'responseTime':// LUN最大I/O响应时间（ms）
+          {
+            const responseTime = item.responseTime;
+            chart.series[0].data.push({value: Number(responseTime.toFixed(3)), symbol: 'none'});
+            break;
+          }
+          case 'perfDensity': // LUN I/O密度（IOPS/TB）
+            {
+              let density;
+              if (item.totalCapacity != '0') {
+                density = item.throughput/(item.totalCapacity/1024);
+              } else {
+                density = 0;
+              }
+              chart.series[0].data.push({value: Number(density.toFixed(3)), symbol: 'none'});
+              break;
+            }
+          case 'perfLUNIOPS': // LUN总吞吐量（IOPS）
+            {
+              const throughput = item.throughput;
+              chart.series[0].data.push({value: Number(throughput.toFixed(3)), symbol: 'none'});
+              break;
+            }
+          case 'perfBandwidth': // LUN总带宽（MB/s）
+            {
+              const bandwidth = item.bandwidth;
+              chart.series[0].data.push({value: Number(bandwidth.toFixed(3)), symbol: 'none'});
+              break;
+            }
+          case 'perfStoragePoolDetails':// 存储池I/O密度(IOPS/TB)
+          {
+            let density;
+            if (item.totalCapacity != '0') {
+              density = item.throughput/(item.totalCapacity/1024);
+            } else {
+              density = 0;
+            }
+            chart.series[0].data.push({value: Number(density.toFixed(3)), symbol: 'none'});
+            break;
+          }
+          default:// LUN容量趋势
+          {
+            const allocCapacity = item.allocCapacity/1024;
+            const totalCapacity = item.totalCapacity/1024;
+            chart.series[0].data.push({value: Number(allocCapacity.toFixed(3)), symbol: 'none'});
+            chart.series[1].data.push({value: Number(totalCapacity.toFixed(3)), symbol: 'none'});
+            break;
+          }
+        }
+      } else {
+        dataValues.forEach(value => {
+          const dataValue = item[value];
+          chart.series[dataValues.indexOf(value)].data.push({value: Number(dataValue.toFixed(3)), symbol: 'none'});
+        });
+      }
+    })
+  }
+
+  /**
+   * 数据集的统计: 生成chart并返回
+   * @param height
+   * @param title
+   * @param subtext
+   */
+  getDataSetsCharts(height, title, subtext, dataNames:string[]) {
+    const chart: ChartOptions = new ChartOptions();
+    // 高度
+    chart.height = height;
+    // 标题
+    const titleInfo:Title = new Title();
+    titleInfo.text = title;
+    titleInfo.subtext = subtext;
+    titleInfo.textAlign = 'bottom';
+    const textStyle:TextStyle  = new TextStyle();
+    textStyle.fontStyle = 'normal';
+    titleInfo.textStyle = textStyle;
+
+    chart.title = titleInfo;
+
+    // x轴
+    const xAxis: XAxis = new XAxis();
+    xAxis.type = 'category';
+    xAxis.boundaryGap = false;
+    xAxis.data = [];
+
+    chart.xAxis = xAxis;
+
+    // y轴
+    const yAxis: YAxis = new YAxis();
+    yAxis.type = 'value';
+    yAxis.min = 0;
+    yAxis.splitNumber = 2;
+    yAxis.boundaryGap = ['50%', '50%'];
+    const axisLine: AxisLine = new AxisLine();
+    axisLine.show = false;
+    yAxis.axisLine = axisLine;
+    const splitLine = new SplitLine();
+    splitLine.show = true;
+    const lineStyle = new LineStyle();
+    lineStyle.type = 'dashed';
+    splitLine.lineStyle = lineStyle;
+    yAxis.splitLine = splitLine;
+
+    chart.yAxis = yAxis;
+    // 提示框
+    const tooltip: Tooltip = new Tooltip();
+    tooltip.trigger = 'axis';
+    tooltip.formatter = '{b} <br/> {a0}: {c0}';
+    const axisPointer: AxisPointer = new AxisPointer();
+    axisPointer.axis = 'x';
+    axisPointer.type = 'line';
+    tooltip.axisPointer = axisPointer;
+    chart.tooltip = tooltip;
+
+    // 指标
+    const legend: Legend = new Legend();
+    const legendData: LegendData[] = [];
+
+    // 指标颜色
+    const colors:string[] = ['#DB2000', '#F8E082', '#6870c4', '#01bfa8', '#2f4554', '#61a0a8', '#d48265', '#91c7ae','#749f83','#ca8622', '#bda29a','#6e7074', '#546570', '#c4ccd3'];
+    chart.color = colors;
+
+    // 数据(格式)
+    const series: Serie[] = [];
+    legend.x = 'right';
+    legend.y = 'top';
+    dataNames.forEach(item => {
+      legendData.push(this.setLengdData(item, 'line'));
+      series.push(this.setSerieData(item, 'line', true, 'dotted', colors[dataNames.indexOf(item)], null))
+    });
+    legend.selectedMode  = true;
+    legend.data = legendData;
+
+    chart.series = series;
+
+    return chart;
   }
 }

@@ -9,8 +9,10 @@
       <!--名称 -->
       <clr-input-container>
         <label  style="color: #9F9F9F;">{{'rdm.name' | translate}}<span style="color: red">*</span></label>
-        <input clrInput class="inputWidth100Percent"  [(ngModel)]="configModel.volumeSpecs[0].name" name="name" #name="ngModel" required/>
-        <clr-control-error>{{'validations.required' | translate}}</clr-control-error>
+        <input clrInput class="inputWidth100Percent" maxlength="31"  [(ngModel)]="configModel.volumeSpecs[0].name" (input)="lengthVerification($event,30)" (blur)="nameCheck();" name="name" #name="ngModel" required/>
+        <clr-control-error>
+          <p style="color: red">{{'validations.nameRequired' | translate}}</p>
+        </clr-control-error>
       </clr-input-container>
 
       <!-- 容量 -->
@@ -35,9 +37,16 @@
         </clr-control-helper>-->
         <clr-control-error>{{'validations.required' | translate}}</clr-control-error>
       </clr-input-container>
-
+      <!--兼容模式-->
+      <clr-select-container class="selectClass">
+        <label  style="color: #9F9F9F;">{{'rdm.compatibilityMode.name' | translate}}<span style="color: red">*</span></label>
+        <select clrSelect required [(ngModel)]="compatibilityMode" name="compatibilityMode" class="clr-select">
+          <option value="virtualMode">{{'rdm.compatibilityMode.virtualMode' | translate}}</option>
+          <option value="physicalMode">{{'rdm.compatibilityMode.physicalMode' | translate}}</option>
+        </select>
+      </clr-select-container>
       <!--存储-->
-      <clr-select-container class="selectClass">>
+      <clr-select-container class="selectClass">
         <label  style="color: #9F9F9F;">{{'rdm.dataStore' | translate}}<span style="color: red">*</span></label>
         <select clrSelect (ngModelOptions)="dataStores" required [(ngModel)]="dataStoreObjectId" name="dataStoreObjectId" class="clr-select">
           <option *ngFor="let item of dataStores" value="{{item.objectId}}">{{item.name}}</option>
@@ -141,13 +150,15 @@
       </ng-container>
       <!-- 2、未选择 服务等级-->
       <ng-container *ngIf="levelCheck==='storage'">
+        <!--存储设备-->
         <clr-select-container class="selectClass">
           <label style="color: #9F9F9F;">{{'rdm.storage' | translate}}<span style="color: red">*</span></label>:
           <select clrSelect  [(ngModel)]="configModel.storageId" name="storageId" required (ngModelChange)="loadStoragePool(configModel.storageId);">
-            <option *ngFor="let item of storageDevices" value="{{item.id}}">{{item.name}}</option>
+            <option *ngFor="let item of storageDevices" value="{{item.id}}">{{item.name+'('+item.ip+')'}}</option>
           </select>
           <clr-control-error>{{'validations.required' | translate}}</clr-control-error>
         </clr-select-container>
+        <!--存储池-->
         <clr-select-container class="selectClass">
           <label style="color: #9F9F9F;">{{'rdm.sPool' | translate}}<span style="color: red">*</span></label>:
           <select clrSelect [(ngModel)]="configModel.poolRawId" name="poolRawId" required>
@@ -155,7 +166,7 @@
           </select>
           <clr-control-error>{{'validations.required' | translate}}</clr-control-error>
         </clr-select-container>
-
+        <!--归属控制器-->
         <clr-select-container class="selectClass" *ngIf="ownershipController">
           <label style="color: #9F9F9F;">{{'rdm.ownerC' | translate}}<span style="color: red">*</span></label>:
           <select clrSelect [(ngModel)]="configModel.ownerController" name="ownerController" required>
@@ -164,8 +175,8 @@
           </select>
           <clr-control-error>{{'validations.required' | translate}}</clr-control-error>
         </clr-select-container>
-
-        <clr-select-container class="selectClass">
+        <!--容量初始分配策略-->
+        <clr-select-container class="selectClass" *ngIf="capacityInitShow">
           <label style="color: #9F9F9F;">{{'rdm.idp' | translate}}<span style="color: red">*</span></label>:
           <select clrSelect [(ngModel)]="configModel.initialDistributePolicy" name="initialDistributePolicy" required>
             <option value="0">{{'rdm.autoSelect' | translate}}</option>
@@ -175,8 +186,8 @@
           </select>
           <clr-control-error>{{'validations.required' | translate}}</clr-control-error>
         </clr-select-container>
-
-        <clr-select-container class="selectClass">
+        <!--预取策略-->
+        <clr-select-container class="selectClass" *ngIf="prefetchStrategyShow">
           <label style="color: #9F9F9F;">{{'rdm.fetchP' | translate}}<span style="color: red">*</span></label>:
           <select clrSelect [(ngModel)]="configModel.prefetchPolicy" name="prefetchPolicy" required>
             <option value="0">{{'rdm.notFetch' | translate}}</option>
@@ -191,100 +202,131 @@
           <label style="color: #9F9F9F;">{{'rdm.tuning' | translate}}</label>
         </clr-input-container>
 
+        <!--SmartTier-->
+        <div *ngIf="configModel.storageId && smartTierShow">
+          <clr-toggle-container>
+            <clr-toggle-wrapper>
+              <label style="color: #9F9F9F;">{{'rdm.smartTier' | translate}}</label>
+              <input type="checkbox" clrToggle [(ngModel)]="policyEnable.smartTier" name="smartTierE" />
+            </clr-toggle-wrapper>
+          </clr-toggle-container>
 
-
-        <clr-toggle-container>
-          <clr-toggle-wrapper>
-            <label style="color: #9F9F9F;">{{'rdm.smartTier' | translate}}</label>
-            <input type="checkbox" clrToggle [(ngModel)]="policyEnable.smartTier" name="smartTierE" />
-          </clr-toggle-wrapper>
-        </clr-toggle-container>
-
-        <clr-select-container class="selectClass" *ngIf="policyEnable.smartTier">
-          <label style="color: #9F9F9F;">{{'rdm.smartTierP' | translate}}<span style="color: red">*</span></label>:
-          <select clrSelect [(ngModel)]="configModel.tuning.smarttier" name="smarttier">
-            <option value="0">{{'rdm.notMove' | translate}}</option>
-            <option value="1">{{'rdm.autoMove' | translate}}</option>
-            <option value="2">{{'rdm.highPMove' | translate}}</option>
-            <option value="3">{{'rdm.lowPMove' | translate}}</option>
-          </select>
-        </clr-select-container>
-
-
-        <clr-toggle-container>
-          <clr-toggle-wrapper>
-            <label style="color: #9F9F9F;">{{'rdm.qosP' | translate}}</label>
-            <input type="checkbox" clrToggle  [(ngModel)]="policyEnable.qosPolicy" name="qosPolicyE" />
-          </clr-toggle-wrapper>
-        </clr-toggle-container>
-
-        <clr-radio-container clrInline *ngIf="policyEnable.qosPolicy">
-          <label style="color: #9F9F9F;" class="floatleft">{{'rdm.controlP' | translate}}<span style="color: red">*</span></label>
-          <clr-radio-wrapper>
-            <input type="radio" clrRadio name="controlPolicy" required value="1" (change)="changeQosRedio()" [(ngModel)]="configModel.tuning.smartqos.controlPolicy" />
-            <label style="color: #9F9F9F;">{{'rdm.uLimit' | translate}}</label>
-          </clr-radio-wrapper>
-          <clr-radio-wrapper>
-            <input type="radio" clrRadio name="controlPolicy" required value="0" (change)="changeQosRedio()" [(ngModel)]="configModel.tuning.smartqos.controlPolicy" />
-            <label style="color: #9F9F9F;">{{'rdm.lLimit' | translate}}</label>
-          </clr-radio-wrapper>
-        </clr-radio-container>
-
-        <div *ngIf="policyEnable.qosPolicy">
-          <clr-checkbox-container *ngIf="configModel.tuning.smartqos.controlPolicy==='1'">
-            <label style="color: #9F9F9F;">{{'rdm.trafficC' | translate}}<span style="color: red">*</span></label>
-            <clr-checkbox-wrapper>
-              <input type="checkbox" clrCheckbox name="c1" [(ngModel)]="options1" (change)="changeQosInput('box')"/>
-              <label style="color: #9F9F9F;" style="width: 230px">{{'rdm.bandwidth' | translate}} <=
-                <input class="inputOneLine" disabled="{{!options1}}" name="Brandwidth" [(ngModel)]="configModel.tuning.smartqos.maxbandwidth"
-                       (change)="changeQosInput('band')"
-                       onkeyup="this.value= this.value.match(/\d+(\.\d{0,2})?/) ? this.value.match(/\d+(\.\d{0,2})?/)[0] : ''"/> MB/s
-              </label>
-            </clr-checkbox-wrapper>
-            <clr-checkbox-wrapper>
-              <input type="checkbox" clrCheckbox name="c2" [(ngModel)]="options2" (change)="changeQosInput('box')"/>
-              <label style="color: #9F9F9F;" style="width: 230px">IOPS <=
-                <input class="inputOneLine" disabled="{{!options2}}" name="IOPS" [(ngModel)]="configModel.tuning.smartqos.maxiops"
-                       (change)="changeQosInput('iops')"
-                       onkeyup="this.value= this.value.match(/\d+(\.\d{0,2})?/) ? this.value.match(/\d+(\.\d{0,2})?/)[0] : ''"/>
-              </label>
-            </clr-checkbox-wrapper>
-          </clr-checkbox-container>
-          <clr-checkbox-container *ngIf="configModel.tuning.smartqos.controlPolicy==='0'">
-            <label style="color: #9F9F9F;">{{'rdm.trafficC' | translate}}<span style="color: red">*</span></label>
-            <clr-checkbox-wrapper>
-              <input type="checkbox" clrCheckbox  name="c3"  [(ngModel)]="options3" (change)="changeQosInput('box')"/>
-              <label style="color: #9F9F9F;" style="width: 230px">{{'rdm.bandwidth' | translate}} >=
-                <input class="inputOneLine" disabled="{{!options3}}" name="Bandwidth" [(ngModel)]="configModel.tuning.smartqos.minbandwidth"
-                       (change)="changeQosInput('band')"
-                       onkeyup="this.value= this.value.match(/\d+(\.\d{0,2})?/) ? this.value.match(/\d+(\.\d{0,2})?/)[0] : ''"/> MB/s
-              </label>
-            </clr-checkbox-wrapper>
-            <clr-checkbox-wrapper>
-              <input type="checkbox" clrCheckbox name="c4"  [(ngModel)]="options4" (change)="changeQosInput('box')"/>
-              <label style="color: #9F9F9F;" style="width: 230px">IOPS >=
-                <input class="inputOneLine" disabled="{{!options4}}" name="IOPS" [(ngModel)]="configModel.tuning.smartqos.miniops"
-                       (change)="changeQosInput('iops')"
-                       onkeyup="this.value= this.value.match(/\d+(\.\d{0,2})?/) ? this.value.match(/\d+(\.\d{0,2})?/)[0] : ''"/>
-              </label>
-            </clr-checkbox-wrapper>
-            <clr-checkbox-wrapper>
-              <input type="checkbox" clrCheckbox name="c5"  [(ngModel)]="options5" (change)="changeQosInput('box')"/>
-              <label style="color: #9F9F9F;" style="width: 230px">{{'rdm.latency' | translate}} <=
-                <input class="inputOneLine" disabled="{{!options5}}" name="Latency" [(ngModel)]="configModel.tuning.smartqos.latency"
-                       (change)="changeQosInput('latency')"
-                       onkeyup="this.value= this.value.match(/\d+(\.\d{0,2})?/) ? this.value.match(/\d+(\.\d{0,2})?/)[0] : ''"/> ms
-              </label>
-            </clr-checkbox-wrapper>
-          </clr-checkbox-container>
-          <div style="margin-left: 150px">
-            <div [hidden]="!qos1Show"><span style="color: #C7381F;">{{'rdm.atOne'| translate}}</span></div>
-            <div [hidden]="!qos2Show"><span style="color: #C7381F;">{{'rdm.bandNotNull'| translate}}</span></div>
-            <div [hidden]="!qos3Show"><span style="color: #C7381F;">{{'rdm.IOPSNotNull'| translate}}</span></div>
-            <div [hidden]="!qos4Show"><span style="color: #C7381F;">{{'rdm.latencyNotNull'| translate}}</span></div>
-          </div>
+          <clr-select-container class="selectClass" *ngIf="policyEnable.smartTier">
+            <label style="color: #9F9F9F;">{{'rdm.smartTierP' | translate}}<span style="color: red">*</span></label>:
+            <select clrSelect [(ngModel)]="configModel.tuning.smarttier" name="smarttier">
+              <option value="0">{{'rdm.notMove' | translate}}</option>
+              <option value="1">{{'rdm.autoMove' | translate}}</option>
+              <option value="2">{{'rdm.highPMove' | translate}}</option>
+              <option value="3">{{'rdm.lowPMove' | translate}}</option>
+            </select>
+          </clr-select-container>
         </div>
 
+        <!--Qos-->
+        <clr-toggle-container *ngIf="configModel.storageId">
+          <clr-toggle-wrapper>
+            <label style="color: #9F9F9F;">{{'rdm.qosP' | translate}}</label>
+            <input type="checkbox" clrToggle  [(ngModel)]="policyEnable.qosPolicy" (change)="qosChange(configModel);" name="qosPolicyE" />
+          </clr-toggle-wrapper>
+        </clr-toggle-container>
+
+        <div *ngIf="policyEnable.qosPolicy">
+          <!-- 控制策略 -->
+          <clr-checkbox-container clrInline>
+            <label style="color: #9F9F9F;">{{'vmfs.controlPolicy' | translate}}</label>
+            <!--上限-->
+            <clr-checkbox-wrapper>
+              <input type="checkbox" id="control_policyUpper" clrCheckbox (change)="controlPolicyChangeFunc('control_policyUpper', 'control_policyLower', configModel, true);" name="control_policyUpper" />
+              <label>{{'vmfs.upperLimitControl' | translate}}</label>
+            </clr-checkbox-wrapper>
+            <!--下限-->
+            <clr-checkbox-wrapper *ngIf="!hiddenLowerFlag">
+              <input type="checkbox" id="control_policyLower" clrCheckbox (change)="controlPolicyChangeFunc('control_policyUpper', 'control_policyLower', configModel, false);" name="control_policyLower" />
+              <label>{{'vmfs.lowerLimitControl' | translate}}</label>
+            </clr-checkbox-wrapper>
+          </clr-checkbox-container>
+          <!-- 带宽 上限-->
+          <clr-checkbox-container *ngIf="configModel.flagInfo.control_policyUpper == '1'">
+            <label style="color: #9F9F9F;">{{'rdm.trafficC' | translate}}</label>
+            <clr-checkbox-wrapper>
+              <input type="checkbox" clrCheckbox name="c1" [(ngModel)]="configModel.flagInfo.maxBandwidthChoose" (ngModelChange)="resetQosFlag(configModel.flagInfo.maxBandwidthChoose, 'maxbandwidth')"/>
+              <label style="color: #9F9F9F;" style="width: 190px">{{'rdm.bandwidth' | translate}} <=
+                <input type="number" min="0"  oninput="if (value.length > 11) {value=value.slice(0,11)}" class="inputOneLine" disabled="{{!configModel.flagInfo.maxBandwidthChoose}}" name="maxbandwidth" [(ngModel)]="configModel.tuning.smartqos.maxbandwidth"
+                       (blur)="qosBlur('maxbandwidth');" [required]="configModel.flagInfo.maxBandwidthChoose"/> MB/s
+              </label>
+            </clr-checkbox-wrapper>
+            <clr-control-helper *ngIf="bandWidthMaxErrTips" style="color: red"><clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{'errorMsg.iposMaxMinTips' | translate}}</clr-control-helper>
+            <clr-control-helper *ngIf="!bandWidthMaxErrTips && configModel.flagInfo.maxBandwidthChoose && !configModel.tuning.smartqos.maxbandwidth">{{'errorMsg.require' | translate}}</clr-control-helper>
+          </clr-checkbox-container>
+          <!-- IOPS 上限-->
+          <clr-checkbox-container *ngIf="configModel.flagInfo.control_policyUpper == '1'">
+            <label></label>
+            <clr-checkbox-wrapper>
+              <input type="checkbox" clrCheckbox name="c2" [(ngModel)]="configModel.flagInfo.maxIopsChoose" (ngModelChange)="resetQosFlag(configModel.flagInfo.maxIopsChoose, 'maxiops')"/>
+              <label style="color: #9F9F9F;" style="width: 190px">IOPS <=
+                <input type="number" min="0"  oninput="if (value.length > 11) {value=value.slice(0,11)}" class="inputOneLine" disabled="{{!configModel.flagInfo.maxIopsChoose}}" name="maxiops" [(ngModel)]="configModel.tuning.smartqos.maxiops"
+                       (blur)="qosBlur('maxiops');" [required]="configModel.flagInfo.maxIopsChoose"/>
+              </label>
+            </clr-checkbox-wrapper>
+            <clr-control-helper *ngIf="iopsMaxErrTips" style="color: red"><clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{'errorMsg.iposMaxMinTips' | translate}}</clr-control-helper>
+            <clr-control-helper *ngIf="configModel.flagInfo.maxIopsChoose && !iopsMaxErrTips && !configModel.tuning.smartqos.maxiops">{{'errorMsg.require' | translate}}</clr-control-helper>
+          </clr-checkbox-container>
+          <!-- 下限 -->
+          <div *ngIf="!hiddenLowerFlag">
+            <!-- 带宽下限 -->
+            <clr-checkbox-container *ngIf="configModel.flagInfo.control_policyLower == '0'">
+              <label *ngIf="configModel.flagInfo.control_policyLower == '0' && configModel.flagInfo.control_policyUpper != '1'" style="color: #9F9F9F;">{{'vmfs.trafficControlObject' | translate}}</label>
+              <label *ngIf="configModel.flagInfo.control_policyLower == '0' && configModel.flagInfo.control_policyUpper == '1'" style="color: #9F9F9F;"></label>
+              <clr-checkbox-wrapper>
+                <input type="checkbox" clrCheckbox  name="c3"  [(ngModel)]="configModel.flagInfo.minBandwidthChoose" (ngModelChange)="resetQosFlag(configModel.flagInfo.minBandwidthChoose, 'minbandwidth')"/>
+                <label style="color: #9F9F9F;" style="width: 190px">{{'rdm.bandwidth' | translate}} >=
+                  <input type="number" min="0"  oninput="if (value.length > 11) {value=value.slice(0,11)}" class="inputOneLine" disabled="{{!configModel.flagInfo.minBandwidthChoose}}" name="minbandwidth" [(ngModel)]="configModel.tuning.smartqos.minbandwidth"
+                         (blur)="qosBlur('minbandwidth');" [required]="configModel.flagInfo.minBandwidthChoose"/> MB/s
+                </label>
+              </clr-checkbox-wrapper>
+              <clr-control-helper *ngIf="bandWidthMinErrTips" style="color: red"><clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{'errorMsg.iposMaxMinTips' | translate}}</clr-control-helper>
+              <clr-control-helper *ngIf="!bandWidthMinErrTips && !configModel.tuning.smartqos.minbandwidth && configModel.flagInfo.minBandwidthChoose">{{'errorMsg.require' | translate}}</clr-control-helper>
+            </clr-checkbox-container>
+            <!-- IOPS下限 -->
+            <clr-checkbox-container *ngIf="configModel.flagInfo.control_policyLower == '0'">
+              <label></label>
+              <clr-checkbox-wrapper>
+                <input type="checkbox" clrCheckbox name="c4"  [(ngModel)]="configModel.flagInfo.minIopsChoose" (ngModelChange)="resetQosFlag(configModel.flagInfo.minIopsChoose, 'miniops')"/>
+                <label style="color: #9F9F9F;" style="width: 190px">IOPS >=
+                  <input type="number" min="0"  oninput="if (value.length > 11) {value=value.slice(0,11)}" class="inputOneLine" disabled="{{!configModel.flagInfo.minIopsChoose}}" name="miniops" [(ngModel)]="configModel.tuning.smartqos.miniops"
+                         (blur)="qosBlur('miniops');" [required]="configModel.flagInfo.minIopsChoose"/>
+                </label>
+              </clr-checkbox-wrapper>
+              <clr-control-helper *ngIf="iopsMinErrTips" style="color: red"><clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{'errorMsg.iposMaxMinTips' | translate}}</clr-control-helper>
+              <clr-control-helper *ngIf="configModel.flagInfo.minIopsChoose && !configModel.tuning.smartqos.miniops && !iopsMinErrTips">{{'errorMsg.require' | translate}}</clr-control-helper>
+            </clr-checkbox-container>
+            <!-- latency -->
+            <clr-checkbox-container *ngIf="configModel.flagInfo.control_policyLower == '0'">
+              <label></label>
+              <clr-checkbox-wrapper *ngIf="!latencyIsSelect">
+                <input type="checkbox" clrCheckbox name="c5"  [(ngModel)]="configModel.flagInfo.latencyChoose" (ngModelChange)="resetQosFlag(configModel.flagInfo.latencyChoose, 'latency')" />
+                <label style="width: 190px" >{{'rdm.latency' | translate}} <=
+                  <input type="number" min="0"  oninput="if (value.length > 11) {value=value.slice(0,11)}" class="inputOneLine" disabled="{{!configModel.flagInfo.latencyChoose}}" name="Latency" [(ngModel)]="configModel.tuning.smartqos.latency"
+                         (blur)="qosBlur('latency');" [required]="configModel.flagInfo.latencyChoose"/> ms
+                </label>
+              </clr-checkbox-wrapper>
+              <clr-checkbox-wrapper *ngIf="latencyIsSelect">
+                <input type="checkbox" clrCheckbox name="c5"  [(ngModel)]="configModel.flagInfo.latencyChoose"/>
+                <label style="width: 190px">
+                  {{'vmfs.latencyMax' | translate}}
+                  <select [(disabled)]="!configModel.flagInfo.latencyChoose" [(ngModel)]="configModel.tuning.smartqos.latency" name="latency" style="height: 1.2rem;width: 54%;border: none;border-bottom: 1px solid;border-bottom-color: var(--clr-forms-border-color, #b3b3b3);">
+                    <option value="500">500</option>
+                    <option value="1500">1500</option>
+                  </select>
+                  {{'vmfs.latencyUnitUs' | translate}}
+                </label>
+              </clr-checkbox-wrapper>
+              <clr-control-helper *ngIf="latencyErrTips" style="color: red"><clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{'errorMsg.iposMaxMinTips' | translate}}</clr-control-helper>
+              <clr-control-helper *ngIf="!latencyErrTips && configModel.flagInfo.latencyChoose && !configModel.tuning.smartqos.latency">{{'errorMsg.require' | translate}}</clr-control-helper>
+            </clr-checkbox-container>
+          </div>
+        </div>
+        <!--资源调优-->
         <clr-toggle-container>
           <clr-toggle-wrapper>
             <label style="color: #9F9F9F;">{{'rdm.rtuning' | translate}}</label>
@@ -296,11 +338,11 @@
           <label style="color: #9F9F9F;">{{'rdm.alloctype' | translate}}<span style="color: red">*</span></label>:
           <select clrSelect [(ngModel)]="configModel.tuning.alloctype" name="alloctype" >
             <option value="thin">thin</option>
-            <option value="thick">thick</option>
+            <option *ngIf="allocationTypeShow" value="thick">thick</option>
           </select>
         </clr-select-container>
 
-        <clr-select-container class="selectClass" *ngIf="configModel.tuning.alloctype == 'thin' && policyEnable.resourceTuning">
+        <clr-select-container class="selectClass" *ngIf="configModel.tuning.alloctype == 'thin' && policyEnable.resourceTuning && deduplicationShow">
           <label style="color: #9F9F9F;">{{'rdm.dedupe' | translate}}<span style="color: red">*</span></label>:
           <select clrSelect [(ngModel)]="configModel.tuning.dedupeEnabled" name="dedupe" >
             <option value=null>{{'rdm.default' | translate}}</option>
@@ -309,7 +351,7 @@
           </select>
         </clr-select-container>
 
-        <clr-select-container class="selectClass" *ngIf="configModel.tuning.alloctype == 'thin' && policyEnable.resourceTuning">
+        <clr-select-container class="selectClass" *ngIf="configModel.tuning.alloctype == 'thin' && policyEnable.resourceTuning && compressionShow">
           <label style="color: #9F9F9F;">{{'rdm.compression' | translate}}<span style="color: red">*</span></label>:
           <select clrSelect [(ngModel)]="configModel.tuning.compressionEnabled" name="compression" >
             <option value=null>{{'rdm.default' | translate}}</option>

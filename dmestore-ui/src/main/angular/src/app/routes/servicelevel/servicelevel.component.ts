@@ -14,7 +14,7 @@ import { GlobalsService }     from "../../shared/globals.service";
 import {TranslatePipe} from "@ngx-translate/core";
 import {ServicelevelService, SLStoragePool} from "./servicelevel.service";
 import {ServiceLevelFilter} from "../vmfs/list/filter.component";
-import {SLSPDiskTypeFilter, SLSPStatusFilter, SLSPStorageNameFilter} from "./filter.component";
+import {LUNStatusFilter, SLSPDiskTypeFilter, SLSPStatusFilter, SLSPStorageNameFilter} from "./filter.component";
 
 @Component({
   selector: 'app-servicelevel',
@@ -38,6 +38,8 @@ export class ServicelevelComponent implements OnInit, AfterViewInit, OnDestroy {
   storagePoolDensity={};
 
   range = new Range();
+
+  capacityRange = new CapacityRange();
 
   // 详情列表按钮控制
   storagePoolRadioCheck = 'basic';
@@ -165,6 +167,7 @@ export class ServicelevelComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('runningStatusFilter') runningStatusFilter: SLSPStatusFilter;
   @ViewChild('slspDiskTypeFilter') slspDiskTypeFilter: SLSPDiskTypeFilter;
   @ViewChild('sLSPStorageNameFilter') sLSPStorageNameFilter: SLSPStorageNameFilter;
+  @ViewChild('lunStatusFilter') lunStatusFilter: LUNStatusFilter;
 
   constructor(private ngZone: NgZone,
               private cdr: ChangeDetectorRef,
@@ -188,8 +191,10 @@ export class ServicelevelComponent implements OnInit, AfterViewInit, OnDestroy {
     this.volumeRadioCheck = 'basic';
     this.storagePoolRadioCheck = 'basic';
     this.selectedModel=o;
-
+    // 性能折线图
     this.initChart(this.range);
+    // 容量折线图
+    this.initCapacityChart(this.capacityRange);
   }
 
   closeS(){
@@ -210,7 +215,7 @@ export class ServicelevelComponent implements OnInit, AfterViewInit, OnDestroy {
         }
         const allName = this.storagePoolList.map(item => item.storageName);
         // 设置设备名称过滤相关
-        this.sLSPStorageNameFilter.setStorageNameFilter(allName)
+        // this.sLSPStorageNameFilter.setStorageNameFilter(allName)
         this.storagePoolList.forEach(item => item.usedCapacity = Number(((item.consumedCapacity)/item.totalCapacity * 100).toFixed(2)));
         this.storagePoolTotal = this.storagePoolList.length;
         this.storeagePoolIsloading = false;
@@ -442,7 +447,7 @@ export class ServicelevelComponent implements OnInit, AfterViewInit, OnDestroy {
     this.http.post('datastorestatistichistrory/servicelevelStoragePool', p).subscribe((response: any) => {
       if (response.code == '200'){
         this.storagePoolList.forEach((item)=>{
-          let i = response.data[item.storage_instance_id];
+          let i = response.data[item.storageInstanceId];
           if (i != undefined){
             let iops = i['1125912791810049'].max;
             let latency = i['1125912791810050'].max;
@@ -462,82 +467,124 @@ export class ServicelevelComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
+  /**
+   * 容量折线图
+   * @param range
+   */
+  async initCapacityChart(range: CapacityRange) {
+    // 容量：LUN容量趋势
+    const caLunTrend = [this.translatePipe.transform('chart.title.allocatedCapacity'), this.translatePipe.transform('chart.title.totalCapacity')];
+    this.makePerformance.setDataSetsChart(
+      300
+      , this.translatePipe.transform('chart.title.lunCapacityTrends')
+      , ''
+      , range.range
+      , '/servicelevel/capacity/stat-lun'
+      , this.selectedModel.id
+      , 'statLun'
+      , caLunTrend
+      , null).then(res => {
+      this.volumeCapacity = res;
+      this.cdr.detectChanges();
+    });
+
+    // 容量：存储池容量趋势
+    const caStroagePoolTrend = [this.translatePipe.transform('chart.title.usedCapacity'), this.translatePipe.transform('chart.title.totalCapacity')];
+    this.makePerformance.setDataSetsChart(
+      300
+      , this.translatePipe.transform('chart.title.storagePoolCapacityTrends')
+      , ''
+      , range.range
+      , '/servicelevel/capacity/stat-storage-pool'
+      , this.selectedModel.id
+      , 'statStoragePool'
+      , caStroagePoolTrend
+      , null).then(res => {
+      this.storagePoolCapacity = res;
+      this.cdr.detectChanges();
+    });
+  }
+
+  /**
+   * 性能折线图
+   * @param range
+   */
   async initChart(range: Range) {
-    this.makePerformance.setChartSingle(
-      300,
-      // '卷最大I/O响应时间(ms)',
-      this.translatePipe.transform('performance.volumeMaximumIORespTime'),
-      '',
-      ["1125921381744655"],
-      [this.selectedModel.id],
-      range.range,
-      'datastorestatistichistrory/servicelevelLun',
-      null,
-      null).then(
-        res => {
+
+    // 性能： 'Lun最大I/O响应时间(ms)'
+    const perfResDataNames = [this.translatePipe.transform('performance.volumeMaximumIORespTime')]
+    this.makePerformance.setDataSetsChart(
+      300
+      , this.translatePipe.transform('performance.volumeMaximumIORespTime')
+      , ''
+      , range.range
+      , '/servicelevel/performance/perf-stat-lun-details'
+      , this.selectedModel.id
+      , 'responseTime'
+      , perfResDataNames
+      , null).then(res => {
       this.volumeMaxResponseTime = res;
       this.cdr.detectChanges();
     });
-    this.makePerformance.setChartSingle(
-      300,
-      // '卷I/O密度(IOPS/TB)',
-      this.translatePipe.transform('performance.volumeIODensity'),
-      '',
-      ["1223"],
-      [this.selectedModel.id],
-      range.range,
-      'datastorestatistichistrory/servicelevelLun',
-      null,
-      null).then(
-      res => {
-        this.volumeDensity = res;
-        this.cdr.detectChanges();
-      });
-    this.makePerformance.setChartSingle(
-      300,
-      // '卷总吞吐量(IOPS)',
-      this.translatePipe.transform('performance.totalVolumeThroughput'),
-      '',
-      ["1125921381744641"],
-      [this.selectedModel.id],
-      range.range,
-      'datastorestatistichistrory/servicelevelLun',
-      null,
-      null).then(
-      res => {
-        this.volumeThroughput = res;
-        this.cdr.detectChanges();
-      });
-    this.makePerformance.setChartSingle(
-      300,
-      // '卷总带宽(MB/s)',
-      this.translatePipe.transform('performance.volumeTotalBandwidth'),
-      '',
-      ["1125921381744643"],
-      [this.selectedModel.id],
-      range.range,
-      'datastorestatistichistrory/servicelevelLun',
-      null,
-      null).then(
-      res => {
-        this.volumeBandwidth = res;
-        this.cdr.detectChanges();
-      });
-    this.makePerformance.setChartSingle(
-      300,
-      // '存储池I/O密度(IOPS/TB)',
-      this.translatePipe.transform('performance.storagePoolIODensity'),
-      '',
-      ["111"],
-      [this.selectedModel.id],
-      range.range,
-      'datastorestatistichistrory/servicelevelLun',
-      null,
-      null).then(
-      res => {
-        this.storagePoolDensity = res;
-        this.cdr.detectChanges();
-      });
+    // 性能：'LUN I/O密度(IOPS/TB)'
+    const perfDesDataNames = [this.translatePipe.transform('performance.volumeIODensity')]
+    this.makePerformance.setDataSetsChart(
+      300
+      , this.translatePipe.transform('performance.volumeIODensity')
+      , ''
+      , range.range
+      , '/servicelevel/performance/perf-stat-lun-details'
+      , this.selectedModel.id
+      , 'perfDensity'
+      , perfDesDataNames
+      , null).then(res => {
+      this.volumeDensity = res;
+      this.cdr.detectChanges();
+    });
+    // 性能：'卷总吞吐量(IOPS)'
+    const perfIOPSDataNames = [this.translatePipe.transform('performance.totalVolumeThroughput')]
+    this.makePerformance.setDataSetsChart(
+      300
+      , this.translatePipe.transform('performance.totalVolumeThroughput')
+      , '', range.range
+      , '/servicelevel/performance/perf-stat-lun-details'
+      , this.selectedModel.id
+      , 'perfLUNIOPS'
+      , perfIOPSDataNames
+      , null).then(res => {
+      this.volumeThroughput = res;
+      this.cdr.detectChanges();
+    });
+    // 性能：'卷总带宽(MB/s)'
+    const perfBDWTDataNames = [this.translatePipe.transform('performance.volumeTotalBandwidth')]
+    this.makePerformance.setDataSetsChart(
+      300
+      , this.translatePipe.transform('performance.volumeTotalBandwidth')
+      , ''
+      , range.range
+      , '/servicelevel/performance/perf-stat-lun-details'
+      , this.selectedModel.id
+      , 'perfBandwidth'
+      , perfBDWTDataNames
+      , null).then(res => {
+      this.volumeBandwidth = res;
+      this.cdr.detectChanges();
+    });
+    // 性能：存储池I/O密度(IOPS/TB)
+    const perfSPDDataNames = [this.translatePipe.transform('performance.storagePoolIODensity')]
+    this.makePerformance.setDataSetsChart(
+      300
+      , this.translatePipe.transform('performance.storagePoolIODensity')
+      , ''
+      ,range.range
+      ,'/servicelevel/performance/perf-stat-storage-pool-details'
+      , this.selectedModel.id
+      ,'perfStoragePoolDetails'
+      , perfSPDDataNames,
+      null).then(res => {
+      this.storagePoolDensity = res;
+      this.cdr.detectChanges();
+    });
   }
 
   /**
@@ -572,10 +619,25 @@ export class ServicelevelComponent implements OnInit, AfterViewInit, OnDestroy {
    * 初始化过滤器
    */
   initStoragePoolListFilter(){
-    this.slspStatusFilter.initStatus();
-    this.runningStatusFilter.initStatus();
-    this.slspDiskTypeFilter.initType();
-    this.sLSPStorageNameFilter.initName();
+    if (this.slspStatusFilter){
+      this.slspStatusFilter.initStatus();
+    }
+    if (this.runningStatusFilter) {
+      this.runningStatusFilter.initStatus();
+    }
+    if (this.slspDiskTypeFilter) {
+      this.slspDiskTypeFilter.initType();
+    }
+    if (this.sLSPStorageNameFilter) {
+      this.sLSPStorageNameFilter.initName();
+    }
+    if (this.lunStatusFilter) {
+      this.lunStatusFilter.initName();
+    }
+  }
+
+  setDataSetsChart(height: number, title: string, subtext: string,){
+
   }
 }
 
@@ -641,6 +703,14 @@ class Range{
   interval: string;
   constructor(){
     this.range = "LAST_1_DAY" ;
+    this.interval = "MINUTE";
+  }
+}
+class CapacityRange{
+  range: string;
+  interval: string;
+  constructor(){
+    this.range = "LAST_1_MONTH" ;
     this.interval = "MINUTE";
   }
 }

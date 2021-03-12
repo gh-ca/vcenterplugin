@@ -7,12 +7,7 @@ import com.huawei.dmestore.services.DmeStorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -49,6 +44,20 @@ public class DmeStorageController extends BaseController {
     }
 
     /**
+     * getStorageByServiceLevelId
+     *
+     * @return String
+     */
+    @GetMapping("/storages/serviceLevel/{serviceLevelId}")
+    public String getStorageByServiceLevelId(@PathVariable String serviceLevelId) {
+        try {
+            return dmeStorageService.getStorageByServiceLevelId(serviceLevelId);
+        } catch (DmeException e) {
+            return null;
+        }
+    }
+
+    /**
      * getStorageDetail
      *
      * @param storageId storageId
@@ -67,7 +76,7 @@ public class DmeStorageController extends BaseController {
      * getStoragePools
      *
      * @param storageId storageId
-     * @param mediaType mediaType
+     * @param mediaType mediaType {all,block,file,block-and-file}
      * @return ResponseBodyBean
      */
     @GetMapping("/storagepools")
@@ -102,7 +111,14 @@ public class DmeStorageController extends BaseController {
      *
      * @param storageId storageId
      * @param pageSize  pageSize
-     * @param pageNo    pageNo
+     * @param pageNo  pageNo
+     * @param name  name
+     * @param status  status
+     * @param allocateType  allocateType
+     * @param attached  attached
+     * @param servicelevelId  servicelevelId
+     * @param sortDir  sortDir
+     * @param sortKey  sortKey
      * @return ResponseBodyBean
      */
     @GetMapping("/volumes/byPage")
@@ -110,9 +126,18 @@ public class DmeStorageController extends BaseController {
     public ResponseBodyBean getVolumesByPage(
         @RequestParam(name = "storageId", required = false, defaultValue = "") String storageId,
         @RequestParam(name = "pageSize", required = false, defaultValue = "20") String pageSize,
-        @RequestParam(name = "pageNo", required = false, defaultValue = "0") String pageNo) {
+        @RequestParam(name = "pageNo", required = false, defaultValue = "0") String pageNo,
+        @RequestParam(name = "name", required = false, defaultValue = "") String name,
+        @RequestParam(name = "status", required = false, defaultValue = "") String status,
+        @RequestParam(name = "allocateType", required = false, defaultValue = "") String allocateType,
+        @RequestParam(name = "attached", required = false, defaultValue = "") String attached,
+        @RequestParam(name = "servicelevelId", required = false, defaultValue = "") String servicelevelId,
+        @RequestParam(name = "sortDir", required = false, defaultValue = "") String sortDir,
+        @RequestParam(name = "sortKey", required = false, defaultValue = "") String sortKey) {
         try {
-            return success(dmeStorageService.getVolumesByPage(storageId, pageSize, pageNo));
+            return success(dmeStorageService
+                .getVolumesByPage(storageId, pageSize, pageNo, name, status, allocateType, attached, servicelevelId,
+                    sortDir, sortKey));
         } catch (DmeException e) {
             return failure(e.getMessage());
         }
@@ -126,9 +151,13 @@ public class DmeStorageController extends BaseController {
      */
     @GetMapping("/filesystems")
     @ResponseBody
-    public ResponseBodyBean getFileSystems(@RequestParam(name = "storageId") String storageId) {
+    public ResponseBodyBean getFileSystems(@RequestParam(name = "storageId") String storageId,
+                                           @RequestParam(name = "pageNo", required = false, defaultValue = "1")
+                                               Integer pageNo,
+                                           @RequestParam(name = "pageSize", required = false, defaultValue = "1000")
+                                               Integer pageSize) {
         try {
-            return success(dmeStorageService.getFileSystems(storageId));
+            return success(dmeStorageService.getFileSystems(storageId,pageNo,pageSize));
         } catch (DmeException e) {
             return failure(e.getMessage());
         }
@@ -367,9 +396,11 @@ public class DmeStorageController extends BaseController {
      * @return ResponseBodyBean
      */
     @GetMapping("/queryvolumebyname")
-    public ResponseBodyBean queryVolumeByName(@RequestParam("name") String name) {
+    public ResponseBodyBean queryVolumeByName(@RequestParam(value = "name") String name,
+                                              @RequestParam(value = "storageId",required = false,defaultValue = "") String storageId,
+                                              @RequestParam(value = "serviceLevelId",required = false,defaultValue = "") String serviceLevelId) {
         try {
-            return success(dmeStorageService.queryVolumeByName(name));
+            return success(dmeStorageService.queryVolumeByName(name,storageId,serviceLevelId));
         } catch (DmeException e) {
             return failure(e.getMessage());
         }

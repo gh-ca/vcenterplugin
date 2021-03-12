@@ -199,37 +199,42 @@ public class NfsOperationController extends BaseController {
                 tuning.put(COMPRESSION_ENABLED_FIELD, requestParams.get("compressionEnabled"));
                 tuning.put(DEDUPLICATION_ENABLED_FIELD, requestParams.get("deduplicationEnabled"));
             }
-
-            String capacitymode = (Boolean) requestParams.get(AUTO_SIZE_ENABLE_REQUEST_FIELD)
-                ? CapacityAutonegotiation.CAPACITY_MODE_AUTO : defaultCapacitymode;
-            if (!"grow_off".equalsIgnoreCase(capacitymode)) {
-                capacityAutonegotiation.put("capacity_recycle_mode", "expand_capacity");
-                capacityAutonegotiation.put("auto_grow_threshold_percent", 85);
-                capacityAutonegotiation.put("auto_shrink_threshold_percent", 50);
-                capacityAutonegotiation.put("max_auto_size", 16777216);
-                capacityAutonegotiation.put("min_auto_size", 16777216);
-                capacityAutonegotiation.put("auto_size_increment", 1024);
-                capacityAutonegotiation.put(AUTO_SIZE_ENABLE_FIELD, requestParams.get(AUTO_SIZE_ENABLE_REQUEST_FIELD));
+            if (!storageTypeShow.getDorado()) {
+                String capacitymode = (Boolean) requestParams.get(AUTO_SIZE_ENABLE_REQUEST_FIELD)
+                    ? CapacityAutonegotiation.CAPACITY_MODE_AUTO : defaultCapacitymode;
+                if (!"grow_off".equalsIgnoreCase(capacitymode)) {
+                    capacityAutonegotiation.put("capacity_recycle_mode", "expand_capacity");
+                    capacityAutonegotiation.put("auto_grow_threshold_percent", 85);
+                    capacityAutonegotiation.put("auto_shrink_threshold_percent", 50);
+                    capacityAutonegotiation.put("max_auto_size", 16777216);
+                    capacityAutonegotiation.put("min_auto_size", 16777216);
+                    capacityAutonegotiation.put("auto_size_increment", 1024);
+                    capacityAutonegotiation.put(AUTO_SIZE_ENABLE_FIELD, requestParams.get(AUTO_SIZE_ENABLE_REQUEST_FIELD));
+                }
+                capacityAutonegotiation.put(ADJUSTING_MODE_FIELD, capacitymode);
             }
-            capacityAutonegotiation.put(ADJUSTING_MODE_FIELD, capacitymode);
         } else {
             tuning.put(ALLOCATION_TYPE_FIELD, THIN_FIELD);
             if (storageTypeShow.getDeduplicationShow() || storageTypeShow.getCompressionShow()) {
                 tuning.put(COMPRESSION_ENABLED_FIELD, false);
                 tuning.put(DEDUPLICATION_ENABLED_FIELD, false);
             }
-            //capacityAutonegotiation.put(AUTO_SIZE_ENABLE_FIELD, false);
-            capacityAutonegotiation.put(ADJUSTING_MODE_FIELD, defaultCapacitymode);
+            if (!storageTypeShow.getDorado()) {
+                capacityAutonegotiation.put(ADJUSTING_MODE_FIELD, defaultCapacitymode);
+            }
+        }
+        if (capacityAutonegotiation.size() != 0) {
+            targetParams.put("capacity_autonegotiation", capacityAutonegotiation);
         }
         targetParams.put("tuning", tuning);
-        targetParams.put("capacity_autonegotiation", capacityAutonegotiation);
     }
 
     public StorageTypeShow isDorado(String storageId) throws DmeException {
         StorageTypeShow storageTypeShow = new StorageTypeShow();
         StorageDetail storageDetail = dmeStorageService.getStorageDetail(storageId);
         if (storageDetail != null) {
-            storageTypeShow = ToolUtils.getStorageTypeShow(storageDetail.getModel());
+            String storageType = storageDetail.getModel() +" "+ storageDetail.getProductVersion();
+            storageTypeShow = ToolUtils.getStorageTypeShow(storageType);
         }
         return storageTypeShow;
     }
@@ -344,7 +349,7 @@ public class NfsOperationController extends BaseController {
             createNfsShareParam
                 .put("share_path", FILE_SEPARATOR + requestParams.get(FSNAME_FIELD) + FILE_SEPARATOR);
             filesystemSpec.put(NAME_FIELD, requestParams.get(FSNAME_FIELD));
-            targetParams.put("exportPath", FILE_SEPARATOR + requestParams.get(FSNAME_FIELD));
+            targetParams.put("exportPath", FILE_SEPARATOR + requestParams.get("shareName"));
         }
         List<Map<String, Object>> filesystemSpecs = new ArrayList<>(DmeConstants.COLLECTION_CAPACITY_16);
         filesystemSpecs.add(filesystemSpec);
@@ -352,7 +357,7 @@ public class NfsOperationController extends BaseController {
         Map<String, Object> nfsShareClientAddition = new HashMap<>(DmeConstants.COLLECTION_CAPACITY_16);
         nfsShareClientAddition.put(NAME_FIELD, requestParams.get("vkernelIp"));
         nfsShareClientAddition.put("objectId", requestParams.get("hostObjectId"));
-        createNfsShareParam.put("character_encoding", "utf-8");
+        createNfsShareParam.put("character_encoding", requestParams.get("characterEncoding"));
         targetParams.put("create_nfs_share_param", createNfsShareParam);
         boolean advance = (Boolean) requestParams.get("advance");
         List<Map<String, Object>> nfsShareClientAdditions = new ArrayList<>(DmeConstants.COLLECTION_CAPACITY_16);
@@ -367,14 +372,22 @@ public class NfsOperationController extends BaseController {
         param.put("file_system_id", params.get("fileSystemId"));
         param.put("nfs_share_id", params.get("shareId"));
         param.put("name", params.get("fsName"));
-        parseAutoSizeEnable(params.get(AUTO_SIZE_ENABLE_REQUEST_FIELD), params, param);
         Map<String, Object> tuning = new HashMap<>(DmeConstants.COLLECTION_CAPACITY_16);
         String deviceId = ToolUtils.getStr(params.get("deviceId"));
         if (!StringUtils.isEmpty(deviceId)) {
             StorageTypeShow storageTypeShow = isDorado(deviceId);
             if (storageTypeShow.getDeduplicationShow() || storageTypeShow.getCompressionShow()) {
-                tuning.put(DEDUPLICATION_ENABLED_FIELD, params.get("deduplicationEnabled"));
-                tuning.put(COMPRESSION_ENABLED_FIELD, params.get("compressionEnabled"));
+                Object deduplicationEnabled = params.get("deduplicationEnabled");
+                Object compressionEnabled = params.get("compressionEnabled");
+                if (deduplicationEnabled!=null) {
+                    tuning.put(DEDUPLICATION_ENABLED_FIELD, deduplicationEnabled);
+                }
+                if (compressionEnabled!=null) {
+                    tuning.put(COMPRESSION_ENABLED_FIELD, compressionEnabled);
+                }
+            }
+            if (!storageTypeShow.getDorado()) {
+                parseAutoSizeEnable(params.get(AUTO_SIZE_ENABLE_REQUEST_FIELD), params, param);
             }
         }
         Object thin = params.get(THIN_FIELD);

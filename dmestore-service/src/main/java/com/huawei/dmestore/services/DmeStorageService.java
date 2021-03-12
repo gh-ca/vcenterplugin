@@ -21,6 +21,8 @@ import com.huawei.dmestore.model.VolumeListRestponse;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.web.bind.annotation.RequestParam;
+
 /**
  * DmeStorageService
  *
@@ -70,19 +72,31 @@ public interface DmeStorageService {
      * @param storageId storage id
      * @param pageSize pageSize
      * @param pageNo pageNo
+     * @param name  name
+     * @param status  status
+     * @param allocateType  allocateType
+     * @param attached  attached
+     * @param servicelevelId  servicelevelId
+     * @param sortDir  sortDir
+     * @param sortKey  sortKey
      * @return VolumeListRestponse
      * @throws DmeException when error
      */
-    VolumeListRestponse getVolumesByPage(String storageId, String pageSize, String pageNo) throws DmeException;
+    VolumeListRestponse getVolumesByPage(String storageId, String pageSize, String pageNo,
+                                         String name,String status,String allocateType,
+                                         String attached,String servicelevelId,String sortDir,
+                                         String sortKey) throws DmeException;
 
     /**
      * list FileSystem
      *
      * @param storageId storage id
+     * @param pageNo pageNo
+     * @param pageSize pageSize
      * @return List
      * @throws DmeException when error
      */
-    List<FileSystem> getFileSystems(String storageId) throws DmeException;
+    List<FileSystem> getFileSystems(String storageId,Integer pageNo, Integer pageSize) throws DmeException;
 
     /**
      * list dtree
@@ -233,10 +247,12 @@ public interface DmeStorageService {
      * get volume by name
      *
      * @param name volume name
+     * @param storageId storageId
+     * @param serviceLevelId serviceLevelId
      * @return Boolean
      * @throws DmeException when error
      */
-    Boolean queryVolumeByName(String name) throws DmeException;
+    Boolean queryVolumeByName(String name, String storageId, String serviceLevelId) throws DmeException;
 
     /**
      * list Volume Performance
@@ -266,4 +282,13 @@ public interface DmeStorageService {
      * @throws DmeException when error
      */
     String getStorageByPoolRawId(String poolRawId) throws DmeException;
+
+    /**
+     * list Volume Performance
+     *
+     * @param serviceLevelId serviceLevelId
+     * @return String
+     * @throws DmeException when error
+     */
+    String getStorageByServiceLevelId(String serviceLevelId) throws DmeException;
 }

@@ -6,3 +6,18 @@
   border: .05rem solid #000;
   border-radius: 2rem;
 }
+.over_flow{
+  text-overflow: ellipsis;
+  overflow: hidden;
+  word-break: break-all;
+  white-space: nowrap;
+}
+.hideFilter ::ng-deep clr-dg-string-filter{
+  display: none;
+}
+input::-ms-clear{
+  display: none;
+}
+::ng-deep .datagrid {
+  -ms-overflow-style:scrollbar;
+}

@@ -38,9 +38,13 @@ export class ServiceLevelComponent implements OnInit{
   // 变更服务等级 隐藏/展示
   changeServiceLevelShow = false;
   modalLoading = false; // 数据加载loading
+  loadingData = false; // 数据加载loading
   modalHandleLoading = false; // 数据处理loading
   isOperationErr = false; // 错误信息
   changeServiceLevelSuccessShow = false; // 变更服务等级成功
+
+  isStorageVmfs = false; // true:存储类型LUN，false：服务等级类型LUN
+  getDataFailed = false; // true:数据获取失败，false：数据获取成功
 
   ngOnInit(): void {
     this.changeServiceLevelShow = false;
@@ -51,6 +55,7 @@ export class ServiceLevelComponent implements OnInit{
     // 初始化表单
     this.changeServiceLevelForm = new GetForm().getChangeLevelForm();
     this.route.url.subscribe(url => {
+      this.loadingData = true;
       console.log('url', url);
       this.route.queryParams.subscribe(queryParam => {
         this.resource = queryParam.resource;
@@ -60,17 +65,36 @@ export class ServiceLevelComponent implements OnInit{
           const ctx = this.globalsService.getClientSdk().app.getContextObjects();
           console.log('ctx', ctx);
           this.objectId = ctx[0].id;
+          // this.objectId = "urn:vmomi:Datastore:datastore-10019:674908e5-ab21-4079-9cb1-596358ee5dd1";
 
         }
 
         // todo 获取vmfs数据
-        this.remoteSrv.getStorageById(this.objectId).subscribe((result: any) => {
+        this.remoteSrv.getVmfsById(this.objectId).subscribe((result:any) => {
           if (result.code === '200' && null != result.data) {
-            // 表单数据初始化
-            const volumeIds = [];
-            volumeIds.push(result.data.volumeId);
-            this.changeServiceLevelForm.volume_ids = volumeIds;
-            this.changeServiceLevelForm.ds_name = result.data.storeName;
+            this.vmfsInfo = result.data[0];
+            if (this.vmfsInfo.serviceLevelName){
+              this.remoteSrv.getStorageById(this.objectId).subscribe((result: any) => {
+                if (result.code === '200' && null != result.data) {
+                  // 表单数据初始化
+                  const volumeIds = [];
+                  volumeIds.push(result.data.volumeId);
+                  this.changeServiceLevelForm.volume_ids = volumeIds;
+                  this.changeServiceLevelForm.ds_name = result.data.storeName;
+                } else {
+                  this.getDataFailed = true;
+                }
+                this.loadingData = false;
+                this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
+              });
+            } else { // 非服务等级的VMFS不允许变更服务等级
+              this.loadingData = false;
+              this.isStorageVmfs = true;
+            }
+          } else {
+            // 查询vmfs数据失败不允许修改
+            this.loadingData = false;
+            this.getDataFailed = true;
           }
           this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
         });
@@ -92,6 +116,8 @@ export class ServiceLevelComponent implements OnInit{
       if (result.code === '200' && result.data !== null) {
         this.serviceLevelList = result.data.filter(item => item.totalCapacity !== 0);
         console.log('this.serviceLevelList', this.serviceLevelList);
+      } else {
+        this.getDataFailed = true;
       }
       this.changeServiceLevelShow = true;
       this.modalLoading = false;

@@ -392,28 +392,28 @@
       </object>
    </extension>
    <!--bestpractiselist   bestpractice-->
-<!--   <extension id="com.huawei.dmestore.bestpractiselist">-->
-<!--      <extendedPoint>vise.navigator.nodespecs</extendedPoint>-->
-<!--      <object>-->
-<!--         <title>#{bestpractiselist}</title>-->
-<!--         <icon>#{bestpractice-icons}</icon>-->
-<!--         <parentUid>com.huawei.dmestore.entryPoint</parentUid>-->
-<!--         <navigationTargetUid>com.huawei.dmestore.bestpractiseView</navigationTargetUid>-->
-<!--      </object>-->
-<!--   </extension>-->
-<!--   <extension id="com.huawei.dmestore.bestpractiseView">-->
-<!--      <extendedPoint>vise.global.views</extendedPoint>-->
-<!--      <object>-->
-<!--         <name>#{bestpractiselist}</name>-->
-<!--         <componentClass className="com.vmware.vsphere.client.htmlbridge.HtmlView">-->
-<!--            <object>-->
-<!--               <root>-->
-<!--                  <url>/ui/dmestore/index.html?view=bestpractice</url>-->
-<!--               </root>-->
-<!--            </object>-->
-<!--         </componentClass>-->
-<!--      </object>-->
-<!--   </extension>-->
+   <extension id="com.huawei.dmestore.bestpractiselist">
+      <extendedPoint>vise.navigator.nodespecs</extendedPoint>
+      <object>
+         <title>#{bestpractiselist}</title>
+         <icon>#{bestpractice-icons}</icon>
+         <parentUid>com.huawei.dmestore.entryPoint</parentUid>
+         <navigationTargetUid>com.huawei.dmestore.bestpractiseView</navigationTargetUid>
+      </object>
+   </extension>
+   <extension id="com.huawei.dmestore.bestpractiseView">
+      <extendedPoint>vise.global.views</extendedPoint>
+      <object>
+         <name>#{bestpractiselist}</name>
+         <componentClass className="com.vmware.vsphere.client.htmlbridge.HtmlView">
+            <object>
+               <root>
+                  <url>/ui/dmestore/index.html?view=bestpractice</url>
+               </root>
+            </object>
+         </componentClass>
+      </object>
+   </extension>
 
 
    <!-- Sample Actions on Hosts -->
@@ -429,26 +429,26 @@
                   <object>
                      <root>
                         <actionUrl>/ui/dmestore/index.html?view=iscsi</actionUrl>
-                        <dialogTitle>ISCSI</dialogTitle>
+                        <dialogTitle>#{hostMenu.iscsi}</dialogTitle>
                         <dialogSize>1800,600</dialogSize>
                      </root>
                   </object>
                </delegate>
             </com.vmware.actionsfw.ActionSpec>
-            <!--<com.vmware.actionsfw.ActionSpec>
+            <com.vmware.actionsfw.ActionSpec>
                <uid>com.huawei.dmestore.hostbestpractice.apply</uid>
                <label>#{hostMenu.applyBestPractice}</label>
                <delegate>
                   <className>com.vmware.vsphere.client.HtmlPluginModalAction</className>
                   <object>
                      <root>
-                        <actionUrl>/ui/dmestore/index.html?view=applybp</actionUrl>
+                        <actionUrl>/ui/dmestore/index.html?view=best/host/applybp</actionUrl>
                         <dialogTitle>#{tip}</dialogTitle>
                         <dialogSize>380,180</dialogSize>
                      </root>
                   </object>
                </delegate>
-            </com.vmware.actionsfw.ActionSpec>-->
+            </com.vmware.actionsfw.ActionSpec>
           </actions>
       </object>
       <metadata>
@@ -499,10 +499,10 @@
                   <uid>com.huawei.dmestore.host.iscsi</uid>
                </com.vmware.actionsfw.ActionMenuItemSpec>
 
-               <!--<com.vmware.actionsfw.ActionMenuItemSpec>
+               <com.vmware.actionsfw.ActionMenuItemSpec>
                   <type>action</type>
                   <uid>com.huawei.dmestore.hostbestpractice.apply</uid>
-               </com.vmware.actionsfw.ActionMenuItemSpec>-->
+               </com.vmware.actionsfw.ActionMenuItemSpec>
             </Array>
          </children>
       </object>
@@ -1048,10 +1048,10 @@
                   <uid>com.huawei.dmestore.datastore.clustervmfsumountaction</uid>
                </com.vmware.actionsfw.ActionMenuItemSpec>
 
-               <!--<com.vmware.actionsfw.ActionMenuItemSpec>
+               <com.vmware.actionsfw.ActionMenuItemSpec>
                   <type>action</type>
                   <uid>com.huawei.dmestore.clusterbestpractice.apply</uid>
-               </com.vmware.actionsfw.ActionMenuItemSpec>-->
+               </com.vmware.actionsfw.ActionMenuItemSpec>
             </Array>
          </children>
       </object>
@@ -1121,20 +1121,20 @@
                   </object>
                </delegate>
             </com.vmware.actionsfw.ActionSpec>
-            <!--<com.vmware.actionsfw.ActionSpec>
+            <com.vmware.actionsfw.ActionSpec>
                <uid>com.huawei.dmestore.clusterbestpractice.apply</uid>
                <label>#{clusterMenu.applyBestPractice}</label>
                <delegate>
                   <className>com.vmware.vsphere.client.HtmlPluginModalAction</className>
                   <object>
                      <root>
-                        <actionUrl>/ui/dmestore/index.html?view=applybp</actionUrl>
+                        <actionUrl>/ui/dmestore/index.html?view=best/cluster/applybp</actionUrl>
                         <dialogTitle>#{tip}</dialogTitle>
                         <dialogSize>380,180</dialogSize>
                      </root>
                   </object>
                </delegate>
-            </com.vmware.actionsfw.ActionSpec>-->
+            </com.vmware.actionsfw.ActionSpec>
             <com.vmware.actionsfw.ActionSpec>
                <uid>com.huawei.dmestore.datastore.clustercreatenfsaction</uid>
                <label>#{createnfs.label}</label>

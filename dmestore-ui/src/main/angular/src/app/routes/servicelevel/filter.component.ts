@@ -1,9 +1,11 @@
-import {ChangeDetectorRef, Component} from "@angular/core";
+import {ChangeDetectorRef, Component, OnInit} from "@angular/core";
 import {ClrDatagridFilterInterface} from "@clr/angular";
 import {Subject} from "rxjs";
 import {SLStoragePool} from "./servicelevel.service";
 import {ServicelevelService} from "./servicelevel.service";
 import {HttpClient} from "@angular/common/http";
+import {Volume} from "../storage/detail/detail.service";
+import {StorageList, StorageService} from "../storage/storage.service";
 
 @Component({
   selector: "sl-sp-status-filter",
@@ -141,7 +143,7 @@ export class SLSPDiskTypeFilter implements ClrDatagridFilterInterface<SLStorageP
       return true;
     } else {
       const  physicalType = item.physicalType;
-      return this.type == physicalType;
+      return physicalType.toLowerCase().indexOf(this.type.toLowerCase()) >= 0;
     }
   }
 
@@ -164,33 +166,44 @@ export class SLSPDiskTypeFilter implements ClrDatagridFilterInterface<SLStorageP
   template: `
     <clr-radio-container style="max-height: 6.25rem;overflow-y: auto">
       <clr-radio-wrapper>
-        <input type="radio" clrRadio name="name" (change)="changeFunc($event)" [(ngModel)]="name" value="all" />
+        <input type="radio" clrRadio name="storageId" (change)="changeFunc($event)" [(ngModel)]="storageId" value="all" />
         <label>{{'vmfs.filter.all' | translate}}</label>
       </clr-radio-wrapper>
-      <clr-radio-wrapper *ngFor="let item of storageNames">
-        <input type="radio" clrRadio name="name" (change)="changeFunc($event)" [(ngModel)]="name" value="{{item}}" />
-        <label>{{item}}</label>
+      <clr-radio-wrapper *ngFor="let item of list">
+        <input type="radio" clrRadio name="storageId" (change)="changeFunc($event)" [(ngModel)]="storageId" value="{{item.id}}" />
+        <label>{{item.name}}</label>
       </clr-radio-wrapper>
     </clr-radio-container>
   `,
-  providers: [ServicelevelService, HttpClient],
+  providers: [ServicelevelService, HttpClient, StorageService],
 })
-export class SLSPStorageNameFilter implements ClrDatagridFilterInterface<SLStoragePool>{
+export class SLSPStorageNameFilter implements ClrDatagridFilterInterface<SLStoragePool>, OnInit{
 
   changes = new Subject<any>();
-  name;
-  storageNames:string[];
+  storageId;
+  list: StorageList[] = []; // 数据列表
   readonly state: any;
-  constructor() {}
-  setStorageNameFilter(storageNames) {
-    this.storageNames = storageNames;
+  constructor(private storageService: StorageService, private cdr: ChangeDetectorRef) {}
+  ngOnInit(): void {
+    this.storageService.getData()
+      .subscribe((result: any) => {
+        if (result.code == '200') {
+          this.list = result.data;
+
+          this.list.forEach(item => {
+            item.name = item.name + "(" + item.ip + ")";
+            item.id = item.id.replace(/-/g, '').toLowerCase();
+          })
+        }
+        this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
+      });
   }
   accepts(item: SLStoragePool): boolean {
-    if (!this.name || this.name == 'all') {
+    if (!this.storageId || this.storageId == 'all') {
       return true;
     } else {
-      const  physicalType = item.storageName;
-      return this.name == physicalType;
+      const  storageId = item.storageId.toLowerCase();
+      return this.storageId == storageId;
     }
   }
 
@@ -203,7 +216,77 @@ export class SLSPStorageNameFilter implements ClrDatagridFilterInterface<SLStora
   }
 
   initName() {
-    this.name = undefined;
-    this.changeFunc(this.name);
+    this.storageId = undefined;
+    this.changeFunc(this.storageId);
+  }
+}
+
+@Component({
+  selector: "lun-status-filter",
+  template: `
+    <clr-radio-container style="max-height: 6.25rem;overflow-y: auto">
+      <clr-radio-wrapper>
+        <input type="radio" clrRadio name="status" (change)="changeFunc($event)" [(ngModel)]="status" value="" />
+        <label>{{'vmfs.filter.all' | translate}}</label>
+      </clr-radio-wrapper>
+      <clr-radio-wrapper>
+        <input type="radio" clrRadio name="status" (change)="changeFunc($event)" [(ngModel)]="status" value="normal" />
+        <label>{{'enum.status.normal' | translate}}</label>
+      </clr-radio-wrapper>
+      <clr-radio-wrapper>
+        <input type="radio" clrRadio name="status" (change)="changeFunc($event)" [(ngModel)]="status" value="creating"/>
+        <label>{{'enum.status.creating' | translate}}</label>
+      </clr-radio-wrapper>
+      <clr-radio-wrapper>
+        <input type="radio" clrRadio name="status" (change)="changeFunc($event)" [(ngModel)]="status" value="mapping" />
+        <label>{{'enum.status.mapping' | translate}}</label>
+      </clr-radio-wrapper>
+      <clr-radio-wrapper>
+        <input type="radio" clrRadio name="status" (change)="changeFunc($event)" [(ngModel)]="status" value="unmapping" />
+        <label>{{'enum.status.unmapping' | translate}}</label>
+      </clr-radio-wrapper>
+      <clr-radio-wrapper>
+        <input type="radio" clrRadio name="status" (change)="changeFunc($event)" [(ngModel)]="status" value="deleting" />
+        <label>{{'enum.status.deleting' | translate}}</label>
+      </clr-radio-wrapper>
+      <clr-radio-wrapper>
+        <input type="radio" clrRadio name="status" (change)="changeFunc($event)" [(ngModel)]="status" value="error" />
+        <label>{{'enum.status.error' | translate}}</label>
+      </clr-radio-wrapper>
+      <clr-radio-wrapper>
+        <input type="radio" clrRadio name="status" (change)="changeFunc($event)" [(ngModel)]="status" value="expanding" />
+        <label>{{'enum.status.expanding' | translate}}</label>
+      </clr-radio-wrapper>
+    </clr-radio-container>
+  `,
+  providers: [ServicelevelService, HttpClient],
+})
+export class LUNStatusFilter implements ClrDatagridFilterInterface<Volume>{
+
+  changes = new Subject<any>();
+  status;
+  storageNames:string[];
+  readonly state: any;
+  constructor() {}
+  accepts(item: Volume): boolean {
+    if (!this.status || this.status == 'all') {
+      return true;
+    } else {
+      const  status = item.status;
+      return this.status == status;
+    }
+  }
+
+  changeFunc(value: any) {
+    this.changes.next();
+  }
+
+  isActive(): boolean {
+    return true;
+  }
+
+  initName() {
+    this.status = undefined;
+    this.changeFunc(this.status);
   }
 }

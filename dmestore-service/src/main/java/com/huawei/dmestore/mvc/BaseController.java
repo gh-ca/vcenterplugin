@@ -9,8 +9,6 @@ import com.huawei.dmestore.services.DMEOpenApiService;
 
 import com.google.gson.Gson;
 
-import springfox.documentation.spring.web.json.Json;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;

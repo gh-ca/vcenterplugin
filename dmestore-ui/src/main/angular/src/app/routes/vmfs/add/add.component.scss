@@ -194,3 +194,12 @@ input[type=number] {
 ::ng-deep .modal-dialog .modal-content{
   box-shadow: none;
 }
+#deviceSelect{
+  min-width: 10rem!important;
+}
+input::-ms-clear{
+  display: none;
+}
+::ng-deep .datagrid {
+  -ms-overflow-style:scrollbar;
+}

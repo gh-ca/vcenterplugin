@@ -51,6 +51,12 @@ export class ModifyComponent implements OnInit{
   showWorkLoadFlag = false; // 应用类型展示
   latencyIsSelect = false; // 时延为下拉框
 
+  bandWidthMaxErrTips = false;// 带宽上限错误提示
+  bandWidthMinErrTips = false;// 带宽下限错误提示
+  iopsMaxErrTips = false;// IOPS上限错误提示
+  iopsMinErrTips = false;// IOPS下限错误提示
+  latencyErrTips = false;// 时延错误提示
+
   ngOnInit(): void {
     this.initData();
   }
@@ -76,7 +82,7 @@ export class ModifyComponent implements OnInit{
         } else {
           const ctx = this.globalsService.getClientSdk().app.getContextObjects();
           this.objectId = ctx[0].id;
-          // this.objectId = "urn:vmomi:Datastore:datastore-4022:674908e5-ab21-4079-9cb1-596358ee5dd1";
+          // this.objectId = "urn:vmomi:Datastore:datastore-10017:674908e5-ab21-4079-9cb1-596358ee5dd1";
         }
 
         // 获取vmfs数据
@@ -142,6 +148,10 @@ export class ModifyComponent implements OnInit{
    * 修改
    */
   modifyHandleFunc() {
+    if (this.bandWidthMaxErrTips || this.iopsMaxErrTips
+      || this.bandWidthMinErrTips || this.iopsMinErrTips || this.latencyErrTips) {
+      return;
+    }
     // 设置修改的卷名称以及修改后的名称
     if (this.modifyForm.isSameName) {
       this.modifyForm.newVoName = this.modifyForm.name;
@@ -208,6 +218,11 @@ export class ModifyComponent implements OnInit{
         objVal = '';
       }
     }
+    if (objVal > 999999999){
+      objVal = '';
+    } else if (objVal < 1) {
+      objVal = '';
+    }
     switch (operationType) {
       case 'max_bandwidth':
         this.modifyForm.max_bandwidth = objVal;
@@ -225,6 +240,7 @@ export class ModifyComponent implements OnInit{
         this.modifyForm.latency = objVal;
         break;
     }
+    this.iopsErrTips(objVal, operationType);
   }
 
   /**
@@ -242,7 +258,7 @@ export class ModifyComponent implements OnInit{
     this.volNameRepeatErr = false;
     this.matchErr = false;
 
-    let reg5:RegExp = new RegExp('^[0-9a-zA-Z-"_""."]*$');
+    let reg5:RegExp = new RegExp('^[0-9a-zA-Z-\u4e00-\u9fa5a"_""."]*$');
 
     if (this.modifyForm.name) {
       if (reg5.test(this.modifyForm.name)) {
@@ -374,7 +390,22 @@ export class ModifyComponent implements OnInit{
     form.maxbandwidthChoose = false;
     form.max_bandwidth = null;
   }
+  /**
+   * edit qos开关
+   * @param form
+   */
+  qoSEditFlagChange(form){
+    if(form.qosFlag) {
+      form.control_policyUpper = undefined;
+      form.maxbandwidthChoose = false;
+      form.maxiopsChoose = false;
 
+      form.control_policyLower = undefined;
+      form.minbandwidthChoose = false;
+      form.miniopsChoose = false;
+      form.latencyChoose = false;
+    }
+  }
   /**
    * 修改页面获取存储数据
    * @param objectId
@@ -426,6 +457,7 @@ export class ModifyComponent implements OnInit{
     if (lowerObj) {
       lowerChecked = lowerObj.checked;
     }
+    this.initIopsErrTips(upperChecked, lowerChecked);
     if (isUpper) {
       if(upperChecked) {
         form.control_policyUpper = '1';
@@ -448,6 +480,97 @@ export class ModifyComponent implements OnInit{
         form.control_policyUpper = undefined;
         upperObj.checked = false;
       }
+    }
+  }
+
+  /**
+   * iops错误提示
+   * @param objVal
+   * @param operationType
+   */
+  iopsErrTips(objVal:string, operationType:string) {
+    if (operationType) {
+      switch (operationType) {
+        case 'max_bandwidth':
+          if (objVal == '' && this.modifyForm.maxbandwidthChoose) {
+            this.bandWidthMaxErrTips = true;
+          }else {
+            this.bandWidthMaxErrTips = false;
+          }
+          break;
+        case 'max_iops':
+          if (objVal == '' && this.modifyForm.maxiopsChoose) {
+            this.iopsMaxErrTips = true;
+          }else {
+            this.iopsMaxErrTips = false;
+          }
+          break;
+        case 'min_bandwidth':
+          if (objVal == '' && this.modifyForm.minbandwidthChoose) {
+            this.bandWidthMinErrTips = true;
+          }else {
+            this.bandWidthMinErrTips = false;
+          }
+          break;
+        case 'min_iops':
+          if (objVal == '' && this.modifyForm.miniopsChoose) {
+            this.iopsMinErrTips = true;
+          }else {
+            this.iopsMinErrTips = false;
+          }
+          break;
+        default:
+          if (objVal == '' && this.modifyForm.latencyChoose) {
+            this.latencyErrTips = true;
+          }else {
+            this.latencyErrTips = false;
+          }
+          break;
+      }
+    }
+  }
+
+  /**
+   * 初始化IOPS错误提示
+   */
+  initIopsErrTips(upper:boolean, lower:boolean){
+    if (upper) {
+      this.bandWidthMaxErrTips = false;
+      this.iopsMaxErrTips = false;
+    }
+    if (lower) {
+      this.bandWidthMinErrTips = false;
+      this.iopsMinErrTips = false;
+      this.latencyErrTips = false;
+    }
+  }
+  resetQosFlag(objValue:boolean, operationType:string) {
+    switch (operationType) {
+      case 'maxbandwidth':
+        if(!objValue) {
+          this.bandWidthMaxErrTips = false;
+        }
+        break;
+      case 'maxiops':
+        if(!objValue) {
+          this.iopsMaxErrTips = false;
+        }
+        break;
+      case 'minbandwidth':
+        if(!objValue) {
+          this.bandWidthMinErrTips = false;
+        }
+        break;
+      case 'miniops':
+        if(!objValue) {
+          this.iopsMinErrTips = false;
+        }
+        break;
+      default:
+        if(!objValue) {
+          this.latencyErrTips = false;
+        }
+        break;
     }
   }
 }

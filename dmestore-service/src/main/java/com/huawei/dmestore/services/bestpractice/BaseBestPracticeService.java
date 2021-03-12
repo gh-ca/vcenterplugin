@@ -1,8 +1,8 @@
 package com.huawei.dmestore.services.bestpractice;
 
 import com.huawei.dmestore.utils.VCSDKUtils;
-import com.huawei.vmware.mo.HostAdvanceOptionMO;
-import com.huawei.vmware.mo.HostMO;
+import com.huawei.vmware.mo.HostAdvanceOptionMo;
+import com.huawei.vmware.mo.HostMo;
 import com.huawei.vmware.util.DatastoreVmwareMoFactory;
 import com.huawei.vmware.util.HostVmwareFactory;
 import com.huawei.vmware.util.VmwareContext;
@@ -22,8 +22,18 @@ import java.util.List;
  * @since 2020-11-30
  **/
 public class BaseBestPracticeService {
-    protected final Logger LOGGER = LoggerFactory.getLogger(BaseBestPracticeService.class);
+    protected final Logger logger = LoggerFactory.getLogger(BaseBestPracticeService.class);
 
+    /**
+     * check Best Practice
+     *
+     * @param vcsdkUtils vcsdkUtils vim25 class
+     * @param objectId objectId
+     * @param hostSetting hostSetting
+     * @param recommendValue recommendValue
+     * @return boolean
+     * @throws Exception Exception
+     */
     protected boolean check(final VCSDKUtils vcsdkUtils, final String objectId, final String hostSetting,
         final Object recommendValue) throws Exception {
         Object currentValue = getCurrentValue(vcsdkUtils, objectId, hostSetting);
@@ -34,6 +44,15 @@ public class BaseBestPracticeService {
         }
     }
 
+    /**
+     * update Best Practice
+     *
+     * @param vcsdkUtils vcsdkUtils vim25 class
+     * @param objectId objectId
+     * @param hostSetting hostSetting
+     * @param recommendValue recommendValue
+     * @throws Exception Exception
+     */
     protected void update(final VCSDKUtils vcsdkUtils, final String objectId, final String hostSetting,
         final Object recommendValue) throws Exception {
         ManagedObjectReference mor = vcsdkUtils.getVcConnectionHelper().objectId2Mor(objectId);
@@ -41,7 +60,7 @@ public class BaseBestPracticeService {
         if (check(vcsdkUtils, objectId, hostSetting, recommendValue)) {
             return;
         }
-        HostMO hostMo = this.getHostMoFactory().build(context, mor);
+        HostMo hostMo = this.getHostMoFactory().build(context, mor);
         List<OptionValue> values = hostMo.getHostAdvanceOptionMo().queryOptions(hostSetting);
         for (OptionValue value : values) {
             value.setValue(recommendValue);
@@ -50,12 +69,21 @@ public class BaseBestPracticeService {
         hostMo.getHostStorageSystemMo().refreshStorageSystem();
     }
 
-    protected Object getCurrentValue(final VCSDKUtils vcsdkUtils, final String objectId, final String hostSetting)
-        throws Exception {
+    /**
+     * update Best Practice
+     *
+     * @param vcsdkUtils vcsdkUtils vim25 class
+     * @param objectId objectId
+     * @param hostSetting hostSetting
+     * @return Object
+     * @throws Exception Exception
+     */
+    protected Object getCurrentValue(final VCSDKUtils vcsdkUtils, final String objectId,
+                                     final String hostSetting) throws Exception {
         ManagedObjectReference mor = vcsdkUtils.getVcConnectionHelper().objectId2Mor(objectId);
         VmwareContext context = vcsdkUtils.getVcConnectionHelper().getServerContext(objectId);
-        HostMO hostMo = this.getHostMoFactory().build(context, mor);
-        HostAdvanceOptionMO hostAdvanceOptionMo = hostMo.getHostAdvanceOptionMo();
+        HostMo hostMo = this.getHostMoFactory().build(context, mor);
+        HostAdvanceOptionMo hostAdvanceOptionMo = hostMo.getHostAdvanceOptionMo();
         List<OptionValue> values = hostAdvanceOptionMo.queryOptions(hostSetting);
         for (OptionValue value : values) {
             return value.getValue();
@@ -63,6 +91,16 @@ public class BaseBestPracticeService {
         return "--";
     }
 
+    /**
+     * check module option
+     *
+     * @param vcsdkUtils vcsdkUtils vim25 class
+     * @param objectId objectId
+     * @param moduleName moduleName
+     * @param recommendValue recommendValue
+     * @return boolean
+     * @throws Exception Exception
+     */
     protected boolean checkModuleOption(final VCSDKUtils vcsdkUtils, final String objectId, final String moduleName,
         final Object recommendValue) throws Exception {
         String currentValue = getCurrentModuleOption(vcsdkUtils, objectId, moduleName);
@@ -73,16 +111,35 @@ public class BaseBestPracticeService {
         }
     }
 
+    /**
+     * get current module option
+     *
+     * @param vcsdkUtils vcsdkUtils
+     * @param objectId objectId
+     * @param moduleName moduleName
+     * @return String
+     * @throws Exception Exception
+     */
     protected String getCurrentModuleOption(final VCSDKUtils vcsdkUtils, final String objectId, final String moduleName)
         throws Exception {
         ManagedObjectReference mor = vcsdkUtils.getVcConnectionHelper().objectId2Mor(objectId);
         VmwareContext context = vcsdkUtils.getVcConnectionHelper().getServerContext(objectId);
-        HostMO hostMo = this.getHostMoFactory().build(context, mor);
+        HostMo hostMo = this.getHostMoFactory().build(context, mor);
         String modlueOption = hostMo.getHostKernelModuleSystemMo().queryConfiguredModuleOptionString(moduleName);
         String[] modlues = modlueOption.split("=");
         return modlues[1];
     }
 
+    /**
+     * update module option
+     *
+     * @param vcsdkUtils vcsdkUtils
+     * @param objectId objectId
+     * @param moduleName moduleName
+     * @param optionName optionName
+     * @param recommendValue recommendValue
+     * @throws Exception Exception
+     */
     protected void updateModuleOption(final VCSDKUtils vcsdkUtils, final String objectId, final String moduleName,
         final String optionName, final Object recommendValue) throws Exception {
         if (checkModuleOption(vcsdkUtils, objectId, moduleName, recommendValue)) {
@@ -90,7 +147,7 @@ public class BaseBestPracticeService {
         }
         ManagedObjectReference mor = vcsdkUtils.getVcConnectionHelper().objectId2Mor(objectId);
         VmwareContext context = vcsdkUtils.getVcConnectionHelper().getServerContext(objectId);
-        HostMO hostMo = this.getHostMoFactory().build(context, mor);
+        HostMo hostMo = this.getHostMoFactory().build(context, mor);
         String options = optionName + "=" + recommendValue;
         hostMo.getHostKernelModuleSystemMo().updateModuleOptionString(moduleName, options);
         hostMo.getHostStorageSystemMo().refreshStorageSystem();

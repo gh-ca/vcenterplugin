@@ -50,7 +50,7 @@ public class VirtualMachineMOTest {
     private VimPortType service;
 
     @InjectMocks
-    private VirtualMachineMO virtualMachineMO;
+    private VirtualMachineMo virtualMachineMO;
 
     @Before
     public void setUp() throws Exception {
@@ -129,10 +129,10 @@ public class VirtualMachineMOTest {
         when(vmwareClient.waitForTask(morTask)).thenReturn(true);
         doNothing().when(context).waitForTaskProgressDone(morTask);
         virtualMachineMO.createDisk(vmdkDatastorePath, diskType, diskMode, rdmDeviceName, sizeInMb, morDs,
-            controllerKey);
+            controllerKey, null);
 
         virtualMachineMO.createDisk(vmdkDatastorePath, VirtualDiskType.THIN, diskMode, rdmDeviceName, sizeInMb, morDs,
-            controllerKey);
+            controllerKey, null);
     }
 
     @Test

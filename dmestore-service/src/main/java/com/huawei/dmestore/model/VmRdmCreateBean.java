@@ -17,6 +17,11 @@ public class VmRdmCreateBean {
     private CustomizeVolumesRequest customizeVolumesRequest;
 
     /**
+     * compatibilityMode 兼容模式,取值：virtualMode、physicalMode
+     */
+    private String compatibilityMode;
+
+    /**
      * getCreateVolumesRequest .
      *
      * @return CreateVolumesRequest .
@@ -48,8 +53,15 @@ public class VmRdmCreateBean {
      *
      * @param param .
      */
-    public void setCustomizeVolumesRequest(
-        final CustomizeVolumesRequest param) {
+    public void setCustomizeVolumesRequest(final CustomizeVolumesRequest param) {
         this.customizeVolumesRequest = param;
+    }
+
+    public String getCompatibilityMode() {
+        return compatibilityMode;
+    }
+
+    public void setCompatibilityMode(String compatibilityMode) {
+        this.compatibilityMode = compatibilityMode;
     }
 }

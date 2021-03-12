@@ -44,7 +44,7 @@ public class HostStorageSystemMOTest {
     private VimPortType service;
 
     @InjectMocks
-    private HostStorageSystemMO hostStorageSystemMO;
+    private HostStorageSystemMo hostStorageSystemMO;
 
     @Before
     public void setUp() throws Exception {

@@ -6,7 +6,7 @@ import {ServiceLevelList, VmfsInfo, VmfsListService} from "../vmfs/list/list.ser
 import {StorageComponent} from "./storage.component";
 import {DetailService, Dtrees, StorageController, StorageDisk, StoragePool, Volume} from "./detail/detail.service";
 import {FileSystem} from "../nfs/nfs.service";
-import {EthernetPort, FCoEPort, FCPort, LogicPort} from "./detail/port.service";
+import {BondPort, EthernetPort, FailoverGroup, FCoEPort, FCPort, LogicPort} from "./detail/port.service";
 
 @Component({
   selector: "storage-status-filter",
@@ -113,6 +113,10 @@ export class StorageStatusFilter implements ClrDatagridFilterInterface<StorageLi
       <clr-radio-wrapper>
         <input type="radio" clrRadio name="mediaType" (change)="changeFunc($event)" [(ngModel)]="mediaType" value="block"/>
         <label>{{'enum.type.block' | translate}}</label>
+      </clr-radio-wrapper>
+      <clr-radio-wrapper>
+        <input type="radio" clrRadio name="mediaType" (change)="changeFunc($event)" [(ngModel)]="mediaType" value="block/file"/>
+        <label>{{'enum.type.blockAndFile' | translate}}</label>
       </clr-radio-wrapper>
     </clr-radio-container>
   `,
@@ -530,32 +534,12 @@ export class VolProtectionStatusFilter implements ClrDatagridFilterInterface<Vol
           <label>{{'vmfs.filter.all' | translate}}</label>
         </clr-radio-wrapper>
         <clr-radio-wrapper>
-          <input type="radio" clrRadio name="fsStatus" (change)="changeFunc($event)" [(ngModel)]="fsStatus" value="creating" />
-          <label>{{'enum.status.creating' | translate}}</label>
-        </clr-radio-wrapper>
-        <clr-radio-wrapper>
           <input type="radio" clrRadio name="fsStatus" (change)="changeFunc($event)" [(ngModel)]="fsStatus" value="normal" />
           <label>{{'enum.status.normal' | translate}}</label>
         </clr-radio-wrapper>
         <clr-radio-wrapper>
-          <input type="radio" clrRadio name="fsStatus" (change)="changeFunc($event)" [(ngModel)]="fsStatus" value="mapping" />
-          <label>{{'enum.status.mapping' | translate}}</label>
-        </clr-radio-wrapper>
-        <clr-radio-wrapper>
-          <input type="radio" clrRadio name="fsStatus" (change)="changeFunc($event)" [(ngModel)]="fsStatus" value="unmapping" />
-          <label>{{'enum.status.unmapping' | translate}}</label>
-        </clr-radio-wrapper>
-        <clr-radio-wrapper>
-          <input type="radio" clrRadio name="fsStatus" (change)="changeFunc($event)" [(ngModel)]="fsStatus" value="deleting" />
-          <label>{{'enum.status.deleting' | translate}}</label>
-        </clr-radio-wrapper>
-        <clr-radio-wrapper>
-          <input type="radio" clrRadio name="fsStatus" (change)="changeFunc($event)" [(ngModel)]="fsStatus" value="error" />
-          <label>{{'enum.status.error' | translate}}</label>
-        </clr-radio-wrapper>
-        <clr-radio-wrapper>
-          <input type="radio" clrRadio name="fsStatus" (change)="changeFunc($event)" [(ngModel)]="fsStatus" value="expanding" />
-          <label>{{'enum.status.expanding' | translate}}</label>
+          <input type="radio" clrRadio name="fsStatus" (change)="changeFunc($event)" [(ngModel)]="fsStatus" value="faulty" />
+          <label>{{'enum.status.fault' | translate}}</label>
         </clr-radio-wrapper>
       </clr-radio-container>
   `,
@@ -622,7 +606,8 @@ export class FsTypeFilter implements ClrDatagridFilterInterface<FileSystem>{
     if (!this.type || this.type == 'all') {
       return true;
     } else {
-      return this.type == status;
+      const type = item.allocType;
+      return type.toLowerCase().indexOf(this.type.toLowerCase()) >= 0;
     }
   }
 
@@ -649,20 +634,20 @@ export class FsTypeFilter implements ClrDatagridFilterInterface<FileSystem>{
         <label>{{'vmfs.filter.all' | translate}}</label>
       </clr-radio-wrapper>
       <clr-radio-wrapper>
-        <input type="radio" clrRadio name="secMod" (change)="changeFunc($event)" [(ngModel)]="secMod" value="mixed"/>
+        <input type="radio" clrRadio name="secMod" (change)="changeFunc($event)" [(ngModel)]="secMod" value="Mixed"/>
         <label>Mixed</label>
       </clr-radio-wrapper>
       <clr-radio-wrapper>
-        <input type="radio" clrRadio name="secMod" (change)="changeFunc($event)" [(ngModel)]="secMod" value="native"/>
+        <input type="radio" clrRadio name="secMod" (change)="changeFunc($event)" [(ngModel)]="secMod" value="Native"/>
         <label>Native</label>
       </clr-radio-wrapper>
       <clr-radio-wrapper>
         <input type="radio" clrRadio name="secMod" (change)="changeFunc($event)" [(ngModel)]="secMod" value="NTFS"/>
-        <label>ntfs</label>
+        <label>NTFS</label>
       </clr-radio-wrapper>
       <clr-radio-wrapper>
         <input type="radio" clrRadio name="secMod" (change)="changeFunc($event)" [(ngModel)]="secMod" value="UNIX"/>
-        <label>unix</label>
+        <label>UNIX</label>
       </clr-radio-wrapper>
     </clr-radio-container>
   `,
@@ -679,7 +664,7 @@ export class DtreeSecModFilter implements ClrDatagridFilterInterface<Dtrees>{
       return true;
     } else {
       const  secMod = item.securityStyle.toString();
-      return this.secMod == secMod;
+      return secMod.toLowerCase().indexOf(this.secMod.toLowerCase()) >= 0;
     }
   }
 
@@ -839,7 +824,11 @@ export class DiskStatusFilter implements ClrDatagridFilterInterface<StorageDisk>
       return true;
     } else {
       const  quota = item.status.toString();
-      return this.status == quota;
+      if (this.status == 'fault') {
+        return quota.toLowerCase().indexOf('offline') >= 0 || quota.toLowerCase().indexOf(this.status.toLowerCase()) >= 0;
+      } else {
+        return quota.toLowerCase().indexOf(this.status.toLowerCase()) >= 0;
+      }
     }
   }
 
@@ -877,7 +866,7 @@ export class DiskStatusFilter implements ClrDatagridFilterInterface<StorageDisk>
         <label>SSD</label>
       </clr-radio-wrapper>
       <clr-radio-wrapper>
-        <input type="radio" clrRadio name="type" (change)="changeFunc($event)" [(ngModel)]="type" value="NL-SAS"/>
+        <input type="radio" clrRadio name="type" (change)="changeFunc($event)" [(ngModel)]="type" value="NL_SAS"/>
         <label>NL-SAS</label>
       </clr-radio-wrapper>
       <clr-radio-wrapper>
@@ -1297,5 +1286,159 @@ export class LogicRoleFilter implements ClrDatagridFilterInterface<LogicPort>{
   initStatus() {
     this.role = undefined;
     this.changeFunc(this.role);
+  }
+}
+@Component({
+  selector: "failover-group-type-filter",
+  template: `
+    <clr-radio-container>
+      <clr-radio-wrapper>
+        <input type="radio" clrRadio name="failoverGroupType" (change)="changeFunc($event)" [(ngModel)]="failoverGroupType" value="all" />
+        <label>{{'vmfs.filter.all' | translate}}</label>
+      </clr-radio-wrapper>
+      <clr-radio-wrapper>
+        <input type="radio" clrRadio name="failoverGroupType" (change)="changeFunc($event)" [(ngModel)]="failoverGroupType" value="system"/>
+        <label>{{'enum.status.system' | translate}}</label>
+      </clr-radio-wrapper>
+      <clr-radio-wrapper>
+        <input type="radio" clrRadio name="failoverGroupType" (change)="changeFunc($event)" [(ngModel)]="failoverGroupType" value="VLAN"/>
+        <label>{{'enum.status.vlan' | translate}}</label>
+      </clr-radio-wrapper>
+      <clr-radio-wrapper>
+        <input type="radio" clrRadio name="failoverGroupType" (change)="changeFunc($event)" [(ngModel)]="failoverGroupType" value="customized"/>
+        <label>{{'enum.status.customized' | translate}}</label>
+      </clr-radio-wrapper>
+    </clr-radio-container>
+  `,
+})
+export class FailoverGroupTypeFilter implements ClrDatagridFilterInterface<FailoverGroup>{
+
+  changes = new Subject<any>();
+  failoverGroupType;
+  readonly state: any;
+
+  accepts(item: FailoverGroup): boolean {
+    if (!this.failoverGroupType || this.failoverGroupType == 'all') {
+      return true;
+    } else {
+      const  failoverGroupType = item.failoverGroupType;
+      return this.failoverGroupType == failoverGroupType;
+    }
+  }
+
+  changeFunc(value: any) {
+    this.changes.next();
+  }
+
+  isActive(): boolean {
+    return true;
+  }
+
+  initStatus() {
+    this.failoverGroupType = undefined;
+    this.changeFunc(this.failoverGroupType);
+  }
+}
+
+@Component({
+  selector: "health-status-filter",
+  template: `
+    <clr-radio-container>
+      <clr-radio-wrapper>
+        <input type="radio" clrRadio name="healthStatus" (change)="changeFunc($event)" [(ngModel)]="healthStatus" value="all" />
+        <label>{{'vmfs.filter.all' | translate}}</label>
+      </clr-radio-wrapper>
+      <clr-radio-wrapper>
+        <input type="radio" clrRadio name="healthStatus" (change)="changeFunc($event)" [(ngModel)]="healthStatus" value="unknown"/>
+        <label>{{'enum.status.unknown' | translate}}</label>
+      </clr-radio-wrapper>
+      <clr-radio-wrapper>
+        <input type="radio" clrRadio name="healthStatus" (change)="changeFunc($event)" [(ngModel)]="healthStatus" value="normal"/>
+        <label>{{'enum.status.normal' | translate}}</label>
+      </clr-radio-wrapper>
+      <clr-radio-wrapper>
+        <input type="radio" clrRadio name="healthStatus" (change)="changeFunc($event)" [(ngModel)]="healthStatus" value="abnormal"/>
+        <label>{{'enum.status.abnormal' | translate}}</label>
+      </clr-radio-wrapper>
+    </clr-radio-container>
+  `,
+})
+export class HealthStatusFilter implements ClrDatagridFilterInterface<BondPort>{
+
+  changes = new Subject<any>();
+  healthStatus;
+  readonly state: any;
+
+  accepts(item: BondPort): boolean {
+    if (!this.healthStatus || this.healthStatus == 'all') {
+      return true;
+    } else {
+      const  healthStatus = item.healthStatus;
+      return this.healthStatus == healthStatus;
+    }
+  }
+
+  changeFunc(value: any) {
+    this.changes.next();
+  }
+
+  isActive(): boolean {
+    return true;
+  }
+
+  initStatus() {
+    this.healthStatus = undefined;
+    this.changeFunc(this.healthStatus);
+  }
+}
+@Component({
+  selector: "ports-running-status-filter",
+  template: `
+    <clr-radio-container>
+      <clr-radio-wrapper>
+        <input type="radio" clrRadio name="runningStatus" (change)="changeFunc($event)" [(ngModel)]="runningStatus" value="all" />
+        <label>{{'vmfs.filter.all' | translate}}</label>
+      </clr-radio-wrapper>
+      <clr-radio-wrapper>
+        <input type="radio" clrRadio name="runningStatus" (change)="changeFunc($event)" [(ngModel)]="runningStatus" value="unknown"/>
+        <label>{{'enum.status.unknown' | translate}}</label>
+      </clr-radio-wrapper>
+      <clr-radio-wrapper>
+        <input type="radio" clrRadio name="runningStatus" (change)="changeFunc($event)" [(ngModel)]="runningStatus" value="connected"/>
+        <label>{{'enum.status.connected' | translate}}</label>
+      </clr-radio-wrapper>
+      <clr-radio-wrapper>
+        <input type="radio" clrRadio name="runningStatus" (change)="changeFunc($event)" [(ngModel)]="runningStatus" value="disconnected"/>
+        <label>{{'enum.status.disconnected' | translate}}</label>
+      </clr-radio-wrapper>
+    </clr-radio-container>
+  `,
+})
+export class PortsRunningStatusFilter implements ClrDatagridFilterInterface<BondPort>{
+
+  changes = new Subject<any>();
+  runningStatus;
+  readonly state: any;
+
+  accepts(item: BondPort): boolean {
+    if (!this.runningStatus || this.runningStatus == 'all') {
+      return true;
+    } else {
+      const  runningStatus = item.runningStatus;
+      return this.runningStatus == runningStatus;
+    }
+  }
+
+  changeFunc(value: any) {
+    this.changes.next();
+  }
+
+  isActive(): boolean {
+    return true;
+  }
+
+  initStatus() {
+    this.runningStatus = undefined;
+    this.changeFunc(this.runningStatus);
   }
 }

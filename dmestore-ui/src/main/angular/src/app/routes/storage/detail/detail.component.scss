@@ -319,4 +319,16 @@ input[type=number] {
   height: 16px;
   max-height: none;
 }
+.hideFilter ::ng-deep clr-dg-string-filter{
+  display: none;
+}
+::ng-deep .datagrid-table .datagrid-column .datagrid-filter-toggle{
+  margin: auto;
+}
 
+input::-ms-clear{
+  display: none;
+}
+::ng-deep .datagrid {
+  -ms-overflow-style:scrollbar;
+}

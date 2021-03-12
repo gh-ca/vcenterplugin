@@ -27,7 +27,7 @@ export class DetailService {
     return this.http.get('dmestorage/volumes', {params: {storageId}});
   }
   getVolumeListListByPage(params:any){
-    return this.http.get('dmestorage/volumes/byPage?storageId='+params.storageId+'&pageSize='+params.pageSize+'&pageNo='+params.pageNo);
+    return this.http.get('dmestorage/volumes/byPage', {params: params});
   }
   getFileSystemList(storageId: string){
     return this.http.get('dmestorage/filesystems', {params: {storageId}});
@@ -90,7 +90,7 @@ export class StorageDetail{
   subscriptionCapacity: number;
   synStatus: string;
   totalCapacity: number;
-  totalEffectiveCapacity: number;
+  totalEffectiveCapacity: number; // Dorado设备当可得容量用、非Dorado设备当总容量用
   usedCapacity: number;
   vendor: string;
   volume: string;
@@ -99,6 +99,7 @@ export class StorageDetail{
 }
 
 export interface StorageTypeShow {
+  dorado:boolean; // true 是dorado v6.1版本及高版本 false 是dorado v 6.0版本及更低版本
   qosTag:number;// qos策略 1 支持复选(上限、下限) 2支持单选（上限或下限） 3只支持上限
   workLoadShow:number;// 1 支持应用类型 2不支持应用类型
   ownershipController:boolean;// 归属控制器 true 支持 false 不支持
@@ -119,6 +120,8 @@ export class StoragePool{
   healthStatus: string;// 健康状态
   totalCapacity: number;// 总容量
   consumedCapacity: number;//已用容量
+  capUsage: number;// 利用率
+  supRate: number; // 订阅率
   consumedCapacityPercentage: string;// 已用容量百分比(容量利用率)
   storagePoolId: string;
   storageInstanceId: string;
@@ -162,6 +165,7 @@ export class Volume{
   storageId: string;//存储设备id
   poolRawId: string;//存储池id
   capacityUsage: string;//容量利用率
+  capacityUsageNum: number;//容量利用率
   protectionStatus: boolean;//保护状态
   hostIds: string[];
   hostGroupIds: string;
@@ -221,7 +225,15 @@ export class CapacityDistribution{
   fileSystem: string;
   volume: string;
   freeCapacity: string;
+  blockFile: string; // 块/文件
   chart: CapacityChart;
+  constructor(){
+    this.protection = '0';
+    this.fileSystem = '0';
+    this.volume = '0';
+    this.freeCapacity = '0';
+    this.blockFile = '0';
+  }
 }
 export class StorageController{
   name:string;

@@ -1,23 +1,21 @@
 package com.huawei.dmestore.services.bestpractice;
 
 import com.huawei.dmestore.utils.VCSDKUtils;
-import com.huawei.vmware.mo.HostMO;
-import com.huawei.vmware.mo.HostNetworkSystemMO;
+import com.huawei.vmware.mo.HostMo;
+import com.huawei.vmware.mo.HostNetworkSystemMo;
 import com.huawei.vmware.util.VmwareContext;
 
-import com.vmware.vim25.HostConfigChangeMode;
 import com.vmware.vim25.HostNetworkConfig;
-import com.vmware.vim25.HostPortGroupConfig;
 import com.vmware.vim25.HostVirtualNicConfig;
 import com.vmware.vim25.HostVirtualNicSpec;
-import com.vmware.vim25.HostVirtualSwitch;
-import com.vmware.vim25.HostVirtualSwitchConfig;
-import com.vmware.vim25.HostVirtualSwitchSpec;
 import com.vmware.vim25.ManagedObjectReference;
 
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * JumboFrameMTUImpl
@@ -26,6 +24,8 @@ import java.util.concurrent.Executors;
  * @since 2020-11-30
  **/
 public class JumboFrameMTUImpl extends BaseBestPracticeService implements BestPracticeService {
+    protected final Logger logger = LoggerFactory.getLogger(BaseBestPracticeService.class);
+
     private static final int RECOMMEND_VALUE = 9000;
 
     private static final String MTU_NULL = "--";
@@ -44,7 +44,7 @@ public class JumboFrameMTUImpl extends BaseBestPracticeService implements BestPr
     public Object getCurrentValue(VCSDKUtils vcsdkUtils, String objectId) throws Exception {
         ManagedObjectReference mor = vcsdkUtils.getVcConnectionHelper().objectId2Mor(objectId);
         VmwareContext context = vcsdkUtils.getVcConnectionHelper().getServerContext(objectId);
-        HostMO hostMo = this.getHostMoFactory().build(context, mor);
+        HostMo hostMo = this.getHostMoFactory().build(context, mor);
         HostNetworkConfig networkConfig = hostMo.getHostNetworkSystemMo().getNetworkConfig();
         List<HostVirtualNicConfig> list = networkConfig.getVnic();
         for (HostVirtualNicConfig config : list) {
@@ -81,7 +81,7 @@ public class JumboFrameMTUImpl extends BaseBestPracticeService implements BestPr
     private boolean check(VCSDKUtils vcsdkUtils, String objectId, Object recommendValue) throws Exception {
         ManagedObjectReference mor = vcsdkUtils.getVcConnectionHelper().objectId2Mor(objectId);
         VmwareContext context = vcsdkUtils.getVcConnectionHelper().getServerContext(objectId);
-        HostMO hostMo = this.getHostMoFactory().build(context, mor);
+        HostMo hostMo = this.getHostMoFactory().build(context, mor);
         HostNetworkConfig networkConfig = hostMo.getHostNetworkSystemMo().getNetworkConfig();
         if (networkConfig == null) {
             return true;
@@ -112,8 +112,8 @@ public class JumboFrameMTUImpl extends BaseBestPracticeService implements BestPr
         if (check(vcsdkUtils, objectId, recommendValue)) {
             return;
         }
-        HostMO hostMo = this.getHostMoFactory().build(context, mor);
-        HostNetworkSystemMO hostNetworkSystemMo = hostMo.getHostNetworkSystemMo();
+        HostMo hostMo = this.getHostMoFactory().build(context, mor);
+        HostNetworkSystemMo hostNetworkSystemMo = hostMo.getHostNetworkSystemMo();
         HostNetworkConfig networkConfig = hostNetworkSystemMo.getNetworkConfig();
         List<HostVirtualNicConfig> list = networkConfig.getVnic();
         ExecutorService singleThreadExecutor = Executors.newFixedThreadPool(list.size());
@@ -127,7 +127,7 @@ public class JumboFrameMTUImpl extends BaseBestPracticeService implements BestPr
                     try {
                         hostNetworkSystemMo.updateVirtualNic(device, spec);
                     } catch (Exception exception) {
-                        LOGGER.error("updateVirtualNic error!hostObjectId={},device={}", objectId, device);
+                        logger.error("updateVirtualNic error!hostObjectId={},device={}", objectId, device);
                         exception.printStackTrace();
                     }
                 });

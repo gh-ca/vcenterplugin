@@ -86,7 +86,7 @@ export class StatusFilter implements ClrDatagridFilterInterface<VmfsInfo> {
         <label>{{'vmfs.filter.all' | translate}}</label>
       </clr-radio-wrapper>
       <clr-radio-wrapper *ngFor="let item of storageList">
-        <input type="radio" clrRadio name="device" (change)="changeFunc($event)" [(ngModel)]="device" value="{{item.name}}"/>
+        <input type="radio" clrRadio name="device" (change)="changeFunc($event)" [(ngModel)]="device" value="{{item.id}}"/>
         <label>{{item.name}}</label>
       </clr-radio-wrapper>
     </clr-radio-container>
@@ -95,13 +95,16 @@ export class StatusFilter implements ClrDatagridFilterInterface<VmfsInfo> {
 })
 export class DeviceFilter implements ClrDatagridFilterInterface<VmfsInfo>, OnInit{
   constructor(private storageService: StorageService,private cdr: ChangeDetectorRef){}
-
   ngOnInit(): void {
     this.storageService.getData().subscribe((s: any) => {
       if (s.code === '200'){
         this.storageList = s.data;
-        this.cdr.detectChanges();
+        this.storageList.forEach(item => {
+          item.name = item.name + "(" + item.ip + ")";
+          item.id = item.id.replace(/-/g, '').toLowerCase();
+        })
       }
+      this.cdr.detectChanges();
     });
   }
   changes = new Subject<any>();
@@ -117,7 +120,8 @@ export class DeviceFilter implements ClrDatagridFilterInterface<VmfsInfo>, OnIni
     if (this.device === '') {
       return true;
     } else {
-      return this.device === capital;
+      const  storageId = item.deviceId.replace(/-/g, '').toLowerCase();
+      return this.device == storageId;
     }
   }
 

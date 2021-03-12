@@ -46,7 +46,7 @@ public class Storage {
      **/
     private Double totalCapacity;
     /**
-     * totalEffectiveCapacity.
+     * 可得容量.
      **/
     private Double totalEffectiveCapacity;
     /**
@@ -86,7 +86,7 @@ public class Storage {
      **/
     private String version;
     /**
-     * 最大ops.
+     * 产品型号
      **/
     private String productVersion;
     /**

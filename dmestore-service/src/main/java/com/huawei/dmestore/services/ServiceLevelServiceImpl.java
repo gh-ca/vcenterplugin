@@ -514,15 +514,20 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
         // 封装查询body
         JsonObject queryBody = getDatasetsQueryBody(serviceLevelId, interval, dataSetType);
         String url = DmeConstants.DATASETS_QUERY_URL.replace("{dataSet}", dataSetType);
+        log.info("数据集统计信息查询开始，url={}, post body={}", url, queryBody);
         ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.POST, queryBody.toString());
         if (responseEntity.getStatusCodeValue() == HttpStatus.OK.value()) {
-            return responseEntity.getBody();
+            String responseBody = responseEntity.getBody();
+            log.info("数据集统计信息查询成功！返回信息:{}", responseBody);
+            return responseBody;
+        }else {
+            log.info("数据集统计信息查询失败！url={}", url);
         }
 
         return null;
     }
 
-    private Map<String, Long> parseTime(String interval) {
+    private  Map<String, Long> parseTime(String interval) {
         long endTime = System.currentTimeMillis();
         Calendar rightNow = Calendar.getInstance();
         rightNow.setTimeInMillis(endTime);
@@ -548,6 +553,7 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
                 rightNow.add(Calendar.YEAR, -1);
                 break;
             default:
+                rightNow.add(Calendar.MONTH, -1);
                 break;
         }
         long beginTime = rightNow.getTimeInMillis();
@@ -560,6 +566,7 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
 
     public JsonObject getDatasetsQueryBody(String serviceLevelId, String interval, String dataSetType) {
         Map<String, Long> timeMap = parseTime(interval);
+
         // timeRange
         JsonObject timeRange = new JsonObject();
         timeRange.addProperty("beginTime", timeMap.get("beginTime"));
@@ -575,7 +582,11 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
         JsonObject filters = new JsonObject();
         JsonArray filtersDimensions = new JsonArray();
         JsonObject filtersDimension = new JsonObject();
-        filtersDimension.addProperty("field", "dimensions.lun.tierNativeId");
+        String field = "dimensions.lun.tierNativeId";
+        if("stat-storage-pool".equals(dataSetType) || "perf-stat-storage-pool-details".equals(dataSetType)){
+            field = "dimensions.pool.tierNativeId";
+        }
+        filtersDimension.addProperty("field", field);
         JsonArray values = new JsonArray();
         values.add(new JsonPrimitive(serviceLevelId));
         filtersDimension.add("values", values);
@@ -585,7 +596,7 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
         // dimensions
         JsonArray dimensions = new JsonArray();
         JsonObject dimension1 = new JsonObject();
-        dimension1.addProperty("field", "dimensions.lun.tierNativeId");
+        dimension1.addProperty("field", field);
         dimension1.addProperty("index", 1);
         JsonObject dimension2 = new JsonObject();
         dimension2.addProperty("field", "timestamp");

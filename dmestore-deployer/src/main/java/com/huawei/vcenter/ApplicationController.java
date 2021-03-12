@@ -76,6 +76,12 @@ public class ApplicationController {
             formData.get(VCENTER_PASSWORD), formData.get(VCENTER_IP), formData.get(VCENTER_PORT), "", "", "", "", "");
     }
 
+    /**
+     * 注册
+     *
+     * @param formData register params
+     * @return Map
+     */
     @RequestMapping(value = "rest/register", method = RequestMethod.POST)
     public Map register(final @RequestBody Map<String, String> formData) {
         return Validations.onSubmit(formData.get(PACKAGE_URL), formData.get(VCENTER_USER_NAME),
@@ -83,6 +89,13 @@ public class ApplicationController {
             formData.get("version"), "", "", "", "");
     }
 
+    /**
+     * 通过dme注册vcenter插件
+     *
+     * @param request request
+     * @param formData {username，password，vcenterip，vcenterport，dmeIp，dmePort，dmeUsername，dmePassword...}
+     * @return Map
+     */
     @RequestMapping(value = "rest/registerByDME", method = RequestMethod.POST)
     public Map registerByDme(final HttpServletRequest request, final @RequestBody Map<String, String> formData) {
         Map map = Validations.onloadChecker(request);
@@ -105,6 +118,12 @@ public class ApplicationController {
             dmeUsername, dmePassword);
     }
 
+    /**
+     * 卸载插件
+     *
+     * @param formData 卸载插件参数
+     * @return Map
+     */
     @RequestMapping(value = "rest/unregister", method = RequestMethod.POST)
     public Map unRegister(final @RequestBody Map<String, String> formData) {
         return Validations.unRegister(formData.get(PACKAGE_URL), formData.get(VCENTER_USER_NAME),
@@ -112,17 +131,36 @@ public class ApplicationController {
             formData.get("keepData"));
     }
 
+    /**
+     * 通过dme卸载插件
+     *
+     * @param formData 卸载插件所需参数
+     * @return Map
+     */
     @RequestMapping(value = "rest/unregisterByDME", method = RequestMethod.POST)
     public Map unregisterByDme(final @RequestBody Map<String, String> formData) {
         return Validations.unRegister("", formData.get(VCENTER_USER_NAME), formData.get(VCENTER_PASSWORD),
             formData.get(VCENTER_IP), formData.get(VCENTER_PORT), formData.get("keepData"));
     }
 
+    /**
+     * 获取插件安装包
+     *
+     * @param response response
+     * @throws IOException IOException
+     */
     @RequestMapping(value = Constants.UPDATE_FILE, method = RequestMethod.GET)
     public void getPackage(final HttpServletResponse response) throws IOException {
         getPackage(response, "dme-vcenter-plugin");
     }
 
+    /**
+     * 获取插件包
+     *
+     * @param response response
+     * @param zipName 包名
+     * @throws IOException IOException
+     */
     @RequestMapping(value = "package/{zipName}", method = RequestMethod.GET)
     public void getPackage(final HttpServletResponse response, final @PathVariable String zipName) throws IOException {
         File file;

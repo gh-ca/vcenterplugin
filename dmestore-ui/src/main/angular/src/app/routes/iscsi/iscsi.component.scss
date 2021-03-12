@@ -11,3 +11,15 @@
 ::ng-deep .clr-select-wrapper select{
   width: 200px;
 }
+.hideFilter ::ng-deep clr-dg-string-filter{
+  display: none;
+}
+::ng-deep .datagrid-table .datagrid-column .datagrid-filter-toggle{
+  margin: auto;
+}
+input::-ms-clear{
+  display: none;
+}
+::ng-deep .datagrid {
+  -ms-overflow-style:scrollbar;
+}

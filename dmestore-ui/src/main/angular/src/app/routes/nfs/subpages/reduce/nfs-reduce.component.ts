@@ -2,6 +2,7 @@ import {ChangeDetectorRef, Component, OnInit} from "@angular/core";
 import {GlobalsService} from "../../../../shared/globals.service";
 import {NfsReduceService} from "./nfs-reduce.service";
 import {ActivatedRoute, Router} from "@angular/router";
+import {UpdateNfs} from "../../nfs.service";
 @Component({
   selector: 'app-reduce',
   templateUrl: './nfs-reduce.component.html',
@@ -20,6 +21,11 @@ export class NfsReduceComponent implements OnInit{
   modalHandleLoading = false; // 数据处理loading
   fsId:string;
   reduceSuccessShow = false;// 缩容成功窗口
+  capacityErr= true;
+  updateNfs=new UpdateNfs();
+
+  minCapacity = null;
+
   constructor(private reduceService: NfsReduceService, private gs: GlobalsService,
               private activatedRoute: ActivatedRoute,private router:Router, private cdr: ChangeDetectorRef){
   }
@@ -50,6 +56,32 @@ export class NfsReduceComponent implements OnInit{
         this.cdr.detectChanges();
       });
     }
+    this.modalLoading = true;
+    this.reduceService.getNfsDetailById(this.storeObjectId).subscribe((result: any) => {
+      this.modalLoading = false;
+      if (result.code === '200'){
+        this.updateNfs = result.data;
+        const capacity =  this.updateNfs.capacity;
+        if (this.updateNfs.thin) {
+          if (capacity) {
+            if (capacity > 1) {
+              this.minCapacity = 1;
+            } else {
+              this.minCapacity = capacity;
+            }
+          }
+        } else {
+          if (capacity) {
+            if (capacity > 3) {
+              this.minCapacity = 3;
+            } else {
+              this.minCapacity = capacity;
+            }
+          }
+        }
+      }
+      this.cdr.detectChanges();
+    });
   }
   backToNfsList(){
     this.modalLoading=false;
@@ -62,6 +94,8 @@ export class NfsReduceComponent implements OnInit{
     this.gs.getClientSdk().modal.close();
   }
   reduceCommit(){
+    let v=this.checkCapacity();
+    if(!v) return;
     this.modalHandleLoading=true;
     let capacity;
     switch (this.unit) {
@@ -115,5 +149,26 @@ export class NfsReduceComponent implements OnInit{
     }else{
       this.closeModel();
     }
+  }
+  checkCapacity(){
+    let capacity;
+    switch (this.unit) {
+      case 'TB':
+        capacity = this.newCapacity * 1024;
+        break;
+      default: // 默认GB 不变
+        capacity = this.newCapacity;
+        break;
+    }
+    const lastCapacity = this.updateNfs.capacity - capacity;
+    if (lastCapacity<this.minCapacity){
+      this.newCapacity=0;
+      this.capacityErr=false;
+      return false;
+    }else {
+      this.capacityErr=true;
+      return true;
+    }
+
   }
 }

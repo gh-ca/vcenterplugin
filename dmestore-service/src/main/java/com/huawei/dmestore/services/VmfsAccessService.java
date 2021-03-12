@@ -1,6 +1,7 @@
 package com.huawei.dmestore.services;
 
 import com.huawei.dmestore.exception.DmeException;
+import com.huawei.dmestore.model.ResponseBodyBean;
 import com.huawei.dmestore.model.VmfsDataInfo;
 import com.huawei.dmestore.model.VmfsDatastoreVolumeDetail;
 
@@ -64,7 +65,7 @@ public interface VmfsAccessService {
      * @param params include Parameters above
      * @throws DmeException when error
      */
-    void createVmfs(Map<String, Object> params) throws DmeException;
+    List<Map<String, String>> createVmfs(Map<String, Object> params) throws DmeException;
 
     /**
      * Mount vmfs include
@@ -77,7 +78,7 @@ public interface VmfsAccessService {
      * @param params include dataStoreObjectIds,host,hostId,cluster,clusterId
      * @throws DmeException when error
      */
-    void mountVmfs(Map<String, Object> params) throws DmeException;
+    List<Map<String, String>> mountVmfs(Map<String, Object> params) throws DmeException;
 
     /**
      * unmount Vmfs
@@ -156,4 +157,16 @@ public interface VmfsAccessService {
      * @throws DmeException DmeException
      **/
     String checkOrCreateToHost(String hostIp, String hostId) throws DmeException;
+
+    /**
+     * 判断dme主机或者主机组的连通性
+     *
+     * @param storageId   存储设备Id
+     * @param hostId      dme主机id
+     * @param hostgroupId dme主机组Id
+     * @return 连通性结果提示
+     * @throws DmeException error
+     */
+    List<Map<String, String>> estimateConnectivityOfHostOrHostgroup(String storageId, String hostId, String hostgroupId)
+        throws DmeException;
 }

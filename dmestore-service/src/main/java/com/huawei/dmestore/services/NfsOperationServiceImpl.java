@@ -1,7 +1,5 @@
 package com.huawei.dmestore.services;
 
-import com.google.gson.*;
-
 import com.huawei.dmestore.constant.DmeConstants;
 import com.huawei.dmestore.dao.DmeVmwareRalationDao;
 import com.huawei.dmestore.entity.DmeVmwareRelation;
@@ -15,15 +13,24 @@ import com.huawei.dmestore.model.TaskDetailInfo;
 import com.huawei.dmestore.utils.ToolUtils;
 import com.huawei.dmestore.utils.VCSDKUtils;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
-
-import java.util.*;
 
 /**
  * NfsOperationServiceImpl
@@ -191,7 +198,7 @@ public class NfsOperationServiceImpl implements NfsOperationService {
             Object nfsShareClientAddition = params.get("nfs_share_client_addition");
             List<Map<String, Object>> nfsShareClientArrayAddition = (List<Map<String, Object>>) nfsShareClientAddition;
             String shareName = "";
-            Map<String, Object> createNfsShareParams = null;
+            Map<String, Object> createNfsShareParams = new HashMap<>();
             if (nfsShareClientAddition != null) {
                 Map<String, Object> reqNfsShareClientArrayAddition = new HashMap<>();
                 for (int index = 0; index < nfsShareClientArrayAddition.size(); index++) {
@@ -272,7 +279,7 @@ public class NfsOperationServiceImpl implements NfsOperationService {
             // 判断存储类型
             String storageModel = getStorageModel(ToolUtils.getStr(params.get("storage_id")));
             saveNfsInfoToDmeVmwareRelation(result, currentPortId, logicPortName, fsId, shareName, shareId, fsName,
-                storageModel,storageId);
+                storageModel, storageId);
             LOG.info("create nfs save relation success!nfsName={}", nfsName);
         } catch (Exception e) {
             //创建失败，解除共享客户端并删除共享
@@ -294,35 +301,43 @@ public class NfsOperationServiceImpl implements NfsOperationService {
         if (params == null || params.size() == 0) {
             throw new DmeException(CODE_403, "params error , please check it!");
         }
-        String dataStoreObjectId = (String) params.get("dataStoreObjectId");
-        String nfsName = (String) params.get(NFS_NAME);
-        if (StringUtils.isEmpty(dataStoreObjectId) || StringUtils.isEmpty(nfsName)) {
-            LOG.error("params error , please check it! dataStoreObjectId={}, nfsName={}", dataStoreObjectId, nfsName);
-            throw new DmeException(CODE_403, "params dataStoreObjectId or nfsName is null, please check it!");
-        }
-
-        Map<String, Object> fsReqBody = new HashMap<>();
-        Object tuning = params.get(TUNING);
-        String name = (String) params.get(NAME_FIELD);
-        if (!StringUtils.isEmpty(name)) {
-            fsReqBody.put(NAME_FIELD, name);
-        }
-        if (tuning != null) {
-            Map<String, Object> tuningMap = gson.fromJson(tuning.toString(), Map.class);
-            Object qosPolicy = params.get(QOS_POLICY);
-            if (qosPolicy != null) {
-                tuningMap.put(QOS_POLICY, qosPolicy);
-            }
-            fsReqBody.put(TUNING, tuningMap);
-            fsReqBody.put("capacity_threshold", 90);
-            fsReqBody.put("capacity", params.get("capacity"));
-        }
-        String fileSystemId = (String) params.get("file_system_id");
-        Object capacityAutonegotiation = params.get(CAPACITY_AUTONEGOTIATION);
-        if (capacityAutonegotiation != null) {
-            fsReqBody.put(CAPACITY_AUTONEGOTIATION, capacityAutonegotiation);
-        }
         try {
+            String dataStoreObjectId = (String) params.get("dataStoreObjectId");
+            String nfsName = (String) params.get(NFS_NAME);
+            if (StringUtils.isEmpty(dataStoreObjectId) || StringUtils.isEmpty(nfsName)) {
+                LOG.error("params error , please check it! dataStoreObjectId={}, nfsName={}", dataStoreObjectId,
+                    nfsName);
+                throw new DmeException(CODE_403, "params dataStoreObjectId or nfsName is null, please check it!");
+            }
+
+            // 获取表中修改对象修改前字段值
+            DmeVmwareRelation dmeVmwareRelation =
+                dmeVmwareRalationDao.getDmeVmwareRelationByDsId(dataStoreObjectId);
+            dmeVmwareRelation.setStoreName(nfsName);
+
+            Map<String, Object> fsReqBody = new HashMap<>();
+            Object tuning = params.get(TUNING);
+            String name = (String) params.get(NAME_FIELD);
+            if (!StringUtils.isEmpty(name)) {
+                fsReqBody.put(NAME_FIELD, name);
+                dmeVmwareRelation.setFsName(name);
+            }
+            if (tuning != null) {
+                Map<String, Object> tuningMap = gson.fromJson(tuning.toString(), Map.class);
+                Object qosPolicy = params.get(QOS_POLICY);
+                if (qosPolicy != null) {
+                    tuningMap.put(QOS_POLICY, qosPolicy);
+                }
+                fsReqBody.put(TUNING, tuningMap);
+                fsReqBody.put("capacity_threshold", 90);
+                fsReqBody.put("capacity", params.get("capacity"));
+            }
+            String fileSystemId = (String) params.get("file_system_id");
+            Object capacityAutonegotiation = params.get(CAPACITY_AUTONEGOTIATION);
+            if (capacityAutonegotiation != null) {
+                fsReqBody.put(CAPACITY_AUTONEGOTIATION, capacityAutonegotiation);
+            }
+
             if (!StringUtils.isEmpty(fileSystemId)) {
                 if (!updateFileSystem(fsReqBody, fileSystemId)) {
                     throw new DmeException(CODE_400, "update file system failed");
@@ -332,6 +347,9 @@ public class NfsOperationServiceImpl implements NfsOperationService {
             if (RESULT_SUCCESS.equals(result)) {
                 LOG.info("rename NFS datastore success!");
             }
+            // 更新表中字段
+            LOG.info("starting update database !");
+            dmeVmwareRalationDao.updateNfs(dmeVmwareRelation);
         } catch (VcenterException e) {
             LOG.error("update nfs datastore error !", e);
             throw new DmeException(CODE_503, e.getMessage());
@@ -351,6 +369,9 @@ public class NfsOperationServiceImpl implements NfsOperationService {
             || StringUtils.isEmpty(capacity)) {
             throw new DmeException(CODE_400, "change nfs storage capacity error,params error!");
         }
+        if (capacity == 0) {
+            throw new DmeException(CODE_400, "change nfs storage capacity error,capacity params error!");
+        }
         if (!StringUtils.isEmpty(storeObjectId)) {
             List<String> fsIds = dmeVmwareRalationDao.getFsIdsByStorageId(storeObjectId);
             if (fsIds.size() > 0) {
@@ -358,8 +379,7 @@ public class NfsOperationServiceImpl implements NfsOperationService {
                 fileSystemId = fsIds.get(0);
             }
         }
-
-        FileSystem fileSystem = null;
+        FileSystem fileSystem = new FileSystem();
         Map<String, String> orientedFileSystem = getOrientedFs(fileSystemId);
         if ("200".equals(orientedFileSystem.get("code"))) {
             String fs = orientedFileSystem.get(DATA);
@@ -383,7 +403,9 @@ public class NfsOperationServiceImpl implements NfsOperationService {
             // 扩容
             if (dataSpace != null && Double.compare(changeCapacity, dataSpace) == 1) {
                 LOG.info("The expansion exceeds the available storage pool capacity!");
-                changeCapacity = dataSpace;
+                //所阔容量不受存储池容量大小限制
+                //changeCapacity = dataSpace;
+                changeCapacity = changeCapacity;
             }
             exchangedCapacity = changeCapacity + currentCapacity;
         } else if (!isExpand) {
@@ -635,15 +657,13 @@ public class NfsOperationServiceImpl implements NfsOperationService {
         Map<String, String> respMap = new HashMap<>();
         String mgmt = "";
         String logicName = "";
-        List<LogicPorts> logicPort = dmeStorageService.getLogicPorts(storageId);
-        if (logicPort != null) {
-            JsonArray jsonArray = new JsonParser().parse(gson.toJson(logicPort)).getAsJsonArray();
-            for (JsonElement jsonElement : jsonArray) {
-                JsonObject element = jsonElement.getAsJsonObject();
-                String currentPortId1 = element.get("homePortId").getAsString();
-                if (!StringUtils.isEmpty(currentPortId) && currentPortId1.equals(currentPortId)) {
-                    mgmt = ToolUtils.jsonToStr(element.get("mgmtIp"));
-                    logicName = ToolUtils.jsonToStr(element.get(NAME_FIELD));
+        List<LogicPorts> logicPorts = dmeStorageService.getLogicPorts(storageId);
+        if (logicPorts != null) {
+            for (LogicPorts logicPort : logicPorts) {
+                if (logicPort != null && !StringUtils.isEmpty(currentPortId) &&
+                    logicPort.getId().equalsIgnoreCase(currentPortId)) {
+                    mgmt = logicPort.getMgmtIp();
+                    logicName = logicPort.getName();
                     break;
                 }
             }
@@ -681,7 +701,8 @@ public class NfsOperationServiceImpl implements NfsOperationService {
     }
 
     private void saveNfsInfoToDmeVmwareRelation(String params, String currentPortId, String logicPortName, String fsId,
-        String shareName, String shareId, String fsName, String storageModel,String storageId) throws DmeException {
+                                                String shareName, String shareId, String fsName, String storageModel,
+                                                String storageId) throws DmeException {
         if (!StringUtils.isEmpty(params)) {
             DmeVmwareRelation datastoreInfo = gson.fromJson(params, DmeVmwareRelation.class);
             datastoreInfo.setLogicPortId(currentPortId);
@@ -750,22 +771,27 @@ public class NfsOperationServiceImpl implements NfsOperationService {
     }
 
     private String fsDetailPrase(Map<String, Object> resultMap, String fileSystemId,
-        ResponseEntity<String> responseTuning) {
+                                 ResponseEntity<String> responseTuning) {
         String fsname;
-        JsonObject fsDetail = gson.fromJson(responseTuning.getBody(), JsonObject.class);
-        resultMap.put("fsName", ToolUtils.jsonToStr(fsDetail.get(NAME_FIELD)));
-        fsname = ToolUtils.jsonToStr(fsDetail.get(NAME_FIELD));
+        //JsonObject fsDetail = gson.fromJson(responseTuning.getBody(), JsonObject.class);
+        JsonObject object = new JsonParser().parse(responseTuning.getBody()).getAsJsonObject();
+        resultMap.put("fsName", ToolUtils.jsonToStr(object.get(NAME_FIELD)));
+        fsname = ToolUtils.jsonToStr(object.get(NAME_FIELD));
         resultMap.put("fileSystemId", fileSystemId);
-        JsonObject json = fsDetail.get("capacity_auto_negotiation").getAsJsonObject();
+        JsonObject json = object.get("capacity_auto_negotiation").getAsJsonObject();
         resultMap.put("autoSizeEnable", ToolUtils.jsonToBoo(json.get("auto_size_enable")));
-        boolean isThin = (THIN_FIELD.equalsIgnoreCase(ToolUtils.jsonToStr(fsDetail.get("alloc_type")))) ? true : false;
+        boolean isThin = (THIN_FIELD.equalsIgnoreCase(ToolUtils.jsonToStr(object.get("alloc_type")))) ? true : false;
         resultMap.put(THIN_FIELD, isThin);
-        JsonObject tuning = fsDetail.get(TUNING).getAsJsonObject();
+        resultMap.put("capacity",ToolUtils.jsonToDou(object.get("capacity")));
+        JsonObject tuning = object.get(TUNING).getAsJsonObject();
         resultMap.put("compressionEnabled", ToolUtils.jsonToBoo(tuning.get("compression_enabled")));
         resultMap.put("deduplicationEnabled", ToolUtils.jsonToBoo(tuning.get("deduplication_enabled")));
-        String smartQos = ToolUtils.jsonToStr(tuning.get("smart_qos"));
-        if (!StringUtils.isEmpty(smartQos)) {
-            smartQosParse(resultMap, smartQos);
+        boolean qos = tuning.get("smart_qos").isJsonNull();
+        if (!qos) {
+            JsonObject smartQos = tuning.get("smart_qos").getAsJsonObject();
+            if (smartQos != null) {
+                smartQosParse(resultMap, gson.toJson(smartQos));
+            }
         } else {
             resultMap.put("qosFlag", false);
         }
@@ -783,7 +809,8 @@ public class NfsOperationServiceImpl implements NfsOperationService {
     }
 
     private String getStorageModel(String storageId) throws DmeException {
-        return dmeStorageService.getStorageDetail(storageId).getModel();
+        StorageDetail storageDetail = dmeStorageService.getStorageDetail(storageId);
+        return storageDetail.getModel() + " " + storageDetail.getProductVersion();
     }
 
     // 查询指定share,获取共享在存储设备上的id

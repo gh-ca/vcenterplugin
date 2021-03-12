@@ -8,16 +8,8 @@ import com.huawei.dmestore.model.BestPracticeUpResultResponse;
 
 import org.springframework.util.StringUtils;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringReader;
-import java.sql.Clob;
-import java.sql.Connection;
-import java.sql.Date;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.io.*;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -223,29 +215,36 @@ public class BestPracticeCheckDao extends H2DataBaseDao {
         bean.setHostName(rs.getString(HOST_NAME));
         bean.setHostSetting(rs.getString("HOST_SETTING"));
         bean.setRecommendValue(rs.getString("RECOMMEND_VALUE"));
-        bean.setActualValue(clobStreamToStr(rs.getClob("ACTUAL_VALUE")));
+        try {
+            String acturalValue = clobToString(rs.getClob("ACTUAL_VALUE"));
+            bean.setActualValue(acturalValue);
+        } catch (IOException e) {
+
+        }
         bean.setLevel(rs.getString("HINT_LEVEL"));
         bean.setNeedReboot(rs.getString("NEED_REBOOT"));
         bean.setAutoRepair(rs.getString("AUTO_REPAIR"));
         return bean;
     }
 
-    private String clobStreamToStr(Clob clob) {
-        try {
-            InputStream input = clob.getAsciiStream();
-            int len = (int) clob.length();
-            byte[] by = new byte[len];
-            int index;
-            while ((index = input.read(by, 0, by.length)) != MINUS_ONE) {
-                input.read(by, 0, index);
-            }
-            return new String(by);
-        } catch (SQLException e) {
-            LOGGER.error(e.getMessage());
-        } catch (IOException e) {
-            LOGGER.error(e.getMessage());
+    public String clobToString(Clob clob) throws SQLException, IOException {
+        String reString = "";
+        Reader is = clob.getCharacterStream();
+        BufferedReader br = new BufferedReader(is);
+        String s = br.readLine();
+        StringBuffer sb = new StringBuffer();
+        while (s != null) {
+            sb.append(s);
+            s = br.readLine();
         }
-        return "";
+        reString = sb.toString();
+        if (br != null) {
+            br.close();
+        }
+        if (is != null) {
+            is.close();
+        }
+        return reString;
     }
 
     public void deleteBy(List<BestPracticeUpResultResponse> list) {
@@ -269,6 +268,36 @@ public class BestPracticeCheckDao extends H2DataBaseDao {
                         stm.addBatch(sqlTemp);
                     }
                 }
+            }
+            stm.executeBatch();
+            con.commit();
+        } catch (SQLException ex) {
+            try {
+                // 回滚
+                con.rollback();
+            } catch (SQLException e) {
+                LOGGER.error(e.getMessage());
+            }
+        } finally {
+            closeConnection(con, stm, null);
+        }
+    }
+
+    public void deleteByHostIds(List<String> ids) {
+        if (ids == null || ids.size() == 0) {
+            return;
+        }
+
+        Connection con = null;
+        Statement stm = null;
+        try {
+            con = getConnection();
+            String sql = "delete from DP_DME_BEST_PRACTICE_CHECK where host_id='%s'";
+            stm = con.createStatement();
+            con.setAutoCommit(false);
+            for (String id : ids) {
+                String sqlTemp = String.format(sql, id);
+                stm.addBatch(sqlTemp);
             }
             stm.executeBatch();
             con.commit();
@@ -333,7 +362,7 @@ public class BestPracticeCheckDao extends H2DataBaseDao {
                 pstm.setString(DpSqlFileConstants.DIGIT_4, bean.getHostSetting());
                 pstm.addBatch();
             }
-            pstm.executeUpdate();
+            pstm.executeBatch();
             con.commit();
         } catch (SQLException ex) {
             try {

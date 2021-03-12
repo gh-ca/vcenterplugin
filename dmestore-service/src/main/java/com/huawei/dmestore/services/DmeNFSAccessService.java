@@ -87,11 +87,17 @@ public interface DmeNFSAccessService {
     /**
      * delete NFS
      *
-     * @param params storage object id
+     * @param dataStorageId storage object id
      * @throws DmeException when error
      */
-    void deleteNfs(Map<String, Object> params) throws DmeException;
+    void deleteNfs(String dataStorageId) throws DmeException;
 
+    /**
+     * 批量删除nfs
+     *
+     * @param storeObjectIds storeObjectIds
+     */
+    void bulkDeletionNfs(List<String> storeObjectIds) throws DmeException;
     /**
      * List nfs Performance
      *

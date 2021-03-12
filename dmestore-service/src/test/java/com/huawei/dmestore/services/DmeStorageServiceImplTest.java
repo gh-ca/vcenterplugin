@@ -307,8 +307,8 @@ public class DmeStorageServiceImplTest {
         String params =
             "{\"constraint\":[{\"simple\":{\"name\":\"dataStatus\",\"operator\":\"equal\",\"value\":\"normal\"}},{\"simple\":{\"name\":\"poolId\",\"operator\":\"equal\",\"value\":\"0\"},\"logOp\":\"and\"}]}";
         when(dmeAccessService.accessByJson(poolUrl, HttpMethod.GET, params)).thenReturn(responseEntity2);
-        VolumeListRestponse volumesByPage = dmeStorageService.getVolumesByPage(storageId, null, null);
-        System.out.println(volumesByPage);
+        /*VolumeListRestponse volumesByPage = dmeStorageService.getVolumesByPage(storageId, null, null);
+        System.out.println(volumesByPage);*/
 
     }
 
@@ -346,7 +346,7 @@ public class DmeStorageServiceImplTest {
         Map<String, Object> params = new HashMap<>();
         params.put("storage_id", storageId);
         when(dmeAccessService.access(url, HttpMethod.POST, gson.toJson(params))).thenReturn(responseEntity);
-        List<FileSystem> fileSystems = dmeStorageService.getFileSystems(storageId);
+        List<FileSystem> fileSystems = dmeStorageService.getFileSystems(storageId, null, null);
         System.out.println(fileSystems);
     }
 
@@ -868,7 +868,7 @@ public class DmeStorageServiceImplTest {
         jsonObject.addProperty("count", 1);
         ResponseEntity<String> responseEntity = new ResponseEntity(gson.toJson(jsonObject), null, HttpStatus.OK);
         when(dmeAccessService.access(url, HttpMethod.GET, null)).thenReturn(responseEntity);
-        System.out.println(dmeStorageService.queryVolumeByName(name));
+        //System.out.println(dmeStorageService.queryVolumeByName(name));
     }
 
     @Test

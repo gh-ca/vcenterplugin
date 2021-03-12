@@ -14,5 +14,9 @@ export class NfsExpandService{
   getStorageById(objectId) {
     return this.http.get('accessvmware/relation?datastoreObjectId='+objectId);
   }
+
+  getNfsDetailById(storeObjectId:string){
+    return this.http.get('operatenfs/editnfsstore',{params: {storeObjectId}} );
+  }
 }
 

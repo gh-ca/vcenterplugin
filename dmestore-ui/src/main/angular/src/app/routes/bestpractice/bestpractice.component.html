@@ -9,8 +9,10 @@
 
     <clr-dg-column [clrDgField]="'hostSetting'">{{'bestPractice.hostSetting'|translate}}</clr-dg-column>
     <clr-dg-column [clrDgField]="'recommendValue'">{{'bestPractice.recommend'|translate}}</clr-dg-column>
-    <clr-dg-column [clrDgField]="'levelDesc'">{{'bestPractice.level'|translate}}</clr-dg-column>
-    <clr-dg-column [clrDgField]="'violation'" [clrDgSortOrder]="'violation'">{{'bestPractice.violation'|translate}}</clr-dg-column>
+    <clr-dg-column [clrDgField]="'levelDesc'" [clrDgSortBy]="'levelNum'">{{'bestPractice.level'|translate}}</clr-dg-column>
+    <clr-dg-column class="hideFilter" [clrDgField]="'count'" [clrDgSortOrder]="'count'">{{'bestPractice.violation'|translate}}</clr-dg-column>
+    <clr-dg-column>{{'bestPractice.description'|translate}}</clr-dg-column>
+    <clr-dg-column>{{'bestPractice.operation'|translate}}</clr-dg-column>
 
     <clr-dg-row *clrDgItems="let item of list" [clrDgItem]="item">
       <clr-dg-cell>{{item.hostSetting}}</clr-dg-cell>
@@ -29,12 +31,20 @@
           <span class="color-square" style="background-color: #79C6E6; margin-right: 10px"></span>{{item.levelDesc}}
         </span>
       </clr-dg-cell>
-      <clr-dg-cell><span (click)="openHostList(item)" style="color:#00F;cursor:pointer">{{item.count}}</span></clr-dg-cell>
+      <clr-dg-cell>
+<!--        <span *ngIf="item.count > 0" (click)="openHostList(item)" style="color:#00F;cursor:pointer">{{item.count}}</span>-->
+        <span>{{item.count}}</span>
+      </clr-dg-cell>
+      <clr-dg-cell></clr-dg-cell>
+      <clr-dg-cell>
+        <span *ngIf="item.count > 0" (click)="openHostList(item)" style="color:#00F;cursor:pointer">{{'bestPractice.implementation'|translate}}</span>
+        <span *ngIf="item.count == 0" style="color:#9F9F9F;">{{'bestPractice.implementation'|translate}}</span>
+      </clr-dg-cell>
     </clr-dg-row>
 
     <clr-dg-footer>
-      <clr-dg-pagination #pagination [clrDgPageSize]="5" [clrDgTotalItems]="total">
-        <clr-dg-page-size [clrPageSizeOptions]="[5,10,50,100]">{{'page.perPage' | translate}}</clr-dg-page-size>
+      <clr-dg-pagination #pagination [clrDgPageSize]="20" [clrDgTotalItems]="total">
+        <clr-dg-page-size [clrPageSizeOptions]="[10,20]">{{'page.perPage' | translate}}</clr-dg-page-size>
         {{pagination.firstItem + 1}} - {{pagination.lastItem + 1}}
         {{'page.all' | translate}}
         {{pagination.totalItems}}
@@ -59,17 +69,29 @@
         <clr-dg-column [clrDgField]="'recommendValue'">{{'bestPractice.recommend'|translate}}</clr-dg-column>
 
         <clr-dg-row *clrDgItems="let item of hostList" [clrDgItem]="item">
-          <clr-dg-cell>{{item.hostName}}</clr-dg-cell>
-          <clr-dg-cell>{{item.actualValue}}</clr-dg-cell>
-          <clr-dg-cell>{{item.recommendValue}}</clr-dg-cell>
+          <clr-dg-cell class="over_flow" title="{{item.hostName}}">{{item.hostName}}</clr-dg-cell>
+          <clr-dg-cell class="over_flow" *ngIf="isObjectValue(item.actualObjValue) == false" title="{{item.actualValue}}">
+            {{item.actualValue}}
+          </clr-dg-cell>
+          <clr-dg-cell class="over_flow" *ngIf="isObjectValue(item.actualObjValue) == true">
+            <div [title]="getObjectTitle(item.actualObjValue)">
+              <div *ngFor="let actValue of item.actualObjValue">
+                <span style="max-width: 4rem;display: inline-block;" class="over_flow">{{actValue.name}}</span>
+                |
+                <span style="max-width: 4rem;display: inline-block;" class="over_flow">{{actValue.value}}</span>
+              </div>
+            </div>
+
+          </clr-dg-cell>
+          <clr-dg-cell class="over_flow" title="{{item.recommendValue}}">{{item.recommendValue}}</clr-dg-cell>
         </clr-dg-row>
 
         <clr-dg-footer>
-          <clr-dg-pagination #pagination [clrDgPageSize]="5" [clrDgTotalItems]="hostTotal">
+          <clr-dg-pagination #hostModalPagination [clrDgPageSize]="5" [clrDgTotalItems]="hostTotal">
             <clr-dg-page-size [clrPageSizeOptions]="[5,10,50,100]">{{'page.perPage' | translate}}</clr-dg-page-size>
-            {{pagination.firstItem + 1}} - {{pagination.lastItem + 1}}
+            {{hostModalPagination.firstItem + 1}} - {{hostModalPagination.lastItem + 1}}
             {{'page.all' | translate}}
-            {{pagination.totalItems}}
+            {{hostModalPagination.totalItems}}
           </clr-dg-pagination>
         </clr-dg-footer>
 
@@ -113,5 +135,14 @@
   </div>
   <div class="modal-footer">
     <button type="button" class="btn btn-danger" (click)="tipModalFail=false">{{'menu.ok'|translate}}</button>
+  </div>
+</clr-modal>
+<clr-modal [(clrModalOpen)]="applyTips" [clrModalSize]="'sm'">
+  <h3 class="modal-title">{{'menu.tip'|translate}}</h3>
+  <div class="modal-body">
+    <clr-icon shape="error-standard" class="is-solid" style="color: red;margin-right: 5px;"></clr-icon>{{'bestPractice.applyBestPracticeTips'|translate}}
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-danger" (click)="applyTips=false">{{'menu.ok'|translate}}</button>
   </div>
 </clr-modal>

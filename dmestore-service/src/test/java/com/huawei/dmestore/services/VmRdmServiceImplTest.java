@@ -164,7 +164,7 @@ public class VmRdmServiceImplTest {
         map3.put("blockSize", "321");
         lunlist.add(map3);
         when(vcsdkUtils.getLunsOnHost("321")).thenReturn(gson.toJson(lunlist));
-        vmRdmService.createRdm("321", "321", vmRdmCreateBean);
+        vmRdmService.createRdm("321", "321", vmRdmCreateBean, null);
 
     }
 
@@ -198,7 +198,7 @@ public class VmRdmServiceImplTest {
         customizeVolumeTuningForCreate.setDedupeEnabled(false);
         SmartQosForRdmCreate smartQosForRdmCreate = new SmartQosForRdmCreate();
         smartQosForRdmCreate.setControlPolicy("321");
-        smartQosForRdmCreate.setEnabled(true);
+        smartQosForRdmCreate.isEnabled(true);
         smartQosForRdmCreate.setLatency(1);
         smartQosForRdmCreate.setLatencyUnit("321");
         smartQosForRdmCreate.setMaxbandwidth(21);
@@ -310,7 +310,7 @@ public class VmRdmServiceImplTest {
         map3.put("blockSize", "321");
         lunlist.add(map3);
         when(vcsdkUtils.getLunsOnHost("321")).thenReturn(gson.toJson(lunlist));
-        vmRdmService.createRdm("321", "321", vmRdmCreateBean);
+        vmRdmService.createRdm("321", "321", vmRdmCreateBean, null);
     }
 
     @Test

@@ -64,42 +64,42 @@
         <vmfs-filter #statusFilter></vmfs-filter>
       </clr-dg-filter>
     </clr-dg-column>
-    <clr-dg-column [hidden]="radioCheck!=='list'" [clrDgField]="'capacity'">{{'vmfs.capacity' | translate}}</clr-dg-column>
-    <clr-dg-column [hidden]="radioCheck!=='list'" [clrDgField]="'usedCapacity'">{{'vmfs.usedCapacity' | translate}}</clr-dg-column>
-    <clr-dg-column [hidden]="radioCheck!=='list'" [clrDgField]="'capacityUsage'" style="width: 11rem;">{{'vmfs.capacityUsage' | translate}}</clr-dg-column>
-    <clr-dg-column [hidden]="radioCheck!=='list'" [clrDgField]="'freeSpace'">{{'vmfs.freeSpace' | translate}}</clr-dg-column>
-    <clr-dg-column [hidden]="radioCheck!=='list'" [clrDgField]="'reserveCapacity'">{{'vmfs.reserveCapacity' | translate}}</clr-dg-column>
+    <clr-dg-column [hidden]="radioCheck!=='list'" class="hideFilter" [clrDgField]="'capacity'">{{'vmfs.capacity' | translate}}</clr-dg-column>
+    <clr-dg-column [hidden]="radioCheck!=='list'" class="hideFilter" [clrDgField]="'usedCapacity'">{{'vmfs.usedCapacity' | translate}}</clr-dg-column>
+    <clr-dg-column [hidden]="radioCheck!=='list'" class="hideFilter" [clrDgField]="'capacityUsage'" style="width: 11rem;">{{'vmfs.capacityUsage' | translate}}</clr-dg-column>
+    <clr-dg-column [hidden]="radioCheck!=='list'" class="hideFilter" [clrDgField]="'freeSpace'">{{'vmfs.freeSpace' | translate}}</clr-dg-column>
+    <clr-dg-column [hidden]="radioCheck!=='list'" class="hideFilter" [clrDgField]="'reserveCapacity'">{{'vmfs.reserveCapacity' | translate}}</clr-dg-column>
     <clr-dg-column [hidden]="radioCheck!=='list'" [clrDgField]="'device'">
       {{'vmfs.device' | translate}}
       <clr-dg-filter [clrDgFilter]="deviceFilter">
         <device-filter #deviceFilter></device-filter>
       </clr-dg-filter>
     </clr-dg-column>
-    <clr-dg-column [hidden]="radioCheck!=='list'" [clrDgField]="'serviceLevelName'">
+    <clr-dg-column style="width: 250px;" [hidden]="radioCheck!=='list'" [clrDgField]="'serviceLevelName'">
       {{'vmfs.serviceLevelName' | translate}}
       <clr-dg-filter [clrDgFilter]="serviceLevelFilter">
         <serviceLevel-filter #serviceLevelFilter></serviceLevel-filter>
       </clr-dg-filter>
     </clr-dg-column>
-    <clr-dg-column [hidden]="radioCheck!=='list'" [clrDgField]="'protectionStatus'">
-      {{'vmfs.protectionStatus.name' | translate}}
-      <clr-dg-filter [clrDgFilter]="protectionStatusFilter">
-        <protection-status-filter #protectionStatusFilter></protection-status-filter>
-      </clr-dg-filter>
-    </clr-dg-column>
-    <clr-dg-column [hidden]="radioCheck!=='chart'">{{'vmfs.iops' | translate}}</clr-dg-column>
+<!--    <clr-dg-column [hidden]="radioCheck!=='list'" [clrDgField]="'protectionStatus'">-->
+<!--      {{'vmfs.protectionStatus.name' | translate}}-->
+<!--      <clr-dg-filter [clrDgFilter]="protectionStatusFilter">-->
+<!--        <protection-status-filter #protectionStatusFilter></protection-status-filter>-->
+<!--      </clr-dg-filter>-->
+<!--    </clr-dg-column>-->
+    <clr-dg-column [hidden]="radioCheck!=='chart'" class="hideFilter" [clrDgField]="'iops'">{{'vmfs.iops' | translate}}</clr-dg-column>
     <clr-dg-column [hidden]="radioCheck!=='chart'">{{'vmfs.iopsQoSTarget' | translate}}</clr-dg-column>
-    <clr-dg-column [hidden]="radioCheck!=='chart'">{{'vmfs.bandwidth' | translate}}(MB/s)</clr-dg-column>
+    <clr-dg-column [hidden]="radioCheck!=='chart'" class="hideFilter" [clrDgField]="'bandwidth'">{{'vmfs.bandwidth' | translate}}(MB/s)</clr-dg-column>
     <clr-dg-column [hidden]="radioCheck!=='chart'">{{'vmfs.bandwidthQoSTarget' | translate}}</clr-dg-column>
-    <clr-dg-column [hidden]="radioCheck!=='chart'">{{'vmfs.readResponseTime' | translate}}</clr-dg-column>
-    <clr-dg-column [hidden]="radioCheck!=='chart'">{{'vmfs.writeResponseTime' | translate}}</clr-dg-column>
-    <clr-dg-column [hidden]="radioCheck!=='chart'">{{'vmfs.latency' | translate}}</clr-dg-column>
+    <clr-dg-column [hidden]="radioCheck!=='chart'" class="hideFilter" [clrDgField]="'readResponseTime'">{{'vmfs.readResponseTime' | translate}}</clr-dg-column>
+    <clr-dg-column [hidden]="radioCheck!=='chart'" class="hideFilter" [clrDgField]="'writeResponseTime'">{{'vmfs.writeResponseTime' | translate}}</clr-dg-column>
+    <clr-dg-column [hidden]="radioCheck!=='chart'" class="hideFilter" [clrDgField]="'latency'">{{'vmfs.latency' | translate}}</clr-dg-column>
     <clr-dg-column [hidden]="radioCheck!=='chart'">{{'vmfs.latencyQoSTarget' | translate}}</clr-dg-column>
 
     <clr-dg-placeholder>{{'vmfs.listNullTips' | translate}}</clr-dg-placeholder>
 
     <clr-dg-row [clrDgSelectable]="false" *clrDgItems="let item of list" [clrDgItem]="item">
-      <clr-dg-cell class="over_flow" (click)="navigateTo(item.objectid);">{{item.name}}</clr-dg-cell>
+      <clr-dg-cell class="over_flow" (click)="navigateTo(item.objectid);" style="color:#829DE6;cursor:pointer">{{item.name}}</clr-dg-cell>
       <clr-dg-cell hidden>{{item.volumeId}}</clr-dg-cell>
       <clr-dg-cell  hidden>{{item.wwn}}</clr-dg-cell>
       <clr-dg-cell  hidden>{{item.volumeName}}</clr-dg-cell>
@@ -141,15 +141,15 @@
       <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='list'">{{formatCapacity(item.freeSpace, true)}}</clr-dg-cell>
       <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='list'">{{formatCapacity(item.reserveCapacity, true)}}</clr-dg-cell>
       <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='list'">{{item.device}}</clr-dg-cell>
-      <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='list'">{{item.serviceLevelName}}</clr-dg-cell>
-      <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='list'">
-        <span *ngIf="item.vmfsProtected">
-          <img src="./assets/images/icon-unprotected.svg">{{'vmfs.protectionStatus.protected' | translate}}
-        </span>
-        <span *ngIf="!item.vmfsProtected">
-          {{'vmfs.protectionStatus.unprotected' | translate}}
-        </span>
-      </clr-dg-cell>
+      <clr-dg-cell title="{{item.serviceLevelName}}" class="over_flow" [hidden]="radioCheck!=='list'">{{item.serviceLevelName}}</clr-dg-cell>
+<!--      <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='list'">-->
+<!--        <span *ngIf="item.vmfsProtected">-->
+<!--          <img src="./assets/images/icon-unprotected.svg">{{'vmfs.protectionStatus.protected' | translate}}-->
+<!--        </span>-->
+<!--        <span *ngIf="!item.vmfsProtected">-->
+<!--          {{'vmfs.protectionStatus.unprotected' | translate}}-->
+<!--        </span>-->
+<!--      </clr-dg-cell>-->
       <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='chart'">{{item.iops}}</clr-dg-cell>
       <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='chart'">{{('vmfs.upper' | translate)+' '+ (item.maxIops || "--")+' | '+('vmfs.lower' | translate)+' '+(item.minIops || "--")}}</clr-dg-cell>
       <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='chart'">{{item.bandwidth}}</clr-dg-cell>
@@ -171,7 +171,7 @@
 
   <!-- 弹出form提交框 添加 -->
   <clr-wizard #wizard [(clrWizardOpen)]="popListShow" [clrWizardClosable]="false">
-    <clr-wizard-title style="font-weight: bolder">{{'vmfs.addTitle' | translate}}</clr-wizard-title>
+    <clr-wizard-title style="font-weight: bolder">{{'table.createDmeStorage' | translate}}</clr-wizard-title>
     <div *ngIf="modalLoading" class="loadingDiv">
       <span>
         {{'vmfs.loadingTips' | translate}}<img src="./assets/images/loading.gif"  width="20px" height="20px" style="margin-left: 20px;">
@@ -301,8 +301,8 @@
           <clr-combobox-container>
             <label style="color: #9F9F9F;">{{'vmfs.hostOrCluster' | translate}}</label>
             <clr-combobox *ngIf="form.hostDataloadSuccess && form.culDataloadSuccess" [(ngModel)]="chooseDevice" name="chooseDevice" formControlName="chooseDevice" required>
-              <clr-options>
-                <clr-option *clrOptionItems="let device of deviceList; field:'deviceName'" [clrValue]="device">
+              <clr-options style="max-height: 6.5rem;overflow: auto">
+                <clr-option id="deviceSelect" *clrOptionItems="let device of deviceList; field:'deviceName'" [clrValue]="device">
                   <clr-icon *ngIf="device.deviceName !== '' && device.deviceType === 'host'" shape="host" role="img" aria-label="World is turning"></clr-icon>
                   <clr-icon *ngIf="device.deviceName !== '' && device.deviceType !== 'host'" shape="host-group" role="img" aria-label="World is turning"></clr-icon>
                   {{device.deviceName}}
@@ -405,7 +405,7 @@
             <clr-select-container class="selectClass">
               <label style="color: #9F9F9F;">{{'vmfs.storageDevice' | translate}}</label>
               <select clrSelect  [(ngModel)]="form.storage_id" name="storage_id" (ngModelChange)="getStoragePoolsByStorId();" required>
-                <option *ngFor="let item of storageList" value="{{item.id}}">{{item.name}}</option>
+                <option *ngFor="let item of storageList" value="{{item.id}}">{{item.name+'('+item.ip+')'}}</option>
               </select>
               <clr-control-error>{{'validations.required' | translate}}</clr-control-error>
             </clr-select-container>
@@ -443,7 +443,7 @@
             <!--b.QoS 设置 -->
             <clr-toggle-wrapper  style="margin-top: 1.2rem;width: 6rem;" class="selectClass" *ngIf="form.storage_id">
               <label>{{'nfs.qosPolicy' | translate}}</label>
-              <input type="checkbox" clrToggle name="qosFlag" [(ngModel)]="form.qosFlag"/>
+              <input type="checkbox" clrToggle name="qosFlag" (change)="qoSAddFlagChange(form);" [(ngModel)]="form.qosFlag"/>
             </clr-toggle-wrapper>
             <!-- 控制策略 -->
             <div *ngIf="form.qosFlag">
@@ -465,23 +465,29 @@
               <clr-checkbox-container *ngIf="form.control_policyUpper === '1'">
                 <label style="color: #9F9F9F;">{{'vmfs.trafficControlObject' | translate}}</label>
                 <clr-checkbox-wrapper>
-                  <input type="checkbox" [(ngModel)]="form.maxbandwidthChoose" name="maxbandwidthChoose" clrCheckbox/>
+                  <input type="checkbox" [(ngModel)]="form.maxbandwidthChoose" (ngModelChange)="resetQosFlag(form.maxbandwidthChoose, 'maxbandwidth')" name="maxbandwidthChoose" clrCheckbox/>
                   <label style="width: 190px;">
                     {{'vmfs.bandwidthLimitUpper' | translate}}
-                    <input type="number" [(readOnly)]="!form.maxbandwidthChoose" class="inputOneLine" name="maxbandwidth" [(ngModel)]="form.maxbandwidth" min="0" (blur)="qosBlur('add', 'maxbandwidth');"/>{{'vmfs.unitM' | translate}}
+                    <input type="number" [(readOnly)]="!form.maxbandwidthChoose" class="inputOneLine" name="maxbandwidth" [(ngModel)]="form.maxbandwidth" min="0" oninput="if (value.length > 11) {value=value.slice(0,11)}" (blur)="qosBlur('add', 'maxbandwidth');"
+                           [required]="form.maxbandwidthChoose"/>{{'vmfs.unitM' | translate}}
                   </label>
                 </clr-checkbox-wrapper>
+                <clr-control-helper *ngIf="bandWidthMaxErrTips" style="color: red"><clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{'errorMsg.iposMaxMinTips' | translate}}</clr-control-helper>
+                <clr-control-helper *ngIf="!bandWidthMaxErrTips && form.maxbandwidthChoose && !form.maxbandwidth">{{'errorMsg.require' | translate}}</clr-control-helper>
               </clr-checkbox-container>
               <!-- 交通管制对象 IOPS 上限-->
               <clr-checkbox-container *ngIf="form.control_policyUpper === '1'">
                 <label></label>
                 <clr-checkbox-wrapper>
-                  <input type="checkbox" [(ngModel)]="form.maxiopsChoose" name="maxiopsChoose" clrCheckbox/>
+                  <input type="checkbox" [(ngModel)]="form.maxiopsChoose" (ngModelChange)="resetQosFlag(form.maxiopsChoose, 'maxiops')" name="maxiopsChoose" clrCheckbox/>
                   <label style="width: 190px;">
                     {{'vmfs.IOPSLimitUpper' | translate}}
-                    <input type="number" [(readOnly)]="!form.maxiopsChoose" class="inputOneLine" name="maxiops" [(ngModel)]="form.maxiops" min="0" (blur)="qosBlur('add', 'maxiops');"/>
+                    <input type="number" [(readOnly)]="!form.maxiopsChoose" class="inputOneLine" name="maxiops" [(ngModel)]="form.maxiops" min="0" oninput="if (value.length > 11) {value=value.slice(0,11)}" (blur)="qosBlur('add', 'maxiops');"
+                           [required]="form.maxiopsChoose"/>
                   </label>
                 </clr-checkbox-wrapper>
+                <clr-control-helper *ngIf="iopsMaxErrTips" style="color: red"><clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{'errorMsg.iposMaxMinTips' | translate}}</clr-control-helper>
+                <clr-control-helper *ngIf="form.maxiopsChoose && !iopsMaxErrTips && !form.maxiops">{{'errorMsg.require' | translate}}</clr-control-helper>
               </clr-checkbox-container>
               <div *ngIf="!showLowerFlag">
                 <!-- 交通管制对象 带宽 下限-->
@@ -489,32 +495,39 @@
                   <label *ngIf="form.control_policyLower == '0' && form.control_policyUpper != '1'" style="color: #9F9F9F;">{{'vmfs.trafficControlObject' | translate}}</label>
                   <label *ngIf="form.control_policyLower == '0' && form.control_policyUpper == '1'" style="color: #9F9F9F;"></label>
                   <clr-checkbox-wrapper *ngIf="form.control_policyLower == '0'">
-                    <input type="checkbox" [(ngModel)]="form.minbandwidthChoose" name="minbandwidthChoose" clrCheckbox/>
+                    <input type="checkbox" [(ngModel)]="form.minbandwidthChoose" (ngModelChange)="resetQosFlag(form.minbandwidthChoose, 'minbandwidth')" name="minbandwidthChoose" clrCheckbox/>
                     <label style="width: 190px;">
                       {{'vmfs.bandwidthLimitLower' | translate}}
-                      <input type="number" [(readOnly)]="!form.minbandwidthChoose" min="0" class="inputOneLine" name="minbandwidth" [(ngModel)]="form.minbandwidth" (blur)="qosBlur('add', 'minbandwidth');"/>{{'vmfs.unitM' | translate}}
+                      <input type="number" [(readOnly)]="!form.minbandwidthChoose" min="0" class="inputOneLine" name="minbandwidth" [(ngModel)]="form.minbandwidth" oninput="if (value.length > 11) {value=value.slice(0,11)}" (blur)="qosBlur('add', 'minbandwidth');"
+                             [required]="form.minbandwidthChoose"/>{{'vmfs.unitM' | translate}}
                     </label>
                   </clr-checkbox-wrapper>
+                  <clr-control-helper *ngIf="bandWidthMinErrTips" style="color: red"><clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{'errorMsg.iposMaxMinTips' | translate}}</clr-control-helper>
+                  <clr-control-helper *ngIf="!bandWidthMinErrTips && form.minbandwidthChoose && !form.minbandwidth">{{'errorMsg.require' | translate}}</clr-control-helper>
                 </clr-checkbox-container>
                 <!-- 交通管制对象 IOPS 下限-->
                 <clr-checkbox-container *ngIf="form.control_policyLower === '0'">
                   <label></label>
                   <clr-checkbox-wrapper>
-                    <input type="checkbox" [(ngModel)]="form.miniopsChoose" name="minbandwidthChoose" clrCheckbox/>
+                    <input type="checkbox" [(ngModel)]="form.miniopsChoose" (ngModelChange)="resetQosFlag(form.miniopsChoose, 'miniops')" name="minbandwidthChoose" clrCheckbox/>
                     <label style="width: 190px;">
                       {{'vmfs.IOPSLimitLower' | translate}}
-                      <input type="number" [(readOnly)]="!form.miniopsChoose" min="0" class="inputOneLine" name="miniops" [(ngModel)]="form.miniops" (blur)="qosBlur('add', 'miniops');"/>
+                      <input type="number" [(readOnly)]="!form.miniopsChoose" min="0" class="inputOneLine" name="miniops" [(ngModel)]="form.miniops" oninput="if (value.length > 11) {value=value.slice(0,11)}" (blur)="qosBlur('add', 'miniops');"
+                             [required]="form.miniopsChoose"/>
                     </label>
                   </clr-checkbox-wrapper>
+                  <clr-control-helper *ngIf="iopsMinErrTips" style="color: red"><clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{'errorMsg.iposMaxMinTips' | translate}}</clr-control-helper>
+                  <clr-control-helper *ngIf="form.miniopsChoose && !form.miniops && !iopsMinErrTips">{{'errorMsg.require' | translate}}</clr-control-helper>
                 </clr-checkbox-container>
                 <!-- 交通管制对象 latency 时延-->
                 <clr-checkbox-container *ngIf="form.control_policyLower === '0'">
                   <label></label>
                   <clr-checkbox-wrapper *ngIf="!latencyIsSelect">
-                    <input type="checkbox" [(ngModel)]="form.latencyChoose" name="latencyChoose" clrCheckbox/>
+                    <input type="checkbox" [(ngModel)]="form.latencyChoose" (ngModelChange)="resetQosFlag(form.latencyChoose, 'latency')" name="latencyChoose" clrCheckbox/>
                     <label style="width: 190px;">
                       {{'vmfs.latencyMax' | translate}}
-                      <input  *ngIf="!latencyIsSelect" type="number" [(readOnly)]="!form.latencyChoose" min="0" class="inputOneLine" name="latency" [(ngModel)]="form.latency" (blur)="qosBlur('add', 'latency');"/>
+                      <input  *ngIf="!latencyIsSelect" type="number" [(readOnly)]="!form.latencyChoose" min="0" oninput="if (value.length > 11) {value=value.slice(0,11)}" class="inputOneLine" name="latency" [(ngModel)]="form.latency" (blur)="qosBlur('add', 'latency');"
+                              [required]="form.latencyChoose"/>
                       {{'vmfs.latencyUnit' | translate}}
                     </label>
                   </clr-checkbox-wrapper>
@@ -529,6 +542,8 @@
                       {{'vmfs.latencyUnitUs' | translate}}
                     </label>
                   </clr-checkbox-wrapper>
+                  <clr-control-helper *ngIf="latencyErrTips" style="color: red"><clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{'errorMsg.iposMaxMinTips' | translate}}</clr-control-helper>
+                  <clr-control-helper *ngIf="!latencyErrTips && form.latencyChoose && !form.latency">{{'errorMsg.require' | translate}}</clr-control-helper>
                 </clr-checkbox-container>
               </div>
             </div>
@@ -540,7 +555,6 @@
             <clr-select-container class="selectClass">
               <label style="color: #9F9F9F;">{{'vmfs.provisioningType' | translate}}</label>
               <select clrSelect [(ngModel)]="form.alloctype" name="alloctype">
-                <option value="">{{'tips.select' | translate}}</option>
                 <option value="thin">thin</option>
                 <option [hidden]="!showAlloctypeThick" value="thick">thick</option>
               </select>
@@ -626,7 +640,7 @@
           <!--b.QoS 设置 -->
           <clr-toggle-wrapper  style="margin-top: 1.2rem;width: 6rem;" class="selectClass">
             <label>{{'nfs.qosPolicy' | translate}}</label>
-            <input type="checkbox" clrToggle name="qosFlag" [(ngModel)]="modifyForm.qosFlag"/>
+            <input type="checkbox" clrToggle name="qosFlag" (change)="qoSEditFlagChange(modifyForm);" [(ngModel)]="modifyForm.qosFlag"/>
           </clr-toggle-wrapper>
           <div *ngIf="modifyForm.qosFlag">
             <!-- 控制策略 -->
@@ -647,58 +661,72 @@
             <clr-checkbox-container *ngIf="modifyForm.control_policyUpper === '1'">
               <label style="color: #9F9F9F;">{{'vmfs.trafficControlObject' | translate}}</label>
               <clr-checkbox-wrapper>
-                <input type="checkbox" [(ngModel)]="modifyForm.maxbandwidthChoose" name="maxbandwidthChoose" clrCheckbox/>
+                <input type="checkbox" [(ngModel)]="modifyForm.maxbandwidthChoose" (ngModelChange)="resetQosFlag(modifyForm.maxbandwidthChoose, 'maxbandwidth')" name="maxbandwidthChoose" clrCheckbox/>
                 <label>
                   {{'vmfs.bandwidthLimitUpper' | translate}}
                   <input type="number" [(readOnly)]="!modifyForm.maxbandwidthChoose" (blur)="qosBlur('modify', 'max_bandwidth');"
-                         class="inputOneLine" min="0" name="max_bandwidth" [(ngModel)]="modifyForm.max_bandwidth"/>{{'vmfs.unitM' | translate}}
+                         class="inputOneLine" min="0" oninput="if (value.length > 11) {value=value.slice(0,11)}" name="max_bandwidth" [(ngModel)]="modifyForm.max_bandwidth"
+                         [required]="modifyForm.maxbandwidthChoose"/>{{'vmfs.unitM' | translate}}
                 </label>
               </clr-checkbox-wrapper>
+              <clr-control-helper *ngIf="bandWidthMaxErrTips" style="color: red"><clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{'errorMsg.iposMaxMinTips' | translate}}</clr-control-helper>
+              <clr-control-helper *ngIf="!bandWidthMaxErrTips && modifyForm.maxbandwidthChoose && !modifyForm.max_bandwidth">{{'errorMsg.require' | translate}}</clr-control-helper>
             </clr-checkbox-container>
             <!-- 交通管制对象 IOPS 上限-->
             <clr-checkbox-container *ngIf="modifyForm.control_policyUpper === '1'">
               <label></label>
               <clr-checkbox-wrapper>
-                <input type="checkbox" [(ngModel)]="modifyForm.maxiopsChoose" name="maxiopsChoose" clrCheckbox/>
+                <input type="checkbox" [(ngModel)]="modifyForm.maxiopsChoose" (ngModelChange)="resetQosFlag(modifyForm.maxiopsChoose, 'maxiops')" name="maxiopsChoose" clrCheckbox/>
                 <label>
                   {{'vmfs.IOPSLimitUpper' | translate}}
                   <input type="number" [(readOnly)]="!modifyForm.maxiopsChoose" class="inputOneLine" name="max_iops" min="0"
-                         [(ngModel)]="modifyForm.max_iops" (blur)="qosBlur('modify', 'max_iops');" />
+                         oninput="if (value.length > 11) {value=value.slice(0,11)}" [(ngModel)]="modifyForm.max_iops" (blur)="qosBlur('modify', 'max_iops');"
+                         [required]="modifyForm.maxiopsChoose"/>
                 </label>
               </clr-checkbox-wrapper>
+              <clr-control-helper *ngIf="iopsMaxErrTips" style="color: red"><clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{'errorMsg.iposMaxMinTips' | translate}}</clr-control-helper>
+              <clr-control-helper *ngIf="modifyForm.maxiopsChoose && !iopsMaxErrTips && !modifyForm.max_iops">{{'errorMsg.require' | translate}}</clr-control-helper>
             </clr-checkbox-container>
 
             <!-- 交通管制对象 带宽 下限-->
             <clr-checkbox-container *ngIf="modifyForm.control_policyLower === '0'">
-              <label style="color: #9F9F9F;">{{'vmfs.trafficControlObject' | translate}}</label>
+              <label *ngIf="modifyForm.control_policyLower == '0' && modifyForm.control_policyUpper != '1'" style="color: #9F9F9F;">{{'vmfs.trafficControlObject' | translate}}</label>
+              <label *ngIf="modifyForm.control_policyLower == '0' && modifyForm.control_policyUpper == '1'" style="color: #9F9F9F;"></label>
               <clr-checkbox-wrapper>
-                <input type="checkbox" [(ngModel)]="modifyForm.minbandwidthChoose" name="minbandwidthChoose" clrCheckbox/>
+                <input type="checkbox" [(ngModel)]="modifyForm.minbandwidthChoose" (ngModelChange)="resetQosFlag(modifyForm.minbandwidthChoose, 'minbandwidth')" name="minbandwidthChoose" clrCheckbox/>
                 <label>
                   {{'vmfs.bandwidthLimitLower' | translate}}
                   <input type="number" [(readOnly)]="!modifyForm.minbandwidthChoose" class="inputOneLine" name="min_bandwidth" min="0"
-                         [(ngModel)]="modifyForm.min_bandwidth" (blur)="qosBlur('modify', 'min_bandwidth');" />{{'vmfs.unitM' | translate}}
+                         oninput="if (value.length > 11) {value=value.slice(0,11)}" [(ngModel)]="modifyForm.min_bandwidth" (blur)="qosBlur('modify', 'min_bandwidth');"
+                         [required]="modifyForm.minbandwidthChoose"/>{{'vmfs.unitM' | translate}}
                 </label>
               </clr-checkbox-wrapper>
+              <clr-control-helper *ngIf="bandWidthMinErrTips" style="color: red"><clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{'errorMsg.iposMaxMinTips' | translate}}</clr-control-helper>
+              <clr-control-helper *ngIf="!bandWidthMinErrTips && !modifyForm.min_bandwidth && modifyForm.minbandwidthChoose">{{'errorMsg.require' | translate}}</clr-control-helper>
             </clr-checkbox-container>
             <!-- 交通管制对象 IOPS 下限-->
             <clr-checkbox-container *ngIf="modifyForm.control_policyLower === '0'">
               <label></label>
               <clr-checkbox-wrapper>
-                <input type="checkbox" [(ngModel)]="modifyForm.miniopsChoose" name="minbandwidthChoose" clrCheckbox/>
+                <input type="checkbox" [(ngModel)]="modifyForm.miniopsChoose" (ngModelChange)="resetQosFlag(modifyForm.miniopsChoose, 'miniops')" name="minbandwidthChoose" clrCheckbox/>
                 <label style="width: 190px;">
                   {{'vmfs.IOPSLimitLower' | translate}}
-                  <input type="number" [(readOnly)]="!modifyForm.miniopsChoose" min="0" class="inputOneLine" name="min_iops" [(ngModel)]="modifyForm.min_iops" (blur)="qosBlur('add', 'min_iops');"/>
+                  <input type="number" [(readOnly)]="!modifyForm.miniopsChoose" min="0" oninput="if (value.length > 11) {value=value.slice(0,11)}" class="inputOneLine" name="min_iops" [(ngModel)]="modifyForm.min_iops" (blur)="qosBlur('modify', 'min_iops');"
+                         [required]="modifyForm.miniopsChoose"/>
                 </label>
               </clr-checkbox-wrapper>
+              <clr-control-helper *ngIf="iopsMinErrTips" style="color: red"><clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{'errorMsg.iposMaxMinTips' | translate}}</clr-control-helper>
+              <clr-control-helper *ngIf="modifyForm.miniopsChoose && !modifyForm.min_iops && !iopsMinErrTips">{{'errorMsg.require' | translate}}</clr-control-helper>
             </clr-checkbox-container>
             <!-- 交通管制对象 latency 时延-->
             <clr-checkbox-container *ngIf="modifyForm.control_policyLower === '0'">
               <label></label>
               <clr-checkbox-wrapper *ngIf="!latencyIsSelect">
-                <input type="checkbox" [(ngModel)]="modifyForm.latencyChoose" name="latencyChoose" clrCheckbox/>
+                <input type="checkbox" [(ngModel)]="modifyForm.latencyChoose" (ngModelChange)="resetQosFlag(modifyForm.latencyChoose, 'latency')" name="latencyChoose" clrCheckbox/>
                 <label style="width: 190px;">
                   {{'vmfs.latencyMax' | translate}}
-                  <input  *ngIf="!latencyIsSelect" type="number" [(readOnly)]="!modifyForm.latencyChoose" min="0" class="inputOneLine" name="latency" [(ngModel)]="modifyForm.latency" (blur)="qosBlur('add', 'latency');"/>
+                  <input  *ngIf="!latencyIsSelect" type="number" [(readOnly)]="!modifyForm.latencyChoose" min="0" oninput="if (value.length > 11) {value=value.slice(0,11)}" class="inputOneLine" name="latency" [(ngModel)]="modifyForm.latency" (blur)="qosBlur('modify', 'latency');"
+                          [required]="modifyForm.latencyChoose"/>
                   {{'vmfs.latencyUnit' | translate}}
                 </label>
               </clr-checkbox-wrapper>
@@ -713,6 +741,8 @@
                   {{'vmfs.latencyUnitUs' | translate}}
                 </label>
               </clr-checkbox-wrapper>
+              <clr-control-helper *ngIf="latencyErrTips" style="color: red"><clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{'errorMsg.iposMaxMinTips' | translate}}</clr-control-helper>
+              <clr-control-helper *ngIf="!latencyErrTips && modifyForm.latencyChoose && !modifyForm.latency">{{'errorMsg.require' | translate}}</clr-control-helper>
             </clr-checkbox-container>
           </div>
         </div>
@@ -758,7 +788,7 @@
         <clr-combobox-container *ngIf="mountForm.mountType==='1' && mountHostData">
           <label style="color: #9F9F9F;">{{'vmfs.mount.host' | translate}}</label>
           <clr-combobox [(ngModel)]="chooseHost" name="chooseHost" required>
-            <clr-options>
+            <clr-options style="max-height: 6.5rem;overflow: auto">
               <clr-option *clrOptionItems="let state of hostList; field:'hostName'" [clrValue]="state">
                 <clr-icon *ngIf="state.hostName !== ''" shape="host" role="img" aria-label="World is turning"></clr-icon>{{state.hostName}}
               </clr-option>
@@ -771,7 +801,7 @@
         <clr-combobox-container *ngIf="mountForm.mountType==='2' && mountClusterData">
           <label style="color: #9F9F9F;">{{'vmfs.mount.cluster' | translate}}</label>
           <clr-combobox [(ngModel)]="chooseCluster" name="chooseCluster" required>
-            <clr-options>
+            <clr-options style="max-height: 6.5rem;overflow: auto">
               <clr-option *clrOptionItems="let state of clusterList; field:'clusterName'" [clrValue]="state">
                 <clr-icon *ngIf="state.clusterName !== ''" shape="host-group" role="img" aria-label="World is turning"></clr-icon>{{state.clusterName}}
               </clr-option>
@@ -1001,7 +1031,7 @@
         <clr-input-container style="height: 4rem;">
           <label style="color: #9F9F9F;">{{'vmfs.expandSize' | translate}}</label>
           <div clrInput style="float: left;position: relative;">
-            <input clrInput min="0" style="width: 70%;border-bottom: none" type="number" [(ngModel)]="expandForm.vo_add_capacity" name="vo_add_capacity" 
+            <input clrInput min="0" style="width: 70%;border-bottom: none" type="number" [(ngModel)]="expandForm.vo_add_capacity" name="vo_add_capacity"
                    (blur)="expandOnblur();" required/>
             <select class="capacity" (change)="expandForm.vo_add_capacity = null;" [(ngModel)]="expandForm.capacityUnit" clrInput style="width: 30%;border: 1px solid #DDDDDD;position: absolute;bottom: 3px;"  name="capacityUnit" >
               <option value="TB">TB</option>
@@ -1026,6 +1056,38 @@
     </div>
   </clr-modal>
 
+  <!--主机连接失败提示窗口-->
+  <clr-modal [(clrModalOpen)]="connectivityFailure" [clrModalClosable]="false">
+    <h3 class="modal-title modelTile">{{'tips.operationFailed' | translate}}</h3>
+    <div class="modal-body">
+      <p *ngIf="isAddPage">{{'tips.addVmfsConnFail' | translate}}
+        <button class="btn btn-link" (click)="showDetail = !showDetail;">
+          {{'tips.details' | translate}}
+          <clr-icon *ngIf="!showDetail" style="width: 0.6rem" shape="caret down"></clr-icon>
+          <clr-icon *ngIf="showDetail" style="width: 0.6rem" shape="caret up"></clr-icon>
+        </button>
+      </p>
+      <p *ngIf="!isAddPage">{{'tips.mountVmfsConnFail' | translate}}
+        <button class="btn btn-link" (click)="showDetail = !showDetail;">
+          {{'tips.details' | translate}}
+          <clr-icon *ngIf="!showDetail" style="width: 0.6rem" shape="caret down"></clr-icon>
+          <clr-icon *ngIf="showDetail" style="width: 0.6rem" shape="caret up"></clr-icon>
+        </button>
+      </p>
+      <clr-datagrid *ngIf="showDetail">
+        <clr-dg-column>{{'nfs.hostName' | translate}}</clr-dg-column>
+        <clr-dg-column style="width: 14rem;">{{'table.description' | translate}}</clr-dg-column>
+        <clr-dg-placeholder>{{'tips.noData' | translate}}</clr-dg-placeholder>
+        <clr-dg-row [clrDgSelectable]="false" *clrDgItems="let item of connFailData" [clrDgItem]="item">
+          <clr-dg-cell title="{{item.hostName}}">{{item.hostName}}</clr-dg-cell>
+          <clr-dg-cell title="{{item.description}}" class="over_flow">{{item.description}}</clr-dg-cell>
+        </clr-dg-row>
+      </clr-datagrid>
+    </div>
+    <div class="modal-footer">
+      <button type="submit" class="btn btn-primary" (click)="connectivityFailure = false;">{{'menu.ok' | translate}}</button>
+    </div>
+  </clr-modal>
   <!--成功提示窗口-->
   <clr-modal [(clrModalOpen)]="addSuccessShow || modifySuccessShow
   || expandSuccessShow || reclaimSuccessShow ||  changeServiceLevelSuccessShow

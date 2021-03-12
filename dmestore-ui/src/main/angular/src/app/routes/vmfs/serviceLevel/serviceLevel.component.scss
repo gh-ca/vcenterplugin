@@ -186,3 +186,9 @@
 ::ng-deep .modal-dialog .modal-content{
   box-shadow: none;
 }
+input::-ms-clear{
+  display: none;
+}
+::ng-deep .datagrid {
+  -ms-overflow-style:scrollbar;
+}

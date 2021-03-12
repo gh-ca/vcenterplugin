@@ -97,7 +97,8 @@ public class VmRdmServiceImpl implements VmRdmService {
     }
 
     @Override
-    public void createRdm(String dataStoreObjectId, String vmObjectId, VmRdmCreateBean createBean) throws DmeException {
+    public void createRdm(String dataStoreObjectId, String vmObjectId, VmRdmCreateBean createBean,
+        String compatibilityMode) throws DmeException {
         createDmeRdm(createBean);
         Map<String, Object> paramMap = initParams(createBean);
         String requestVolumeName = (String) paramMap.get("requestVolumeName");
@@ -119,19 +120,19 @@ public class VmRdmServiceImpl implements VmRdmService {
         String hostObjectId = vcenterHostMap.get("hostId");
         String hostId = getDmeHostId(hostIp, hostObjectId);
         boolean isFind = false;
-        for(int index = 0; index < hostListOnVmware.size(); index ++){
+        for (int index = 0; index < hostListOnVmware.size(); index++) {
             String tempHostObjectId = hostListOnVmware.get(index).get("hostId");
-            if(hostObjectId.equals(tempHostObjectId)){
+            if (hostObjectId.equals(tempHostObjectId)) {
                 isFind = true;
                 break;
             }
         }
-        if(!isFind){
+        if (!isFind) {
             hostListOnVmware.add(vcenterHostMap);
         }
         List<String> dmeMapingHostIds = new ArrayList<>();
         if (paramMap.get("mapping") == null) {
-            for(int index = 0; index < hostListOnVmware.size(); index ++){
+            for (int index = 0; index < hostListOnVmware.size(); index++) {
                 String tempHostIp = hostListOnVmware.get(index).get("hostName");
                 String tempHostObjectId = hostListOnVmware.get(index).get("hostId");
                 String tempDmeHostId = getDmeHostId(tempHostIp, tempHostObjectId);
@@ -150,14 +151,15 @@ public class VmRdmServiceImpl implements VmRdmService {
                 String volumeId = entry.getKey();
                 JsonObject object = entry.getValue();
                 try {
-                    vcsdkUtils.createDisk(dataStoreObjectId, vmObjectId, object.get("devicePath").getAsString(), capacity);
+                    vcsdkUtils.createDisk(dataStoreObjectId, vmObjectId, object.get("devicePath").getAsString(),
+                        capacity, compatibilityMode);
                 } catch (VcenterException ex) {
                     failedVolumeIds.add(volumeId);
                     errorMsg = ex.getMessage();
                 }
             }
             if (failedVolumeIds.size() > 0) {
-                for(String dmeHostId : dmeMapingHostIds){
+                for (String dmeHostId : dmeMapingHostIds) {
                     unMapping(dmeHostId, failedVolumeIds);
                 }
                 deleteVolumes(failedVolumeIds);
@@ -166,7 +168,7 @@ public class VmRdmServiceImpl implements VmRdmService {
                 }
             }
         } else {
-            for(String dmeHostId : dmeMapingHostIds){
+            for (String dmeHostId : dmeMapingHostIds) {
                 unMapping(dmeHostId, volumeIds);
             }
             deleteVolumes(volumeIds);
@@ -396,7 +398,11 @@ public class VmRdmServiceImpl implements VmRdmService {
 
     private Map<String, Object> tuningParse(CustomizeVolumeTuningForCreate tuningBean) {
         Map<String, Object> tuning = new HashMap<>();
-        putNotNull(tuning, "alloction_type", tuningBean.getAlloctype());
+        if (tuningBean.getAlloctype() != null) {
+            putNotNull(tuning, "alloction_type", tuningBean.getAlloctype());
+        } else {
+            tuning.put("alloction_type", "thin");
+        }
         putNotNull(tuning, "smart_tier", DmeConstants.SMART_TIER.get(tuningBean.getSmarttier()));
         putNotNull(tuning, "workload_type_raw_id", tuningBean.getWorkloadTypeId());
         putNotNull(tuning, "compression_enabled", tuningBean.getCompressionEnabled());
@@ -405,11 +411,24 @@ public class VmRdmServiceImpl implements VmRdmService {
         SmartQosForRdmCreate smartqosBean = tuningBean.getSmartqos();
         if (smartqosBean != null) {
             Map<String, Object> smartqos = new HashMap<>(MAP_DEFAULT_CAPACITY);
-            putNotNull(smartqos, "latency", smartqosBean.getLatency());
-            putNotNull(smartqos, "max_bandwidth", smartqosBean.getMaxbandwidth());
-            putNotNull(smartqos, "max_iops", smartqosBean.getMaxiops());
-            putNotNull(smartqos, "min_bandwidth", smartqosBean.getMinbandwidth());
-            putNotNull(smartqos, "min_iops", smartqosBean.getMiniops());
+            if (smartqosBean.getLatency() != 0) {
+                putNotNull(smartqos, "latency", smartqosBean.getLatency());
+            }
+            if (smartqosBean.getLatency() != 0) {
+                putNotNull(smartqos, "latency", smartqosBean.getLatency());
+            }
+            if (smartqosBean.getMaxbandwidth() != 0) {
+                putNotNull(smartqos, "max_bandwidth", smartqosBean.getMaxbandwidth());
+            }
+            if (smartqosBean.getMaxiops() != 0) {
+                putNotNull(smartqos, "max_iops", smartqosBean.getMaxiops());
+            }
+            if (smartqosBean.getMinbandwidth() != 0) {
+                putNotNull(smartqos, "min_bandwidth", smartqosBean.getMinbandwidth());
+            }
+            if (smartqosBean.getMiniops() != 0) {
+                putNotNull(smartqos, "min_iops", smartqosBean.getMiniops());
+            }
             tuning.put("smart_qos", smartqos);
         }
 

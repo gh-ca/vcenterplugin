@@ -30,7 +30,7 @@
     <div class="clr-col-4" *ngFor="let item of serviceLevels" [clrDgItem]="item">
       <div class="info-card" style="margin-left: 10px;margin-top: 30px; height: 260px; overflow: auto">
         <div class="info-card-header">
-          <div class="info-card-title" style="cursor:pointer;overflow: hidden" title="{{item.name}}" (click)="clickName(item)">{{item.name}}</div>
+          <div class="info-card-title" style="color:#829DE6;cursor:pointer;overflow: hidden" title="{{item.name}}" (click)="clickName(item)">{{item.name}}</div>
           <!--<clr-dropdown [clrCloseMenuOnItemClick]="false">
             <button clrDropdownTrigger class="dropdown-toggle btn btn-link">
               Operation
@@ -279,10 +279,10 @@
                 </clr-dg-filter>
               </clr-dg-column>
 
-              <clr-dg-column [hidden]="storagePoolRadioCheck!=='capacity'" [clrDgField]="'totalCapacity'">{{'tier.total'|translate}}</clr-dg-column>
-              <clr-dg-column [hidden]="storagePoolRadioCheck!=='capacity'" [clrDgField]="'consumedCapacity'">{{'tier.used'|translate}}</clr-dg-column>
-              <clr-dg-column [hidden]="storagePoolRadioCheck!=='capacity'" [clrDgField]="'usedCapacity'">{{'tier.usage'|translate}}</clr-dg-column>
-              <clr-dg-column [hidden]="storagePoolRadioCheck!=='capacity'" [clrDgField]="'freeCapacity'">{{'tier.free'|translate}}</clr-dg-column>
+              <clr-dg-column [hidden]="storagePoolRadioCheck!=='capacity'" class="hideFilter" [clrDgField]="'totalCapacity'">{{'tier.total'|translate}}</clr-dg-column>
+              <clr-dg-column [hidden]="storagePoolRadioCheck!=='capacity'" class="hideFilter" [clrDgField]="'consumedCapacity'">{{'tier.used'|translate}}</clr-dg-column>
+              <clr-dg-column [hidden]="storagePoolRadioCheck!=='capacity'" class="hideFilter" [clrDgField]="'usedCapacity'">{{'tier.usage'|translate}}</clr-dg-column>
+              <clr-dg-column [hidden]="storagePoolRadioCheck!=='capacity'" class="hideFilter" [clrDgField]="'freeCapacity'">{{'tier.free'|translate}}</clr-dg-column>
 
               <clr-dg-column [hidden]="storagePoolRadioCheck!=='performance'" [clrDgField]="'runningStatus'">
                 {{'tier.status'|translate}}
@@ -290,9 +290,9 @@
                   <sl-sp-status-filter #runningStatusFilter></sl-sp-status-filter>
                 </clr-dg-filter>
               </clr-dg-column>
-              <clr-dg-column [hidden]="storagePoolRadioCheck!=='performance'" [clrDgField]="'latency'">{{'tier.latencyms'|translate}}</clr-dg-column>
-              <clr-dg-column [hidden]="storagePoolRadioCheck!=='performance'" [clrDgField]="'iops'">IOPS</clr-dg-column>
-              <clr-dg-column [hidden]="storagePoolRadioCheck!=='performance'" [clrDgField]="'bandwidth'">{{'tier.bandwidthm'|translate}}</clr-dg-column>
+              <clr-dg-column [hidden]="storagePoolRadioCheck!=='performance'" class="hideFilter" [clrDgField]="'latency'">{{'tier.latencyms'|translate}}</clr-dg-column>
+              <clr-dg-column [hidden]="storagePoolRadioCheck!=='performance'" class="hideFilter" [clrDgField]="'iops'">IOPS</clr-dg-column>
+              <clr-dg-column [hidden]="storagePoolRadioCheck!=='performance'" class="hideFilter" [clrDgField]="'bandwidth'">{{'tier.bandwidthm'|translate}}</clr-dg-column>
 
               <clr-dg-row *clrDgItems="let item of storagePoolList" [clrDgItem]="item">
 
@@ -374,7 +374,7 @@
         </clr-tab-content>
       </clr-tab>
       <clr-tab>
-        <button clrTabLink (click)="volumeRefresh()">{{'tier.volume'|translate}}</button>
+        <button clrTabLink (click)="volumeRefresh()">{{'storage.chart.volume'|translate}}</button>
         <clr-tab-content *clrIfActive>
 
           <div class="gh-info-head"></div>
@@ -395,28 +395,48 @@
 
           <clr-datagrid [clrDgLoading]="volumeIsloading">
             <clr-dg-column [clrDgField]="'name'">{{'tier.name'|translate}}</clr-dg-column>
-            <clr-dg-column [clrDgField]="'status'">{{'tier.status'|translate}}</clr-dg-column>
-            <clr-dg-column [hidden]="volumeRadioCheck!=='basic'" [clrDgField]="'capacity'">{{'tier.total'|translate}}</clr-dg-column>
+            <clr-dg-column>
+              {{'tier.status'|translate}}
+              <clr-dg-filter [clrDgFilter]="lunStatusFilter">
+                <lun-status-filter #lunStatusFilter></lun-status-filter>
+              </clr-dg-filter>
+            </clr-dg-column>
+            <clr-dg-column [hidden]="volumeRadioCheck!=='basic'" class="hideFilter" [clrDgField]="'capacity'">{{'tier.total'|translate}}</clr-dg-column>
             <clr-dg-column [hidden]="volumeRadioCheck!=='basic'" [clrDgField]="'alloctype'">{{'tier.alloctype'|translate}}</clr-dg-column>
-            <clr-dg-column [hidden]="volumeRadioCheck!=='basic'" [clrDgField]="'capacityUsage'">{{'tier.used'|translate}}</clr-dg-column>
+            <clr-dg-column [hidden]="volumeRadioCheck!=='basic'" class="hideFilter" [clrDgField]="'capacityUsage'">{{'tier.used'|translate}}</clr-dg-column>
 
-            <clr-dg-column [hidden]="volumeRadioCheck!=='performance'" [clrDgField]="'latency'">{{'tier.latencyms'|translate}}</clr-dg-column>
-            <clr-dg-column [hidden]="volumeRadioCheck!=='performance'" [clrDgField]="'iops'">IOPS</clr-dg-column>
-            <clr-dg-column [hidden]="volumeRadioCheck!=='performance'" [clrDgField]="'bandwidth'">{{'tier.bandwidthm'|translate}}</clr-dg-column>
+            <clr-dg-column [hidden]="volumeRadioCheck!=='performance'" class="hideFilter" [clrDgField]="'latency'">{{'tier.latencyms'|translate}}</clr-dg-column>
+            <clr-dg-column [hidden]="volumeRadioCheck!=='performance'" class="hideFilter" [clrDgField]="'iops'">IOPS</clr-dg-column>
+            <clr-dg-column [hidden]="volumeRadioCheck!=='performance'" class="hideFilter" [clrDgField]="'bandwidth'">{{'tier.bandwidthm'|translate}}</clr-dg-column>
 
             <clr-dg-row *clrDgItems="let item of volumeList" [clrDgItem]="item">
 
                 <clr-dg-cell>{{item.name}}</clr-dg-cell>
-                <clr-dg-cell>
-                  <span *ngIf="item.status == 'deleted'">
-                    <span class="color-square" style="background-color: #A9A9A9; margin-right: 10px"></span>{{'tier.offLine' | translate}}
-                  </span>
+                <clr-dg-cell class="over_flow">
+                 <span *ngIf="item.status == 'creating'">
+                            <span class="color-square" style="background-color: green; margin-right: 10px"></span>{{'enum.status.creating' | translate}}
+                          </span>
                   <span *ngIf="item.status == 'normal'">
-                    <span class="color-square" style="background-color: #7CDFA0; margin-right: 10px;"></span>{{'tier.normal' | translate}}
-                  </span>
-                  <span *ngIf="item.status == 'na'">
-                    --
-                  </span>
+                            <span class="color-square" style="background-color: #7CDFA0; margin-right: 10px"></span>{{'enum.status.normal' | translate}}
+                          </span>
+                  <span *ngIf="item.status == 'mapping'">
+                            <span class="color-square" style="background-color: gold; margin-right: 10px"></span>{{'enum.status.mapping' | translate}}
+                          </span>
+                  <span *ngIf="item.status == 'unmapping'">
+                            <span class="color-square" style="background-color: blueviolet; margin-right: 10px"></span>{{'enum.status.unmapping' | translate}}
+                          </span>
+                  <span *ngIf="item.status == 'deleting'">
+                            <span class="color-square" style="background-color: bisque; margin-right: 10px"></span>{{'enum.status.deleting' | translate}}
+                          </span>
+                  <span *ngIf="item.status == 'error'">
+                            <span class="color-square" style="background-color: red; margin-right: 10px"></span>{{'enum.status.error' | translate}}
+                          </span>
+                  <span *ngIf="item.status == 'expanding'">
+                            <span class="color-square" style="background-color: darkmagenta; margin-right: 10px"></span>{{'enum.status.expanding' | translate}}
+                          </span>
+                  <span *ngIf="!item.status">
+                            --
+                          </span>
                 </clr-dg-cell>
 
                 <clr-dg-cell [hidden]="volumeRadioCheck!=='basic'">{{item.capacity}} GB</clr-dg-cell>
@@ -453,43 +473,43 @@
 
         </clr-tab-content>
       </clr-tab>
-<!--      <clr-tab>-->
-<!--        <button clrTabLink>{{'tier.capacity'|translate}}</button>-->
-<!--        <clr-tab-content *clrIfActive>-->
-<!--          <div style="float:right; height: 50px;">-->
-<!--            <clr-select-container style="margin-right: 50px">-->
-<!--              <select clrSelect>-->
-<!--                <option value="1">{{'tier.last1M'|translate}}</option>-->
-<!--                <option value="2">{{'tier.last3M'|translate}}</option>-->
-<!--                <option value="3">{{'tier.last6M'|translate}}</option>-->
-<!--                <option value="4">{{'tier.last1Y'|translate}}</option>-->
-<!--              </select>-->
-<!--            </clr-select-container>-->
-<!--          </div>-->
-<!--          <div style="margin-top: 50px" echarts [options]="volumeCapacity"></div>-->
-<!--          <div style="margin-top: 30px" echarts [options]="storagePoolCapacity"></div>-->
-<!--        </clr-tab-content>-->
-<!--      </clr-tab>-->
-<!--      <clr-tab>-->
-<!--        <button clrTabLink>{{'tier.performance'|translate}}</button>-->
-<!--        <clr-tab-content *clrIfActive>-->
-<!--          <div style="float:right; height: 50px;">-->
-<!--            <clr-select-container style="margin-right: 50px">-->
-<!--              <select clrSelect (change)="initChart(range)"  [(ngModel)]="range.range">-->
-<!--                <option value="LAST_1_DAY">{{'tier.last1D'|translate}}</option>-->
-<!--                <option value="LAST_1_WEEK">{{'tier.last1W'|translate}}</option>-->
-<!--                <option value="LAST_1_MONTH">{{'tier.last1M'|translate}}</option>-->
-<!--                <option value="LAST_1_YEAR">{{'tier.last1Y'|translate}}</option>-->
-<!--              </select>-->
-<!--            </clr-select-container>-->
-<!--          </div>-->
-<!--          <div style="margin-top: 50px" echarts [options]="volumeMaxResponseTime"></div>-->
-<!--          <div style="margin-top: 30px" echarts [options]="volumeDensity"></div>-->
-<!--          <div style="margin-top: 30px" echarts [options]="volumeThroughput"></div>-->
-<!--          <div style="margin-top: 30px" echarts [options]="volumeBandwidth"></div>-->
-<!--          <div style="margin-top: 30px" echarts [options]="storagePoolDensity"></div>-->
-<!--        </clr-tab-content>-->
-<!--      </clr-tab>-->
+      <clr-tab>
+        <button clrTabLink>{{'tier.capacity'|translate}}</button>
+        <clr-tab-content *clrIfActive>
+          <div style="float:right; height: 50px;">
+            <clr-select-container style="margin-right: 50px">
+              <select clrSelect (change)="initCapacityChart(capacityRange)" [(ngModel)]="capacityRange.range">
+                <option value="LAST_1_MONTH">{{'tier.last1M'|translate}}</option>
+                <option value="LAST_3_MONTH">{{'tier.last3M'|translate}}</option>
+                <option value="LAST_6_MONTH">{{'tier.last6M'|translate}}</option>
+                <option value="LAST_1_YEAR">{{'tier.last1Y'|translate}}</option>
+              </select>
+            </clr-select-container>
+          </div>
+          <div style="margin-top: 50px" echarts [options]="volumeCapacity"></div>
+          <div style="margin-top: 30px" echarts [options]="storagePoolCapacity"></div>
+        </clr-tab-content>
+      </clr-tab>
+      <clr-tab>
+        <button clrTabLink>{{'tier.performance'|translate}}</button>
+        <clr-tab-content *clrIfActive>
+          <div style="float:right; height: 50px;">
+            <clr-select-container style="margin-right: 50px">
+              <select clrSelect (change)="initChart(range)"  [(ngModel)]="range.range">
+                <option value="LAST_1_DAY">{{'tier.last1D'|translate}}</option>
+                <option value="LAST_1_WEEK">{{'tier.last1W'|translate}}</option>
+                <option value="LAST_1_MONTH">{{'tier.last1M'|translate}}</option>
+                <option value="LAST_1_YEAR">{{'tier.last1Y'|translate}}</option>
+              </select>
+            </clr-select-container>
+          </div>
+          <div style="margin-top: 50px" echarts [options]="volumeMaxResponseTime"></div>
+          <div style="margin-top: 30px" echarts [options]="volumeDensity"></div>
+          <div style="margin-top: 30px" echarts [options]="volumeThroughput"></div>
+          <div style="margin-top: 30px" echarts [options]="volumeBandwidth"></div>
+          <div style="margin-top: 30px" echarts [options]="storagePoolDensity"></div>
+        </clr-tab-content>
+      </clr-tab>
       <clr-tab>
         <button clrTabLink>{{'tier.appType'|translate}}</button>
         <clr-tab-content *clrIfActive>

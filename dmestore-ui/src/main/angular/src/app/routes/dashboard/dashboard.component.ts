@@ -14,7 +14,6 @@ import {HttpClient} from '@angular/common/http';
 import {Router} from "@angular/router";
 import {TranslatePipe, TranslateService} from "@ngx-translate/core";
 import { GlobalsService }     from "../../shared/globals.service";
-import {NfsService} from "../nfs/nfs.service";
 
 @Component({
   selector: 'app-dashboard',
@@ -69,6 +68,14 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   bestShowLoading = false;
   top5ShowLoading = false;
 
+  disconnectFlag = false; // 断开连接提示框
+  disconnectResult = false; // 断开连接结果：true 弹窗展示 false 隐藏
+  disconnectSuccessFlag = false; // 断开连接成功
+  disconnectFailedFlag = false; // 断开连接失败
+  disconnectHandleLoading = false;// 断开连接处理提示
+
+  passwordShow= false;
+  inputType= "text";
   connectForm = new FormGroup({
     port: new FormControl('', [
         Validators.required,
@@ -217,6 +224,11 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
           }
         ];
       } else {
+        this.storageNum = {
+          total: 0,
+          normal: 0,
+          abnormal: 0
+        };
         os = [
           {
             name: this.translatePipe.transform('overview.normal'),
@@ -279,6 +291,8 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
 
   showPop(){
     this.popShow = true;
+    this.passwordShow=false;
+    this.inputType="password";
     this.resetForm();
   }
 
@@ -309,5 +323,33 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     this.gs.getClientSdk().app.navigateTo({
       targetViewId: 'com.huawei.dmestore.storageView'
     });
+  }
+
+  /**
+   * 断开连接
+   */
+  disconnectedDMEFunc() {
+    this.disconnectHandleLoading = true;
+    this.http.get('/accessdme/access/disconnect').subscribe((result: any) => {
+      this.disconnectHandleLoading = false;
+      this.disconnectResult=true;
+      this.disconnectFlag=false;
+      if (result.code == '200'){
+        this.disconnectSuccessFlag = true;
+      } else{
+        this.disconnectFailedFlag = true;
+      }
+      this.cdr.detectChanges();
+    });
+  }
+
+  showOrHide(){
+    if(this.passwordShow){
+      this.passwordShow=false;
+      this.inputType="password";
+    }else {
+      this.passwordShow=true;
+      this.inputType="type";
+    }
   }
 }
