@@ -39,6 +39,11 @@ export class NfsModifyComponent implements OnInit{
 
   getDataFaild = false; // 获取nfs数据异常
   dorado= false;//是否是V6设备
+  bandWidthMaxErrTips = false;// 带宽上限错误提示
+  bandWidthMinErrTips = false;// 带宽下限错误提示
+  iopsMaxErrTips = false;// IOPS上限错误提示
+  iopsMinErrTips = false;// IOPS下限错误提示
+  latencyErrTips = false;// 时延错误提示
 
 
   constructor(private modifyService: NfsModifyService, private cdr: ChangeDetectorRef,
@@ -55,7 +60,7 @@ export class NfsModifyComponent implements OnInit{
       //入口来至Vcenter
       const ctx = this.gs.getClientSdk().app.getContextObjects();
       this.objectId=ctx[0].id;
-      // this.objectId="urn:vmomi:Datastore:datastore-5028:674908e5-ab21-4079-9cb1-596358ee5dd1";
+      // this.objectId="urn:vmomi:Datastore:datastore-10020:674908e5-ab21-4079-9cb1-596358ee5dd1";
     }
     this.modifyService.getNfsDetailById(this.objectId).subscribe((result: any) => {
       if (this.pluginFlag){
@@ -115,6 +120,10 @@ export class NfsModifyComponent implements OnInit{
     });
   }
   modifyCommit(){
+    if (this.bandWidthMaxErrTips || this.iopsMaxErrTips
+      || this.bandWidthMinErrTips || this.iopsMinErrTips || this.latencyErrTips) {
+      return;
+    }
     this.modalHandleLoading=true;
     console.log(this.updateNfs);
     if (this.updateNfs.sameName){
@@ -193,6 +202,11 @@ export class NfsModifyComponent implements OnInit{
         objVal = '';
       }
     }
+    if (objVal > 999999999){
+      objVal = '';
+    } else if (objVal < 1) {
+      objVal = '';
+    }
     if (type === 'add') {
       switch (operationType) {
         case 'maxbandwidth':
@@ -211,6 +225,68 @@ export class NfsModifyComponent implements OnInit{
           this.updateNfs.latency = objVal;
           break;
       }
+    }
+    this.iopsErrTips(objVal, operationType);
+  }
+  /**
+   * iops错误提示
+   * @param objVal
+   * @param operationType
+   */
+  iopsErrTips(objVal:string, operationType:string) {
+    if (operationType) {
+      switch (operationType) {
+        case 'maxbandwidth':
+          if (objVal == '' && this.updateNfs.maxBandwidthChoose) {
+            this.bandWidthMaxErrTips = true;
+          }else {
+            this.bandWidthMaxErrTips = false;
+          }
+          break;
+        case 'maxiops':
+          if (objVal == '' && this.updateNfs.maxIopsChoose) {
+            this.iopsMaxErrTips = true;
+          }else {
+            this.iopsMaxErrTips = false;
+          }
+          break;
+        case 'minbandwidth':
+          if (objVal == '' && this.updateNfs.minBandwidthChoose) {
+            this.bandWidthMinErrTips = true;
+          }else {
+            this.bandWidthMinErrTips = false;
+          }
+          break;
+        case 'miniops':
+          if (objVal == '' && this.updateNfs.minIopsChoose) {
+            this.iopsMinErrTips = true;
+          }else {
+            this.iopsMinErrTips = false;
+          }
+          break;
+        default:
+          if (objVal == '' && this.updateNfs.latencyChoose) {
+            this.latencyErrTips = true;
+          }else {
+            this.latencyErrTips = false;
+          }
+          break;
+      }
+    }
+  }
+
+  /**
+   * 初始化IOPS错误提示
+   */
+  initIopsErrTips(upper:boolean, lower:boolean) {
+    if (upper) {
+      this.bandWidthMaxErrTips = false;
+      this.iopsMaxErrTips = false;
+    }
+    if (lower) {
+      this.bandWidthMinErrTips = false;
+      this.iopsMinErrTips = false;
+      this.latencyErrTips = false;
     }
   }
   matchErr=false;
@@ -425,6 +501,7 @@ export class NfsModifyComponent implements OnInit{
     if (lowerObj) {
       lowerChecked = lowerObj.checked;
     }
+    this.initIopsErrTips(upperChecked, lowerChecked);
     if (isUpper) {
       if(upperChecked) {
         form.control_policyUpper = '1';
@@ -450,5 +527,33 @@ export class NfsModifyComponent implements OnInit{
     }
     console.log("lowerChecked", form)
   }
-
+  resetQosFlag(objValue:boolean, operationType:string) {
+    switch (operationType) {
+      case 'maxbandwidth':
+        if(!objValue) {
+          this.bandWidthMaxErrTips = false;
+        }
+        break;
+      case 'maxiops':
+        if(!objValue) {
+          this.iopsMaxErrTips = false;
+        }
+        break;
+      case 'minbandwidth':
+        if(!objValue) {
+          this.bandWidthMinErrTips = false;
+        }
+        break;
+      case 'miniops':
+        if(!objValue) {
+          this.iopsMinErrTips = false;
+        }
+        break;
+      default:
+        if(!objValue) {
+          this.latencyErrTips = false;
+        }
+        break;
+    }
+  }
 }

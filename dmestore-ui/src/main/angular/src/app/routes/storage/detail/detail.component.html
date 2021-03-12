@@ -7,7 +7,7 @@
       <clr-tabs>
         <clr-tab >
           <button clrTabLink id="conf" (click)="changeTab('conf')">{{'storage.detail.conf.configuration' | translate}}</button>
-          <clr-tab-content id="configuration" *clrIfActive="true" >
+          <clr-tab-content id="configuration">
             <table class="table table-noborder" *ngIf="detail" [clrLoading]="detailLoading">
               <tr>
                 <td class="left">{{'storage.detail.conf.name' | translate}}</td>
@@ -68,7 +68,7 @@
               <!--Storage Pools-->
               <clr-tab>
                 <button clrTabLink id="storage" (click)="changeTab('pool')">{{'storage.detail.storagePool.storagePool' | translate}}</button>
-                <clr-tab-content id="storagePool" *clrIfActive="true">
+                <clr-tab-content id="storagePool">
                   <div class="detail-margin-top">
                     <!-- 头部按钮组 -->
                     <div class="gh-btngroup-header">
@@ -310,9 +310,9 @@
 <!--                        </clr-dg-cell>-->
                         <clr-dg-cell [hidden]="volumeRadio!=='table1'">{{item.datastores}}</clr-dg-cell>
 
-                        <clr-dg-cell [hidden]="volumeRadio!=='table2'">{{item.lantency}}</clr-dg-cell>
-                        <clr-dg-cell [hidden]="volumeRadio!=='table2'">{{item.iops}}</clr-dg-cell>
-                        <clr-dg-cell [hidden]="volumeRadio!=='table2'">{{item.bandwith}}</clr-dg-cell>
+                        <clr-dg-cell [hidden]="volumeRadio!=='table2'">{{item.lantency!=null?item.lantency.toFixed(2):'--'}}</clr-dg-cell>
+                        <clr-dg-cell [hidden]="volumeRadio!=='table2'">{{item.iops!=null?item.iops.toFixed(2):'--'}}</clr-dg-cell>
+                        <clr-dg-cell [hidden]="volumeRadio!=='table2'">{{item.bandwith!=null?item.bandwith.toFixed(2):'--'}}</clr-dg-cell>
                       </clr-dg-row>
 <!--                      <clr-dg-footer>-->
 <!--                        <clr-dg-pagination  #paginationVolume [clrDgPageSize]="10" [clrDgTotalItems]="volumeTotal">-->
@@ -411,26 +411,11 @@
                       <clr-dg-row *clrDgItems="let item of fsList" [clrDgItem]="item">
                         <clr-dg-cell class="over_flow">{{item.name}}</clr-dg-cell>
                         <clr-dg-cell class="over_flow">
-                          <span *ngIf="item.healthStatus == 'creating'">
-                            <span class="color-square" style="background-color: green; margin-right: 10px"></span>{{'enum.status.creating' | translate}}
-                          </span>
                           <span *ngIf="item.healthStatus == 'normal'">
                             <span class="color-square" style="background-color: #7CDFA0; margin-right: 10px"></span>{{'enum.status.normal' | translate}}
                           </span>
-                          <span *ngIf="item.healthStatus == 'mapping'">
-                            <span class="color-square" style="background-color: gold; margin-right: 10px"></span>{{'enum.status.mapping' | translate}}
-                          </span>
-                          <span *ngIf="item.healthStatus == 'unmapping'">
-                            <span class="color-square" style="background-color: blueviolet; margin-right: 10px"></span>{{'enum.status.unmapping' | translate}}
-                          </span>
-                          <span *ngIf="item.healthStatus == 'deleting'">
-                            <span class="color-square" style="background-color: bisque; margin-right: 10px"></span>{{'enum.status.deleting' | translate}}
-                          </span>
-                          <span *ngIf="item.healthStatus == 'error'">
-                            <span class="color-square" style="background-color: red; margin-right: 10px"></span>{{'enum.status.error' | translate}}
-                          </span>
-                          <span *ngIf="item.healthStatus == 'expanding'">
-                            <span class="color-square" style="background-color: darkmagenta; margin-right: 10px"></span>{{'enum.status.expanding' | translate}}
+                          <span *ngIf="item.healthStatus == 'faulty'">
+                            <span class="color-square" style="background-color: gold; margin-right: 10px"></span>{{'enum.status.faulty' | translate}}
                           </span>
                           <span *ngIf="!item.healthStatus">--</span>
                         </clr-dg-cell>
@@ -507,10 +492,7 @@
                         <clr-dg-cell class="over_flow">{{item.fsName}}</clr-dg-cell>
                         <clr-dg-cell title="{{item.tierName!=null?item.tierName!=''?item.tierName:'--':'--'}}" class="over_flow">{{item.tierName!=null?item.tierName!=''?item.tierName:'--':'--'}}</clr-dg-cell>
                         <clr-dg-cell class="over_flow">
-                          <span *ngIf="item.securityStyle=='mixed'">Mixed</span>
-                          <span *ngIf="item.securityStyle=='native'">Native</span>
-                          <span *ngIf="item.securityStyle=='ntfs'">NTFS</span>
-                          <span *ngIf="item.securityStyle=='unix'">UNIX</span>
+                          <span *ngIf="item.securityStyle">{{item.securityStyle}}</span>
                           <span *ngIf="!item.securityStyle||item.securityStyle==''">--</span>
                         </clr-dg-cell>
                         <clr-dg-cell class="over_flow">{{item.nfsCount}}</clr-dg-cell>
@@ -756,7 +738,14 @@
                   <td>
                     <clr-select-container>
                       <select clrSelect (ngModelOptions)="ranges" [(ngModel)]="selectRange" name="defaultSelect" class="clr-select" (change)="changeFunc()">
-                        <option *ngFor="let item of ranges" value="{{item.key}}">{{item.value}}</option>
+                        <option value="LAST_5_MINUTE">{{'chart.select.last5Minute'|translate}}</option>
+                        <option value="LAST_1_HOUR">{{'chart.select.last1Hour'|translate}}</option>
+                        <option value="LAST_1_DAY">{{'chart.select.last1Day'|translate}}</option>
+                        <option value="LAST_1_WEEK">{{'chart.select.last1Week'|translate}}</option>
+                        <option value="LAST_1_MONTH">{{'chart.select.last1Month'|translate}}</option>
+                        <option value="LAST_1_QUARTER">{{'chart.select.last1Quarter'|translate}}</option>
+                        <option value="HALF_1_YEAR">{{'chart.select.half1Year'|translate}}</option>
+                        <option value="LAST_1_YEAR">{{'chart.select.last1Year'|translate}}</option>
                       </select>
                     </clr-select-container>
                   </td>
@@ -863,7 +852,7 @@
                             <span *ngIf="item.status == 'normal'">
                               <span class="color-square" style="background-color: #7CDFA0; margin-right: 10px"></span>{{'enum.status.normal' | translate}}
                             </span>
-                            <span *ngIf="item.status == 'fault'">
+                            <span *ngIf="item.status == 'fault' || item.status == 'offline'">
                               <span class="color-square" style="background-color: red; margin-right: 10px"></span>{{'enum.status.fault' | translate}}
                             </span>
                             <span *ngIf="!item.status">--</span>
@@ -881,10 +870,10 @@
                           </clr-dg-cell>
                           <clr-dg-cell class="over_flow">{{item.diskDomain}}</clr-dg-cell>
                           <clr-dg-cell class="over_flow">{{item.speed}}</clr-dg-cell>
-                          <clr-dg-cell class="over_flow">{{item.iops}}</clr-dg-cell>
-                          <clr-dg-cell class="over_flow">{{item.lantency}}</clr-dg-cell>
-                          <clr-dg-cell class="over_flow">{{item.bandwith}}</clr-dg-cell>
-                          <clr-dg-cell class="over_flow">{{item.useage}}</clr-dg-cell>
+                          <clr-dg-cell class="over_flow">{{item.iops!=null?item.iops.toFixed(2):'--'}}</clr-dg-cell>
+                          <clr-dg-cell class="over_flow">{{item.lantency!=null?item.lantency.toFixed(2):'--'}}</clr-dg-cell>
+                          <clr-dg-cell class="over_flow">{{item.bandwith!=null?item.bandwith.toFixed(2):'--'}}</clr-dg-cell>
+                          <clr-dg-cell class="over_flow">{{item.useage!=null?item.useage.toFixed(2):'--'}}</clr-dg-cell>
                         </clr-dg-row>
                         <clr-dg-footer>
                           <clr-dg-pagination #paginationDisk [clrDgPageSize]="10" [clrDgTotalItems]="diskTotal">
@@ -930,11 +919,11 @@
                                   <span *ngIf="!item.status">--</span>
                                 </clr-dg-cell>
                                 <clr-dg-cell class="over_flow">{{item.wwn}}</clr-dg-cell>
-                                <clr-dg-cell class="over_flow">{{item.speed}}</clr-dg-cell>
-                                <clr-dg-cell class="over_flow">{{item.iops}}</clr-dg-cell>
-                                <clr-dg-cell class="over_flow">{{item.lantency}}</clr-dg-cell>
-                                <clr-dg-cell class="over_flow">{{item.bandwith}}</clr-dg-cell>
-                                <clr-dg-cell class="over_flow">{{item.useage}}</clr-dg-cell>
+                                <clr-dg-cell class="over_flow">{{item.speed!=null?item.iops.toFixed(2):'--'}}</clr-dg-cell>
+                                <clr-dg-cell class="over_flow">{{item.iops!=null?item.iops.toFixed(2):'--'}}</clr-dg-cell>
+                                <clr-dg-cell class="over_flow">{{item.lantency!=null?item.lantency.toFixed(2):'--'}}</clr-dg-cell>
+                                <clr-dg-cell class="over_flow">{{item.bandwith!=null?item.bandwith.toFixed(2):'--'}}</clr-dg-cell>
+                                <clr-dg-cell class="over_flow">{{item.useage!=null?item.useage.toFixed(2):'--'}}</clr-dg-cell>
                               </clr-dg-row>
                               <clr-dg-footer>
                                 <clr-dg-pagination #paginationPort [clrDgPageSize]="10" [clrDgTotalItems]="fcTotal">
@@ -1060,17 +1049,13 @@
                                 <clr-dg-cell class="over_flow">
                                   <span *ngIf="item.healthStatus == 'unknown'">{{'enum.status.unknown' | translate}}</span>
                                   <span *ngIf="item.healthStatus == 'normal'">{{'enum.status.normal' | translate}}</span>
-                                  <span *ngIf="item.healthStatus == 'faulty'">{{'enum.status.faulty' | translate}}</span>
-                                  <span *ngIf="item.healthStatus == 'about to fail'">{{'enum.status.aboutToFail' | translate}}</span>
-                                  <span *ngIf="item.healthStatus == 'partially damaged'">{{'enum.status.partiallyDamaged' | translate}}</span>
+                                  <span *ngIf="item.healthStatus == 'abnormal'">{{'enum.status.abnormal' | translate}}</span>
                                   <span *ngIf="!item.healthStatus">--</span>
                                 </clr-dg-cell>
                                 <clr-dg-cell class="over_flow">
                                   <span *ngIf="item.runningStatus == 'unknown'">{{'enum.status.unknown' | translate}}</span>
-                                  <span *ngIf="item.runningStatus == 'normal'">{{'enum.status.normal' | translate}}</span>
-                                  <span *ngIf="item.runningStatus == 'running'">{{'enum.status.running' | translate}}</span>
-                                  <span *ngIf="item.runningStatus == 'link up'">{{'enum.status.linkUp' | translate}}</span>
-                                  <span *ngIf="item.runningStatus == 'link down'">{{'enum.status.linkDown' | translate}}</span>
+                                  <span *ngIf="item.runningStatus == 'connected'">{{'enum.status.connected' | translate}}</span>
+                                  <span *ngIf="item.runningStatus == 'disconnected'">{{'enum.status.disconnected' | translate}}</span>
                                   <span *ngIf="!item.runningStatus">--</span>
                                 </clr-dg-cell>
                                 <clr-dg-cell class="over_flow">{{item.mtu}}</clr-dg-cell>

@@ -49,7 +49,7 @@ public class ScheduleSetting {
                     .build();
                 quartzConfig.getScheduler().scheduleJob(job, getTrigger(scheduleConfig));
             } catch (ClassNotFoundException | SchedulerException e) {
-                LOGGER.error("job error", e);
+                LOGGER.error("job error", e.getMessage());
             }
         }
     }

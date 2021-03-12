@@ -250,7 +250,6 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 vmfsDataInfo.setServiceLevelName(ToolUtils.jsonToStr(vjson2.get(SERVICE_LEVEL_NAME)));
                 vmfsDataInfo.setVmfsProtected(ToolUtils.jsonToBoo(vjson2.get("protected")));
                 vmfsDataInfo.setWwn(ToolUtils.jsonToStr(vjson2.get(VOLUME_WWN)));
-
                 String storageId = ToolUtils.jsonToStr(vjson2.get(STORAGE_ID));
                 vmfsDataInfo.setDeviceId(storageId);
                 vmfsDataInfo.setDevice(stoNameMap == null ? "" : stoNameMap.get(storageId));

@@ -148,7 +148,7 @@
       "dataCom":"压缩",
       "database":"数据库",
       "vm":"虚拟机",
-      "userDefine":"用户自定义"
+      "userDefine":"自定义"
     },
     "mount":{
       "mount":"挂载",
@@ -171,6 +171,14 @@
     },
     "reduce": {
       "success": "缩容成功！"
+    },
+    "expand":{
+      "capacityErr":"输入超过容量限制!",
+      "maxCapTip":"最大容量限制：16384 TB",
+      "minCapTip":"最小容量限制：",
+      "expandErrTips":"磁盘扩容容量最小为1GB，且扩容后的容量不得大于16384TB！",
+      "reduceThinTips": "该磁盘类型为Thin类型，修改后的容量不得小于1GB。",
+      "reduceThickTips": "该磁盘类型为Thick类型，修改后的容量不得小于3GB。"
     }
   },
   "vmfs": {
@@ -631,7 +639,8 @@
     "portNullMessage": "端口不能为空！",
     "establishConnect": "建立iSCSI连接",
     "showCol": "展示列",
-    "selectAll": "全选"
+    "selectAll": "全选",
+    "hideIpTips": "注：以下数据将不包含IPv4地址为空的数据！"
   },
   "rdm": {
     "name": "名称",
@@ -789,6 +798,7 @@
       "connected":"已连接",
       "creating":"创建中",
       "normal":"正常",
+      "abnormal":"故障",
       "mapping":"映射中",
       "unmapping":"解除映射中",
       "deleting":"删除中",
@@ -827,7 +837,7 @@
     "type":{
       "block":"块",
       "file":"文件",
-      "blockAndFile": "块/文件"
+      "blockAndFile": "块和文件"
     }
   },
   "errorMsg":{
@@ -849,7 +859,8 @@
     "numberAndLetter":"只能输入数字和字母!",
     "cantFindData": "抱歉未查询到相关数据！",
     "getDataFailed": "获取数据失败！",
-    "cantChangeServiceLevel": "该设备为自定义类型，不支持DME存储策略变更操作！"
+    "cantChangeServiceLevel": "该设备为自定义类型，不支持DME存储策略变更操作！",
+    "iposMaxMinTips": "只能为1到999999999的整数。"
   },
   "page": {
     "perPage": "每页",

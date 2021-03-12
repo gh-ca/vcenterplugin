@@ -171,6 +171,14 @@
     },
     "reduce": {
       "success": "Successfully reduce!"
+    },
+    "expand":{
+      "capacityErr":"Input exceeds capacity limit!",
+      "maxCapTip":"Maximum capacity limit：16384 TB",
+      "minCapTip":"Minimum capacity limit：",
+      "expandErrTips":"The minimum disk expansion capacity is 1GB, and the expanded capacity cannot be greater than 16384TB!",
+      "reduceThinTips": "The disk type is Thin, and the modified capacity must not be less than ",
+      "reduceThickTips": "The disk type is Thick, and the modified capacity must not be less than "
     }
   },
   "vmfs": {
@@ -631,7 +639,8 @@
     "portNullMessage": "Port is not be Empty!",
     "establishConnect": "Establish an iSCSI connection",
     "showCol": "Display Column",
-    "selectAll": "Select All"
+    "selectAll": "Select All",
+    "hideIpTips": "Note: The following data will not include data with empty IPv4 addresses!"
   },
   "rdm": {
     "name": "Name",
@@ -789,6 +798,7 @@
        "connected":"Connected",
        "creating":"Creating",
        "normal":"Normal",
+       "abnormal":"Abnormal",
        "mapping":"Mapping",
        "unmapping":"Unmapping",
        "deleting":"Deleting",
@@ -827,7 +837,7 @@
      "type":{
       "block":"Block",
       "file":"File",
-      "blockAndFile": "Block/File"
+      "blockAndFile": "Block And File"
      }
   },
   "errorMsg":{
@@ -849,7 +859,8 @@
     "numberAndLetter":"Only numbers and letters can be entered!",
     "cantFindData":"Sorry, no relevant data is found!",
     "getDataFailed": "Failed to get data!",
-    "cantChangeServiceLevel": "This device is a Custom type and does not support DME Storage Strategy change operation!"
+    "cantChangeServiceLevel": "This device is a Custom type and does not support DME Storage Strategy change operation!",
+    "iposMaxMinTips": "Can only be an integer from 1 to 999999999."
   },
   "page": {
     "perPage": "Per Page",

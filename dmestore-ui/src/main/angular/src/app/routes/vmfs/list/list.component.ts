@@ -169,6 +169,12 @@ export class VmfsListComponent implements OnInit {
 
   isFirstLoadChartData = true;
 
+  bandWidthMaxErrTips = false;// 带宽上限错误提示
+  bandWidthMinErrTips = false;// 带宽下限错误提示
+  iopsMaxErrTips = false;// IOPS上限错误提示
+  iopsMinErrTips = false;// IOPS下限错误提示
+  latencyErrTips = false;// 时延错误提示
+
 
   ngOnInit() {
     // 列表数据
@@ -181,6 +187,7 @@ export class VmfsListComponent implements OnInit {
     this.modifyNameChanged = false;
     // 初始化form
     this.modifyForm = new GetForm().getEditForm();
+    this.initIopsErrTips(true, true);
     console.log('this.rowSelected[0]', this.modifyForm );
     if (this.rowSelected.length === 1) {
       this.modalLoading = false;
@@ -260,7 +267,10 @@ export class VmfsListComponent implements OnInit {
 
   // 修改 处理
   modifyHandleFunc() {
-
+    if (this.bandWidthMaxErrTips || this.iopsMaxErrTips
+      || this.bandWidthMinErrTips || this.iopsMinErrTips || this.latencyErrTips) {
+      return;
+    }
     // 设置修改的卷名称以及修改后的名称
     if (this.modifyForm.isSameName) {
       this.modifyForm.newVoName = this.modifyForm.name;
@@ -438,9 +448,17 @@ export class VmfsListComponent implements OnInit {
 
       const storagePoolList = storagePoolMap[0].storagePoolList;
       const workloads = storagePoolMap[0].workloadList;
+      const storages=this.storageList.filter(item=>item.id==this.form.storage_id)[0];
+      const dorado = storages.storageTypeShow.dorado;
+      let mediaType;
+      if (dorado) { // v6设备
+        mediaType = 'block-and-file';
+      } else { // V5设备
+        mediaType = 'block';
+      }
       // 存储池
       // if (!storagePoolList) {
-        this.remoteSrv.getStoragePoolsByStorId(this.form.storage_id, 'block').subscribe((result: any) => {
+        this.remoteSrv.getStoragePoolsByStorId(this.form.storage_id, mediaType).subscribe((result: any) => {
           if (result.code === '200' && result.data !== null) {
             this.storagePoolList = result.data;
 
@@ -631,6 +649,8 @@ export class VmfsListComponent implements OnInit {
     // 初始化服务等级数据
     this.setServiceLevelList();
 
+    this.initIopsErrTips(true, true);
+
     // 初始化存储池
     this.storagePoolList = [];
 
@@ -663,6 +683,11 @@ export class VmfsListComponent implements OnInit {
   }
   // 添加vmfs 处理
   addVmfsHanlde() {
+    if (this.bandWidthMaxErrTips || this.iopsMaxErrTips
+      || this.bandWidthMinErrTips || this.iopsMinErrTips || this.latencyErrTips) {
+      return;
+    }
+
     const selectResult = this.serviceLevelList.find(item => item.show === true);
     if ((this.levelCheck === 'level' && selectResult && selectResult.totalCapacity !== 0) || this.levelCheck !== 'level') { // 选择服务等级
       if (selectResult) {
@@ -1487,7 +1512,7 @@ export class VmfsListComponent implements OnInit {
    * @param operationType add modify
    * @param valType
    */
-  qosBlur(type:String, operationType:string) {
+  qosBlur(type:string, operationType:string) {
 
     let objVal;
     if (type === 'add') {
@@ -1528,12 +1553,18 @@ export class VmfsListComponent implements OnInit {
       }
     }
     if (objVal && objVal !== '') {
-      if (objVal.toString().match(/\d+(\.\d{0,2})?/)) {
-        objVal = objVal.toString().match(/\d+(\.\d{0,2})?/)[0];
+      if (objVal.toString().match( /^[1-9]\d*$/)) {
+        objVal = objVal.toString().match(/^[1-9]\d*$/)[0];
       } else {
         objVal = '';
       }
     }
+    if (objVal > 999999999){
+      objVal = '';
+    } else if (objVal < 1) {
+      objVal = '';
+    }
+
     if (type === 'add') {
       switch (operationType) {
         case 'maxbandwidth':
@@ -1570,6 +1601,110 @@ export class VmfsListComponent implements OnInit {
           this.modifyForm.latency = objVal;
           break;
       }
+    }
+
+    this.iopsErrTips(objVal, operationType, type);
+  }
+
+  /**
+   * iops错误提示
+   * @param objVal
+   * @param operationType
+   */
+  iopsErrTips(objVal:string, operationType:string, type:string) {
+    if (operationType) {
+      if (type == 'add') {
+        switch (operationType) {
+          case 'maxbandwidth':
+            if (objVal == '' && this.form.maxbandwidthChoose) {
+              this.bandWidthMaxErrTips = true;
+            }else {
+              this.bandWidthMaxErrTips = false;
+            }
+            break;
+          case 'maxiops':
+            if (objVal == '' && this.form.maxiopsChoose) {
+              this.iopsMaxErrTips = true;
+            }else {
+              this.iopsMaxErrTips = false;
+            }
+            break;
+          case 'minbandwidth':
+            if (objVal == '' && this.form.minbandwidthChoose) {
+              this.bandWidthMinErrTips = true;
+            }else {
+              this.bandWidthMinErrTips = false;
+            }
+            break;
+          case 'miniops':
+            if (objVal == '' && this.form.miniopsChoose) {
+              this.iopsMinErrTips = true;
+            }else {
+              this.iopsMinErrTips = false;
+            }
+            break;
+          default:
+            if (objVal == '' && this.form.latencyChoose) {
+              this.latencyErrTips = true;
+            }else {
+              this.latencyErrTips = false;
+            }
+            break;
+        }
+      } else {
+        switch (operationType) {
+          case 'max_bandwidth':
+            if (objVal == '' && this.modifyForm.maxbandwidthChoose) {
+              this.bandWidthMaxErrTips = true;
+            }else {
+              this.bandWidthMaxErrTips = false;
+            }
+            break;
+          case 'max_iops':
+            if (objVal == '' && this.modifyForm.maxiopsChoose) {
+              this.iopsMaxErrTips = true;
+            }else {
+              this.iopsMaxErrTips = false;
+            }
+            break;
+          case 'min_bandwidth':
+            if (objVal == '' && this.modifyForm.minbandwidthChoose) {
+              this.bandWidthMinErrTips = true;
+            }else {
+              this.bandWidthMinErrTips = false;
+            }
+            break;
+          case 'min_iops':
+            if (objVal == '' && this.modifyForm.miniopsChoose) {
+              this.iopsMinErrTips = true;
+            }else {
+              this.iopsMinErrTips = false;
+            }
+            break;
+          default:
+            if (objVal == '' && this.modifyForm.latencyChoose) {
+              this.latencyErrTips = true;
+            }else {
+              this.latencyErrTips = false;
+            }
+            break;
+        }
+      }
+    }
+  }
+
+  /**
+   * 初始化IOPS错误提示
+   */
+  initIopsErrTips(upper:boolean, lower:boolean){
+    if (upper) {
+      this.bandWidthMaxErrTips = false;
+      this.iopsMaxErrTips = false;
+    }
+    if (lower) {
+      this.bandWidthMinErrTips = false;
+      this.iopsMinErrTips = false;
+      this.latencyErrTips = false;
     }
   }
 
@@ -1977,7 +2112,7 @@ export class VmfsListComponent implements OnInit {
    * 添加页面 资源调优thick展示与隐藏
    */
   addAllocationTypeShowInit() {
-    this.form.alloctype = '';
+    this.form.alloctype = 'thin';
     const allocationTypeShow = this.getAllocationTypeShow(this.form.storage_id);
     this.showAlloctypeThick = allocationTypeShow == 1;
   }
@@ -2047,6 +2182,7 @@ export class VmfsListComponent implements OnInit {
     if (lowerObj) {
       lowerChecked = lowerObj.checked;
     }
+    this.initIopsErrTips(upperChecked, lowerChecked);
     if (isUpper) {
       if(upperChecked) {
         form.control_policyUpper = '1';
@@ -2085,6 +2221,35 @@ export class VmfsListComponent implements OnInit {
   addSameBtnChangeFunc(obj) {
     if (this.form.isSameName) {
       this.form.volumeName = this.form.name
+    }
+  }
+  resetQosFlag(objValue:boolean, operationType:string) {
+    switch (operationType) {
+      case 'maxbandwidth':
+        if(!objValue) {
+          this.bandWidthMaxErrTips = false;
+        }
+        break;
+      case 'maxiops':
+        if(!objValue) {
+          this.iopsMaxErrTips = false;
+        }
+        break;
+      case 'minbandwidth':
+        if(!objValue) {
+          this.bandWidthMinErrTips = false;
+        }
+        break;
+      case 'miniops':
+        if(!objValue) {
+          this.iopsMinErrTips = false;
+        }
+        break;
+      default:
+        if(!objValue) {
+          this.latencyErrTips = false;
+        }
+        break;
     }
   }
 }
