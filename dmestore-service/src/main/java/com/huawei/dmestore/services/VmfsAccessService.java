@@ -113,6 +113,19 @@ public interface VmfsAccessService {
      * @param params include dataStoreObjectIds,host,hostId,cluster,clusterId
      * @throws DmeException when error
      */
+    List<Map<String, String>> mountVmfs2(Map<String, Object> params) throws DmeException;
+
+    /**
+     * Mount vmfs include
+     * param list dataStoreObjectIds: datastore object id列表 必
+     * param str host: 主机名称 必 （主机与集群二选一）
+     * param str hostId: 主机
+     * param str cluster: 集群名称 必（主机与集群二选一）
+     * param str clusterId: 集群
+     *
+     * @param params include dataStoreObjectIds,host,hostId,cluster,clusterId
+     * @throws DmeException when error
+     */
     List<Map<String, String>> mountVmfs(Map<String, Object> params) throws DmeException;
 
     /**
