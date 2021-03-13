@@ -12,6 +12,7 @@ import org.springframework.util.StringUtils;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
+import jdk.internal.org.objectweb.asm.Handle;
 
 /**
  * ToolUtils
@@ -350,13 +351,6 @@ public class ToolUtils {
         return condition.toString();
     }
 
-    public static void main(String[] args) {
-        Map<String, String> map = new HashMap<>();
-        map.put("id", "112321");
-        map.put("type", "aa");
-        System.out.println(getRequsetParams(map, true, true));
-    }
-
     public static StorageTypeShow getStorageTypeShow(String storageModel) throws DmeException {
         StorageTypeShow storageTypeShow = new StorageTypeShow();
         List<String> list = Arrays.asList(storageModel.split(" "));
@@ -421,5 +415,20 @@ public class ToolUtils {
             }
         }
         return storageTypeShow;
+    }
+
+    public static String handleString(String var1){
+        var1 = var1.replace("-", "");
+        String substring1 = var1.replace("-", "").substring(0, 8);
+        String substring2 = var1.replace("-", "").substring(var1.length() - 8, var1.length());
+        return substring1 + substring2;
+    }
+
+    public static void main(String[] args) {
+        String var1 = "08855010-7cf8-11eb-9b0f-c6168c546b36";
+        var1 = var1.replace("-", "");
+        String substring1 = var1.replace("-", "").substring(0, 8);
+        String substring2 = var1.replace("-", "").substring(var1.length() - 1 - 8, var1.length() - 1);
+        System.out.println(substring1 + substring2);
     }
 }
