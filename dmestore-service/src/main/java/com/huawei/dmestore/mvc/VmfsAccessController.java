@@ -92,7 +92,7 @@ public class VmfsAccessController extends BaseController {
         LOG.info("accessvmfs/createvmfs=={}", gson.toJson(params));
         String failureStr = "";
         try {
-            List<Map<String, String>> vmfs = vmfsAccessService.createVmfs(params);
+            List<Map<String, String>> vmfs = vmfsAccessService.createVmfs2(params);
             if (vmfs.size() != 0) {
                 return failure(DmeConstants.CODE_CONNECTIVITY_FAILURE,
                     "create vmfs failure,connectivity of host or hostgroup on dme error!", vmfs);
