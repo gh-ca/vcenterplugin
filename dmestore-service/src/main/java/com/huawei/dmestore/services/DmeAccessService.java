@@ -84,6 +84,15 @@ public interface DmeAccessService {
     List<Map<String, Object>> getDmeHosts(String hostIp) throws DmeException;
 
     /**
+     * Query Dme Hosts
+     *
+     * @param hostIp host ip
+     * @return ResponseBodyBean
+     * @throws DmeException when error
+     */
+    List<Map<String, Object>> getDmeHosts2(String hostIp) throws DmeException;
+
+    /**
      * Query Dme Host's initiators
      *
      * @param hostId host id

@@ -264,6 +264,12 @@ public class DmeConstants {
     public static final String PUT_ADD_HOST_TO_HOSTS = "/rest/hostmgmt/v1/hostgroups/{hostgroup_id}/hosts/add";
 
     /**
+     * remove host from hostgroup
+     **/
+    public static final String PUT_REMOVE_HOST_FROM_HOSTGROUP =
+        "/rest/hostmgmt/v1/hostgroups/{hostgroup_id}/hosts/remove";
+
+    /**
      * instance relation query
      **/
     public static final String LIST_RELATION_URL = "/rest/resourcedb/v1/relations/{relationName}/instances";
