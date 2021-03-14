@@ -472,7 +472,19 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                         if (volumelist != null && volumelist.size() > 0) {
                             createOnVmware(params, volumelist);
                         }
+                    }else {
+                        TaskDetailInfo taskinfo = taskService.queryTaskById(taskId);
+                        if (taskinfo != null) {
+                            throw new DmeException(
+                                "DME create vmfs volume error(task status info:" + "name:" + taskinfo.getTaskName() + ";status:"
+                                    + taskinfo.getStatus() + ";" + "progress:" + taskinfo.getProgress() + ";detail:"
+                                    + taskinfo.getDetail() + ")!");
+                        } else {
+                            throw new DmeException("DME create vmfs volume error(task status is failure)!");
+                        }
                     }
+                }else {
+                    throw new DmeException("DME create vmfs volume error(task status is failure)!");
                 }
             }
         } catch (DmeException e) {
