@@ -418,9 +418,18 @@ public class ToolUtils {
 
     public static String handleString(String var1){
         var1 = var1.replace("-", "");
-        String substring1 = var1.replace("-", "").substring(0, 8);
-        String substring2 = var1.replace("-", "").substring(var1.length() - 8, var1.length());
+        String substring1 = var1.substring(0, 8);
+        String substring2 = var1.substring(var1.length() - 8, var1.length() );
         return substring1 + substring2;
+    }
+
+    public static String handleStringBegin(String var1){
+        return var1.replace("-", "").substring(0, 8);
+    }
+
+    public static String handleStringEnd(String var1){
+        String replace = var1.replace("-", "");
+        return replace.substring(replace.length()  - 8, replace.length());
     }
 
     public static void main(String[] args) {
