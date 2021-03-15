@@ -14,7 +14,11 @@
     <context:property-placeholder location="classpath:application.properties"/>
 
     <bean name="cipherUtils" class="com.huawei.dmestore.utils.CipherUtils">
-        <property name="multitypeutil" value="${multitypeutil}"/>
+        <property name="multitypeutil" value="${secure.aes.key}"/>
+        <property name="cipheralgorithm" value="${secure.aes.cipheralgorithm}"/>
+        <property name="ivsize" value="${secure.aes.ivsize}"/>
+        <property name="keyalgorithm" value="${secure.aes.key.algorithm}"/>
+        <property name="securerandomalgorithm" value="${secure.aes.securerandomalgorithm}"/>
     </bean>
 
     <bean name="dmeInfoDao" class="com.huawei.dmestore.dao.DmeInfoDao">
