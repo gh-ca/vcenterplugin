@@ -13,12 +13,56 @@
 
     <context:property-placeholder location="classpath:application.properties"/>
 
+    <bean name="cipherconfig" class="com.huawei.dmestore.utils.CipherConfig">
+
+        <property name="delimiter" value="${cipher.delimiter}"/>
+        <property name="pbkdf2.iteration" value="${cipher.pbkdf2.iteration}"/>
+        <property name="pbkdf2.length" value="${cipher.pbkdf2.length}"/>
+        <property name="aes">
+            <bean class="com.huawei.dmestore.utils.CipherConfig$Aes">
+                <property name="algorithm" value="${cipher.aes.algorithm}"/>
+                <property name="workKey" value="${cipher.aes.workKey}"/>
+                <property name="key">
+                    <bean class="com.huawei.dmestore.utils.CipherConfig$Aes$Key">
+                        <property name="algorithm" value="${cipher.aes.key.algorithm}"/>
+                    </bean>
+                </property>
+            </bean>
+        </property>
+        <property name="rootKey">
+            <bean class="com.huawei.dmestore.utils.CipherConfig$RootKey">
+                <property name="algorithm" value="${cipher.rootkey.algorithm}"/>
+                <property name="iteration" value="${cipher.rootkey.iteration}"/>
+                <property name="salt" value="${cipher.rootkey.salt}"/>
+                <property name="key" value="${cipher.rootkey.key}"/>
+            </bean>
+        </property>
+        <property name="pbkdf2">
+            <bean class="com.huawei.dmestore.utils.CipherConfig$Pbkdf2">
+                <property name="iteration" value="${cipher.pbkdf2.iteration}"/>
+                <property name="length" value="${cipher.pbkdf2.length}"/>
+            </bean>
+        </property>
+    </bean>
+
+
+
+    <bean name="rootkeygenerator" class="com.huawei.dmestore.utils.RootKeyGenerator">
+        <property name="cipherConfig" ref="cipherconfig"/>
+    </bean>
+
+    <bean name="aescipher" class="com.huawei.dmestore.utils.AESCipher">
+        <property name="cipherConfig" ref="cipherconfig"/>
+        <property name="rootKeyGenerator" ref="rootkeygenerator"/>
+    </bean>
+
     <bean name="cipherUtils" class="com.huawei.dmestore.utils.CipherUtils">
         <property name="multitypeutil" value="${secure.aes.key}"/>
         <property name="cipheralgorithm" value="${secure.aes.cipheralgorithm}"/>
         <property name="ivsize" value="${secure.aes.ivsize}"/>
         <property name="keyalgorithm" value="${secure.aes.key.algorithm}"/>
         <property name="securerandomalgorithm" value="${secure.aes.securerandomalgorithm}"/>
+        <property name="aesCipher" ref="aescipher"/>
     </bean>
 
     <bean name="dmeInfoDao" class="com.huawei.dmestore.dao.DmeInfoDao">
