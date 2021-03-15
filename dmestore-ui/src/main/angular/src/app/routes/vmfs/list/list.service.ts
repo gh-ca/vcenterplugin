@@ -18,6 +18,11 @@ export class VmfsListService {
   getStorages() {
     return this.http.get('dmestorage/storages');
   }
+
+  getStorageDetail(storageId: string){
+    return this.http.get('dmestorage/storage', {params: {storageId}});
+  }
+
   // 通过存储ID获取存储池数据 (vmfs添加mediaType为block)
   getStoragePoolsByStorId(storageId: string, mediaType: string) {
     return this.http.get('dmestorage/storagepools?storageId='+ storageId + '&mediaType=' + mediaType);
@@ -87,6 +92,11 @@ export class VmfsListService {
     return  this.http.post('operatevmfs/recyclevmfsbydatastoreids', params);
   }
 
+  // 空间回收判断 true 可以回收 false 不可以回收
+  reclaimVmfsJudge(params = {}) { // vmfs空间回收
+    return  this.http.post('operatevmfs/canrecyclevmfsbydatastoreid', params);
+  }
+
   // 修改服务等级
   changeServiceLevel(params = {}) {
     return  this.http.post('operatevmfs/updatevmfsservicelevel', params);
@@ -121,6 +131,14 @@ export class VmfsListService {
   checkVolName(volName: string) {
     return this.http.get('dmestorage/queryvolumebyname', {params: {name:volName}});
   }
+
+  /**
+   * 通过objectId 获取vmfs存储数据
+   * @param objectId
+   */
+  getStorageById(objectId:string) {
+    return this.http.get('accessvmware/relation?datastoreObjectId='+objectId);
+  }
 }
 // vmfs列表
 export interface VmfsInfo {
@@ -148,11 +166,26 @@ export interface VmfsInfo {
   wwn: string;
   usedCapacity: number; // 使用容量
   capacityUsage: number; // 利用率
+  storageId:string;
 }
 // 存储
 export interface StorageList {
   name: string;
   id: string;
+  storageTypeShow:StorageTypeShow;
+}
+export interface StorageTypeShow {
+  dorado:boolean; // true 是dorado v6.1版本及高版本 false 是dorado v 6.0版本及更低版本
+  qosTag:number;// qos策略 1 支持复选(上限、下限) 2支持单选（上限或下限） 3只支持上限
+  workLoadShow:number;// 1 支持应用类型 2不支持应用类型
+  ownershipController:boolean;// 归属控制器 true 支持 false 不支持
+  allocationTypeShow:number;// 资源分配类型  1 可选thin/thick 2 可选thin
+  deduplicationShow:boolean;// 重复数据删除 true 支持 false 不支持
+  compressionShow:boolean; // 数据压缩 true 支持 false 不支持
+  capacityInitialAllocation:boolean;// 容量初始分配策略 true 支持 false 不支持
+  smartTierShow:boolean;// SmartTier策略 true 支持 false 不支持
+  prefetchStrategyShow:boolean;// 预取策略 true 支持 false 不支持
+  storageDetailTag:number;// 存储详情下展示情况 1 仅展示存储池和lun 2 展示存储池/lun/文件系统/共享/dtree
 }
 // 存储池
 export interface StoragePoolList {
@@ -235,6 +268,10 @@ export interface Workload{
     enable_compress: string;
     enable_dedup: string;
 }
+export interface ConnFaildData {
+  hostName: string;
+  description: string
+}
 export class GetForm {
   // 获取添加form表单（初始化的添加表单）
   getAddForm() {
@@ -258,8 +295,13 @@ export class GetForm {
       storage_id: null, // 存储设备id
       pool_raw_id: null, // 卷所属存储池在存储设备上的id
       workload_type_id: null, // 应用类型id
-      alloctype: null, // 卷分配类型，取值范围 thin，thick
-      control_policy: '1', // 控制策略
+      alloctype: 'thin', // 卷分配类型，取值范围 thin，thick
+      control_policy: null, // 控制策略
+      control_policyUpper: undefined, // 控制策略上限
+      control_policyLower: undefined, // 控制策略下限
+      qosFlag: false, // 控制策略
+      smartTier: null, // SmartTier
+      smartTierFlag: false, // SmartTier
       latencyChoose: false, // 时延 选中
       latency: null, // 时延，单位ms
       maxbandwidth: null, // 最大带宽
@@ -283,7 +325,9 @@ export class GetForm {
       name: null,
       isSameName: true, // 卷名称与vmfs名称是否相同
       volumeId: null, // 卷ID
-      control_policy: '1', // 控制策略,
+      control_policy: undefined, // 控制策略,
+      control_policyUpper: undefined, // 控制策略上限
+      control_policyLower: undefined, // 控制策略下限
       max_iops: null,
       maxiopsChoose: false, // 最大iops 选中
       max_bandwidth: null,
@@ -299,13 +343,16 @@ export class GetForm {
       service_level_name: null, // 服务等级名称
       latency: null,
       latencyChoose: false, // 时延 选中
+      qosFlag: false,
+      smartTier: null, // SmartTier
+      smartTierFlag: false, // SmartTier
     };
     return editForm;
   }
   // 扩容form（初始化的添加表单）
   getExpandForm() {
     const expandForm = {
-      vo_add_capacity: null, // 扩容大小默认GB
+      vo_add_capacity: 1, // 扩容大小默认GB
       capacityUnit: 'GB', // 容量单位 （最后需转换为GB）
       volume_id: '', // 卷ID
       ds_name: '', // vmfsName

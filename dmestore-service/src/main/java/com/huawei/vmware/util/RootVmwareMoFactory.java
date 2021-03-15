@@ -1,6 +1,6 @@
 package com.huawei.vmware.util;
 
-import com.huawei.vmware.mo.RootFsMO;
+import com.huawei.vmware.mo.RootFsMo;
 
 import com.vmware.vim25.ManagedObjectReference;
 
@@ -40,7 +40,7 @@ public class RootVmwareMoFactory {
      * @param mor mor
      * @return RootFsMO
      */
-    public RootFsMO build(VmwareContext context, ManagedObjectReference mor) {
-        return new RootFsMO(context, mor);
+    public RootFsMo build(VmwareContext context, ManagedObjectReference mor) {
+        return new RootFsMo(context, mor);
     }
 }

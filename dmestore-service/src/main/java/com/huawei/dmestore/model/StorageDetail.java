@@ -52,11 +52,11 @@ public class StorageDetail {
      */
     private Double totalCapacity;
     /**
-     * 可得容量 .
+     * 可得容量 . 当前使用情况 非dorado设备，当总容量使用，dorado设备 当可得容量使用
      */
     private Double totalEffectiveCapacity;
     /**
-     * 空闲容量 .
+     * 空闲可得容量 .
      */
     private Double freeEffectiveCapacity;
     /**
@@ -155,6 +155,18 @@ public class StorageDetail {
      * 维保结束时间.
      **/
     private String maintenanceOvertime;
+    /**
+     * 存储类型不同导致页面及属性差异对象
+     */
+    private StorageTypeShow storageTypeShow;
+
+    public StorageTypeShow getStorageTypeShow() {
+        return storageTypeShow;
+    }
+
+    public void setStorageTypeShow(StorageTypeShow storageTypeShow) {
+        this.storageTypeShow = storageTypeShow;
+    }
 
     /**
      * getPatchVersion .

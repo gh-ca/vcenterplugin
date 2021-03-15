@@ -4,17 +4,14 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-
-import java.text.SimpleDateFormat;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+import com.huawei.dmestore.exception.DmeException;
+import com.huawei.dmestore.model.StorageTypeShow;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
+
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * ToolUtils
@@ -98,7 +95,7 @@ public class ToolUtils {
     }
 
     public static String normalizeWwn(long wwn) {
-        return  (Long.toHexString(wwn));
+        return (Long.toHexString(wwn));
     }
 
     public static String jsonToStr(JsonElement obj) {
@@ -212,7 +209,7 @@ public class ToolUtils {
     public static Float jsonToFloat(JsonElement obj) {
         Float re = 0.0F;
         try {
-            if (!StringUtils.isEmpty(obj)) {
+            if (!StringUtils.isEmpty(obj) && !obj.isJsonNull()) {
                 re = obj.getAsFloat();
             }
         } catch (IllegalStateException e) {
@@ -245,24 +242,32 @@ public class ToolUtils {
         return re;
     }
 
+    /**
+     * 判断逻辑，只要vcenter中扫描的主机启动器包含dme主机中的启动器，符合主机一致性
+     *
+     * @param a   vcenter 中扫描的主机中的启动器
+     * @param b   DME 中扫描的主机启动器
+     * @param <T> 参数类型
+     * @return boolean 包含或者不包含
+     */
     public static <T extends Comparable<T>> boolean compare(List<T> a, List<T> b) {
-        if (a.size() != b.size()) {
-            return false;
-        }
-        Collections.sort(a);
-        Collections.sort(b);
-        for (int index = 0; index < a.size(); index++) {
-            if (!a.get(index).equals(b.get(index))) {
-                return false;
+        int count = 0;
+        for (int index = 0; index < b.size(); index++) {
+            if (a.contains(b.get(index))) {
+                count++;
+                if (count == b.size()) {
+                    return true;
+                }
             }
         }
-        return true;
+        return false;
     }
 
     public static boolean jsonIsNull(JsonElement obj) {
         boolean re = false;
         try {
-            if (StringUtils.isEmpty(obj) || obj.isJsonNull() || "{}".equals(GSON.toJson(obj))) {
+            if (StringUtils.isEmpty(obj) || obj.isJsonNull() || "{}".equals(GSON.toJson(obj)) || "[]".equals(
+                GSON.toJson(obj))) {
                 re = true;
             }
         } catch (IllegalStateException e) {
@@ -305,24 +310,133 @@ public class ToolUtils {
     }
 
     public static String getRequsetParams(String paramName, String paramValue) {
+        return getRequsetParams(paramName, paramValue, true, true);
+    }
+
+    public static String getRequsetParams(String paramName, String paramValue, boolean flag, boolean returnFlag) {
+        Map<String, String> map = new HashMap<>();
+        map.put(paramName, paramValue);
+        return getRequsetParams(map, flag, returnFlag);
+    }
+
+    public static String getRequsetParams(Map<String, String> map, boolean flag, boolean returnFlag) {
+        JsonArray constraint = new JsonArray();
         JsonObject simple = new JsonObject();
         simple.addProperty("name", "dataStatus");
         simple.addProperty("operator", "equal");
         simple.addProperty("value", "normal");
         JsonObject consObj = new JsonObject();
         consObj.add("simple", simple);
-        JsonArray constraint = new JsonArray();
-        constraint.add(consObj);
-        JsonObject simple1 = new JsonObject();
-        simple1.addProperty("name", paramName);
-        simple1.addProperty("operator", "equal");
-        simple1.addProperty("value", paramValue);
-        JsonObject consObj1 = new JsonObject();
-        consObj1.add("simple", simple1);
-        consObj1.addProperty("logOp", "and");
-        constraint.add(consObj1);
+        if(flag){
+            constraint.add(consObj);
+        }
+        for (Map.Entry<String, String> entry : map.entrySet()) {
+            JsonObject simple1 = new JsonObject();
+            simple1.addProperty("name", entry.getKey());
+            simple1.addProperty("operator", "equal");
+            simple1.addProperty("value", entry.getValue());
+            JsonObject consObj1 = new JsonObject();
+            consObj1.add("simple", simple1);
+            consObj1.addProperty("logOp", "and");
+            constraint.add(consObj1);
+        }
+
+        if(!returnFlag){
+            return constraint.toString();
+        }
+
         JsonObject condition = new JsonObject();
         condition.add("constraint", constraint);
         return condition.toString();
+    }
+
+    public static StorageTypeShow getStorageTypeShow(String storageModel) throws DmeException {
+        StorageTypeShow storageTypeShow = new StorageTypeShow();
+        List<String> list = Arrays.asList(storageModel.split(" "));
+        if (list.contains("OceanStor") && list.contains("Dorado") && list.contains("V6")) {
+            String substring = list.get(list.size() - 1).substring(0, 3);
+            Double productVersion = Double.valueOf(substring);
+            if (productVersion >= 6.1) {
+                // OceanStor Dorado 3000 V6 6.1+ 版本
+                storageTypeShow.setDorado(true);
+                storageTypeShow.setQosTag(1);
+                storageTypeShow.setWorkLoadShow(1);
+                storageTypeShow.setAllocationTypeShow(2);
+                storageTypeShow.setOwnershipController(false);
+                storageTypeShow.setStorageDetailTag(2);
+                storageTypeShow.setDeduplicationShow(false);
+                storageTypeShow.setCompressionShow(false);
+                storageTypeShow.setCapacityInitialAllocation(false);
+                storageTypeShow.setSmartTierShow(false);
+                storageTypeShow.setPrefetchStrategyShow(false);
+            } else {
+                // OceanStor Dorado 3000 V6 6.1- 版本
+                storageTypeShow.setDorado(false);
+                storageTypeShow.setQosTag(3);
+                storageTypeShow.setWorkLoadShow(1);
+                storageTypeShow.setAllocationTypeShow(2);
+                storageTypeShow.setOwnershipController(true);
+                storageTypeShow.setStorageDetailTag(1);
+                storageTypeShow.setDeduplicationShow(false);
+                storageTypeShow.setCompressionShow(false);
+                storageTypeShow.setCapacityInitialAllocation(false);
+                storageTypeShow.setSmartTierShow(false);
+                storageTypeShow.setPrefetchStrategyShow(false);
+            }
+
+        } else {
+            if (list.contains("V3") && list.get(0).contains("Dorado")) {
+                // Dorado v3
+                storageTypeShow.setDorado(false);
+                storageTypeShow.setQosTag(3);
+                storageTypeShow.setWorkLoadShow(1);
+                storageTypeShow.setAllocationTypeShow(2);
+                storageTypeShow.setOwnershipController(true);
+                storageTypeShow.setStorageDetailTag(1);
+                storageTypeShow.setDeduplicationShow(false);
+                storageTypeShow.setCompressionShow(false);
+                storageTypeShow.setCapacityInitialAllocation(false);
+                storageTypeShow.setSmartTierShow(false);
+                storageTypeShow.setPrefetchStrategyShow(false);
+            } else {
+                // v3/v5
+                storageTypeShow.setDorado(false);
+                storageTypeShow.setQosTag(2);
+                storageTypeShow.setWorkLoadShow(2);
+                storageTypeShow.setAllocationTypeShow(1);
+                storageTypeShow.setOwnershipController(true);
+                storageTypeShow.setStorageDetailTag(2);
+                storageTypeShow.setDeduplicationShow(true);
+                storageTypeShow.setCompressionShow(true);
+                storageTypeShow.setCapacityInitialAllocation(true);
+                storageTypeShow.setSmartTierShow(true);
+                storageTypeShow.setPrefetchStrategyShow(true);
+            }
+        }
+        return storageTypeShow;
+    }
+
+    public static String handleString(String var1){
+        var1 = var1.replace("-", "");
+        String substring1 = var1.substring(0, 8);
+        String substring2 = var1.substring(var1.length() - 8, var1.length() );
+        return substring1 + substring2;
+    }
+
+    public static String handleStringBegin(String var1){
+        return var1.replace("-", "").substring(0, 8);
+    }
+
+    public static String handleStringEnd(String var1){
+        String replace = var1.replace("-", "");
+        return replace.substring(replace.length()  - 8, replace.length());
+    }
+
+    public static void main(String[] args) {
+        String var1 = "08855010-7cf8-11eb-9b0f-c6168c546b36";
+        var1 = var1.replace("-", "");
+        String substring1 = var1.replace("-", "").substring(0, 8);
+        String substring2 = var1.replace("-", "").substring(var1.length() - 1 - 8, var1.length() - 1);
+        System.out.println(substring1 + substring2);
     }
 }

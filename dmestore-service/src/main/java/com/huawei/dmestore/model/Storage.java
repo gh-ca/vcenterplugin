@@ -46,7 +46,7 @@ public class Storage {
      **/
     private Double totalCapacity;
     /**
-     * totalEffectiveCapacity.
+     * 可得容量.
      **/
     private Double totalEffectiveCapacity;
     /**
@@ -86,7 +86,7 @@ public class Storage {
      **/
     private String version;
     /**
-     * 最大ops.
+     * 产品型号
      **/
     private String productVersion;
     /**
@@ -121,6 +121,18 @@ public class Storage {
      * 维保结束时间.
      **/
     private String maintenanceOvertime;
+    /**
+     * 存储类型不同导致页面及属性差异对象
+     */
+    private StorageTypeShow storageTypeShow;
+
+    public StorageTypeShow getStorageTypeShow() {
+        return storageTypeShow;
+    }
+
+    public void setStorageTypeShow(StorageTypeShow storageTypeShow) {
+        this.storageTypeShow = storageTypeShow;
+    }
 
     /**
      * getLocation .
@@ -521,9 +533,9 @@ public class Storage {
     /**
      * getAzIds .
      *
-     * @return Object .
+     * @return String[] .
      */
-    public Object getAzIds() {
+    public String[] getAzIds() {
         return azIds;
     }
 

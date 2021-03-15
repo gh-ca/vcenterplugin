@@ -14,7 +14,6 @@ import {HttpClient} from '@angular/common/http';
 import {Router} from "@angular/router";
 import {TranslatePipe, TranslateService} from "@ngx-translate/core";
 import { GlobalsService }     from "../../shared/globals.service";
-import {NfsService} from "../nfs/nfs.service";
 
 @Component({
   selector: 'app-dashboard',
@@ -63,12 +62,20 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   popShow = false;
   connectAlertSuccess = false;
   connectAlertFail = false;
-  connectModel = { hostIp: '', port: '26335', userName: '', password: ''};
+  connectModel = { hostIp: '', port: '26335', userName: '', password: '', hostPort: ''};
   hostModel = { hostIp: '', hostPort: '', code: ''};
 
   bestShowLoading = false;
   top5ShowLoading = false;
 
+  disconnectFlag = false; // 断开连接提示框
+  disconnectResult = false; // 断开连接结果：true 弹窗展示 false 隐藏
+  disconnectSuccessFlag = false; // 断开连接成功
+  disconnectFailedFlag = false; // 断开连接失败
+  disconnectHandleLoading = false;// 断开连接处理提示
+
+  passwordShow= false;
+  inputType= "text";
   connectForm = new FormGroup({
     port: new FormControl('', [
         Validators.required,
@@ -141,8 +148,8 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
           item.utilization = item.utilization.toFixed(2);
         });
         this.storeageTopN = result.data;
-        this.cdr.detectChanges();
       }
+      this.cdr.detectChanges();
     }, err => {
       console.error('ERROR', err);
     });
@@ -156,13 +163,14 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     this.capadataStoreName = this.translateService.instant(name);
     this.storageCapacityChart.showLoading();
     this.http.get('overview/getdatastoreoverview', { params: {type: type}}).subscribe((result: any) => {
+      let os;
       if (result.code === '200'){
         result.data.totalCapacity = result.data.totalCapacity.toFixed(2);
         result.data.usedCapacity = result.data.usedCapacity.toFixed(2);
         result.data.freeCapacity = result.data.freeCapacity.toFixed(2);
         result.data.utilization = result.data.utilization.toFixed(2);
         this.storageCapacity = result.data;
-        const os = [
+        os = [
           {
             name: this.translatePipe.transform('overview.used'),
             value: result.data.usedCapacity
@@ -172,12 +180,24 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
             value: result.data.freeCapacity
           }
         ];
-        this.dashboardSrv.storageCapacityOption.series[0].data = os;
-        this.dashboardSrv.storageCapacityOption.title.text = this.storageCapacity.utilization + ' %';
-        this.storageCapacityChart.setOption(this.dashboardSrv.storageCapacityOption, true);
-        this.storageCapacityChart.hideLoading();
-        this.cdr.detectChanges();
+      } else {
+        os = [
+          {
+            name: this.translatePipe.transform('overview.used'),
+            value: 0
+          },
+          {
+            name: this.translatePipe.transform('overview.free'),
+            value: 0
+          }
+        ];
       }
+
+      this.dashboardSrv.storageCapacityOption.series[0].data = os;
+      this.dashboardSrv.storageCapacityOption.title.text = this.storageCapacity.utilization + ' %';
+      this.storageCapacityChart.setOption(this.dashboardSrv.storageCapacityOption, true);
+      this.storageCapacityChart.hideLoading();
+      this.cdr.detectChanges();
     }, err => {
       console.error('ERROR', err);
     });
@@ -190,9 +210,10 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   loadStorageNum(){
     this.storageNumChart.showLoading();
     this.http.get('overview/getstoragenum', {}).subscribe((result: any) => {
+      let os;
       if (result.code === '200'){
         this.storageNum = result.data;
-        const os = [
+        os = [
           {
             name: this.translatePipe.transform('overview.normal'),
             value: result.data.normal
@@ -202,11 +223,27 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
             value: result.data.abnormal
           }
         ];
-        this.dashboardSrv.storageNumOption.series[0].data = os;
-        this.storageNumChart.setOption(this.dashboardSrv.storageNumOption, true);
-        this.storageNumChart.hideLoading();
-        this.cdr.detectChanges();
+      } else {
+        this.storageNum = {
+          total: 0,
+          normal: 0,
+          abnormal: 0
+        };
+        os = [
+          {
+            name: this.translatePipe.transform('overview.normal'),
+            value: 0
+          },
+          {
+            name: this.translatePipe.transform('overview.abnormal'),
+            value: 0
+          }
+        ];
       }
+      this.dashboardSrv.storageNumOption.series[0].data = os;
+      this.storageNumChart.setOption(this.dashboardSrv.storageNumOption, true);
+      this.storageNumChart.hideLoading();
+      this.cdr.detectChanges();
     }, err => {
       console.error('ERROR', err);
     });
@@ -231,6 +268,7 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
       this.clrForm.markAsTouched();
     } else {
       this.gs.loading = true;
+      this.connectModel.hostPort = this.connectModel.port;
       this.http.post('accessdme/access', this.connectModel).subscribe((result: any) => {
         this.gs.loading = false;
         if (result.code == '200'){
@@ -247,11 +285,14 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   resetForm() {
-    this.connectForm.reset(this.connectModel);
+    const connectModel = { hostIp: '', port: '26335', userName: '', password: '', hostPort: ''}
+    this.connectForm.reset(connectModel);
   }
 
   showPop(){
     this.popShow = true;
+    this.passwordShow=false;
+    this.inputType="password";
     this.resetForm();
   }
 
@@ -282,5 +323,33 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     this.gs.getClientSdk().app.navigateTo({
       targetViewId: 'com.huawei.dmestore.storageView'
     });
+  }
+
+  /**
+   * 断开连接
+   */
+  disconnectedDMEFunc() {
+    this.disconnectHandleLoading = true;
+    this.http.get('/accessdme/access/disconnect').subscribe((result: any) => {
+      this.disconnectHandleLoading = false;
+      this.disconnectResult=true;
+      this.disconnectFlag=false;
+      if (result.code == '200'){
+        this.disconnectSuccessFlag = true;
+      } else{
+        this.disconnectFailedFlag = true;
+      }
+      this.cdr.detectChanges();
+    });
+  }
+
+  showOrHide(){
+    if(this.passwordShow){
+      this.passwordShow=false;
+      this.inputType="password";
+    }else {
+      this.passwordShow=true;
+      this.inputType="type";
+    }
   }
 }

@@ -6,10 +6,11 @@
     "del": "删除",
     "expand": "扩容",
     "more": "更多",
+    "otherOperations": "其它操作",
     "mount": "挂载",
     "unmount": "卸载",
     "reclaim": "回收空间",
-    "changeServiceLevel": "变更服务等级",
+    "changeServiceLevel": "变更DME存储策略",
     "save": "保存",
     "cancel": "取消",
     "next": "下一步",
@@ -29,7 +30,9 @@
   },
   "validations": {
     "required": "该字段必填!",
-    "nameRequired": "该字段必填！且只能包含半角字母、半角数字、“_”、“-”、“.”。",
+    "nameRequired": "该字段必填！且只能包含半角字母、半角数字、“_”、“-”、“.”和中文字符。",
+    "nameRequiredTwo": "该字段必填！且只能包含半角字母、半角数字、“_”和中文字符。",
+    "shareNameRequired": "该字段必填！且只能包含半角字母、半角数字、“_”",
     "minlength": "必须大于 {{number}} 个字符",
     "maxlength": "必须小于 {{number}} 个字符",
     "min": "值必须大于 {{number}}",
@@ -42,7 +45,8 @@
   "table": {
     "name": "名称",
     "id": "编号",
-    "description": "描述"
+    "description": "描述",
+    "createDmeStorage": "创建DME数据存储"
   },
   "nfs":{
     "name":"名称",
@@ -78,7 +82,7 @@
     "add_advance":"高级属性",
     "qosPolicy":"Qos策略",
     "controlPolicy":"控制策略",
-    "tfo":"交通管制对象",
+    "tfo":"流量控制目标",
     "qos_bandwidth":"带宽",
     "qos_iops":"IOPS",
     "qos_latency":"时延",
@@ -91,6 +95,7 @@
     "dataCompre":"压缩",
     "capAuto":"自动扩容",
     "sameName":"文件系统/共享名称与数据存储名称相同。",
+    "modifySameName":"文件系统与数据存储名称相同。",
     "mountType":"挂载类型",
     "readWrite":"读写",
     "readOnly":"只读",
@@ -109,6 +114,7 @@
     "nfsStore":"NFS存储",
     "respRt":"读响应时间(毫秒)",
     "respWt":"写响应时间(毫秒)",
+    "characterEncoding":"字符编码",
     "logic":{
       "logic":"逻辑端口",
       "name":"名称",
@@ -139,7 +145,10 @@
       "provisionType":"供应类型",
       "appSce":"应用场景",
       "dataDed":"重删",
-      "dataCom":"压缩"
+      "dataCom":"压缩",
+      "database":"数据库",
+      "vm":"虚拟机",
+      "userDefine":"自定义"
     },
     "mount":{
       "mount":"挂载",
@@ -162,22 +171,35 @@
     },
     "reduce": {
       "success": "缩容成功！"
+    },
+    "expand":{
+      "capacityErr":"输入超过容量限制!",
+      "maxCapTip":"最大容量限制：16384 TB",
+      "minCapTip":"最小容量限制：",
+      "expandErrTips":"磁盘扩容容量最小为1GB，且扩容后的容量不得大于16384TB！",
+      "reduceThinTips": "该磁盘类型为Thin类型，修改后的容量不得小于1GB。",
+      "reduceThickTips": "该磁盘类型为Thick类型，修改后的容量不得小于3GB。"
     }
   },
   "vmfs": {
     "controlPolicy": "控制策略",
-    "trafficControlObject": "交通管制对象",
+    "controlPolicyDescOne": "控制策略",
+    "controlPolicyDescZero": "控制策略",
+    "trafficControlObject": "流量控制目标",
     "modifyNameDesc": "自动更改卷名",
     "upperLimitControl": "上限控制",
     "lowerLimitControl": "下限控制",
+    "upperControlLimit": "控制上限",
+    "lowerProtectionLimit": "保护下限",
     "bandwidthLimitUpper": "带宽 <= ",
     "IOPSLimitUpper": "IOPS <= ",
     "bandwidthLimitLower": "带宽 >= ",
     "IOPSLimitLower": "IOPS >= ",
     "unitM": "MB/s",
+    "iopsUnit": "IO/s",
     "addTitle": "创建华为DME数据存储",
     "datastoreSetting": "数据存储设置",
-    "storageSetting": "储存设置",
+    "storageSetting": "存储设置",
     "vmfsAddNameDesc": "卷名称与数据存储名称相同.",
     "version": "版本",
     "blockSize": "块大小",
@@ -195,7 +217,7 @@
     "freeSpace": "空闲容量",
     "reserveCapacity": "置备容量",
     "device": "设备",
-    "serviceLevelName": "服务等级",
+    "serviceLevelName": "DME存储策略",
     "multiply": "X",
     "iops": "IOPS",
     "iopsQoSTarget": "IOPS QoS上下限",
@@ -206,6 +228,7 @@
     "latency": "时延(ms)",
     "latencyMax": "时延 <= ",
     "latencyUnit": "ms",
+    "latencyUnitUs": "us",
     "latencyQoSTarget": "时延QoS下限",
     "upper": "Upper",
     "lower": "Lower",
@@ -214,9 +237,9 @@
     "qosPolicy": "QoS策略",
     "thin": "Thin",
     "resourceTuning": "资源调优",
-    "provisioningType": "设置类型",
+    "provisioningType": "资源分配类型",
     "basicInformation": "基本信息",
-    "byServiceLevel": "服务等级",
+    "byServiceLevel": "DME存储策略",
     "custom": "自定义",
     "wwn": "WWN",
     "storage": "存储",
@@ -230,7 +253,7 @@
     "volumeName": "卷名称",
     "low": "低",
     "none": "无",
-    "changeServiceLevel": "变更服务等级",
+    "changeServiceLevel": "变更DME存储策略",
     "expandSize":"扩容大小",
     "host": "主机",
     "cluster": "集群",
@@ -239,8 +262,9 @@
     "endTime": "结束时间",
     "timeInputTips": "请输入开始-结束时间！",
     "capacityTips": "若版本为VMFS5则容量最小值为1G，若版本为VMFS6则容量最小值为2G，且容量必须为单位为G的正整数，数量必须为正整数！",
-    "serviceLevelCantBeNull": "服务等级是必选项，且只能选择容量不为0的服务等级！",
+    "serviceLevelCantBeNull": "DME存储策略是必选项，且只能选择容量不为0的DME存储策略！",
     "expandTips": "扩容容量只能单位为GB的正整数。",
+    "expandTipsMax": "扩容后总容量不能超过256TB。",
     "loadingTips": "数据加载中，请稍后",
     "dataHandleLoadingTips": "数据处理中，请稍后",
     "listNullTips": "找不到VMFS",
@@ -255,7 +279,7 @@
       "success": "扩容成功！"
     },
     "serviceLevel": {
-      "success": "服务等级变更成功！"
+      "success": "DME存储策略变更成功！"
     },
     "protectionStatus": {
       "name": "保护状态",
@@ -293,7 +317,8 @@
     "reclaim": {
       "title":"提示",
       "content":"确认要回收空间吗?",
-      "success": "回收空间成功！"
+      "success": "回收空间成功！",
+      "error": "不能回收thick vmfs存储！"
     },
     "filter": {
       "all": "所有",
@@ -329,7 +354,7 @@
       "freeCap":"空闲容量",
       "supRate":"订阅率",
       "totalCap":"总容量",
-      "cpuUtilization":"CUP使用率",
+      "cpuUtilization":"CPU使用率",
       "latency":"时延(毫秒)",
       "iops":"IOPS",
       "ops":"OPS",
@@ -340,13 +365,16 @@
       "notMgr": "未管理",
       "notSync": "未同步",
       "inSync": "同步中",
-      "synced": "已同步"
+      "synced": "已同步",
+      "status": "运行状态",
+      "synStatus": "同步状态"
     },
     "chart":{
       "total":" 总计",
       "protection":"保护",
       "fileSystem":"文件系统",
-      "volume":"卷",
+      "file":"文件",
+      "volume":"LUN",
       "freeCapacity":"空闲容量",
       "used":" 已用",
       "free":" 空闲",
@@ -356,7 +384,8 @@
       "bandwidth":"带宽(MS/s)",
       "capacity":"容量",
       "health":"健康",
-      "performance":"性能 - 过去24小时"
+      "performance":"性能 - 过去24小时",
+      "blockFile":"块/文件"
     },
     "detail":{
       "conf":{
@@ -381,7 +410,7 @@
         "capacityUsage":"容量利用率",
         "bareCapacity":"裸容量",
         "totalCapacity":"总容量",
-        "useFree":"已使用/空闲",
+        "useFree":"已使用|空闲",
         "subscribe":"已订阅",
         "storagePool":"存储池列表",
         "used":"已用:",
@@ -401,7 +430,7 @@
         "status":"状态",
         "diskType":"磁盘类型",
         "type":"类型",
-        "serviceLevel":"服务等级",
+        "serviceLevel":"DME存储策略",
         "raidLevel":"RAID级别",
         "totalCap":"总容量",
         "usedCap":"已用容量",
@@ -426,7 +455,7 @@
         "capUsage":"容量利用率",
         "mapStatus":"映射状态",
         "stoPool":"存储池",
-        "serviceLevel":"服务等级",
+        "serviceLevel":"DME存储策略",
         "protStatus":"保护状态",
         "latency": "时延(ms)",
         "iops": "IOPS",
@@ -439,7 +468,7 @@
         "totalCap":"总容量",
         "proType":"分配类型",
         "capUsage":"已使用容量",
-        "ownSto":"所属存储",
+        "ownSto":"所属存储池",
         "nfs":"NFS",
         "cifs":"CIFS",
         "dtree":"Dtree",
@@ -451,7 +480,7 @@
         "dtrees":"DTrees",
         "name":"名称",
         "ofs":"所属文件系统",
-        "osl":"所属服务等级",
+        "osl":"所属DME存储策略",
         "secMod":"安全模式",
         "nfs":"NFS",
         "cifs":"CIFS",
@@ -463,7 +492,7 @@
         "sharePath":"共享路径",
         "ofs":"所属文件系统",
         "od":"所属Dtree",
-        "osl":"所属服务等级"
+        "osl":"所属DME存储策略"
       },
       "capacity":{
         "pool":{
@@ -486,7 +515,7 @@
           "bandwidth":"带宽(MB/s)"
         },
         "disks":{
-          "disks":"磁盘",
+          "disks":"硬盘",
           "location":"位置",
           "status":"状态",
           "type":"类型",
@@ -562,7 +591,8 @@
     "connectT": "DME连接",
     "connectFail": "连接失败！",
     "connectSuccess": "连接成功！",
-    "portholder": "端口默认26335"
+    "portholder": "端口默认26335",
+    "disconnect": "断开连接"
   },
   "bestPractice": {
     "apply": "实施最佳实践",
@@ -582,7 +612,11 @@
     "syncSuccess": "同步成功",
     "syncFail": "同步失败",
     "exeSuccess": "执行成功",
-    "exeFail": "执行失败"
+    "exeFail": "执行失败",
+    "operation": "操作",
+    "implementation": "实施",
+    "description": "描述",
+    "applyBestPracticeTips": "所选数据中有违规数为0的数据，请重新选择!"
   },
   "iscsi": {
     "hostIp": "主机VmKernel IP",
@@ -596,8 +630,17 @@
     "speed": "工作速率(Mbps)",
     "hStatus": "健康状态",
     "cStatus": "连接状态",
+    "cStatusType": "连接状态类型",
+    "phyPortNotConn": "物理端口未连接",
+    "ipUnreachable": "IP无法到达",
+    "connected": "已连接",
+    "toBeConnected": "待连接",
     "ports": "请选择存储设备的以太网端口",
-    "portNullMessage": "端口不能为空！"
+    "portNullMessage": "端口不能为空！",
+    "establishConnect": "建立iSCSI连接",
+    "showCol": "展示列",
+    "selectAll": "全选",
+    "hideIpTips": "注：以下数据将不包含IPv4地址为空的数据！"
   },
   "rdm": {
     "name": "名称",
@@ -606,7 +649,7 @@
     "operation": "操作",
     "add": "增加",
     "storageType": "存储类型",
-    "tier": "服务等级",
+    "tier": "DME存储策略",
     "storage1": "存储/存储池",
     "storage": "存储设备",
     "sPool": "存储池",
@@ -660,8 +703,13 @@
     "storeSet": "存储设置",
 
     "createRdmError": "创建RDM出错!",
-    "selectOneSer": "服务等级不能为空！",
-    "rdmSuccessMsg": "创建RDM成功!"
+    "selectOneSer": "DME存储策略不能为空！",
+    "rdmSuccessMsg": "创建RDM成功!",
+    "compatibilityMode": {
+      "name": "兼容模式",
+      "virtualMode": "虚拟",
+      "physicalMode": "物理"
+    }
   },
   "tier": {
     "name": "名称",
@@ -734,7 +782,8 @@
     "offLine": "离线",
     "normal": "正常",
     "abnormal": "异常",
-    "unknown": "未知"
+    "unknown": "未知",
+    "faulty": "故障"
   },
   "applybp": {
     "ing": "最佳实践实施中",
@@ -749,6 +798,7 @@
       "connected":"已连接",
       "creating":"创建中",
       "normal":"正常",
+      "abnormal":"故障",
       "mapping":"映射中",
       "unmapping":"解除映射中",
       "deleting":"删除中",
@@ -771,11 +821,23 @@
       "linkUp":"已连接",
       "activated":"已激活",
       "unActivated":"未激活",
-      "all":"所有"
+      "all":"所有",
+      "invalid":"无效",
+      "enable":"启用",
+      "notActivated":"未启用",
+      "service":"管理",
+      "management":"数据",
+      "managementAndService":"管理+数据",
+      "aboutToFail": "即将故障",
+      "partiallyDamaged": "部分损坏",
+      "system": "系统",
+      "vlan": "VLAN",
+      "customized": "自定义"
     },
     "type":{
       "block":"块",
-      "file":"文件"
+      "file":"文件",
+      "blockAndFile": "块和文件"
     }
   },
   "errorMsg":{
@@ -787,14 +849,18 @@
     "addError":"添加失败！请联系管理员！",
     "modifyError":"编辑失败！请联系管理员！",
     "reclaimError":"空间回收失败！请联系管理员！",
-    "serviceLevelError":"服务等级变更失败！请联系管理员！",
+    "serviceLevelError":"DME存储策略变更失败！请联系管理员！",
     "require":"此字段必填！",
     "nfsrepeat":"NFS名称已经存在！",
     "sharerepeat":"共享名称已经存在！",
     "fsrepeat":"文件系统名称已经存在！",
     "vmfsNameRepeat":"VMFS名称已经存在！",
     "volNameRepeat":"卷名称已经存在！",
-    "numberAndLetter":"只能输入数字和字母!"
+    "numberAndLetter":"只能输入数字和字母!",
+    "cantFindData": "抱歉未查询到相关数据！",
+    "getDataFailed": "获取数据失败！",
+    "cantChangeServiceLevel": "该设备为自定义类型，不支持DME存储策略变更操作！",
+    "iposMaxMinTips": "只能为1到999999999的整数。"
   },
   "page": {
     "perPage": "每页",
@@ -802,10 +868,40 @@
     "all": "共"
   },
   "performance": {
-    "volumeMaximumIORespTime": "卷最大I/O响应时间(ms)",
-    "volumeIODensity": "卷I/O密度(IOPS/TB)",
-    "totalVolumeThroughput": "卷总吞吐量(IOPS)",
-    "volumeTotalBandwidth": "卷总带宽(MB/s)",
+    "volumeMaximumIORespTime": "LUN 最大I/O响应时间(ms)",
+    "volumeIODensity": "LUN I/O密度(IOPS/TB)",
+    "totalVolumeThroughput": "LUN 总吞吐量(IOPS)",
+    "volumeTotalBandwidth": "LUN 总带宽(MB/s)",
     "storagePoolIODensity": "存储池I/O密度(IOPS/TB)"
+  },
+  "tips": {
+    "select": "请选择",
+    "disconnected": "是否断开DME连接 ？",
+    "operationSuccessful": "操作成功!",
+    "operationFailed": "操作失败!",
+    "noData": "暂无数据",
+    "addVmfsConnFail": "创建VMFS失败，主机或集群连通性异常！",
+    "mountVmfsConnFail": "挂载失败，主机或集群连通性异常！",
+    "details": "详情"
+  },
+  "chart": {
+    "select": {
+      "last5Minute": "最近5分钟",
+      "last1Hour": "最近1小时",
+      "last1Day": "最近1天",
+      "last1Week": "最近1周",
+      "last1Month": "最近1个月",
+      "last1Quarter": "最近1个季度",
+      "half1Year": "最近半年",
+      "last1Year": "最近1年",
+      "invalid": "无效"
+    },
+    "title": {
+      "allocatedCapacity": "已分配容量(GB)",
+      "totalCapacity": "总容量(GB)",
+      "usedCapacity": "已用容量(GB)",
+      "lunCapacityTrends": "LUN 容量趋势",
+      "storagePoolCapacityTrends": "存储池容量趋势"
+    }
   }
 }

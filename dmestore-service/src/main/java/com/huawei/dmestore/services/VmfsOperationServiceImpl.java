@@ -5,11 +5,10 @@ import com.huawei.dmestore.exception.DmeException;
 import com.huawei.dmestore.exception.VcenterException;
 import com.huawei.dmestore.model.CapabilitiesQos;
 import com.huawei.dmestore.model.CapabilitiesSmarttier;
-import com.huawei.dmestore.model.CustomizeVolumeTuning;
 import com.huawei.dmestore.model.SimpleCapabilities;
 import com.huawei.dmestore.model.SimpleServiceLevel;
 import com.huawei.dmestore.model.SmartQos;
-import com.huawei.dmestore.model.VolumeUpdate;
+import com.huawei.dmestore.model.VmfsDatastoreVolumeDetail;
 import com.huawei.dmestore.utils.ToolUtils;
 import com.huawei.dmestore.utils.VCSDKUtils;
 
@@ -44,11 +43,15 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
 
     private static final String CODE_403 = "403";
 
+    private static final String CODE_20883 = "20883";
+
     private static final String CODE_503 = "503";
 
     private static final String TASK_ID = "task_id";
 
     private DmeAccessService dmeAccessService;
+
+    private VmfsAccessServiceImpl vmfsAccessService;
 
     private Gson gson = new Gson();
 
@@ -80,21 +83,33 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
         this.vcsdkUtils = vcsdkUtils;
     }
 
+    public VmfsAccessServiceImpl getVmfsAccessService() {
+        return vmfsAccessService;
+    }
+
+    public void setVmfsAccessService(VmfsAccessServiceImpl vmfsAccessService) {
+        this.vmfsAccessService = vmfsAccessService;
+    }
+
     @Override
     public void updateVmfs(String volumeId, Map<String, Object> params) throws DmeException {
-        VolumeUpdate volume = new VolumeUpdate();
+        Map<String, Object> volumeMap = new HashMap<>();
         Object serviceLevelName = params.get("service_level_name");
         if (StringUtils.isEmpty(serviceLevelName)) {
-            CustomizeVolumeTuning customizeVolumeTuning = getCustomizeVolumeTuning(params);
+            Map<String, Object> customizeVolumeTuning = getCustomizeVolumeTuning(params);
             LOG.info("自定义方式创建vmfs{},服务等级：", serviceLevelName);
-            volume.setTuning(customizeVolumeTuning);
+            if (customizeVolumeTuning.size() != 0 && customizeVolumeTuning != null) {
+                volumeMap.put("tuning", customizeVolumeTuning);
+            }
         }
+
         Object newVoName = params.get("newVoName");
         if (!StringUtils.isEmpty(newVoName)) {
-            volume.setName(newVoName.toString());
+            volumeMap.put("name", newVoName.toString());
         }
+
         Map<String, Object> reqMap = new HashMap<>(DEFAULT_CAPACITY);
-        reqMap.put("volume", volume);
+        reqMap.put("volume", volumeMap);
         String reqBody = gson.toJson(reqMap);
 
         String url = DmeConstants.DME_VOLUME_BASE_URL + "/" + volumeId;
@@ -109,14 +124,17 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
             if (dataStoreObjectId != null) {
                 result = vcsdkUtils.renameDataStore(newDsName.toString(), dataStoreObjectId.toString());
             }
+            if (StringUtils.isEmpty(result) || "failed".equals(result)) {
+                throw new DmeException(CODE_503, "vmware update VmfsDatastore failed!");
+            }
+
             ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.PUT, reqBody);
             int code = responseEntity.getStatusCodeValue();
-            LOG.info("自定义方式创建vmfs{},请dme求参数：：", code+":"+reqBody);
-            if (code != HttpStatus.ACCEPTED.value() || StringUtils.isEmpty(result) || "failed".equals(result)) {
-                throw new DmeException(CODE_503, "update VmfsDatastore failed");
+            LOG.info("dme update vmfs,response:code={},response body={}", code, responseEntity.getBody());
+            if (code != HttpStatus.ACCEPTED.value()) {
+                throw new DmeException(CODE_503, "dme update VmfsDatastore failed!");
             }
-            String object = responseEntity.getBody();
-            JsonObject jsonObject = new JsonParser().parse(object).getAsJsonObject();
+            JsonObject jsonObject = new JsonParser().parse(responseEntity.getBody()).getAsJsonObject();
             String taskId = ToolUtils.jsonToStr(jsonObject.get(TASK_ID));
             List<String> taskIds = new ArrayList<>();
             taskIds.add(taskId);
@@ -131,30 +149,43 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
         }
     }
 
-    private CustomizeVolumeTuning getCustomizeVolumeTuning(Map<String, Object> params) {
-        SmartQos smartQos = new SmartQos();
-        Object controlPolicy = params.get("control_policy");
-        if (!StringUtils.isEmpty(controlPolicy)) {
-            smartQos.setControlPolicy(controlPolicy.toString());
+    private Map<String, Object> getCustomizeVolumeTuning(Map<String, Object> params) {
+        Map<String, Object> map = new HashMap<>();
+        Map<String, Object> customizeVolumeTuning = new HashMap<>();
+        Boolean qosFlag = (Boolean) params.get("qosFlag");
+        if (qosFlag) {
+            Object controlPolicy = params.get("control_policy");
+            if (!StringUtils.isEmpty(controlPolicy)) {
+                map.put("control_policy", controlPolicy.toString());
+            }
+            Object maxIops = params.get("max_iops");
+            if (!StringUtils.isEmpty(maxIops)) {
+                map.put("maxiops", Integer.valueOf(maxIops.toString()));
+            }
+            Object minIops = params.get("min_iops");
+            if (!StringUtils.isEmpty(minIops)) {
+                map.put("miniops", Integer.valueOf(minIops.toString()));
+            }
+            Object maxBandwidth = params.get("max_bandwidth");
+            if (!StringUtils.isEmpty(maxBandwidth)) {
+                map.put("maxbandwidth", Integer.valueOf(maxBandwidth.toString()));
+            }
+            Object minBandwidth = params.get("min_bandwidth");
+            if (!StringUtils.isEmpty(minBandwidth)) {
+                map.put("minbandwidth", Integer.valueOf(minBandwidth.toString()));
+            }
+
+            Object latency = params.get("latency");
+            if (!StringUtils.isEmpty(latency)) {
+                map.put("latency", Integer.valueOf(latency.toString()));
+            }
+            map.put("enabled", true);
+            customizeVolumeTuning.put("smartqos", map);
         }
-        Object maxIops = params.get("max_iops");
-        if (!StringUtils.isEmpty(maxIops)) {
-            smartQos.setMaxiops(Integer.valueOf(maxIops.toString()));
+        Boolean smartTierFlag = (Boolean) params.get("smartTierFlag");
+        if (smartTierFlag) {
+            customizeVolumeTuning.put("smarttier", ToolUtils.getStr(params.get("smartTier")));
         }
-        Object minIops = params.get("min_iops");
-        if (!StringUtils.isEmpty(minIops)) {
-            smartQos.setMiniops(Integer.valueOf(minIops.toString()));
-        }
-        Object maxBandwidth = params.get("max_bandwidth");
-        if (!StringUtils.isEmpty(maxBandwidth)) {
-            smartQos.setMaxbandwidth(Integer.valueOf(maxBandwidth.toString()));
-        }
-        Object minBandwidth = params.get("min_bandwidth");
-        if (!StringUtils.isEmpty(minBandwidth)) {
-            smartQos.setMinbandwidth(Integer.valueOf(minBandwidth.toString()));
-        }
-        CustomizeVolumeTuning customizeVolumeTuning = new CustomizeVolumeTuning();
-        customizeVolumeTuning.setSmartQos(smartQos);
         return customizeVolumeTuning;
     }
 
@@ -225,6 +256,25 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
             LOG.error("recycle vmfsDatastore error !", e);
             throw new DmeException(CODE_503, e.getMessage());
         }
+    }
+
+    @Override
+    public boolean canRecycleVmfsCapacity(List<String> dsObjectIds) throws DmeException {
+
+        boolean isThinVmdatastore = false;
+        if (dsObjectIds != null && dsObjectIds.size() > 0) {
+            for (int index = 0; index < dsObjectIds.size(); index++) {
+                List<VmfsDatastoreVolumeDetail> detaillists = vmfsAccessService.volumeDetail(dsObjectIds.get(index));
+                for (VmfsDatastoreVolumeDetail vmfsDatastoreVolumeDetail : detaillists) {
+                    if ("thin".equalsIgnoreCase(vmfsDatastoreVolumeDetail.getProvisionType())) {
+                        isThinVmdatastore = true;
+                        break;
+                    }
+                }
+            }
+        }
+        return isThinVmdatastore;
+
     }
 
     @Override

@@ -99,6 +99,11 @@ public class EthPortInfo {
     private String connectStatus;
 
     /**
+     * 连接状态类型. 1-物理端口未连接，2-ip无法到达，3-已连接，4-待连接
+     **/
+    private Integer connectStatusType;
+
+    /**
      * classId.
      */
     private Integer classId;
@@ -857,5 +862,22 @@ public class EthPortInfo {
      */
     public void setSfpStatus(final String param) {
         this.sfpStatus = param;
+    }
+
+    /**
+     * getConnectStatusType .
+     *
+     * @return Integer .
+     */
+    public Integer getConnectStatusType() {
+        return connectStatusType;
+    }
+    /**
+     * setConnectStatusType.
+     *
+     * @param connectStatusType 连接状态类型.
+     */
+    public void setConnectStatusType(final Integer connectStatusType) {
+        this.connectStatusType = connectStatusType;
     }
 }

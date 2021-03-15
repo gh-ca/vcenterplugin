@@ -2,6 +2,7 @@ import {ChangeDetectorRef, Component, OnInit} from "@angular/core";
 import {GlobalsService} from "../../../../shared/globals.service";
 import {NfsExpandService} from "./nfs-expand.service";
 import {ActivatedRoute, Router} from "@angular/router";
+import {UpdateNfs} from "../../nfs.service";
 @Component({
   selector: 'app-reduce',
   templateUrl: './nfs-expand.component.html',
@@ -9,7 +10,7 @@ import {ActivatedRoute, Router} from "@angular/router";
   providers: [NfsExpandService]
 })
 export class NfsExpandComponent implements OnInit{
-  newCapacity = 0;
+  newCapacity = 1;
   viewPage: string;
   pluginFlag: string;//来至插件的标记
   unit='GB';
@@ -20,6 +21,8 @@ export class NfsExpandComponent implements OnInit{
   modalLoading = false; // 数据加载loading
   modalHandleLoading = false; // 数据处理loading
   expandSuccessShow = false; // 扩容成功提示
+  capacityErr= true;
+  updateNfs=new UpdateNfs();
   constructor(private expandService: NfsExpandService, private gs: GlobalsService,
               private activatedRoute: ActivatedRoute,private router:Router, private cdr: ChangeDetectorRef){
   }
@@ -35,22 +38,65 @@ export class NfsExpandComponent implements OnInit{
         //入口来至Vcenter
         const ctx = this.gs.getClientSdk().app.getContextObjects();
         this.storeObjectId=ctx[0].id;
-        this.viewPage='expand_vcenter'
+        // this.storeObjectId="urn:vmomi:Datastore:datastore-4072:674908e5-ab21-4079-9cb1-596358ee5dd1";
+        this.viewPage='expand_vcenter';
+        this.modalLoading = true;
+        this.expandService.getStorageById(this.storeObjectId).subscribe((result: any) => {
+          this.modalLoading = false;
+          if (result.code === '200'){
+            this.fsId = result.data.fsId;
+            // console.log("this.fsId", this.fsId);
+            // console.log("result.data", result.data);
+          }
+          this.cdr.detectChanges();
+        });
       }
+
+    this.modalLoading = true;
+    this.expandService.getNfsDetailById(this.storeObjectId).subscribe((result: any) => {
+      this.modalLoading = false;
+      if (result.code === '200'){
+        this.updateNfs = result.data;
+        // const capacity =  this.updateNfs.capacity;
+        // if (this.updateNfs.thin) {
+        //   if (capacity) {
+        //     if (capacity > 1) {
+        //       this.minCapacity = 1;
+        //     } else {
+        //       this.minCapacity = capacity;
+        //     }
+        //   }
+        // } else {
+        //   if (capacity) {
+        //     if (capacity > 3) {
+        //       this.minCapacity = 3;
+        //     } else {
+        //       this.minCapacity = capacity;
+        //     }
+        //   }
+        // }
+      }
+      this.cdr.detectChanges();
+    });
+
   }
   expandData(){
+    let v=this.checkCapacity();
+    if(!v) return;
     this.modalHandleLoading=true;
+    let capacity;
     switch (this.unit) {
       case 'TB':
-        this.newCapacity = this.newCapacity * 1024;
+        capacity = this.newCapacity * 1024;
         break;
       case 'MB':
-        this.newCapacity = this.newCapacity / 1024;
+        capacity = this.newCapacity / 1024;
         break;
       case 'KB':
-        this.newCapacity = this.newCapacity / (1024 * 1024);
+        capacity = this.newCapacity / (1024 * 1024);
         break;
       default: // 默认GB 不变
+        capacity = this.newCapacity;
         break;
     }
     var params;
@@ -59,14 +105,15 @@ export class NfsExpandComponent implements OnInit{
         "fileSystemId": this.fsId,
         "storeObjectId": this.storeObjectId,
         "expand":true,
-        "capacity": this.newCapacity
+        "capacity": capacity
       }
     }
     if(this.pluginFlag==null){
       params={
         "storeObjectId": this.storeObjectId,
         "expand":true,
-        "capacity": this.newCapacity
+        "fileSystemId": this.fsId,
+        "capacity": capacity
       }
     }
     this.expandService.changeCapacity(params).subscribe((result: any) => {
@@ -100,5 +147,30 @@ export class NfsExpandComponent implements OnInit{
     }else{
       this.closeModel();
     }
+  }
+  checkCapacity(){
+    let capacity;
+    switch (this.unit) {
+      case 'TB':
+        capacity = this.newCapacity * 1024;
+        break;
+      default: // 默认GB 不变
+        capacity = this.newCapacity;
+        break;
+    }
+    if (capacity<1){
+      this.newCapacity=0;
+      this.capacityErr=false;
+      return false;
+    }
+    if ((capacity+this.updateNfs.capacity)>16777216){
+      this.newCapacity=0;
+      this.capacityErr=false;
+      return false;
+    }else{
+      this.capacityErr=true;
+      return true;
+    }
+
   }
 }

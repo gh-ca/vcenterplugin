@@ -18,6 +18,7 @@ import com.huawei.dmestore.utils.VCSDKUtils;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.google.gson.reflect.TypeToken;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -96,7 +97,8 @@ public class VmRdmServiceImpl implements VmRdmService {
     }
 
     @Override
-    public void createRdm(String dataStoreObjectId, String vmObjectId, VmRdmCreateBean createBean) throws DmeException {
+    public void createRdm(String dataStoreObjectId, String vmObjectId, VmRdmCreateBean createBean,
+        String compatibilityMode) throws DmeException {
         createDmeRdm(createBean);
         Map<String, Object> paramMap = initParams(createBean);
         String requestVolumeName = (String) paramMap.get("requestVolumeName");
@@ -106,12 +108,37 @@ public class VmRdmServiceImpl implements VmRdmService {
         for (int index = 0; index < volumeArr.size(); index++) {
             volumeIds.add(volumeArr.get(index).getAsJsonObject().get(ID_FIELD).getAsString());
         }
+
+        // vmware上虚拟机归属的主机查询
         Map<String, String> vcenterHostMap = vcsdkUtils.getHostByVmObjectId(vmObjectId);
+
+        // vmware上已挂载存储的所有主机
+        String hostsJsonStr = vcsdkUtils.getMountHostsByDsObjectId(dataStoreObjectId);
+        List<Map<String, String>> hostListOnVmware = gson.fromJson(hostsJsonStr,
+            new TypeToken<List<Map<String, String>>>() { }.getType());
         String hostIp = vcenterHostMap.get("hostName");
-        String hostObjectId = vcenterHostMap.get("hostObjectId");
+        String hostObjectId = vcenterHostMap.get("hostId");
         String hostId = getDmeHostId(hostIp, hostObjectId);
+        boolean isFind = false;
+        for (int index = 0; index < hostListOnVmware.size(); index++) {
+            String tempHostObjectId = hostListOnVmware.get(index).get("hostId");
+            if (hostObjectId.equals(tempHostObjectId)) {
+                isFind = true;
+                break;
+            }
+        }
+        if (!isFind) {
+            hostListOnVmware.add(vcenterHostMap);
+        }
+        List<String> dmeMapingHostIds = new ArrayList<>();
         if (paramMap.get("mapping") == null) {
-            dmeAccessService.hostMapping(hostId, volumeIds);
+            for (int index = 0; index < hostListOnVmware.size(); index++) {
+                String tempHostIp = hostListOnVmware.get(index).get("hostName");
+                String tempHostObjectId = hostListOnVmware.get(index).get("hostId");
+                String tempDmeHostId = getDmeHostId(tempHostIp, tempHostObjectId);
+                dmeMapingHostIds.add(tempDmeHostId);
+                dmeAccessService.hostMapping(tempDmeHostId, volumeIds);
+            }
         }
         vcsdkUtils.hostRescanVmfs(hostIp);
         vcsdkUtils.hostRescanHba(hostIp);
@@ -119,26 +146,32 @@ public class VmRdmServiceImpl implements VmRdmService {
         String errorMsg = "";
         int lunSize = lunMap.size();
         if (lunSize > 0) {
-            List<String> failList = new ArrayList();
+            List<String> failedVolumeIds = new ArrayList();
             for (Map.Entry<String, JsonObject> entry : lunMap.entrySet()) {
                 String volumeId = entry.getKey();
                 JsonObject object = entry.getValue();
                 try {
                     vcsdkUtils.createDisk(dataStoreObjectId, vmObjectId, object.get("devicePath").getAsString(),
-                        capacity);
+                        capacity, compatibilityMode);
                 } catch (VcenterException ex) {
-                    failList.add(volumeId);
+                    failedVolumeIds.add(volumeId);
                     errorMsg = ex.getMessage();
                 }
             }
-            if (failList.size() > 0) {
-                deleteVolumes(hostId, failList);
-                if (failList.size() == lunSize) {
+            if (failedVolumeIds.size() > 0) {
+                for (String dmeHostId : dmeMapingHostIds) {
+                    unMapping(dmeHostId, failedVolumeIds);
+                }
+                deleteVolumes(failedVolumeIds);
+                if (failedVolumeIds.size() == lunSize) {
                     throw new DmeException(errorMsg);
                 }
             }
         } else {
-            deleteVolumes(hostId, volumeIds);
+            for (String dmeHostId : dmeMapingHostIds) {
+                unMapping(dmeHostId, volumeIds);
+            }
+            deleteVolumes(volumeIds);
             throw new DmeException("No matching LUN information was found on the vCenter");
         }
     }
@@ -233,12 +266,28 @@ public class VmRdmServiceImpl implements VmRdmService {
         return hostId;
     }
 
-    private void deleteVolumes(String hostId, List<String> ids) {
+    private void deleteVolumes(String hostId, List<String> volumeIds) {
         try {
-            dmeAccessService.unMapHost(hostId, ids);
-            dmeAccessService.deleteVolumes(ids);
+            dmeAccessService.unMapHost(hostId, volumeIds);
+            dmeAccessService.deleteVolumes(volumeIds);
         } catch (DmeException ex) {
             LOG.error("delete volumes failed!");
+        }
+    }
+
+    private void deleteVolumes(List<String> volumeIds) {
+        try {
+            dmeAccessService.deleteVolumes(volumeIds);
+        } catch (DmeException ex) {
+            LOG.error("delete volumes failed!");
+        }
+    }
+
+    private void unMapping(String hostId, List<String> volumeIds) {
+        try {
+            dmeAccessService.unMapHost(hostId, volumeIds);
+        } catch (DmeException ex) {
+            LOG.error("unMapping volumes failed!");
         }
     }
 
@@ -349,7 +398,11 @@ public class VmRdmServiceImpl implements VmRdmService {
 
     private Map<String, Object> tuningParse(CustomizeVolumeTuningForCreate tuningBean) {
         Map<String, Object> tuning = new HashMap<>();
-        putNotNull(tuning, "alloction_type", tuningBean.getAlloctype());
+        if (tuningBean.getAlloctype() != null) {
+            putNotNull(tuning, "alloction_type", tuningBean.getAlloctype());
+        } else {
+            tuning.put("alloction_type", "thin");
+        }
         putNotNull(tuning, "smart_tier", DmeConstants.SMART_TIER.get(tuningBean.getSmarttier()));
         putNotNull(tuning, "workload_type_raw_id", tuningBean.getWorkloadTypeId());
         putNotNull(tuning, "compression_enabled", tuningBean.getCompressionEnabled());
@@ -358,11 +411,24 @@ public class VmRdmServiceImpl implements VmRdmService {
         SmartQosForRdmCreate smartqosBean = tuningBean.getSmartqos();
         if (smartqosBean != null) {
             Map<String, Object> smartqos = new HashMap<>(MAP_DEFAULT_CAPACITY);
-            putNotNull(smartqos, "latency", smartqosBean.getLatency());
-            putNotNull(smartqos, "max_bandwidth", smartqosBean.getMaxbandwidth());
-            putNotNull(smartqos, "max_iops", smartqosBean.getMaxiops());
-            putNotNull(smartqos, "min_bandwidth", smartqosBean.getMinbandwidth());
-            putNotNull(smartqos, "min_iops", smartqosBean.getMiniops());
+            if (smartqosBean.getLatency() != 0) {
+                putNotNull(smartqos, "latency", smartqosBean.getLatency());
+            }
+            if (smartqosBean.getLatency() != 0) {
+                putNotNull(smartqos, "latency", smartqosBean.getLatency());
+            }
+            if (smartqosBean.getMaxbandwidth() != 0) {
+                putNotNull(smartqos, "max_bandwidth", smartqosBean.getMaxbandwidth());
+            }
+            if (smartqosBean.getMaxiops() != 0) {
+                putNotNull(smartqos, "max_iops", smartqosBean.getMaxiops());
+            }
+            if (smartqosBean.getMinbandwidth() != 0) {
+                putNotNull(smartqos, "min_bandwidth", smartqosBean.getMinbandwidth());
+            }
+            if (smartqosBean.getMiniops() != 0) {
+                putNotNull(smartqos, "min_iops", smartqosBean.getMiniops());
+            }
             tuning.put("smart_qos", smartqos);
         }
 

@@ -11,14 +11,14 @@ import com.huawei.dmestore.exception.VcenterException;
 import com.huawei.vmware.VcConnectionHelpers;
 import com.huawei.vmware.autosdk.SessionHelper;
 import com.huawei.vmware.autosdk.TaggingWorkflow;
-import com.huawei.vmware.mo.ClusterMO;
-import com.huawei.vmware.mo.DatastoreMO;
-import com.huawei.vmware.mo.HostDatastoreSystemMO;
-import com.huawei.vmware.mo.HostMO;
-import com.huawei.vmware.mo.HostStorageSystemMO;
-import com.huawei.vmware.mo.IscsiManagerMO;
-import com.huawei.vmware.mo.RootFsMO;
-import com.huawei.vmware.mo.VirtualMachineMO;
+import com.huawei.vmware.mo.ClusterMo;
+import com.huawei.vmware.mo.DatastoreMo;
+import com.huawei.vmware.mo.HostDatastoreSystemMo;
+import com.huawei.vmware.mo.HostMo;
+import com.huawei.vmware.mo.HostStorageSystemMo;
+import com.huawei.vmware.mo.IscsiManagerMo;
+import com.huawei.vmware.mo.RootFsMo;
+import com.huawei.vmware.mo.VirtualMachineMo;
 import com.huawei.vmware.util.ClusterVmwareMoFactory;
 import com.huawei.vmware.util.DatastoreVmwareMoFactory;
 import com.huawei.vmware.util.HostVmwareFactory;
@@ -111,10 +111,10 @@ public class VCSDKUtilsTest {
     VCSDKUtils vcsdkUtils = new VCSDKUtils();;
     VmwareContext vmwareContext;
     ManagedObjectReference managedObjectReference;
-    RootFsMO rootFsMo;
-    DatastoreMO datastoreMO;
-    HostMO hostMO;
-    ClusterMO clusterMO;
+    RootFsMo rootFsMo;
+    DatastoreMo datastoreMO;
+    HostMo hostMO;
+    ClusterMo clusterMO;
     VmwareClient vimClient;
     List<Pair<ManagedObjectReference, String>> list;
     Pair<ManagedObjectReference, String> pair;
@@ -122,13 +122,13 @@ public class VCSDKUtilsTest {
     DatastoreHostMount datastoreHostMount;
     HostMountInfo hostMountInfo;
     DatastoreSummary datastoreSummary;
-    HostDatastoreSystemMO hostDatastoreSystemMO;
+    HostDatastoreSystemMo hostDatastoreSystemMO;
     List<VmfsDatastoreOption> vmfsDatastoreOptions;
     VmfsDatastoreOption vmfsDatastoreOption;
     VmfsDatastoreInfo vmfsDatastoreInfo;
     HostVmfsVolume hostVmfsVolume;
     VmfsDatastoreExpandSpec vmfsDatastoreExpandSpec;
-    HostStorageSystemMO hostStorageSystemMO;
+    HostStorageSystemMo hostStorageSystemMO;
     List<HostScsiDisk> hostScsiDisks;
     HostScsiDisk hostScsiDisk;
     HostDiskDimensionsLba capacity;
@@ -137,7 +137,7 @@ public class VCSDKUtilsTest {
     VCenterInfo vCenterInfo;
     SessionHelper sessionHelper;
     TaggingWorkflow taggingWorkflow;
-    VirtualMachineMO virtualMachineMo;
+    VirtualMachineMo virtualMachineMo;
     List<PbmProfile> pbmprofiles;
     PbmProfile pbmProfile;
     PbmServiceInstanceContent spbmsc ;
@@ -149,11 +149,11 @@ public class VCSDKUtilsTest {
         vmwareContext = mock(VmwareContext.class);
         managedObjectReference = spy(ManagedObjectReference.class);
         managedObjectReference.setValue("321");
-        rootFsMo = mock(RootFsMO.class);
-        datastoreMO = mock(DatastoreMO.class);
+        rootFsMo = mock(RootFsMo.class);
+        datastoreMO = mock(DatastoreMo.class);
         datastoreMO.setCustomFieldValue("321", "321");
-        hostMO = mock(HostMO.class);
-        clusterMO = mock(ClusterMO.class);
+        hostMO = mock(HostMo.class);
+        clusterMO = mock(ClusterMo.class);
         vimClient = mock(VmwareClient.class);
         list = new ArrayList<>();
         pair = new Pair<>(managedObjectReference, "321");
@@ -177,7 +177,7 @@ public class VCSDKUtilsTest {
         datastoreSummary.setDatastore(managedObjectReference);
         datastoreSummary.setAccessible(true);
 
-        hostDatastoreSystemMO = mock(HostDatastoreSystemMO.class);
+        hostDatastoreSystemMO = mock(HostDatastoreSystemMo.class);
         vmfsDatastoreOptions = new ArrayList<>();
         vmfsDatastoreOption = spy(VmfsDatastoreOption.class);
         VmfsDatastoreSpec vmfsDatastoreSpec = spy(VmfsDatastoreSpec.class);
@@ -192,7 +192,7 @@ public class VCSDKUtilsTest {
         HostDiskPartitionSpec hostDiskPartitionSpec = spy(HostDiskPartitionSpec.class);
         hostDiskPartitionSpec.setTotalSectors(321l);
         vmfsDatastoreExpandSpec.setPartition(hostDiskPartitionSpec);
-        hostStorageSystemMO = mock(HostStorageSystemMO.class);
+        hostStorageSystemMO = mock(HostStorageSystemMo.class);
 
         hostScsiDisks = new ArrayList<>();
         hostScsiDisk = spy(HostScsiDisk.class);
@@ -220,7 +220,7 @@ public class VCSDKUtilsTest {
 
         sessionHelper = mock(SessionHelper.class);
         taggingWorkflow = mock(TaggingWorkflow.class);
-        virtualMachineMo = mock(VirtualMachineMO.class);
+        virtualMachineMo = mock(VirtualMachineMo.class);
 
         pbmprofiles = spy(ArrayList.class);
         pbmProfile = spy(PbmProfile.class);
@@ -866,7 +866,7 @@ public class VCSDKUtilsTest {
         when(datastoreVmwareMoFactory.build(vmwareContext, managedObjectReference)).thenReturn(datastoreMO);
         when(vcConnectionHelpers.objectId2Mor("321")).thenReturn(managedObjectReference);
         when(virtualMachineMoFactorys.build(vmwareContext, managedObjectReference)).thenReturn(virtualMachineMo);
-        vcsdkUtils.createDisk("321", "321", "321", 21);
+        vcsdkUtils.createDisk("321", "321", "321", 21, null);
     }
 
     @Test
@@ -1094,7 +1094,7 @@ public class VCSDKUtilsTest {
     public void boundVmKernel() throws Exception {
         Map<String, String> vmKernel = spy(HashMap.class);
         vmKernel.put("device", "321");
-        IscsiManagerMO iscsiManagerMo = mock(IscsiManagerMO.class);
+        IscsiManagerMo iscsiManagerMo = mock(IscsiManagerMo.class);
         for (int i = 0; i <2 ; i++) {
             if (i == 0) {
                 when(hostMO.getIscsiManagerMo()).thenReturn(iscsiManagerMo);

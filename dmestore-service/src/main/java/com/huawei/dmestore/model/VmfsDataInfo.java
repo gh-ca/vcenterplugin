@@ -97,7 +97,6 @@ public class VmfsDataInfo {
      * dme中wwn.
      **/
     private String wwn;
-
     /**
      * getObjectid .
      *
@@ -311,7 +310,7 @@ public class VmfsDataInfo {
      * @param param .
      */
     public void setMinIops(final Integer param) {
-        this.minIops = minIops;
+        this.minIops = param;
     }
 
     /**

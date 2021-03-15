@@ -1,5 +1,7 @@
 package com.huawei.dmestore.task;
 
+import com.huawei.dmestore.exception.VcenterException;
+import com.huawei.dmestore.services.BestPracticeProcessServiceImpl;
 import com.huawei.dmestore.services.SystemServiceImpl;
 
 import org.slf4j.Logger;
@@ -36,6 +38,9 @@ public class IniExecTask implements ApplicationListener<ContextRefreshedEvent> {
     @Autowired
     private SystemServiceImpl systemService;
 
+    @Autowired
+    private BestPracticeProcessServiceImpl bestPracticeProcessService;
+
 
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
@@ -53,8 +58,16 @@ public class IniExecTask implements ApplicationListener<ContextRefreshedEvent> {
             @Override
             public void run() {
                 LOG.info("--->ini Scan Datastore Task...start");
-                backgroundScanDatastoreTask.scanDatastore();
-                LOG.info("--->ini Scan Datastore Task...end");
+                try {
+                    LOG.info("--->ini Scan Datastore Task...start");
+                    backgroundScanDatastoreTask.scanDatastore();
+                    LOG.info("--->ini Scan Datastore Task...end");
+                    LOG.info("--->ini Scan Best Practice Task...start");
+                    bestPracticeProcessService.check(null);
+                    LOG.info("--->ini Scan Best Practice Task...end");
+                } catch (VcenterException e) {
+                    LOG.error("初始化任务失败：", e.getMessage());
+                }
             }
         }, daLay, TimeUnit.SECONDS);
     }

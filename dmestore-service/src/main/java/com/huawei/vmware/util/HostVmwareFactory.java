@@ -1,6 +1,6 @@
 package com.huawei.vmware.util;
 
-import com.huawei.vmware.mo.HostMO;
+import com.huawei.vmware.mo.HostMo;
 
 import com.vmware.vim25.ManagedObjectReference;
 
@@ -41,8 +41,8 @@ public class HostVmwareFactory {
      * @return HostMO
      * @throws Exception Exception
      */
-    public HostMO build(VmwareContext context, ManagedObjectReference morHost) throws Exception {
-        return new HostMO(context, morHost);
+    public HostMo build(VmwareContext context, ManagedObjectReference morHost) throws Exception {
+        return new HostMo(context, morHost);
     }
 
     /**
@@ -53,7 +53,7 @@ public class HostVmwareFactory {
      * @return HostMO HostMO
      * @throws Exception Exception
      */
-    public HostMO build(VmwareContext context, String hostName) throws Exception {
-        return new HostMO(context, hostName);
+    public HostMo build(VmwareContext context, String hostName) throws Exception {
+        return new HostMo(context, hostName);
     }
 }

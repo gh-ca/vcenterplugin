@@ -1,5 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import {StorageTypeShow} from "../vmfs/list/list.service";
+import {TranslatePipe} from "@ngx-translate/core";
 
 @Injectable()
 export class StorageService {
@@ -30,6 +32,7 @@ export interface StorageList {
    productVersion: string;
    usedCapacity: number;
    totalCapacity: number;
+   freeCap: number;
    totalEffectiveCapacity: number;
    freeEffectiveCapacity: number;
    maxCpuUtilization: number;
@@ -44,6 +47,7 @@ export interface StorageList {
    maintenanceOvertime: string;
    location: string;
    patchVersion: string;
+   storageTypeShow:StorageTypeShow;
 }
 export class LogicPort{
   id: string;
@@ -115,7 +119,7 @@ export class CapacitySerie{
   labelLine: any;
   color: any;
   data: D[]=[];
-  constructor(protection:number,fs:number,volume:number,free:number){
+  constructor(protection:number,fs:number,volume:number,free:number, blockFile:number,isDorado:boolean, translatePipe:TranslatePipe){
     this.name= "";
     this.type="pie";
     this.radius=['60%', '70%'];
@@ -132,26 +136,41 @@ export class CapacitySerie{
         fontWeight: 'bold'
       }
     };
-    this.color=['hsl(164,58%, 52%)', 'hsl(48, 77%, 55%)', 'hsl(224, 93%, 70%)', 'hsl(0, 0%, 90%)'];
+    // 保护
+    const p = new D();
+    p.value=protection;
+    p.name=translatePipe.transform("storage.chart.protection") + '(GB)';
+    this.data.push(p);
+
+    if (isDorado) {
+      this.color=['hsl(164,58%, 52%)', 'hsl(48, 77%, 55%)', 'hsl(0, 0%, 90%)'];
+      // 块/文件
+      const bf = new D();
+      bf.value = blockFile;
+      bf.name = translatePipe.transform('storage.chart.blockFile') + '(GB)';
+      this.data.push(bf);
+    } else {
+      this.color=['hsl(164,58%, 52%)', 'hsl(48, 77%, 55%)', 'hsl(224, 93%, 70%)', 'hsl(0, 0%, 90%)'];
+      // 文件系统
+      const f= new D();
+      f.value=fs;
+      f.name = translatePipe.transform('storage.chart.file') + '(GB)';;
+      this.data.push(f);
+      // LUN
+      const v= new D();
+      v.value=volume;
+      v.name = translatePipe.transform('storage.chart.volume') + '(GB)';;
+      this.data.push(v);
+    }
     this.labelLine = {
       show: false
     };
-    const p = new D();
-    p.value=protection;
-    p.name="保护";
-    this.data.push(p);
-    const f= new D();
-    f.value=fs;
-    f.name="文件系统";
-    this.data.push(f);
-    const v= new D();
-    v.value=volume;
-    v.name="卷";
-    this.data.push(v);
+    // 空闲
     const fr= new D();
     fr.value=free;
-    fr.name="空闲";
+    fr.name = translatePipe.transform('storage.chart.free') + '(GB)';;
     this.data.push(fr);
+
   }
 }
 export class D{

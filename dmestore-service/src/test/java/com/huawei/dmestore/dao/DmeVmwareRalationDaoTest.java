@@ -3,6 +3,7 @@ package com.huawei.dmestore.dao;
 import com.huawei.dmestore.DMEServiceApplication;
 import com.huawei.dmestore.entity.DmeVmwareRelation;
 import com.huawei.dmestore.exception.DmeSqlException;
+import com.huawei.dmestore.utils.ToolUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -88,7 +89,7 @@ public class DmeVmwareRalationDaoTest {
 
     @Test
     public void update() {
-        dmeVmwareRalationDao.update(list);
+        dmeVmwareRalationDao.update(list, ToolUtils.STORE_TYPE_NFS);
 
     }
 

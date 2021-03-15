@@ -1,8 +1,6 @@
 package com.huawei.vmware.mo;
 
-import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyObject;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
@@ -56,7 +54,7 @@ public class HostMOTest {
     private VimPortType service;
 
     @InjectMocks
-    private HostMO hostMo;
+    private HostMo hostMo;
 
     private VmwareClient vmwareClient;
 
@@ -103,7 +101,7 @@ public class HostMOTest {
         ManagedObjectReference parent = mock(ManagedObjectReference.class);
         when(vmwareClient.getDynamicProperty(anyObject(), eq("parent"))).thenReturn(parent);
         when(parent.getType()).thenReturn("ClusterComputeResource");
-        ClusterMO clusterMO = mock(ClusterMO.class);
+        ClusterMo clusterMO = mock(ClusterMo.class);
         when(clusterVmwareMoFactory.build(context, parent)).thenReturn(clusterMO);
         when(clusterMO.getDasConfig()).thenReturn(mock(ClusterDasConfigInfo.class));
         hostMo.getDasConfig();
@@ -114,7 +112,7 @@ public class HostMOTest {
         ManagedObjectReference parent = mock(ManagedObjectReference.class);
         when(vmwareClient.getDynamicProperty(anyObject(), eq("parent"))).thenReturn(parent);
         when(parent.getType()).thenReturn("ClusterComputeResource");
-        ClusterMO clusterMO = mock(ClusterMO.class);
+        ClusterMo clusterMO = mock(ClusterMo.class);
         when(clusterVmwareMoFactory.build(context, parent)).thenReturn(clusterMO);
         when(clusterMO.isHaEnabled()).thenReturn(true);
         hostMo.isHaEnabled();
@@ -126,10 +124,10 @@ public class HostMOTest {
         ManagedObjectReference parent = mock(ManagedObjectReference.class);
         when(vmwareClient.getDynamicProperty(anyObject(), eq("parent"))).thenReturn(parent);
         when(parent.getType()).thenReturn("ClusterComputeResource");
-        ClusterMO clusterMO = mock(ClusterMO.class);
+        ClusterMo clusterMO = mock(ClusterMo.class);
         when(clusterVmwareMoFactory.build(context, parent)).thenReturn(clusterMO);
         when(clusterMO.isHaEnabled()).thenReturn(true);
-        VirtualMachineMO vmMo = mock(VirtualMachineMO.class);
+        VirtualMachineMo vmMo = mock(VirtualMachineMo.class);
         doNothing().when(clusterMO).setRestartPriorityForVm(anyObject(), eq(priority));
         hostMo.setRestartPriorityForVm(vmMo, priority);
     }
@@ -346,7 +344,7 @@ public class HostMOTest {
     public void getExistingDataStoreOnHost() throws Exception {
         String hostAddress = "122";
         String path = "12";
-        HostDatastoreSystemMO hostDatastoreSystemMo = mock(HostDatastoreSystemMO.class);
+        HostDatastoreSystemMo hostDatastoreSystemMo = mock(HostDatastoreSystemMo.class);
         List<ManagedObjectReference> morArray = new ArrayList<>();
         ManagedObjectReference managedObjectReference = mock(ManagedObjectReference.class);
         morArray.add(managedObjectReference);
@@ -452,7 +450,7 @@ public class HostMOTest {
         ManagedObjectReference parent = mock(ManagedObjectReference.class);
         when(vmwareClient.getDynamicProperty(anyObject(), eq("parent"))).thenReturn(parent);
         when(parent.getType()).thenReturn("ClusterComputeResource");
-        ClusterMO clusterMO = mock(ClusterMO.class);
+        ClusterMo clusterMO = mock(ClusterMo.class);
         when(clusterVmwareMoFactory.build(context, parent)).thenReturn(clusterMO);
         when(clusterMO.getRecommendedDiskController(guestOsId)).thenReturn("aa");
         try {

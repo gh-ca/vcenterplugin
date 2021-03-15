@@ -1,7 +1,7 @@
 import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {
-  ClusterList,
+  ClusterList, ConnFaildData,
   GetForm,
   HostList,
   HostOrCluster,
@@ -73,6 +73,7 @@ export class MountComponent implements OnInit{
   mountedCluster: HostOrCluster[] = []; // 已挂载的集群
   mountSuccessShow = false; // 挂载成功窗口
   unmountSuccessShow = false; // 卸载窗口
+  unmountTipsShow = false; // 卸载删除提示
   // vmfs数据
   vmfsInfo = {
     name: ''
@@ -80,7 +81,12 @@ export class MountComponent implements OnInit{
 
   modalLoading = false; // 数据加载loading
   modalHandleLoading = false; // 数据处理loading
-  isOperationErr = false; // 错误信息
+  isOperationErr = false; // 挂载错误信息
+  isUnmountOperationErr = false; // 卸载错误信息
+
+  connectivityFailure = false; // 主机联通性测试失败
+  connFailData:ConnFaildData[]; //  主机联通性测试失败数据
+  showDetail = false; // 展示主机联通异常数据
 
   ngOnInit(): void {
     // 初始化隐藏窗口
@@ -111,6 +117,7 @@ export class MountComponent implements OnInit{
             this.objectId = queryParam.objectId;
           } else { // 以dataStore为入口
             this.objectId = ctx[0].id;
+            // this.objectId = "urn:vmomi:Datastore:datastore-5036:674908e5-ab21-4079-9cb1-596358ee5dd1";
           }
           if (this.operationType === 'mount') {
             this.mountShow = true;
@@ -132,6 +139,7 @@ export class MountComponent implements OnInit{
 
         } else { // 以集群为入口
           this.hostOrClusterId = ctx[0].id;
+          // this.hostOrClusterId = "urn:vmomi:HostSystem:host-1034:674908e5-ab21-4079-9cb1-596358ee5dd1";
           this.hostMountShow = true;
           console.log("this.hostMountShow", this.hostMountShow)
         }
@@ -383,6 +391,22 @@ export class MountComponent implements OnInit{
         if (result.code  ===  '200'){
           console.log('挂载成功');
           this.mountSuccessShow = true;
+        } else if(result.code === '-60001') {
+          this.connectivityFailure = true;
+          this.showDetail = false;
+          const connFailDatas:ConnFaildData[] = [];
+          if (result.data) {
+            result.data.forEach(item => {
+              for (let key in item) {
+                const conFailData = {
+                  hostName: key,
+                  description: item[key]
+                };
+                connFailDatas.push(conFailData);
+              }
+            });
+            this.connFailData = connFailDatas;
+          }
         } else {
           console.log('挂载异常：' + result.description);
           this.isOperationErr = true;
@@ -416,7 +440,7 @@ export class MountComponent implements OnInit{
           this.unmountSuccessShow = true;
         } else {
           console.log('unmount  fail：' + result.description);
-          this.isOperationErr = true;
+          this.isUnmountOperationErr = true;
         }
         this.cdr.detectChanges();
       });
@@ -484,6 +508,22 @@ export class MountComponent implements OnInit{
       if (result.code  ===  '200'){
         console.log('挂载成功');
         this.mountSuccessShow = true;
+      } else if(result.code === '-60001') {
+        this.connectivityFailure = true;
+        this.showDetail = false;
+        const connFailDatas:ConnFaildData[] = [];
+        if (result.data) {
+          result.data.forEach(item => {
+            for (let key in item) {
+              const conFailData = {
+                hostName: key,
+                description: item[key]
+              };
+              connFailDatas.push(conFailData);
+            }
+          });
+          this.connFailData = connFailDatas;
+        }
       } else {
         console.log('挂载异常：' + result.description);
         this.isOperationErr = true;
@@ -517,7 +557,7 @@ export class MountComponent implements OnInit{
           this.unmountSuccessShow = true;
         } else {
           console.log('unmount  fail：' + result.description);
-          this.isOperationErr = true;
+          this.isUnmountOperationErr = true;
         }
         this.cdr.detectChanges();
       });

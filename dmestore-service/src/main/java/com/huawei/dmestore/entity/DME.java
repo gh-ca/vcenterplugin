@@ -316,25 +316,7 @@ public class DME extends Dmebase implements Serializable {
             + reservedStr2 + ", lastModify=" + lastModify + ", createTime=" + createTime + "]";
     }
 
-    /**
-     * 加密dme对象的登录密码.
-     *
-     * @param param dme
-     */
-    public static void updateEsightWithEncryptedPassword(final DME param) {
-        if (param != null) {
-            param.setLoginPwd(CipherUtils.encryptString(param.getLoginPwd()));
-        }
-    }
 
-    /**
-     * 解密dme对象的登录密码.
-     *
-     * @param param dme .
-     */
-    public static void decryptedPassword(final DME param) {
-        if (param != null) {
-            param.setLoginPwd(CipherUtils.decryptString(param.getLoginPwd()));
-        }
-    }
+
+
 }

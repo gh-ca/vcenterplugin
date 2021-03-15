@@ -27,4 +27,12 @@ export class ServiceLevelService {
   getVmfsById(objectId) {
     return this.http.get('accessvmfs/queryvmfs?dataStoreObjectId='+objectId);
   }
+
+  /**
+   * 通过objectId 获取vmfs存储数据
+   * @param objectId
+   */
+  getStorageById(objectId) {
+    return this.http.get('accessvmware/relation?datastoreObjectId='+objectId);
+  }
 }

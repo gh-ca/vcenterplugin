@@ -40,7 +40,7 @@ public class HostNetworkSystemMOTest {
     private VimPortType service;
 
     @InjectMocks
-    private HostNetworkSystemMO hostNetworkSystemMO;
+    private HostNetworkSystemMo hostNetworkSystemMO;
 
     @Before
     public void setUp() throws Exception {

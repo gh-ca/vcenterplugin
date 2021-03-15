@@ -6,13 +6,14 @@ import {
 import {HttpClient} from '@angular/common/http';
 import { CommonService } from '../common.service';
 import { GlobalsService }     from "../../shared/globals.service";
+import {TranslatePipe} from "@ngx-translate/core";
 
 @Component({
   selector: 'app-bestpractice',
   templateUrl: './bestpractice.component.html',
   styleUrls: ['./bestpractice.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [CommonService]
+  providers: [CommonService, TranslatePipe]
 })
 export class BestpracticeComponent implements OnInit {
 
@@ -45,10 +46,14 @@ export class BestpracticeComponent implements OnInit {
 
   applyLoading = false;
   checkLoading = false;
+
+  applyTips = false;// 实施最佳实践提示（违规数为0时提示）
+
   constructor(private cdr: ChangeDetectorRef,
               public gs: GlobalsService,
               private http: HttpClient,
-              private commonService: CommonService) { }
+              private commonService: CommonService,
+              private translatePipe:TranslatePipe) { }
 
   ngOnInit(): void {
     this.practiceRefresh();
@@ -127,6 +132,17 @@ export class BestpracticeComponent implements OnInit {
   }
 
   applyClick(type: string){
+    if (type == '1') {
+      this.rowSelected.forEach((item) => {
+        if (item.count == 0) {
+          this.applyTips = true;
+          return;
+        }
+      });
+      if (this.applyTips) {
+        return;
+      }
+    }
     this.applyType = type;
     let params;
     if(this.applyType == '1'){
@@ -173,6 +189,41 @@ export class BestpracticeComponent implements OnInit {
     this.http.get('v1/bestpractice/records/all', {}).subscribe((result: any) => {
           if (result.code === '200'){
             this.list = result.data;
+            // bug修改：列表页面级别过滤 中英文问题
+            if (this.list) {
+              this.list.forEach(item => {
+                let levelDesc;
+                let levelNum;
+                switch (item.level) {
+                  case "Critical":
+                    levelNum = 4;
+                    levelDesc = this.translatePipe.transform("overview.critical");
+                    break;
+                  case "Major":
+                    levelNum = 3;
+                    levelDesc = this.translatePipe.transform("overview.major");
+                    break;
+                  case "Warning":
+                    levelNum = 2;
+                    levelDesc = this.translatePipe.transform("overview.warning");
+                    break;
+                  case "Info":
+                    levelNum = 1;
+                    levelDesc = this.translatePipe.transform("overview.info");
+                    break;
+                  default:
+                    levelNum = 0;
+                    levelDesc = "--";
+                    break;
+                }
+                item.levelDesc = levelDesc;
+                item.levelNum = levelNum;
+                // 违规主机实际值修改
+                item.hostList.forEach(hostInfo => {
+                  hostInfo.actualObjValue = this.getTypeOf(hostInfo.actualValue);
+                });
+              });
+            }
             this.total = result.data.length;
             this.isLoading = false;
             this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
@@ -197,12 +248,67 @@ export class BestpracticeComponent implements OnInit {
       this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
     }
   }
+
+  /**
+   * 单行实施
+   * @param item
+   */
+  applyOperation(item:Bestpractice){
+    const params = [];
+    this.ips = '';
+    const i = {hostSetting:'', hostObjectIds: []};
+    i.hostSetting = item.hostSetting;
+    item.hostList.forEach((s) => {
+      i.hostObjectIds.push(s.hostObjectId);
+      if (s.needReboot == "true"){
+        this.ips += s.hostName+",";
+      }
+    });
+    params.push(i);
+    this.applyPractice(params);
+  }
+
+  /**
+   * 将字符串转JSON数组
+   * @param obj
+   */
+  getTypeOf(obj) {
+    let object:object;
+    if (typeof obj == 'string' && obj.indexOf("[{") != -1) {
+      object = JSON.parse(obj);
+    } else {
+      object = obj;
+    }
+    return object;
+  }
+
+  /**
+   * 实际值 是否为数组 true 数组 false 字符串
+   * @param obj
+   */
+  isObjectValue(obj) {
+    return (typeof obj) == 'object';
+  }
+
+  /**
+   * 获取实际值文本值
+   * @param obj
+   */
+  getObjectTitle(obj) {
+    let title = '';
+    obj.forEach(item => {
+      title += item.name + " | " + item.value + '\n';
+    });
+    return title;
+  }
 }
 
 class Bestpractice {
   hostSetting: string;
   recommendValue: number;
   level: string;
+  levelNum: number;
+  levelDesc: string;
   count: number;
   hostList: Host[];
 }
@@ -213,6 +319,7 @@ class Host {
   hostName: string;
   recommendValue: number;
   actualValue: number;
+  actualObjValue:any;
   hostObjectId: string;
   needReboot: string;
   hostId: string;

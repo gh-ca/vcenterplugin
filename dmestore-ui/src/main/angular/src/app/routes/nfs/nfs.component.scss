@@ -97,8 +97,8 @@
 ::ng-deep clr-icon {
   display: inline-block;
   margin: 0;
-  height: 20px;
-  width: 20px;
+  //height: 20px;
+  //width: 20px;
   vertical-align: middle;
   fill: currentColor;
 }
@@ -257,8 +257,8 @@ input[type=number] {
 ::ng-deep clr-icon {
   display: inline-block;
   margin: 0;
-  height: 20px;
-  width: 20px;
+  //height: 20px;
+  //width: 20px;
   vertical-align: middle;
   fill: currentColor;
 }
@@ -379,4 +379,22 @@ input[type=number] {
   font-size: .8rem;
   color: white;
   font-weight: bolder;
+}
+.over_flow{
+  text-overflow: ellipsis;
+  overflow: hidden;
+  word-break: break-all;
+  white-space: nowrap;
+}
+.hideFilter ::ng-deep clr-dg-string-filter{
+  display: none;
+}
+::ng-deep .datagrid-table .datagrid-column .datagrid-filter-toggle{
+  margin: auto;
+}
+input::-ms-clear{
+  display: none;
+}
+::ng-deep .datagrid {
+  -ms-overflow-style:scrollbar;
 }

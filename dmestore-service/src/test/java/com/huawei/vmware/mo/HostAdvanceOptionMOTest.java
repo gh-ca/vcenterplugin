@@ -37,7 +37,7 @@ public class HostAdvanceOptionMOTest {
     private VimPortType service;
 
     @InjectMocks
-    private HostAdvanceOptionMO hostAdvanceOptionMO;
+    private HostAdvanceOptionMo hostAdvanceOptionMO;
 
     @Before
     public void setUp() throws Exception {

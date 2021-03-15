@@ -7,6 +7,8 @@ import com.huawei.dmestore.exception.DataBaseException;
 import com.huawei.dmestore.exception.DmeSqlException;
 import com.huawei.dmestore.utils.ToolUtils;
 
+import com.vmware.vim.binding.vmodl.list;
+
 import org.springframework.util.StringUtils;
 
 import java.sql.Connection;
@@ -14,6 +16,7 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -54,6 +57,8 @@ public class DmeVmwareRalationDao extends H2DataBaseDao {
     private static final String LOGICPORT_NAME = "LOGICPORT_NAME";
 
     private static final String STORE_TYPE = "STORE_TYPE";
+
+    private static final String STORAGE_TYPE = "STORAGE_TYPE";
 
     private static final String CREATETIME = "CREATETIME";
 
@@ -98,6 +103,7 @@ public class DmeVmwareRalationDao extends H2DataBaseDao {
                 dvr.setUpdateTime(rs.getTimestamp(UPDATETIME));
                 dvr.setState(rs.getInt(STATE));
                 dvr.setStorageDeviceId(rs.getString(STORAGE_DEVICE_ID));
+                dvr.setStorageType(rs.getString(STORAGE_TYPE));
                 lists.add(dvr);
             }
         } catch (DataBaseException | SQLException e) {
@@ -144,6 +150,7 @@ public class DmeVmwareRalationDao extends H2DataBaseDao {
                 dvr.setCreateTime(rs.getTimestamp("CREATETIME"));
                 dvr.setUpdateTime(rs.getTimestamp("UPDATETIME"));
                 dvr.setState(rs.getInt(STATE));
+                dvr.setStorageType(rs.getString(STORAGE_TYPE));
                 dvr.setStorageDeviceId(rs.getString(STORAGE_DEVICE_ID));
             }
         } catch (DataBaseException | SQLException e) {
@@ -207,13 +214,85 @@ public class DmeVmwareRalationDao extends H2DataBaseDao {
         return lists;
     }
 
-    public void update(List<DmeVmwareRelation> list) {
-        LOGGER.info("update do nothing, list size={}", list.size());
+    public void updateNfs(List<DmeVmwareRelation> list) {
+        LOGGER.info("starting nfs database, list size={}", list.size());
+        if (list == null || list.size() == 0) {
+            return;
+        }
+
+        Connection con = null;
+        PreparedStatement pstm = null;
+        try {
+            con = getConnection();
+            String sql = "UPDATE " + DpSqlFileConstants.DP_DME_VMWARE_RELATION
+                + " SET STORE_ID=?,STORE_NAME=?,FS_ID=?,FS_NAME=?,UPDATETIME=?,STORE_TYPE=? where FS_ID=?";
+            pstm = con.prepareStatement(sql);
+            LOGGER.info("updateNfs!sql={}, connection is not null:{}", sql, con == null ? false : true);
+            con.setAutoCommit(false);
+            for (DmeVmwareRelation relation : list) {
+                pstm.setString(DpSqlFileConstants.DIGIT_1, relation.getStoreId());
+                pstm.setString(DpSqlFileConstants.DIGIT_2, relation.getStoreName());
+                pstm.setString(DpSqlFileConstants.DIGIT_3, relation.getFsId());
+                pstm.setString(DpSqlFileConstants.DIGIT_4, relation.getFsName());
+                pstm.setDate(DpSqlFileConstants.DIGIT_5, new Date(System.currentTimeMillis()));
+                pstm.setString(DpSqlFileConstants.DIGIT_6, relation.getStoreType());
+                pstm.setString(DpSqlFileConstants.DIGIT_7, relation.getFsId());
+                pstm.addBatch();
+            }
+            pstm.executeBatch();
+            con.commit();
+        } catch (SQLException ex) {
+            try {
+                // 回滚
+                con.rollback();
+            } catch (SQLException e) {
+                LOGGER.error("updateNfs error:{}", ex.getMessage());
+            }
+        } finally {
+            closeConnection(con, pstm, null);
+        }
     }
 
     public void update(List<DmeVmwareRelation> list, String storeType) {
         if (storeType != null && storeType.equalsIgnoreCase(DmeConstants.STORE_TYPE_VMFS)) {
             updateVmfs(list);
+        } else if (storeType != null && storeType.equalsIgnoreCase(DmeConstants.STORE_TYPE_NFS)) {
+            updateNfs(list);
+        }
+    }
+
+    public void updateNfs(DmeVmwareRelation dmeVmwareRelation) {
+        if (dmeVmwareRelation == null) {
+            return;
+        }
+
+        Connection con = null;
+        Statement pstm = null;
+        try {
+            con = getConnection();
+            String sql = "UPDATE " + DpSqlFileConstants.DP_DME_VMWARE_RELATION + " SET " +
+                "STORE_ID='"+dmeVmwareRelation.getStoreId()+"'" +
+                ",FS_ID='"+dmeVmwareRelation.getFsId()+"'," +
+                "STORE_NAME='"+dmeVmwareRelation.getStoreName()+"'," +
+                "FS_NAME='"+dmeVmwareRelation.getFsName()+"'," +
+                "UPDATETIME='"+new Date(System.currentTimeMillis())+"'," +
+                "SHARE_ID='"+dmeVmwareRelation.getShareId()+"'," +
+                "SHARE_NAME='"+dmeVmwareRelation.getShareName()+"'," +
+                "STORE_TYPE='"+dmeVmwareRelation.getStoreType()+"' " +
+                "where FS_ID='"+dmeVmwareRelation.getFsId()+"'";
+            pstm = con.createStatement();
+            LOGGER.info("updateNfs!sql={}, connection is not null:{}", sql, con == null ? false : true);
+            pstm.executeUpdate(sql);
+            con.commit();
+        } catch (SQLException ex) {
+            try {
+                // 回滚
+                con.rollback();
+            } catch (SQLException e) {
+                LOGGER.error("updateVmfs error:{}", ex.getMessage());
+            }
+        } finally {
+            closeConnection(con, pstm, null);
         }
     }
 
@@ -238,6 +317,7 @@ public class DmeVmwareRalationDao extends H2DataBaseDao {
                 pstm.setString(DpSqlFileConstants.DIGIT_4, relation.getVolumeName());
                 pstm.setDate(DpSqlFileConstants.DIGIT_5, new Date(System.currentTimeMillis()));
                 pstm.setString(DpSqlFileConstants.DIGIT_6, relation.getVolumeWwn());
+                pstm.setString(DpSqlFileConstants.DIGIT_7, relation.getStorageType());
                 pstm.addBatch();
             }
             pstm.executeBatch();
@@ -264,8 +344,8 @@ public class DmeVmwareRalationDao extends H2DataBaseDao {
         try {
             con = getConnection();
             String sql = "insert into DP_DME_VMWARE_RELATION(STORE_ID,STORE_NAME,VOLUME_ID,VOLUME_NAME,VOLUME_WWN,"
-                + "VOLUME_SHARE,VOLUME_FS,STORE_TYPE,SHARE_ID,SHARE_NAME,FS_ID,FS_NAME,LOGICPORT_ID,"
-                + "LOGICPORT_NAME,STORAGE_DEVICE_ID) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+                + "VOLUME_SHARE,VOLUME_FS,STORE_TYPE,STORAGE_TYPE,SHARE_ID,SHARE_NAME,FS_ID,FS_NAME,LOGICPORT_ID,"
+                + "LOGICPORT_NAME,STORAGE_DEVICE_ID) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
             pstm = con.prepareStatement(sql);
             LOGGER.info("save relation!sql={}, connection is not null:{}", sql, con == null ? false : true);
 
@@ -280,13 +360,14 @@ public class DmeVmwareRalationDao extends H2DataBaseDao {
                 pstm.setString(DpSqlFileConstants.DIGIT_6, relation.getVolumeShare());
                 pstm.setString(DpSqlFileConstants.DIGIT_7, relation.getVolumeFs());
                 pstm.setString(DpSqlFileConstants.DIGIT_8, relation.getStoreType());
-                pstm.setString(DpSqlFileConstants.DIGIT_9, relation.getShareId());
-                pstm.setString(DpSqlFileConstants.DIGIT_10, relation.getShareName());
-                pstm.setString(DpSqlFileConstants.DIGIT_11, relation.getFsId());
-                pstm.setString(DpSqlFileConstants.DIGIT_12, relation.getFsName());
-                pstm.setString(DpSqlFileConstants.DIGIT_13, relation.getLogicPortId());
-                pstm.setString(DpSqlFileConstants.DIGIT_14, relation.getLogicPortName());
-                pstm.setString(DpSqlFileConstants.DIGIT_15, relation.getStorageDeviceId());
+                pstm.setString(DpSqlFileConstants.DIGIT_9, relation.getStorageType());
+                pstm.setString(DpSqlFileConstants.DIGIT_10, relation.getShareId());
+                pstm.setString(DpSqlFileConstants.DIGIT_11, relation.getShareName());
+                pstm.setString(DpSqlFileConstants.DIGIT_12, relation.getFsId());
+                pstm.setString(DpSqlFileConstants.DIGIT_13, relation.getFsName());
+                pstm.setString(DpSqlFileConstants.DIGIT_14, relation.getLogicPortId());
+                pstm.setString(DpSqlFileConstants.DIGIT_15, relation.getLogicPortName());
+                pstm.setString(DpSqlFileConstants.DIGIT_16, relation.getStorageDeviceId());
                 LOGGER.info("pstm.addBatch StoreType={}", sql, relation.getStoreType());
                 pstm.addBatch();
             }
@@ -300,7 +381,7 @@ public class DmeVmwareRalationDao extends H2DataBaseDao {
             } catch (SQLException e) {
                 LOGGER.error(ex.getMessage());
             }
-            LOGGER.error("Failed to svae datastorage dme relation: {}", ex.getMessage());
+            LOGGER.error("Failed to save datastorage dme relation: {}", ex.getMessage());
         } finally {
             closeConnection(con, pstm, null);
         }
@@ -607,4 +688,120 @@ public class DmeVmwareRalationDao extends H2DataBaseDao {
         }
         return vmfsDatastoreName;
     }
+
+    public DmeVmwareRelation getDataStoreByFs(String fsId) throws DmeSqlException {
+        DmeVmwareRelation dmeVmwareRelation = new DmeVmwareRelation();
+
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        try {
+            con = getConnection();
+            String sql = "SELECT * FROM " + DpSqlFileConstants.DP_DME_VMWARE_RELATION
+                + " WHERE state=1 and FS_ID='" + fsId + "'";
+            ps = con.prepareStatement(sql);
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                dmeVmwareRelation.setId(rs.getInt(ID));
+                dmeVmwareRelation.setStoreId(rs.getString(STORE_ID));
+                dmeVmwareRelation.setStoreName(rs.getString(STORE_NAME));
+                dmeVmwareRelation.setShareId(rs.getString(STORE_ID));
+                dmeVmwareRelation.setShareName(rs.getString(STORE_NAME));
+                dmeVmwareRelation.setFsId(rs.getString(FS_ID));
+                dmeVmwareRelation.setFsName(rs.getString(FS_NAME));
+                dmeVmwareRelation.setLogicPortId(rs.getString(LOGICPORT_ID));
+                dmeVmwareRelation.setLogicPortName(rs.getString(LOGICPORT_NAME));
+                dmeVmwareRelation.setStoreType(rs.getString(STORE_TYPE));
+                dmeVmwareRelation.setCreateTime(rs.getDate(CREATETIME));
+                dmeVmwareRelation.setUpdateTime(rs.getDate(UPDATETIME));
+                dmeVmwareRelation.setState(rs.getInt(STATE));
+                dmeVmwareRelation.setStorageDeviceId(rs.getString(STORAGE_DEVICE_ID));
+                dmeVmwareRelation.setStorageType(rs.getString(STORAGE_TYPE));
+                break;
+            }
+        } catch (DataBaseException | SQLException e) {
+            LOGGER.error("Failed to get vmfs datastore on: {},{}", FS_ID, e.getMessage());
+            throw new DmeSqlException(e.getMessage());
+        } finally {
+            closeConnection(con, ps, rs);
+        }
+        return dmeVmwareRelation;
+    }
+
+
+    public String getStorageModelByWwn(String wwn) throws DmeSqlException{
+        String storageModel = "";
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        try {
+            con = getConnection();
+            String sql = "SELECT * FROM " + DpSqlFileConstants.DP_DME_VMWARE_RELATION
+                + " WHERE state=1 and STORE_TYPE='" + DmeConstants.STORE_TYPE_VMFS + "'and VOLUME_WWN ='" + wwn
+                + "'";
+            ps = con.prepareStatement(sql);
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                storageModel = rs.getString("STORAGE_TYPE");
+                break;
+            }
+        } catch (DataBaseException | SQLException e) {
+            LOGGER.error("Failed to get vmfs datastore on: {},{}", wwn, e.getMessage());
+            throw new DmeSqlException(e.getMessage());
+        } finally {
+            closeConnection(con, ps, rs);
+        }
+        return storageModel;
+    }
+
+    public String getStorageIdlByObjectId(String objectId) throws DmeSqlException{
+        String storageId = "";
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        try {
+            con = getConnection();
+            String sql = "SELECT * FROM " + DpSqlFileConstants.DP_DME_VMWARE_RELATION
+                + " WHERE state=1 and STORE_TYPE='" + DmeConstants.STORE_TYPE_NFS + "'and STORE_ID ='" + objectId
+                + "'";
+            ps = con.prepareStatement(sql);
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                storageId = rs.getString(STORAGE_DEVICE_ID);
+                break;
+            }
+        } catch (DataBaseException | SQLException e) {
+            LOGGER.error("Failed to get vmfs datastore on: {},{}", objectId, e.getMessage());
+            throw new DmeSqlException(e.getMessage());
+        } finally {
+            closeConnection(con, ps, rs);
+        }
+        return storageId;
+    }
+
+    public String getVolumeIdlByStoreId(String objectId) throws DmeSqlException{
+        String volumeId = "";
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        try {
+            con = getConnection();
+            String sql = "SELECT * FROM " + DpSqlFileConstants.DP_DME_VMWARE_RELATION
+                + " WHERE state=1 and STORE_TYPE='" + DmeConstants.STORE_TYPE_VMFS + "'and STORE_ID ='" + objectId
+                + "'";
+            ps = con.prepareStatement(sql);
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                volumeId = rs.getString(VOLUME_ID);
+                break;
+            }
+        } catch (DataBaseException | SQLException e) {
+            LOGGER.error("Failed to get vmfs datastore on: {},{}", objectId, e.getMessage());
+            throw new DmeSqlException(e.getMessage());
+        } finally {
+            closeConnection(con, ps, rs);
+        }
+        return volumeId;
+    }
+
 }

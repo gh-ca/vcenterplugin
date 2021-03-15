@@ -52,7 +52,7 @@ public class HostDatastoreSystemMOTest {
     private VimPortType service;
 
     @InjectMocks
-    private HostDatastoreSystemMO hostDatastoreSystemMO;
+    private HostDatastoreSystemMo hostDatastoreSystemMO;
 
     @Before
     public void setUp() throws Exception {
@@ -104,7 +104,7 @@ public class HostDatastoreSystemMOTest {
 
     @Test
     public void queryVmfsDatastoreExpandOptions() throws Exception {
-        DatastoreMO datastoreMo = mock(DatastoreMO.class);
+        DatastoreMo datastoreMo = mock(DatastoreMo.class);
         List<VmfsDatastoreOption> list = new ArrayList<>();
         when(service.queryVmfsDatastoreExpandOptions(anyObject(), anyObject())).thenReturn(list);
         hostDatastoreSystemMO.queryVmfsDatastoreExpandOptions(datastoreMo);
@@ -112,7 +112,7 @@ public class HostDatastoreSystemMOTest {
 
     @Test
     public void expandVmfsDatastore() throws Exception {
-        DatastoreMO datastoreMo = mock(DatastoreMO.class);
+        DatastoreMo datastoreMo = mock(DatastoreMo.class);
         VmfsDatastoreExpandSpec vmfsDatastoreExpandSpec = mock(VmfsDatastoreExpandSpec.class);
         when(service.expandVmfsDatastore(anyObject(), anyObject(), anyObject())).thenReturn(
             mock(ManagedObjectReference.class));
@@ -205,12 +205,5 @@ public class HostDatastoreSystemMOTest {
         List<ObjectContent> list = new ArrayList<>();
         when(service.retrieveProperties(anyObject(), anyObject())).thenReturn(list);
         hostDatastoreSystemMO.getDatastorePropertiesOnHostDatastoreSystem(propertyPaths);
-    }
-
-    @Test
-    public void unmapVmfsVolumeExTask() throws Exception {
-        List<String> vmfsUuids = new ArrayList<>();
-        when(service.unmapVmfsVolumeExTask(anyObject(), anyObject())).thenReturn(mock(ManagedObjectReference.class));
-        hostDatastoreSystemMO.unmapVmfsVolumeExTask(vmfsUuids);
     }
 }

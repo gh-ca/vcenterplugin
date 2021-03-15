@@ -11,6 +11,11 @@ import java.util.Map;
  **/
 public class DmeConstants {
     /**
+     *  POST
+     *  estimate connectivity of host or hostgroup on dme
+     */
+    public static final String DME_ESTIMATE_CONNECTIVITY = "/rest/vmmgmt/v1/connectivity/host-storage";
+    /**
      * nfs share detail
      **/
     public static final String DME_NFS_SHARE_DETAIL_URL = "/rest/fileservice/v1/nfs-shares/{nfs_share_id}";
@@ -21,9 +26,20 @@ public class DmeConstants {
     public static final String DME_NFS_SHARE_AUTH_CLIENTS_URL = "/rest/fileservice/v1/nfs-auth-clients/query";
 
     /**
+     * 旧URL ："/rest/fileservice/v1/nfs-shares/{nfs_share_id}/auth_clients" old dme
+     **/
+    public static final String DME_NFS_SHARE_AUTH_CLIENTS_URL_OLD
+        = "/rest/fileservice/v1/nfs-shares/{nfs_share_id}/auth_clients";
+
+    /**
      * 旧URL ："/rest/fileservice/v1/nfs-shares/summary"
      **/
     public static final String DME_NFS_SHARE_URL = "/rest/fileservice/v1/nfs-shares/query";
+
+    /**
+     * 旧URL ："/rest/fileservice/v1/nfs-shares/summary"
+     **/
+    public static final String DME_NFS_SHARE_URL_OLD = "/rest/fileservice/v1/nfs-shares/summary";
 
     /**
      * nfs share delete
@@ -57,6 +73,12 @@ public class DmeConstants {
     public static final String API_FS_CREATE = "/rest/fileservice/v1/filesystems/customize-filesystems";
 
     /**
+     * create fs with custom. old DME
+     * old url:/rest/fileservice/v1/filesystems/customize
+     **/
+    public static final String API_FS_CREATE_OLD = "/rest/fileservice/v1/filesystems/customize";
+
+    /**
      * logic port detail
      **/
     public static final String DME_NFS_LOGICPORT_DETAIL_URL = "/rest/storagemgmt/v1/logic-ports/{logic_port_id}";
@@ -64,7 +86,7 @@ public class DmeConstants {
     /**
      * failover groups query
      **/
-    public static final String API_FAILOVERGROUPS = "/rest/storagemgmt/v1/storage-port/failover-groups?storage_id=";
+    public static final String API_FAILOVERGROUPS = "/rest/storagemgmt/v1/failover-groups/query";
 
     /**
      * logic ports query
@@ -79,7 +101,7 @@ public class DmeConstants {
     /**
      * bond ports query
      **/
-    public static final String API_BANDPORTS_LIST = "/rest/storagemgmt/v1/storage-port/bond-ports?storage_id=";
+    public static final String API_BANDPORTS_LIST = "/rest/storagemgmt/v1/bond-ports/query";
 
     /**
      * volume base url
@@ -166,7 +188,7 @@ public class DmeConstants {
     /**
      * storage base url
      **/
-    public static final String API_STORAGES = "/rest/storagemgmt/v1/storages";
+    public static final String API_STORAGES = "/rest/storagemgmt/v1/storages?start=1&limit=1000";
 
     /**
      * storage detail query
@@ -230,6 +252,24 @@ public class DmeConstants {
         = "/rest/hostmgmt/v1/hostgroups/{hostgroup_id}/hosts/list";
 
     /**
+     * delete oriented hostgroup url
+     *
+     **/
+    public static final String DELETE_ORIENTED_HOSTGROUP_URL
+        = "/rest/hostmgmt/v1/hostgroups/{hostgroup_id}";
+
+    /**
+     * add host to hosts
+     **/
+    public static final String PUT_ADD_HOST_TO_HOSTS = "/rest/hostmgmt/v1/hostgroups/{hostgroup_id}/hosts/add";
+
+    /**
+     * remove host from hostgroup
+     **/
+    public static final String PUT_REMOVE_HOST_FROM_HOSTGROUP =
+        "/rest/hostmgmt/v1/hostgroups/{hostgroup_id}/hosts/remove";
+
+    /**
      * instance relation query
      **/
     public static final String LIST_RELATION_URL = "/rest/resourcedb/v1/relations/{relationName}/instances";
@@ -246,9 +286,19 @@ public class DmeConstants {
     public static final String API_DTREES_LIST = "/rest/fileservice/v1/dtrees/query";
 
     /**
+     * 旧版本url : /rest/fileservice/v1/dtrees/summary
+     */
+    public static final String API_DTREES_LIST_OLD = "/rest/fileservice/v1/dtrees/summary";
+
+    /**
      * service level query
      **/
     public static final String LIST_SERVICE_LEVEL_URL = "/rest/service-policy/v1/service-levels";
+
+    /**
+     * datasets query
+     **/
+    public static final String DATASETS_QUERY_URL = "/rest/metrics/v1/datasets/{dataSet}?pageSize=1000";
 
     /**
      * Constant definition
@@ -421,10 +471,24 @@ public class DmeConstants {
     public static final String STORE_TYPE_VMFS = "VMFS";
 
     /**
+     * NFS type
+     **/
+    public static final String STORE_TYPE_NFS = "NFS";
+
+    /**
+     * default_page_size
+     **/
+    public static final int DEFAULT_PAGE_SIZE = 1000;
+    /**
+     * dme主机连通性检测错误代码
+     */
+    public static final String CODE_CONNECTIVITY_FAILURE = "-60001";
+
+    /**
      * 容量初始分配策略。仅支持华为V3/V5设备，Dorado系列不支持该参数。
      * 取值范围：automatic：自动，highest_performance：高性能层，performance：性能层，capacity：容量层。默认值：automatic
      **/
-    public static final Map<String, String> INITIAL_DISTRIBUTE_POLICY = new HashMap(){
+    public static final Map<String, String> INITIAL_DISTRIBUTE_POLICY = new HashMap() {
         {
             put("0", "automatic");
             put("1", "highest_performance");
@@ -438,7 +502,7 @@ public class DmeConstants {
      * 取值范围：no_prefetch: 不预取，constant_prefetch：固定预取，variable_prefetch：可变预取，intelligent_prefetch：智能预取。
      * 默认值：intelligent_prefetch
      **/
-    public static final Map<String, String> PREFETCH_POLICY = new HashMap(){
+    public static final Map<String, String> PREFETCH_POLICY = new HashMap() {
         {
             put("0", "no_prefetch");
             put("1", "constant_prefetch");
@@ -452,12 +516,28 @@ public class DmeConstants {
      * no_migration：不迁移，automatic_migration：自动迁移，migration_to_higher：向高性能层迁移，migration_to_lower：向低性能层迁移
      * 默认值：no_migration。
      **/
-    public static final Map<String, String> SMART_TIER = new HashMap(){
+    public static final Map<String, String> SMART_TIER = new HashMap() {
         {
             put("0", "no_migration");
             put("1", "automatic_migration");
             put("2", "migration_to_higher");
             put("3", "migration_to_lower");
+        }
+    };
+
+    /**
+     * RAID级别。
+     **/
+    public static final Map<String, String> RAID_LEVEL_MAP = new HashMap() {
+        {
+            put("1", "RAID10");
+            put("2", "RAID5");
+            put("3", "RAID0");
+            put("4", "RAID1");
+            put("5", "RAID6");
+            put("6", "RAID50");
+            put("7", "RAID3");
+            put("11", "RAIDTP");
         }
     };
 

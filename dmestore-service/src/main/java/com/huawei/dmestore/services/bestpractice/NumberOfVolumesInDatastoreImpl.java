@@ -1,10 +1,9 @@
 package com.huawei.dmestore.services.bestpractice;
 
 import com.huawei.dmestore.constant.DmeConstants;
-import com.huawei.dmestore.utils.ToolUtils;
 import com.huawei.dmestore.utils.VCSDKUtils;
-import com.huawei.vmware.mo.DatastoreMO;
-import com.huawei.vmware.mo.HostMO;
+import com.huawei.vmware.mo.DatastoreMo;
+import com.huawei.vmware.mo.HostMo;
 import com.huawei.vmware.util.Pair;
 import com.huawei.vmware.util.VmwareContext;
 import com.google.gson.JsonArray;
@@ -35,19 +34,19 @@ public class NumberOfVolumesInDatastoreImpl extends BaseBestPracticeService impl
     public Object getCurrentValue(VCSDKUtils vcsdkUtils, String objectId) throws Exception {
         ManagedObjectReference mor = vcsdkUtils.getVcConnectionHelper().objectId2Mor(objectId);
         VmwareContext context = vcsdkUtils.getVcConnectionHelper().getServerContext(objectId);
-        HostMO hostMo = this.getHostMoFactory().build(context, mor);
+        HostMo hostMo = this.getHostMoFactory().build(context, mor);
         List<Pair<ManagedObjectReference, String>> datastoreMountsOnHost = hostMo.getDatastoreMountsOnHost();
         JsonArray array = new JsonArray();
         for (Pair<ManagedObjectReference, String> pair : datastoreMountsOnHost) {
             ManagedObjectReference dsMor = pair.first();
-            DatastoreMO datastoreMo = this.getDatastoreMoFactory().build(context, dsMor);
+            DatastoreMo datastoreMo = this.getDatastoreMoFactory().build(context, dsMor);
             DatastoreSummary summary = datastoreMo.getSummary();
             if (summary.getType().equalsIgnoreCase(DmeConstants.STORE_TYPE_VMFS)) {
                 JsonObject object = new JsonObject();
                 int volumeSize = datastoreMo.getVmfsDatastoreInfo().getVmfs().getExtent().size();
                 if (volumeSize > Integer.parseInt(getRecommendValue().toString())) {
-                    object.addProperty("dataStoreName", summary.getName());
-                    object.addProperty("volumeSize", volumeSize);
+                    object.addProperty("name", summary.getName());
+                    object.addProperty("value", volumeSize);
                 }
                 array.add(object);
             }
@@ -70,18 +69,18 @@ public class NumberOfVolumesInDatastoreImpl extends BaseBestPracticeService impl
 
     @Override
     public boolean autoRepair() {
-        return true;
+        return false;
     }
 
     @Override
     public boolean check(VCSDKUtils vcsdkUtils, String objectId) throws Exception {
         ManagedObjectReference mor = vcsdkUtils.getVcConnectionHelper().objectId2Mor(objectId);
         VmwareContext context = vcsdkUtils.getVcConnectionHelper().getServerContext(objectId);
-        HostMO hostMo = this.getHostMoFactory().build(context, mor);
+        HostMo hostMo = this.getHostMoFactory().build(context, mor);
         List<Pair<ManagedObjectReference, String>> datastoreMountsOnHost = hostMo.getDatastoreMountsOnHost();
         for (Pair<ManagedObjectReference, String> pair : datastoreMountsOnHost) {
             ManagedObjectReference dsMor = pair.first();
-            DatastoreMO datastoreMo = this.getDatastoreMoFactory().build(context, dsMor);
+            DatastoreMo datastoreMo = this.getDatastoreMoFactory().build(context, dsMor);
             DatastoreSummary summary = datastoreMo.getSummary();
             if (summary.getType().equalsIgnoreCase(DmeConstants.STORE_TYPE_VMFS)) {
                 int volumeSize = datastoreMo.getVmfsDatastoreInfo().getVmfs().getExtent().size();

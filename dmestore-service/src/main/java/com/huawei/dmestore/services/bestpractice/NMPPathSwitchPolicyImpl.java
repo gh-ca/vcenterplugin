@@ -1,14 +1,16 @@
 package com.huawei.dmestore.services.bestpractice;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import com.huawei.dmestore.utils.VCSDKUtils;
-import com.huawei.vmware.mo.HostMO;
-import com.huawei.vmware.mo.HostStorageSystemMO;
+import com.huawei.vmware.mo.HostMo;
+import com.huawei.vmware.mo.HostStorageSystemMo;
 import com.huawei.vmware.util.VmwareContext;
-import com.vmware.vim25.HostMultipathInfoLogicalUnit;
-import com.vmware.vim25.HostMultipathInfoLogicalUnitPolicy;
-import com.vmware.vim25.ManagedObjectReference;
+import com.vmware.vim25.*;
 
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * NMPPathSwitchPolicyImpl
@@ -29,20 +31,20 @@ public class NMPPathSwitchPolicyImpl extends BaseBestPracticeService implements 
 
     @Override
     public Object getCurrentValue(VCSDKUtils vcsdkUtils, String objectId) throws Exception {
-        ManagedObjectReference mor = vcsdkUtils.getVcConnectionHelper().objectId2Mor(objectId);
-        VmwareContext context = vcsdkUtils.getVcConnectionHelper().getServerContext(objectId);
-        HostMO hostMo = this.getHostMoFactory().build(context, mor);
-        HostStorageSystemMO hostStorageSystemMo = hostMo.getHostStorageSystemMo();
-        List<HostMultipathInfoLogicalUnit> lunList = hostStorageSystemMo.getStorageDeviceInfo()
-            .getMultipathInfo()
-            .getLun();
+        List<HostMultipathInfoLogicalUnit> lunList = getLuns(vcsdkUtils, objectId);
+        JsonArray array = new JsonArray();
         for (HostMultipathInfoLogicalUnit lun : lunList) {
             HostMultipathInfoLogicalUnitPolicy policy = lun.getPolicy();
             String policyStr = policy.getPolicy();
-            return policyStr;
+            if (!policyStr.equals(getRecommendValue())) {
+                JsonObject object = new JsonObject();
+                object.addProperty("name", "naa." + lun.getId().substring(10, 42));
+                object.addProperty("value", policyStr);
+                array.add(object);
+            }
         }
 
-        return "--";
+        return array.toString();
     }
 
     @Override
@@ -62,24 +64,14 @@ public class NMPPathSwitchPolicyImpl extends BaseBestPracticeService implements 
 
     @Override
     public boolean check(VCSDKUtils vcsdkUtils, String objectId) throws Exception {
-        ManagedObjectReference mor = vcsdkUtils.getVcConnectionHelper().objectId2Mor(objectId);
-        VmwareContext context = vcsdkUtils.getVcConnectionHelper().getServerContext(objectId);
-        HostMO hostMo = this.getHostMoFactory().build(context, mor);
-        HostStorageSystemMO hostStorageSystemMo = hostMo.getHostStorageSystemMo();
-        List<HostMultipathInfoLogicalUnit> lunList = hostStorageSystemMo.getStorageDeviceInfo()
-            .getMultipathInfo()
-            .getLun();
+        List<HostMultipathInfoLogicalUnit> lunList = getLuns(vcsdkUtils, objectId);
         for (HostMultipathInfoLogicalUnit lun : lunList) {
-            HostMultipathInfoLogicalUnitPolicy policy = lun.getPolicy();
-            String policyStr = policy.getPolicy();
-            //多路径选路策略，集中式存储选择VMW_SATP_ALUA, VMW_PSP_RR
-            //TODO
-            if (policyStr.contains("_PSP_") && !"VMW_PSP_RR".equals(policy)) {
-                //return false;
-            }
+            HostMultipathInfoLogicalUnitPolicy psp = lun.getPolicy();
+            String pspPolicy = psp.getPolicy();
 
-            if (policyStr.contains("_SATP_") && !"VMW_SATP_ALUA".equals(policy)) {
-                //return false;
+            // 多路径选路策略，集中式存储选择VMW_SATP_ALUA, VMW_PSP_RR
+            if (!pspPolicy.equals(getRecommendValue())) {
+                return false;
             }
         }
 
@@ -91,22 +83,40 @@ public class NMPPathSwitchPolicyImpl extends BaseBestPracticeService implements 
         if (check(vcsdkUtils, objectId)) {
             return;
         }
-
         ManagedObjectReference mor = vcsdkUtils.getVcConnectionHelper().objectId2Mor(objectId);
         VmwareContext context = vcsdkUtils.getVcConnectionHelper().getServerContext(objectId);
-        HostMO hostMo = this.getHostMoFactory().build(context, mor);
-        HostStorageSystemMO hostStorageSystemMo = hostMo.getHostStorageSystemMo();
-        List<HostMultipathInfoLogicalUnit> lunList = hostStorageSystemMo.getStorageDeviceInfo()
-            .getMultipathInfo()
-            .getLun();
-        for (HostMultipathInfoLogicalUnit lun : lunList) {
-            HostMultipathInfoLogicalUnitPolicy policy = lun.getPolicy();
-            String policyStr = policy.getPolicy();
-            //TODO
-            //多路径选路策略，集中式存储选择VMW_SATP_ALUA, VMW_PSP_RR
-            if ("".equals(policyStr)) {
+        HostMo hostMo = this.getHostMoFactory().build(context, mor);
+        HostStorageSystemMo hostStorageSystemMo = hostMo.getHostStorageSystemMo();
+        List<HostMultipathInfoLogicalUnit> lunList = getLuns(vcsdkUtils, objectId);
+        if (lunList != null && lunList.size() > 0) {
+            ExecutorService executor = Executors.newFixedThreadPool(lunList.size());
+            for (HostMultipathInfoLogicalUnit lun : lunList) {
+                executor.execute(() -> {
+                    HostMultipathInfoLogicalUnitPolicy policy = lun.getPolicy();
+                    String pspPolicy = policy.getPolicy();
+
+                    // 多路径选路策略，集中式存储选择VMW_SATP_ALUA, VMW_PSP_RR
+                    if (!pspPolicy.equals(getRecommendValue())) {
+                        policy.setPolicy((String) getRecommendValue());
+                        try {
+                            hostStorageSystemMo.setMultipathLunPolicy(lun.getId(), policy);
+                        } catch (Exception exception) {
+                            exception.printStackTrace();
+                        }
+                    }
+                });
             }
-            hostStorageSystemMo.setMultipathLunPolicy(lun.getId(), policy);
         }
+    }
+
+    private List<HostMultipathInfoLogicalUnit> getLuns(VCSDKUtils vcsdkUtils, String objectId) throws Exception {
+        ManagedObjectReference mor = vcsdkUtils.getVcConnectionHelper().objectId2Mor(objectId);
+        VmwareContext context = vcsdkUtils.getVcConnectionHelper().getServerContext(objectId);
+        HostMo hostMo = this.getHostMoFactory().build(context, mor);
+        HostStorageSystemMo hostStorageSystemMo = hostMo.getHostStorageSystemMo();
+        HostStorageDeviceInfo deviceInfo = hostStorageSystemMo.getStorageDeviceInfo();
+        HostMultipathInfo hostMultipathInfo = deviceInfo.getMultipathInfo();
+        List<HostMultipathInfoLogicalUnit> lunList = hostMultipathInfo.getLun();
+        return lunList;
     }
 }

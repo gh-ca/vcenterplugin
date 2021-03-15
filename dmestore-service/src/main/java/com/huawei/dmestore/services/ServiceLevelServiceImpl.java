@@ -6,6 +6,7 @@ import com.huawei.dmestore.exception.DmeException;
 import com.huawei.dmestore.exception.VcenterException;
 import com.huawei.dmestore.model.CapabilitiesQos;
 import com.huawei.dmestore.model.CapabilitiesSmarttier;
+import com.huawei.dmestore.model.DmeDatasetsQueryResponse;
 import com.huawei.dmestore.model.QosParam;
 import com.huawei.dmestore.model.RelationInstance;
 import com.huawei.dmestore.model.SimpleCapabilities;
@@ -17,10 +18,12 @@ import com.huawei.dmestore.utils.ToolUtils;
 import com.huawei.dmestore.utils.VCSDKUtils;
 import com.huawei.vmware.autosdk.SessionHelper;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.google.gson.JsonPrimitive;
 import com.vmware.cis.tagging.TagModel;
 import com.vmware.pbm.PbmProfile;
 
@@ -32,6 +35,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -62,6 +66,18 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
     private VCenterInfoService vcenterinfoservice;
 
     private VCSDKUtils vcsdkUtils;
+
+    private CipherUtils cipherUtils;
+
+    private Gson gson = new Gson();
+
+    public CipherUtils getCipherUtils() {
+        return cipherUtils;
+    }
+
+    public void setCipherUtils(CipherUtils cipherUtils) {
+        this.cipherUtils = cipherUtils;
+    }
 
     public DmeAccessService getDmeAccessService() {
         return dmeAccessService;
@@ -130,7 +146,7 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
                 SessionHelper sessionHelper = new SessionHelper();
                 try {
                     sessionHelper.login(vcenterInfo.getHostIp(), String.valueOf(vcenterInfo.getHostPort()),
-                        vcenterInfo.getUserName(), CipherUtils.decryptString(vcenterInfo.getPassword()));
+                        vcenterInfo.getUserName(), cipherUtils.decryptString(vcenterInfo.getPassword()));
                 } catch (Exception ex) {
                     log.error(ex.getMessage());
                 }
@@ -394,6 +410,7 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
     private List<StoragePool> getStoragePoolInfosByStorageIdStoragePoolIds(String storageDeviceId,
         List<String> storagePoolIds) throws DmeException {
         List<StoragePool> sps = new ArrayList<>();
+
         List<StoragePool> storagePools = dmeStorageService.getStoragePools(storageDeviceId, "all");
 
         for (StoragePool sp : storagePools) {
@@ -461,4 +478,189 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
         sp.setStorageDeviceId(storageDeviceId);
         return sp;
     }
+
+    @Override
+    public DmeDatasetsQueryResponse statLunDatasetsQuery(String serviceLevelId, String interval) throws DmeException {
+        String data = excute(serviceLevelId, interval, "stat-lun");
+        if (!StringUtils.isEmpty(data)) {
+            return gson.fromJson(data, DmeDatasetsQueryResponse.class);
+        }
+        return null;
+    }
+
+    @Override
+    public DmeDatasetsQueryResponse statStoragePoolDatasetsQuery(String serviceLevelId, String interval)
+        throws DmeException {
+        String data = excute(serviceLevelId, interval, "stat-storage-pool");
+        if (!StringUtils.isEmpty(data)) {
+            return gson.fromJson(data, DmeDatasetsQueryResponse.class);
+        }
+        return null;
+    }
+
+    @Override
+    public DmeDatasetsQueryResponse lunPerformanceDatasetsQuery(String serviceLevelId, String interval)
+        throws DmeException {
+        String data = excute(serviceLevelId, interval, "perf-stat-lun-details");
+        if (!StringUtils.isEmpty(data)) {
+            return gson.fromJson(data, DmeDatasetsQueryResponse.class);
+        }
+
+        return null;
+    }
+
+    @Override
+    public DmeDatasetsQueryResponse storagePoolPerformanceDatasetsQuery(String serviceLevelId, String interval)
+        throws DmeException {
+        String data = excute(serviceLevelId, interval, "perf-stat-storage-pool-details");
+        if (!StringUtils.isEmpty(data)) {
+            return gson.fromJson(data, DmeDatasetsQueryResponse.class);
+        }
+
+        return null;
+    }
+
+    private String excute(String serviceLevelId, String interval, String dataSetType) throws DmeException {
+        // 封装查询body
+        JsonObject queryBody = getDatasetsQueryBody(serviceLevelId, interval, dataSetType);
+        String url = DmeConstants.DATASETS_QUERY_URL.replace("{dataSet}", dataSetType);
+        log.info("数据集统计信息查询开始，url={}, post body={}", url, queryBody);
+        ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.POST, queryBody.toString());
+        if (responseEntity.getStatusCodeValue() == HttpStatus.OK.value()) {
+            String responseBody = responseEntity.getBody();
+            log.info("数据集统计信息查询成功！返回信息:{}", responseBody);
+            return responseBody;
+        }else {
+            log.info("数据集统计信息查询失败！url={}", url);
+        }
+
+        return null;
+    }
+
+    private  Map<String, Long> parseTime(String interval) {
+        long endTime = System.currentTimeMillis();
+        Calendar rightNow = Calendar.getInstance();
+        rightNow.setTimeInMillis(endTime);
+
+        // 开始结束时间计算, 默认为最近一个月
+        switch (interval) {
+            case "LAST_1_DAY":
+                rightNow.add(Calendar.DAY_OF_MONTH, -1);
+                break;
+            case "LAST_1_WEEK":
+                rightNow.add(Calendar.DAY_OF_MONTH, -7);
+                break;
+            case "LAST_1_MONTH":
+                rightNow.add(Calendar.MONTH, -1);
+                break;
+            case "LAST_3_MONTH":
+                rightNow.add(Calendar.MONTH, -3);
+                break;
+            case "LAST_6_MONTH":
+                rightNow.add(Calendar.MONTH, -6);
+                break;
+            case "LAST_1_YEAR":
+                rightNow.add(Calendar.YEAR, -1);
+                break;
+            default:
+                rightNow.add(Calendar.MONTH, -1);
+                break;
+        }
+        long beginTime = rightNow.getTimeInMillis();
+        Map<String, Long> timeMap = new HashMap();
+        timeMap.put("beginTime", beginTime);
+        timeMap.put("endTime", endTime);
+
+        return timeMap;
+    }
+
+    public JsonObject getDatasetsQueryBody(String serviceLevelId, String interval, String dataSetType) {
+        Map<String, Long> timeMap = parseTime(interval);
+
+        // timeRange
+        JsonObject timeRange = new JsonObject();
+        timeRange.addProperty("beginTime", timeMap.get("beginTime"));
+        timeRange.addProperty("endTime", timeMap.get("endTime"));
+        if ("stat-lun".equals(dataSetType) || "stat-storage-pool".equals(dataSetType)) {
+            timeRange.addProperty("granularity", "1d");
+        } else if ("perf-stat-lun-details".equals(dataSetType) || "perf-stat-storage-pool-details".equals(
+            dataSetType)) {
+            timeRange.addProperty("granularity", "30m");
+        }
+
+        // filters
+        JsonObject filters = new JsonObject();
+        JsonArray filtersDimensions = new JsonArray();
+        JsonObject filtersDimension = new JsonObject();
+        String field = "dimensions.lun.tierNativeId";
+        if("stat-storage-pool".equals(dataSetType) || "perf-stat-storage-pool-details".equals(dataSetType)){
+            field = "dimensions.pool.tierNativeId";
+        }
+        filtersDimension.addProperty("field", field);
+        JsonArray values = new JsonArray();
+        values.add(new JsonPrimitive(serviceLevelId));
+        filtersDimension.add("values", values);
+        filtersDimensions.add(filtersDimension);
+        filters.add("dimensions", filtersDimensions);
+
+        // dimensions
+        JsonArray dimensions = new JsonArray();
+        JsonObject dimension1 = new JsonObject();
+        dimension1.addProperty("field", field);
+        dimension1.addProperty("index", 1);
+        JsonObject dimension2 = new JsonObject();
+        dimension2.addProperty("field", "timestamp");
+        dimension2.addProperty("index", 2);
+        dimensions.add(dimension1);
+        dimensions.add(dimension2);
+
+        // metrics
+        JsonArray metrics = new JsonArray();
+        JsonObject totalCapacity = new JsonObject();
+        totalCapacity.addProperty("field", "metrics.totalCapacity");
+        totalCapacity.addProperty("aggType", "sum");
+
+        JsonObject allocCapacity = new JsonObject();
+        allocCapacity.addProperty("field", "metrics.allocCapacity");
+        allocCapacity.addProperty("aggType", "sum");
+
+        JsonObject usedCapacity = new JsonObject();
+        usedCapacity.addProperty("field", "metrics.usedCapacity");
+        usedCapacity.addProperty("aggType", "sum");
+
+        JsonObject responseTime = new JsonObject();
+        responseTime.addProperty("field", "metrics.responseTime");
+        responseTime.addProperty("aggType", "max");
+
+        JsonObject throughput = new JsonObject();
+        throughput.addProperty("field", "metrics.throughput");
+        throughput.addProperty("aggType", "sum");
+
+        JsonObject bandwidth = new JsonObject();
+        bandwidth.addProperty("field", "metrics.bandwidth");
+        bandwidth.addProperty("aggType", "sum");
+
+        metrics.add(totalCapacity);
+
+        if ("stat-lun".equals(dataSetType)) {
+            metrics.add(allocCapacity);
+        } else if ("stat-storage-pool".equals(dataSetType)) {
+            metrics.add(usedCapacity);
+        } else if ("perf-stat-lun-details".equals(dataSetType)) {
+            metrics.add(responseTime);
+            metrics.add(throughput);
+            metrics.add(bandwidth);
+        } else if ("perf-stat-storage-pool-details".equals(dataSetType)) {
+            metrics.add(throughput);
+        }
+
+        JsonObject returnBody = new JsonObject();
+        returnBody.add("timeRange", timeRange);
+        returnBody.add("filters", filters);
+        returnBody.add("dimensions", dimensions);
+        returnBody.add("metrics", metrics);
+
+        return returnBody;
+    }
+
 }

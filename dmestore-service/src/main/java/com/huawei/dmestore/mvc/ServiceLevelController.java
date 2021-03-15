@@ -12,11 +12,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 import java.util.Map;
-
 
 /**
  * ServiceLevelController
@@ -100,6 +100,64 @@ public class ServiceLevelController extends BaseController {
         try {
             serviceLevelService.updateVmwarePolicy();
             return success();
+        } catch (DmeException e) {
+            return failure(e.getMessage());
+        }
+    }
+
+    /**
+     * statLun
+     *
+     * @return ResponseBodyBean
+     */
+    @RequestMapping(value = "/capacity/stat-lun", method = RequestMethod.GET)
+    public ResponseBodyBean statLun(@RequestParam String serviceLevelId, @RequestParam String interval) {
+        try {
+            return success(serviceLevelService.statLunDatasetsQuery(serviceLevelId, interval));
+        } catch (DmeException e) {
+            return failure(e.getMessage());
+        }
+    }
+
+    /**
+     * stat-storage-pool
+     *
+     * @return ResponseBodyBean
+     */
+    @RequestMapping(value = "/capacity/stat-storage-pool", method = RequestMethod.GET)
+    public ResponseBodyBean statStoragePool(@RequestParam String serviceLevelId, @RequestParam String interval) {
+        try {
+            return success(serviceLevelService.statStoragePoolDatasetsQuery(serviceLevelId, interval));
+        } catch (DmeException e) {
+            return failure(e.getMessage());
+        }
+    }
+
+    /**
+     * perf-stat-lun-details
+     *
+     * @return ResponseBodyBean
+     */
+    @RequestMapping(value = "/performance/perf-stat-lun-details", method = RequestMethod.GET)
+    public ResponseBodyBean lunPerformanceDatasetsQuery(@RequestParam String serviceLevelId,
+        @RequestParam String interval) {
+        try {
+            return success(serviceLevelService.lunPerformanceDatasetsQuery(serviceLevelId, interval));
+        } catch (DmeException e) {
+            return failure(e.getMessage());
+        }
+    }
+
+    /**
+     * perf-stat-storage-pool-details
+     *
+     * @return ResponseBodyBean
+     */
+    @RequestMapping(value = "/performance/perf-stat-storage-pool-details", method = RequestMethod.GET)
+    public ResponseBodyBean storagePoolPerformanceDatasetsQuery(@RequestParam String serviceLevelId,
+        @RequestParam String interval) {
+        try {
+            return success(serviceLevelService.storagePoolPerformanceDatasetsQuery(serviceLevelId, interval));
         } catch (DmeException e) {
             return failure(e.getMessage());
         }

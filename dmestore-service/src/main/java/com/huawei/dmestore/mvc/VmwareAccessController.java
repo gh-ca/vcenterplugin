@@ -1,6 +1,7 @@
 package com.huawei.dmestore.mvc;
 
 import com.huawei.dmestore.exception.DmeException;
+import com.huawei.dmestore.exception.DmeSqlException;
 import com.huawei.dmestore.model.ResponseBodyBean;
 import com.huawei.dmestore.services.VmwareAccessService;
 
@@ -213,5 +214,20 @@ public class VmwareAccessController extends BaseController {
             failureStr = e.getMessage();
         }
         return failure(failureStr);
+    }
+
+    /**
+     * getRelationByObjId
+     *
+     * @param datastoreObjectId datastoreObjectId
+     * @return ResponseBodyBean
+     */
+    @RequestMapping(value = "/relation", method = RequestMethod.GET)
+    public ResponseBodyBean getRelationByObjId(@RequestParam("datastoreObjectId") String datastoreObjectId) {
+        try {
+            return success(vmwareAccessService.getDmeVmwareRelationByDsId(datastoreObjectId));
+        } catch (DmeSqlException e) {
+            return failure("get dme volume by datastore failed!" + e.toString());
+        }
     }
 }

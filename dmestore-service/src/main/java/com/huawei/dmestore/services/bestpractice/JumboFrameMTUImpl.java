@@ -1,19 +1,21 @@
 package com.huawei.dmestore.services.bestpractice;
 
 import com.huawei.dmestore.utils.VCSDKUtils;
-import com.huawei.vmware.mo.HostMO;
-import com.huawei.vmware.mo.HostNetworkSystemMO;
+import com.huawei.vmware.mo.HostMo;
+import com.huawei.vmware.mo.HostNetworkSystemMo;
 import com.huawei.vmware.util.VmwareContext;
 
-import com.vmware.vim25.HostConfigChangeMode;
 import com.vmware.vim25.HostNetworkConfig;
-import com.vmware.vim25.HostNetworkInfo;
-import com.vmware.vim25.HostVirtualSwitch;
-import com.vmware.vim25.HostVirtualSwitchConfig;
-import com.vmware.vim25.HostVirtualSwitchSpec;
+import com.vmware.vim25.HostVirtualNicConfig;
+import com.vmware.vim25.HostVirtualNicSpec;
 import com.vmware.vim25.ManagedObjectReference;
 
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * JumboFrameMTUImpl
@@ -22,6 +24,8 @@ import java.util.List;
  * @since 2020-11-30
  **/
 public class JumboFrameMTUImpl extends BaseBestPracticeService implements BestPracticeService {
+    protected final Logger logger = LoggerFactory.getLogger(BaseBestPracticeService.class);
+
     private static final int RECOMMEND_VALUE = 9000;
 
     private static final String MTU_NULL = "--";
@@ -40,20 +44,11 @@ public class JumboFrameMTUImpl extends BaseBestPracticeService implements BestPr
     public Object getCurrentValue(VCSDKUtils vcsdkUtils, String objectId) throws Exception {
         ManagedObjectReference mor = vcsdkUtils.getVcConnectionHelper().objectId2Mor(objectId);
         VmwareContext context = vcsdkUtils.getVcConnectionHelper().getServerContext(objectId);
-        HostMO hostMo = this.getHostMoFactory().build(context, mor);
-        List<HostVirtualSwitch> virtualSwitches = hostMo.getHostNetworkInfo().getVswitch();
-        for (HostVirtualSwitch virtualSwitch : virtualSwitches) {
-            HostVirtualSwitchSpec spec = virtualSwitch.getSpec();
-            Integer mtu = spec.getMtu();
-            if (null == mtu || (mtu.intValue() != getRecommendValue().intValue())) {
-                return null == mtu ? MTU_NULL : mtu.intValue();
-            }
-        }
-
+        HostMo hostMo = this.getHostMoFactory().build(context, mor);
         HostNetworkConfig networkConfig = hostMo.getHostNetworkSystemMo().getNetworkConfig();
-        List<HostVirtualSwitchConfig> list = networkConfig.getVswitch();
-        for (HostVirtualSwitchConfig config : list) {
-            HostVirtualSwitchSpec spec = config.getSpec();
+        List<HostVirtualNicConfig> list = networkConfig.getVnic();
+        for (HostVirtualNicConfig config : list) {
+            HostVirtualNicSpec spec = config.getSpec();
             Integer mtu = spec.getMtu();
             if (null == mtu || (mtu.intValue() != getRecommendValue().intValue())) {
                 return null == mtu ? MTU_NULL : mtu.intValue();
@@ -86,21 +81,17 @@ public class JumboFrameMTUImpl extends BaseBestPracticeService implements BestPr
     private boolean check(VCSDKUtils vcsdkUtils, String objectId, Object recommendValue) throws Exception {
         ManagedObjectReference mor = vcsdkUtils.getVcConnectionHelper().objectId2Mor(objectId);
         VmwareContext context = vcsdkUtils.getVcConnectionHelper().getServerContext(objectId);
-        HostMO hostMo = this.getHostMoFactory().build(context, mor);
-        HostNetworkInfo networkInfo = hostMo.getHostNetworkInfo();
-        List<HostVirtualSwitch> virtualSwitches = networkInfo.getVswitch();
-        for (HostVirtualSwitch virtualSwitch : virtualSwitches) {
-            HostVirtualSwitchSpec spec = virtualSwitch.getSpec();
-            Integer mtu = spec.getMtu();
-            if (null == mtu || (mtu.intValue() != ((Integer) recommendValue).intValue())) {
-                return false;
-            }
-        }
-
+        HostMo hostMo = this.getHostMoFactory().build(context, mor);
         HostNetworkConfig networkConfig = hostMo.getHostNetworkSystemMo().getNetworkConfig();
-        List<HostVirtualSwitchConfig> list = networkConfig.getVswitch();
-        for (HostVirtualSwitchConfig config : list) {
-            HostVirtualSwitchSpec spec = config.getSpec();
+        if (networkConfig == null) {
+            return true;
+        }
+        List<HostVirtualNicConfig> list = networkConfig.getVnic();
+        if (list == null || list.size() == 0) {
+            return true;
+        }
+        for (HostVirtualNicConfig config : list) {
+            HostVirtualNicSpec spec = config.getSpec();
             Integer mtu = spec.getMtu();
             if (null == mtu || (mtu.intValue() != ((Integer) recommendValue).intValue())) {
                 return false;
@@ -121,29 +112,26 @@ public class JumboFrameMTUImpl extends BaseBestPracticeService implements BestPr
         if (check(vcsdkUtils, objectId, recommendValue)) {
             return;
         }
-        HostMO hostMo = this.getHostMoFactory().build(context, mor);
-        HostNetworkInfo networkInfo = hostMo.getHostNetworkInfo();
-        HostNetworkSystemMO hostNetworkSystemMo = hostMo.getHostNetworkSystemMo();
-        List<HostVirtualSwitch> virtualSwitches = networkInfo.getVswitch();
-        for (HostVirtualSwitch virtualSwitch : virtualSwitches) {
-            String name = virtualSwitch.getName();
-            HostVirtualSwitchSpec spec = virtualSwitch.getSpec();
-            Integer mtu = spec.getMtu();
-            if (null == mtu || (mtu.intValue() != ((Integer) recommendValue).intValue())) {
-                spec.setMtu((Integer) recommendValue);
-                hostNetworkSystemMo.updateVirtualSwitch(name, spec);
-            }
-        }
-
+        HostMo hostMo = this.getHostMoFactory().build(context, mor);
+        HostNetworkSystemMo hostNetworkSystemMo = hostMo.getHostNetworkSystemMo();
         HostNetworkConfig networkConfig = hostNetworkSystemMo.getNetworkConfig();
-        List<HostVirtualSwitchConfig> list = networkConfig.getVswitch();
-        for (HostVirtualSwitchConfig config : list) {
-            HostVirtualSwitchSpec spec = config.getSpec();
+        List<HostVirtualNicConfig> list = networkConfig.getVnic();
+        ExecutorService singleThreadExecutor = Executors.newFixedThreadPool(list.size());
+        for (HostVirtualNicConfig config : list) {
+            HostVirtualNicSpec spec = config.getSpec();
+            String device = config.getDevice();
             Integer mtu = spec.getMtu();
             if (null == mtu || (mtu.intValue() != ((Integer) recommendValue).intValue())) {
-                spec.setMtu((Integer) recommendValue);
+                singleThreadExecutor.execute(() -> {
+                    spec.setMtu((Integer) recommendValue);
+                    try {
+                        hostNetworkSystemMo.updateVirtualNic(device, spec);
+                    } catch (Exception exception) {
+                        logger.error("updateVirtualNic error!hostObjectId={},device={}", objectId, device);
+                        exception.printStackTrace();
+                    }
+                });
             }
         }
-        hostNetworkSystemMo.updateNetworkConfig(networkConfig, HostConfigChangeMode.MODIFY.value());
     }
 }

@@ -14,25 +14,28 @@
     <tr>
       <td class="left">{{'nfs.fs.storagePool' | translate}}</td>
       <td class="left">{{fsDetail.storagePoolName}}</td>
-
-      <td class="left">{{'nfs.fs.controller' | translate}}</td>
-      <td class="left">{{fsDetail.controller}}</td>
-    </tr>
-    <tr>
       <td class="left">{{'nfs.fs.provisionType' | translate}}</td>
       <td class="left">{{fsDetail.provisionType}}</td>
+    </tr>
+    <tr *ngIf="!fsDetail.isDorado">
+      <td class="left">{{'nfs.fs.controller' | translate}}</td>
+      <td class="left">{{fsDetail.controller}}</td>
       <td class="left">{{'nfs.fs.appSce' | translate}}</td>
       <td class="left">{{fsDetail.applicationScenario}}</td>
     </tr>
     <tr>
       <td class="left">{{'nfs.fs.dataDed' | translate}}</td>
-      <td class="left">{{fsDetail.dataDeduplication}}</td>
+      <td class="left" *ngIf="fsDetail.dataDeduplication != null && fsDetail.dataDeduplication">{{'nfs.enable' | translate}}</td>
+      <td class="left" *ngIf="fsDetail.dataDeduplication != null && !fsDetail.dataDeduplication">{{'nfs.disable' | translate}}</td>
+      <td class="left" *ngIf="fsDetail.dataDeduplication == null">{{'rdm.default' | translate}}</td>
 
       <td class="left">{{'nfs.fs.dataCom' | translate}}</td>
-      <td class="left">{{fsDetail.dateCompression}}</td>
+      <td class="left" *ngIf="fsDetail.dateCompression != null && fsDetail.dateCompression">{{'nfs.enable' | translate}}</td>
+      <td class="left" *ngIf="fsDetail.dateCompression != null && !fsDetail.dateCompression">{{'nfs.disable' | translate}}</td>
+      <td class="left" *ngIf="fsDetail.dateCompression == null">{{'rdm.default' | translate}}</td>
     </tr>
   </table>
 </div>
 <div *ngIf="!fsDetails">
-  无
+  {{'tips.noData' | translate}}
 </div>

@@ -46,7 +46,7 @@ public class DatastoreMOTest {
     private VimPortType service;
 
     @InjectMocks
-    private DatastoreMO datastoreMO;
+    private DatastoreMo datastoreMO;
 
     @Before
     public void setUp() throws Exception {

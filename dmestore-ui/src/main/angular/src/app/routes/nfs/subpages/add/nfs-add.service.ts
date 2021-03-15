@@ -38,16 +38,24 @@ export class AddNfs{
   fsName:string;//  文件系统名称
   size: number; //  ?待确认默认单位（界面可选。前端可转换）
   type:string;//  nfs协议版本
+  characterEncoding:string;//  字符编码
   advance :boolean;//false true  true 是有高级选项
   qosFlag:boolean;// qos策略开关 false true false关闭
-  contolPolicy :string;//  上下线选择标记  枚举值 up low
+  contolPolicy :string;//  上下线选择标记  枚举值 up(上限) low(下) all(上下限都有)
+  control_policyUpper:string; // 上限控制flag
+  control_policyLower:string; // 下限
 // up 取值如下
   maxBandwidth: number; //
+  maxBandwidthChoose: false; //
   maxIops: number; //
+  maxIopsChoose: false; //
 //low取值
   minBandwidth: number; //
+  minBandwidthChoose: false; //
   minIops: number; //
+  minIopsChoose: false; //
   latency: number; //
+  latencyChoose: false; //
   thin:boolean;// true  代表thin false代表thick
   deduplicationEnabled:boolean;// 重删 true false
   compressionEnabled:boolean;// 压缩 true false
@@ -66,6 +74,7 @@ export class AddNfs{
     this.autoSizeEnable = false;
     this.thin = true;
     this.unit = 'GB';
+    this.characterEncoding = 'utf-8';
   }
 }
 export class StoragePool{
