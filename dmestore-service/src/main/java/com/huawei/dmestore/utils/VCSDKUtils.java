@@ -177,6 +177,8 @@ public class VCSDKUtils {
 
     private static VmodlContext context;
 
+    private CipherUtils cipherUtils;
+
     private VcConnectionHelpers vcConnectionHelpers;
 
     private RootVmwareMoFactory rootVmwareMoFactory = RootVmwareMoFactory.getInstance();
@@ -194,6 +196,14 @@ public class VCSDKUtils {
     private VirtualMachineMoFactorys virtualMachineMoFactorys = VirtualMachineMoFactorys.getInstance();
 
     private Gson gson = new Gson();
+
+    public CipherUtils getCipherUtils() {
+        return cipherUtils;
+    }
+
+    public void setCipherUtils(CipherUtils cipherUtils) {
+        this.cipherUtils = cipherUtils;
+    }
 
     public VcConnectionHelpers getVcConnectionHelper() {
         return vcConnectionHelpers;
@@ -1642,7 +1652,7 @@ public class VCSDKUtils {
             }
             sessionHelper = sessionHelperFactory.build();
             sessionHelper.login(vcenterinfo.getHostIp(), String.valueOf(vcenterinfo.getHostPort()),
-                vcenterinfo.getUserName(), CipherUtils.decryptString(vcenterinfo.getPassword()));
+                vcenterinfo.getUserName(), cipherUtils.decryptString(vcenterinfo.getPassword()));
             TaggingWorkflow taggingWorkflow = taggingWorkflowFactory.build(sessionHelper);
 
             List<String> taglist = taggingWorkflow.listTags();
@@ -2918,7 +2928,7 @@ public class VCSDKUtils {
             ServiceInstanceContent serviceInstanceContent = instance.retrieveContent();
 
             sessionManager = vmomiClient.createStub(SessionManager.class, serviceInstanceContent.getSessionManager());
-            sessionManager.login(vcenterinfo.getUserName(), CipherUtils.decryptString(vcenterinfo.getPassword()), "en");
+            sessionManager.login(vcenterinfo.getUserName(), cipherUtils.decryptString(vcenterinfo.getPassword()), "en");
             ManagedObjectReference objmor = vcConnectionHelpers.objectId2Mor(hostObjectId);
             com.vmware.vim.binding.vmodl.ManagedObjectReference hostmor
                 = new com.vmware.vim.binding.vmodl.ManagedObjectReference();

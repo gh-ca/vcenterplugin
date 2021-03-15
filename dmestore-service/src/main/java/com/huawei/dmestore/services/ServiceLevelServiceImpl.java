@@ -67,7 +67,17 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
 
     private VCSDKUtils vcsdkUtils;
 
+    private CipherUtils cipherUtils;
+
     private Gson gson = new Gson();
+
+    public CipherUtils getCipherUtils() {
+        return cipherUtils;
+    }
+
+    public void setCipherUtils(CipherUtils cipherUtils) {
+        this.cipherUtils = cipherUtils;
+    }
 
     public DmeAccessService getDmeAccessService() {
         return dmeAccessService;
@@ -136,7 +146,7 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
                 SessionHelper sessionHelper = new SessionHelper();
                 try {
                     sessionHelper.login(vcenterInfo.getHostIp(), String.valueOf(vcenterInfo.getHostPort()),
-                        vcenterInfo.getUserName(), CipherUtils.decryptString(vcenterInfo.getPassword()));
+                        vcenterInfo.getUserName(), cipherUtils.decryptString(vcenterInfo.getPassword()));
                 } catch (Exception ex) {
                     log.error(ex.getMessage());
                 }

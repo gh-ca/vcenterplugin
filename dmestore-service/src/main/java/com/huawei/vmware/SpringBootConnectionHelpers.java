@@ -8,6 +8,7 @@ import com.huawei.vmware.util.VmwareContext;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +21,9 @@ import java.util.List;
  * @since 2020-12-10
  */
 public class SpringBootConnectionHelpers extends VcConnectionHelpers {
+
+    @Autowired
+    private CipherUtils cipherUtils;
     private static final Logger log = LoggerFactory.getLogger(SpringBootConnectionHelpers.class);
     private VCenterInfoService vcenterInfoService;
 
@@ -50,7 +54,7 @@ public class SpringBootConnectionHelpers extends VcConnectionHelpers {
                 this.setServerurl(vcenterInfo.getHostIp());
                 this.setServerport(vcenterInfo.getHostPort());
                 this.setUsername(vcenterInfo.getUserName());
-                this.setPassword(CipherUtils.decryptString(vcenterInfo.getPassword()));
+                this.setPassword(cipherUtils.decryptString(vcenterInfo.getPassword()));
             }
         } catch (Exception e) {
             log.error("get local vcenter info error",e.getMessage());
@@ -66,7 +70,7 @@ public class SpringBootConnectionHelpers extends VcConnectionHelpers {
                 this.setServerurl(vcenterInfo.getHostIp());
                 this.setServerport(vcenterInfo.getHostPort());
                 this.setUsername(vcenterInfo.getUserName());
-                this.setPassword(CipherUtils.decryptString(vcenterInfo.getPassword()));
+                this.setPassword(cipherUtils.decryptString(vcenterInfo.getPassword()));
             }
         } catch (Exception e) {
             log.error(e.getMessage());

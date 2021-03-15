@@ -50,10 +50,13 @@ public class Vmfs6AutoReclaimImpl extends BaseBestPracticeService implements Bes
             for (VmfsDatastoreInfo vmfsDatastoreInfo : list) {
                 HostVmfsVolume hostVmfsVolume = vmfsDatastoreInfo.getVmfs();
                 String unmapPriority = hostVmfsVolume.getUnmapPriority();
-                if (unmapPriority == null || !unmapPriority.equals(getRecommendValue())) {
+                if (unmapPriority != null || !unmapPriority.equals(getRecommendValue())) {
                     JsonObject object = new JsonObject();
                     object.addProperty("name", vmfsDatastoreInfo.getName());
-                    object.addProperty("value", unmapPriority == null ? "--" : unmapPriority);
+                    object.addProperty("value", unmapPriority);
+
+                    object.addProperty("dataStoreName", vmfsDatastoreInfo.getName());
+                    object.addProperty("unmapPriority", unmapPriority);
                     array.add(object);
                 }
             }
@@ -84,7 +87,7 @@ public class Vmfs6AutoReclaimImpl extends BaseBestPracticeService implements Bes
             for (VmfsDatastoreInfo vmfsDatastoreInfo : list) {
                 HostVmfsVolume hostVmfsVolume = vmfsDatastoreInfo.getVmfs();
                 String unmapPriority = hostVmfsVolume.getUnmapPriority();
-                if (null == unmapPriority || !unmapPriority.equals(getRecommendValue())) {
+                if (null != unmapPriority && !unmapPriority.equals(getRecommendValue())) {
                     return false;
                 }
             }
@@ -127,7 +130,7 @@ public class Vmfs6AutoReclaimImpl extends BaseBestPracticeService implements Bes
                 HostVmfsVolume hostVmfsVolume = vmfsDatastoreInfo.getVmfs();
                 String uuid = hostVmfsVolume.getUuid();
                 String unmapPriority = hostVmfsVolume.getUnmapPriority();
-                if (null == unmapPriority || !unmapPriority.equals(String.valueOf(getRecommendValue()))) {
+                if (null != unmapPriority || !unmapPriority.equals(String.valueOf(getRecommendValue()))) {
                     executor.execute(() -> {
                         try {
                             hostMo.getHostStorageSystemMo().updateVmfsUnmapPriority(uuid, (String) getRecommendValue());
