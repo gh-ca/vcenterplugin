@@ -176,6 +176,7 @@
       "capacityErr":"输入超过容量限制!",
       "maxCapTip":"最大容量限制：16384 TB",
       "minCapTip":"最小容量限制：",
+      "expandErrTips":"磁盘扩容容量最小为1GB，且扩容后的容量不得大于16384TB！",
       "reduceThinTips": "该磁盘类型为Thin类型，修改后的容量不得小于1GB。",
       "reduceThickTips": "该磁盘类型为Thick类型，修改后的容量不得小于3GB。"
     }
@@ -638,7 +639,8 @@
     "portNullMessage": "端口不能为空！",
     "establishConnect": "建立iSCSI连接",
     "showCol": "展示列",
-    "selectAll": "全选"
+    "selectAll": "全选",
+    "hideIpTips": "注：以下数据将不包含IPv4地址为空的数据！"
   },
   "rdm": {
     "name": "名称",
@@ -835,7 +837,7 @@
     "type":{
       "block":"块",
       "file":"文件",
-      "blockAndFile": "块/文件"
+      "blockAndFile": "块和文件"
     }
   },
   "errorMsg":{

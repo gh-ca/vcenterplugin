@@ -128,6 +128,10 @@ export class NfsAddComponent implements OnInit{
     this.wizard.open();
   }
   addNfs(){
+    if (this.bandWidthMaxErrTips || this.iopsMaxErrTips
+      || this.bandWidthMinErrTips || this.iopsMinErrTips || this.latencyErrTips) {
+      return;
+    }
     //
     this.modalHandleLoading=true;
 
@@ -194,8 +198,12 @@ export class NfsAddComponent implements OnInit{
       this.addLatencyChoose();
       const storages=this.storageList.filter(item=>item.id==this.addForm.storagId);
       this.dorado=storages[0].storageTypeShow.dorado;
+      let mediaType;
       if (this.dorado){
         this.addForm.autoSizeEnable=undefined;
+        mediaType = 'block-and-file';
+      } else {
+        mediaType = 'file';
       }
       const storagePoolMap = this.storagePoolMap.filter(item => item.storageId == this.addForm.storagId);
 
@@ -204,7 +212,7 @@ export class NfsAddComponent implements OnInit{
 
       // 选择存储后获取存储池
       // if (!storagePoolList) {
-        this.storageService.getStoragePoolListByStorageId("file",this.addForm.storagId)
+        this.storageService.getStoragePoolListByStorageId(mediaType,this.addForm.storagId)
           .subscribe((r: any) => {
             if (r.code === '200'){
               this.storagePools = r.data;
@@ -729,6 +737,35 @@ export class NfsAddComponent implements OnInit{
     this.addForm.latency = null;
     const qosTag = this.getStorageQosTag(this.addForm.storagId);
     this.latencyIsSelect = qosTag == 1;
+  }
+  resetQosFlag(objValue:boolean, operationType:string) {
+    switch (operationType) {
+      case 'maxbandwidth':
+        if(!objValue) {
+          this.bandWidthMaxErrTips = false;
+        }
+        break;
+      case 'maxiops':
+        if(!objValue) {
+          this.iopsMaxErrTips = false;
+        }
+        break;
+      case 'minbandwidth':
+        if(!objValue) {
+          this.bandWidthMinErrTips = false;
+        }
+        break;
+      case 'miniops':
+        if(!objValue) {
+          this.iopsMinErrTips = false;
+        }
+        break;
+      default:
+        if(!objValue) {
+          this.latencyErrTips = false;
+        }
+        break;
+    }
   }
 }
 

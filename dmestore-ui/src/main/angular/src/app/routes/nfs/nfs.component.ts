@@ -279,6 +279,10 @@ export class NfsComponent implements OnInit {
   }
 
   addNfs(){
+    if (this.bandWidthMaxErrTips || this.iopsMaxErrTips
+      || this.bandWidthMinErrTips || this.iopsMinErrTips || this.latencyErrTips) {
+      return;
+    }
     //
     this.modalHandleLoading=true;
 
@@ -347,17 +351,22 @@ export class NfsComponent implements OnInit {
       this.addLatencyChoose();
       const storages=this.storageList.filter(item=>item.id==this.addForm.storagId);
       this.dorado=storages[0].storageTypeShow.dorado;
-      //如果是v6就不显示自动扩容选项
-      if(this.dorado){
-        this.addForm.autoSizeEnable=undefined;
-      }
+
       // const storagePoolMap = this.storagePoolMap.filter(item => item.storageId == this.addForm.storagId);
 
       // const storagePoolList = storagePoolMap[0].storagePoolList;
       // const logicPorts = storagePoolMap[0].logicPort;
       // 选择存储后获取存储池
       // if (!storagePoolList) {
-        this.storageService.getStoragePoolListByStorageId("file",this.addForm.storagId)
+      let mediaType;
+      //如果是v6就不显示自动扩容选项 mediaType 为BlockAndFile
+      if(this.dorado){
+        this.addForm.autoSizeEnable=undefined;
+        mediaType = 'block-and-file';
+      } else {
+        mediaType = 'file';
+      }
+        this.storageService.getStoragePoolListByStorageId(mediaType,this.addForm.storagId)
           .subscribe((r: any) => {
             this.modalLoading=false;
             if (r.code === '200'){
@@ -1000,5 +1009,35 @@ export class NfsComponent implements OnInit {
       return unescape(r[2]);
     }
     return null;
+  }
+
+  resetQosFlag(objValue:boolean, operationType:string) {
+    switch (operationType) {
+      case 'maxbandwidth':
+        if(!objValue) {
+          this.bandWidthMaxErrTips = false;
+        }
+        break;
+      case 'maxiops':
+        if(!objValue) {
+          this.iopsMaxErrTips = false;
+        }
+        break;
+      case 'minbandwidth':
+        if(!objValue) {
+          this.bandWidthMinErrTips = false;
+        }
+        break;
+      case 'miniops':
+        if(!objValue) {
+          this.iopsMinErrTips = false;
+        }
+        break;
+      default:
+        if(!objValue) {
+          this.latencyErrTips = false;
+        }
+        break;
+    }
   }
 }

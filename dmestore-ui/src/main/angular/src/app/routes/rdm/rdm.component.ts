@@ -135,6 +135,10 @@ export class RdmComponent implements OnInit {
   }
 
   submit(): void {
+    if (this.bandWidthMaxErrTips || this.iopsMaxErrTips
+      || this.bandWidthMinErrTips || this.iopsMinErrTips || this.latencyErrTips) {
+      return;
+    }
     if (!this.ownershipController) {
       this.configModel.ownerController = '0';
     }
@@ -263,7 +267,15 @@ export class RdmComponent implements OnInit {
     console.log("this.ownershipController", this.ownershipController);
     this.storagePools = null;
     this.configModel.poolRawId = null;
-    this.http.get('dmestorage/storagepools', {params: {storageId, mediaType: "block"}}).subscribe((result: any) => {
+    const storage=this.storageDevices.filter(item=>item.id==storageId);
+    const dorado=storage[0].storageTypeShow.dorado;
+    let mediaType;
+    if (dorado){
+      mediaType = 'block-and-file';
+    } else {
+      mediaType = 'block';
+    }
+    this.http.get('dmestorage/storagepools', {params: {storageId, mediaType: mediaType}}).subscribe((result: any) => {
       this.slLoading = false;
       if (result.code === '200'){
         this.storagePools = result.data;
@@ -690,7 +702,35 @@ export class RdmComponent implements OnInit {
       this.latencyErrTips = false;
     }
   }
-
+  resetQosFlag(objValue:boolean, operationType:string) {
+    switch (operationType) {
+      case 'maxbandwidth':
+        if(!objValue) {
+          this.bandWidthMaxErrTips = false;
+        }
+        break;
+      case 'maxiops':
+        if(!objValue) {
+          this.iopsMaxErrTips = false;
+        }
+        break;
+      case 'minbandwidth':
+        if(!objValue) {
+          this.bandWidthMinErrTips = false;
+        }
+        break;
+      case 'miniops':
+        if(!objValue) {
+          this.iopsMinErrTips = false;
+        }
+        break;
+      default:
+        if(!objValue) {
+          this.latencyErrTips = false;
+        }
+        break;
+    }
+  }
 }
 
 
