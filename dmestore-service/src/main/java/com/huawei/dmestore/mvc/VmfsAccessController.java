@@ -160,8 +160,8 @@ public class VmfsAccessController extends BaseController {
         LOG.info("accessvmfs/deletevmfs=={}", gson.toJson(params));
         String failureStr = "";
         try {
-            vmfsAccessService.deleteVmfs(params);
-            return success();
+            vmfsAccessService.deleteVmfs2(params);
+            return success("delete vmfs success!");
         } catch (DmeException e) {
             failureStr = e.getMessage();
         }

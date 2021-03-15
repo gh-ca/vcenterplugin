@@ -147,10 +147,18 @@ public interface VmfsAccessService {
     /**
      * delete vmfs
      *
-     * @param params include dataStoreObjectIds,host,hostId,cluster,clusterId
+     * @param params include dataStoreObjectIds（list）
      * @throws DmeException when error
      */
     void deleteVmfs(Map<String, Object> params) throws DmeException;
+
+    /**
+     * delete vmfs
+     *
+     * @param params include dataStoreObjectIds（list）
+     * @throws DmeException when error
+     */
+    void deleteVmfs2(Map<String, Object> params) throws DmeException;
 
     /**
      * vCenter VMFS存储卷详细信息查询
@@ -179,6 +187,15 @@ public interface VmfsAccessService {
     List<Map<String, Object>> getHostsByStorageId(String storageId) throws DmeException;
 
     /**
+     * 通过vmfs storageId查询VC的主机 (DME侧关联的主机的启动器和VC主机的启动器要一致)
+     *
+     * @param storageId storageId
+     * @return List 返回VC主机列表，单个主机的信息以map方式存储属性和属性值
+     * @throws DmeException DmeException
+     */
+    List<Map<String, Object>> getHostsByStorageId2(String storageId) throws DmeException;
+
+    /**
      * 通过vmfs storageId查询vc 集群信息 （DME侧关联的主机组信息下所有主机的启动器和集群下的主机的启动器一致）
      *
      * @param storageId storageId
@@ -186,6 +203,15 @@ public interface VmfsAccessService {
      * @throws DmeException DmeException
      */
     List<Map<String, Object>> getHostGroupsByStorageId(String storageId) throws DmeException;
+
+    /**
+     * 通过vmfs storageId查询vc 集群信息 （DME侧关联的主机组信息下所有主机的启动器和集群下的主机的启动器一致）
+     *
+     * @param storageId storageId
+     * @return 返回集群列表，单个集群的信息以map方式存储属性和属性值
+     * @throws DmeException DmeException
+     */
+    List<Map<String, Object>> getHostGroupsByStorageId2(String storageId) throws DmeException;
 
     /**
      * query vmfs
