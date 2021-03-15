@@ -21,6 +21,8 @@ import javax.crypto.spec.SecretKeySpec;
 
 public class CipherUtils {
 
+    private AESCipher aesCipher;
+
     private static final Logger LOGGER = LoggerFactory.getLogger(CipherUtils.class);
 
     //private static final int IV_SIZE = 16;
@@ -75,9 +77,18 @@ public class CipherUtils {
         this.ivsize = ivsize;
     }
 
+    public AESCipher getAesCipher() {
+        return aesCipher;
+    }
+
+    public void setAesCipher(AESCipher aesCipher) {
+        this.aesCipher = aesCipher;
+    }
+
     public  String encryptString(String sSrc) {
 
-        return aesEncode(sSrc, multitypeutil);
+        //return aesEncode(sSrc, multitypeutil);
+        return aesCipher.encryptByAES(sSrc);
     }
 
     public  String aesEncode(String sSrc, String key) {
@@ -100,7 +111,8 @@ public class CipherUtils {
     }
 
     public  String decryptString(String sSrc) {
-        return aesDncode(sSrc, multitypeutil);
+        //return aesDncode(sSrc, multitypeutil);
+        return aesCipher.decryptByAES(sSrc);
     }
 
     public  String aesDncode(String sSrc, String key) {
