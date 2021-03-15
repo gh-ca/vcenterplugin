@@ -567,7 +567,7 @@ public class VCSDKUtils {
 
             /*
              * 取得所有集群，并通过mounthostids进行过滤，过滤掉已经挂载的主机
-             * 扫描集群下所有主机，只有集群下所有主机都没有挂载了该存储就不显示
+             * 扫描集群下所有主机，只有集群下所有主机都没有挂载该存储就不显示
              */
             List<Pair<ManagedObjectReference, String>> cls = rootFsMo.getAllClusterOnRootFs();
             if (cls != null && cls.size() > 0) {
@@ -585,7 +585,7 @@ public class VCSDKUtils {
                             }
                         }
                     }
-                    if (isMount && (null == inludeclustermap || null != inludeclustermap.get(cl.first().getValue()))) {
+                    if (isMount && (null != inludeclustermap || null != inludeclustermap.get(cl.first().getValue()))) {
                         Map<String, String> map = new HashMap<>();
                         String objectId = vcConnectionHelpers.mor2ObjectId(cl1.getMor(),
                             vmwareContext.getServerAddress());
@@ -658,8 +658,8 @@ public class VCSDKUtils {
                         map.put(OBJECT_ID, objectId);
                         map.put(STATUS, dsmo.getSummary().isAccessible());
                         map.put(TYPE, dsmo.getSummary().getType());
-                        map.put(CAPACITY, dsmo.getSummary().getCapacity() / ToolUtils.GI);
-                        map.put(FREE_SPACE, dsmo.getSummary().getFreeSpace() / ToolUtils.GI);
+                        map.put(CAPACITY, dsmo.getSummary().getCapacity() / (1024 * 1024 * 1024f));
+                        map.put(FREE_SPACE, dsmo.getSummary().getFreeSpace() / (1024 * 1024 * 1024f));
 
                         lists.add(map);
                     }
@@ -721,8 +721,8 @@ public class VCSDKUtils {
                                 map.put(OBJECT_ID, objectId);
                                 map.put(STATUS, dsmo.getSummary().isAccessible());
                                 map.put(TYPE, dsmo.getSummary().getType());
-                                map.put(CAPACITY, dsmo.getSummary().getCapacity() / ToolUtils.GI);
-                                map.put(FREE_SPACE, dsmo.getSummary().getFreeSpace() / ToolUtils.GI);
+                                map.put(CAPACITY, dsmo.getSummary().getCapacity() / (1024 * 1024 * 1024f));
+                                map.put(FREE_SPACE, dsmo.getSummary().getFreeSpace() / (1024 * 1024 * 1024f));
 
                                 lists.add(map);
                                 break;
@@ -805,8 +805,8 @@ public class VCSDKUtils {
                         map.put(OBJECT_ID, objectId);
                         map.put(STATUS, dsmo.getSummary().isAccessible());
                         map.put(TYPE, dsmo.getSummary().getType());
-                        map.put(CAPACITY, dsmo.getSummary().getCapacity() / ToolUtils.GI);
-                        map.put(FREE_SPACE, dsmo.getSummary().getFreeSpace() / ToolUtils.GI);
+                        map.put(CAPACITY, dsmo.getSummary().getCapacity() / (1024 * 1024 * 1024f));
+                        map.put(FREE_SPACE, dsmo.getSummary().getFreeSpace() / (1024 * 1024 * 1024f));
 
                         lists.add(map);
                     }
@@ -882,8 +882,8 @@ public class VCSDKUtils {
                             map.put(OBJECT_ID, objectId);
                             map.put(STATUS, dsmo.getSummary().isAccessible());
                             map.put(TYPE, dsmo.getSummary().getType());
-                            map.put(CAPACITY, dsmo.getSummary().getCapacity() / ToolUtils.GI);
-                            map.put(FREE_SPACE, dsmo.getSummary().getFreeSpace() / ToolUtils.GI);
+                            map.put(CAPACITY, dsmo.getSummary().getCapacity() / (1024*1024*1024f));
+                            map.put(FREE_SPACE, dsmo.getSummary().getFreeSpace() /(1024*1024*1024f));
 
                             lists.add(map);
                             break;

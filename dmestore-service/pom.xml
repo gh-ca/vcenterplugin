@@ -66,6 +66,13 @@
             <systemPath>${project.basedir}/extlib/vim25.jar</systemPath>
         </dependency>
         <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcprov-jdk15on</artifactId>
+            <version>1.59</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/extlib/bcprov-jdk15on-1.59.jar</systemPath>
+        </dependency>
+        <dependency>
             <groupId>com.vmware</groupId>
             <artifactId>pbm</artifactId>
             <version>1.0</version>

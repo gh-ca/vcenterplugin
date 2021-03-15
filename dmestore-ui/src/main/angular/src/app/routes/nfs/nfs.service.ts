@@ -118,17 +118,17 @@ export class UpdateNfs{
   control_policyUpper:string; // 上限控制flag
   control_policyLower:string; // 下限
 // up 取值如下
-  maxBandwidth: number; //
-  maxBandwidthChoose: false; //
-  maxIops: number; //
-  maxIopsChoose: false; //
+  maxBandwidth: string; //
+  maxBandwidthChoose: boolean; //
+  maxIops: string; //
+  maxIopsChoose: boolean; //
 //low取值
-  minBandwidth: number; //
-  minBandwidthChoose: false; //
-  minIops: number; //
-  minIopsChoose: false; //
-  latency: number; //
-  latencyChoose: false; //
+  minBandwidth: string; //
+  minBandwidthChoose: boolean; //
+  minIops: string; //
+  minIopsChoose: boolean; //
+  latency: string; //
+  latencyChoose: boolean; //
   thin:boolean;// true  代表thin false代表thick
   deduplicationEnabled:boolean;// 重删 true false
   compressionEnabled:boolean;// 压缩 true false
@@ -139,6 +139,11 @@ export class UpdateNfs{
   capacity:number;
   constructor(){
     this.sameName=true;
+    this.maxBandwidthChoose = false;
+    this.maxIopsChoose = false;
+    this.latencyChoose = false;
+    this.minIopsChoose = false;
+    this.minBandwidthChoose = false;
   }
 }
 
@@ -841,8 +846,8 @@ export class MakePerformance {
         switch (type) {
           case 'statStoragePool':// 存储池容量趋势
           {
-            const usedCapacity = item.usedCapacity/1024;
-            const totalCapacity = item.totalCapacity/1024;
+            const usedCapacity = item.usedCapacity;
+            const totalCapacity = item.totalCapacity;
             chart.series[0].data.push({value: Number(usedCapacity.toFixed(3)), symbol: 'none'});
             chart.series[1].data.push({value: Number(totalCapacity.toFixed(3)), symbol: 'none'});
             break;
@@ -857,7 +862,7 @@ export class MakePerformance {
             {
               let density;
               if (item.totalCapacity != '0') {
-                density = item.throughput/(item.totalCapacity/1024);
+                density = item.throughput/(item.totalCapacity);
               } else {
                 density = 0;
               }
@@ -880,7 +885,7 @@ export class MakePerformance {
           {
             let density;
             if (item.totalCapacity != '0') {
-              density = item.throughput/(item.totalCapacity/1024);
+              density = item.throughput/(item.totalCapacity);
             } else {
               density = 0;
             }
@@ -889,8 +894,8 @@ export class MakePerformance {
           }
           default:// LUN容量趋势
           {
-            const allocCapacity = item.allocCapacity/1024;
-            const totalCapacity = item.totalCapacity/1024;
+            const allocCapacity = item.allocCapacity;
+            const totalCapacity = item.totalCapacity;
             chart.series[0].data.push({value: Number(allocCapacity.toFixed(3)), symbol: 'none'});
             chart.series[1].data.push({value: Number(totalCapacity.toFixed(3)), symbol: 'none'});
             break;
@@ -954,7 +959,12 @@ export class MakePerformance {
     // 提示框
     const tooltip: Tooltip = new Tooltip();
     tooltip.trigger = 'axis';
-    tooltip.formatter = '{b} <br/> {a0}: {c0}';
+
+    let toolTips = '{b}';
+    for(let i = 0; i < dataNames.length;i++) {
+      toolTips = toolTips + '<br/>{a' + i + '}: {c' + i + '}';
+    }
+    tooltip.formatter = toolTips;
     const axisPointer: AxisPointer = new AxisPointer();
     axisPointer.axis = 'x';
     axisPointer.type = 'line';

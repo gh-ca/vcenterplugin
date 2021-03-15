@@ -157,8 +157,8 @@ export class AddComponent implements OnInit{
     if (versionVal === '6') {
       const option1 = {key: 1024, value : '1MB'};
       options.push(option1);
-      const option2 = {key: 64, value : '64KB'};
-      options.push(option2);
+      // const option2 = {key: 64, value : '64KB'};
+      // options.push(option2);
     } else if (versionVal === '5') {
       const option1 = {key: 1024, value : '1MB'};
       options.push(option1);

@@ -53,7 +53,7 @@ public class VcenterRegisterRunner {
         regParamMap.put(KEY, key);
         regParamMap.put("-version", version);
         regParamMap.put("-pluginUrl", packageUrl);
-        regParamMap.put("-company", "DME");
+        regParamMap.put("-company", "Huawei Technologies Co.,Ltd");
         regParamMap.put("--serverThumbprint", serverThumbprint);
         regParamMap.put(URL, HTTPS_PRE + vcenterIp + COLON + vcenterPort + SDK_PATH);
 
