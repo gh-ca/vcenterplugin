@@ -21,11 +21,21 @@ import javax.crypto.spec.SecretKeySpec;
 
 public class CipherUtils {
 
+    private AESCipher aesCipher;
+
     private static final Logger LOGGER = LoggerFactory.getLogger(CipherUtils.class);
 
-    private static final int IV_SIZE = 16;
+    //private static final int IV_SIZE = 16;
 
     private  String multitypeutil;
+
+    private  String cipheralgorithm;
+
+    private  String securerandomalgorithm;
+
+    private  String keyalgorithm;
+
+    private  String ivsize;
 
     public String getMultitypeutil() {
         return multitypeutil;
@@ -35,18 +45,59 @@ public class CipherUtils {
         this.multitypeutil = multitypeutil;
     }
 
+    public String getCipheralgorithm() {
+        return cipheralgorithm;
+    }
+
+    public void setCipheralgorithm(String cipheralgorithm) {
+        this.cipheralgorithm = cipheralgorithm;
+    }
+
+    public String getSecurerandomalgorithm() {
+        return securerandomalgorithm;
+    }
+
+    public void setSecurerandomalgorithm(String securerandomalgorithm) {
+        this.securerandomalgorithm = securerandomalgorithm;
+    }
+
+    public String getKeyalgorithm() {
+        return keyalgorithm;
+    }
+
+    public void setKeyalgorithm(String keyalgorithm) {
+        this.keyalgorithm = keyalgorithm;
+    }
+
+    public String getIvsize() {
+        return ivsize;
+    }
+
+    public void setIvsize(String ivsize) {
+        this.ivsize = ivsize;
+    }
+
+    public AESCipher getAesCipher() {
+        return aesCipher;
+    }
+
+    public void setAesCipher(AESCipher aesCipher) {
+        this.aesCipher = aesCipher;
+    }
+
     public  String encryptString(String sSrc) {
 
-        return aesEncode(sSrc, multitypeutil);
+        //return aesEncode(sSrc, multitypeutil);
+        return aesCipher.encryptByAES(sSrc);
     }
 
     public  String aesEncode(String sSrc, String key) {
         try {
-            Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+            Cipher cipher = Cipher.getInstance(cipheralgorithm);
             byte[] raw;
             raw = key.getBytes("utf-8");
-            SecretKeySpec skeySpec = new SecretKeySpec(raw, "AES");
-            byte[] ivBytes = getSafeRandom(IV_SIZE);
+            SecretKeySpec skeySpec = new SecretKeySpec(raw, keyalgorithm);
+            byte[] ivBytes = getSafeRandom(Integer.parseInt(ivsize));
             // 使用CBC模式，需要一个向量iv，可增加加密算法的强度
             IvParameterSpec iv = new IvParameterSpec(ivBytes);
             cipher.init(Cipher.ENCRYPT_MODE, skeySpec, iv);
@@ -60,14 +111,15 @@ public class CipherUtils {
     }
 
     public  String decryptString(String sSrc) {
-        return aesDncode(sSrc, multitypeutil);
+        //return aesDncode(sSrc, multitypeutil);
+        return aesCipher.decryptByAES(sSrc);
     }
 
     public  String aesDncode(String sSrc, String key) {
         try {
             byte[] raw = key.getBytes("utf-8");
-            SecretKeySpec skeySpec = new SecretKeySpec(raw, "AES");
-            Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+            SecretKeySpec skeySpec = new SecretKeySpec(raw, keyalgorithm);
+            Cipher cipher = Cipher.getInstance(cipheralgorithm);
             // 先用base64解密
             byte[] sSrcByte = new BASE64Decoder().decodeBuffer(sSrc);
             byte[] ivBytes = splitByteArray(sSrcByte, 0, 16);
@@ -85,8 +137,8 @@ public class CipherUtils {
         return null;
     }
 
-    private static byte[] getSafeRandom(int num) throws NoSuchAlgorithmException {
-        SecureRandom random = SecureRandom.getInstance("SHA1PRNG");
+    private  byte[] getSafeRandom(int num) throws NoSuchAlgorithmException {
+        SecureRandom random = SecureRandom.getInstance(securerandomalgorithm);
         byte[] b = new byte[num];
         random.nextBytes(b);
         return b;
