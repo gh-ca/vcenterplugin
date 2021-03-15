@@ -13,9 +13,13 @@
 
     <context:property-placeholder location="classpath:application.properties"/>
 
+    <bean name="cipherUtils" class="com.huawei.dmestore.utils.CipherUtils">
+        <property name="multitypeutil" value="${multitypeutil}"/>
+    </bean>
 
     <bean name="dmeInfoDao" class="com.huawei.dmestore.dao.DmeInfoDao">
         <property name="url" value="${h2.url}"/>
+        <property name="cipherUtils" ref="cipherUtils"/>
     </bean>
 
     <bean name="DmeAccessServiceImpl" class="com.huawei.dmestore.services.DmeAccessServiceImpl">
@@ -64,6 +68,7 @@
         <property name="dmeRelationInstanceService" ref="DmeRelationInstanceServiceImpl"/>
         <property name="vcenterinfoservice" ref="VCenterInfoServiceImpl"/>
         <property name="vcsdkUtils" ref="vCSDKUtils"/>
+        <property name="cipherUtils" ref="cipherUtils"/>
     </bean>
 
     <bean name="DmeRelationInstanceServiceImpl" class="com.huawei.dmestore.services.DmeRelationInstanceServiceImpl">
@@ -171,6 +176,7 @@
 
     <bean name="vCSDKUtils" class="com.huawei.dmestore.utils.VCSDKUtils">
         <property name="vcConnectionHelper" ref="springBootConnectionHelper"/>
+        <property name="cipherUtils" ref="cipherUtils"/>
     </bean>
 
     <bean name="springBootConnectionHelper" class="com.huawei.vmware.SpringBootConnectionHelpers">
