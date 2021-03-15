@@ -57,7 +57,7 @@ public class FileUtils {
     }
 
     public static void setWindowsFilePermission(File file) throws IOException {
-        Path path = Paths.get(file.getAbsolutePath());
+        Path path = Paths.get(file.getCanonicalPath());
 
         // Read Acl
         AclFileAttributeView view = Files.getFileAttributeView(path, AclFileAttributeView.class);
@@ -132,7 +132,7 @@ public class FileUtils {
         perms.remove(PosixFilePermission.OTHERS_WRITE);
         perms.remove(PosixFilePermission.OTHERS_EXECUTE);
         try {
-            Path path = Paths.get(file.getAbsolutePath());
+            Path path = Paths.get(file.getCanonicalPath());
             Files.setPosixFilePermissions(path, perms);
         } catch (Exception e) {
             LOGGER.error("Change folder " + file.getName() + " permission failed.");
