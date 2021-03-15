@@ -47,14 +47,11 @@ public class NumberOfVolumesInDatastoreImpl extends BaseBestPracticeService impl
                 if (volumeSize > Integer.parseInt(getRecommendValue().toString())) {
                     object.addProperty("name", summary.getName());
                     object.addProperty("value", volumeSize);
+                    array.add(object);
                 }
-                array.add(object);
             }
         }
-
-        JsonObject reObject = new JsonObject();
-        reObject.add("dataStores", array);
-        return reObject.toString();
+        return array.toString();
     }
 
     @Override
