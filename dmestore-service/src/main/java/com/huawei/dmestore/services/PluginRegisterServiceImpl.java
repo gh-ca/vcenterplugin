@@ -28,6 +28,8 @@ public class PluginRegisterServiceImpl implements PluginRegisterService {
 
     @Autowired
     private VcConnectionHelpers vcConnectionHelpers;
+    @Autowired
+    private CipherUtils cipherUtils;
 
     @Override
     public void installService(String vcenterIp, String vcenterPort, String vcenterUsername, String vcenterPassword,
@@ -37,7 +39,7 @@ public class PluginRegisterServiceImpl implements PluginRegisterService {
             VCenterInfo vcenterinfo = new VCenterInfo();
             vcenterinfo.setHostIp(vcenterIp);
             vcenterinfo.setUserName(vcenterUsername);
-            vcenterinfo.setPassword(CipherUtils.encryptString(vcenterPassword));
+            vcenterinfo.setPassword(cipherUtils.encryptString(vcenterPassword));
             vcenterinfo.setHostPort(Integer.parseInt(vcenterPort));
             vcenterinfoservice.saveVcenterInfo(vcenterinfo);
 

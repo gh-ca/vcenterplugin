@@ -252,9 +252,22 @@ public class DmeConstants {
         = "/rest/hostmgmt/v1/hostgroups/{hostgroup_id}/hosts/list";
 
     /**
+     * delete oriented hostgroup url
+     *
+     **/
+    public static final String DELETE_ORIENTED_HOSTGROUP_URL
+        = "/rest/hostmgmt/v1/hostgroups/{hostgroup_id}";
+
+    /**
      * add host to hosts
      **/
     public static final String PUT_ADD_HOST_TO_HOSTS = "/rest/hostmgmt/v1/hostgroups/{hostgroup_id}/hosts/add";
+
+    /**
+     * remove host from hostgroup
+     **/
+    public static final String PUT_REMOVE_HOST_FROM_HOSTGROUP =
+        "/rest/hostmgmt/v1/hostgroups/{hostgroup_id}/hosts/remove";
 
     /**
      * instance relation query
