@@ -128,16 +128,19 @@ public class BestPracticeCheckDao extends H2DataBaseDao {
         ResultSet rs = null;
         try {
             con = getConnection();
-            String sql = "SELECT HOST_ID,HOST_NAME from DP_DME_BEST_PRACTICE_CHECK where 1=1 AND HOST_ID in(%s)";
-            StringBuilder stringBuilder = new StringBuilder();
+            String sql = "SELECT HOST_ID,HOST_NAME from DP_DME_BEST_PRACTICE_CHECK where 1=1 AND HOST_ID in(";
+            StringBuilder stringBuilder = new StringBuilder(sql);
             for (int index = 0; index < ids.size(); index++) {
-                stringBuilder.append("'").append(ids.get(index)).append("'");
-                if (index < ids.size() - 1) {
-                    stringBuilder.append(",");
+                if (index == ids.size() - 1) {
+                    stringBuilder.append("?)");
+                } else {
+                    stringBuilder.append("?,");
                 }
             }
-            sql = String.format(sql, stringBuilder.toString());
-            ps = con.prepareStatement(sql);
+            ps = con.prepareStatement(stringBuilder.toString());
+            for (int index = 0; index < ids.size(); index++) {
+                ps.setString(index + 1, ids.get(index));
+            }
             rs = ps.executeQuery();
             while (rs.next()) {
                 map.put(rs.getString(HOST_ID), rs.getString(HOST_NAME));
@@ -163,11 +166,15 @@ public class BestPracticeCheckDao extends H2DataBaseDao {
                 "SELECT HOST_ID,HOST_NAME,HOST_SETTING,RECOMMEND_VALUE,ACTUAL_VALUE,HINT_LEVEL,NEED_REBOOT,AUTO_REPAIR "
                     + " from DP_DME_BEST_PRACTICE_CHECK where 1=1 ";
             if (!StringUtils.isEmpty(hostSetting)) {
-                sql = sql + " and HOST_SETTING='" + hostSetting + "'";
+                sql = sql + " and HOST_SETTING=? ";
             }
-
             sql = sql + " OFFSET " + offset + " ROWS FETCH FIRST " + pageSize + " ROWS ONLY";
-            ps = con.prepareStatement(sql);
+            if (!StringUtils.isEmpty(hostSetting)) {
+                ps = con.prepareStatement(sql);
+                ps.setString(1, hostSetting);
+            } else {
+                ps = con.prepareStatement(sql);
+            }
             rs = ps.executeQuery();
             while (rs.next()) {
                 BestPracticeBean bean = getBestPracticeBean(rs);
@@ -192,9 +199,12 @@ public class BestPracticeCheckDao extends H2DataBaseDao {
             String sql = "SELECT HOST_ID,HOST_NAME,HOST_SETTING,RECOMMEND_VALUE,ACTUAL_VALUE,HINT_LEVEL,NEED_REBOOT,"
                 + "AUTO_REPAIR from DP_DME_BEST_PRACTICE_CHECK where 1=1 ";
             if (!StringUtils.isEmpty(hostSetting)) {
-                sql = sql + " and HOST_SETTING='" + hostSetting + "'";
+                sql = sql + " and HOST_SETTING=?";
+                ps = con.prepareStatement(sql);
+                ps.setString(1, hostSetting);
+            }else {
+                ps = con.prepareStatement(sql);
             }
-            ps = con.prepareStatement(sql);
             rs = ps.executeQuery();
             while (rs.next()) {
                 BestPracticeBean bean = getBestPracticeBean(rs);
