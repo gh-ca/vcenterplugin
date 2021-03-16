@@ -571,6 +571,7 @@
     "user": "User",
     "password": "Password",
     "connected": "Connected",
+    "connectionError": "Connection Error",
     "storage": "Storage",
     "total": "Total",
     "normal": "Normal",
@@ -832,7 +833,10 @@
        "partiallyDamaged": "Partially Damaged",
        "system": "System",
        "vlan": "VLAN",
-       "customized": "Customized"
+       "customized": "Customized",
+       "inconsistent": "Inconsistent",
+       "toBeRecovered": "To be recovered",
+       "initializing": "Initializing"
      },
      "type":{
       "block":"Block",
@@ -860,7 +864,8 @@
     "cantFindData":"Sorry, no relevant data is found!",
     "getDataFailed": "Failed to get data!",
     "cantChangeServiceLevel": "This device is a Custom type and does not support DME Storage Strategy change operation!",
-    "iposMaxMinTips": "Can only be an integer from 1 to 999999999."
+    "iposMaxMinTips": "Can only be an integer from 1 to 999999999.",
+    "nfsSecurityTips": "To use Kerberos authentication, each host that mounts this datastore has to be a part of an Active Directory domain and its NFS authentication credentials need to be set. This is done on the Authentication Services page on each host."
   },
   "page": {
     "perPage": "Per Page",
