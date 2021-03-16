@@ -115,9 +115,9 @@
               <span class="gh-info-lable">{{'tier.iop'|translate}}</span>
               <span class="gh-info-value" *ngIf="selectedModel.capabilities.iopriority !== undefined
                                             && selectedModel.capabilities.iopriority.enabled === true">
-                  <span *ngIf="selectedModel.capabilities.iopriority.policy == 1">Lower</span>
-                  <span *ngIf="selectedModel.capabilities.iopriority.policy == 2">Middle</span>
-                  <span *ngIf="selectedModel.capabilities.iopriority.policy == 3">High</span>
+                  <span *ngIf="selectedModel.capabilities.iopriority.policy == 1">{{'vmfs.low'|translate}}</span>
+                  <span *ngIf="selectedModel.capabilities.iopriority.policy == 2">{{'tier.middle'|translate}}</span>
+                  <span *ngIf="selectedModel.capabilities.iopriority.policy == 3">{{'tier.high'|translate}}</span>
               </span>
               <span class="gh-info-value" *ngIf="selectedModel.capabilities.iopriority === undefined
                                             || selectedModel.capabilities.iopriority.enabled === false">
