@@ -1035,7 +1035,7 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
         if (objSize * indicatorSize > maxObjIndicator) {
             int length = maxObjIndicator / indicatorSize;
             int count = 0;
-            List<String> list = null;
+            List<String> list = new ArrayList<>();
             for (String objId : objIds) {
                 if (0 == count % length) {
                     list = new ArrayList<>();
