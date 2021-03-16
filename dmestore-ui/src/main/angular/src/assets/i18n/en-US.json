@@ -784,7 +784,9 @@
     "normal": "Normal",
     "abnormal": "Abnormal",
     "unknown": "Unknown",
-    "faulty": "Faulty"
+    "faulty": "Faulty",
+    "middle": "Middle",
+    "high": "High"
   },
   "applybp": {
     "ing": "Best Practice is Executing",
