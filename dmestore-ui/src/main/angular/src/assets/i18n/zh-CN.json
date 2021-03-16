@@ -784,7 +784,9 @@
     "normal": "正常",
     "abnormal": "异常",
     "unknown": "未知",
-    "faulty": "故障"
+    "faulty": "故障",
+    "middle": "中",
+    "high": "高"
   },
   "applybp": {
     "ing": "最佳实践实施中",
