@@ -29,7 +29,7 @@
                   <clr-icon shape="success-standard" class="is-solid" style="color: #59A220;margin-right: 5px;"></clr-icon>
                   {{'overview.connected' | translate}}</span>
                 <span class="gh-info-value" *ngIf="hostModel.hostIp != '' && hostModel.hostIp != null && hostModel.code != '200'">
-                  <span class="gh-info-value" style="color: red">连接出错</span>
+                  <span class="gh-info-value" style="color: red">{{'overview.connectionError' | translate}}</span>
                 </span>
                 <span class="gh-info-value" *ngIf="(hostModel.hostIp == '' || hostModel.hostIp == null) && hostModel.code == '200'">
                   <button type="button" (click)="showPop()" class="btn btn-icon" aria-label="home"><clr-icon shape="add"></clr-icon>

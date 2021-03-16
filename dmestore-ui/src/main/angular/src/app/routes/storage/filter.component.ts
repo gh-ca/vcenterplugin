@@ -1343,7 +1343,7 @@ export class FailoverGroupTypeFilter implements ClrDatagridFilterInterface<Failo
 @Component({
   selector: "health-status-filter",
   template: `
-    <clr-radio-container>
+    <clr-radio-container style="max-height: 6.25rem;overflow-y: auto">
       <clr-radio-wrapper>
         <input type="radio" clrRadio name="healthStatus" (change)="changeFunc($event)" [(ngModel)]="healthStatus" value="all" />
         <label>{{'vmfs.filter.all' | translate}}</label>
@@ -1357,8 +1357,20 @@ export class FailoverGroupTypeFilter implements ClrDatagridFilterInterface<Failo
         <label>{{'enum.status.normal' | translate}}</label>
       </clr-radio-wrapper>
       <clr-radio-wrapper>
-        <input type="radio" clrRadio name="healthStatus" (change)="changeFunc($event)" [(ngModel)]="healthStatus" value="abnormal"/>
-        <label>{{'enum.status.abnormal' | translate}}</label>
+        <input type="radio" clrRadio name="healthStatus" (change)="changeFunc($event)" [(ngModel)]="healthStatus" value="faulty"/>
+        <label>{{'enum.status.faulty' | translate}}</label>
+      </clr-radio-wrapper>
+      <clr-radio-wrapper>
+        <input type="radio" clrRadio name="healthStatus" (change)="changeFunc($event)" [(ngModel)]="healthStatus" value="about to fail"/>
+        <label>{{'enum.status.aboutToFail' | translate}}</label>
+      </clr-radio-wrapper>
+      <clr-radio-wrapper>
+        <input type="radio" clrRadio name="healthStatus" (change)="changeFunc($event)" [(ngModel)]="healthStatus" value="partially damaged"/>
+        <label>{{'enum.status.partiallyDamaged' | translate}}</label>
+      </clr-radio-wrapper>
+      <clr-radio-wrapper>
+        <input type="radio" clrRadio name="healthStatus" (change)="changeFunc($event)" [(ngModel)]="healthStatus" value="inconsistent"/>
+        <label>{{'enum.status.inconsistent' | translate}}</label>
       </clr-radio-wrapper>
     </clr-radio-container>
   `,
@@ -1394,22 +1406,38 @@ export class HealthStatusFilter implements ClrDatagridFilterInterface<BondPort>{
 @Component({
   selector: "ports-running-status-filter",
   template: `
-    <clr-radio-container>
+    <clr-radio-container style="max-height: 6.25rem;overflow-y: auto">
       <clr-radio-wrapper>
         <input type="radio" clrRadio name="runningStatus" (change)="changeFunc($event)" [(ngModel)]="runningStatus" value="all" />
         <label>{{'vmfs.filter.all' | translate}}</label>
       </clr-radio-wrapper>
       <clr-radio-wrapper>
-        <input type="radio" clrRadio name="runningStatus" (change)="changeFunc($event)" [(ngModel)]="runningStatus" value="unknown"/>
+        <input type="radio" clrRadio name="runningStatus" (change)="changeFunc($event)" [(ngModel)]="runningStatus" value="UNKNOWN"/>
         <label>{{'enum.status.unknown' | translate}}</label>
       </clr-radio-wrapper>
       <clr-radio-wrapper>
-        <input type="radio" clrRadio name="runningStatus" (change)="changeFunc($event)" [(ngModel)]="runningStatus" value="connected"/>
+        <input type="radio" clrRadio name="runningStatus" (change)="changeFunc($event)" [(ngModel)]="runningStatus" value="NORMAL"/>
+        <label>{{'enum.status.normal' | translate}}</label>
+      </clr-radio-wrapper>
+      <clr-radio-wrapper>
+        <input type="radio" clrRadio name="runningStatus" (change)="changeFunc($event)" [(ngModel)]="runningStatus" value="RUNNING"/>
+        <label>{{'enum.status.running' | translate}}</label>
+      </clr-radio-wrapper>
+      <clr-radio-wrapper>
+        <input type="radio" clrRadio name="runningStatus" (change)="changeFunc($event)" [(ngModel)]="runningStatus" value="LINK_UP"/>
         <label>{{'enum.status.connected' | translate}}</label>
       </clr-radio-wrapper>
       <clr-radio-wrapper>
-        <input type="radio" clrRadio name="runningStatus" (change)="changeFunc($event)" [(ngModel)]="runningStatus" value="disconnected"/>
+        <input type="radio" clrRadio name="runningStatus" (change)="changeFunc($event)" [(ngModel)]="runningStatus" value="LINK_DOWN"/>
         <label>{{'enum.status.disconnected' | translate}}</label>
+      </clr-radio-wrapper>
+      <clr-radio-wrapper>
+        <input type="radio" clrRadio name="runningStatus" (change)="changeFunc($event)" [(ngModel)]="runningStatus" value="to be recovered"/>
+        <label>{{'enum.status.toBeRecovered' | translate}}</label>
+      </clr-radio-wrapper>
+      <clr-radio-wrapper>
+        <input type="radio" clrRadio name="runningStatus" (change)="changeFunc($event)" [(ngModel)]="runningStatus" value="initializing"/>
+        <label>{{'enum.status.initializing' | translate}}</label>
       </clr-radio-wrapper>
     </clr-radio-container>
   `,

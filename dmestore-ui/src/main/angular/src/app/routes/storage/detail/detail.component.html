@@ -829,11 +829,11 @@
                             <disk-status-filter #diskStatusFilter></disk-status-filter>
                           </clr-dg-filter>
                         </clr-dg-column>
-                        <clr-dg-column >
+                        <clr-dg-column [clrDgField]="'physicalType'">
                           {{'storage.detail.hardware.disks.type' | translate}}
-                          <clr-dg-filter [clrDgFilter]="diskTypeFilter">
-                            <disk-type-filter #diskTypeFilter></disk-type-filter>
-                          </clr-dg-filter>
+<!--                          <clr-dg-filter [clrDgFilter]="diskTypeFilter">-->
+<!--                            <disk-type-filter #diskTypeFilter></disk-type-filter>-->
+<!--                          </clr-dg-filter>-->
                         </clr-dg-column>
                         <clr-dg-column class="hideFilter" [clrDgField]="'capacity'">{{'storage.detail.hardware.disks.capacity' | translate}}</clr-dg-column>
                         <clr-dg-column [clrDgField]="'member'">{{'storage.detail.hardware.disks.role' | translate}}</clr-dg-column>
@@ -1049,13 +1049,20 @@
                                 <clr-dg-cell class="over_flow">
                                   <span *ngIf="item.healthStatus == 'unknown'">{{'enum.status.unknown' | translate}}</span>
                                   <span *ngIf="item.healthStatus == 'normal'">{{'enum.status.normal' | translate}}</span>
-                                  <span *ngIf="item.healthStatus == 'abnormal'">{{'enum.status.abnormal' | translate}}</span>
+                                  <span *ngIf="item.healthStatus == 'faulty'">{{'enum.status.faulty' | translate}}</span>
+                                  <span *ngIf="item.healthStatus == 'about to fail'">{{'enum.status.aboutToFail' | translate}}</span>
+                                  <span *ngIf="item.healthStatus == 'partially damaged'">{{'enum.status.partiallyDamaged' | translate}}</span>
+                                  <span *ngIf="item.healthStatus == 'inconsistent'">{{'enum.status.inconsistent' | translate}}</span>
                                   <span *ngIf="!item.healthStatus">--</span>
                                 </clr-dg-cell>
                                 <clr-dg-cell class="over_flow">
-                                  <span *ngIf="item.runningStatus == 'unknown'">{{'enum.status.unknown' | translate}}</span>
-                                  <span *ngIf="item.runningStatus == 'connected'">{{'enum.status.connected' | translate}}</span>
-                                  <span *ngIf="item.runningStatus == 'disconnected'">{{'enum.status.disconnected' | translate}}</span>
+                                  <span *ngIf="item.runningStatus == 'UNKNOWN'">{{'enum.status.unknown' | translate}}</span>
+                                  <span *ngIf="item.runningStatus == 'NORMAL'">{{'enum.status.normal' | translate}}</span>
+                                  <span *ngIf="item.runningStatus == 'RUNNING'">{{'enum.status.running' | translate}}</span>
+                                  <span *ngIf="item.runningStatus == 'LINK_UP'">{{'enum.status.connected' | translate}}</span>
+                                  <span *ngIf="item.runningStatus == 'LINK_DOWN'">{{'enum.status.disconnected' | translate}}</span>
+                                  <span *ngIf="item.runningStatus == 'to be recovered'">{{'enum.status.toBeRecovered' | translate}}</span>
+                                  <span *ngIf="item.runningStatus == 'initializing'">{{'enum.status.initializing' | translate}}</span>
                                   <span *ngIf="!item.runningStatus">--</span>
                                 </clr-dg-cell>
                                 <clr-dg-cell class="over_flow">{{item.mtu}}</clr-dg-cell>
