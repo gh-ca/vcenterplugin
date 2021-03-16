@@ -729,7 +729,6 @@ public class DmeAccessServiceImpl implements DmeAccessService {
         String getHostGroupUrl = DmeConstants.GET_DME_HOSTGROUP_URL.replace("{hostgroup_id}", hostGroupId);
         try {
             ResponseEntity responseEntity = access(getHostGroupUrl, HttpMethod.GET, null);
-            LOG.info("==get oriented host group responseBody==", gson.toJson(responseEntity));
             if (responseEntity.getStatusCodeValue() == RestUtils.RES_STATE_I_200) {
                 JsonObject vjson = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonObject();
                 if (vjson != null) {
