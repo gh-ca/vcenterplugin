@@ -82,7 +82,7 @@ export class ModifyComponent implements OnInit{
         } else {
           const ctx = this.globalsService.getClientSdk().app.getContextObjects();
           this.objectId = ctx[0].id;
-          // this.objectId = "urn:vmomi:Datastore:datastore-10017:674908e5-ab21-4079-9cb1-596358ee5dd1";
+          // this.objectId = "urn:vmomi:Datastore:datastore-10076:674908e5-ab21-4079-9cb1-596358ee5dd1";
         }
 
         // 获取vmfs数据
@@ -104,17 +104,25 @@ export class ModifyComponent implements OnInit{
                 this.modifyForm.control_policy = '';
                 const wwns = [];
                 wwns.push(this.vmfsInfo.wwn);
+
+                this.modifyForm.max_bandwidth = this.vmfsInfo.maxBandwidth;
+                this.modifyForm.max_iops = this.vmfsInfo.maxIops;
+                this.modifyForm.min_iops = this.vmfsInfo.minIops;
+                this.modifyForm.min_bandwidth = this.vmfsInfo.minBandwidth;
+                this.modifyForm.latency = this.vmfsInfo.latency;
+                if (this.modifyForm.latency || this.modifyForm.min_bandwidth
+                  || this.modifyForm.min_iops || this.modifyForm.max_bandwidth
+                  || this.modifyForm.max_iops) {
+                  this.modifyForm.qosFlag = true;
+                }
                 this.modifyGetStorage(this.vmfsInfo.deviceId);
+
                 this.remoteSrv.getChartData(wwns).subscribe((chartResult: any) => {
                   console.log('chartResult', chartResult);
                   console.log('chartResult', chartResult.code === '200' && chartResult.data != null);
                   if (chartResult.code === '200' && chartResult.data != null) {
                     const chartList: VmfsInfo  = chartResult.data[0];
-                    this.modifyForm.max_bandwidth = chartList.maxBandwidth;
-                    this.modifyForm.max_iops = chartList.maxIops;
-                    this.modifyForm.min_iops = chartList.minIops;
-                    this.modifyForm.min_bandwidth = chartList.minBandwidth;
-                    this.modifyForm.latency = chartList.latency;
+
                   }
                 });
               } else {
@@ -430,6 +438,37 @@ export class ModifyComponent implements OnInit{
               this.showLowerFlag = false;
             }
             this.latencyIsSelect = qosTag == 1;
+            const upperObj = document.getElementById('editControl_policyUpper') as HTMLInputElement;
+            const lowerObj = document.getElementById('editControl_policyLower') as HTMLInputElement;
+            if (this.modifyForm.max_iops || this.modifyForm.max_bandwidth) {
+              if (this.modifyForm.max_iops) {
+                this.modifyForm.maxiopsChoose = true;
+              }
+              if (this.modifyForm.max_bandwidth) {
+                this.modifyForm.maxbandwidthChoose = true;
+              }
+              upperObj.checked = true;
+              this.controlPolicyChangeFunc('editControl_policyUpper', 'editControl_policyLower', true, this.modifyForm, true);
+            }
+            if (this.modifyForm.min_iops || this.modifyForm.min_bandwidth || this.modifyForm.latency) {
+              if (this.modifyForm.min_iops) {
+                this.modifyForm.miniopsChoose = true;
+              }
+              if (this.modifyForm.min_bandwidth) {
+                this.modifyForm.minbandwidthChoose = true;
+              }
+              if (this.modifyForm.latency) {
+                this.modifyForm.latencyChoose = true;
+              }
+              lowerObj.checked = true;
+              this.controlPolicyChangeFunc('editControl_policyUpper', 'editControl_policyLower', true, this.modifyForm, false);
+            }
+            if (smartTierShow) {
+              if (this.vmfsInfo.smartTier) {
+                this.modifyForm.smartTierFlag = true;
+                this.modifyForm.smartTier = this.vmfsInfo.smartTier;
+              }
+            }
           }
         }
         this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
