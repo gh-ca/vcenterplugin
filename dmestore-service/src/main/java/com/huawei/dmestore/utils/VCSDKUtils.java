@@ -658,8 +658,8 @@ public class VCSDKUtils {
                         map.put(OBJECT_ID, objectId);
                         map.put(STATUS, dsmo.getSummary().isAccessible());
                         map.put(TYPE, dsmo.getSummary().getType());
-                        map.put(CAPACITY, dsmo.getSummary().getCapacity() / ToolUtils.GI);
-                        map.put(FREE_SPACE, dsmo.getSummary().getFreeSpace() / ToolUtils.GI);
+                        map.put(CAPACITY, dsmo.getSummary().getCapacity() / (1024 * 1024 * 1024f));
+                        map.put(FREE_SPACE, dsmo.getSummary().getFreeSpace() / (1024 * 1024 * 1024f));
 
                         lists.add(map);
                     }
@@ -805,8 +805,8 @@ public class VCSDKUtils {
                         map.put(OBJECT_ID, objectId);
                         map.put(STATUS, dsmo.getSummary().isAccessible());
                         map.put(TYPE, dsmo.getSummary().getType());
-                        map.put(CAPACITY, dsmo.getSummary().getCapacity() / ToolUtils.GI);
-                        map.put(FREE_SPACE, dsmo.getSummary().getFreeSpace() / ToolUtils.GI);
+                        map.put(CAPACITY, dsmo.getSummary().getCapacity() / (1024 * 1024 * 1024f));
+                        map.put(FREE_SPACE, dsmo.getSummary().getFreeSpace() / (1024 * 1024 * 1024f));
 
                         lists.add(map);
                     }
