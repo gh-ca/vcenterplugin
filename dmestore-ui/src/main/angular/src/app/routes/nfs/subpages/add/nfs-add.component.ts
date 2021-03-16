@@ -767,5 +767,13 @@ export class NfsAddComponent implements OnInit{
         break;
     }
   }
+  setType() {
+    if (this.addForm.type == 'NFS41') {
+      this.addForm.securityType = 'AUTH_SYS';
+    } else {
+      this.addForm.securityType = '';
+    }
+  }
+
 }
 

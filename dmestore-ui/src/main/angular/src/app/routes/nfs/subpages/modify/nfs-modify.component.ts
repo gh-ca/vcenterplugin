@@ -70,7 +70,7 @@ export class NfsModifyComponent implements OnInit{
       }
       if (result.code === '200'){
         this.updateNfs=result.data;
-        this.updateNfs.sameName=true;
+        // this.updateNfs.sameName=true;
         this.updateNfs.dataStoreObjectId=this.objectId;
         this.oldNfsName=this.updateNfs.nfsName;
         this.oldFsName=this.updateNfs.fsName;
@@ -107,6 +107,42 @@ export class NfsModifyComponent implements OnInit{
               }
             }
             this.modalLoading=false;
+            const upperObj = document.getElementById('editControl_policyUpper') as HTMLInputElement;
+            const lowerObj = document.getElementById('editControl_policyLower') as HTMLInputElement;
+
+            if ((this.updateNfs.maxBandwidth && this.updateNfs.maxBandwidth != '0')
+              || (this.updateNfs.maxIops && this.updateNfs.maxIops != '0')) {
+
+              if (this.updateNfs.maxBandwidth) {
+                this.updateNfs.maxBandwidthChoose = true;
+              }
+              if (this.updateNfs.maxIops) {
+                this.updateNfs.maxIopsChoose = true;
+              }
+              // 转换报错问题修改
+              this.updateNfs.maxBandwidth = this.updateNfs.maxBandwidth + '';
+              this.updateNfs.maxIops = this.updateNfs.maxIops + '';
+              upperObj.checked = true;
+              this.controlPolicyChangeFunc('editControl_policyUpper', 'editControl_policyLower', true, this.updateNfs, true);
+            }
+            if ((this.updateNfs.latency && this.updateNfs.latency != '0')
+              || (this.updateNfs.minBandwidth && this.updateNfs.minBandwidth != '0')
+              || (this.updateNfs.minIops && this.updateNfs.minIops != '0')) {
+              lowerObj.checked = true;
+              if (this.updateNfs.latency) {
+                this.updateNfs.latencyChoose = true;
+              }
+              if (this.updateNfs.minBandwidth) {
+                this.updateNfs.minBandwidthChoose = true;
+              }
+              if (this.updateNfs.minIops) {
+                this.updateNfs.minIopsChoose = true;
+              }
+              this.updateNfs.latency = this.updateNfs.latency + '';
+              this.updateNfs.minBandwidth = this.updateNfs.minBandwidth + '';
+              this.updateNfs.minIops = this.updateNfs.minIops + '';
+              this.controlPolicyChangeFunc('editControl_policyUpper', 'editControl_policyLower', true, this.updateNfs, false);
+            }
             this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
           });
         } else {
@@ -119,6 +155,7 @@ export class NfsModifyComponent implements OnInit{
       this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
     });
   }
+
   modifyCommit(){
     if (this.bandWidthMaxErrTips || this.iopsMaxErrTips
       || this.bandWidthMinErrTips || this.iopsMinErrTips || this.latencyErrTips) {

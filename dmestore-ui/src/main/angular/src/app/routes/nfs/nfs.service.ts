@@ -118,17 +118,17 @@ export class UpdateNfs{
   control_policyUpper:string; // 上限控制flag
   control_policyLower:string; // 下限
 // up 取值如下
-  maxBandwidth: number; //
-  maxBandwidthChoose: false; //
-  maxIops: number; //
-  maxIopsChoose: false; //
+  maxBandwidth: string; //
+  maxBandwidthChoose: boolean; //
+  maxIops: string; //
+  maxIopsChoose: boolean; //
 //low取值
-  minBandwidth: number; //
-  minBandwidthChoose: false; //
-  minIops: number; //
-  minIopsChoose: false; //
-  latency: number; //
-  latencyChoose: false; //
+  minBandwidth: string; //
+  minBandwidthChoose: boolean; //
+  minIops: string; //
+  minIopsChoose: boolean; //
+  latency: string; //
+  latencyChoose: boolean; //
   thin:boolean;// true  代表thin false代表thick
   deduplicationEnabled:boolean;// 重删 true false
   compressionEnabled:boolean;// 压缩 true false
@@ -139,6 +139,11 @@ export class UpdateNfs{
   capacity:number;
   constructor(){
     this.sameName=true;
+    this.maxBandwidthChoose = false;
+    this.maxIopsChoose = false;
+    this.latencyChoose = false;
+    this.minIopsChoose = false;
+    this.minBandwidthChoose = false;
   }
 }
 
