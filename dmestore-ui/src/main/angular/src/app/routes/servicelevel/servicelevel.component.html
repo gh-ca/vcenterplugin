@@ -183,11 +183,14 @@
               <span class="gh-info-lable">{{'tier.dedupe'|translate}}</span>
               <span class="gh-info-value" *ngIf="selectedModel.capabilities.deduplication == undefined">--</span>
               <span class="gh-info-value" *ngIf="selectedModel.capabilities.deduplication != undefined">
-                <span *ngIf="selectedModel.capabilities.deduplication == true">
+                <span *ngIf="selectedModel.capabilities.deduplication == 'enabled'">
                    {{'tier.enable'|translate}}
                 </span>
-                <span *ngIf="selectedModel.capabilities.deduplication == false">
+                <span *ngIf="selectedModel.capabilities.deduplication == 'disabled'">
                    {{'tier.disable'|translate}}
+                </span>
+                 <span *ngIf="selectedModel.capabilities.deduplication == 'default_type'">
+                   {{'rdm.default'|translate}}
                 </span>
               </span>
             </div>
