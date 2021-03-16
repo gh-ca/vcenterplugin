@@ -118,54 +118,56 @@ public class BestPracticeProcessServiceImpl implements BestPracticeProcessServic
             hostsStr = vcsdkUtils.getAllHosts();
         }
         JsonArray hostArray = gson.fromJson(hostsStr, JsonArray.class);
-        Map<String, List<BestPracticeBean>> checkMap = new HashMap<>(DmeConstants.COLLECTION_CAPACITY_16);
-        List<String> unConnectedIds = new ArrayList<>();
-        for (int index = 0; index < hostArray.size(); index++) {
-            // 对每一项进行检查
-            JsonObject hostObject = hostArray.get(index).getAsJsonObject();
-            String hostName = hostObject.get("hostName").getAsString();
-            String hostObjectId = hostObject.get("objectId").getAsString();
+        if (null!=hostArray) {
+            Map<String, List<BestPracticeBean>> checkMap = new HashMap<>(DmeConstants.COLLECTION_CAPACITY_16);
+            List<String> unConnectedIds = new ArrayList<>();
+            for (int index = 0; index < hostArray.size(); index++) {
+                // 对每一项进行检查
+                JsonObject hostObject = hostArray.get(index).getAsJsonObject();
+                String hostName = hostObject.get("hostName").getAsString();
+                String hostObjectId = hostObject.get("objectId").getAsString();
 
-            // 连接断开的主机跳过
-            if (!vcsdkUtils.isHostConnected(hostObjectId)) {
-                unConnectedIds.add(hostObjectId);
-                continue;
-            }
-            for (BestPracticeService bestPracticeService : bestPracticeServices) {
-                try {
-                    String hostSetting = bestPracticeService.getHostSetting();
-                    if (!checkMap.containsKey(hostSetting)) {
-                        checkMap.put(hostSetting, new ArrayList<>());
+                // 连接断开的主机跳过
+                if (!vcsdkUtils.isHostConnected(hostObjectId)) {
+                    unConnectedIds.add(hostObjectId);
+                    continue;
+                }
+                for (BestPracticeService bestPracticeService : bestPracticeServices) {
+                    try {
+                        String hostSetting = bestPracticeService.getHostSetting();
+                        if (!checkMap.containsKey(hostSetting)) {
+                            checkMap.put(hostSetting, new ArrayList<>());
+                        }
+                        boolean isCheck = bestPracticeService.check(vcsdkUtils, hostObjectId);
+                        if (!isCheck) {
+                            BestPracticeBean bean = new BestPracticeBean();
+                            bean.setHostSetting(hostSetting);
+                            bean.setRecommendValue(String.valueOf(bestPracticeService.getRecommendValue()));
+                            bean.setLevel(bestPracticeService.getLevel());
+                            bean.setNeedReboot(String.valueOf(bestPracticeService.needReboot()));
+                            Object currentValue = bestPracticeService.getCurrentValue(vcsdkUtils, hostObjectId);
+                            String actualValue = String.valueOf(currentValue);
+                            bean.setActualValue(actualValue);
+                            bean.setHostObjectId(hostObjectId);
+                            bean.setHostName(hostName);
+                            bean.setAutoRepair(String.valueOf(bestPracticeService.autoRepair()));
+                            checkMap.get(hostSetting).add(bean);
+                        }
+                    } catch (Exception ex) {
+                        // 报错，跳过当前项检查
+                        log.error("{} check failed! hostSetting={}, errorMsg={}", hostName,
+                                bestPracticeService.getHostSetting(), ex.getMessage());
                     }
-                    boolean isCheck = bestPracticeService.check(vcsdkUtils, hostObjectId);
-                    if (!isCheck) {
-                        BestPracticeBean bean = new BestPracticeBean();
-                        bean.setHostSetting(hostSetting);
-                        bean.setRecommendValue(String.valueOf(bestPracticeService.getRecommendValue()));
-                        bean.setLevel(bestPracticeService.getLevel());
-                        bean.setNeedReboot(String.valueOf(bestPracticeService.needReboot()));
-                        Object currentValue = bestPracticeService.getCurrentValue(vcsdkUtils, hostObjectId);
-                        String actualValue = String.valueOf(currentValue);
-                        bean.setActualValue(actualValue);
-                        bean.setHostObjectId(hostObjectId);
-                        bean.setHostName(hostName);
-                        bean.setAutoRepair(String.valueOf(bestPracticeService.autoRepair()));
-                        checkMap.get(hostSetting).add(bean);
-                    }
-                } catch (Exception ex) {
-                    // 报错，跳过当前项检查
-                    log.error("{} check failed! hostSetting={}, errorMsg={}", hostName,
-                        bestPracticeService.getHostSetting(), ex.getMessage());
                 }
             }
-        }
 
-        if (checkMap.size() > 0) {
-            // 保存到数据库
-            bachDbProcess(checkMap);
-        }
+            if (checkMap.size() > 0) {
+                // 保存到数据库
+                bachDbProcess(checkMap);
+            }
 
-        bestPracticeCheckDao.deleteByHostIds(unConnectedIds);
+            bestPracticeCheckDao.deleteByHostIds(unConnectedIds);
+        }
         log.info("====best practice check end====");
     }
 
