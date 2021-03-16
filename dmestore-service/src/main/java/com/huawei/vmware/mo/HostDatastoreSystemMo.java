@@ -145,6 +145,7 @@ public class HostDatastoreSystemMo extends BaseMo {
         String accessMode, String type, String securityType) throws Exception {
         HostNasVolumeSpec spec = new HostNasVolumeSpec();
         spec.setRemoteHost(host);
+        spec.getRemoteHostNames().add(host);
         spec.setRemotePath(exportPath);
         if (!StringUtils.isEmpty(type)) {
             spec.setType(type);

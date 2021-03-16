@@ -214,7 +214,7 @@ public class VmfsAccessController extends BaseController {
     @RequestMapping(value = "/gethostsbystorageid/{storageId}", method = RequestMethod.GET)
     public ResponseBodyBean getHostsByStorageId(@PathVariable(value = "storageId") String storageId) {
         try {
-            List<Map<String, Object>> hosts = vmfsAccessService.getHostsByStorageId(storageId);
+            List<Map<String, Object>> hosts = vmfsAccessService.getHostsByStorageId2(storageId);
             return success(hosts);
         } catch (DmeException e) {
             return failure(e.getMessage());
@@ -230,7 +230,7 @@ public class VmfsAccessController extends BaseController {
     @RequestMapping(value = "/gethostgroupsbystorageid/{storageId}", method = RequestMethod.GET)
     public ResponseBodyBean getHostGroupsByStorageId(@PathVariable(value = "storageId") String storageId) {
         try {
-            List<Map<String, Object>> hosts = vmfsAccessService.getHostGroupsByStorageId(storageId);
+            List<Map<String, Object>> hosts = vmfsAccessService.getHostGroupsByStorageId2(storageId);
             return success(hosts);
         } catch (DmeException e) {
             return failure(e.getMessage());
