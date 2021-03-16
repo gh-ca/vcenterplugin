@@ -1,13 +1,20 @@
 package com.huawei.dmestore.services.bestpractice;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.huawei.dmestore.constant.DmeConstants;
+import com.huawei.dmestore.exception.DmeException;
+import com.huawei.dmestore.services.DmeAccessService;
 import com.huawei.dmestore.utils.VCSDKUtils;
 import com.huawei.vmware.mo.HostMo;
 import com.huawei.vmware.mo.HostStorageSystemMo;
 import com.huawei.vmware.util.VmwareContext;
 import com.vmware.vim25.*;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -19,6 +26,12 @@ import java.util.concurrent.Executors;
  * @since 2020-11-30
  **/
 public class NMPPathSwitchPolicyImpl extends BaseBestPracticeService implements BestPracticeService {
+    private DmeAccessService dmeAccessService;
+
+    private static final int DIVISOR_100 = 100;
+
+    private static final int HTTP_SUCCESS = 2;
+
     @Override
     public String getHostSetting() {
         return "NMP path switch policy";
@@ -117,6 +130,39 @@ public class NMPPathSwitchPolicyImpl extends BaseBestPracticeService implements 
         HostStorageDeviceInfo deviceInfo = hostStorageSystemMo.getStorageDeviceInfo();
         HostMultipathInfo hostMultipathInfo = deviceInfo.getMultipathInfo();
         List<HostMultipathInfoLogicalUnit> lunList = hostMultipathInfo.getLun();
-        return lunList;
+        return pickupDmeLun(lunList);
+    }
+
+    private List<HostMultipathInfoLogicalUnit> pickupDmeLun(List<HostMultipathInfoLogicalUnit> lunList) {
+        List<HostMultipathInfoLogicalUnit> targetList = new ArrayList<>();
+        for (int index = 0; index < lunList.size(); index++) {
+            HostMultipathInfoLogicalUnit logicalUnit = lunList.get(index);
+            String wwn = logicalUnit.getId().substring(10, 42);
+            // 根据wwn从DME中查询卷信息,如果查找到则说明是华为存储。
+            String volumeUrlByName = DmeConstants.DME_VOLUME_BASE_URL + "?volume_wwn=" + wwn;
+            try {
+                ResponseEntity<String> responseEntity = dmeAccessService.access(volumeUrlByName, HttpMethod.GET, null);
+                if (responseEntity.getStatusCodeValue() / DIVISOR_100 != HTTP_SUCCESS) {
+                    continue;
+                }
+                JsonObject jsonObject = new Gson().fromJson(responseEntity.getBody(), JsonObject.class);
+                if (jsonObject.get("volumes").getAsJsonArray().size() > 0) {
+                    targetList.add(logicalUnit);
+                } else {
+                    logger.debug("非华为DME Lun信息，跳过多路复选最佳实践检查、实施！");
+                }
+            } catch (DmeException e) {
+                e.printStackTrace();
+            }
+        }
+        return targetList;
+    }
+
+    public DmeAccessService getDmeAccessService() {
+        return dmeAccessService;
+    }
+
+    public void setDmeAccessService(DmeAccessService dmeAccessService) {
+        this.dmeAccessService = dmeAccessService;
     }
 }

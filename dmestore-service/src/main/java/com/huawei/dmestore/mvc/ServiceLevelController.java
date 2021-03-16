@@ -1,6 +1,7 @@
 package com.huawei.dmestore.mvc;
 
 import com.huawei.dmestore.exception.DmeException;
+import com.huawei.dmestore.model.DmeDatasetsQueryResponse;
 import com.huawei.dmestore.model.ResponseBodyBean;
 import com.huawei.dmestore.model.StoragePool;
 import com.huawei.dmestore.model.Volume;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * ServiceLevelController
@@ -113,7 +115,10 @@ public class ServiceLevelController extends BaseController {
     @RequestMapping(value = "/capacity/stat-lun", method = RequestMethod.GET)
     public ResponseBodyBean statLun(@RequestParam String serviceLevelId, @RequestParam String interval) {
         try {
-            return success(serviceLevelService.statLunDatasetsQuery(serviceLevelId, interval));
+            DmeDatasetsQueryResponse responseBodyBean = serviceLevelService.statLunDatasetsQuery(serviceLevelId,
+                interval);
+            filtration(responseBodyBean, serviceLevelId);
+            return success(responseBodyBean);
         } catch (DmeException e) {
             return failure(e.getMessage());
         }
@@ -127,7 +132,10 @@ public class ServiceLevelController extends BaseController {
     @RequestMapping(value = "/capacity/stat-storage-pool", method = RequestMethod.GET)
     public ResponseBodyBean statStoragePool(@RequestParam String serviceLevelId, @RequestParam String interval) {
         try {
-            return success(serviceLevelService.statStoragePoolDatasetsQuery(serviceLevelId, interval));
+            DmeDatasetsQueryResponse responseBodyBean = serviceLevelService.statStoragePoolDatasetsQuery(serviceLevelId,
+                interval);
+            filtration(responseBodyBean, serviceLevelId);
+            return success(responseBodyBean);
         } catch (DmeException e) {
             return failure(e.getMessage());
         }
@@ -142,7 +150,10 @@ public class ServiceLevelController extends BaseController {
     public ResponseBodyBean lunPerformanceDatasetsQuery(@RequestParam String serviceLevelId,
         @RequestParam String interval) {
         try {
-            return success(serviceLevelService.lunPerformanceDatasetsQuery(serviceLevelId, interval));
+            DmeDatasetsQueryResponse responseBodyBean = serviceLevelService.lunPerformanceDatasetsQuery(serviceLevelId,
+                interval);
+            filtration(responseBodyBean, serviceLevelId);
+            return success(responseBodyBean);
         } catch (DmeException e) {
             return failure(e.getMessage());
         }
@@ -157,9 +168,20 @@ public class ServiceLevelController extends BaseController {
     public ResponseBodyBean storagePoolPerformanceDatasetsQuery(@RequestParam String serviceLevelId,
         @RequestParam String interval) {
         try {
-            return success(serviceLevelService.storagePoolPerformanceDatasetsQuery(serviceLevelId, interval));
+            DmeDatasetsQueryResponse responseBodyBean = serviceLevelService.storagePoolPerformanceDatasetsQuery(
+                serviceLevelId, interval);
+            filtration(responseBodyBean, serviceLevelId);
+            return success(responseBodyBean);
         } catch (DmeException e) {
             return failure(e.getMessage());
         }
     }
+
+    private void filtration(DmeDatasetsQueryResponse responseBodyBean, String serviceLevelId) {
+        responseBodyBean.setDatas(responseBodyBean.getDatas()
+            .stream()
+            .filter(item -> item.getTierNativeId().equals(serviceLevelId))
+            .collect(Collectors.toList()));
+    }
+
 }

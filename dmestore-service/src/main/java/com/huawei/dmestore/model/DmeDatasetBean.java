@@ -15,6 +15,7 @@ public class DmeDatasetBean {
     private float totalCapacity;
     private float usedCapacity;
     private float bandwidth;
+    private String tierNativeId;
 
     public float getResponseTime() {
         return responseTime;
@@ -78,5 +79,13 @@ public class DmeDatasetBean {
 
     public void setBandwidth(float bandwidth) {
         this.bandwidth = bandwidth;
+    }
+
+    public String getTierNativeId() {
+        return tierNativeId;
+    }
+
+    public void setTierNativeId(String tierNativeId) {
+        this.tierNativeId = tierNativeId;
     }
 }
