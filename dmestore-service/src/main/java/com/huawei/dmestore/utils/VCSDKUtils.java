@@ -567,7 +567,7 @@ public class VCSDKUtils {
 
             /*
              * 取得所有集群，并通过mounthostids进行过滤，过滤掉已经挂载的主机
-             * 扫描集群下所有主机，只有集群下所有主机都没有挂载了该存储就不显示
+             * 扫描集群下所有主机，只有集群下所有主机都没有挂载该存储就不显示
              */
             List<Pair<ManagedObjectReference, String>> cls = rootFsMo.getAllClusterOnRootFs();
             if (cls != null && cls.size() > 0) {
@@ -585,7 +585,7 @@ public class VCSDKUtils {
                             }
                         }
                     }
-                    if (isMount && (null == inludeclustermap || null != inludeclustermap.get(cl.first().getValue()))) {
+                    if (isMount && (null != inludeclustermap || null != inludeclustermap.get(cl.first().getValue()))) {
                         Map<String, String> map = new HashMap<>();
                         String objectId = vcConnectionHelpers.mor2ObjectId(cl1.getMor(),
                             vmwareContext.getServerAddress());

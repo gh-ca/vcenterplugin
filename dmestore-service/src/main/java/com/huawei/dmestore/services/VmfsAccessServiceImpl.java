@@ -1346,12 +1346,12 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 List<Map<String, Object>> hostgrouplist = dmeAccessService.getDmeHostGroups(clustername);
                 if (hostgrouplist != null && hostgrouplist.size() > 0) {
                     for (Map<String, Object> hostgroupmap : hostgrouplist) {
-                        String hostgroupId = ToolUtils.getStr(hostgroupmap.get(NAME_FIELD));
-                        if (hostgroupId.contains(clustername)) {
+                        String hostgroupName = ToolUtils.getStr(hostgroupmap.get(NAME_FIELD));
+                        if (hostgroupName.contains(clustername)) {
                             for (String volume : volumeIds) {
                                 String subVolume1 = ToolUtils.handleStringBegin(volume);
                                 String subVolume2 = ToolUtils.handleStringEnd(volume);
-                                if (hostgroupId.contains(subVolume1) || hostgroupId.contains(subVolume2)) {
+                                if (hostgroupName.contains(subVolume1) || hostgroupName.contains(subVolume2)) {
                                     hostgroupIDAndVolemeID.put(ToolUtils.getStr(hostgroupmap.get(ID_FIELD)), volume);
                                     break;
                                 }
@@ -1419,7 +1419,6 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                             initiators.addAll(subinitiators);
                         }
                     }
-                    // 添加带有主机信息色彩的字段，模型 map<"name"list<map<string,list>>>
                 }
                 if (initiators.size() > 0) {
                     List<String> initiatorName = new ArrayList<>();
@@ -2460,6 +2459,70 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         return taskIds;
     }
 
+    private List<String> unmountVmfs2(String dsObjId, Map<String, Object> params) throws DmeException {
+        List<String> taskIds = new ArrayList<>();
+
+        // 获取vmfs关联的dme侧volume 并提取volumeId
+        List<String> hostObjIds = new ArrayList<>();
+        List<String> volumeIds = new ArrayList<>();
+        DmeVmwareRelation dvr = dmeVmwareRalationDao.getDmeVmwareRelationByDsId(dsObjId);
+        if (dvr != null) {
+            volumeIds.add(dvr.getVolumeId());
+        }
+
+        // 没有指定集群 查询存储关联的所有集群
+        List<Map<String, Object>> vcClusters = getHostGroupsByStorageId2(dsObjId);
+        if (volumeIds.size() > 0 && vcClusters != null && vcClusters.size() > 0) {
+            for (Map<String, Object> vcCluster : vcClusters) {
+                String hostGroupObjectId = ToolUtils.getStr(vcCluster.get(HOST_GROUP_ID));
+                if (StringUtils.isEmpty(hostGroupObjectId)) {
+                    continue;
+                }
+                // 通过主机组ID,volume id 获取到要卸载的主机组 并执行卸载
+                Map<String, String> hostGroupMappingOrientedVolume =
+                    getHostGroupMappingOrientedVolume(hostGroupObjectId, volumeIds);
+
+                if (hostGroupMappingOrientedVolume != null && hostGroupMappingOrientedVolume.size() != 0) {
+                    for (Map.Entry<String, String> entry : hostGroupMappingOrientedVolume.entrySet()) {
+                        String hostGroupIdDmeId = entry.getKey();
+                        if (dataStoreVmRelateHostOrCluster(dsObjId, null, hostGroupObjectId)) {
+                            continue;
+                        }
+                        Map<String, Object> tempParams = new HashMap<>();
+                        /*List<String> volumeidList = new ArrayList<>();
+                        volumeidList.add(entry.getValue());*/
+                        tempParams.put(HOST_GROUP_ID1, hostGroupIdDmeId);
+                        tempParams.put(VOLUMEIDS, volumeIds);
+                        String taskId = unmountHostGroupGetTaskId(tempParams);
+                        taskIds.add(taskId);
+                    }
+                }
+            }
+        }
+
+        // 没有指定主机 查询datastore下的主机 并过滤与vm有关联的
+        List<Map<String, Object>> vcHosts = getHostsByStorageId2(dsObjId);
+        if (volumeIds.size() > 0 && vcHosts != null && vcHosts.size() > 0) {
+            taskIds.addAll(unmountHostFromDme(dsObjId, hostObjIds, volumeIds, vcHosts));
+        }
+
+        // 提取datastore的hostid
+        if (hostObjIds.size() > 0) {
+            Object object = params.get(HOST_OBJ_IDS);
+            if (object != null) {
+                List<String> hostObjIdList = (List<String>) object;
+                if (hostObjIdList != null && hostObjIdList.size() > 0) {
+                    hostObjIds.addAll(hostObjIdList);
+                }
+            }
+            params.put(HOST_OBJ_IDS, hostObjIds);
+        }
+
+        // 删除前的卸载 vcenter侧不扫描,执行删除时再扫描
+        // host scan
+        return taskIds;
+    }
+
     private List<String> unmountHostFromDme(String dsObjId, List<String> hostObjIds, List<String> volumeIds,
         List<Map<String, Object>> vcHosts) throws DmeException {
         List<String> taskIds = new ArrayList<>();
@@ -2547,11 +2610,124 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         return taskIds;
     }
 
+    // 删除前的卸载
+    public List<String> unmountVmfsAll2(Map<String, Object> params) throws DmeException {
+        List<String> taskIds = new ArrayList<>();
+
+        // 获取vmfs关联的dme侧volume 并提取volumeId
+        if (params != null && params.get(DmeConstants.DATASTOREOBJECTIDS) != null) {
+            List<String> dataStoreObjectIds = (List<String>) params.get(DATASTORE_OBJECT_IDS);
+            List<String> dataStorageIds = new ArrayList<>();
+            if (dataStoreObjectIds != null && dataStoreObjectIds.size() > 0) {
+                List<String> volumeIds = new ArrayList<>();
+                List<String> dataStoreNames = new ArrayList<>();
+                for (String dsObjectId : dataStoreObjectIds) {
+                    // 如果dsObject包含虚拟机 则不能删除
+                    boolean isFoundVm = vcsdkUtils.hasVmOnDatastore(dsObjectId);
+                    if (isFoundVm) {
+                        LOG.info("vmfs delete,the vmfs:{} contain vm,can not delete!!!", dsObjectId);
+                        continue;
+                    }
+                    DmeVmwareRelation dvr = null;
+                    try {
+                        dvr = dmeVmwareRalationDao.getDmeVmwareRelationByDsId(dsObjectId);
+                    } catch (DmeSqlException e) {
+                        LOG.info("getDmeVmwareRelationByDsId exception!dsId={}, msg={}", dsObjectId, e.getMessage());
+                    }
+                    if (dvr == null) {
+                        scanVmfs();
+                        dvr = dmeVmwareRalationDao.getDmeVmwareRelationByDsId(dsObjectId);
+                    }
+                    if (dvr != null) {
+                        volumeIds.add(dvr.getVolumeId());
+                        dataStoreNames.add(dvr.getStoreName());
+                        dataStorageIds.add(dsObjectId);
+                    }
+                }
+                if (volumeIds.size() > 0) {
+                    params.put(VOLUMEIDS, volumeIds);
+                    params.put(DATASTORE_NAMES, dataStoreNames);
+                }
+
+                // 没有满足条件的datastore 直接返回taskids(size=0)
+                if (dataStorageIds.size() == 0) {
+                    LOG.info("vmfs delete,all vmfs contain vm,can not delete!!!");
+                    return taskIds;
+                }
+            }
+
+            // 获取vcenter关联的所有hostId, dataStoreObjectIds只有一个值
+            for (String dsObjectId : dataStorageIds) {
+                List<String> unmountTaskIds = unmountVmfs2(dsObjectId, params);
+                if (unmountTaskIds != null && unmountTaskIds.size() > 0) {
+                    taskIds.addAll(unmountTaskIds);
+                }
+            }
+        }
+
+        return taskIds;
+    }
+
     @Override
     public void deleteVmfs(Map<String, Object> params) throws DmeException {
         // 先调卸载的接口 卸载是卸载所有所有主机和集群(dem侧主机,主机组)
         try {
             List<String> unmountTaskIds = unmountVmfsAll(params);
+            if (unmountTaskIds != null && unmountTaskIds.size() > 0) {
+                // 检测任务等待卸载完成后再删除,不用判断是否卸载成功
+                taskService.checkTaskStatus(unmountTaskIds);
+            }
+        } catch (DmeException e) {
+            LOG.error("delete volume precondition unmapping host and hostGroup error!");
+            throw new DmeException("delete volume precondition unmapping host and hostGroup error!");
+        }
+
+        // DME侧卸载卷
+        String taskId = volumeDeleteGetTaskId(params);
+        if (!StringUtils.isEmpty(taskId)) {
+            boolean isDmeDelete = taskService.checkTaskStatus(Arrays.asList(taskId));
+            if (!isDmeDelete) {
+                throw new DmeException(taskService.queryTaskById(taskId).getDetail());
+            }
+        } else {
+            throw new DmeException("dme delete vmfs failed,task id is null!");
+        }
+
+        // vcenter侧 扫描
+        List<String> hostObjIds = (List<String>) params.get(HOST_OBJ_IDS);
+        if (hostObjIds != null && hostObjIds.size() > 0) {
+            // 过滤重复的hostObjId
+            hostObjIds = new ArrayList<>(new HashSet(hostObjIds));
+            for (String hostObjId : hostObjIds) {
+                vcsdkUtils.scanDataStore(null, hostObjId);
+            }
+        } else {
+            // dme侧已删除(卸载) hostObjectIds参数为空，此时通过dsObjectId查询hostObjId,再扫描一次
+            List<String> dataStoreObjectIds = (List<String>) params.get(DATASTORE_OBJECT_IDS);
+            if (dataStoreObjectIds != null && dataStoreObjectIds.size() > 0) {
+                for (String dsObjId : dataStoreObjectIds) {
+                    String listStr = vcsdkUtils.getMountHostsByDsObjectId(dsObjId);
+                    if (!StringUtils.isEmpty(listStr)) {
+                        List<Map<String, String>> lists = gson.fromJson(listStr,
+                            new TypeToken<List<Map<String, String>>>() { }.getType());
+                        for (Map<String, String> hostMap : lists) {
+                            String hostObjId = hostMap.get(HOSTID);
+                            vcsdkUtils.scanDataStore(null, hostObjId);
+                        }
+                    }
+                }
+            }
+        }
+
+        // 重新扫描关联关系 更新数据库
+        scanVmfs();
+    }
+
+    @Override
+    public void deleteVmfs2(Map<String, Object> params) throws DmeException {
+        // 先调卸载的接口 卸载是卸载所有所有主机和集群(dem侧主机,主机组)
+        try {
+            List<String> unmountTaskIds = unmountVmfsAll2(params);
             if (unmountTaskIds != null && unmountTaskIds.size() > 0) {
                 // 检测任务等待卸载完成后再删除,不用判断是否卸载成功
                 taskService.checkTaskStatus(unmountTaskIds);
@@ -2786,6 +2962,52 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
     }
 
     @Override
+    public List<Map<String, Object>> getHostsByStorageId2(String storeId) throws DmeException {
+        List<Map<String, Object>> hostMapList = new ArrayList<>(DEFAULT_LEN);
+
+        // 先查询vcenter侧的主机
+        String listStr = vcsdkUtils.getHostsByDsObjectId(storeId, true);
+
+        // 获取已挂载的集群，找到对应的主机，用于排除主机
+        List<Map<String, Object>> clustermaps = getHostGroupsByStorageId2(storeId);
+        Map<String, String> excludehostmap = new HashMap<>();
+        for (Map<String, Object> clustermap : clustermaps) {
+            String clusterid = String.valueOf(clustermap.get(HOST_GROUP_ID));
+            String vmwarehosts = vcsdkUtils.getHostsOnCluster(clusterid);
+            if (!StringUtils.isEmpty(vmwarehosts)) {
+                List<Map<String, String>> vmwarehostlists = gson.fromJson(vmwarehosts,
+                    new TypeToken<List<Map<String, String>>>() { }.getType());
+
+                for (Map<String, String> vmwarehostmap : vmwarehostlists) {
+                    excludehostmap.put(vmwarehostmap.get(HOSTID), "true");
+                }
+            }
+        }
+        if (!StringUtils.isEmpty(listStr)) {
+            List<Map<String, String>> hosts = gson.fromJson(listStr,
+                new TypeToken<List<Map<String, String>>>() { }.getType());
+
+            // vcenter侧主机启动器是否和dem侧主机启动器一致
+            for (Map<String, String> host : hosts) {
+                String hostId = ToolUtils.getStr(host.get(HOSTID));
+
+                // 排除已挂载在集群中的主机
+                if (excludehostmap.get(hostId) == null) {
+                    String hostNmme = ToolUtils.getStr(host.get(HOST_NAME));
+                    String initiatorId = checkToHost(hostId);
+                    if (!StringUtils.isEmpty(initiatorId)) {
+                        Map<String, Object> tempMap = new HashMap<>();
+                        tempMap.put(HOSTID, hostId);
+                        tempMap.put(HOST_NAME, hostNmme);
+                        hostMapList.add(tempMap);
+                    }
+                }
+            }
+        }
+        return hostMapList;
+    }
+
+    @Override
     public List<Map<String, Object>> getHostGroupsByStorageId(String storageId) throws DmeException {
         List<Map<String, Object>> hostGroupMapList = new ArrayList<>();
 
@@ -2821,6 +3043,45 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         return hostGroupMapList;
     }
 
+    @Override
+    public List<Map<String, Object>> getHostGroupsByStorageId2(String storeId) throws DmeException {
+        List<Map<String, Object>> hostGroupMapList = new ArrayList<>();
+
+        // 取得vcenter中的所有cluster
+        DmeVmwareRelation dvr = dmeVmwareRalationDao.getDmeVmwareRelationByDsId(storeId);
+        if (dvr == null) {
+            throw new DmeException("存储关联关系为空");
+        }
+        List<String> hostgroupids = getDmeAttachHostGroupByVolumeId(dvr.getVolumeId());
+        Map<String, String> mappeddmegroups = new HashMap<>();
+        for (String hostgroupid : hostgroupids) {
+            Map<String, Object> hostgroupmap = dmeAccessService.getDmeHostGroup(hostgroupid);
+            mappeddmegroups.put(String.valueOf(hostgroupmap.get(NAME_FIELD)), "has");
+        }
+        String listStr = vcsdkUtils.getMountClustersByDsObjectId(storeId, mappeddmegroups);
+        if (!StringUtils.isEmpty(listStr)) {
+            List<Map<String, String>> clusters = gson.fromJson(listStr,
+                new TypeToken<List<Map<String, String>>>() { }.getType());
+
+            // 通过名字判断主机组是否一致
+            for (Map<String, String> cluster : clusters) {
+                String clusterId = ToolUtils.getStr(cluster.get(CLUSTER_ID));
+                String clusterNmme = ToolUtils.getStr(cluster.get("clusterName"));
+                List<String> volumeIds = new ArrayList<>();
+                volumeIds.add(dvr.getVolumeId());
+                Map<String, String> hostGroupMappingOrientedVolume =
+                    getHostGroupMappingOrientedVolume(clusterId, volumeIds);
+                if (hostGroupMappingOrientedVolume.size()!=0) {
+                    Map<String, Object> tempMap = new HashMap<>();
+                    tempMap.put(HOST_GROUP_ID, clusterId);
+                    tempMap.put("hostGroupName", clusterNmme);
+                    hostGroupMapList.add(tempMap);
+                }
+            }
+        }
+        return hostGroupMapList;
+    }
+
     private List<String> getDmeAttachHostGroupByVolumeId(String volumeId) throws DmeException {
         String url;
         List<String> groupids = new ArrayList<>();
@@ -2837,7 +3098,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         for (JsonElement jsonElement : attachments) {
             JsonObject element = jsonElement.getAsJsonObject();
             String attachedHostGroupId = ToolUtils.jsonToStr(element.get("attached_host_group"));
-            if (!"".equalsIgnoreCase(attachedHostGroupId)) {
+            if (!"".equalsIgnoreCase(attachedHostGroupId) && !groupids.contains(attachedHostGroupId)) {
                 groupids.add(attachedHostGroupId);
             }
         }
@@ -2927,6 +3188,16 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
 
     // 通过vcenter的集群ID 查询dme侧的主机组信息
     private Map<String, Object> getDmeHostGroupByClusterObjId(String clusterObjId) throws DmeException {
+        Map<String, Object> hostGroupMap = new HashMap<>();
+        String initiatorId = checkToHostGroup(clusterObjId);
+        if (!StringUtils.isEmpty(initiatorId)) {
+            hostGroupMap.put(HOST_GROUP_ID, initiatorId);
+        }
+        return hostGroupMap;
+    }
+
+    // 通过vcenter的集群ID 查询dme侧的主机组信息
+    private Map<String, Object> getDmeHostGroupByClusterObjId2(String clusterObjId,List<String> volumeIds) throws DmeException {
         Map<String, Object> hostGroupMap = new HashMap<>();
         String initiatorId = checkToHostGroup(clusterObjId);
         if (!StringUtils.isEmpty(initiatorId)) {
