@@ -218,6 +218,12 @@ export class VmfsListComponent implements OnInit {
         this.modifyForm.max_bandwidth = this.rowSelected[0].maxBandwidth;
         this.modifyForm.min_iops = this.rowSelected[0].minIops;
         this.modifyForm.min_bandwidth = this.rowSelected[0].minBandwidth;
+        this.modifyForm.latency = this.rowSelected[0].latency;
+        if (this.modifyForm.latency || this.modifyForm.min_bandwidth
+          || this.modifyForm.min_iops || this.modifyForm.max_bandwidth
+          || this.modifyForm.max_iops) {
+          this.modifyForm.qosFlag = true;
+        }
         // 默认隐藏smartTier
         this.showSmartTierFlag = false;
         // 默认隐藏下限
@@ -256,6 +262,37 @@ export class VmfsListComponent implements OnInit {
               this.showLowerFlag = true;
             } else {
               this.showLowerFlag = false;
+            }
+            const upperObj = document.getElementById('editControl_policyUpper') as HTMLInputElement;
+            const lowerObj = document.getElementById('editControl_policyLower') as HTMLInputElement;
+            if (this.modifyForm.max_iops || this.modifyForm.max_bandwidth) {
+              if (this.modifyForm.max_iops) {
+                this.modifyForm.maxiopsChoose = true;
+              }
+              if (this.modifyForm.max_bandwidth) {
+                this.modifyForm.maxbandwidthChoose = true;
+              }
+              upperObj.checked = true;
+              this.controlPolicyChangeFunc('editControl_policyUpper', 'editControl_policyLower', true, this.modifyForm, true);
+            }
+            if (this.modifyForm.min_iops || this.modifyForm.min_bandwidth || this.modifyForm.latency) {
+              if (this.modifyForm.min_iops) {
+                this.modifyForm.miniopsChoose = true;
+              }
+              if (this.modifyForm.min_bandwidth) {
+                this.modifyForm.minbandwidthChoose = true;
+              }
+              if (this.modifyForm.latency) {
+                this.modifyForm.latencyChoose = true;
+              }
+              lowerObj.checked = true;
+              this.controlPolicyChangeFunc('editControl_policyUpper', 'editControl_policyLower', true, this.modifyForm, false);
+            }
+            if (smartTierShow) {
+              if (this.rowSelected[0].smartTier) {
+                this.modifyForm.smartTierFlag = true;
+                this.modifyForm.smartTier = this.rowSelected[0].smartTier;
+              }
             }
             this.latencyIsSelect = qosTag == 1;
           }
@@ -494,8 +531,8 @@ export class VmfsListComponent implements OnInit {
     if (versionVal === '6') {
       const option1 = {key: 1024, value : '1MB'};
       options.push(option1);
-      const option2 = {key: 64, value : '64KB'};
-      options.push(option2);
+      // const option2 = {key: 64, value : '64KB'};
+      // options.push(option2);
     } else if (versionVal === '5') {
       const option1 = {key: 1024, value : '1MB'};
       options.push(option1);
