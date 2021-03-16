@@ -137,7 +137,12 @@ public class NMPPathSwitchPolicyImpl extends BaseBestPracticeService implements 
         List<HostMultipathInfoLogicalUnit> targetList = new ArrayList<>();
         for (int index = 0; index < lunList.size(); index++) {
             HostMultipathInfoLogicalUnit logicalUnit = lunList.get(index);
-            String wwn = logicalUnit.getId().substring(10, 42);
+            String id = logicalUnit.getId();
+            if(id.length() < 42){
+                logger.info("HostMultipathInfoLogicalUnit id={}", id);
+                continue;
+            }
+            String wwn = id.substring(10, 42);
             // 根据wwn从DME中查询卷信息,如果查找到则说明是华为存储。
             String volumeUrlByName = DmeConstants.DME_VOLUME_BASE_URL + "?volume_wwn=" + wwn;
             try {
