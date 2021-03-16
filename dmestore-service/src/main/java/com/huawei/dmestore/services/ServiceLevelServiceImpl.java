@@ -671,7 +671,7 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
         returnBody.add("filters", filters);
         returnBody.add("dimensions", dimensions);
         returnBody.add("metrics", metrics);
-
+        log.info("数据集查询，请求body={}", returnBody.toString());
         return returnBody;
     }
 
