@@ -571,6 +571,7 @@
     "password": "密码",
     "status":"连接状态",
     "connected": "已连接",
+    "connectionError": "连接出错",
     "storage": "存储设备",
     "total": "总数",
     "normal": "正常数",
@@ -832,7 +833,10 @@
       "partiallyDamaged": "部分损坏",
       "system": "系统",
       "vlan": "VLAN",
-      "customized": "自定义"
+      "customized": "自定义",
+      "inconsistent": "不一致",
+      "toBeRecovered": "待恢复",
+      "initializing": "初始化中"
     },
     "type":{
       "block":"块",
@@ -860,7 +864,8 @@
     "cantFindData": "抱歉未查询到相关数据！",
     "getDataFailed": "获取数据失败！",
     "cantChangeServiceLevel": "该设备为自定义类型，不支持DME存储策略变更操作！",
-    "iposMaxMinTips": "只能为1到999999999的整数。"
+    "iposMaxMinTips": "只能为1到999999999的整数。",
+    "nfsSecurityTips": "要使用 Kerberos 身份验证，挂载此数据存储的每个主机都必须包含在 Active Directory 域中，并需要设置其 NFS 身份验证凭据。该过程在每个主机的“身份验证服务”页上完成。"
   },
   "page": {
     "perPage": "每页",
