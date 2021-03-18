@@ -938,7 +938,8 @@ export class DetailComponent implements OnInit, AfterViewInit {
     }
      this.cd.freeCapacity= this.getFreeCapacity(this.detail.totalEffectiveCapacity,this.detail.usedCapacity);
     const freeCapacity = (this.detail.totalEffectiveCapacity-this.detail.usedCapacity).toFixed(3);
-    const cc = new CapacityChart(this.formatCapacity(this.detail.totalEffectiveCapacity));
+    const title = this.formatCapacity(this.detail.totalEffectiveCapacity) + '\n' + this.translatePipe.transform('storage.chart.total');
+    const cc = new CapacityChart(title);
     let cs = new CapacitySerie(this.detail.protectionCapacity
         ,this.detail.fileCapacity,this.detail.blockCapacity,
       Number(freeCapacity), Number(storagePoolAllUsedCap), this.detail.storageTypeShow.dorado, this.translatePipe);
