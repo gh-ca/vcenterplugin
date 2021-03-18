@@ -34,7 +34,7 @@ public class Vmfs6AutoReclaimImpl extends BaseBestPracticeService implements Bes
 
     @Override
     public String getHostSetting() {
-        return "VMFS-6 Auto Reclaim";
+        return "VMFS-6 Auto-Space Reclamation";
     }
 
     @Override

@@ -107,14 +107,13 @@ public class NMPPathSwitchPolicyImpl extends BaseBestPracticeService implements 
                 executor.execute(() -> {
                     HostMultipathInfoLogicalUnitPolicy policy = lun.getPolicy();
                     String pspPolicy = policy.getPolicy();
-
                     // 多路径选路策略，集中式存储选择VMW_SATP_ALUA, VMW_PSP_RR
                     if (!pspPolicy.equals(getRecommendValue())) {
                         policy.setPolicy((String) getRecommendValue());
                         try {
                             hostStorageSystemMo.setMultipathLunPolicy(lun.getId(), policy);
                         } catch (Exception exception) {
-                            exception.printStackTrace();
+                            logger.error("setMultipathLunPolicy error!lun_id={}", lun.getId());
                         }
                     }
                 });
@@ -139,7 +138,7 @@ public class NMPPathSwitchPolicyImpl extends BaseBestPracticeService implements 
             HostMultipathInfoLogicalUnit logicalUnit = lunList.get(index);
             String id = logicalUnit.getId();
             if(id.length() < 42){
-                logger.info("HostMultipathInfoLogicalUnit id={}", id);
+                logger.debug("hostMultipathInfoLogicalUnit is not dme volume!id={}", id);
                 continue;
             }
             String wwn = id.substring(10, 42);
@@ -154,10 +153,11 @@ public class NMPPathSwitchPolicyImpl extends BaseBestPracticeService implements 
                 if (jsonObject.get("volumes").getAsJsonArray().size() > 0) {
                     targetList.add(logicalUnit);
                 } else {
-                    logger.debug("非华为DME Lun信息，跳过多路复选最佳实践检查、实施！");
+                    logger.debug("not found the volume！wwn={}", wwn);
                 }
             } catch (DmeException e) {
-                e.printStackTrace();
+                logger.error("get dme volume error！wwn={}", wwn);
+               continue;
             }
         }
         return targetList;
