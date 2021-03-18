@@ -588,7 +588,7 @@
     "totalCapacity": "Total",
     "used": "Used",
     "free": "Free",
-    "top5T": "Top 5 DataStore",
+    "top5T": "Top 5 storage usage rate",
     "connectT": "DME Connect",
     "connectFail": "Connect Failed!",
     "connectSuccess": "Connect Success!",
