@@ -26,6 +26,8 @@ public class ToolUtils {
 
     public static final int GI = 1024 * 1024 * 1024;
 
+    public static final int MB = 1024 * 1024;
+
     private static final Logger LOG = LoggerFactory.getLogger(ToolUtils.class);
 
     private static final Gson GSON = new Gson();

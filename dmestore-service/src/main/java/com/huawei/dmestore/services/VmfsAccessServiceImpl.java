@@ -412,17 +412,17 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
 
         List<Map<String, Object>> volumelist = new ArrayList<>();
         List<String> volumeIds = new ArrayList<>();
-        // 根据服务等级ID获取对应的存储设备ID
-        Object storageId = params.get(STORAGE_ID);
-        if (storageId == null && params.get(DmeConstants.SERVICELEVELID) != null) {
-            storageId =
-                dmeStorageService.getStorageByServiceLevelId(String.valueOf(params.get(DmeConstants.SERVICELEVELID)));
-            params.put(STORAGE_ID, storageId);
-        }
         try {
             // 创建Lun
             String taskId = createLun(params);
 
+            // 根据服务等级ID获取对应的存储设备ID
+            Object storageId = params.get(STORAGE_ID);
+            if (storageId == null && params.get(DmeConstants.SERVICELEVELID) != null) {
+                storageId =
+                    dmeStorageService.getStorageByServiceLevelId(String.valueOf(params.get(DmeConstants.SERVICELEVELID)));
+                params.put(STORAGE_ID, storageId);
+            }
             //获取lun
             if (!StringUtils.isEmpty(taskId)) {
                 // 创建Lun结果判断

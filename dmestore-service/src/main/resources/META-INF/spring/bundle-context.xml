@@ -57,11 +57,6 @@
     </bean>
 
     <bean name="cipherUtils" class="com.huawei.dmestore.utils.CipherUtils">
-        <property name="multitypeutil" value="${secure.aes.key}"/>
-        <property name="cipheralgorithm" value="${secure.aes.cipheralgorithm}"/>
-        <property name="ivsize" value="${secure.aes.ivsize}"/>
-        <property name="keyalgorithm" value="${secure.aes.key.algorithm}"/>
-        <property name="securerandomalgorithm" value="${secure.aes.securerandomalgorithm}"/>
         <property name="aesCipher" ref="aescipher"/>
     </bean>
 
@@ -216,7 +211,9 @@
     <bean name="JumboFrameMTUImpl" class="com.huawei.dmestore.services.bestpractice.JumboFrameMTUImpl"/>
     <bean name="NumberOfVolumesInDatastoreImpl" class="com.huawei.dmestore.services.bestpractice.NumberOfVolumesInDatastoreImpl"/>
     <bean name="Vmfs6AutoReclaimImpl" class="com.huawei.dmestore.services.bestpractice.Vmfs6AutoReclaimImpl"/>
-    <bean name="NMPPathSwitchPolicyImpl" class="com.huawei.dmestore.services.bestpractice.NMPPathSwitchPolicyImpl"/>
+    <bean name="NMPPathSwitchPolicyImpl" class="com.huawei.dmestore.services.bestpractice.NMPPathSwitchPolicyImpl">
+        <property name="dmeAccessService" ref="DmeAccessServiceImpl"/>
+    </bean>
 
     <bean name="bestPracticeCheckDao" class="com.huawei.dmestore.dao.BestPracticeCheckDao">
         <property name="url" value="${h2.url}"/>

@@ -126,7 +126,7 @@
       </clr-select-container>
       <clr-select-container class="selectClass">
         <label>{{'nfs.nfsProtocol' | translate}}</label>
-        <select clrSelect [(ngModel)]="addForm.type" name="type">
+        <select clrSelect [(ngModel)]="addForm.type"  (change)="setType();" name="type">
           <option value="NFS">v3</option>
           <option value="NFS41">v4.1</option>
         </select>
@@ -145,6 +145,7 @@
           <input type="radio" clrRadio name="securityType" [(ngModel)]="addForm.securityType" value="SEC_KRB5I"/>
           <label>{{'nfs.secKrb5i' | translate}}</label>
         </clr-radio-wrapper>
+        <clr-control-helper><clr-icon shape="info-circle" class="is-warning" size="25"></clr-icon>{{'errorMsg.nfsSecurityTips' | translate}}</clr-control-helper>
       </clr-radio-container>
       <!--主机-->
       <clr-select-container class="selectClass">
@@ -457,7 +458,7 @@
       </clr-select-container>
       <clr-select-container class="selectClass">
         <label>{{'nfs.nfsProtocol' | translate}}</label>
-        <select clrSelect [(ngModel)]="addForm.type" name="type">
+        <select clrSelect [(ngModel)]="addForm.type" (change)="setType();" name="type">
           <option value="NFS">v3</option>
           <option value="NFS41">v4.1</option>
         </select>
@@ -476,6 +477,7 @@
           <input type="radio" clrRadio name="securityType" [(ngModel)]="addForm.securityType" value="SEC_KRB5I"/>
           <label>{{'nfs.secKrb5i' | translate}}</label>
         </clr-radio-wrapper>
+        <clr-control-helper><clr-icon shape="info-circle" class="is-warning" size="25"></clr-icon>{{'errorMsg.nfsSecurityTips' | translate}}</clr-control-helper>
       </clr-radio-container>
       <!--主机-->
       <clr-select-container class="selectClass">

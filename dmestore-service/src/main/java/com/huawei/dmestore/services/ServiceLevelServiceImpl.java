@@ -4,6 +4,7 @@ import com.huawei.dmestore.constant.DmeConstants;
 import com.huawei.dmestore.entity.VCenterInfo;
 import com.huawei.dmestore.exception.DmeException;
 import com.huawei.dmestore.exception.VcenterException;
+import com.huawei.dmestore.model.CapabilitiesIopriority;
 import com.huawei.dmestore.model.CapabilitiesQos;
 import com.huawei.dmestore.model.CapabilitiesSmarttier;
 import com.huawei.dmestore.model.DmeDatasetsQueryResponse;
@@ -238,6 +239,17 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
                 boolean compression = ToolUtils.jsonToBoo(capJsonObj.get("compression"));
                 scb.setResourceType(resourceType);
                 scb.setCompression(compression);
+
+                CapabilitiesIopriority ci = new CapabilitiesIopriority();
+                JsonElement element = capJsonObj.get("iopriority");
+                if (!ToolUtils.jsonIsNull(element)) {
+                    JsonObject element1 = element.getAsJsonObject();
+                    ci.setEnabled(ToolUtils.jsonToBoo(element1.get("enabled")));
+                    ci.setPolicy(ToolUtils.jsonToInt(element1.get("policy")));
+                    scb.setIopriority(ci);
+
+                }
+
                 JsonElement smarttierObj = capJsonObj.get("smarttier");
                 if (!ToolUtils.jsonIsNull(smarttierObj)) {
                     CapabilitiesSmarttier cbs = parseCapabilitiesSmarttier(smarttierObj);
@@ -659,7 +671,7 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
         returnBody.add("filters", filters);
         returnBody.add("dimensions", dimensions);
         returnBody.add("metrics", metrics);
-
+        log.info("数据集查询，请求body={}", returnBody.toString());
         return returnBody;
     }
 
