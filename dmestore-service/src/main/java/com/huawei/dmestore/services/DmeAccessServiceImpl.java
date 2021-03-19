@@ -32,6 +32,8 @@ import org.springframework.web.client.RestTemplate;
 
 import java.sql.SQLException;
 import java.util.*;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * DmeAccessServiceImpl
@@ -118,6 +120,9 @@ public class DmeAccessServiceImpl implements DmeAccessService {
     private Gson gson = new Gson();
 
     private RestUtils restUtils = new RestUtils();
+
+
+    private static Lock lock = new ReentrantLock();
 
     @Override
     public void accessDme(Map<String, Object> params) throws DmeException {
@@ -261,33 +266,39 @@ public class DmeAccessServiceImpl implements DmeAccessService {
         return responseEntity;
     }
 
-    private synchronized ResponseEntity login(Map<String, Object> params) throws DmeException {
-        ResponseEntity responseEntity = null;
-        dmeToken = null;
-        if (params != null && params.get(DmeConstants.HOSTIP) != null) {
-            HttpHeaders headers = getHeaders();
-            Map<String, Object> requestbody = new HashMap<>(DmeConstants.COLLECTION_CAPACITY_16);
-            requestbody.put("grantType", PASSWORD);
-            requestbody.put(USER_NAME, params.get(USER_NAME));
-            requestbody.put("value", params.get(PASSWORD));
-            String hostUrl = "https://" + params.get(HOST_IP) + ":" + params.get(HOST_PORT);
-            HttpEntity<String> entity = new HttpEntity<>(gson.toJson(requestbody), headers);
-            RestTemplate restTemplate = restUtils.getRestTemplate();
-            String url = hostUrl + DmeConstants.LOGIN_DME_URL;
-            responseEntity = restTemplate.exchange(url, HttpMethod.PUT, entity, String.class);
-            LOG.info("login end!url={},return={}", url, gson.toJson(responseEntity));
-            if (responseEntity.getStatusCodeValue() == RestUtils.RES_STATE_I_200) {
-                JsonObject jsonObject = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonObject();
-                if (jsonObject != null && jsonObject.get(DmeConstants.ACCESSSESSION) != null) {
-                    dmeToken = jsonObject.get("accessSession").getAsString();
-                    dmeHostUrl = hostUrl;
-                    dmeHostIp = params.get(HOST_IP).toString();
-                    dmeHostPort = Integer.parseInt(params.get(HOST_PORT).toString());
+    private ResponseEntity login(Map<String, Object> params) throws DmeException {
+        ResponseEntity responseEntity;
+        try {
+            lock.lock();
+            responseEntity = null;
+            dmeToken = null;
+            if (params != null && params.get(DmeConstants.HOSTIP) != null) {
+                HttpHeaders headers = getHeaders();
+                Map<String, Object> requestbody = new HashMap<>(DmeConstants.COLLECTION_CAPACITY_16);
+                requestbody.put("grantType", PASSWORD);
+                requestbody.put(USER_NAME, params.get(USER_NAME));
+                requestbody.put("value", params.get(PASSWORD));
+                String hostUrl = "https://" + params.get(HOST_IP) + ":" + params.get(HOST_PORT);
+                HttpEntity<String> entity = new HttpEntity<>(gson.toJson(requestbody), headers);
+                RestTemplate restTemplate = restUtils.getRestTemplate();
+                String url = hostUrl + DmeConstants.LOGIN_DME_URL;
+                responseEntity = restTemplate.exchange(url, HttpMethod.PUT, entity, String.class);
+                LOG.info("login end!url={},return={}", url, gson.toJson(responseEntity));
+                if (responseEntity.getStatusCodeValue() == RestUtils.RES_STATE_I_200) {
+                    JsonObject jsonObject = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonObject();
+                    if (jsonObject != null && jsonObject.get(DmeConstants.ACCESSSESSION) != null) {
+                        dmeToken = jsonObject.get("accessSession").getAsString();
+                        dmeHostUrl = hostUrl;
+                        dmeHostIp = params.get(HOST_IP).toString();
+                        dmeHostPort = Integer.parseInt(params.get(HOST_PORT).toString());
+                    }
+                } else {
+                    LOG.info("url:{},userName={},password={},authentication failed！", url, params.get(USER_NAME),
+                        params.get(PASSWORD));
                 }
-            } else {
-                LOG.info("url:{},userName={},password={},authentication failed！", url, params.get(USER_NAME),
-                    params.get(PASSWORD));
             }
+        } finally {
+            lock.unlock();
         }
 
         return responseEntity;
@@ -305,22 +316,27 @@ public class DmeAccessServiceImpl implements DmeAccessService {
         return headers;
     }
 
-    private synchronized void iniLogin() throws DmeException {
-        if (StringUtils.isEmpty(dmeToken)) {
-            // 查询数据库
-            DmeInfo dmeInfo = dmeInfoDao.getDmeInfo();
-            if (dmeInfo != null && dmeInfo.getHostIp() != null) {
-                Map<String, Object> params = new HashMap<>(DmeConstants.COLLECTION_CAPACITY_16);
-                params.put(HOST_IP, dmeInfo.getHostIp());
-                params.put(HOST_PORT, dmeInfo.getHostPort());
-                params.put(USER_NAME, dmeInfo.getUserName());
-                params.put(PASSWORD, dmeInfo.getPassword());
+    private void iniLogin() throws DmeException {
+        try {
+            lock.lock();
+            if (StringUtils.isEmpty(dmeToken)) {
+                // 查询数据库
+                DmeInfo dmeInfo = dmeInfoDao.getDmeInfo();
+                if (dmeInfo != null && dmeInfo.getHostIp() != null) {
+                    Map<String, Object> params = new HashMap<>(DmeConstants.COLLECTION_CAPACITY_16);
+                    params.put(HOST_IP, dmeInfo.getHostIp());
+                    params.put(HOST_PORT, dmeInfo.getHostPort());
+                    params.put(USER_NAME, dmeInfo.getUserName());
+                    params.put(PASSWORD, dmeInfo.getPassword());
 
-                // 登录
-                login(params);
-            } else {
-                throw new DmeException("目前没有DME接入信息");
+                    // 登录
+                    login(params);
+                } else {
+                    throw new DmeException("目前没有DME接入信息");
+                }
             }
+        } finally {
+            lock.unlock();
         }
     }
 

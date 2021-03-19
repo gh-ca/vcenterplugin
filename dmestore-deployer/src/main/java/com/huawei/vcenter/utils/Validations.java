@@ -251,7 +251,11 @@ public class Validations {
 
         returnMap.put("packageNameList", packageNameList);
         returnMap.put("versionList", versionList);
-        returnMap.put("key", keyFile.getAbsolutePath());
+        try {
+            returnMap.put("key", keyFile.getCanonicalPath());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         returnMap.put("path", "https://" + request.getServerName() + ":" + request.getServerPort() + "/package/");
         return returnMap;
     }
