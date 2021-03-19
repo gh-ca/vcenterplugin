@@ -249,7 +249,7 @@
     "deduplication": "重复数据删除",
     "compression": "数据压缩",
     "qos": "QoS",
-    "protection": "Protection",
+    "protection": "保护",
     "volumeName": "卷名称",
     "low": "低",
     "none": "无",
@@ -446,7 +446,7 @@
         "unknown":"未知"
       },
       "volumes":{
-        "volumes":"LUN",
+        "volumes":"LUNs",
         "name":"名称",
         "status":"状态",
         "dataStore":"所属数据存储",
@@ -521,7 +521,7 @@
           "type":"类型",
           "capacity":"容量",
           "role":"角色",
-          "diskDomain":"磁盘域",
+          "diskDomain":"硬盘域",
           "rotationalSpeed":"转速",
           "iops":"IOPS",
           "latency":"平均I/O响应时间(ms)",
@@ -843,7 +843,7 @@
     "type":{
       "block":"块",
       "file":"文件",
-      "blockAndFile": "块和文件"
+      "blockAndFile": "块/文件"
     }
   },
   "errorMsg":{

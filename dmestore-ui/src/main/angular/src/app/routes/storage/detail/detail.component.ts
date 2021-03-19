@@ -258,7 +258,7 @@ export class DetailComponent implements OnInit, AfterViewInit {
     const fsNames:string[] = [];
     fsNames.push(this.storageId);
      // IOPS
-    this.setChart(150,this.translatePipe.transform('vmfs.iops'),"IO/s",
+    this.setChart(150,this.translatePipe.transform('vmfs.iops')+'(IO/s)', null,
      NfsService.storageIOPS,fsNames,this.selectRange,NfsService.storageUrl, this.startTime, this.endTime).then(res=>{
      // this.gs.loading = false;
       this.iopsChart = res;
@@ -266,7 +266,7 @@ export class DetailComponent implements OnInit, AfterViewInit {
     });
 
     // 带宽
-    this.setChart(150, this.translatePipe.transform('nfs.qos_bandwidth'), 'MB/s',
+    this.setChart(150, this.translatePipe.transform('nfs.qos_bandwidth') + '(MB/s)', '',
       NfsService.storageBDWT, fsNames, this.selectRange, NfsService.storageUrl, this.startTime, this.endTime).then(res => {
      // this.gs.loading = false;
       this.bandwidthChart = res;
@@ -1055,10 +1055,13 @@ export class DetailComponent implements OnInit, AfterViewInit {
     // 标题
     const titleInfo:Title = new Title();
     titleInfo.text = title;
-    titleInfo.subtext = subtext;
+    if (subtext) {
+      titleInfo.subtext = subtext;
+    }
     titleInfo.textAlign = 'bottom';
     const textStyle:TextStyle  = new TextStyle();
     textStyle.fontStyle = 'normal';
+    textStyle.fontWeight = 'normal';
     titleInfo.textStyle = textStyle;
 
     chart.title = titleInfo;
