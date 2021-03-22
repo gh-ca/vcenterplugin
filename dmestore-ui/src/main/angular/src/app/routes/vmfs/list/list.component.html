@@ -130,10 +130,10 @@
                             --
                           </span>
       </clr-dg-cell>
-      <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='list'">
+      <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='list'" style="text-align: right">
         {{item.capacity ? formatCapacity(item.capacity, true):'--'}}
       </clr-dg-cell>
-      <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='list'">
+      <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='list'" style="text-align: right">
         {{item.capacity ? formatCapacity(item.capacity - item.freeSpace, true):'--'}}
       </clr-dg-cell>
       <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='list'">
@@ -143,10 +143,10 @@
         </div>
         <span *ngIf="!item.capacity">--</span>
       </clr-dg-cell>
-      <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='list'">
+      <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='list'" style="text-align: right">
         {{item.freeSpace ? formatCapacity(item.freeSpace, true):'--'}}
       </clr-dg-cell>
-      <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='list'">
+      <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='list'" style="text-align: right">
         {{item.reserveCapacity ? formatCapacity(item.reserveCapacity, true):'--'}}
       </clr-dg-cell>
       <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='list'">{{item.device}}</clr-dg-cell>
@@ -161,21 +161,21 @@
 <!--          {{'vmfs.protectionStatus.unprotected' | translate}}-->
 <!--        </span>-->
 <!--      </clr-dg-cell>-->
-      <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='chart'">
+      <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='chart'" style="text-align: right">
         {{item.iops ? item.iops:'--'}}
       </clr-dg-cell>
       <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='chart'">{{('vmfs.upper' | translate)+' '+ (item.maxIops || "--")+' | '+('vmfs.lower' | translate)+' '+(item.minIops || "--")}}</clr-dg-cell>
-      <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='chart'">
+      <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='chart'" style="text-align: right">
         {{item.bandwidth ? item.bandwidth:'--'}}
       </clr-dg-cell>
       <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='chart'">{{('vmfs.upper' | translate)+' '+(item.maxBandwidth|| "--")+' | '+('vmfs.lower' | translate)+' '+(item.minBandwidth || "--")}}</clr-dg-cell>
-      <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='chart'">
+      <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='chart'" style="text-align: right">
         {{item.readResponseTime ? item.readResponseTime:'--'}}
       </clr-dg-cell>
-      <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='chart'">
+      <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='chart'" style="text-align: right">
         {{item.writeResponseTime ? item.writeResponseTime:'--'}}
       </clr-dg-cell>
-      <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='chart'">
+      <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='chart'" style="text-align: right">
         {{item.latency ? item.latency:'--'}}
       </clr-dg-cell>
       <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='chart'" >{{('vmfs.lower' | translate)+' '+(item.latency || "--")}}</clr-dg-cell>

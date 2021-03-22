@@ -66,7 +66,7 @@
           <clr-dg-column [hidden]="radioCheck!=='table2'" class="hideFilter" [clrDgField]="'usedCapacity'">{{'storage.list.usedCap' | translate}}</clr-dg-column>
           <clr-dg-column [hidden]="radioCheck!=='table2'" class="hideFilter" [clrDgField]="'usedCapacity'" style="width: 11rem;">{{'storage.list.capUsage' | translate}}</clr-dg-column>
           <clr-dg-column [hidden]="radioCheck!=='table2'" class="hideFilter" [clrDgField]="'freeCap'">{{'storage.list.freeCap' | translate}}</clr-dg-column>
-<!--          <clr-dg-column [hidden]="radioCheck!=='table2'" class="hideFilter" [clrDgField]="'subscriptionCapacity'">{{'storage.list.supRate' | translate}}</clr-dg-column>-->
+          <clr-dg-column [hidden]="radioCheck!=='table2'" class="hideFilter" [clrDgField]="'subscriptionCapacity'">{{'storage.list.supRate' | translate}}</clr-dg-column>
 
           <clr-dg-column [hidden]="radioCheck!=='table3'">{{'storage.list.cpuUtilization' | translate}}</clr-dg-column>
           <clr-dg-column [hidden]="radioCheck!=='table3'">{{'storage.list.latency' | translate}}</clr-dg-column>
@@ -136,45 +136,45 @@
               </span>
             </clr-dg-cell>
 
-            <clr-dg-cell [hidden]="radioCheck!=='table2'">
+            <clr-dg-cell [hidden]="radioCheck!=='table2'" style="text-align: right" >
               {{item.totalCapacity ? formatCapacity(item.totalCapacity):'--'}}
             </clr-dg-cell>
-            <clr-dg-cell [hidden]="radioCheck!=='table2'">
+            <clr-dg-cell [hidden]="radioCheck!=='table2'" style="text-align: right" >
               {{item.totalEffectiveCapacity ? formatCapacity(item.totalEffectiveCapacity):'--'}}
             </clr-dg-cell>
-            <clr-dg-cell [hidden]="radioCheck!=='table2'">
+            <clr-dg-cell [hidden]="radioCheck!=='table2'" style="text-align: right" >
               {{item.totalPoolCapacity ? formatCapacity(item.totalPoolCapacity):'--'}}
             </clr-dg-cell>
-            <clr-dg-cell [hidden]="radioCheck!=='table2'">
+            <clr-dg-cell [hidden]="radioCheck!=='table2'" style="text-align: right" >
               {{item.usedCapacity ? formatCapacity(item.usedCapacity):'--'}}
             </clr-dg-cell>
-            <clr-dg-cell [hidden]="radioCheck!=='table2'" class="over_flow">
+            <clr-dg-cell [hidden]="radioCheck!=='table2'" class="over_flow" style="text-align: right">
               <div class="progress-block" *ngIf="item.totalPoolCapacity">
                 <clr-progress-bar clrValue="{{(item.usedCapacity/item.totalPoolCapacity * 100).toFixed(2)}}" clrSuccess></clr-progress-bar>
                 <span>{{(item.usedCapacity/item.totalPoolCapacity * 100).toFixed(2)}}%</span>
               </div>
               <span *ngIf="!item.usedCapacity">--</span>
             </clr-dg-cell>
-            <clr-dg-cell [hidden]="radioCheck!=='table2'">
+            <clr-dg-cell [hidden]="radioCheck!=='table2'" style="text-align: right">
               {{item.totalPoolCapacity ? formatCapacity(item.totalPoolCapacity-item.usedCapacity):'--'}}
             </clr-dg-cell>
-<!--            <clr-dg-cell [hidden]="radioCheck!=='table2'">-->
-<!--              {{item.totalPoolCapacity ? (item.subscriptionCapacity/item.totalPoolCapacity * 100).toFixed(3):'&#45;&#45;'}} %-->
-<!--            </clr-dg-cell>-->
+            <clr-dg-cell [hidden]="radioCheck!=='table2'" style="text-align: right">
+              {{item.totalPoolCapacity ? (item.subscriptionCapacity/item.totalPoolCapacity * 100).toFixed(3):'--'}} %
+            </clr-dg-cell>
 
-            <clr-dg-cell [hidden]="radioCheck!=='table3'">
+            <clr-dg-cell [hidden]="radioCheck!=='table3'" style="text-align: right">
               {{item.maxCpuUtilization ? item.maxCpuUtilization:'--'}}
             </clr-dg-cell>
-            <clr-dg-cell [hidden]="radioCheck!=='table3'">
+            <clr-dg-cell [hidden]="radioCheck!=='table3'" style="text-align: right">
               {{item.maxLatency ? item.maxLatency:'--'}}
             </clr-dg-cell>
-            <clr-dg-cell [hidden]="radioCheck!=='table3'">
+            <clr-dg-cell [hidden]="radioCheck!=='table3'" style="text-align: right">
               {{item.maxIops ? item.maxIops:'--'}}
             </clr-dg-cell>
-            <clr-dg-cell [hidden]="radioCheck!=='table3'">
+            <clr-dg-cell [hidden]="radioCheck!=='table3'" style="text-align: right">
               {{item.maxOps ? item.maxOps:'--'}}
             </clr-dg-cell>
-            <clr-dg-cell [hidden]="radioCheck!=='table3'">
+            <clr-dg-cell [hidden]="radioCheck!=='table3'" style="text-align: right">
               {{item.maxBandwidth ? item.maxBandwidth:'--'}}
             </clr-dg-cell>
           </clr-dg-row>

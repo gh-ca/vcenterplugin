@@ -50,7 +50,8 @@
       <clr-select-container class="selectClass">
         <label  style="color: #9F9F9F;">{{'rdm.dataStore' | translate}}<span style="color: red">*</span></label>
         <select clrSelect (ngModelOptions)="dataStores" required [(ngModel)]="dataStoreObjectId" name="dataStoreObjectId" class="clr-select">
-          <option *ngFor="let item of dataStores" value="{{item.objectId}}">{{item.name}}</option>
+          <option *ngIf="defaultStoreObjectId" value="{{defaultStoreObjectId}}">{{('rdm.defaultStorage' | translate)}}</option>
+          <option *ngFor="let item of dataStores" value="{{item.objectId}}">{{item.vmRootpath ? ('rdm.defaultStorage' | translate):item.name}}</option>
         </select>
         <clr-control-error>{{'validations.required' | translate}}</clr-control-error>
       </clr-select-container>
