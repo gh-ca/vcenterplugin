@@ -76,8 +76,8 @@
 
           <clr-dg-placeholder>{{'tips.noData' | translate}}</clr-dg-placeholder>
           <clr-dg-row *clrDgItems="let item of portList"  [clrDgItem]="item" [clrDgSelectable]="item.connectStatusType == '4'">
-            <clr-dg-cell>{{item.location}}</clr-dg-cell>
-            <clr-dg-cell>{{item.portName}}</clr-dg-cell>
+            <clr-dg-cell>{{item.location ? item.location:'--'}}</clr-dg-cell>
+            <clr-dg-cell>{{item.portName ? item.portName:'--'}}</clr-dg-cell>
             <clr-dg-cell>
               <span *ngIf="item.mac == ''">--</span>
               <span *ngIf="item.mac != ''">{{item.mac}}</span>
@@ -112,6 +112,7 @@
               <span *ngIf="item.connectStatusType == '4'">
                  <span class="color-square" [style.backgroundColor]="'#79C6E6'"></span>
               </span>
+              <span *ngIf="!item.connectStatusType">--</span>
             </clr-dg-cell>
             <clr-dg-cell>
               <span *ngIf="!item.connectStatusType">--</span>
