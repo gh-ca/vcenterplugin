@@ -2489,8 +2489,6 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                             continue;
                         }
                         Map<String, Object> tempParams = new HashMap<>();
-                        /*List<String> volumeidList = new ArrayList<>();
-                        volumeidList.add(entry.getValue());*/
                         tempParams.put(HOST_GROUP_ID1, hostGroupIdDmeId);
                         tempParams.put(VOLUMEIDS, volumeIds);
                         String taskId = unmountHostGroupGetTaskId(tempParams);
@@ -2500,7 +2498,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             }
         }
 
-        // 没有指定主机 查询datastore下的主机 并过滤与vm有关联的
+        // 没有指定主机 下查询datastore的主机 并过滤与vm有关联的
         List<Map<String, Object>> vcHosts = getHostsByStorageId2(dsObjId);
         if (volumeIds.size() > 0 && vcHosts != null && vcHosts.size() > 0) {
             taskIds.addAll(unmountHostFromDme(dsObjId, hostObjIds, volumeIds, vcHosts));
