@@ -31,8 +31,8 @@
             <clr-dg-cell hidden>{{item.objectId}}</clr-dg-cell>
             <clr-dg-cell>{{item.name ? item.name:'--'}}</clr-dg-cell>
             <clr-dg-cell>{{item.type ? item.type:'--'}}</clr-dg-cell>
-            <clr-dg-cell>{{item.capacity ? formatCapacity(item.capacity, true):'--'}}</clr-dg-cell>
-            <clr-dg-cell>{{item.freeSpace ? formatCapacity(item.freeSpace, true):'--'}}</clr-dg-cell>
+            <clr-dg-cell style="text-align: right">{{item.capacity ? formatCapacity(item.capacity, true):'--'}}</clr-dg-cell>
+            <clr-dg-cell style="text-align: right">{{item.freeSpace ? formatCapacity(item.freeSpace, true):'--'}}</clr-dg-cell>
           </clr-dg-row>
         </clr-datagrid>
       </form>
