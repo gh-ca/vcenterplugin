@@ -259,7 +259,8 @@ public class VCSDKUtils {
                         }
                         if (StringUtils.isEmpty(storeType)) {
                             lists.add(dsmap);
-                        } else if (ds1.getSummary().getType().equals(storeType)) {
+                        } else if (ds1.getSummary().getType().equals(storeType) ||
+                            ds1.getSummary().getType().equals(ToolUtils.STORE_TYPE_NFS41)) {
                             lists.add(dsmap);
                         }
                     }
