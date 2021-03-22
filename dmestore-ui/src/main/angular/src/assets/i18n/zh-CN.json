@@ -267,7 +267,7 @@
     "expandTipsMax": "扩容后总容量不能超过256TB。",
     "loadingTips": "数据加载中，请稍后",
     "dataHandleLoadingTips": "数据处理中，请稍后",
-    "listNullTips": "找不到VMFS",
+    "listNullTips": "暂无数据",
     "workload": "应用类型",
     "add": {
       "success": "添加成功！"

@@ -74,6 +74,7 @@
             </ng-container>
           </clr-dg-column>
 
+          <clr-dg-placeholder>{{'tips.noData' | translate}}</clr-dg-placeholder>
           <clr-dg-row *clrDgItems="let item of portList"  [clrDgItem]="item" [clrDgSelectable]="item.connectStatusType == '4'">
             <clr-dg-cell>{{item.location}}</clr-dg-cell>
             <clr-dg-cell>{{item.portName}}</clr-dg-cell>

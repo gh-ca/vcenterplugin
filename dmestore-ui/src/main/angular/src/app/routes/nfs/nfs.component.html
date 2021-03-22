@@ -68,6 +68,7 @@
       <clr-dg-column [hidden]="radioCheck!=='chart'" class="hideFilter" [clrDgField]="'readResponseTime'">{{'nfs.respRt' | translate}}</clr-dg-column>
       <clr-dg-column [hidden]="radioCheck!=='chart'" class="hideFilter" [clrDgField]="'writeResponseTime'">{{'nfs.respWt' | translate}}</clr-dg-column>
 
+      <clr-dg-placeholder>{{'tips.noData' | translate}}</clr-dg-placeholder>
       <clr-dg-row *clrDgItems="let item of list" [clrDgItem]="item">
         <clr-dg-cell class="over_flow" (click)="navigateTo(item.objectid)" style="color:#829DE6;cursor:pointer">{{item.name}}</clr-dg-cell>
         <clr-dg-cell class="over_flow" style="width: 5%" [hidden]="radioCheck!=='list'">

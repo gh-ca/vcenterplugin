@@ -13,7 +13,7 @@
     <clr-dg-column class="hideFilter" [clrDgField]="'count'" [clrDgSortOrder]="'count'">{{'bestPractice.violation'|translate}}</clr-dg-column>
     <clr-dg-column>{{'bestPractice.description'|translate}}</clr-dg-column>
     <clr-dg-column>{{'bestPractice.operation'|translate}}</clr-dg-column>
-
+    <clr-dg-placeholder>{{'tips.noData' | translate}}</clr-dg-placeholder>
     <clr-dg-row *clrDgItems="let item of list" [clrDgItem]="item">
       <clr-dg-cell>{{item.hostSetting}}</clr-dg-cell>
       <clr-dg-cell>{{item.recommendValue}}</clr-dg-cell>
@@ -67,7 +67,7 @@
         <clr-dg-column [clrDgField]="'hostName'">{{'bestPractice.host'|translate}}</clr-dg-column>
         <clr-dg-column [clrDgField]="'actualValue'">{{'bestPractice.actual'|translate}}</clr-dg-column>
         <clr-dg-column [clrDgField]="'recommendValue'">{{'bestPractice.recommend'|translate}}</clr-dg-column>
-
+        <clr-dg-placeholder>{{'tips.noData' | translate}}</clr-dg-placeholder>
         <clr-dg-row *clrDgItems="let item of hostList" [clrDgItem]="item">
           <clr-dg-cell class="over_flow" title="{{item.hostName}}">{{item.hostName}}</clr-dg-cell>
           <clr-dg-cell class="over_flow" *ngIf="isObjectValue(item.actualObjValue) == false" title="{{item.actualValue}}">

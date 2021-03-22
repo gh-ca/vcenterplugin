@@ -267,7 +267,7 @@
     "expandTipsMax": "After expansion, the total capacity cannot exceed 256TB.",
     "loadingTips": "Data loading, please wait",
     "dataHandleLoadingTips": "Data processing, please wait",
-    "listNullTips": "We couldn't find any users",
+    "listNullTips": "No data",
     "workload": "Workload",
     "add": {
       "success": "Added successfully!"
