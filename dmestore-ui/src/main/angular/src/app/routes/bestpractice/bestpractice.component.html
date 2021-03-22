@@ -13,7 +13,7 @@
     <clr-dg-column class="hideFilter" [clrDgField]="'count'" [clrDgSortOrder]="'count'">{{'bestPractice.violation'|translate}}</clr-dg-column>
     <clr-dg-column>{{'bestPractice.description'|translate}}</clr-dg-column>
     <clr-dg-column>{{'bestPractice.operation'|translate}}</clr-dg-column>
-
+    <clr-dg-placeholder>{{'tips.noData' | translate}}</clr-dg-placeholder>
     <clr-dg-row *clrDgItems="let item of list" [clrDgItem]="item">
       <clr-dg-cell>{{item.hostSetting}}</clr-dg-cell>
       <clr-dg-cell>{{item.recommendValue}}</clr-dg-cell>
@@ -35,7 +35,7 @@
 <!--        <span *ngIf="item.count > 0" (click)="openHostList(item)" style="color:#00F;cursor:pointer">{{item.count}}</span>-->
         <span>{{item.count}}</span>
       </clr-dg-cell>
-      <clr-dg-cell></clr-dg-cell>
+      <clr-dg-cell>--</clr-dg-cell>
       <clr-dg-cell>
         <span *ngIf="item.count > 0" (click)="openHostList(item)" style="color:#00F;cursor:pointer">{{'bestPractice.implementation'|translate}}</span>
         <span *ngIf="item.count == 0" style="color:#9F9F9F;">{{'bestPractice.implementation'|translate}}</span>
@@ -67,23 +67,24 @@
         <clr-dg-column [clrDgField]="'hostName'">{{'bestPractice.host'|translate}}</clr-dg-column>
         <clr-dg-column [clrDgField]="'actualValue'">{{'bestPractice.actual'|translate}}</clr-dg-column>
         <clr-dg-column [clrDgField]="'recommendValue'">{{'bestPractice.recommend'|translate}}</clr-dg-column>
-
+        <clr-dg-placeholder>{{'tips.noData' | translate}}</clr-dg-placeholder>
         <clr-dg-row *clrDgItems="let item of hostList" [clrDgItem]="item">
-          <clr-dg-cell class="over_flow" title="{{item.hostName}}">{{item.hostName}}</clr-dg-cell>
-          <clr-dg-cell class="over_flow" *ngIf="isObjectValue(item.actualObjValue) == false" title="{{item.actualValue}}">
-            {{item.actualValue}}
+          <clr-dg-cell class="over_flow" title="{{item.hostName ? item.hostName:'--'}}">{{item.hostName ? item.hostName:'--'}}</clr-dg-cell>
+          <clr-dg-cell class="over_flow" *ngIf="isObjectValue(item.actualObjValue) == false" title="{{item.actualValue ? item.actualValue:'--'}}">
+            {{item.actualValue ? item.actualValue:'--'}}
           </clr-dg-cell>
           <clr-dg-cell class="over_flow" *ngIf="isObjectValue(item.actualObjValue) == true">
-            <div [title]="getObjectTitle(item.actualObjValue)">
+            <div [title]="getObjectTitle(item.actualObjValue)" *ngIf="item.actualObjValue">
               <div *ngFor="let actValue of item.actualObjValue">
                 <span style="max-width: 4rem;display: inline-block;" class="over_flow">{{actValue.name}}</span>
                 |
                 <span style="max-width: 4rem;display: inline-block;" class="over_flow">{{actValue.value}}</span>
               </div>
             </div>
+            <span *ngIf="!item.actualObjValue">--</span>
 
           </clr-dg-cell>
-          <clr-dg-cell class="over_flow" title="{{item.recommendValue}}">{{item.recommendValue}}</clr-dg-cell>
+          <clr-dg-cell class="over_flow" title="{{item.recommendValue ? item.recommendValue:'--'}}">{{item.recommendValue ? item.recommendValue:'--'}}</clr-dg-cell>
         </clr-dg-row>
 
         <clr-dg-footer>
