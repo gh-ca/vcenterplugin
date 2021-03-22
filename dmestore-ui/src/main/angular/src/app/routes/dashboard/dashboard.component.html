@@ -208,15 +208,15 @@
   <h3 class="modal-title">{{'overview.connectT' | translate}}</h3>
   <div class="modal-body">
     <form clrForm [formGroup]="connectForm">
-      <clr-input-container>
+      <clr-input-container class="dme_access">
         <label>IP</label>
         <input clrInput formControlName="ip" type="text" [(ngModel)]="connectModel.hostIp" name="ip" />
       </clr-input-container>
-      <clr-input-container>
+      <clr-input-container class="dme_access">
         <label>{{'overview.port' | translate}}</label>
         <input clrInput formControlName="port" type="text" placeholder="{{'overview.portholder'|translate}}" [(ngModel)]="connectModel.port" name="port" />
       </clr-input-container>
-      <clr-input-container>
+      <clr-input-container class="dme_access">
         <label>{{'overview.user' | translate}}</label>
         <input clrInput formControlName="username" type="text" [(ngModel)]="connectModel.userName" name="username" />
       </clr-input-container>
@@ -229,7 +229,7 @@
 <!--          <clr-icon *ngIf="!passwordShow"shape="eye-hide" (click)="showOrHide();"></clr-icon>-->
 <!--        </div>-->
 <!--      </clr-input-container>-->
-      <clr-password-container>
+      <clr-password-container class="dme_access">
         <label>{{'overview.password' | translate}}</label>
         <input clrPassword formControlName="password" name="password" oncopy="return false" onpaste="return false" oncut="return false" [(ngModel)]="connectModel.password" />
       </clr-password-container>
