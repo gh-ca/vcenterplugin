@@ -4,6 +4,8 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.vmware.vim25.VirtualMachineFileInfo;
+
 import com.huawei.dmestore.exception.DmeException;
 import com.huawei.dmestore.model.StorageTypeShow;
 import org.slf4j.Logger;
@@ -12,6 +14,7 @@ import org.springframework.util.StringUtils;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
+import jdk.internal.dynalink.beans.StaticClass;
 
 /**
  * ToolUtils
@@ -440,5 +443,10 @@ public class ToolUtils {
         String substring1 = var1.replace("-", "").substring(0, 8);
         String substring2 = var1.replace("-", "").substring(var1.length() - 1 - 8, var1.length() - 1);
         System.out.println(substring1 + substring2);
+    }
+
+    public static String handleString (VirtualMachineFileInfo var) {
+        String subVmPathName = Arrays.stream(var.getVmPathName().split(" ")).findFirst().get();
+        return subVmPathName.substring(1, subVmPathName.length() - 1);
     }
 }
