@@ -498,7 +498,7 @@ export class RdmComponent implements OnInit {
   capacityInitFunc(){
     this.configModel.initialDistributePolicy = '0';
     const storageTypeShow = this.storageDevices.filter(item => item.id == this.configModel.storageId);
-    this.capacityInitShow = storageTypeShow[0].storageTypeShow.capacityInitialAllocation;
+    this.capacityInitShow = storageTypeShow[0].storageTypeShow.capacityInitialAllocation && !storageTypeShow[0].storageTypeShow.dorado;
   }
 
   /**

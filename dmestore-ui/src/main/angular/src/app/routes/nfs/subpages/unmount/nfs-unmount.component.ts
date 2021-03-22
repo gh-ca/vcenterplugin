@@ -76,15 +76,7 @@ export class NfsUnmountComponent implements OnInit{
     this.router.navigate(['nfs']);
   }
   unMount(){
-    if(this.viewPage=='unmount_vcenter'||this.viewPage=='unmount_pugin'){
-      if (this.hostList.length==1){
-        this.unmountTipsShow=true;
-      }else{
-        this.unmountHandleFunc();
-      }
-    }else{
-      this.unmountHandleFunc();
-    }
+    this.unmountTipsShow=true;
   }
   closeModel(){
     this.errorMsg = null;
