@@ -25,6 +25,8 @@ import jdk.internal.dynalink.beans.StaticClass;
 public class ToolUtils {
     public static final String STORE_TYPE_NFS = "NFS";
 
+    public static final String STORE_TYPE_NFS41 = "NFS41";
+
     public static final String STORE_TYPE_ALL = "ALL";
 
     public static final int GI = 1024 * 1024 * 1024;
