@@ -363,7 +363,12 @@
                       </tr>
                       <tr>
                         <th hidden></th>
-                        <th><clr-progress-bar clrValue="{{(item.usedCapacity/item.totalCapacity * 100 || 0).toFixed(2)}}" clrSuccess clrLabeled></clr-progress-bar></th>
+                        <th>
+                          <div class="progress-block">
+                            <clr-progress-bar clrValue="{{(item.usedCapacity/item.totalCapacity * 100 || 0).toFixed(2)}}" clrSuccess></clr-progress-bar>
+                            <span>{{(item.usedCapacity/item.totalCapacity * 100 || 0).toFixed(2)}}%</span>
+                          </div>
+                        </th>
                         <th *ngIf="item.capabilities !== null && item.capabilities.qos !== null
                         && item.capabilities.qos.qosParam !== null
                         && item.capabilities.qos.qosParam.maxBandWidth !== 0">{{'vmfs.bandwidth' | translate}} <= {{item.capabilities.qos.qosParam.maxBandWidth}}MBPS/TB</th>
@@ -976,7 +981,13 @@
                   </tr>
                   <tr>
                     <th hidden></th>
-                    <th><clr-progress-bar clrValue="{{(item.usedCapacity/item.totalCapacity * 100 || 0).toFixed(2)}}" clrSuccess clrLabeled></clr-progress-bar></th>
+                    <th>
+                      <div class="progress-block">
+                        <clr-progress-bar clrValue="{{(item.usedCapacity/item.totalCapacity * 100 || 0).toFixed(2)}}" clrSuccess></clr-progress-bar>
+                        <span>{{(item.usedCapacity/item.totalCapacity * 100 || 0).toFixed(2)}}%</span>
+                      </div>
+
+                    </th>
                     <th *ngIf="item.capabilities !== null && item.capabilities.qos !== null
                         && item.capabilities.qos.qosParam !== null
                         && item.capabilities.qos.qosParam.maxBandWidth !== 0">{{'vmfs.bandwidth' | translate}} <= {{item.capabilities.qos.qosParam.maxBandWidth}}MBPS/TB</th>

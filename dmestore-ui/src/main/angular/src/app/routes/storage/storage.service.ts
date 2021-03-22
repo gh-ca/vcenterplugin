@@ -86,7 +86,7 @@ export class CapacityChart{
   title: any;
   series: CapacitySerie[] =[];
   constructor(title: string){
-    this.tooltip = {trigger: 'item', formatter: ' {b}: {c} ({d}%)'};
+    this.tooltip = {trigger: 'item', formatter: ' {b}: {d}%'};
     this.title = {
       text: title,
       textAlign: 'center',
@@ -139,7 +139,7 @@ export class CapacitySerie{
     // 保护
     const p = new D();
     p.value=protection;
-    p.name=translatePipe.transform("storage.chart.protection") + '(GB)';
+    p.name=translatePipe.transform("storage.chart.protection");
     this.data.push(p);
 
     if (isDorado) {
@@ -147,19 +147,19 @@ export class CapacitySerie{
       // 块/文件
       const bf = new D();
       bf.value = blockFile;
-      bf.name = translatePipe.transform('storage.chart.blockFile') + '(GB)';
+      bf.name = translatePipe.transform('storage.chart.blockFile');
       this.data.push(bf);
     } else {
       this.color=['hsl(164,58%, 52%)', 'hsl(48, 77%, 55%)', 'hsl(224, 93%, 70%)', 'hsl(0, 0%, 90%)'];
       // 文件系统
       const f= new D();
       f.value=fs;
-      f.name = translatePipe.transform('storage.chart.file') + '(GB)';;
+      f.name = translatePipe.transform('storage.chart.file');
       this.data.push(f);
       // LUN
       const v= new D();
       v.value=volume;
-      v.name = translatePipe.transform('storage.chart.volume') + '(GB)';;
+      v.name = translatePipe.transform('storage.chart.volume');
       this.data.push(v);
     }
     this.labelLine = {
@@ -168,7 +168,7 @@ export class CapacitySerie{
     // 空闲
     const fr= new D();
     fr.value=free;
-    fr.name = translatePipe.transform('storage.chart.free') + '(GB)';;
+    fr.name = translatePipe.transform('storage.chart.free');
     this.data.push(fr);
 
   }

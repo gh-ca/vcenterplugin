@@ -706,6 +706,7 @@
     "createRdmError": "Create RDM Error!",
     "selectOneSer": "DME Storage Strategy is not be Null！",
     "rdmSuccessMsg": "Create RDM Success!",
+    "addTips": "Note: Use this method when you need to create a new LUN on the storage and use the LUN to create an RDM disk for the virtual machine. If you want to use an existing LUN to create, you can directly choose to add RDM disks in the virtual machine hardware editor.",
     "compatibilityMode": {
       "name": "Compatibility Mode",
       "virtualMode": "Virtual Mode",
