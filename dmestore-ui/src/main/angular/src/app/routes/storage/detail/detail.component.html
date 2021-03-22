@@ -587,7 +587,7 @@
                         <div class="num-bar_outer">
                           <div class="num-bar_inner"></div>
                         </div>
-                        <span class="capacity-span">{{formatCapacity(detail.totalEffectiveCapacity)}}</span>
+                        <span class="capacity-span">{{detail.totalEffectiveCapacity ? formatCapacity(detail.totalEffectiveCapacity):'--'}}</span>
                       </div>
                       <!--裸容量-->
                       <div class="capacity-wrap" *ngIf="!detail.storageTypeShow.dorado">
@@ -595,15 +595,15 @@
                         <div class="num-bar_outer">
                           <div class="num-bar_inner"></div>
                         </div>
-                        <span class="capacity-span">{{formatCapacity(detail.totalCapacity)}}</span>
+                        <span class="capacity-span">{{detail.totalCapacity ? formatCapacity(detail.totalCapacity):'--'}}</span>
                       </div>
                       <!--总容量-->
                       <div class="capacity-wrap" *ngIf="!detail.storageTypeShow.dorado">
                         <span class="capacity-label">{{'storage.detail.cap.totalCapacity' | translate}}</span>
-                        <div class="num-bar_outer">
+                        <div class="num-bar_outer" *ngIf="detail.totalEffectiveCapacity">
                           <div class="num-bar_inner total" [ngStyle]="{'width':(detail.totalEffectiveCapacity/detail.totalCapacity * 100)+'%'}"></div>
                         </div>
-                        <span class="capacity-span">{{formatCapacity(detail.totalEffectiveCapacity)}}</span>
+                        <span class="capacity-span">{{detail.totalEffectiveCapacity ? formatCapacity(detail.totalEffectiveCapacity):'--'}}</span>
                       </div>
                       <!--已使用|空闲-->
                       <div class="capacity-wrap">
@@ -622,7 +622,7 @@
                         <div class="num-bar_outer">
                           <div class="num-bar_inner total" [ngStyle]="{'width':(detail.subscriptionCapacity/detail.totalEffectiveCapacity * 100)+'%'}"></div>
                         </div>
-                        <span class="capacity-span">{{formatCapacity(detail.subscriptionCapacity)}}</span>
+                        <span class="capacity-span">{{detail.subscriptionCapacity ? formatCapacity(detail.subscriptionCapacity):'--'}}</span>
                       </div>
                     </div>
                   </div>
@@ -635,31 +635,31 @@
                         <!--保护-->
                         <div class="d-info-content-text">
                           <span>{{'storage.chart.protection' | translate}}</span>
-                          <span>{{cd.protection}}</span>
+                          <span>{{cd.protection ? cd.protection:'--'}}</span>
                           <span class="squre protection"></span>
                         </div>
                         <!--块/文件-->
                         <div class="d-info-content-text" *ngIf="detail.storageTypeShow.dorado">
                           <span>{{'storage.chart.blockFile' | translate}}</span>
-                          <span>{{cd.blockFile}}</span>
+                          <span>{{cd.blockFile ? cd.blockFile:'--'}}</span>
                           <span class="squre fs"></span>
                         </div>
                         <!--文件系统-->
                         <div class="d-info-content-text" *ngIf="!detail.storageTypeShow.dorado">
                           <span>{{'storage.chart.fileSystem' | translate}}</span>
-                          <span>{{cd.fileSystem}}</span>
+                          <span>{{cd.fileSystem ? cd.fileSystem:'--'}}</span>
                           <span class="squre fs"></span>
                         </div>
                         <!--LUN-->
                         <div class="d-info-content-text" *ngIf="!detail.storageTypeShow.dorado">
                           <span>{{'storage.chart.volume' | translate}}</span>
-                          <span>{{cd.volume}}</span>
+                          <span>{{cd.volume ? cd.volume:'--'}}</span>
                           <span class="squre volume"></span>
                         </div>
                         <!--空闲容量-->
                         <div class="d-info-content-text">
                           <span>{{'storage.chart.freeCapacity' | translate}}</span>
-                          <span>{{cd.freeCapacity}}</span>
+                          <span>{{cd.freeCapacity ? cd.freeCapacity:'--'}}</span>
                           <span class="squre free"></span>
                         </div>
                       </div>

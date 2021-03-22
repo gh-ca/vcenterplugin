@@ -2,27 +2,27 @@
   <table class="table table-noborder">
     <tr>
       <td class="left">{{'nfs.logic.name' | translate}}</td>
-      <td class="left">{{logicDetail.name}}</td>
+      <td class="left">{{logicDetail.name ? logicDetail.name:'--'}}</td>
 
       <td class="left">{{'nfs.logic.ip' | translate}}</td>
-      <td class="left">{{logicDetail.ip}}</td>
+      <td class="left">{{logicDetail.ip ? logicDetail.ip:'--'}}</td>
 
       <td class="left">{{'nfs.logic.healthStatus' | translate}}</td>
-      <td class="left">{{logicDetail.status}}</td>
+      <td class="left">{{logicDetail.status ? logicDetail.status:'--'}}</td>
     </tr>
     <tr>
       <td class="left">{{'nfs.logic.runningStatus' | translate}}</td>
-      <td class="left">{{logicDetail.runningStatus}}</td>
+      <td class="left">{{logicDetail.runningStatus ? logicDetail.runningStatus:'--'}}</td>
 
       <td class="left">{{'nfs.logic.activePort' | translate}}</td>
-      <td class="left">{{logicDetail.activePort}}</td>
+      <td class="left">{{logicDetail.activePort ? logicDetail.activePort:'--'}}</td>
 
       <td class="left">{{'nfs.logic.currentPort' | translate}}</td>
-      <td class="left">{{logicDetail.currentPort}}</td>
+      <td class="left">{{logicDetail.currentPort ? logicDetail.currentPort:'--'}}</td>
     </tr>
     <tr>
       <td class="left">{{'nfs.logic.failoverGroup' | translate}}</td>
-      <td class="left">{{logicDetail.failoverGroup}}</td>
+      <td class="left">{{logicDetail.failoverGroup ? logicDetail.failoverGroup:'--'}}</td>
     </tr>
   </table>
 </div>
