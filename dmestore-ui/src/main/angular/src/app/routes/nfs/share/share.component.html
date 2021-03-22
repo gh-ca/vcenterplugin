@@ -26,7 +26,12 @@
     </clr-dg-row>
   </clr-datagrid>
 </div>
-<div *ngIf="!shareDetail">
+<div *ngIf="isLoading" class="loadingDiv">
+  <span>
+    {{'vmfs.loadingTips' | translate}}<img src="./assets/images/loading.gif"  width="20px" height="20px" style="margin-left: 20px;">
+  </span>
+</div>
+<div *ngIf="!shareDetail && !isLoading">
   {{'tips.noData' | translate}}
 </div>
 
