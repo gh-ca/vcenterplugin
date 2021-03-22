@@ -41,7 +41,7 @@
         </div>
         <!-- 列表页 -->
         <clr-datagrid [clrDgLoading]="isLoading">
-          <clr-dg-column [clrDgField]="'name'" style="color: red">{{'storage.list.name' | translate}}</clr-dg-column>
+          <clr-dg-column [clrDgField]="'name'" style="color: red;width: 8rem;">{{'storage.list.name' | translate}}</clr-dg-column>
           <clr-dg-column [clrDgField]="'ip'">{{'storage.list.ipAddress' | translate}}</clr-dg-column>
 
           <clr-dg-column [hidden]="radioCheck!=='table1'">
@@ -57,7 +57,7 @@
           <clr-dg-column [hidden]="radioCheck!=='table1'">{{'storage.list.version' | translate}}</clr-dg-column>
           <clr-dg-column [hidden]="radioCheck!=='table1'">{{'storage.list.patchVersion' | translate}}</clr-dg-column>
           <clr-dg-column [hidden]="radioCheck!=='table1'" style="width: 11rem;">{{'storage.list.location' | translate}}</clr-dg-column>
-          <clr-dg-column [hidden]="radioCheck!=='table1'">{{'storage.list.zone' | translate}}</clr-dg-column>
+          <clr-dg-column [hidden]="radioCheck!=='table1'" style="width: 11rem;">{{'storage.list.zone' | translate}}</clr-dg-column>
           <clr-dg-column [hidden]="radioCheck!=='table1'">{{'storage.list.wp' | translate}}</clr-dg-column>
 
           <clr-dg-column [hidden]="radioCheck!=='table2'" class="hideFilter" [clrDgField]="'totalCapacity'">{{'storage.list.rawCap' | translate}}</clr-dg-column>
@@ -75,7 +75,7 @@
           <clr-dg-column [hidden]="radioCheck!=='table3'">{{'storage.list.bandwidth' | translate}}</clr-dg-column>
           <clr-dg-placeholder>{{'tips.noData' | translate}}</clr-dg-placeholder>
           <clr-dg-row *clrDgItems="let item of list" [clrDgItem]="item">
-            <clr-dg-cell><span (click)="toDetailView(item.id,item.name)" style="color:#829DE6;cursor:pointer">{{item.name}}</span></clr-dg-cell>
+            <clr-dg-cell class="over_flow" title="{{item.name}}"><span (click)="toDetailView(item.id,item.name)" style="color:#829DE6;cursor:pointer">{{item.name}}</span></clr-dg-cell>
             <clr-dg-cell>{{item.ip}}</clr-dg-cell>
 
             <clr-dg-cell [hidden]="radioCheck!=='table1'">
@@ -124,7 +124,7 @@
             <clr-dg-cell [hidden]="radioCheck!=='table1'">{{item.version}}</clr-dg-cell>
             <clr-dg-cell [hidden]="radioCheck!=='table1'">{{item.patchVersion}}</clr-dg-cell>
             <clr-dg-cell class="over_flow" title="{{item.location}}" [hidden]="radioCheck!=='table1'">{{item.location}}</clr-dg-cell>
-            <clr-dg-cell [hidden]="radioCheck!=='table1'">{{item.azIds || '--'}}</clr-dg-cell>
+            <clr-dg-cell class="over_flow" title="{{item.azIds}}" [hidden]="radioCheck!=='table1'">{{item.azIds || '--'}}</clr-dg-cell>
             <clr-dg-cell [hidden]="radioCheck!=='table1'">{{item.maintenanceStart}}-{{item.maintenanceOvertime}}</clr-dg-cell>
 
             <clr-dg-cell [hidden]="radioCheck!=='table2'">{{formatCapacity(item.totalCapacity)}}</clr-dg-cell>
