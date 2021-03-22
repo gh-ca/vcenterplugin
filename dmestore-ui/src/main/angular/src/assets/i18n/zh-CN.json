@@ -249,7 +249,7 @@
     "deduplication": "重复数据删除",
     "compression": "数据压缩",
     "qos": "QoS",
-    "protection": "Protection",
+    "protection": "保护",
     "volumeName": "卷名称",
     "low": "低",
     "none": "无",
@@ -267,7 +267,7 @@
     "expandTipsMax": "扩容后总容量不能超过256TB。",
     "loadingTips": "数据加载中，请稍后",
     "dataHandleLoadingTips": "数据处理中，请稍后",
-    "listNullTips": "找不到VMFS",
+    "listNullTips": "暂无数据",
     "workload": "应用类型",
     "add": {
       "success": "添加成功！"
@@ -346,7 +346,7 @@
       "wp":"维保时间",
       "alarm":"告警",
       "event":"事件",
-      "zone":"可用区",
+      "zone":"可用分区",
       "rawCap":"裸容量",
       "usedCap":"已使用容量",
       "capUsage":"容量利用率",
@@ -354,8 +354,8 @@
       "freeCap":"空闲容量",
       "supRate":"订阅率",
       "totalCap":"总容量",
-      "cpuUtilization":"CPU使用率",
-      "latency":"时延(毫秒)",
+      "cpuUtilization":"CPU利用率",
+      "latency":"平均I/O响应时间(ms)",
       "iops":"IOPS",
       "ops":"OPS",
       "bandwidth":"带宽(MB/s)",
@@ -446,7 +446,7 @@
         "unknown":"未知"
       },
       "volumes":{
-        "volumes":"LUN",
+        "volumes":"LUNs",
         "name":"名称",
         "status":"状态",
         "dataStore":"所属数据存储",
@@ -508,10 +508,10 @@
           "controller":"控制器",
           "status":"状态",
           "version":"版本",
-          "cpuUsage":"CPU使用率",
+          "cpuUsage":"CPU利用率",
           "iops":"IOPS",
           "ops":"OPS",
-          "latency":"时延(毫秒)",
+          "latency":"平均I/O响应时间(ms)",
           "bandwidth":"带宽(MB/s)"
         },
         "disks":{
@@ -521,10 +521,10 @@
           "type":"类型",
           "capacity":"容量",
           "role":"角色",
-          "diskDomain":"磁盘域",
+          "diskDomain":"硬盘域",
           "rotationalSpeed":"转速",
           "iops":"IOPS",
-          "latency":"时延(毫秒)",
+          "latency":"平均I/O响应时间(ms)",
           "bandwidth":"带宽(MB/s)",
           "usage":"使用率(%)"
         },
@@ -535,7 +535,7 @@
           "wwn":"WWN",
           "workingRate":"工作速度(Mbps)",
           "iops":"IOPS",
-          "latency":"时延(毫秒)",
+          "latency":"平均I/O响应时间(ms)",
           "bandwidth":"带宽(MB/s)",
           "usage":"使用率(%)",
           "name":"名称",
@@ -543,7 +543,7 @@
           "runningStatus":"运行状态",
           "mtu":"MTU(Byte)",
           "totalIops":"Total IOPS(IO/s)",
-          "avg":"平均I/O响应时间(微秒)",
+          "avg":"平均I/O响应时间(μs)",
           "totalBandwidth":"总带宽(MB/s)",
           "ipv4":"IPv4地址",
           "ipv6":"IPv6地址",
@@ -588,7 +588,7 @@
     "totalCapacity": "总量",
     "used": "已用",
     "free": "可用",
-    "top5T": "存储使用率前5",
+    "top5T": "存储容量利用率Top5",
     "connectT": "DME连接",
     "connectFail": "连接失败！",
     "connectSuccess": "连接成功！",
@@ -706,6 +706,7 @@
     "createRdmError": "创建RDM出错!",
     "selectOneSer": "DME存储策略不能为空！",
     "rdmSuccessMsg": "创建RDM成功!",
+    "addTips": "注：当您需要在存储上创建新LUN，并用该LUN给虚拟机创建RDM盘时，使用该方式。如果想使用已有LUN创建，可直接在虚拟机硬件编辑中选择添加RDM磁盘。",
     "compatibilityMode": {
       "name": "兼容模式",
       "virtualMode": "虚拟",
@@ -843,7 +844,7 @@
     "type":{
       "block":"块",
       "file":"文件",
-      "blockAndFile": "块和文件"
+      "blockAndFile": "块/文件"
     }
   },
   "errorMsg":{

@@ -186,6 +186,7 @@
         <property name="dmeAccessService" ref="DmeAccessServiceImpl"/>
         <property name="taskService" ref="taskService"/>
         <property name="vmfsAccessService" ref="VmfsAccessServiceImpl"/>
+        <property name="dmeStorageService" ref="DmeStorageServiceImpl" />
     </bean>
 
     <bean name="BestPracticeProcessServiceImpl" class="com.huawei.dmestore.services.BestPracticeProcessServiceImpl">

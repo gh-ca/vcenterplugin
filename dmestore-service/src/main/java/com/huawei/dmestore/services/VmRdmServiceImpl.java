@@ -10,6 +10,8 @@ import com.huawei.dmestore.model.CustomizeVolumesRequest;
 import com.huawei.dmestore.model.ServiceVolumeBasicParams;
 import com.huawei.dmestore.model.ServiceVolumeMapping;
 import com.huawei.dmestore.model.SmartQosForRdmCreate;
+import com.huawei.dmestore.model.StorageDetail;
+import com.huawei.dmestore.model.StorageTypeShow;
 import com.huawei.dmestore.model.VmRdmCreateBean;
 import com.huawei.dmestore.utils.StringUtil;
 import com.huawei.dmestore.utils.ToolUtils;
@@ -22,6 +24,7 @@ import com.google.gson.reflect.TypeToken;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -56,6 +59,8 @@ public class VmRdmServiceImpl implements VmRdmService {
 
     private DmeAccessService dmeAccessService;
 
+    private DmeStorageService dmeStorageService;
+
     private TaskService taskService;
 
     private Gson gson = new Gson();
@@ -70,6 +75,14 @@ public class VmRdmServiceImpl implements VmRdmService {
 
     public void setVmfsAccessService(VmfsAccessService vmfsAccessService) {
         this.vmfsAccessService = vmfsAccessService;
+    }
+
+    public DmeStorageService getDmeStorageService() {
+        return dmeStorageService;
+    }
+
+    public void setDmeStorageService(DmeStorageService dmeStorageService) {
+        this.dmeStorageService = dmeStorageService;
     }
 
     public VCSDKUtils getVcsdkUtils() {
@@ -355,8 +368,12 @@ public class VmRdmServiceImpl implements VmRdmService {
         // 判断该集群下有多少主机，如果主机在DME不存在就需要创建
         Map<String, Object> requestbody = new HashMap<>(MAP_DEFAULT_CAPACITY);
         CustomizeVolumes customizeVolumes = customizeVolumesRequest.getCustomizeVolumes();
-        putNotNull(requestbody, "initial_distribute_policy",
-            DmeConstants.INITIAL_DISTRIBUTE_POLICY.get(customizeVolumes.getInitialDistributePolicy()));
+        String storageModel = getStorageModel(customizeVolumes.getStorageId());
+        StorageTypeShow storageTypeShow = ToolUtils.getStorageTypeShow(storageModel);
+        if (!storageTypeShow.getDorado()) {
+            putNotNull(requestbody, "initial_distribute_policy",
+                DmeConstants.INITIAL_DISTRIBUTE_POLICY.get(customizeVolumes.getInitialDistributePolicy()));
+        }
         putNotNull(requestbody, "prefetch_value", customizeVolumes.getPrefetchValue());
         putNotNull(requestbody, "prefetch_policy",
             DmeConstants.PREFETCH_POLICY.get(customizeVolumes.getPrefetchPolicy()));
@@ -452,5 +469,10 @@ public class VmRdmServiceImpl implements VmRdmService {
             }
             map.put(key, value);
         }
+    }
+
+    private String getStorageModel(String storageId) throws DmeException {
+        StorageDetail storageDetail = dmeStorageService.getStorageDetail(storageId);
+        return storageDetail.getModel() + " " + storageDetail.getProductVersion();
     }
 }

@@ -283,6 +283,7 @@ export class Title{
 }
 export class TextStyle{
   fontStyle: string;
+  fontWeight: string;
 }
 export class XAxis{
   type: string;

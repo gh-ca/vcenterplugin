@@ -123,8 +123,10 @@
                       <clr-dg-column class="hideFilter" [clrDgField]="'maxIops'" [hidden]="poolRadio!=='table3'">{{'storage.detail.storagePool.iops' | translate}}</clr-dg-column>
                       <clr-dg-column class="hideFilter" [clrDgField]="'maxBandwidth'" [hidden]="poolRadio!=='table3'">{{'storage.detail.storagePool.bandwidth' | translate}}</clr-dg-column>
 
+                      <clr-dg-placeholder>{{'tips.noData' | translate}}</clr-dg-placeholder>
+
                       <clr-dg-row *clrDgItems="let item of storagePool" [clrDgItem]="item">
-                        <clr-dg-cell class="over_flow">{{item.name}}</clr-dg-cell>
+                        <clr-dg-cell class="over_flow">{{item.name ? item.name:'--'}}</clr-dg-cell>
                         <clr-dg-cell class="over_flow">
                           <span *ngIf="item.healthStatus == 'normal'">
                             <span class="color-square" style="background-color: #7CDFA0; margin-right: 10px"></span>
@@ -138,10 +140,11 @@
                             <span class="color-square" style="background-color: #A9A9A9; margin-right: 10px"></span>
                             {{'storage.detail.storagePool.degraded' | translate}}
                           </span>
+                          <span *ngIf="!item.healthStatus">--</span>
                         </clr-dg-cell>
 
                         <clr-dg-cell [hidden]="poolRadio!=='table1'">
-                          {{item.physicalType}}
+                          {{item.physicalType ? item.physicalType:'--'}}
                         </clr-dg-cell>
                         <clr-dg-cell [hidden]="poolRadio!=='table1'">
                           <span *ngIf="!item.mediaType">--</span>
@@ -149,22 +152,25 @@
                           <span *ngIf="item.mediaType == 'block'">{{'enum.type.block' | translate}}</span>
                           <span *ngIf="item.mediaType == 'block/file'">{{'enum.type.blockAndFile' | translate}}</span>
                         </clr-dg-cell>
-                        <clr-dg-cell title="{{formatArry(item.serviceLevelName)}}" class="over_flow" [hidden]="poolRadio!=='table1'">{{formatArry(item.serviceLevelName)}}</clr-dg-cell>
+                        <clr-dg-cell title="{{formatArry(item.serviceLevelName)}}" class="over_flow" [hidden]="poolRadio!=='table1'">
+                          {{item.serviceLevelName ? formatArry(item.serviceLevelName):'--'}}
+                        </clr-dg-cell>
                         <clr-dg-cell [hidden]="poolRadio!=='table1'">
-                          {{item.raidLevel}}
+                          {{item.raidLevel ? item.raidLevel:'--'}}
                         </clr-dg-cell>
 
-                        <clr-dg-cell [hidden]="poolRadio!=='table2'">{{formatCapacity(item.totalCapacity)}}</clr-dg-cell>
-                        <clr-dg-cell [hidden]="poolRadio!=='table2'">{{formatCapacity(item.consumedCapacity)}}</clr-dg-cell>
+                        <clr-dg-cell [hidden]="poolRadio!=='table2'">{{item.totalCapacity ? formatCapacity(item.totalCapacity):'--'}}</clr-dg-cell>
+                        <clr-dg-cell [hidden]="poolRadio!=='table2'">{{item.consumedCapacity ? formatCapacity(item.consumedCapacity):'--'}}</clr-dg-cell>
                         <clr-dg-cell [hidden]="poolRadio!=='table2'">
-                          <div class="progress-block">
+                          <div class="progress-block" *ngIf="item.consumedCapacity">
                             <clr-progress-bar clrValue="{{((item.consumedCapacity)/item.totalCapacity * 100).toFixed(2)}}" clrSuccess></clr-progress-bar>
                             <span>{{((item.consumedCapacity)/item.totalCapacity * 100).toFixed(2)}}%</span>
                           </div>
+                          <span *ngIf="!item.consumedCapacity">--</span>
                         </clr-dg-cell>
-                        <clr-dg-cell [hidden]="poolRadio!=='table2'">{{formatCapacity(item.freeCapacity)}}</clr-dg-cell>
+                        <clr-dg-cell [hidden]="poolRadio!=='table2'">{{item.freeCapacity ? formatCapacity(item.freeCapacity):'--'}}</clr-dg-cell>
                         <clr-dg-cell [hidden]="poolRadio!=='table2'">
-                          {{(item.subscribedCapacity/item.totalCapacity*100).toFixed(2)}}%
+                          {{item.subscribedCapacity ? (item.subscribedCapacity/item.totalCapacity*100).toFixed(2):'--'}}%
                         </clr-dg-cell>
 
                         <clr-dg-cell [hidden]="poolRadio!=='table3'">{{item.maxLatency!=null?item.maxLatency.toFixed(2):'--'}}</clr-dg-cell>
@@ -253,8 +259,9 @@
                       <clr-dg-column class="hideFilter" [clrDgField]="'iops'" [hidden]="volumeRadio!=='table2'">{{'storage.detail.volumes.iops' | translate}}</clr-dg-column>
                       <clr-dg-column class="hideFilter" [clrDgField]="'bandwith'" [hidden]="volumeRadio!=='table2'">{{'storage.detail.volumes.bandwidth' | translate}}</clr-dg-column>
 
+                      <clr-dg-placeholder>{{'tips.noData' | translate}}</clr-dg-placeholder>
                       <clr-dg-row *clrDgItems="let item of volumes" [clrDgItem]="item">
-                        <clr-dg-cell class="over_flow">{{item.name}}</clr-dg-cell>
+                        <clr-dg-cell class="over_flow">{{item.name ? item.name:'--'}}</clr-dg-cell>
                         <clr-dg-cell class="over_flow">
                           <span *ngIf="item.status == 'creating'">
                             <span class="color-square" style="background-color: green; margin-right: 10px"></span>{{'enum.status.creating' | translate}}
@@ -281,7 +288,7 @@
                             --
                           </span>
                         </clr-dg-cell>
-                        <clr-dg-cell [hidden]="volumeRadio!=='table1'">{{formatCapacity(item.capacity)}}</clr-dg-cell>
+                        <clr-dg-cell [hidden]="volumeRadio!=='table1'">{{item.capacity ? formatCapacity(item.capacity):'--'}}</clr-dg-cell>
                         <clr-dg-cell [hidden]="volumeRadio!=='table1'">
                           <span *ngIf="item.alloctype == 'thick'">Thick</span>
                           <span *ngIf="item.alloctype == 'thin'">Thin</span>
@@ -292,23 +299,29 @@
                           --
                         </clr-dg-cell>
                         <clr-dg-cell [hidden]="volumeRadio!=='table1'"*ngIf="item.capacityUsage">
-                          <div class="progress-block">
+                          <div class="progress-block" *ngIf="item.capacityUsage">
                             <clr-progress-bar clrValue="{{parseUsage(item.capacityUsage)}}" clrSuccess></clr-progress-bar>
                             <span>{{parseUsage(item.capacityUsage)}}%</span>
                           </div>
+                          <span *ngIf="!item.capacityUsage">--</span>
                         </clr-dg-cell>
 
                         <clr-dg-cell [hidden]="volumeRadio!=='table1'">
                           <span *ngIf="!item.attached">{{'enum.status.unmapped' | translate}}</span>
                           <span *ngIf="item.attached">{{'enum.status.mapped' | translate}}</span>
+                          <span *ngIf="item.attached == null">--</span>
                         </clr-dg-cell>
-                        <clr-dg-cell [hidden]="volumeRadio!=='table1'">{{item.storagePoolName}}</clr-dg-cell>
-                        <clr-dg-cell title="{{item.serviceLevelName}}" class="over_flow" [hidden]="volumeRadio!=='table1'">{{item.serviceLevelName}}</clr-dg-cell>
+                        <clr-dg-cell [hidden]="volumeRadio!=='table1'">{{item.storagePoolName ? item.storagePoolName:'--'}}</clr-dg-cell>
+                        <clr-dg-cell title="{{item.serviceLevelName}}" class="over_flow" [hidden]="volumeRadio!=='table1'">
+                          {{item.serviceLevelName ? item.serviceLevelName:'--'}}
+                        </clr-dg-cell>
 <!--                        <clr-dg-cell [hidden]="volumeRadio!=='table1'">-->
 <!--                          <span *ngIf="item.protectionStatus">{{'enum.status.protected' | translate}}</span>-->
 <!--                          <span *ngIf="!item.protectionStatus">{{'enum.status.unprotected' | translate}}</span>-->
 <!--                        </clr-dg-cell>-->
-                        <clr-dg-cell [hidden]="volumeRadio!=='table1'">{{item.datastores}}</clr-dg-cell>
+                        <clr-dg-cell [hidden]="volumeRadio!=='table1'">
+                          {{item.datastores ? item.datastores:'--'}}
+                        </clr-dg-cell>
 
                         <clr-dg-cell [hidden]="volumeRadio!=='table2'">{{item.lantency!=null?item.lantency.toFixed(2):'--'}}</clr-dg-cell>
                         <clr-dg-cell [hidden]="volumeRadio!=='table2'">{{item.iops!=null?item.iops.toFixed(2):'--'}}</clr-dg-cell>
@@ -408,8 +421,9 @@
                       <!--<clr-dg-column>{{'storage.detail.fileSystems.cifs' | translate}}</clr-dg-column>-->
                       <clr-dg-column class="hideFilter" [clrDgField]="'dtreeCount'">{{'storage.detail.fileSystems.dtree' | translate}}</clr-dg-column>
 
+                      <clr-dg-placeholder>{{'tips.noData' | translate}}</clr-dg-placeholder>
                       <clr-dg-row *clrDgItems="let item of fsList" [clrDgItem]="item">
-                        <clr-dg-cell class="over_flow">{{item.name}}</clr-dg-cell>
+                        <clr-dg-cell class="over_flow">{{item.name ? item.name:'--'}}</clr-dg-cell>
                         <clr-dg-cell class="over_flow">
                           <span *ngIf="item.healthStatus == 'normal'">
                             <span class="color-square" style="background-color: #7CDFA0; margin-right: 10px"></span>{{'enum.status.normal' | translate}}
@@ -429,18 +443,19 @@
                           <span *ngIf="item.type == 'worm'">{{'enum.status.wormFs' | translate}}</span>
                           <span *ngIf="!item.type">--</span>
                         </clr-dg-cell>
-                        <clr-dg-cell class="over_flow">{{formatCapacity(item.capacity)}}</clr-dg-cell>
-                        <clr-dg-cell class="over_flow">{{formatCapacity(item.availableCapacity)}}</clr-dg-cell>
+                        <clr-dg-cell class="over_flow">{{item.capacity ? formatCapacity(item.capacity):'--'}}</clr-dg-cell>
+                        <clr-dg-cell class="over_flow">{{item.availableCapacity ? formatCapacity(item.availableCapacity):'--'}}</clr-dg-cell>
                         <clr-dg-cell class="over_flow">
-                          <div class="progress-block">
+                          <div class="progress-block" *ngIf="item.capacityUsageRatio">
                             <clr-progress-bar clrValue="{{item.capacityUsageRatio.toFixed(2)}}" clrSuccess></clr-progress-bar>
                             <span>{{item.capacityUsageRatio.toFixed(2)}}%</span>
                           </div>
+                          <span *ngIf="!item.capacityUsageRatio">--</span>
                         </clr-dg-cell>
-                        <clr-dg-cell class="over_flow">{{item.storagePoolName}}</clr-dg-cell>
-                        <clr-dg-cell class="over_flow">{{item.nfsCount}}</clr-dg-cell>
+                        <clr-dg-cell class="over_flow">{{item.storagePoolName ? item.storagePoolName:'--'}}</clr-dg-cell>
+                        <clr-dg-cell class="over_flow">{{item.nfsCount ? item.nfsCount:'--'}}</clr-dg-cell>
                         <!--<clr-dg-cell class="over_flow">{{item.cifs_count}}</clr-dg-cell>-->
-                        <clr-dg-cell class="over_flow">{{item.dtreeCount}}</clr-dg-cell>
+                        <clr-dg-cell class="over_flow">{{item.dtreeCount ? item.dtreeCount:'--'}}</clr-dg-cell>
                       </clr-dg-row>
 
                       <clr-dg-footer>
@@ -487,9 +502,10 @@
                           <dtree-quota-filter #dtreeQuotaFilter></dtree-quota-filter>
                         </clr-dg-filter>
                       </clr-dg-column>
+                      <clr-dg-placeholder>{{'tips.noData' | translate}}</clr-dg-placeholder>
                       <clr-dg-row  *clrDgItems="let item of dtrees" [clrDgItem]="item">
-                        <clr-dg-cell class="over_flow">{{item.name}}</clr-dg-cell>
-                        <clr-dg-cell class="over_flow">{{item.fsName}}</clr-dg-cell>
+                        <clr-dg-cell class="over_flow">{{item.name ? item.name:'--'}}</clr-dg-cell>
+                        <clr-dg-cell class="over_flow">{{item.fsName ? item.fsName:'--'}}</clr-dg-cell>
                         <clr-dg-cell title="{{item.tierName!=null?item.tierName!=''?item.tierName:'--':'--'}}" class="over_flow">{{item.tierName!=null?item.tierName!=''?item.tierName:'--':'--'}}</clr-dg-cell>
                         <clr-dg-cell class="over_flow">
                           <span *ngIf="item.securityStyle">{{item.securityStyle}}</span>
@@ -500,6 +516,7 @@
                         <clr-dg-cell class="over_flow">
                           <span *ngIf="item.quotaSwitch">{{'enum.status.enabled' | translate}}</span>
                           <span *ngIf="!item.quotaSwitch">{{'enum.status.notEnabled' | translate}}</span>
+                          <span *ngIf="item.quotaSwitch == null">--</span>
                         </clr-dg-cell>
                       </clr-dg-row>
                       <clr-dg-footer>
@@ -533,10 +550,11 @@
                         <clr-dg-column [clrDgField]="'fsName'">{{'storage.detail.shares.ofs' | translate}}</clr-dg-column>
                         <clr-dg-column [clrDgField]="'owningDtreeName'">{{'storage.detail.shares.od' | translate}}</clr-dg-column>
                         <clr-dg-column style="width: 250px" [clrDgField]="'tierName'">{{'storage.detail.shares.osl' | translate}}</clr-dg-column>
+                        <clr-dg-placeholder>{{'tips.noData' | translate}}</clr-dg-placeholder>
                         <clr-dg-row  *clrDgItems="let item of shares" [clrDgItem]="item">
-                          <clr-dg-cell class="over_flow">{{item.name}}</clr-dg-cell>
-                          <clr-dg-cell class="over_flow">{{item.sharePath}}</clr-dg-cell>
-                          <clr-dg-cell class="over_flow">{{item.fsName}}</clr-dg-cell>
+                          <clr-dg-cell class="over_flow">{{item.name ? item.name:'--'}}</clr-dg-cell>
+                          <clr-dg-cell class="over_flow">{{item.sharePath ? item.sharePath:'--'}}</clr-dg-cell>
+                          <clr-dg-cell class="over_flow">{{item.fsName ? item.sharePath:'--'}}</clr-dg-cell>
                           <clr-dg-cell class="over_flow">{{item.owningDtreeName!=null?item.owningDtreeName!=''?item.owningDtreeName:'--':'--'}}</clr-dg-cell>
                           <clr-dg-cell title="{{item.tierName!=null?item.tierName:'--'}}" class="over_flow">{{item.tierName!=null?item.tierName!=''?item.tierName:'--':'--'}}</clr-dg-cell>
                         </clr-dg-row>
@@ -569,7 +587,7 @@
                         <div class="num-bar_outer">
                           <div class="num-bar_inner"></div>
                         </div>
-                        <span class="capacity-span">{{formatCapacity(detail.totalEffectiveCapacity)}}</span>
+                        <span class="capacity-span">{{detail.totalEffectiveCapacity ? formatCapacity(detail.totalEffectiveCapacity):'--'}}</span>
                       </div>
                       <!--裸容量-->
                       <div class="capacity-wrap" *ngIf="!detail.storageTypeShow.dorado">
@@ -577,33 +595,34 @@
                         <div class="num-bar_outer">
                           <div class="num-bar_inner"></div>
                         </div>
-                        <span class="capacity-span">{{formatCapacity(detail.totalCapacity)}}</span>
+                        <span class="capacity-span">{{detail.totalCapacity ? formatCapacity(detail.totalCapacity):'--'}}</span>
                       </div>
                       <!--总容量-->
                       <div class="capacity-wrap" *ngIf="!detail.storageTypeShow.dorado">
                         <span class="capacity-label">{{'storage.detail.cap.totalCapacity' | translate}}</span>
-                        <div class="num-bar_outer">
+                        <div class="num-bar_outer" *ngIf="detail.totalEffectiveCapacity">
                           <div class="num-bar_inner total" [ngStyle]="{'width':(detail.totalEffectiveCapacity/detail.totalCapacity * 100)+'%'}"></div>
                         </div>
-                        <span class="capacity-span">{{formatCapacity(detail.totalEffectiveCapacity)}}</span>
+                        <span class="capacity-span">{{detail.totalEffectiveCapacity ? formatCapacity(detail.totalEffectiveCapacity):'--'}}</span>
                       </div>
                       <!--已使用|空闲-->
                       <div class="capacity-wrap">
                         <span class="capacity-label">{{'storage.detail.cap.useFree' | translate}}</span>
                         <div class="num-bar_outer">
-                          <clr-progress-bar id="usedCapacityId" clrValue="{{detail.usedCapacity/detail.totalCapacity * 100}}"></clr-progress-bar>
+                          <clr-progress-bar id="usedCapacityId" clrValue="{{detail.usedCapacity/detail.totalEffectiveCapacity * 100}}"></clr-progress-bar>
 <!--                          <div class="num-bar_inner total progress" [ngStyle]="{'width':(detail.usedCapacity/detail.totalCapacity * 100)+'%'}"></div>-->
 <!--                          <div class="num-bar_inner free" [ngStyle]="{'width':((detail.totalEffectiveCapacity-detail.usedCapacity)/detail.totalCapacity * 100)+'%'}"></div>-->
                         </div>
-                        <span class="capacity-span">{{formatCapacity(detail.usedCapacity)}} / {{getFreeCapacity(detail.totalEffectiveCapacity,detail.usedCapacity)}}</span>
+                        <span *ngIf="!detail.storageTypeShow.dorado" class="capacity-span">{{formatCapacity(detail.usedCapacity)}} / {{getFreeCapacity(detail.totalEffectiveCapacity,detail.usedCapacity)}}</span>
+                        <span *ngIf="detail.storageTypeShow.dorado" class="capacity-span">{{formatCapacity(detail.usedCapacity)}} / {{formatCapacity(detail.totalEffectiveCapacity-detail.blockFileCapacity-detail.protectionCapacity)}}</span>
                       </div>
                       <!--已订阅-->
                       <div class="capacity-wrap">
                         <span class="capacity-label">{{'storage.detail.cap.subscribe' | translate}}</span>
                         <div class="num-bar_outer">
-                          <div class="num-bar_inner total" [ngStyle]="{'width':(detail.subscriptionCapacity/detail.totalCapacity * 100)+'%'}"></div>
+                          <div class="num-bar_inner total" [ngStyle]="{'width':(detail.subscriptionCapacity/detail.totalEffectiveCapacity * 100)+'%'}"></div>
                         </div>
-                        <span class="capacity-span">{{formatCapacity(detail.subscriptionCapacity)}}</span>
+                        <span class="capacity-span">{{detail.subscriptionCapacity ? formatCapacity(detail.subscriptionCapacity):'--'}}</span>
                       </div>
                     </div>
                   </div>
@@ -616,31 +635,31 @@
                         <!--保护-->
                         <div class="d-info-content-text">
                           <span>{{'storage.chart.protection' | translate}}</span>
-                          <span>{{cd.protection}}</span>
+                          <span>{{cd.protection ? cd.protection:'--'}}</span>
                           <span class="squre protection"></span>
                         </div>
                         <!--块/文件-->
                         <div class="d-info-content-text" *ngIf="detail.storageTypeShow.dorado">
                           <span>{{'storage.chart.blockFile' | translate}}</span>
-                          <span>{{cd.blockFile}}</span>
+                          <span>{{cd.blockFile ? cd.blockFile:'--'}}</span>
                           <span class="squre fs"></span>
                         </div>
                         <!--文件系统-->
                         <div class="d-info-content-text" *ngIf="!detail.storageTypeShow.dorado">
                           <span>{{'storage.chart.fileSystem' | translate}}</span>
-                          <span>{{cd.fileSystem}}</span>
+                          <span>{{cd.fileSystem ? cd.fileSystem:'--'}}</span>
                           <span class="squre fs"></span>
                         </div>
                         <!--LUN-->
                         <div class="d-info-content-text" *ngIf="!detail.storageTypeShow.dorado">
                           <span>{{'storage.chart.volume' | translate}}</span>
-                          <span>{{cd.volume}}</span>
+                          <span>{{cd.volume ? cd.volume:'--'}}</span>
                           <span class="squre volume"></span>
                         </div>
                         <!--空闲容量-->
                         <div class="d-info-content-text">
                           <span>{{'storage.chart.freeCapacity' | translate}}</span>
-                          <span>{{cd.freeCapacity}}</span>
+                          <span>{{cd.freeCapacity ? cd.freeCapacity:'--'}}</span>
                           <span class="squre free"></span>
                         </div>
                       </div>
@@ -780,7 +799,7 @@
                         <clr-dg-column class="hideFilter"  [clrDgField]="'lantency'">{{'storage.detail.hardware.controllers.latency' | translate}}</clr-dg-column>
                         <clr-dg-column class="hideFilter"  [clrDgField]="'bandwith'">{{'storage.detail.hardware.controllers.bandwidth' | translate}}</clr-dg-column>
                         <clr-dg-row  *clrDgItems="let item of controllers" [clrDgItem]="item">
-                          <clr-dg-cell class="over_flow">{{item.name}}</clr-dg-cell>
+                          <clr-dg-cell class="over_flow">{{item.name ? item.name:'--'}}</clr-dg-cell>
                           <clr-dg-cell class="over_flow">
                             <span *ngIf="item.status == 'unknown'">
                               <span class="color-square" style="background-color: beige; margin-right: 10px"></span>{{'enum.status.unknown' | translate}}
@@ -799,7 +818,7 @@
                           </span>
                             <span *ngIf="!item.status">--</span>
                           </clr-dg-cell>
-                          <clr-dg-cell class="over_flow">{{item.softVer}}</clr-dg-cell>
+                          <clr-dg-cell class="over_flow">{{item.softVer ? item.softVer:'--'}}</clr-dg-cell>
                           <clr-dg-cell class="over_flow">{{item.cpuUsage!=null?item.cpuUsage:'--'}}</clr-dg-cell>
                           <clr-dg-cell class="over_flow">{{item.iops!=null?item.iops:'--'}}</clr-dg-cell>
                           <clr-dg-cell class="over_flow">{{item.ops!=null?item.ops:'--'}}</clr-dg-cell>
@@ -843,8 +862,9 @@
                         <clr-dg-column class="hideFilter"  [clrDgField]="'lantency'">{{'storage.detail.hardware.disks.latency' | translate}}</clr-dg-column>
                         <clr-dg-column class="hideFilter"  [clrDgField]="'bandwith'">{{'storage.detail.hardware.disks.bandwidth' | translate}}</clr-dg-column>
                         <clr-dg-column class="hideFilter"  [clrDgField]="'useage'">{{'storage.detail.hardware.disks.usage' | translate}}</clr-dg-column>
+                        <clr-dg-placeholder>{{'tips.noData' | translate}}</clr-dg-placeholder>
                         <clr-dg-row  *clrDgItems="let item of disks" [clrDgItem]="item">
-                          <clr-dg-cell class="over_flow">{{item.name}}</clr-dg-cell>
+                          <clr-dg-cell class="over_flow">{{item.name ? item.name:'--'}}</clr-dg-cell>
                           <clr-dg-cell class="over_flow">
                             <span *ngIf="item.status == 'unknown'">
                               <span class="color-square" style="background-color: beige; margin-right: 10px"></span>{{'enum.status.unknown' | translate}}
@@ -868,8 +888,8 @@
                             <span *ngIf="item.logicalType == 'member'">{{'enum.status.member' | translate}}</span>
                             <span *ngIf="!item.logicalType">--</span>
                           </clr-dg-cell>
-                          <clr-dg-cell class="over_flow">{{item.diskDomain}}</clr-dg-cell>
-                          <clr-dg-cell class="over_flow">{{item.speed}}</clr-dg-cell>
+                          <clr-dg-cell class="over_flow">{{item.diskDomain ? item.diskDomain:'--'}}</clr-dg-cell>
+                          <clr-dg-cell class="over_flow">{{item.speed ? item.speed:'--'}}</clr-dg-cell>
                           <clr-dg-cell class="over_flow">{{item.iops!=null?item.iops.toFixed(2):'--'}}</clr-dg-cell>
                           <clr-dg-cell class="over_flow">{{item.lantency!=null?item.lantency.toFixed(2):'--'}}</clr-dg-cell>
                           <clr-dg-cell class="over_flow">{{item.bandwith!=null?item.bandwith.toFixed(2):'--'}}</clr-dg-cell>
@@ -908,8 +928,9 @@
                               <clr-dg-column class="hideFilter" [clrDgField]="'lantency'">{{'storage.detail.hardware.ports.latency' | translate}}</clr-dg-column>
                               <clr-dg-column class="hideFilter" [clrDgField]="'bandwith'">{{'storage.detail.hardware.ports.bandwidth' | translate}}</clr-dg-column>
                               <clr-dg-column class="hideFilter" [clrDgField]="'useage'">{{'storage.detail.hardware.ports.usage' | translate}}</clr-dg-column>
+                              <clr-dg-placeholder>{{'tips.noData' | translate}}</clr-dg-placeholder>
                               <clr-dg-row  *clrDgItems="let item of fcs" [clrDgItem]="item">
-                                <clr-dg-cell class="over_flow">{{item.location}}</clr-dg-cell>
+                                <clr-dg-cell class="over_flow">{{item.location ? item.location:'--'}}</clr-dg-cell>
                                 <clr-dg-cell class="over_flow">
                                   <span *ngIf="item.connectStatus == 'unknown'">{{'enum.status.unknown' | translate}}</span>
                                   <span *ngIf="item.connectStatus == 'normal'">{{'enum.status.normal' | translate}}</span>
@@ -918,7 +939,7 @@
                                   <span *ngIf="item.connectStatus == 'disconnected'">{{'enum.status.disconnected' | translate}}</span>
                                   <span *ngIf="!item.status">--</span>
                                 </clr-dg-cell>
-                                <clr-dg-cell class="over_flow">{{item.wwn}}</clr-dg-cell>
+                                <clr-dg-cell class="over_flow">{{item.wwn ? item.wwn:'--'}}</clr-dg-cell>
                                 <clr-dg-cell class="over_flow">{{item.speed!=null?item.iops.toFixed(2):'--'}}</clr-dg-cell>
                                 <clr-dg-cell class="over_flow">{{item.iops!=null?item.iops.toFixed(2):'--'}}</clr-dg-cell>
                                 <clr-dg-cell class="over_flow">{{item.lantency!=null?item.lantency.toFixed(2):'--'}}</clr-dg-cell>
@@ -953,8 +974,9 @@
                               <clr-dg-column class="hideFilter" [clrDgField]="'lantency'">{{'storage.detail.hardware.ports.latency' | translate}}</clr-dg-column>
                               <clr-dg-column class="hideFilter" [clrDgField]="'bandwith'">{{'storage.detail.hardware.ports.bandwidth' | translate}}</clr-dg-column>
                               <clr-dg-column class="hideFilter" [clrDgField]="'useage'">{{'storage.detail.hardware.ports.usage' | translate}}</clr-dg-column>
+                              <clr-dg-placeholder>{{'tips.noData' | translate}}</clr-dg-placeholder>
                               <clr-dg-row  *clrDgItems="let item of eths" [clrDgItem]="item">
-                                <clr-dg-cell class="over_flow">{{item.location}}</clr-dg-cell>
+                                <clr-dg-cell class="over_flow">{{item.location ? item.location:'--'}}</clr-dg-cell>
 
                                 <clr-dg-cell class="over_flow">
                                   <span *ngIf="item.connectStatus == 'unknown'">{{'enum.status.unknown' | translate}}</span>
@@ -988,16 +1010,24 @@
                           <clr-accordion-title>{{'storage.detail.hardware.ports.fcoe' | translate}}({{fcoes==null?0:fcoes.length}})</clr-accordion-title>
                           <clr-accordion-content *clrIfExpanded>
                             <clr-datagrid [clrDgLoading]="fcoeportIsLoading">
-                              <clr-dg-column [clrDgField]="'status'">{{'storage.detail.hardware.ports.location' | translate}}</clr-dg-column>
-                              <clr-dg-column >{{'storage.detail.hardware.ports.status' | translate}}</clr-dg-column>
+                              <clr-dg-column [clrDgField]="'location'">
+                                {{'storage.detail.hardware.ports.location' | translate}}
+                              </clr-dg-column>
+                              <clr-dg-column >
+                                {{'storage.detail.hardware.ports.status' | translate}}
+                                <clr-dg-filter [clrDgFilter]="fceoConnectStatus">
+                                  <fcoe-status-filter #fceoConnectStatus></fcoe-status-filter>
+                                </clr-dg-filter>
+                              </clr-dg-column>
                               <clr-dg-column [clrDgField]="'status'">{{'storage.detail.hardware.ports.wwn' | translate}}</clr-dg-column>
                               <clr-dg-column class="hideFilter" [clrDgField]="'speed'">{{'storage.detail.hardware.ports.workingRate' | translate}}</clr-dg-column>
                               <clr-dg-column class="hideFilter" [clrDgField]="'iops'">{{'storage.detail.hardware.ports.iops' | translate}}</clr-dg-column>
                               <clr-dg-column class="hideFilter" [clrDgField]="'latency'">{{'storage.detail.hardware.ports.latency' | translate}}</clr-dg-column>
                               <clr-dg-column class="hideFilter" [clrDgField]="'bandwidth'">{{'storage.detail.hardware.ports.bandwidth' | translate}}</clr-dg-column>
                               <clr-dg-column class="hideFilter" [clrDgField]="'usage'">{{'storage.detail.hardware.ports.usage' | translate}}</clr-dg-column>
+                              <clr-dg-placeholder>{{'tips.noData' | translate}}</clr-dg-placeholder>
                               <clr-dg-row  *clrDgItems="let item of fcoes" [clrDgItem]="item">
-                                <clr-dg-cell class="over_flow">{{item.location}}</clr-dg-cell>
+                                <clr-dg-cell class="over_flow">{{item.location ? item.location:'--'}}</clr-dg-cell>
                                 <clr-dg-cell class="over_flow">
                                   <span *ngIf="item.connectStatus == 'unknown'">{{'enum.status.unknown' | translate}}</span>
                                   <span *ngIf="item.connectStatus == 'normal'">{{'enum.status.normal' | translate}}</span>
@@ -1006,8 +1036,8 @@
                                   <span *ngIf="item.connectStatus == 'disconnected'">{{'enum.status.disconnected' | translate}}</span>
                                   <span *ngIf="!item.connectStatus">--</span>
                                 </clr-dg-cell>
-                                <clr-dg-cell class="over_flow">{{item.wwn}}</clr-dg-cell>
-                                <clr-dg-cell class="over_flow">{{item.speed}}</clr-dg-cell>
+                                <clr-dg-cell class="over_flow">{{item.wwn ? item.wwn:'--'}}</clr-dg-cell>
+                                <clr-dg-cell class="over_flow">{{item.speed ? item.speed:'--'}}</clr-dg-cell>
                                 <clr-dg-cell class="over_flow">{{item.iops!=null?item.iops:'--'}}</clr-dg-cell>
                                 <clr-dg-cell class="over_flow">{{item.latency!=null?item.latency:'--'}}</clr-dg-cell>
                                 <clr-dg-cell class="over_flow">{{item.bandwidth!=null?item.bandwidth:'--'}}</clr-dg-cell>
@@ -1044,8 +1074,9 @@
                               <clr-dg-column class="hideFilter" [clrDgField]="'iops'">{{'storage.detail.hardware.ports.totalIops' | translate}}</clr-dg-column>
                               <clr-dg-column class="hideFilter" [clrDgField]="'latency'">{{'storage.detail.hardware.ports.avg' | translate}}</clr-dg-column>
                               <clr-dg-column class="hideFilter" [clrDgField]="'bandwidth'" >{{'storage.detail.hardware.ports.totalBandwidth' | translate}}</clr-dg-column>
+                              <clr-dg-placeholder>{{'tips.noData' | translate}}</clr-dg-placeholder>
                               <clr-dg-row  *clrDgItems="let item of bonds" [clrDgItem]="item">
-                                <clr-dg-cell class="over_flow">{{item.name}}</clr-dg-cell>
+                                <clr-dg-cell class="over_flow">{{item.name ? item.name:'--'}}</clr-dg-cell>
                                 <clr-dg-cell class="over_flow">
                                   <span *ngIf="item.healthStatus == 'unknown'">{{'enum.status.unknown' | translate}}</span>
                                   <span *ngIf="item.healthStatus == 'normal'">{{'enum.status.normal' | translate}}</span>
@@ -1065,7 +1096,7 @@
                                   <span *ngIf="item.runningStatus == 'initializing'">{{'enum.status.initializing' | translate}}</span>
                                   <span *ngIf="!item.runningStatus">--</span>
                                 </clr-dg-cell>
-                                <clr-dg-cell class="over_flow">{{item.mtu}}</clr-dg-cell>
+                                <clr-dg-cell class="over_flow">{{item.mtu ? item.mtu:'--'}}</clr-dg-cell>
                                 <clr-dg-cell class="over_flow">{{item.iops!=null?item.iops:'--'}}</clr-dg-cell>
                                 <clr-dg-cell class="over_flow">{{item.latency!=null?item.latency:'--'}}</clr-dg-cell>
                                 <clr-dg-cell class="over_flow">{{item.bandwidth!=null?item.bandwidth:'--'}}</clr-dg-cell>
@@ -1115,8 +1146,9 @@
                               <clr-dg-column [clrDgField]="'supportProtocol'">{{'storage.detail.hardware.ports.dataProtocol' | translate}}</clr-dg-column>
                               <clr-dg-column [clrDgField]="'managementAccess'">{{'storage.detail.hardware.ports.manageAccess' | translate}}</clr-dg-column>
                               <clr-dg-column [clrDgField]="'vstoreName'">{{'storage.detail.hardware.ports.vStoreName' | translate}}</clr-dg-column>
+                              <clr-dg-placeholder>{{'tips.noData' | translate}}</clr-dg-placeholder>
                               <clr-dg-row  *clrDgItems="let item of logicports" [clrDgItem]="item">
-                                <clr-dg-cell class="over_flow">{{item.name}}</clr-dg-cell>
+                                <clr-dg-cell class="over_flow" title="{{item.name ? item.name:'--'}}">{{item.name ? item.name:'--'}}</clr-dg-cell>
                                 <clr-dg-cell class="over_flow">
                                   <span *ngIf="item.runningStatus == 'LINK_DOWN'">{{'enum.status.linkDown' | translate}}</span>
                                   <span *ngIf="item.runningStatus == 'LINK_UP'">{{'enum.status.linkUp' | translate}}</span>
@@ -1125,8 +1157,9 @@
                                 <clr-dg-cell class="over_flow">
                                   <span *ngIf="item.operationalStatus == 'ACTIVATED'">{{'enum.status.activated' | translate}}</span>
                                   <span *ngIf="item.operationalStatus != 'ACTIVATED'">{{'enum.status.unActivated' | translate}}</span>
+                                  <span *ngIf="item.operationalStatus == null">--</span>
                                 </clr-dg-cell>
-                                <clr-dg-cell class="over_flow">{{item.mgmtIp!=null?item.mgmtIp!=''?item.mgmtIp:'--':'--'}}</clr-dg-cell>
+                                <clr-dg-cell class="over_flow" title="{{item.mgmtIp!=null?item.mgmtIp!=''?item.mgmtIp:'--':'--'}}">{{item.mgmtIp!=null?item.mgmtIp!=''?item.mgmtIp:'--':'--'}}</clr-dg-cell>
                                 <clr-dg-cell  class="over_flow">
                                   {{item.mgmtIpv6!=null?item.mgmtIpv6!=''?item.mgmtIpv6:'--':'--'}}
                                 </clr-dg-cell>
@@ -1141,8 +1174,9 @@
                                   <span *ngIf="item.ddnsStatus == 'INVALID'">{{'enum.status.invalid' | translate}}</span>
                                   <span *ngIf="item.ddnsStatus == 'ENABLE'">{{'enum.status.enable' | translate}}</span>
                                   <span *ngIf="item.ddnsStatus != 'ENABLE' && item.ddnsStatus != 'INVALID'">{{'enum.status.notActivated' | translate}}</span>
+                                  <span *ngIf="item.ddnsStatus == null">--</span>
                                 </clr-dg-cell>
-                                <clr-dg-cell class="over_flow">{{item.supportProtocol!=null?item.supportProtocol:'--'}}</clr-dg-cell>
+                                <clr-dg-cell class="over_flow" title="{{item.supportProtocol!=null?item.supportProtocol:'--'}}">{{item.supportProtocol!=null?item.supportProtocol:'--'}}</clr-dg-cell>
                                 <clr-dg-cell class="over_flow">{{item.managementAccess!=null?item.managementAccess:'--'}}</clr-dg-cell>
                                 <clr-dg-cell class="over_flow">{{item.vstoreName!=null?item.vstoreName!=''?item.vstoreName:'--':'--'}}</clr-dg-cell>
                               </clr-dg-row>
@@ -1167,8 +1201,9 @@
                                   <failover-group-type-filter #failoverGroupTypeFilter></failover-group-type-filter>
                                 </clr-dg-filter>
                               </clr-dg-column>
+                              <clr-dg-placeholder>{{'tips.noData' | translate}}</clr-dg-placeholder>
                               <clr-dg-row  *clrDgItems="let item of fgs" [clrDgItem]="item">
-                                <clr-dg-cell class="over_flow">{{item.name}}</clr-dg-cell>
+                                <clr-dg-cell class="over_flow">{{item.name ? item.name:'--'}}</clr-dg-cell>
                                 <clr-dg-cell class="over_flow" *ngIf="item.failoverGroupType == 'system'">{{'enum.status.system' | translate}}</clr-dg-cell>
                                 <clr-dg-cell class="over_flow" *ngIf="item.failoverGroupType == 'VLAN'">{{'enum.status.vlan' | translate}}</clr-dg-cell>
                                 <clr-dg-cell class="over_flow" *ngIf="item.failoverGroupType == 'customized'">{{'enum.status.customized' | translate}}</clr-dg-cell>

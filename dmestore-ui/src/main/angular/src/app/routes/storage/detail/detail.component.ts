@@ -258,7 +258,7 @@ export class DetailComponent implements OnInit, AfterViewInit {
     const fsNames:string[] = [];
     fsNames.push(this.storageId);
      // IOPS
-    this.setChart(150,this.translatePipe.transform('vmfs.iops'),"IO/s",
+    this.setChart(150,this.translatePipe.transform('vmfs.iops')+'(IO/s)', null,
      NfsService.storageIOPS,fsNames,this.selectRange,NfsService.storageUrl, this.startTime, this.endTime).then(res=>{
      // this.gs.loading = false;
       this.iopsChart = res;
@@ -266,7 +266,7 @@ export class DetailComponent implements OnInit, AfterViewInit {
     });
 
     // 带宽
-    this.setChart(150, this.translatePipe.transform('nfs.qos_bandwidth'), 'MB/s',
+    this.setChart(150, this.translatePipe.transform('nfs.qos_bandwidth') + '(MB/s)', '',
       NfsService.storageBDWT, fsNames, this.selectRange, NfsService.storageUrl, this.startTime, this.endTime).then(res => {
      // this.gs.loading = false;
       this.bandwidthChart = res;
@@ -929,19 +929,24 @@ export class DetailComponent implements OnInit, AfterViewInit {
     this.detail.protectionCapacity
     this.cd.protection = this.formatCapacity(this.detail.protectionCapacity);
     let storagePoolAllUsedCap;
+    let freeCapacity;
     if (this.detail.storageTypeShow.dorado) { // dorado v6.1版本及高版本
-      storagePoolAllUsedCap = this.storagePool.map(item => item.consumedCapacity).reduce(this.getSum, 0).toFixed(3);
-      this.cd.blockFile = this.formatCapacity(storagePoolAllUsedCap);
+      // storagePoolAllUsedCap = this.storagePool.map(item => item.consumedCapacity).reduce(this.getSum, 0).toFixed(3);
+      storagePoolAllUsedCap = this.formatCapacity(this.detail.blockFileCapacity);
+      this.cd.blockFile = storagePoolAllUsedCap;
+      freeCapacity = (this.detail.totalEffectiveCapacity-this.detail.protectionCapacity - this.detail.blockFileCapacity).toFixed(3);
     } else { // dorado v 6.0版本及更低版本
       this.cd.fileSystem =this.formatCapacity(this.detail.fileCapacity);
       this.cd.volume =this.formatCapacity(this.detail.blockCapacity);
+      freeCapacity = (this.detail.totalEffectiveCapacity-this.detail.usedCapacity).toFixed(3);
     }
-     this.cd.freeCapacity= this.getFreeCapacity(this.detail.totalEffectiveCapacity,this.detail.usedCapacity);
-    const freeCapacity = (this.detail.totalEffectiveCapacity-this.detail.usedCapacity).toFixed(3);
-    const cc = new CapacityChart(this.formatCapacity(this.detail.totalEffectiveCapacity));
+     this.cd.freeCapacity= this.formatCapacity(freeCapacity);
+
+    const title = this.formatCapacity(this.detail.totalEffectiveCapacity) + '\n' + this.translatePipe.transform('storage.chart.total');
+    const cc = new CapacityChart(title);
     let cs = new CapacitySerie(this.detail.protectionCapacity
         ,this.detail.fileCapacity,this.detail.blockCapacity,
-      Number(freeCapacity), Number(storagePoolAllUsedCap), this.detail.storageTypeShow.dorado, this.translatePipe);
+      Number(freeCapacity), Number(this.detail.blockFileCapacity), this.detail.storageTypeShow.dorado, this.translatePipe);
     cc.series.push(cs);
     this.cd.chart = cc;
   }
@@ -1054,10 +1059,13 @@ export class DetailComponent implements OnInit, AfterViewInit {
     // 标题
     const titleInfo:Title = new Title();
     titleInfo.text = title;
-    titleInfo.subtext = subtext;
+    if (subtext) {
+      titleInfo.subtext = subtext;
+    }
     titleInfo.textAlign = 'bottom';
     const textStyle:TextStyle  = new TextStyle();
     textStyle.fontStyle = 'normal';
+    textStyle.fontWeight = 'normal';
     titleInfo.textStyle = textStyle;
 
     chart.title = titleInfo;

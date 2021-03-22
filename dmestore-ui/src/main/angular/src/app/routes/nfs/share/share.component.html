@@ -2,16 +2,16 @@
     <table class="table table-noborder">
     <tr>
       <td class="left">{{'nfs.share.name' | translate}}</td>
-      <td class="left">{{shareDetail.name}}</td>
+      <td class="left">{{shareDetail.name ? shareDetail.name:'--'}}</td>
       <td class="left">{{'nfs.share.sharePath' | translate}}</td>
-      <td class="left">{{shareDetail.sharePath}}</td>
+      <td class="left">{{shareDetail.sharePath ? shareDetail.sharePath:'--'}}</td>
     </tr>
     <tr>
       <td class="left">{{'nfs.share.dtree' | translate}}</td>
-      <td class="left">{{shareDetail.owningDtreeName}}</td>
+      <td class="left">{{shareDetail.owningDtreeName ? shareDetail.owningDtreeName:'--'}}</td>
 
       <td class="left">{{'nfs.share.description' | translate}}</td>
-      <td class="left">{{shareDetail.description}}</td>
+      <td class="left">{{shareDetail.description ? shareDetail.description:'--'}}</td>
     </tr>
   </table>
   <span class="titlebar-text">{{'nfs.share.clientInfo' | translate}}</span>
@@ -19,14 +19,20 @@
     <clr-dg-column>{{'nfs.share.nameAddr' | translate}}</clr-dg-column>
     <clr-dg-column>{{'nfs.share.type' | translate}}</clr-dg-column>
     <clr-dg-column>{{'nfs.share.permission' | translate}}</clr-dg-column>
+    <clr-dg-placeholder>{{'vmfs.listNullTips' | translate}}</clr-dg-placeholder>
     <clr-dg-row *ngFor="let item of shareDetail.authClientList" [clrDgItem]="item">
-      <clr-dg-cell>{{item.name}}</clr-dg-cell>
-      <clr-dg-cell>{{item.type}}</clr-dg-cell>
-      <clr-dg-cell>{{item.accessval}}</clr-dg-cell>
+      <clr-dg-cell>{{item.name ? item.name:'--'}}</clr-dg-cell>
+      <clr-dg-cell>{{item.type ? item.type:'--'}}</clr-dg-cell>
+      <clr-dg-cell>{{item.accessval ? item.accessval:'--'}}</clr-dg-cell>
     </clr-dg-row>
   </clr-datagrid>
 </div>
-<div *ngIf="!shareDetail">
+<div *ngIf="isLoading" class="loadingDiv">
+  <span>
+    {{'vmfs.loadingTips' | translate}}<img src="./assets/images/loading.gif"  width="20px" height="20px" style="margin-left: 20px;">
+  </span>
+</div>
+<div *ngIf="!shareDetail && !isLoading">
   {{'tips.noData' | translate}}
 </div>
 
