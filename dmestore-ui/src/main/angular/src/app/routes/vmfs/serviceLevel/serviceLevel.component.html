@@ -67,7 +67,7 @@
                   <th>{{formatCapacity(item.usedCapacity, false)}} /{{formatCapacity(item.totalCapacity, false)}}</th>
                   <th *ngIf="item.capabilities !== null && item.capabilities.qos !== null
                         && item.capabilities.qos.qosParam !== null
-                        && item.capabilities.qos.qosParam.latency !== 0 ">Latency: {{item.capabilities.qos.qosParam.latency + item.capabilities.qos.qosParam.latencyUnit}}</th>
+                        && item.capabilities.qos.qosParam.latency !== 0 ">{{'rdm.latency' | translate}}: {{item.capabilities.qos.qosParam.latency + item.capabilities.qos.qosParam.latencyUnit}}</th>
                   <th *ngIf="item.capabilities === null || item.capabilities.qos === null || item.capabilities.qos.qosParam === null || item.capabilities.qos.qosParam.latency === 0">--</th>
                 </tr>
                 </tbody>
