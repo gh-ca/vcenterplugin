@@ -346,7 +346,28 @@ export class BestpracticeComponent implements OnInit {
     });
     return title;
   }
-}
+
+  sortFunc(obj:any) {
+    // let object;
+    // if (obj.target.type && obj.target.type == 'button') {
+    //   object = obj.target;
+    // } else {
+    //   if ((obj.target.attributes.shape && obj.target.attributes.shape.nodeValue == 'filter-grid')
+    //     || (obj.target.attributes.class && obj.target.attributes.class.value == 'datagrid-column ng-star-inserted')) {
+    //     return;
+    //   } else {
+    //     object = obj.target.parentElement;
+    //   }
+    // }
+    // const sortValue = object.children[1].attributes.shape.nodeValue;
+    // if (sortValue == 'arrow down' || sortValue == 'arrow') {
+    //   object.children[0].hidden = true;
+    // } else {
+    //   object.children[0].hidden = false;
+    // }
+    return !obj;
+  }
+} 
 
 class Bestpractice {
   hostSetting: string;

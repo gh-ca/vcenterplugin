@@ -211,6 +211,9 @@ export class IscsiComponent implements OnInit, AfterViewInit {
       selectDom.innerText = this.translatePipe.transform('iscsi.selectAll');
     }
   }
+  sortFunc(obj:any) {
+    return !obj;
+  }
 }
 
 
