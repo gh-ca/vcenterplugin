@@ -616,7 +616,22 @@
     "exeFail": "Execute Failed",
     "operation": "Operation",
     "implementation": "Apply",
-    "description": "Description",
+    "description": {
+      "name": "Description",
+      "vmfs5": "This item is configured to enable VAAI ATS heartbeat. In versions earlier than ESXi 6.5, connections to the datastores corresponding to VMFS3 and VMFS5 may be lost and you are advised to disable this function. For other versions, you are advised to enable this function.",
+      "locking": "This item is configured to enable VAAI ATS locking. Compared with the SCSI reservation locking mechanism, the ATS locking mechanism uses a finer-grained lock (sector) and offloads VMFS locking operations to storage devices. This prevents multiple hosts from concurrently accessing the VMFS.",
+      "init": "This item is configured to use VAAI to accelerate VMFS data initialization and offload initial zeroing of disks to storage devices to improve performance.",
+      "move": "This item is configured to use VAAI to accelerate VMFS data movement and offload data movement to storage devices to improve performance.",
+      "delete": " This item is configured to reclaim the space of VMs that use VMFS5 by running the unmap command.To execute the unmap command successfully, the datastore used by virtual disks must support thin provisioning.",
+      "quanTum": "This item is configured to set the queue depth of virtual disks to 64. If the queue depth is set to a too small value, requests will be blocked.",
+      "diskMaxIOSize": "This item is configured to set the maximum number of I/Os for virtual disks to the applicable value of ESXi of the current version. In specific ESXi versions, if the number is set to a large value, Windows EFI boot issues may occur. A small value is automatically used in the best practice.",
+      "depthForQlogic": "This item is configured to set the QLogic HBA queue depth to 512 and increase the throughput of ESXi hosts.",
+      "depthForEmulex": "This item is configured to set the Emulex HBA queue depth to 512 and increase the throughput of ESXi hosts.",
+      "pathSwitchPolicy": "his item is configured to automatically configure the multipathing policy for storage devices to improve their availability and performance.",
+      "jumboFrame": "This item is configured to enable jumbo frame configuration and the MTU value of ESXi vmkernel adapters is set to 9000. Jumbo frames are recommended for the storage network.\nThis configuration requires that ESXi hosts, storage devices, and all physical network devices in the data packet link support jumbo frames, and their MTU values are set to 9000.",
+      "reclamation": "This item is configured to configure the automatic space reclamation policy for VMFS6 datastores.",
+      "numberOfVolInDatastore": "This item is configured to limit the maximum number of volumes in a single datastore to 1. A VM cannot concurrently process multiple volumes requests in a datastore. If a datastore contains multiple volumes, request blocking of a volume will affect other volumes. Therefore, it is not recommended that a datastore contain multiple volumes."
+    },
     "applyBestPracticeTips": "There are data with 0 violations in the selected data, please select again!"
   },
   "iscsi": {
