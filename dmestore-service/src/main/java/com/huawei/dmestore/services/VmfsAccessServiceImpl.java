@@ -1951,8 +1951,8 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 parseVolumeTuning(volumeDetail, tuning);
             }
             // 存储应用类型
-            String workLoadName = getWorkLoadNameById(storageId, volumeDetail.getApplicationType());
-            volumeDetail.setApplicationType(getWorkLoadNameById(storageId, volumeDetail.getApplicationType()));
+            //String workLoadName = getWorkLoadNameById(storageId, volumeDetail.getApplicationType());
+            //volumeDetail.setApplicationType(getWorkLoadNameById(storageId, volumeDetail.getApplicationType()));
             list.add(volumeDetail);
         }
 
