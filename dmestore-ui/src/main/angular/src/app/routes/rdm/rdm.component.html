@@ -146,7 +146,7 @@
                   <th *ngIf="item.capabilities.qos != undefined
                                                 && item.capabilities.qos.enabled == true
                                                 && item.capabilities.qos.qosParam.latency != undefined">
-                    Latency= {{item.capabilities.qos.qosParam.latency}} {{item.capabilities.qos.qosParam.latencyUnit}}
+                    {{'rdm.latency' | translate}}= {{item.capabilities.qos.qosParam.latency}} {{item.capabilities.qos.qosParam.latencyUnit}}
                   </th>
                 </tr>
                 </tbody>
