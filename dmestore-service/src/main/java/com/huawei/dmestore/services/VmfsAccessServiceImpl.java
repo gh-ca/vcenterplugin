@@ -1951,8 +1951,9 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 parseVolumeTuning(volumeDetail, tuning);
             }
             // 存储应用类型
-            //String workLoadName = getWorkLoadNameById(storageId, volumeDetail.getApplicationType());
-            //volumeDetail.setApplicationType(getWorkLoadNameById(storageId, volumeDetail.getApplicationType()));
+            if (!StringUtils.isEmpty(volumeDetail.getApplicationType())) {
+                volumeDetail.setApplicationType(getWorkLoadNameById(storageId, volumeDetail.getApplicationType()));
+            }
             list.add(volumeDetail);
         }
 
@@ -1960,19 +1961,9 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
     }
     private String getWorkLoadNameById(String storageId,String workLoadType) throws DmeException {
         String name = "";
-        Map<String, String> params = new HashMap<>();
-        if (!StringUtils.isEmpty(workLoadType)) {
-            params.put("create_type", workLoadType);
-        }
-        if (!StringUtils.isEmpty(storageId)) {
+        if (!StringUtils.isEmpty(storageId) && !StringUtils.isEmpty(workLoadType)) {
             String workloadsUrl = DmeConstants.GET_WORKLOADS_URL.replace("{storage_id}", storageId);
-            LOG.info("storage workload request params:{}", gson.toJson(params));
-            ResponseEntity responseEntity = null;
-            if (params.size() != 0) {
-                responseEntity = dmeAccessService.access(workloadsUrl, HttpMethod.GET, gson.toJson(params));
-            }else {
-                responseEntity = dmeAccessService.access(workloadsUrl, HttpMethod.GET, null);
-            }
+            ResponseEntity responseEntity = dmeAccessService.access(workloadsUrl, HttpMethod.GET, null);
             if (responseEntity.getStatusCodeValue() == RestUtils.RES_STATE_I_200) {
                 JsonObject jsonObject = new JsonParser().parse(responseEntity.getBody().toString())
                     .getAsJsonObject();
@@ -1980,8 +1971,10 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                     JsonArray jsonArray = jsonObject.getAsJsonArray(DmeConstants.DATAS);
                     for (int index = 0; index < jsonArray.size(); index++) {
                         JsonObject vjson = jsonArray.get(index).getAsJsonObject();
-                        name = ToolUtils.jsonToStr(vjson.get("name"));
-                        break;
+                        if (!StringUtils.isEmpty(workLoadType) && workLoadType.equals(vjson.get("id"))) {
+                            name = ToolUtils.jsonToStr(vjson.get("name"));
+                            break;
+                        }
                     }
                 }
             } else {
