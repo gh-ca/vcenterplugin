@@ -17,6 +17,7 @@ export class AttributeComponent implements OnInit {
   selectVolName: string;
   // 卷名称集合
   volNames: string[] = [];
+  isLoading = true;
 
   constructor(private attribute: AttributeService, private cdr: ChangeDetectorRef, private gs: GlobalsService) { }
 
@@ -32,7 +33,7 @@ export class AttributeComponent implements OnInit {
   getVolumeInfoByVolID(objectId: string){
     console.log('objectId: ' + objectId);
     this.attribute.getData(objectId).subscribe((result: any) => {
-      console.log(result);
+      this.isLoading = false;
       if (result.code === '200') {
         this.volumeInfoList = result.data;
         this.volumeInfoList.forEach(item => {

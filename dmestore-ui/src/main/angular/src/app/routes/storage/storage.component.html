@@ -58,7 +58,7 @@
           <clr-dg-column [hidden]="radioCheck!=='table1'">{{'storage.list.patchVersion' | translate}}</clr-dg-column>
           <clr-dg-column [hidden]="radioCheck!=='table1'" style="width: 11rem;">{{'storage.list.location' | translate}}</clr-dg-column>
           <clr-dg-column [hidden]="radioCheck!=='table1'" style="width: 11rem;">{{'storage.list.zone' | translate}}</clr-dg-column>
-          <clr-dg-column [hidden]="radioCheck!=='table1'">{{'storage.list.wp' | translate}}</clr-dg-column>
+<!--          <clr-dg-column [hidden]="radioCheck!=='table1'">{{'storage.list.wp' | translate}}</clr-dg-column>-->
 
           <clr-dg-column #totalCapacity [hidden]="radioCheck!=='table2'" class="hideFilter" [clrDgField]="'totalCapacity'" style="position: relative" (clrDgSortedChange)="sortFunc($event);">
             {{'storage.list.rawCap' | translate}}
@@ -147,15 +147,15 @@
             <clr-dg-cell class="over_flow" title="{{item.location}}" [hidden]="radioCheck!=='table1'">
               {{item.location ? item.location:'--'}}
             </clr-dg-cell>
-            <clr-dg-cell class="over_flow" title="{{item.azIds}}" [hidden]="radioCheck!=='table1'">{{item.azIds || '--'}}</clr-dg-cell>
-            <clr-dg-cell [hidden]="radioCheck!=='table1'">
-              <span *ngIf="item.maintenanceStart || item.maintenanceOvertime">
-                {{item.maintenanceStart}}~{{item.maintenanceOvertime}}
-              </span>
-              <span *ngIf="!item.maintenanceStart && !item.maintenanceOvertime">
-                --
-              </span>
-            </clr-dg-cell>
+            <clr-dg-cell class="over_flow" title="{{item.azIds && item.azIds.length > 0 ? item.azIds:'--'}}" [hidden]="radioCheck!=='table1'">{{item.azIds && item.azIds.length > 0 ? item.azIds:'--'}}</clr-dg-cell>
+<!--            <clr-dg-cell [hidden]="radioCheck!=='table1'">-->
+<!--              <span *ngIf="item.maintenanceStart || item.maintenanceOvertime">-->
+<!--                {{item.maintenanceStart}}~{{item.maintenanceOvertime}}-->
+<!--              </span>-->
+<!--              <span *ngIf="!item.maintenanceStart && !item.maintenanceOvertime">-->
+<!--                &#45;&#45;-->
+<!--              </span>-->
+<!--            </clr-dg-cell>-->
 
             <clr-dg-cell [hidden]="radioCheck!=='table2'" style="text-align: right" >
               {{item.totalCapacity ? formatCapacity(item.totalCapacity):'--'}}
