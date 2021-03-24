@@ -7,14 +7,7 @@ import com.huawei.dmestore.entity.DmeVmwareRelation;
 import com.huawei.dmestore.exception.DmeException;
 import com.huawei.dmestore.exception.DmeSqlException;
 import com.huawei.dmestore.exception.VcenterException;
-import com.huawei.dmestore.model.AuthClient;
-import com.huawei.dmestore.model.NfsDataInfo;
-import com.huawei.dmestore.model.NfsDataStoreFsAttr;
-import com.huawei.dmestore.model.NfsDataStoreLogicPortAttr;
-import com.huawei.dmestore.model.NfsDataStoreShareAttr;
-import com.huawei.dmestore.model.Storage;
-import com.huawei.dmestore.model.StorageDetail;
-import com.huawei.dmestore.model.TaskDetailInfo;
+import com.huawei.dmestore.model.*;
 import com.huawei.dmestore.utils.ToolUtils;
 import com.huawei.dmestore.utils.VCSDKUtils;
 
@@ -33,12 +26,10 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * DmeNFSAccessServiceImpl
@@ -579,10 +570,15 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
             return relists;
         }
         Map<String, DmeVmwareRelation> dvrMap = getDvrMap(dvrlist);
+        long start = System.currentTimeMillis();
         String listStr = vcsdkUtils.getAllVmfsDataStoreInfos(ToolUtils.STORE_TYPE_NFS);
+        LOG.info("取得vcenter中的所有nfs存储时间：{}ms", System.currentTimeMillis() - start);
         if (StringUtils.isEmpty(listStr)) {
             throw new DmeException("list NFS from vcenter failed!");
         }
+
+        Map<String, NfsDataInfo> volIds = new HashMap<>();
+
         JsonArray jsonArray = new JsonParser().parse(listStr).getAsJsonArray();
         for (int index = 0; index < jsonArray.size(); index++) {
             JsonObject jo = jsonArray.get(index).getAsJsonObject();
@@ -609,13 +605,46 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
                     nfsDataInfo.setFs(dvr.getFsName());
                     nfsDataInfo.setFsId(dvr.getFsId());
                     nfsDataInfo.setObjectid(ToolUtils.jsonToStr(jo.get(OBJECTID)));
-                    getFsDetailInfo(nfsDataInfo, dvr.getFsId());
+                    volIds.put(dvr.getFsId(), nfsDataInfo);
                     relists.add(nfsDataInfo);
                 }
             }
         }
+        Iterator<String> iterator = volIds.keySet().iterator();
+        int k = 0;
+        Map<String, NfsDataInfo> tm = new HashMap<>();
+        long start1 = System.currentTimeMillis();
+        while(iterator.hasNext()){
+            k++;
+            String key = iterator.next();
+            tm.put(key, volIds.get(key));
+            if (k % 20 == 0){
+                getNfsSync(tm);
+                tm = new HashMap<>();
+            }
+        }
+        if (k % 20 > 0){
+            getNfsSync(tm);
+        }
+        LOG.info("调用nfs存储接口时间：{}ms", System.currentTimeMillis() - start1);
 
         return relists;
+    }
+
+    public synchronized void getNfsSync(Map<String, NfsDataInfo> volIds){
+        ExecutorService executorService = Executors.newFixedThreadPool(volIds.size());
+        CountDownLatch countDownLatch = new CountDownLatch(volIds.size());
+        for (Map.Entry<String, NfsDataInfo> entry: volIds.entrySet()){
+            executorService.execute(()->{
+                getFsDetailInfo(entry.getValue(), entry.getKey());
+                countDownLatch.countDown();
+            });
+        }
+        try {
+            countDownLatch.await();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     private void getFsDetailInfo(NfsDataInfo nfsDataInfo, String fsId) {

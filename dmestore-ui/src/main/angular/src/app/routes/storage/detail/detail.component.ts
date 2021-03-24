@@ -1281,7 +1281,7 @@ export class DetailComponent implements OnInit, AfterViewInit {
         this.volSortDir = "desc";
       } else {
         this.volSortDir = null;
-        return;
+        return !caObject;
       }
     }
     this.volumeCurrentPage = 1;
@@ -1299,6 +1299,7 @@ export class DetailComponent implements OnInit, AfterViewInit {
     }
     this.volReqParam = requestParams;
     this.getStorageVolumeList(true);
+    return  !caObject;
   }
 
   /**
@@ -1319,5 +1320,8 @@ export class DetailComponent implements OnInit, AfterViewInit {
     this.volSortDir = null;
     this.volSortKey = null;
     this.volReqParam = null;
+  }
+  sortFunc(obj:any) {
+    return !obj;
   }
 }

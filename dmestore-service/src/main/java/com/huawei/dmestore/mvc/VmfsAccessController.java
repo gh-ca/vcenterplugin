@@ -116,7 +116,7 @@ public class VmfsAccessController extends BaseController {
         LOG.info("accessvmfs/mountvmfs=={}", gson.toJson(params));
         String failureStr = "";
         try {
-            List<Map<String, String>> list = vmfsAccessService.mountVmfs(params);
+            List<Map<String, String>> list = vmfsAccessService.mountVmfs2(params);
             if (list.size() != 0) {
                 return failure(DmeConstants.CODE_CONNECTIVITY_FAILURE,
                     "mount vmfs failure,connectivity of host or hostgroup on dme error!", list);

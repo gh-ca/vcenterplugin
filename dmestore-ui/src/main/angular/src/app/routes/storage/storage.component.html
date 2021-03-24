@@ -60,13 +60,34 @@
           <clr-dg-column [hidden]="radioCheck!=='table1'" style="width: 11rem;">{{'storage.list.zone' | translate}}</clr-dg-column>
           <clr-dg-column [hidden]="radioCheck!=='table1'">{{'storage.list.wp' | translate}}</clr-dg-column>
 
-          <clr-dg-column [hidden]="radioCheck!=='table2'" class="hideFilter" [clrDgField]="'totalCapacity'">{{'storage.list.rawCap' | translate}}</clr-dg-column>
-          <clr-dg-column [hidden]="radioCheck!=='table2'" class="hideFilter" [clrDgField]="'totalEffectiveCapacity'">{{'storage.list.tec' | translate}}</clr-dg-column>
-          <clr-dg-column [hidden]="radioCheck!=='table2'" class="hideFilter" [clrDgField]="'totalPoolCapacity'">{{'storage.list.totalCap' | translate}}</clr-dg-column>
-          <clr-dg-column [hidden]="radioCheck!=='table2'" class="hideFilter" [clrDgField]="'usedCapacity'">{{'storage.list.usedCap' | translate}}</clr-dg-column>
-          <clr-dg-column [hidden]="radioCheck!=='table2'" class="hideFilter" [clrDgField]="'usedCapacity'" style="width: 11rem;">{{'storage.list.capUsage' | translate}}</clr-dg-column>
-          <clr-dg-column [hidden]="radioCheck!=='table2'" class="hideFilter" [clrDgField]="'freeCap'">{{'storage.list.freeCap' | translate}}</clr-dg-column>
-          <clr-dg-column [hidden]="radioCheck!=='table2'" class="hideFilter" [clrDgField]="'subscriptionCapacity'">{{'storage.list.supRate' | translate}}</clr-dg-column>
+          <clr-dg-column #totalCapacity [hidden]="radioCheck!=='table2'" class="hideFilter" [clrDgField]="'totalCapacity'" style="position: relative" (clrDgSortedChange)="sortFunc($event);">
+            {{'storage.list.rawCap' | translate}}
+            <clr-icon *ngIf="sortFunc(totalCapacity.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+          </clr-dg-column>
+          <clr-dg-column #totalEffectiveCapacity [hidden]="radioCheck!=='table2'" class="hideFilter" [clrDgField]="'totalEffectiveCapacity'" style="position: relative" (clrDgSortedChange)="sortFunc($event);">
+            {{'storage.list.tec' | translate}}
+            <clr-icon *ngIf="sortFunc(totalEffectiveCapacity.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+          </clr-dg-column>
+          <clr-dg-column #totalPoolCapacity [hidden]="radioCheck!=='table2'" class="hideFilter" [clrDgField]="'totalPoolCapacity'" style="position: relative" (clrDgSortedChange)="sortFunc($event);">
+            {{'storage.list.totalCap' | translate}}
+            <clr-icon *ngIf="sortFunc(totalPoolCapacity.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+          </clr-dg-column>
+          <clr-dg-column #usedCapacity [hidden]="radioCheck!=='table2'" class="hideFilter" [clrDgField]="'usedCapacity'" style="position: relative" (clrDgSortedChange)="sortFunc($event);">
+            {{'storage.list.usedCap' | translate}}
+            <clr-icon *ngIf="sortFunc(usedCapacity.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+          </clr-dg-column>
+          <clr-dg-column #usedCapacity2 [hidden]="radioCheck!=='table2'" class="hideFilter" [clrDgField]="'usedCapacity'" style="width: 11rem;position: relative;" (clrDgSortedChange)="sortFunc($event);">
+            {{'storage.list.capUsage' | translate}}
+            <clr-icon *ngIf="sortFunc(usedCapacity2.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+          </clr-dg-column>
+          <clr-dg-column #freeCap [hidden]="radioCheck!=='table2'" class="hideFilter" [clrDgField]="'freeCap'"  style="position: relative" (clrDgSortedChange)="sortFunc($event);">
+            {{'storage.list.freeCap' | translate}}
+            <clr-icon *ngIf="sortFunc(freeCap.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+          </clr-dg-column>
+          <clr-dg-column #subscriptionCapacity [hidden]="radioCheck!=='table2'" class="hideFilter" [clrDgField]="'subscriptionCapacity'"  style="position: relative" (clrDgSortedChange)="sortFunc($event);">
+            {{'storage.list.supRate' | translate}}
+            <clr-icon *ngIf="sortFunc(subscriptionCapacity.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+          </clr-dg-column>
 
           <clr-dg-column [hidden]="radioCheck!=='table3'">{{'storage.list.cpuUtilization' | translate}}</clr-dg-column>
           <clr-dg-column [hidden]="radioCheck!=='table3'">{{'storage.list.latency' | translate}}</clr-dg-column>
