@@ -207,7 +207,9 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             Map<String, VmfsDataInfo> volIds = new HashMap<>();
 
             // 取得vcenter中的所有vmfs存储。
+            long start = System.currentTimeMillis();
             String listStr = vcsdkUtils.getAllVmfsDataStoreInfos(DmeConstants.STORE_TYPE_VMFS);
+            LOG.info("取得vcenter中的所有vmfs存储时间：{}ms", System.currentTimeMillis() - start);
             if (!StringUtils.isEmpty(listStr)) {
                 JsonArray jsonArray = new JsonParser().parse(listStr).getAsJsonArray();
                 if (jsonArray != null && jsonArray.size() > 0) {
@@ -235,6 +237,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                     Iterator<String> iterator = volIds.keySet().iterator();
                     int k = 0;
                     Map<String, VmfsDataInfo> tm = new HashMap<>();
+                    long start1 = System.currentTimeMillis();
                     while(iterator.hasNext()){
                         k++;
                         String key = iterator.next();
@@ -247,6 +250,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                     if (k % 20 > 0){
                         getVmfsSync(tm, relists, stoNameMap);
                     }
+                    LOG.info("调用vmfs存储接口时间：{}ms", System.currentTimeMillis() - start1);
                 }
             } else {
                 LOG.info("list vmfs return empty");
