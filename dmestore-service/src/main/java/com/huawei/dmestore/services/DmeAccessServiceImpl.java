@@ -200,7 +200,7 @@ public class DmeAccessServiceImpl implements DmeAccessService {
         }
         ResponseEntity<String> responseEntity;
         try {
-            responseEntity = restTemplate.exchange(url, method, entity, String.class);
+                responseEntity = restTemplate.exchange(url, method, entity, String.class);
         } catch (HttpClientErrorException e) {
             LOG.error("HttpClientErrorException:{}", e.toString());
             responseEntity = new ResponseEntity(e.getStatusCode());

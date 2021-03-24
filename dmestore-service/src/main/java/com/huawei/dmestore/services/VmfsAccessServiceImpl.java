@@ -775,7 +775,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         String taskId = "";
         try {
             if (params != null && params.get(DmeConstants.STORAGEID) != null) {
-                Map<String, Object> requestbody = initCreateBody2(params);
+                Map<String, Object> requestbody = initCreateBody(params,"321321321");
                 ResponseEntity responseEntity = dmeAccessService.access(DmeConstants.DME_CREATE_VOLUME_UNLEVEL_URL,
                     HttpMethod.POST, gson.toJson(requestbody));
                 if (responseEntity.getStatusCodeValue() == RestUtils.RES_STATE_I_202) {
