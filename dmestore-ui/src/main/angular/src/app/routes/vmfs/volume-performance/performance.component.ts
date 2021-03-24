@@ -22,11 +22,13 @@ export class PerformanceComponent implements OnInit{
   // 创建表格对象
   // IOPS+QoS上下限
   iopsChart: EChartOption = {};
+  iopsChartDataIsNull = false;
   // 带宽+QoS上下限
   bandwidthChart: EChartOption = {};
+  bandwidthChartDataIsNull = false;
   // 响应时间+QoS下限
   latencyChart: EChartOption = {};
-
+  latencyChartDataIsNull = false;
   // obj_type_id  (卷类型ID)
   objTypeId;
   // indicator_ids 获取参数指标（上下限等） 0 上限 1下限
@@ -103,17 +105,20 @@ export class PerformanceComponent implements OnInit{
     // IOPS
     this.makePerformance.setChart(300,this.translatePipe.transform('vmfs.iops'), 'IO/s', NfsService.vmfsIOPS, volIds, this.selectRange, NfsService.vmfsUrl, this.startTime, this.endTime).then(res => {
       this.iopsChart = res;
+      this.iopsChartDataIsNull = res['series'][0].data.length < 1;
       this.cdr.detectChanges();
     });
 
     // 带宽
     this.makePerformance.setChart(300,this.translatePipe.transform('vmfs.bandwidth'), 'MB/s', NfsService.vmfsBDWT, volIds, this.selectRange, NfsService.vmfsUrl, this.startTime, this.endTime).then(res => {
       this.bandwidthChart = res;
+      this.bandwidthChartDataIsNull = res['series'][0].data.length < 1;
       this.cdr.detectChanges();
     });
     // 响应时间
     this.makePerformance.setChart(300,this.translatePipe.transform('vmfs.latency'), 'ms', NfsService.vmfsLatency, volIds, this.selectRange, NfsService.vmfsUrl, this.startTime, this.endTime).then(res => {
       this.latencyChart = res;
+      this.latencyChartDataIsNull = res['series'][0].data.length < 1;
       this.cdr.detectChanges();
     });
   }

@@ -114,8 +114,10 @@ export class DetailComponent implements OnInit, AfterViewInit {
   // 创建表格对象
   // IOPS+QoS上下限
   iopsChart: EChartOption = {};
+  iopsChartDataIsNull = false;
   // 带宽+QoS上下限
   bandwidthChart: EChartOption = {};
+  bdwtChartDataIsNull = false;
   range;
   // 定时函数执行时间 默认一天
   poolRadio = 'table1'; // 存储池列表切换
@@ -262,6 +264,7 @@ export class DetailComponent implements OnInit, AfterViewInit {
      NfsService.storageIOPS,fsNames,this.selectRange,NfsService.storageUrl, this.startTime, this.endTime).then(res=>{
      // this.gs.loading = false;
       this.iopsChart = res;
+      this.iopsChartDataIsNull = res['series'][0].data.length < 1;
       this.cdr.detectChanges();
     });
 
@@ -270,6 +273,7 @@ export class DetailComponent implements OnInit, AfterViewInit {
       NfsService.storageBDWT, fsNames, this.selectRange, NfsService.storageUrl, this.startTime, this.endTime).then(res => {
      // this.gs.loading = false;
       this.bandwidthChart = res;
+      this.bdwtChartDataIsNull = res['series'][0].data.length < 1;
       this.cdr.detectChanges();
     });
   }

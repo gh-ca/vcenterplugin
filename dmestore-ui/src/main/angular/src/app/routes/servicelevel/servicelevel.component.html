@@ -517,38 +517,80 @@
       <clr-tab>
         <button clrTabLink>{{'tier.capacity'|translate}}</button>
         <clr-tab-content *clrIfActive>
-          <div style="float:right; height: 50px;">
-            <clr-select-container style="margin-right: 50px">
-              <select clrSelect (change)="initCapacityChart(capacityRange)" [(ngModel)]="capacityRange.range">
-                <option value="LAST_1_MONTH">{{'tier.last1M'|translate}}</option>
-                <option value="LAST_3_MONTH">{{'tier.last3M'|translate}}</option>
-                <option value="LAST_6_MONTH">{{'tier.last6M'|translate}}</option>
-                <option value="LAST_1_YEAR">{{'tier.last1Y'|translate}}</option>
-              </select>
-            </clr-select-container>
+          <div style="position:relative;">
+            <div style="float:right; height: 50px;">
+              <clr-select-container style="margin-right: 50px">
+                <select clrSelect (change)="initCapacityChart(capacityRange)" [(ngModel)]="capacityRange.range">
+                  <option value="LAST_1_MONTH">{{'tier.last1M'|translate}}</option>
+                  <option value="LAST_3_MONTH">{{'tier.last3M'|translate}}</option>
+                  <option value="LAST_6_MONTH">{{'tier.last6M'|translate}}</option>
+                  <option value="LAST_1_YEAR">{{'tier.last1Y'|translate}}</option>
+                </select>
+              </clr-select-container>
+            </div>
+            <div style="margin-top: 30px;" echarts [options]="volumeCapacity"></div>
+
+            <div *ngIf="volDataIsNull" style="position: absolute;width: 100%;top: 15%;">
+              <span style="color: #b3b3b3;display: inline-block;width: 100%;text-align: center;font-size: 20px;font-weight: 600;">
+                <clr-icon shape="info-standard" class="is-warning" size="20"></clr-icon>&nbsp;{{'tips.noData' | translate}}
+              </span>
+            </div>
+
+            <div style="margin-top: 30px;" echarts [options]="storagePoolCapacity"></div>
+
+            <div *ngIf="storagePoolDataIsNull" style="position: absolute;width: 100%;top: 70%;">
+              <span style="color: #b3b3b3;display: inline-block;width: 100%;text-align: center;font-size: 20px;font-weight: 600;">
+                <clr-icon shape="info-standard" class="is-warning" size="20"></clr-icon>&nbsp;{{'tips.noData' | translate}}
+              </span>
+            </div>
           </div>
-          <div style="margin-top: 50px" echarts [options]="volumeCapacity"></div>
-          <div style="margin-top: 30px" echarts [options]="storagePoolCapacity"></div>
         </clr-tab-content>
       </clr-tab>
       <clr-tab>
         <button clrTabLink>{{'tier.performance'|translate}}</button>
         <clr-tab-content *clrIfActive>
-          <div style="float:right; height: 50px;">
-            <clr-select-container style="margin-right: 50px">
-              <select clrSelect (change)="initChart(range)"  [(ngModel)]="range.range">
-                <option value="LAST_1_DAY">{{'tier.last1D'|translate}}</option>
-                <option value="LAST_1_WEEK">{{'tier.last1W'|translate}}</option>
-                <option value="LAST_1_MONTH">{{'tier.last1M'|translate}}</option>
-                <option value="LAST_1_YEAR">{{'tier.last1Y'|translate}}</option>
-              </select>
-            </clr-select-container>
+          <div style="position:relative;">
+            <div style="float:right; height: 50px;">
+              <clr-select-container style="margin-right: 50px">
+                <select clrSelect (change)="initChart(range)"  [(ngModel)]="range.range">
+                  <option value="LAST_1_DAY">{{'tier.last1D'|translate}}</option>
+                  <option value="LAST_1_WEEK">{{'tier.last1W'|translate}}</option>
+                  <option value="LAST_1_MONTH">{{'tier.last1M'|translate}}</option>
+                  <option value="LAST_1_YEAR">{{'tier.last1Y'|translate}}</option>
+                </select>
+              </clr-select-container>
+            </div>
+            <div style="margin-top: 50px" echarts [options]="volumeMaxResponseTime"></div>
+            <div style="margin-top: 30px" echarts [options]="volumeDensity"></div>
+            <div style="margin-top: 30px" echarts [options]="volumeThroughput"></div>
+            <div style="margin-top: 30px" echarts [options]="volumeBandwidth"></div>
+            <div style="margin-top: 30px" echarts [options]="storagePoolDensity"></div>
+            <div *ngIf="volMaxDataIsNull" style="position: absolute;width: 100%;top: 7%;">
+              <span style="color: #b3b3b3;display: inline-block;width: 100%;text-align: center;font-size: 20px;font-weight: 600;">
+                <clr-icon shape="info-standard" class="is-warning" size="20"></clr-icon>&nbsp;{{'tips.noData' | translate}}
+              </span>
+            </div>
+            <div *ngIf="volDenDataIsNull" style="position: absolute;width: 100%;top: 27%;">
+              <span style="color: #b3b3b3;display: inline-block;width: 100%;text-align: center;font-size: 20px;font-weight: 600;">
+                <clr-icon shape="info-standard" class="is-warning" size="20"></clr-icon>&nbsp;{{'tips.noData' | translate}}
+              </span>
+            </div>
+            <div *ngIf="volThrDataIsNull" style="position: absolute;width: 100%;top: 47%;">
+              <span style="color: #b3b3b3;display: inline-block;width: 100%;text-align: center;font-size: 20px;font-weight: 600;">
+                <clr-icon shape="info-standard" class="is-warning" size="20"></clr-icon>&nbsp;{{'tips.noData' | translate}}
+              </span>
+            </div>
+            <div *ngIf="volBDWTDataIsNull" style="position: absolute;width: 100%;top: 67%;">
+              <span style="color: #b3b3b3;display: inline-block;width: 100%;text-align: center;font-size: 20px;font-weight: 600;">
+                <clr-icon shape="info-standard" class="is-warning" size="20"></clr-icon>&nbsp;{{'tips.noData' | translate}}
+              </span>
+            </div>
+            <div *ngIf="storagePoolDenDataIsNull" style="position: absolute;width: 100%;top: 87%;">
+              <span style="color: #b3b3b3;display: inline-block;width: 100%;text-align: center;font-size: 20px;font-weight: 600;">
+                <clr-icon shape="info-standard" class="is-warning" size="20"></clr-icon>&nbsp;{{'tips.noData' | translate}}
+              </span>
+            </div>
           </div>
-          <div style="margin-top: 50px" echarts [options]="volumeMaxResponseTime"></div>
-          <div style="margin-top: 30px" echarts [options]="volumeDensity"></div>
-          <div style="margin-top: 30px" echarts [options]="volumeThroughput"></div>
-          <div style="margin-top: 30px" echarts [options]="volumeBandwidth"></div>
-          <div style="margin-top: 30px" echarts [options]="storagePoolDensity"></div>
         </clr-tab-content>
       </clr-tab>
       <clr-tab>

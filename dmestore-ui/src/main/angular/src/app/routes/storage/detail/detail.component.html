@@ -288,7 +288,7 @@
 <!--                      </clr-dg-column>-->
                       <clr-dg-column [hidden]="volumeRadio!=='table1'">{{'storage.detail.volumes.dataStore' | translate}}</clr-dg-column>
 
-                      <clr-dg-column #volLatency class="hideFilter" [clrDgField]="'lantency'" [hidden]="volumeRadio!=='table2'" style="position: relative" (clrDgSortedChange)="sortFunc($event);">
+                      <clr-dg-column #volLatency class="hideFilter" [clrDgField]="'lantency'" [hidden]="volumeRadio!=='table2'" style="min-width: 9rem;position: relative" (clrDgSortedChange)="sortFunc($event);">
                         {{'storage.detail.volumes.latency' | translate}}
                         <clr-icon *ngIf="sortFunc(volLatency.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
                       </clr-dg-column>
@@ -365,7 +365,7 @@
                           {{item.datastores ? item.datastores:'--'}}
                         </clr-dg-cell>
 
-                        <clr-dg-cell [hidden]="volumeRadio!=='table2'" style="text-align: right">{{item.lantency!=null?item.lantency.toFixed(2):'--'}}</clr-dg-cell>
+                        <clr-dg-cell [hidden]="volumeRadio!=='table2'" style="text-align: right;min-width: 9rem;">{{item.lantency!=null?item.lantency.toFixed(2):'--'}}</clr-dg-cell>
                         <clr-dg-cell [hidden]="volumeRadio!=='table2'" style="text-align: right">{{item.iops!=null?item.iops.toFixed(2):'--'}}</clr-dg-cell>
                         <clr-dg-cell [hidden]="volumeRadio!=='table2'" style="text-align: right">{{item.bandwith!=null?item.bandwith.toFixed(2):'--'}}</clr-dg-cell>
                       </clr-dg-row>
@@ -814,28 +814,41 @@
           <button  clrTabLink>{{'storage.detail.performance.performance' | translate}}</button>
           <clr-tab-content clrTabLinkInOverflow="true">
             <div style="margin-bottom: 1%;font-size: 5px">{{'storage.detail.performance.ptc' | translate}}</div>
-            <div style="float: right;">
-              <table cellpadding="5" >
-                <tr>
-                  <td>
-                    <clr-select-container>
-                      <select clrSelect (ngModelOptions)="ranges" [(ngModel)]="selectRange" name="defaultSelect" class="clr-select" (change)="changeFunc()">
-                        <option value="LAST_5_MINUTE">{{'chart.select.last5Minute'|translate}}</option>
-                        <option value="LAST_1_HOUR">{{'chart.select.last1Hour'|translate}}</option>
-                        <option value="LAST_1_DAY">{{'chart.select.last1Day'|translate}}</option>
-                        <option value="LAST_1_WEEK">{{'chart.select.last1Week'|translate}}</option>
-                        <option value="LAST_1_MONTH">{{'chart.select.last1Month'|translate}}</option>
-                        <option value="LAST_1_QUARTER">{{'chart.select.last1Quarter'|translate}}</option>
-                        <option value="HALF_1_YEAR">{{'chart.select.half1Year'|translate}}</option>
-                        <option value="LAST_1_YEAR">{{'chart.select.last1Year'|translate}}</option>
-                      </select>
-                    </clr-select-container>
-                  </td>
-                </tr>
-              </table>
+            <div style="position:relative;">
+              <div style="float: right;">
+                <table cellpadding="5" >
+                  <tr>
+                    <td>
+                      <clr-select-container>
+                        <select clrSelect (ngModelOptions)="ranges" [(ngModel)]="selectRange" name="defaultSelect" class="clr-select" (change)="changeFunc()">
+                          <option value="LAST_5_MINUTE">{{'chart.select.last5Minute'|translate}}</option>
+                          <option value="LAST_1_HOUR">{{'chart.select.last1Hour'|translate}}</option>
+                          <option value="LAST_1_DAY">{{'chart.select.last1Day'|translate}}</option>
+                          <option value="LAST_1_WEEK">{{'chart.select.last1Week'|translate}}</option>
+                          <option value="LAST_1_MONTH">{{'chart.select.last1Month'|translate}}</option>
+                          <option value="LAST_1_QUARTER">{{'chart.select.last1Quarter'|translate}}</option>
+                          <option value="HALF_1_YEAR">{{'chart.select.half1Year'|translate}}</option>
+                          <option value="LAST_1_YEAR">{{'chart.select.last1Year'|translate}}</option>
+                        </select>
+                      </clr-select-container>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+              <div echarts [options]="iopsChart" style="height: 300px;"></div>
+              <div echarts [options]="bandwidthChart" style="height: 300px;"></div>
+
+              <div *ngIf="iopsChartDataIsNull" style="position: absolute;width: 100%;top: 15%;">
+                <span style="color: #b3b3b3;display: inline-block;width: 100%;text-align: center;font-size: 20px;font-weight: 600;">
+                  <clr-icon shape="info-standard" class="is-warning" size="20"></clr-icon>&nbsp;{{'tips.noData' | translate}}
+                </span>
+              </div>
+              <div *ngIf="bdwtChartDataIsNull" style="position: absolute;width: 100%;top: 64%;">
+                <span style="color: #b3b3b3;display: inline-block;width: 100%;text-align: center;font-size: 20px;font-weight: 600;">
+                  <clr-icon shape="info-standard" class="is-warning" size="20"></clr-icon>&nbsp;{{'tips.noData' | translate}}
+                </span>
+              </div>
             </div>
-            <div echarts [options]="iopsChart" style="height: 300px;"></div>
-            <div echarts [options]="bandwidthChart" style="height: 300px;"></div>
           </clr-tab-content>
         </clr-tab>
         <clr-tab>
@@ -1319,8 +1332,8 @@
                                 </clr-dg-cell>
                                 <clr-dg-cell class="over_flow">{{item.currentPortName!=null?item.currentPortName:'--'}}</clr-dg-cell>
                                 <clr-dg-cell class="over_flow">
-                                  <span *ngIf="item.role == '1'">{{'enum.status.service' | translate}}</span>
-                                  <span *ngIf="item.role == '2'">{{'enum.status.management' | translate}}</span>
+                                  <span *ngIf="item.role == '1'">{{'enum.status.management' | translate}}</span>
+                                  <span *ngIf="item.role == '2'">{{'enum.status.service' | translate}}</span>
                                   <span *ngIf="item.role == '3'">{{'enum.status.managementAndService' | translate}}</span>
                                   <span *ngIf="item.role != '1' && item.role != '2' && item.role != '3'">--</span>
                                 </clr-dg-cell>
