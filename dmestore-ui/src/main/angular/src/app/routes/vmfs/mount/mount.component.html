@@ -23,8 +23,14 @@
           <clr-dg-column hidden>objectId</clr-dg-column>
           <clr-dg-column [clrDgField]="'name'">{{'vmfs.name' | translate}}</clr-dg-column>
           <clr-dg-column>{{'vmfs.type' | translate}}</clr-dg-column>
-          <clr-dg-column class="hideFilter" [clrDgField]="'capacity'">{{'vmfs.capacity' | translate}}</clr-dg-column>
-          <clr-dg-column class="hideFilter" [clrDgField]="'freeSpace'">{{'vmfs.freeSpace' | translate}}</clr-dg-column>
+          <clr-dg-column #capacity class="hideFilter" [clrDgField]="'capacity'" style="position: relative" (clrDgSortedChange)="sortFunc($event);">
+            {{'vmfs.capacity' | translate}}
+            <clr-icon *ngIf="sortFunc(capacity.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+          </clr-dg-column>
+          <clr-dg-column #freeSpace class="hideFilter" [clrDgField]="'freeSpace'" style="position: relative" (clrDgSortedChange)="sortFunc($event);">
+            {{'vmfs.freeSpace' | translate}}
+            <clr-icon *ngIf="sortFunc(freeSpace.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+          </clr-dg-column>
           <clr-dg-placeholder>{{'vmfs.listNullTips' | translate}}</clr-dg-placeholder>
           <clr-dg-row *clrDgItems="let item of dataStores" [clrDgItem]="item">
             <clr-dg-cell hidden>{{item.id}}</clr-dg-cell>

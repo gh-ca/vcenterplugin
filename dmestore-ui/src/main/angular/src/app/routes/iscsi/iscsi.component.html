@@ -23,64 +23,56 @@
       <ng-container>
         <clr-datagrid [(clrDgSelected)]="configModel.ethPorts"  [clrDgLoading]="portLoading">
 
-          <clr-dg-column #location [clrDgField]="'location'" style="position: relative" (clrDgSortedChange)="sortFunc($event);">
+          <clr-dg-column #location [clrDgField]="'location'">
             <ng-container *clrDgHideableColumn="{hidden: false}" >
               {{'iscsi.location' | translate}}
-              <clr-icon *ngIf="sortFunc(location.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
             </ng-container>
           </clr-dg-column>
-          <clr-dg-column #portName [clrDgField]="'portName'" style="position: relative" (clrDgSortedChange)="sortFunc($event);">
+          <clr-dg-column #portName [clrDgField]="'portName'">
             <ng-container *clrDgHideableColumn="{hidden: false}" >
               {{'iscsi.portName' | translate}}
-              <clr-icon *ngIf="sortFunc(portName.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
             </ng-container>
           </clr-dg-column>
-          <clr-dg-column #mac [clrDgField]="'mac'" style="position: relative" (clrDgSortedChange)="sortFunc($event);">
+          <clr-dg-column #mac [clrDgField]="'mac'">
             <ng-container *clrDgHideableColumn="{hidden: false}" >
               {{'iscsi.mac' | translate}}
-              <clr-icon *ngIf="sortFunc(mac.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
             </ng-container>
           </clr-dg-column>
-          <clr-dg-column #maxSpeed [clrDgField]="'maxSpeed'" style="position: relative" (clrDgSortedChange)="sortFunc($event);">
+          <clr-dg-column #maxSpeed [clrDgField]="'maxSpeed'" style="position: relative;min-width: 10rem" (clrDgSortedChange)="sortFunc($event);">
             <ng-container *clrDgHideableColumn="{hidden: false}" >
               {{'iscsi.maxSpeed' | translate}}
               <clr-icon *ngIf="sortFunc(maxSpeed.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
             </ng-container>
           </clr-dg-column>
-          <clr-dg-column #mgmtIp [clrDgField]="'mgmtIp'" style="position: relative" (clrDgSortedChange)="sortFunc($event);">
+          <clr-dg-column #mgmtIp [clrDgField]="'mgmtIp'">
             <ng-container *clrDgHideableColumn="{hidden: false}" >
               {{'iscsi.ip4' | translate}}
-              <clr-icon *ngIf="sortFunc(mgmtIp.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
             </ng-container>
           </clr-dg-column>
-          <clr-dg-column #mgmtIpv6 [clrDgField]="'mgmtIpv6'" style="position: relative" (clrDgSortedChange)="sortFunc($event);">
+          <clr-dg-column #mgmtIpv6 [clrDgField]="'mgmtIpv6'">
             <ng-container *clrDgHideableColumn="{hidden: false}" >
               {{'iscsi.ip6' | translate}}
-              <clr-icon *ngIf="sortFunc(mgmtIpv6.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
             </ng-container>
           </clr-dg-column>
-          <clr-dg-column #speed class="hideFilter" [clrDgField]="'speed'" style="position: relative" (clrDgSortedChange)="sortFunc($event);">
+          <clr-dg-column #speed class="hideFilter" [clrDgField]="'speed'" style="position: relative;min-width: 9rem" (clrDgSortedChange)="sortFunc($event);">
             <ng-container *clrDgHideableColumn="{hidden: false}" >
               {{'iscsi.speed' | translate}}
               <clr-icon *ngIf="sortFunc(speed.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
             </ng-container>
           </clr-dg-column>
-          <clr-dg-column #status [clrDgField]="'status'" style="position: relative" (clrDgSortedChange)="sortFunc($event);">
+          <clr-dg-column #status [clrDgField]="'status'">
             <ng-container *clrDgHideableColumn="{hidden: false}" >
               {{'iscsi.hStatus' | translate}}
-              <clr-icon *ngIf="sortFunc(status.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
             </ng-container>
           </clr-dg-column>
-          <clr-dg-column #connectStatusType class="hideFilter" [clrDgField]="'connectStatusType'" style="position: relative" (clrDgSortedChange)="sortFunc($event);">
+          <clr-dg-column #connectStatusType class="hideFilter" [clrDgField]="'connectStatusType'">
             <ng-container *clrDgHideableColumn="{hidden: false}" >
               {{'iscsi.cStatus' | translate}}
-              <clr-icon *ngIf="sortFunc(connectStatusType.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
             </ng-container>
           </clr-dg-column>
-          <clr-dg-column #connectStatusType2 class="hideFilter" [clrDgField]="'connectStatusType'" style="position: relative" (clrDgSortedChange)="sortFunc($event);">
+          <clr-dg-column #connectStatusType2 class="hideFilter" [clrDgField]="'connectStatusType'">
             <ng-container *clrDgHideableColumn="{hidden: false}" >
               {{'iscsi.cStatusType' | translate}}
-              <clr-icon *ngIf="sortFunc(connectStatusType2.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
             </ng-container>
           </clr-dg-column>
 
@@ -92,7 +84,7 @@
               <span *ngIf="item.mac == ''">--</span>
               <span *ngIf="item.mac != ''">{{item.mac}}</span>
             </clr-dg-cell>
-            <clr-dg-cell style="text-align: right">
+            <clr-dg-cell style="text-align: right;min-width: 10rem">
               <span *ngIf="item.maxSpeed == -1">--</span>
               <span *ngIf="item.maxSpeed != -1">{{item.maxSpeed}}</span>
             </clr-dg-cell>
@@ -104,7 +96,7 @@
               <span *ngIf="item.mgmtIpv6 == ''">--</span>
               <span *ngIf="item.mgmtIpv6 != ''">{{item.mgmtIpv6}}</span>
             </clr-dg-cell>
-            <clr-dg-cell style="text-align: right">
+            <clr-dg-cell style="text-align: right;min-width: 9rem">
               <span *ngIf="item.speed == -1">--</span>
               <span *ngIf="item.speed != -1">{{item.speed}}</span>
             </clr-dg-cell>

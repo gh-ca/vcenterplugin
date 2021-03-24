@@ -284,10 +284,22 @@
                 </clr-dg-filter>
               </clr-dg-column>
 
-              <clr-dg-column [hidden]="storagePoolRadioCheck!=='capacity'" class="hideFilter" [clrDgField]="'totalCapacity'">{{'tier.total'|translate}}</clr-dg-column>
-              <clr-dg-column [hidden]="storagePoolRadioCheck!=='capacity'" class="hideFilter" [clrDgField]="'consumedCapacity'">{{'tier.used'|translate}}</clr-dg-column>
-              <clr-dg-column [hidden]="storagePoolRadioCheck!=='capacity'" class="hideFilter" [clrDgField]="'usedCapacity'">{{'tier.usage'|translate}}</clr-dg-column>
-              <clr-dg-column [hidden]="storagePoolRadioCheck!=='capacity'" class="hideFilter" [clrDgField]="'freeCapacity'">{{'tier.free'|translate}}</clr-dg-column>
+              <clr-dg-column #poolTotalCapacity [hidden]="storagePoolRadioCheck!=='capacity'" class="hideFilter" [clrDgField]="'totalCapacity'" style="position: relative" (clrDgSortedChange)="sortFunc($event);">
+                {{'tier.total'|translate}}
+                <clr-icon *ngIf="sortFunc(poolTotalCapacity.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+              </clr-dg-column>
+              <clr-dg-column  #poolConsumedCapacity [hidden]="storagePoolRadioCheck!=='capacity'" class="hideFilter" [clrDgField]="'consumedCapacity'" style="position: relative" (clrDgSortedChange)="sortFunc($event);">
+                {{'tier.used'|translate}}
+                <clr-icon *ngIf="sortFunc(poolConsumedCapacity.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+              </clr-dg-column>
+              <clr-dg-column #poolUsedCapacity [hidden]="storagePoolRadioCheck!=='capacity'" class="hideFilter" [clrDgField]="'usedCapacity'" style="position: relative" (clrDgSortedChange)="sortFunc($event);">
+                {{'tier.usage'|translate}}
+                <clr-icon *ngIf="sortFunc(poolUsedCapacity.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+              </clr-dg-column>
+              <clr-dg-column #poolFreeCapacity [hidden]="storagePoolRadioCheck!=='capacity'" class="hideFilter" [clrDgField]="'freeCapacity'" style="position: relative" (clrDgSortedChange)="sortFunc($event);">
+                {{'tier.free'|translate}}
+                <clr-icon *ngIf="sortFunc(poolFreeCapacity.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+              </clr-dg-column>
 
               <clr-dg-column [hidden]="storagePoolRadioCheck!=='performance'" [clrDgField]="'runningStatus'">
                 {{'tier.status'|translate}}
@@ -295,9 +307,18 @@
                   <sl-sp-status-filter #runningStatusFilter></sl-sp-status-filter>
                 </clr-dg-filter>
               </clr-dg-column>
-              <clr-dg-column [hidden]="storagePoolRadioCheck!=='performance'" class="hideFilter" [clrDgField]="'latency'">{{'tier.latencyms'|translate}}</clr-dg-column>
-              <clr-dg-column [hidden]="storagePoolRadioCheck!=='performance'" class="hideFilter" [clrDgField]="'iops'">IOPS</clr-dg-column>
-              <clr-dg-column [hidden]="storagePoolRadioCheck!=='performance'" class="hideFilter" [clrDgField]="'bandwidth'">{{'tier.bandwidthm'|translate}}</clr-dg-column>
+              <clr-dg-column #poolLatency [hidden]="storagePoolRadioCheck!=='performance'" class="hideFilter" [clrDgField]="'latency'" style="position: relative" (clrDgSortedChange)="sortFunc($event);">
+                {{'tier.latencyms'|translate}}
+                <clr-icon *ngIf="sortFunc(poolLatency.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+              </clr-dg-column>
+              <clr-dg-column #poolIOPS [hidden]="storagePoolRadioCheck!=='performance'" class="hideFilter" [clrDgField]="'iops'" style="position: relative" (clrDgSortedChange)="sortFunc($event);">
+                IOPS
+                <clr-icon *ngIf="sortFunc(poolIOPS.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+              </clr-dg-column>
+              <clr-dg-column #poolBandwidth [hidden]="storagePoolRadioCheck!=='performance'" class="hideFilter" [clrDgField]="'bandwidth'" style="position: relative" (clrDgSortedChange)="sortFunc($event);">
+                {{'tier.bandwidthm'|translate}}
+                <clr-icon *ngIf="sortFunc(poolBandwidth.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+              </clr-dg-column>
               <clr-dg-placeholder>{{'tips.noData' | translate}}</clr-dg-placeholder>
               <clr-dg-row *clrDgItems="let item of storagePoolList" [clrDgItem]="item">
 
@@ -406,13 +427,28 @@
                 <lun-status-filter #lunStatusFilter></lun-status-filter>
               </clr-dg-filter>
             </clr-dg-column>
-            <clr-dg-column [hidden]="volumeRadioCheck!=='basic'" class="hideFilter" [clrDgField]="'capacity'">{{'tier.total'|translate}}</clr-dg-column>
+            <clr-dg-column #lunCapacity [hidden]="volumeRadioCheck!=='basic'" class="hideFilter" [clrDgField]="'capacity'" style="position: relative" (clrDgSortedChange)="sortFunc($event);">
+              {{'tier.total'|translate}}
+              <clr-icon *ngIf="sortFunc(lunCapacity.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+            </clr-dg-column>
             <clr-dg-column [hidden]="volumeRadioCheck!=='basic'" [clrDgField]="'alloctype'">{{'tier.alloctype'|translate}}</clr-dg-column>
-            <clr-dg-column [hidden]="volumeRadioCheck!=='basic'" class="hideFilter" [clrDgField]="'capacityUsage'">{{'tier.used'|translate}}</clr-dg-column>
+            <clr-dg-column #lunCapacityUsage [hidden]="volumeRadioCheck!=='basic'" class="hideFilter" [clrDgField]="'capacityUsage'" style="position: relative" (clrDgSortedChange)="sortFunc($event);">
+              {{'tier.used'|translate}}
+              <clr-icon *ngIf="sortFunc(lunCapacityUsage.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+            </clr-dg-column>
 
-            <clr-dg-column [hidden]="volumeRadioCheck!=='performance'" class="hideFilter" [clrDgField]="'latency'">{{'tier.latencyms'|translate}}</clr-dg-column>
-            <clr-dg-column [hidden]="volumeRadioCheck!=='performance'" class="hideFilter" [clrDgField]="'iops'">IOPS</clr-dg-column>
-            <clr-dg-column [hidden]="volumeRadioCheck!=='performance'" class="hideFilter" [clrDgField]="'bandwidth'">{{'tier.bandwidthm'|translate}}</clr-dg-column>
+            <clr-dg-column #lunLatency [hidden]="volumeRadioCheck!=='performance'" class="hideFilter" [clrDgField]="'latency'" style="position: relative" (clrDgSortedChange)="sortFunc($event);">
+              {{'tier.latencyms'|translate}}
+              <clr-icon *ngIf="sortFunc(lunLatency.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+            </clr-dg-column>
+            <clr-dg-column #lunIOPS [hidden]="volumeRadioCheck!=='performance'" class="hideFilter" [clrDgField]="'iops'" style="position: relative" (clrDgSortedChange)="sortFunc($event);">
+              IOPS
+              <clr-icon *ngIf="sortFunc(lunIOPS.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+            </clr-dg-column>
+            <clr-dg-column #lunBandwidth [hidden]="volumeRadioCheck!=='performance'" class="hideFilter" [clrDgField]="'bandwidth'" style="position: relative" (clrDgSortedChange)="sortFunc($event);">
+              {{'tier.bandwidthm'|translate}}
+              <clr-icon *ngIf="sortFunc(lunBandwidth.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+            </clr-dg-column>
             <clr-dg-placeholder>{{'tips.noData' | translate}}</clr-dg-placeholder>
             <clr-dg-row *clrDgItems="let item of volumeList" [clrDgItem]="item">
 
