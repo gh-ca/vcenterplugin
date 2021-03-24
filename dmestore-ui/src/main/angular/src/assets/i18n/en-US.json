@@ -669,7 +669,7 @@
     "storage1": "Storage/Storage Pool",
     "storage": "Storage Device",
     "sPool": "Storage Pool",
-    "dataStore": "DataStore",
+    "dataStore": "Location",
     "ownerC": "Owner Controller",
     "idp": "Initial Distribute Policy",
     "fetchP": "Prefetch Policy",

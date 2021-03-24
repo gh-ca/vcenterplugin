@@ -113,15 +113,39 @@
                       <clr-dg-column style="width: 250px" [hidden]="poolRadio!=='table1'" [clrDgField]="'serviceLevelName'">{{'storage.detail.storagePool.serviceLevel' | translate}}</clr-dg-column>
                       <clr-dg-column [hidden]="poolRadio!=='table1'" [clrDgField]="'raidLevel'">{{'storage.detail.storagePool.raidLevel' | translate}}</clr-dg-column>
 
-                      <clr-dg-column [hidden]="poolRadio!=='table2'" class="hideFilter" [clrDgField]="'totalCapacity'">{{'storage.detail.storagePool.totalCap' | translate}}</clr-dg-column>
-                      <clr-dg-column [hidden]="poolRadio!=='table2'" class="hideFilter" [clrDgField]="'consumedCapacity'">{{'storage.detail.storagePool.usedCap' | translate}}</clr-dg-column>
-                      <clr-dg-column [hidden]="poolRadio!=='table2'" class="hideFilter" [clrDgField]="'capUsage'" style="width: 11rem;">{{'storage.detail.storagePool.capUsage' | translate}}</clr-dg-column>
-                      <clr-dg-column [hidden]="poolRadio!=='table2'" class="hideFilter" [clrDgField]="'freeCapacity'">{{'storage.detail.storagePool.freeCap' | translate}}</clr-dg-column>
-                      <clr-dg-column [hidden]="poolRadio!=='table2'" class="hideFilter" [clrDgField]="'supRate'">{{'storage.detail.storagePool.supRate' | translate}}</clr-dg-column>
+                      <clr-dg-column #poolTotalCap [hidden]="poolRadio!=='table2'" class="hideFilter" [clrDgField]="'totalCapacity'" style="position: relative" (clrDgSortedChange)="sortFunc($event);">
+                        {{'storage.detail.storagePool.totalCap' | translate}}
+                        <clr-icon *ngIf="sortFunc(poolTotalCap.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+                      </clr-dg-column>
+                      <clr-dg-column #poolUsedCap [hidden]="poolRadio!=='table2'" class="hideFilter" [clrDgField]="'consumedCapacity'" style="position: relative" (clrDgSortedChange)="sortFunc($event);">
+                        {{'storage.detail.storagePool.usedCap' | translate}}
+                        <clr-icon *ngIf="sortFunc(poolUsedCap.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+                      </clr-dg-column>
+                      <clr-dg-column #poolCapUsage [hidden]="poolRadio!=='table2'" class="hideFilter" [clrDgField]="'capUsage'" style="width: 11rem;position: relative"(clrDgSortedChange)="sortFunc($event);">
+                        {{'storage.detail.storagePool.capUsage' | translate}}
+                        <clr-icon *ngIf="sortFunc(poolCapUsage.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+                      </clr-dg-column>
+                      <clr-dg-column #poolFreeCap [hidden]="poolRadio!=='table2'" class="hideFilter" [clrDgField]="'freeCapacity'" style="position: relative" (clrDgSortedChange)="sortFunc($event);">
+                        {{'storage.detail.storagePool.freeCap' | translate}}
+                        <clr-icon *ngIf="sortFunc(poolFreeCap.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+                      </clr-dg-column>
+                      <clr-dg-column #poolSupRate [hidden]="poolRadio!=='table2'" class="hideFilter" [clrDgField]="'supRate'" style="position: relative" (clrDgSortedChange)="sortFunc($event);">
+                        {{'storage.detail.storagePool.supRate' | translate}}
+                        <clr-icon *ngIf="sortFunc(poolSupRate.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+                      </clr-dg-column>
 
-                      <clr-dg-column class="hideFilter" [clrDgField]="'maxLatency'" [hidden]="poolRadio!=='table3'">{{'storage.detail.storagePool.latency' | translate}}</clr-dg-column>
-                      <clr-dg-column class="hideFilter" [clrDgField]="'maxIops'" [hidden]="poolRadio!=='table3'">{{'storage.detail.storagePool.iops' | translate}}</clr-dg-column>
-                      <clr-dg-column class="hideFilter" [clrDgField]="'maxBandwidth'" [hidden]="poolRadio!=='table3'">{{'storage.detail.storagePool.bandwidth' | translate}}</clr-dg-column>
+                      <clr-dg-column #poolLatency class="hideFilter" [clrDgField]="'maxLatency'" [hidden]="poolRadio!=='table3'" style="min-width: 9rem;position: relative" (clrDgSortedChange)="sortFunc($event);">
+                        {{'storage.detail.storagePool.latency' | translate}}
+                        <clr-icon *ngIf="sortFunc(poolLatency.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+                      </clr-dg-column>
+                      <clr-dg-column #poolIops class="hideFilter" [clrDgField]="'maxIops'" [hidden]="poolRadio!=='table3'" style="position: relative" (clrDgSortedChange)="sortFunc($event);">
+                        {{'storage.detail.storagePool.iops' | translate}}
+                        <clr-icon *ngIf="sortFunc(poolIops.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+                      </clr-dg-column>
+                      <clr-dg-column #poolBandwidth class="hideFilter" [clrDgField]="'maxBandwidth'" [hidden]="poolRadio!=='table3'" style="position: relative" (clrDgSortedChange)="sortFunc($event);">
+                        {{'storage.detail.storagePool.bandwidth' | translate}}
+                        <clr-icon *ngIf="sortFunc(poolBandwidth.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+                      </clr-dg-column>
 
                       <clr-dg-placeholder>{{'tips.noData' | translate}}</clr-dg-placeholder>
 
@@ -176,7 +200,7 @@
                           <span *ngIf="!item.subscribedCapacity">--</span>
                         </clr-dg-cell>
 
-                        <clr-dg-cell [hidden]="poolRadio!=='table3'" style="text-align: right">{{item.maxLatency!=null?item.maxLatency.toFixed(2):'--'}}</clr-dg-cell>
+                        <clr-dg-cell [hidden]="poolRadio!=='table3'" style="text-align: right;min-width: 9rem;">{{item.maxLatency!=null?item.maxLatency.toFixed(2):'--'}}</clr-dg-cell>
                         <clr-dg-cell [hidden]="poolRadio!=='table3'" style="text-align: right">{{item.maxIops!=null?item.maxIops.toFixed(1):'--'}}</clr-dg-cell>
                         <clr-dg-cell [hidden]="poolRadio!=='table3'" style="text-align: right">{{item.maxBandwidth!=null?item.maxBandwidth.toFixed(1):'--'}}</clr-dg-cell>
                       </clr-dg-row>
@@ -224,14 +248,20 @@
                         </clr-dg-filter>
                       </clr-dg-column>
 
-                      <clr-dg-column class="hideFilter" [clrDgField]="'capacity'" (clrDgSortOrderChange)="volQueryChange(null, $event, null)" [hidden]="volumeRadio!=='table1'">{{'storage.detail.volumes.totalCap' | translate}}</clr-dg-column>
+                      <clr-dg-column #volTotalCap class="hideFilter" [clrDgField]="'capacity'" (clrDgSortOrderChange)="volQueryChange(null, $event, null)" [hidden]="volumeRadio!=='table1'" style="position: relative">
+                        {{'storage.detail.volumes.totalCap' | translate}}
+                        <clr-icon *ngIf="sortFunc(volTotalCap.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+                      </clr-dg-column>
                       <clr-dg-column [hidden]="volumeRadio!=='table1'">
                         {{'storage.detail.volumes.proType' | translate}}
                         <clr-dg-filter [clrDgFilter]="portTypeFilter">
                           <por-type-filter #portTypeFilter (change)="volQueryChange(null, null, null);"></por-type-filter>
                         </clr-dg-filter>
                       </clr-dg-column>
-                      <clr-dg-column class="hideFilter" [clrDgField]="'capacityUsageNum'" [hidden]="volumeRadio!=='table1'" style="width: 11rem;">{{'storage.detail.volumes.capUsage' | translate}}</clr-dg-column>
+                      <clr-dg-column #volCapUsage class="hideFilter" [clrDgField]="'capacityUsageNum'" [hidden]="volumeRadio!=='table1'" style="width: 11rem;position: relative;" (clrDgSortedChange)="sortFunc($event);">
+                        {{'storage.detail.volumes.capUsage' | translate}}
+                        <clr-icon *ngIf="sortFunc(volCapUsage.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+                      </clr-dg-column>
                       <clr-dg-column [hidden]="volumeRadio!=='table1'">
                         {{'storage.detail.volumes.mapStatus' | translate}}
                         <clr-dg-filter [clrDgFilter]="mapStatusFilter">
@@ -258,9 +288,18 @@
 <!--                      </clr-dg-column>-->
                       <clr-dg-column [hidden]="volumeRadio!=='table1'">{{'storage.detail.volumes.dataStore' | translate}}</clr-dg-column>
 
-                      <clr-dg-column class="hideFilter" [clrDgField]="'lantency'" [hidden]="volumeRadio!=='table2'">{{'storage.detail.volumes.latency' | translate}}</clr-dg-column>
-                      <clr-dg-column class="hideFilter" [clrDgField]="'iops'" [hidden]="volumeRadio!=='table2'">{{'storage.detail.volumes.iops' | translate}}</clr-dg-column>
-                      <clr-dg-column class="hideFilter" [clrDgField]="'bandwith'" [hidden]="volumeRadio!=='table2'">{{'storage.detail.volumes.bandwidth' | translate}}</clr-dg-column>
+                      <clr-dg-column #volLatency class="hideFilter" [clrDgField]="'lantency'" [hidden]="volumeRadio!=='table2'" style="position: relative" (clrDgSortedChange)="sortFunc($event);">
+                        {{'storage.detail.volumes.latency' | translate}}
+                        <clr-icon *ngIf="sortFunc(volLatency.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+                      </clr-dg-column>
+                      <clr-dg-column #volIops class="hideFilter" [clrDgField]="'iops'" [hidden]="volumeRadio!=='table2'" style="position: relative" (clrDgSortedChange)="sortFunc($event);">
+                        {{'storage.detail.volumes.iops' | translate}}
+                        <clr-icon *ngIf="sortFunc(volIops.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+                      </clr-dg-column>
+                      <clr-dg-column #volBandwidth class="hideFilter" [clrDgField]="'bandwith'" [hidden]="volumeRadio!=='table2'" style="position: relative" (clrDgSortedChange)="sortFunc($event);">
+                        {{'storage.detail.volumes.bandwidth' | translate}}
+                        <clr-icon *ngIf="sortFunc(volBandwidth.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+                      </clr-dg-column>
 
                       <clr-dg-placeholder>{{'tips.noData' | translate}}</clr-dg-placeholder>
                       <clr-dg-row *clrDgItems="let item of volumes" [clrDgItem]="item">
@@ -416,13 +455,28 @@
                         </clr-dg-filter>
                       </clr-dg-column>
                       <clr-dg-column>{{'storage.detail.fileSystems.fileType' | translate}}</clr-dg-column>
-                      <clr-dg-column class="hideFilter" [clrDgField]="'capacity'">{{'storage.detail.fileSystems.totalCap' | translate}}</clr-dg-column>
-                      <clr-dg-column class="hideFilter" [clrDgField]="'availableCapacity'">{{'storage.detail.fileSystems.freeCap' | translate}}</clr-dg-column>
-                      <clr-dg-column class="hideFilter" [clrDgField]="'capacityUsageRatio'" style="width: 11rem;">{{'storage.detail.fileSystems.capacityUsage' | translate}}</clr-dg-column>
+                      <clr-dg-column #fsTotalCap class="hideFilter" [clrDgField]="'capacity'" style="position: relative" (clrDgSortedChange)="sortFunc($event);">
+                        {{'storage.detail.fileSystems.totalCap' | translate}}
+                        <clr-icon *ngIf="sortFunc(fsTotalCap.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+                      </clr-dg-column>
+                      <clr-dg-column #fsFreeCap class="hideFilter" [clrDgField]="'availableCapacity'" style="position: relative" (clrDgSortedChange)="sortFunc($event);">
+                        {{'storage.detail.fileSystems.freeCap' | translate}}
+                        <clr-icon *ngIf="sortFunc(fsFreeCap.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+                      </clr-dg-column>
+                      <clr-dg-column #fsCapacityUsage class="hideFilter" [clrDgField]="'capacityUsageRatio'" style="width: 11rem;position: relative" (clrDgSortedChange)="sortFunc($event);">
+                        {{'storage.detail.fileSystems.capacityUsage' | translate}}
+                        <clr-icon *ngIf="sortFunc(fsCapacityUsage.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+                      </clr-dg-column>
                       <clr-dg-column [clrDgField]="'storagePoolName'">{{'storage.detail.fileSystems.ownSto' | translate}}</clr-dg-column>
-                      <clr-dg-column class="hideFilter" [clrDgField]="'nfsCount'">{{'storage.detail.fileSystems.nfs' | translate}}</clr-dg-column>
+                      <clr-dg-column #fsNfs class="hideFilter" [clrDgField]="'nfsCount'" style="position: relative" (clrDgSortedChange)="sortFunc($event);">
+                        {{'storage.detail.fileSystems.nfs' | translate}}
+                        <clr-icon *ngIf="sortFunc(fsNfs.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+                      </clr-dg-column>
                       <!--<clr-dg-column>{{'storage.detail.fileSystems.cifs' | translate}}</clr-dg-column>-->
-                      <clr-dg-column class="hideFilter" [clrDgField]="'dtreeCount'">{{'storage.detail.fileSystems.dtree' | translate}}</clr-dg-column>
+                      <clr-dg-column #fsDtree class="hideFilter" [clrDgField]="'dtreeCount'" style="position: relative" (clrDgSortedChange)="sortFunc($event);">
+                        {{'storage.detail.fileSystems.dtree' | translate}}
+                        <clr-icon *ngIf="sortFunc(fsDtree.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+                      </clr-dg-column>
 
                       <clr-dg-placeholder>{{'tips.noData' | translate}}</clr-dg-placeholder>
                       <clr-dg-row *clrDgItems="let item of fsList" [clrDgItem]="item">
@@ -497,7 +551,10 @@
                           <dtree-secMod-filter #dtreeSecModFilter></dtree-secMod-filter>
                         </clr-dg-filter>
                       </clr-dg-column>
-                      <clr-dg-column class="hideFilter" [clrDgField]="'nfsCount'">{{'storage.detail.dtrees.nfs' | translate}}</clr-dg-column>
+                      <clr-dg-column #dtreeDfs class="hideFilter" [clrDgField]="'nfsCount'" style="position: relative" (clrDgSortedChange)="sortFunc($event);">
+                        {{'storage.detail.dtrees.nfs' | translate}}
+                        <clr-icon *ngIf="sortFunc(dtreeDfs.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+                      </clr-dg-column>
                       <!--<clr-dg-column>{{'storage.detail.dtrees.cifs' | translate}}</clr-dg-column>-->
                       <clr-dg-column>
                         {{'storage.detail.dtrees.quota' | translate}}
@@ -720,7 +777,10 @@
                 <clr-datagrid>
                   <clr-dg-column>{{'storage.detail.capacity.pool.name' | translate}}</clr-dg-column>
                   <clr-dg-column>{{'storage.detail.capacity.pool.status' | translate}}</clr-dg-column>
-                  <clr-dg-column class="hideFilter" [clrDgField]="'consumedCapacity'"  style="width: 11rem;">{{'storage.detail.capacity.pool.capacity' | translate}}</clr-dg-column>
+                  <clr-dg-column #detailCapacity class="hideFilter" [clrDgField]="'consumedCapacity'"  style="width: 11rem;" style="position: relative" (clrDgSortedChange)="sortFunc($event);">
+                    {{'storage.detail.capacity.pool.capacity' | translate}}
+                    <clr-icon *ngIf="sortFunc(detailCapacity.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+                  </clr-dg-column>
                   <clr-dg-row *clrDgItems="let item of storagePool" [clrDgItem]="item">
                     <clr-dg-cell class="over_flow">{{item.name}}</clr-dg-cell>
                     <clr-dg-cell class="over_flow">
@@ -796,11 +856,27 @@
                           </clr-dg-filter>
                         </clr-dg-column>
                         <clr-dg-column [clrDgField]="'softVer'">{{'storage.detail.hardware.controllers.version' | translate}}</clr-dg-column>
-                        <clr-dg-column class="hideFilter"  [clrDgField]="'cpuUsage'">{{'storage.detail.hardware.controllers.cpuUsage' | translate}}</clr-dg-column>
-                        <clr-dg-column class="hideFilter"  [clrDgField]="'iops'">{{'storage.detail.hardware.controllers.iops' | translate}}</clr-dg-column>
-                        <clr-dg-column class="hideFilter"  [clrDgField]="'ops'">{{'storage.detail.hardware.controllers.ops' | translate}}</clr-dg-column>
-                        <clr-dg-column class="hideFilter"  [clrDgField]="'lantency'">{{'storage.detail.hardware.controllers.latency' | translate}}</clr-dg-column>
-                        <clr-dg-column class="hideFilter"  [clrDgField]="'bandwith'">{{'storage.detail.hardware.controllers.bandwidth' | translate}}</clr-dg-column>
+                        <clr-dg-column #conCpuUsage class="hideFilter"  [clrDgField]="'cpuUsage'" style="position: relative;min-width: 6rem;" (clrDgSortedChange)="sortFunc($event);">
+                          {{'storage.detail.hardware.controllers.cpuUsage' | translate}}
+                          <clr-icon *ngIf="sortFunc(conCpuUsage.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+                        </clr-dg-column>
+                        <clr-dg-column #conIops class="hideFilter"  [clrDgField]="'iops'" style="position: relative" (clrDgSortedChange)="sortFunc($event);">
+                          {{'storage.detail.hardware.controllers.iops' | translate}}
+                          <clr-icon *ngIf="sortFunc(conIops.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+                        </clr-dg-column>
+                        <clr-dg-column #conOps class="hideFilter"  [clrDgField]="'ops'" style="position: relative" (clrDgSortedChange)="sortFunc($event);">
+                          {{'storage.detail.hardware.controllers.ops' | translate}}
+                          <clr-icon *ngIf="sortFunc(conOps.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+                        </clr-dg-column>
+                        <clr-dg-column #conLatency class="hideFilter"  [clrDgField]="'lantency'" style="position: relative;min-width: 9rem;" (clrDgSortedChange)="sortFunc($event);">
+                          {{'storage.detail.hardware.controllers.latency' | translate}}
+                          <clr-icon *ngIf="sortFunc(conLatency.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+                        </clr-dg-column>
+                        <clr-dg-column #conBandwidth class="hideFilter"  [clrDgField]="'bandwith'" style="position: relative;min-width: 6rem;" (clrDgSortedChange)="sortFunc($event);">
+                          {{'storage.detail.hardware.controllers.bandwidth' | translate}}
+                          <clr-icon *ngIf="sortFunc(conBandwidth.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+                        </clr-dg-column>
+                        <clr-dg-placeholder>{{'tips.noData' | translate}}</clr-dg-placeholder>
                         <clr-dg-row  *clrDgItems="let item of controllers" [clrDgItem]="item">
                           <clr-dg-cell class="over_flow">{{item.name ? item.name:'--'}}</clr-dg-cell>
                           <clr-dg-cell class="over_flow">
@@ -822,11 +898,11 @@
                             <span *ngIf="!item.status">--</span>
                           </clr-dg-cell>
                           <clr-dg-cell class="over_flow">{{item.softVer ? item.softVer:'--'}}</clr-dg-cell>
-                          <clr-dg-cell class="over_flow" style="text-align: right">{{item.cpuUsage!=null?item.cpuUsage:'--'}}</clr-dg-cell>
-                          <clr-dg-cell class="over_flow" style="text-align: right">{{item.iops!=null?item.iops:'--'}}</clr-dg-cell>
-                          <clr-dg-cell class="over_flow" style="text-align: right">{{item.ops!=null?item.ops:'--'}}</clr-dg-cell>
-                          <clr-dg-cell class="over_flow" style="text-align: right">{{item.lantency!=null?item.lantency:'--'}}</clr-dg-cell>
-                          <clr-dg-cell class="over_flow" style="text-align: right">{{item.bandwith!=null?item.bandwith:'--'}}</clr-dg-cell>
+                          <clr-dg-cell class="over_flow" style="text-align: right;min-width: 6rem;">{{item.cpuUsage!=null?item.cpuUsage:'--'}}</clr-dg-cell>
+                          <clr-dg-cell class="over_flow" style="text-align: right;">{{item.iops!=null?item.iops:'--'}}</clr-dg-cell>
+                          <clr-dg-cell class="over_flow" style="text-align: right;">{{item.ops!=null?item.ops:'--'}}</clr-dg-cell>
+                          <clr-dg-cell class="over_flow" style="text-align: right;min-width: 9rem;">{{item.lantency!=null?item.lantency:'--'}}</clr-dg-cell>
+                          <clr-dg-cell class="over_flow" style="text-align: right;min-width: 6rem;">{{item.bandwith!=null?item.bandwith:'--'}}</clr-dg-cell>
                         </clr-dg-row>
                         <clr-dg-footer>
                           <clr-dg-pagination #paginationController [clrDgPageSize]="10" [clrDgTotalItems]="conTotal">
@@ -857,14 +933,32 @@
 <!--                            <disk-type-filter #diskTypeFilter></disk-type-filter>-->
 <!--                          </clr-dg-filter>-->
                         </clr-dg-column>
-                        <clr-dg-column class="hideFilter" [clrDgField]="'capacity'">{{'storage.detail.hardware.disks.capacity' | translate}}</clr-dg-column>
+                        <clr-dg-column #diskCapacity  class="hideFilter" [clrDgField]="'capacity'" style="position: relative" (clrDgSortedChange)="sortFunc($event);">
+                          {{'storage.detail.hardware.disks.capacity' | translate}}
+                          <clr-icon *ngIf="sortFunc(diskCapacity.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+                        </clr-dg-column>
                         <clr-dg-column [clrDgField]="'member'">{{'storage.detail.hardware.disks.role' | translate}}</clr-dg-column>
                         <clr-dg-column [clrDgField]="'diskDomain'">{{'storage.detail.hardware.disks.diskDomain' | translate}}</clr-dg-column>
-                        <clr-dg-column class="hideFilter" [clrDgField]="'speed'">{{'storage.detail.hardware.disks.rotationalSpeed' | translate}}</clr-dg-column>
-                        <clr-dg-column class="hideFilter"  [clrDgField]="'iops'">{{'storage.detail.hardware.disks.iops' | translate}}</clr-dg-column>
-                        <clr-dg-column class="hideFilter"  [clrDgField]="'lantency'">{{'storage.detail.hardware.disks.latency' | translate}}</clr-dg-column>
-                        <clr-dg-column class="hideFilter"  [clrDgField]="'bandwith'">{{'storage.detail.hardware.disks.bandwidth' | translate}}</clr-dg-column>
-                        <clr-dg-column class="hideFilter"  [clrDgField]="'useage'">{{'storage.detail.hardware.disks.usage' | translate}}</clr-dg-column>
+                        <clr-dg-column #diskSpeed class="hideFilter" [clrDgField]="'speed'" style="position: relative" (clrDgSortedChange)="sortFunc($event);">
+                          {{'storage.detail.hardware.disks.rotationalSpeed' | translate}}
+                          <clr-icon *ngIf="sortFunc(diskSpeed.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+                        </clr-dg-column>
+                        <clr-dg-column #diskIops class="hideFilter"  [clrDgField]="'iops'" style="position: relative" (clrDgSortedChange)="sortFunc($event);">
+                          {{'storage.detail.hardware.disks.iops' | translate}}
+                          <clr-icon *ngIf="sortFunc(diskIops.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+                        </clr-dg-column>
+                        <clr-dg-column #diskLatency class="hideFilter"  [clrDgField]="'lantency'" style="position: relative;min-width: 9rem;" (clrDgSortedChange)="sortFunc($event);">
+                          {{'storage.detail.hardware.disks.latency' | translate}}
+                          <clr-icon *ngIf="sortFunc(diskLatency.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+                        </clr-dg-column>
+                        <clr-dg-column #diskBandwidth class="hideFilter"  [clrDgField]="'bandwith'" style="position: relative;min-width: 6rem;" (clrDgSortedChange)="sortFunc($event);">
+                          {{'storage.detail.hardware.disks.bandwidth' | translate}}
+                          <clr-icon *ngIf="sortFunc(diskBandwidth.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+                        </clr-dg-column>
+                        <clr-dg-column #diskUsage class="hideFilter"  [clrDgField]="'useage'" style="position: relative;min-width: 6rem;" (clrDgSortedChange)="sortFunc($event);">
+                          {{'storage.detail.hardware.disks.usage' | translate}}
+                          <clr-icon *ngIf="sortFunc(diskUsage.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+                        </clr-dg-column>
                         <clr-dg-placeholder>{{'tips.noData' | translate}}</clr-dg-placeholder>
                         <clr-dg-row  *clrDgItems="let item of disks" [clrDgItem]="item">
                           <clr-dg-cell class="over_flow">{{item.name ? item.name:'--'}}</clr-dg-cell>
@@ -892,11 +986,11 @@
                             <span *ngIf="!item.logicalType">--</span>
                           </clr-dg-cell>
                           <clr-dg-cell class="over_flow">{{item.diskDomain ? item.diskDomain:'--'}}</clr-dg-cell>
-                          <clr-dg-cell class="over_flow" style="text-align: right">{{item.speed ? item.speed:'--'}}</clr-dg-cell>
-                          <clr-dg-cell class="over_flow" style="text-align: right">{{item.iops!=null?item.iops.toFixed(2):'--'}}</clr-dg-cell>
-                          <clr-dg-cell class="over_flow" style="text-align: right">{{item.lantency!=null?item.lantency.toFixed(2):'--'}}</clr-dg-cell>
-                          <clr-dg-cell class="over_flow" style="text-align: right">{{item.bandwith!=null?item.bandwith.toFixed(2):'--'}}</clr-dg-cell>
-                          <clr-dg-cell class="over_flow" style="text-align: right">{{item.useage!=null?item.useage.toFixed(2):'--'}}</clr-dg-cell>
+                          <clr-dg-cell class="over_flow" style="text-align: right;">{{item.speed ? item.speed:'--'}}</clr-dg-cell>
+                          <clr-dg-cell class="over_flow" style="text-align: right;">{{item.iops!=null?item.iops.toFixed(2):'--'}}</clr-dg-cell>
+                          <clr-dg-cell class="over_flow" style="text-align: right;min-width: 9rem;">{{item.lantency!=null?item.lantency.toFixed(2):'--'}}</clr-dg-cell>
+                          <clr-dg-cell class="over_flow" style="text-align: right;min-width: 6rem;">{{item.bandwith!=null?item.bandwith.toFixed(2):'--'}}</clr-dg-cell>
+                          <clr-dg-cell class="over_flow" style="text-align: right;min-width: 6rem;">{{item.useage!=null?item.useage.toFixed(2):'--'}}</clr-dg-cell>
                         </clr-dg-row>
                         <clr-dg-footer>
                           <clr-dg-pagination #paginationDisk [clrDgPageSize]="10" [clrDgTotalItems]="diskTotal">
@@ -926,11 +1020,26 @@
                                 </clr-dg-filter>
                               </clr-dg-column>
                               <clr-dg-column [clrDgField]="'wwn'">{{'storage.detail.hardware.ports.wwn' | translate}}</clr-dg-column>
-                              <clr-dg-column class="hideFilter" [clrDgField]="'speed'">{{'storage.detail.hardware.ports.workingRate' | translate}}</clr-dg-column>
-                              <clr-dg-column class="hideFilter" [clrDgField]="'iops'">{{'storage.detail.hardware.ports.iops' | translate}}</clr-dg-column>
-                              <clr-dg-column class="hideFilter" [clrDgField]="'lantency'">{{'storage.detail.hardware.ports.latency' | translate}}</clr-dg-column>
-                              <clr-dg-column class="hideFilter" [clrDgField]="'bandwith'">{{'storage.detail.hardware.ports.bandwidth' | translate}}</clr-dg-column>
-                              <clr-dg-column class="hideFilter" [clrDgField]="'useage'">{{'storage.detail.hardware.ports.usage' | translate}}</clr-dg-column>
+                              <clr-dg-column #fcSpeed class="hideFilter" [clrDgField]="'speed'" style="min-width: 7rem;position: relative" (clrDgSortedChange)="sortFunc($event);">
+                                {{'storage.detail.hardware.ports.workingRate' | translate}}
+                                <clr-icon *ngIf="sortFunc(fcSpeed.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+                              </clr-dg-column>
+                              <clr-dg-column #fcIops class="hideFilter" [clrDgField]="'iops'" style="position: relative" (clrDgSortedChange)="sortFunc($event);">
+                                {{'storage.detail.hardware.ports.iops' | translate}}
+                                <clr-icon *ngIf="sortFunc(fcIops.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+                              </clr-dg-column>
+                              <clr-dg-column #fcLanteny class="hideFilter" [clrDgField]="'lantency'" style="min-width: 9rem;position: relative;" (clrDgSortedChange)="sortFunc($event);">
+                                {{'storage.detail.hardware.ports.latency' | translate}}
+                                <clr-icon *ngIf="sortFunc(fcLanteny.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+                              </clr-dg-column>
+                              <clr-dg-column #fcBandwith class="hideFilter" [clrDgField]="'bandwith'" style="min-width: 6rem;position: relative" (clrDgSortedChange)="sortFunc($event);">
+                                {{'storage.detail.hardware.ports.bandwidth' | translate}}
+                                <clr-icon *ngIf="sortFunc(fcBandwith.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+                              </clr-dg-column>
+                              <clr-dg-column #fcUseage class="hideFilter" [clrDgField]="'useage'" style="min-width: 6rem;position: relative" (clrDgSortedChange)="sortFunc($event);">
+                                {{'storage.detail.hardware.ports.usage' | translate}}
+                                <clr-icon *ngIf="sortFunc(fcUseage.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+                              </clr-dg-column>
                               <clr-dg-placeholder>{{'tips.noData' | translate}}</clr-dg-placeholder>
                               <clr-dg-row  *clrDgItems="let item of fcs" [clrDgItem]="item">
                                 <clr-dg-cell class="over_flow">{{item.location ? item.location:'--'}}</clr-dg-cell>
@@ -943,11 +1052,11 @@
                                   <span *ngIf="!item.status">--</span>
                                 </clr-dg-cell>
                                 <clr-dg-cell class="over_flow">{{item.wwn ? item.wwn:'--'}}</clr-dg-cell>
-                                <clr-dg-cell class="over_flow" style="text-align: right">{{item.speed!=null?item.iops.toFixed(2):'--'}}</clr-dg-cell>
-                                <clr-dg-cell class="over_flow" style="text-align: right">{{item.iops!=null?item.iops.toFixed(2):'--'}}</clr-dg-cell>
-                                <clr-dg-cell class="over_flow" style="text-align: right">{{item.lantency!=null?item.lantency.toFixed(2):'--'}}</clr-dg-cell>
-                                <clr-dg-cell class="over_flow" style="text-align: right">{{item.bandwith!=null?item.bandwith.toFixed(2):'--'}}</clr-dg-cell>
-                                <clr-dg-cell class="over_flow" style="text-align: right">{{item.useage!=null?item.useage.toFixed(2):'--'}}</clr-dg-cell>
+                                <clr-dg-cell class="over_flow" style="text-align: right;min-width: 7rem;">{{item.speed!=null?item.iops.toFixed(2):'--'}}</clr-dg-cell>
+                                <clr-dg-cell class="over_flow" style="text-align: right;">{{item.iops!=null?item.iops.toFixed(2):'--'}}</clr-dg-cell>
+                                <clr-dg-cell class="over_flow" style="text-align: right;min-width: 9rem;">{{item.lantency!=null?item.lantency.toFixed(2):'--'}}</clr-dg-cell>
+                                <clr-dg-cell class="over_flow" style="text-align: right;min-width: 6rem;">{{item.bandwith!=null?item.bandwith.toFixed(2):'--'}}</clr-dg-cell>
+                                <clr-dg-cell class="over_flow" style="text-align: right;min-width: 6rem;">{{item.useage!=null?item.useage.toFixed(2):'--'}}</clr-dg-cell>
                               </clr-dg-row>
                               <clr-dg-footer>
                                 <clr-dg-pagination #paginationPort [clrDgPageSize]="10" [clrDgTotalItems]="fcTotal">
@@ -972,11 +1081,26 @@
                               </clr-dg-column>
                               <clr-dg-column [clrDgField]="'mgmtIp'">{{'storage.detail.hardware.ports.ipv4' | translate}}</clr-dg-column>
                               <clr-dg-column [clrDgField]="'mgmtIpv6'">{{'storage.detail.hardware.ports.ipv6' | translate}}</clr-dg-column>
-                              <clr-dg-column class="hideFilter" [clrDgField]="'speed'">{{'storage.detail.hardware.ports.workingRate' | translate}}</clr-dg-column>
-                              <clr-dg-column class="hideFilter" [clrDgField]="'iops'">{{'storage.detail.hardware.ports.iops' | translate}}</clr-dg-column>
-                              <clr-dg-column class="hideFilter" [clrDgField]="'lantency'">{{'storage.detail.hardware.ports.latency' | translate}}</clr-dg-column>
-                              <clr-dg-column class="hideFilter" [clrDgField]="'bandwith'">{{'storage.detail.hardware.ports.bandwidth' | translate}}</clr-dg-column>
-                              <clr-dg-column class="hideFilter" [clrDgField]="'useage'">{{'storage.detail.hardware.ports.usage' | translate}}</clr-dg-column>
+                              <clr-dg-column #ethSpeed class="hideFilter" [clrDgField]="'speed'" style="min-width: 7rem;position: relative" (clrDgSortedChange)="sortFunc($event);">
+                                {{'storage.detail.hardware.ports.workingRate' | translate}}
+                                <clr-icon *ngIf="sortFunc(ethSpeed.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+                              </clr-dg-column>
+                              <clr-dg-column #ethIops class="hideFilter" [clrDgField]="'iops'" style="position: relative" (clrDgSortedChange)="sortFunc($event);">
+                                {{'storage.detail.hardware.ports.iops' | translate}}
+                                <clr-icon *ngIf="sortFunc(ethIops.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+                              </clr-dg-column>
+                              <clr-dg-column #ethLatency class="hideFilter" [clrDgField]="'lantency'" style="min-width: 9rem;position: relative;" (clrDgSortedChange)="sortFunc($event);">
+                                {{'storage.detail.hardware.ports.latency' | translate}}
+                                <clr-icon *ngIf="sortFunc(ethLatency.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+                              </clr-dg-column>
+                              <clr-dg-column #ethBandwidth class="hideFilter" [clrDgField]="'bandwith'" style="min-width: 6rem;position: relative" (clrDgSortedChange)="sortFunc($event);">
+                                {{'storage.detail.hardware.ports.bandwidth' | translate}}
+                                <clr-icon *ngIf="sortFunc(ethBandwidth.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+                              </clr-dg-column>
+                              <clr-dg-column #ethUsage class="hideFilter" [clrDgField]="'useage'" style="min-width: 6rem;position: relative" (clrDgSortedChange)="sortFunc($event);">
+                                {{'storage.detail.hardware.ports.usage' | translate}}
+                                <clr-icon *ngIf="sortFunc(ethUsage.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+                              </clr-dg-column>
                               <clr-dg-placeholder>{{'tips.noData' | translate}}</clr-dg-placeholder>
                               <clr-dg-row  *clrDgItems="let item of eths" [clrDgItem]="item">
                                 <clr-dg-cell class="over_flow">{{item.location ? item.location:'--'}}</clr-dg-cell>
@@ -993,11 +1117,11 @@
                                 <clr-dg-cell  class="over_flow">
                                   {{item.mgmtIpv6!=null?item.mgmtIpv6!=''?item.mgmtIpv6:'--':'--'}}
                                 </clr-dg-cell>
-                                <clr-dg-cell class="over_flow" style="text-align: right">{{item.speed!=null?item.speed:'--'}}</clr-dg-cell>
-                                <clr-dg-cell class="over_flow" style="text-align: right">{{item.iops!=null?item.iops:'--'}}</clr-dg-cell>
-                                <clr-dg-cell class="over_flow" style="text-align: right">{{item.lantency!=null?item.lantency:'--'}}</clr-dg-cell>
-                                <clr-dg-cell class="over_flow" style="text-align: right">{{item.bandwith!=null?item.bandwith:'--'}}</clr-dg-cell>
-                                <clr-dg-cell class="over_flow" style="text-align: right">{{item.useage!=null?item.useage:'--'}}</clr-dg-cell>
+                                <clr-dg-cell class="over_flow" style="text-align: right;min-width: 7rem;">{{item.speed!=null?item.speed:'--'}}</clr-dg-cell>
+                                <clr-dg-cell class="over_flow" style="text-align: right;">{{item.iops!=null?item.iops:'--'}}</clr-dg-cell>
+                                <clr-dg-cell class="over_flow" style="text-align: right;min-width: 9rem;">{{item.lantency!=null?item.lantency:'--'}}</clr-dg-cell>
+                                <clr-dg-cell class="over_flow" style="text-align: right;min-width: 6rem;">{{item.bandwith!=null?item.bandwith:'--'}}</clr-dg-cell>
+                                <clr-dg-cell class="over_flow" style="text-align: right;min-width: 6rem;">{{item.useage!=null?item.useage:'--'}}</clr-dg-cell>
                               </clr-dg-row>
                               <clr-dg-footer>
                                 <clr-dg-pagination #paginationEth [clrDgPageSize]="10" [clrDgTotalItems]="ethTotal">
@@ -1023,11 +1147,26 @@
                                 </clr-dg-filter>
                               </clr-dg-column>
                               <clr-dg-column [clrDgField]="'status'">{{'storage.detail.hardware.ports.wwn' | translate}}</clr-dg-column>
-                              <clr-dg-column class="hideFilter" [clrDgField]="'speed'">{{'storage.detail.hardware.ports.workingRate' | translate}}</clr-dg-column>
-                              <clr-dg-column class="hideFilter" [clrDgField]="'iops'">{{'storage.detail.hardware.ports.iops' | translate}}</clr-dg-column>
-                              <clr-dg-column class="hideFilter" [clrDgField]="'latency'">{{'storage.detail.hardware.ports.latency' | translate}}</clr-dg-column>
-                              <clr-dg-column class="hideFilter" [clrDgField]="'bandwidth'">{{'storage.detail.hardware.ports.bandwidth' | translate}}</clr-dg-column>
-                              <clr-dg-column class="hideFilter" [clrDgField]="'usage'">{{'storage.detail.hardware.ports.usage' | translate}}</clr-dg-column>
+                              <clr-dg-column #fcoeSpeed class="hideFilter" [clrDgField]="'speed'" style="min-width: 7rem;position: relative" (clrDgSortedChange)="sortFunc($event);">
+                                {{'storage.detail.hardware.ports.workingRate' | translate}}
+                                <clr-icon *ngIf="sortFunc(fcoeSpeed.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+                              </clr-dg-column>
+                              <clr-dg-column #fcoeIops class="hideFilter" [clrDgField]="'iops'" style="position: relative" (clrDgSortedChange)="sortFunc($event);">
+                                {{'storage.detail.hardware.ports.iops' | translate}}
+                                <clr-icon *ngIf="sortFunc(fcoeIops.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+                              </clr-dg-column>
+                              <clr-dg-column #fcoeLatency class="hideFilter" [clrDgField]="'latency'" style="min-width: 9rem;position: relative;" (clrDgSortedChange)="sortFunc($event);">
+                                {{'storage.detail.hardware.ports.latency' | translate}}
+                                <clr-icon *ngIf="sortFunc(fcoeLatency.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+                              </clr-dg-column>
+                              <clr-dg-column #fcoeBandwidth class="hideFilter" [clrDgField]="'bandwidth'" style="min-width: 6rem;position: relative" (clrDgSortedChange)="sortFunc($event);">
+                                {{'storage.detail.hardware.ports.bandwidth' | translate}}
+                                <clr-icon *ngIf="sortFunc(fcoeBandwidth.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+                              </clr-dg-column>
+                              <clr-dg-column #fcoeUsage class="hideFilter" [clrDgField]="'usage'"  style="min-width: 6rem;position: relative" (clrDgSortedChange)="sortFunc($event);">
+                                {{'storage.detail.hardware.ports.usage' | translate}}
+                                <clr-icon *ngIf="sortFunc(fcoeUsage.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+                              </clr-dg-column>
                               <clr-dg-placeholder>{{'tips.noData' | translate}}</clr-dg-placeholder>
                               <clr-dg-row  *clrDgItems="let item of fcoes" [clrDgItem]="item">
                                 <clr-dg-cell class="over_flow">{{item.location ? item.location:'--'}}</clr-dg-cell>
@@ -1040,11 +1179,11 @@
                                   <span *ngIf="!item.connectStatus">--</span>
                                 </clr-dg-cell>
                                 <clr-dg-cell class="over_flow">{{item.wwn ? item.wwn:'--'}}</clr-dg-cell>
-                                <clr-dg-cell class="over_flow" style="text-align: right">{{item.speed ? item.speed:'--'}}</clr-dg-cell>
-                                <clr-dg-cell class="over_flow" style="text-align: right">{{item.iops!=null?item.iops:'--'}}</clr-dg-cell>
-                                <clr-dg-cell class="over_flow" style="text-align: right">{{item.latency!=null?item.latency:'--'}}</clr-dg-cell>
-                                <clr-dg-cell class="over_flow" style="text-align: right">{{item.bandwidth!=null?item.bandwidth:'--'}}</clr-dg-cell>
-                                <clr-dg-cell class="over_flow" style="text-align: right">{{item.usage!=null?item.usage:'--'}}</clr-dg-cell>
+                                <clr-dg-cell class="over_flow" style="text-align: right;min-width: 7rem;">{{item.speed ? item.speed:'--'}}</clr-dg-cell>
+                                <clr-dg-cell class="over_flow" style="text-align: right;">{{item.iops!=null?item.iops:'--'}}</clr-dg-cell>
+                                <clr-dg-cell class="over_flow" style="text-align: right;min-width: 9rem;">{{item.latency!=null?item.latency:'--'}}</clr-dg-cell>
+                                <clr-dg-cell class="over_flow" style="text-align: right;min-width: 6rem;">{{item.bandwidth!=null?item.bandwidth:'--'}}</clr-dg-cell>
+                                <clr-dg-cell class="over_flow" style="text-align: right;min-width: 6rem;">{{item.usage!=null?item.usage:'--'}}</clr-dg-cell>
                               </clr-dg-row>
                               <clr-dg-footer>
                                 <clr-dg-pagination #paginationFcoe [clrDgPageSize]="10" [clrDgTotalItems]="fcoeTotal">
@@ -1073,10 +1212,22 @@
                                   <ports-running-status-filter #portsRunningStatusFilter></ports-running-status-filter>
                                 </clr-dg-filter>
                               </clr-dg-column>
-                              <clr-dg-column class="hideFilter" [clrDgField]="'mtu'">{{'storage.detail.hardware.ports.mtu' | translate}}</clr-dg-column>
-                              <clr-dg-column class="hideFilter" [clrDgField]="'iops'">{{'storage.detail.hardware.ports.totalIops' | translate}}</clr-dg-column>
-                              <clr-dg-column class="hideFilter" [clrDgField]="'latency'">{{'storage.detail.hardware.ports.avg' | translate}}</clr-dg-column>
-                              <clr-dg-column class="hideFilter" [clrDgField]="'bandwidth'" >{{'storage.detail.hardware.ports.totalBandwidth' | translate}}</clr-dg-column>
+                              <clr-dg-column #bondMtu class="hideFilter" [clrDgField]="'mtu'" style="position: relative" (clrDgSortedChange)="sortFunc($event);">
+                                {{'storage.detail.hardware.ports.mtu' | translate}}
+                                <clr-icon *ngIf="sortFunc(bondMtu.sorted);" shape="arrow down" class="is-solid" style="min-width: 6rem;position: absolute;right: 1.1rem;"></clr-icon>
+                              </clr-dg-column>
+                              <clr-dg-column #bondIops class="hideFilter" [clrDgField]="'iops'" style="min-width: 9rem;position: relative;" (clrDgSortedChange)="sortFunc($event);">
+                                {{'storage.detail.hardware.ports.totalIops' | translate}}
+                                <clr-icon *ngIf="sortFunc(bondIops.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+                              </clr-dg-column>
+                              <clr-dg-column #bondLatency class="hideFilter" [clrDgField]="'latency'" style="min-width: 9rem;position: relative;" (clrDgSortedChange)="sortFunc($event);">
+                                {{'storage.detail.hardware.ports.avg' | translate}}
+                                <clr-icon *ngIf="sortFunc(bondLatency.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+                              </clr-dg-column>
+                              <clr-dg-column #bondBandwidth class="hideFilter" [clrDgField]="'bandwidth'" style="min-width: 7rem;position: relative" (clrDgSortedChange)="sortFunc($event);">
+                                {{'storage.detail.hardware.ports.totalBandwidth' | translate}}
+                                <clr-icon *ngIf="sortFunc(bondBandwidth.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+                              </clr-dg-column>
                               <clr-dg-placeholder>{{'tips.noData' | translate}}</clr-dg-placeholder>
                               <clr-dg-row  *clrDgItems="let item of bonds" [clrDgItem]="item">
                                 <clr-dg-cell class="over_flow">{{item.name ? item.name:'--'}}</clr-dg-cell>
@@ -1099,10 +1250,10 @@
                                   <span *ngIf="item.runningStatus == 'initializing'">{{'enum.status.initializing' | translate}}</span>
                                   <span *ngIf="!item.runningStatus">--</span>
                                 </clr-dg-cell>
-                                <clr-dg-cell class="over_flow" style="text-align: right">{{item.mtu ? item.mtu:'--'}}</clr-dg-cell>
-                                <clr-dg-cell class="over_flow" style="text-align: right">{{item.iops!=null?item.iops:'--'}}</clr-dg-cell>
-                                <clr-dg-cell class="over_flow" style="text-align: right">{{item.latency!=null?item.latency:'--'}}</clr-dg-cell>
-                                <clr-dg-cell class="over_flow" style="text-align: right">{{item.bandwidth!=null?item.bandwidth:'--'}}</clr-dg-cell>
+                                <clr-dg-cell class="over_flow" style="text-align: right;min-width: 6rem;">{{item.mtu ? item.mtu:'--'}}</clr-dg-cell>
+                                <clr-dg-cell class="over_flow" style="text-align: right;min-width: 9rem;">{{item.iops!=null?item.iops:'--'}}</clr-dg-cell>
+                                <clr-dg-cell class="over_flow" style="text-align: right;min-width: 9rem;">{{item.latency!=null?item.latency:'--'}}</clr-dg-cell>
+                                <clr-dg-cell class="over_flow" style="text-align: right;min-width: 7rem;">{{item.bandwidth!=null?item.bandwidth:'--'}}</clr-dg-cell>
                               </clr-dg-row>
                               <clr-dg-footer>
                                 <clr-dg-pagination #paginationBond [clrDgPageSize]="10" [clrDgTotalItems]="bondTotal">

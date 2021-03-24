@@ -639,6 +639,9 @@ export class ServicelevelComponent implements OnInit, AfterViewInit, OnDestroy {
   setDataSetsChart(height: number, title: string, subtext: string,){
 
   }
+  sortFunc(obj:any) {
+    return !obj;
+  }
 }
 
 class Servicelevel {

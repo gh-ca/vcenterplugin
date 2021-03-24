@@ -46,13 +46,23 @@
           <status-filter #statusFilter></status-filter>
         </clr-dg-filter>
       </clr-dg-column>
-      <clr-dg-column [hidden]="radioCheck!=='list'" class="hideFilter" [clrDgField]="'capacity'">{{'nfs.totalCapacity' | translate}}</clr-dg-column>
-      <clr-dg-column [hidden]="radioCheck!=='list'" class="hideFilter" [clrDgField]="'freeSpace'">
-        {{'nfs.freeCapacity' | translate}}
+      <clr-dg-column #capacity [hidden]="radioCheck!=='list'" class="hideFilter" [clrDgField]="'capacity'" style="position: relative" (clrDgSortedChange)="sortFunc($event);">
+        {{'nfs.totalCapacity' | translate}}
+        <clr-icon *ngIf="sortFunc(capacity.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
       </clr-dg-column>
-      <clr-dg-column [hidden]="radioCheck!=='list'" class="hideFilter" style="width: 11rem;" [clrDgField]="'capacityUsage'">{{'nfs.capacityUsage' | translate}}</clr-dg-column>
-      <clr-dg-column [hidden]="radioCheck!=='list'" class="hideFilter" [clrDgField]="'reserveCapacity'">{{'nfs.provisioningCapacity' | translate}}</clr-dg-column>
-      <clr-dg-column [hidden]="radioCheck!=='list'" >
+      <clr-dg-column #freeSpace [hidden]="radioCheck!=='list'" class="hideFilter" [clrDgField]="'freeSpace'" style="position: relative" (clrDgSortedChange)="sortFunc($event);">
+        {{'nfs.freeCapacity' | translate}}
+        <clr-icon *ngIf="sortFunc(freeSpace.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+      </clr-dg-column>
+      <clr-dg-column #capacityUsage [hidden]="radioCheck!=='list'" class="hideFilter" [clrDgField]="'capacityUsage'" style="min-width:11rem;position: relative" (clrDgSortedChange)="sortFunc($event);">
+        {{'nfs.capacityUsage' | translate}}
+        <clr-icon *ngIf="sortFunc(capacityUsage.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+      </clr-dg-column>
+      <clr-dg-column #reserveCapacity [hidden]="radioCheck!=='list'" class="hideFilter" [clrDgField]="'reserveCapacity'" style="position: relative" (clrDgSortedChange)="sortFunc($event);">
+        {{'nfs.provisioningCapacity' | translate}}
+        <clr-icon *ngIf="sortFunc(reserveCapacity.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+      </clr-dg-column>
+      <clr-dg-column #deviceFilter [hidden]="radioCheck!=='list'" >
         {{'nfs.device' | translate}}
         <clr-dg-filter [clrDgFilter]="deviceFilter">
           <device-filter #deviceFilter></device-filter>
@@ -63,10 +73,22 @@
       <clr-dg-column [hidden]="radioCheck!=='list'" [clrDgField]="'sharePath'">{{'nfs.sharePath' | translate}}</clr-dg-column>
       <clr-dg-column [hidden]="radioCheck!=='list'" [clrDgField]="'fs'">{{'nfs.fileSystem' | translate}}</clr-dg-column>
 
-      <clr-dg-column [hidden]="radioCheck!=='chart'" class="hideFilter" [clrDgField]="'ops'">{{'nfs.ops' | translate}}</clr-dg-column>
-      <clr-dg-column [hidden]="radioCheck!=='chart'" class="hideFilter" [clrDgField]="'bandwidth'">{{'nfs.bandwidth' | translate}}</clr-dg-column>
-      <clr-dg-column [hidden]="radioCheck!=='chart'" class="hideFilter" [clrDgField]="'readResponseTime'">{{'nfs.respRt' | translate}}</clr-dg-column>
-      <clr-dg-column [hidden]="radioCheck!=='chart'" class="hideFilter" [clrDgField]="'writeResponseTime'">{{'nfs.respWt' | translate}}</clr-dg-column>
+      <clr-dg-column #ops [hidden]="radioCheck!=='chart'" class="hideFilter" [clrDgField]="'ops'" style="position: relative" (clrDgSortedChange)="sortFunc($event);">
+        {{'nfs.ops' | translate}}
+        <clr-icon *ngIf="sortFunc(ops.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+      </clr-dg-column>
+      <clr-dg-column #bandwidth [hidden]="radioCheck!=='chart'" class="hideFilter" [clrDgField]="'bandwidth'" style="position: relative" (clrDgSortedChange)="sortFunc($event);">
+        {{'nfs.bandwidth' | translate}}
+        <clr-icon *ngIf="sortFunc(bandwidth.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+      </clr-dg-column>
+      <clr-dg-column #readResponseTime [hidden]="radioCheck!=='chart'" class="hideFilter" [clrDgField]="'readResponseTime'" style="position: relative" (clrDgSortedChange)="sortFunc($event);">
+        {{'nfs.respRt' | translate}}
+        <clr-icon *ngIf="sortFunc(readResponseTime.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+      </clr-dg-column>
+      <clr-dg-column #writeResponseTime [hidden]="radioCheck!=='chart'" class="hideFilter" [clrDgField]="'writeResponseTime'" style="position: relative" (clrDgSortedChange)="sortFunc($event);">
+        {{'nfs.respWt' | translate}}
+        <clr-icon *ngIf="sortFunc(writeResponseTime.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+      </clr-dg-column>
 
       <clr-dg-placeholder>{{'tips.noData' | translate}}</clr-dg-placeholder>
       <clr-dg-row *clrDgItems="let item of list" [clrDgItem]="item">
@@ -88,7 +110,7 @@
         </clr-dg-cell>
         <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='list'" style="text-align: right">{{item.capacity ? formatCapacity(item.capacity):'--'}}</clr-dg-cell>
         <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='list'" style="text-align: right">{{item.freeSpace ? formatCapacity(item.freeSpace):'--'}}</clr-dg-cell>
-        <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='list'">
+        <clr-dg-cell class="over_flow" style="min-width: 11rem;" [hidden]="radioCheck!=='list'">
           <div class="progress-block" *ngIf="item.capacity && item.freeSpace">
             <clr-progress-bar clrValue="{{((item.capacity - item.freeSpace)/item.capacity * 100).toFixed(2)}}" clrSuccess></clr-progress-bar>
             <span>{{((item.capacity - item.freeSpace)/item.capacity * 100).toFixed(2)}}%</span>
