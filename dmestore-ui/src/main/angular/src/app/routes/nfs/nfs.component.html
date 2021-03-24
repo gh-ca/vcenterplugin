@@ -86,8 +86,8 @@
           </span>
           <span *ngIf="!item.status">--</span>
         </clr-dg-cell>
-        <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='list'">{{item.capacity ? formatCapacity(item.capacity):'--'}}</clr-dg-cell>
-        <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='list'">{{item.freeSpace ? formatCapacity(item.freeSpace):'--'}}</clr-dg-cell>
+        <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='list'" style="text-align: right">{{item.capacity ? formatCapacity(item.capacity):'--'}}</clr-dg-cell>
+        <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='list'" style="text-align: right">{{item.freeSpace ? formatCapacity(item.freeSpace):'--'}}</clr-dg-cell>
         <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='list'">
           <div class="progress-block" *ngIf="item.capacity && item.freeSpace">
             <clr-progress-bar clrValue="{{((item.capacity - item.freeSpace)/item.capacity * 100).toFixed(2)}}" clrSuccess></clr-progress-bar>
@@ -95,17 +95,17 @@
           </div>
           <span *ngIf="!item.capacity && !item.freeSpace">--</span>
         </clr-dg-cell>
-        <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='list'">{{item.reserveCapacity ? formatCapacity(item.reserveCapacity):'--'}}</clr-dg-cell>
+        <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='list'" style="text-align: right">{{item.reserveCapacity ? formatCapacity(item.reserveCapacity):'--'}}</clr-dg-cell>
         <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='list'">{{item.device ? item.device:'--'}}</clr-dg-cell>
         <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='list'">{{item.logicPort ? item.logicPort:'--'}}</clr-dg-cell>
         <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='list'">{{item.shareIp ? item.shareIp:'--'}}</clr-dg-cell>
         <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='list'">{{item.sharePath ? item.sharePath:'--'}}</clr-dg-cell>
         <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='list'">{{item.fs ? item.fs:'--'}}</clr-dg-cell>
 
-        <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='chart'">{{item.ops ? item.ops:'--'}}</clr-dg-cell>
-        <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='chart'">{{item.bandwidth ? item.bandwidth:'--'}}</clr-dg-cell>
-        <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='chart'">{{item.readResponseTime ? item.readResponseTime:'--'}}</clr-dg-cell>
-        <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='chart'">{{item.writeResponseTime ? item.writeResponseTime:'--'}}</clr-dg-cell>
+        <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='chart'" style="text-align: right">{{item.ops ? item.ops:'--'}}</clr-dg-cell>
+        <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='chart'" style="text-align: right">{{item.bandwidth ? item.bandwidth:'--'}}</clr-dg-cell>
+        <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='chart'" style="text-align: right">{{item.readResponseTime ? item.readResponseTime:'--'}}</clr-dg-cell>
+        <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='chart'" style="text-align: right">{{item.writeResponseTime ? item.writeResponseTime:'--'}}</clr-dg-cell>
       </clr-dg-row>
       <clr-dg-footer>
         <clr-dg-pagination #pagination [clrDgPageSize]="5" [clrDgTotalItems]="total">

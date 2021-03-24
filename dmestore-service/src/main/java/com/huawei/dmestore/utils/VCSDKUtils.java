@@ -233,9 +233,11 @@ public class VCSDKUtils {
                         String objectid = vcConnectionHelpers.mor2ObjectId(ds1.getMor(),
                             vmwareContext.getServerAddress());
                         dsmap.put(OBJECT_ID, objectid);
-                        if (storeType.equalsIgnoreCase(ToolUtils.STORE_TYPE_NFS) && ds1.getSummary()
+                        if (storeType.equalsIgnoreCase(ToolUtils.STORE_TYPE_NFS) && (ds1.getSummary()
                             .getType()
-                            .equalsIgnoreCase(ToolUtils.STORE_TYPE_NFS)) {
+                            .equalsIgnoreCase(ToolUtils.STORE_TYPE_NFS) || ds1.getSummary()
+                            .getType()
+                            .equalsIgnoreCase(ToolUtils.STORE_TYPE_NFS41))) {
                             NasDatastoreInfo nasinfo = (NasDatastoreInfo) ds1.getInfo();
 
                             dsmap.put("remoteHost", nasinfo.getNas().getRemoteHost());
@@ -257,7 +259,8 @@ public class VCSDKUtils {
                         }
                         if (StringUtils.isEmpty(storeType)) {
                             lists.add(dsmap);
-                        } else if (ds1.getSummary().getType().equals(storeType)) {
+                        } else if (ds1.getSummary().getType().equals(storeType) ||
+                            ds1.getSummary().getType().equals(ToolUtils.STORE_TYPE_NFS41)) {
                             lists.add(dsmap);
                         }
                     }

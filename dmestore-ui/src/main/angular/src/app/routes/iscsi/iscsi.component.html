@@ -82,7 +82,7 @@
               <span *ngIf="item.mac == ''">--</span>
               <span *ngIf="item.mac != ''">{{item.mac}}</span>
             </clr-dg-cell>
-            <clr-dg-cell>
+            <clr-dg-cell style="text-align: right">
               <span *ngIf="item.maxSpeed == -1">--</span>
               <span *ngIf="item.maxSpeed != -1">{{item.maxSpeed}}</span>
             </clr-dg-cell>
@@ -94,7 +94,7 @@
               <span *ngIf="item.mgmtIpv6 == ''">--</span>
               <span *ngIf="item.mgmtIpv6 != ''">{{item.mgmtIpv6}}</span>
             </clr-dg-cell>
-            <clr-dg-cell>
+            <clr-dg-cell style="text-align: right">
               <span *ngIf="item.speed == -1">--</span>
               <span *ngIf="item.speed != -1">{{item.speed}}</span>
             </clr-dg-cell>

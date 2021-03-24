@@ -11,7 +11,7 @@
     <clr-dg-column [clrDgField]="'recommendValue'">{{'bestPractice.recommend'|translate}}</clr-dg-column>
     <clr-dg-column [clrDgField]="'levelDesc'" [clrDgSortBy]="'levelNum'">{{'bestPractice.level'|translate}}</clr-dg-column>
     <clr-dg-column class="hideFilter" [clrDgField]="'count'" [clrDgSortOrder]="'count'">{{'bestPractice.violation'|translate}}</clr-dg-column>
-    <clr-dg-column>{{'bestPractice.description'|translate}}</clr-dg-column>
+    <clr-dg-column style="width: 11rem;">{{'bestPractice.description.name'|translate}}</clr-dg-column>
     <clr-dg-column>{{'bestPractice.operation'|translate}}</clr-dg-column>
     <clr-dg-placeholder>{{'tips.noData' | translate}}</clr-dg-placeholder>
     <clr-dg-row *clrDgItems="let item of list" [clrDgItem]="item">
@@ -31,11 +31,11 @@
           <span class="color-square" style="background-color: #79C6E6; margin-right: 10px"></span>{{item.levelDesc}}
         </span>
       </clr-dg-cell>
-      <clr-dg-cell>
+      <clr-dg-cell style="text-align: right">
 <!--        <span *ngIf="item.count > 0" (click)="openHostList(item)" style="color:#00F;cursor:pointer">{{item.count}}</span>-->
         <span>{{item.count}}</span>
       </clr-dg-cell>
-      <clr-dg-cell>--</clr-dg-cell>
+      <clr-dg-cell class="over_flow" title="{{item.description}}">{{item.description}}</clr-dg-cell>
       <clr-dg-cell>
         <span *ngIf="item.count > 0" (click)="openHostList(item)" style="color:#00F;cursor:pointer">{{'bestPractice.implementation'|translate}}</span>
         <span *ngIf="item.count == 0" style="color:#9F9F9F;">{{'bestPractice.implementation'|translate}}</span>

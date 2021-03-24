@@ -368,6 +368,8 @@ public class DmeAccessServiceImpl implements DmeAccessService {
                                 relists.add(map);
                             }
                         }
+                    }else {
+                        LOG.error("getWorkLoads error url:{},error:{}", workloadsUrl,responseEntity.getStatusCodeValue());
                     }
                 } catch (DmeException e) {
                     LOG.error("getWorkLoads error url:{},error:{}", workloadsUrl, e.toString());

@@ -30,6 +30,7 @@ import com.google.gson.reflect.TypeToken;
 import com.sun.org.apache.bcel.internal.generic.NEW;
 import com.vmware.vim.binding.vmodl.list;
 import com.vmware.vim.binding.vmodl.map;
+import com.vmware.vim.binding.vmodl.name;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -1909,6 +1910,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         List<VmfsDatastoreVolumeDetail> list = new ArrayList<>();
         List<String> volumeIds = dmeVmwareRalationDao.getVolumeIdsByStorageId(storageObjectId);
         LOG.error("get volume detail! volumeIds={}", gson.toJson(volumeIds));
+        String storageId = "";
         for (String volumeId : volumeIds) {
             // 调用DME接口获取卷详情
             String url = DmeConstants.DME_VOLUME_BASE_URL + FIEL_SEPARATOR + volumeId;
@@ -1929,7 +1931,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             volumeDetail.setName(volume.get(NAME_FIELD).getAsString());
             volumeDetail.setServiceLevel(ToolUtils.jsonToStr(volume.get(SERVICE_LEVEL_NAME), null));
             if (!volume.get(STORAGE_ID).isJsonNull()) {
-                String storageId = volume.get(STORAGE_ID).getAsString();
+                 storageId = volume.get(STORAGE_ID).getAsString();
 
                 // 根据存储ID查询存储信息
                 url = DmeConstants.DME_STORAGE_DETAIL_URL.replace("{storage_id}", storageId);
@@ -1948,11 +1950,47 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             if (!tuning.isJsonNull()) {
                 parseVolumeTuning(volumeDetail, tuning);
             }
+            // 存储应用类型
+            //String workLoadName = getWorkLoadNameById(storageId, volumeDetail.getApplicationType());
+            //volumeDetail.setApplicationType(getWorkLoadNameById(storageId, volumeDetail.getApplicationType()));
             list.add(volumeDetail);
         }
 
         return list;
     }
+    private String getWorkLoadNameById(String storageId,String workLoadType) throws DmeException {
+        String name = "";
+        Map<String, String> params = new HashMap<>();
+        if (!StringUtils.isEmpty(workLoadType)) {
+            params.put("create_type", workLoadType);
+        }
+        if (!StringUtils.isEmpty(storageId)) {
+            String workloadsUrl = DmeConstants.GET_WORKLOADS_URL.replace("{storage_id}", storageId);
+            LOG.info("storage workload request params:{}", gson.toJson(params));
+            ResponseEntity responseEntity = null;
+            if (params.size() != 0) {
+                responseEntity = dmeAccessService.access(workloadsUrl, HttpMethod.GET, gson.toJson(params));
+            }else {
+                responseEntity = dmeAccessService.access(workloadsUrl, HttpMethod.GET, null);
+            }
+            if (responseEntity.getStatusCodeValue() == RestUtils.RES_STATE_I_200) {
+                JsonObject jsonObject = new JsonParser().parse(responseEntity.getBody().toString())
+                    .getAsJsonObject();
+                if (jsonObject != null && jsonObject.get(DmeConstants.DATAS) != null) {
+                    JsonArray jsonArray = jsonObject.getAsJsonArray(DmeConstants.DATAS);
+                    for (int index = 0; index < jsonArray.size(); index++) {
+                        JsonObject vjson = jsonArray.get(index).getAsJsonObject();
+                        name = ToolUtils.jsonToStr(vjson.get("name"));
+                        break;
+                    }
+                }
+            } else {
+                LOG.error("getWorkLoads error url:{},error:{}", workloadsUrl);
+            }
+        }
+        return name;
+    }
+
 
     private void parseStoragePool(String poolId, VmfsDatastoreVolumeDetail volumeDetail) throws DmeException {
         String poolName = "";

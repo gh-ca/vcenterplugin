@@ -31,6 +31,7 @@ export class RdmComponent implements OnInit {
   ownerControllers:StorageController[] = [];
   hostList = [];
   dataStoreObjectId = '';
+  defaultStoreObjectId = '';
   levelCheck = 'level';
   dataStores = [];
 
@@ -86,7 +87,7 @@ export class RdmComponent implements OnInit {
     if(ctx != null){
       this.vmObjectId = ctx[0].id;
     } else{
-      this.vmObjectId = 'urn:vmomi:VirtualMachine:vm-1046:674908e5-ab21-4079-9cb1-596358ee5dd1';
+      this.vmObjectId = 'urn:vmomi:VirtualMachine:vm-12030:674908e5-ab21-4079-9cb1-596358ee5dd1';
     }
     this.loadDataStore();
   }
@@ -290,11 +291,22 @@ export class RdmComponent implements OnInit {
     this.dsLoading = true;
     this.http.get('v1/vmrdm/vCenter/datastoreOnHost', { params: {vmObjectId : this.vmObjectId}}).subscribe((result: any) => {
       this.dsLoading = false;
+      let dataStores;
       if (result.code === '200'){
-        this.dataStores = JSON.parse(result.data);
+        dataStores = JSON.parse(result.data);
       } else{
+        dataStores = [];
+      }
+      const selectData = dataStores.filter(item => item.vmRootpath)[0];
+      this.dataStoreObjectId = selectData.objectId;
+      this.defaultStoreObjectId = selectData.objectId;
+      if (dataStores.length > 0) {
+        this.dataStores = dataStores.filter(item => !item.vmRootpath);
+      } else {
         this.dataStores = [];
       }
+
+
       this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
     }, err => {
       console.error('ERROR', err);
