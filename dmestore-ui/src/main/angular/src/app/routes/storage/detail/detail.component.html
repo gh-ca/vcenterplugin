@@ -1319,8 +1319,8 @@
                                 </clr-dg-cell>
                                 <clr-dg-cell class="over_flow">{{item.currentPortName!=null?item.currentPortName:'--'}}</clr-dg-cell>
                                 <clr-dg-cell class="over_flow">
-                                  <span *ngIf="item.role == '1'">{{'enum.status.service' | translate}}</span>
-                                  <span *ngIf="item.role == '2'">{{'enum.status.management' | translate}}</span>
+                                  <span *ngIf="item.role == '1'">{{'enum.status.management' | translate}}</span>
+                                  <span *ngIf="item.role == '2'">{{'enum.status.service' | translate}}</span>
                                   <span *ngIf="item.role == '3'">{{'enum.status.managementAndService' | translate}}</span>
                                   <span *ngIf="item.role != '1' && item.role != '2' && item.role != '3'">--</span>
                                 </clr-dg-cell>

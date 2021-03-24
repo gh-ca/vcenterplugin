@@ -1247,11 +1247,11 @@ export class LogicDdnsStatusFilter implements ClrDatagridFilterInterface<LogicPo
       </clr-radio-wrapper>
       <clr-radio-wrapper>
         <input type="radio" clrRadio name="role" (change)="changeFunc($event)" [(ngModel)]="role" value="1"/>
-        <label>{{'enum.status.service' | translate}}</label>
+        <label>{{'enum.status.management' | translate}}</label>
       </clr-radio-wrapper>
       <clr-radio-wrapper>
         <input type="radio" clrRadio name="role" (change)="changeFunc($event)" [(ngModel)]="role" value="2"/>
-        <label>{{'enum.status.management' | translate}}</label>
+        <label>{{'enum.status.service' | translate}}</label>
       </clr-radio-wrapper>
       <clr-radio-wrapper>
         <input type="radio" clrRadio name="role" (change)="changeFunc($event)" [(ngModel)]="role" value="3"/>
