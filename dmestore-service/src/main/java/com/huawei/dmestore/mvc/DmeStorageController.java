@@ -98,9 +98,10 @@ public class DmeStorageController extends BaseController {
      */
     @GetMapping("/logicports")
     @ResponseBody
-    public ResponseBodyBean getLogicPorts(@RequestParam(name = "storageId") String storageId) {
+    public ResponseBodyBean getLogicPorts(@RequestParam(name = "storageId") String storageId,
+                                          @RequestParam(name = "supportProtocol",required = false,defaultValue = "all") String supportProtocol) {
         try {
-            return success(dmeStorageService.getLogicPorts(storageId));
+            return success(dmeStorageService.getLogicPorts(storageId,supportProtocol));
         } catch (DmeException e) {
             return failure(e.getMessage());
         }

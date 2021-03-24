@@ -224,7 +224,7 @@ public class DmeStorageServiceImplTest {
         map.put("logic_ports", list);
         ResponseEntity<String> responseEntity = new ResponseEntity<>(gson.toJson(map), null, HttpStatus.OK);
         when(dmeAccessService.access(url, HttpMethod.GET, null)).thenReturn(responseEntity);
-        List<LogicPorts> logicPorts = dmeStorageService.getLogicPorts(storageId);
+        List<LogicPorts> logicPorts = dmeStorageService.getLogicPorts(storageId,null);
         System.out.println(logicPorts);
 
     }
