@@ -669,7 +669,7 @@
     "storage1": "存储/存储池",
     "storage": "存储设备",
     "sPool": "存储池",
-    "dataStore": "数据存储",
+    "dataStore": "位置",
     "ownerC": "归属控制器",
     "idp": "容量初始分配策略",
     "fetchP": "预取策略",
