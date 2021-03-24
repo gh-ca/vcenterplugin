@@ -2200,7 +2200,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
     @Override
     public void unmountVmfs(Map<String, Object> params) throws DmeException {
         List<String> taskIds = new ArrayList<>();
-        List<String> dataStoreObjectIds = null;
+        List<String> dataStoreObjectIds = new ArrayList<>();
         String hostObjId = "";
         String clusterObjId = "";
         if (null != params && null != params.get(DATASTORE_OBJECT_IDS)) {

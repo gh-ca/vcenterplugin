@@ -62,6 +62,8 @@
 
     <bean name="dmeInfoDao" class="com.huawei.dmestore.dao.DmeInfoDao">
         <property name="url" value="${h2.url}"/>
+        <property name="user" value="${h2.user}"/>
+        <property name="password" value="${h2.pass}"/>
         <property name="cipherUtils" ref="cipherUtils"/>
     </bean>
 
@@ -77,18 +79,26 @@
 
     <bean name="h2DataBaseDao" class="com.huawei.dmestore.dao.H2DataBaseDao">
         <property name="url" value="${h2.url}"/>
+        <property name="user" value="${h2.user}"/>
+        <property name="password" value="${h2.pass}"/>
     </bean>
 
     <bean name="systemDao" class="com.huawei.dmestore.dao.SystemDao">
         <property name="url" value="${h2.url}"/>
+        <property name="user" value="${h2.user}"/>
+        <property name="password" value="${h2.pass}"/>
     </bean>
 
     <bean name="vcenterInfoDao" class="com.huawei.dmestore.dao.VCenterInfoDao">
         <property name="url" value="${h2.url}"/>
+        <property name="user" value="${h2.user}"/>
+        <property name="password" value="${h2.pass}"/>
     </bean>
 
     <bean name="scheduleDao" class="com.huawei.dmestore.dao.ScheduleDao">
         <property name="url" value="${h2.url}"/>
+        <property name="user" value="${h2.user}"/>
+        <property name="password" value="${h2.pass}"/>
     </bean>
 
     <bean name="InstantiationBeanServiceImpl"
@@ -126,6 +136,8 @@
     </bean>
     <bean name="dmeVmwareRalationDao" class="com.huawei.dmestore.dao.DmeVmwareRalationDao">
         <property name="url" value="${h2.url}"/>
+        <property name="user" value="${h2.user}"/>
+        <property name="password" value="${h2.pass}"/>
     </bean>
 
     <bean name="VmfsAccessServiceImpl" class="com.huawei.dmestore.services.VmfsAccessServiceImpl">
@@ -218,6 +230,8 @@
 
     <bean name="bestPracticeCheckDao" class="com.huawei.dmestore.dao.BestPracticeCheckDao">
         <property name="url" value="${h2.url}"/>
+        <property name="user" value="${h2.user}"/>
+        <property name="password" value="${h2.pass}"/>
     </bean>
 
     <bean name="vCSDKUtils" class="com.huawei.dmestore.utils.VCSDKUtils">
@@ -226,10 +240,7 @@
     </bean>
 
     <bean name="springBootConnectionHelper" class="com.huawei.vmware.SpringBootConnectionHelpers">
-        <property name="serverurl" value="10.143.132.248"/>
-        <property name="username" value="administrator@vsphere.local"/>
-        <property name="password" value="Pbu4@123"/>
-        <property name="serverport" value="443"/>
+
         <property name="vCenterInfoService" ref="VCenterInfoServiceImpl"/>
     </bean>
 

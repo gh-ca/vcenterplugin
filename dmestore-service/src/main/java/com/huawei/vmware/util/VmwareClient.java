@@ -53,6 +53,7 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 
 import java.lang.reflect.Method;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -112,7 +113,7 @@ public class VmwareClient {
 
         @Override
         public java.security.cert.X509Certificate[] getAcceptedIssuers() {
-            return null;
+            return new X509Certificate[0];
         }
 
         @Override
