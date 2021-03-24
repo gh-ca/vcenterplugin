@@ -446,7 +446,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
     }
 
     @Override
-    public List<LogicPorts> getLogicPorts(String storageId) throws DmeException {
+    public List<LogicPorts> getLogicPorts(String storageId,String supportProtocol) throws DmeException {
         List<LogicPorts> resList = new ArrayList<>();
         String url = DmeConstants.API_LOGICPORTS_LIST;
         JsonObject param = null;
@@ -488,10 +488,16 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                     logicPorts.setCurrentPortName(ToolUtils.jsonToStr(element.get("current_port_name")));
                     logicPorts.setSupportProtocol(ToolUtils.jsonToStr(element.get("support_protocol")));
                     logicPorts.setManagementAccess(ToolUtils.jsonToStr(element.get("management_access")));
-                    logicPorts.setVstoreId(ToolUtils.jsonToStr(element.get("vstore_id")));
+                    logicPorts.setVstoreId(ToolUtils.jsonToStr(element.get("vstore_raw_id")));
                     logicPorts.setVstoreName(ToolUtils.jsonToStr(element.get("vstore_name")));
 
-                    resList.add(logicPorts);
+                    if (!StringUtils.isEmpty(supportProtocol) && supportProtocol.equalsIgnoreCase("iSCSI") &&
+                        supportProtocol.equalsIgnoreCase(logicPorts.getSupportProtocol())) {
+                        resList.add(logicPorts);
+                    } else if (supportProtocol.equalsIgnoreCase("all")) {
+                        resList.add(logicPorts);
+                    }
+
                 }
             }
         } catch (DmeException e) {

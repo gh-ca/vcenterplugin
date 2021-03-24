@@ -7,10 +7,22 @@
   <!-- 列表页 -->
   <clr-datagrid [(clrDgSelected)]="rowSelected" [clrDgLoading]="isLoading">
 
-    <clr-dg-column [clrDgField]="'hostSetting'">{{'bestPractice.hostSetting'|translate}}</clr-dg-column>
-    <clr-dg-column [clrDgField]="'recommendValue'">{{'bestPractice.recommend'|translate}}</clr-dg-column>
-    <clr-dg-column [clrDgField]="'levelDesc'" [clrDgSortBy]="'levelNum'">{{'bestPractice.level'|translate}}</clr-dg-column>
-    <clr-dg-column class="hideFilter" [clrDgField]="'count'" [clrDgSortOrder]="'count'">{{'bestPractice.violation'|translate}}</clr-dg-column>
+    <clr-dg-column #hostSetting [clrDgField]="'hostSetting'" style="position: relative" (clrDgSortedChange)="sortFunc($event);">
+      {{'bestPractice.hostSetting'|translate}}
+      <clr-icon *ngIf="sortFunc(hostSetting.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.6rem;"></clr-icon>
+    </clr-dg-column>
+    <clr-dg-column #recommendValue [clrDgField]="'recommendValue'" style="position: relative" (clrDgSortedChange)="sortFunc($event);">
+      {{'bestPractice.recommend'|translate}}
+      <clr-icon *ngIf="sortFunc(recommendValue.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.6rem;"></clr-icon>
+    </clr-dg-column>
+    <clr-dg-column #levelDesc [clrDgField]="'levelDesc'" [clrDgSortBy]="'levelNum'" style="position: relative" (clrDgSortedChange)="sortFunc($event);">
+      {{'bestPractice.level'|translate}}
+      <clr-icon *ngIf="sortFunc(levelDesc.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.6rem;"></clr-icon>
+    </clr-dg-column>
+    <clr-dg-column class="hideFilter" #count [clrDgField]="'count'" [clrDgSortOrder]="'count'" style="position: relative" (clrDgSortedChange)="sortFunc($event);">
+      {{'bestPractice.violation'|translate}}
+      <clr-icon *ngIf="sortFunc(count.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.6rem;"></clr-icon>
+    </clr-dg-column>
     <clr-dg-column style="width: 11rem;">{{'bestPractice.description.name'|translate}}</clr-dg-column>
     <clr-dg-column>{{'bestPractice.operation'|translate}}</clr-dg-column>
     <clr-dg-placeholder>{{'tips.noData' | translate}}</clr-dg-placeholder>
@@ -64,9 +76,9 @@
       <!-- 列表页 -->
       <clr-datagrid [(clrDgSelected)]="hostSelected"  (clrDgRefresh)="hostRefresh()" [clrDgLoading]="hostIsLoading">
 
-        <clr-dg-column [clrDgField]="'hostName'">{{'bestPractice.host'|translate}}</clr-dg-column>
-        <clr-dg-column [clrDgField]="'actualValue'">{{'bestPractice.actual'|translate}}</clr-dg-column>
-        <clr-dg-column [clrDgField]="'recommendValue'">{{'bestPractice.recommend'|translate}}</clr-dg-column>
+        <clr-dg-column>{{'bestPractice.host'|translate}}</clr-dg-column>
+        <clr-dg-column>{{'bestPractice.actual'|translate}}</clr-dg-column>
+        <clr-dg-column>{{'bestPractice.recommend'|translate}}</clr-dg-column>
         <clr-dg-placeholder>{{'tips.noData' | translate}}</clr-dg-placeholder>
         <clr-dg-row *clrDgItems="let item of hostList" [clrDgItem]="item">
           <clr-dg-cell class="over_flow" title="{{item.hostName ? item.hostName:'--'}}">{{item.hostName ? item.hostName:'--'}}</clr-dg-cell>
