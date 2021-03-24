@@ -49,6 +49,9 @@ import java.util.List;
 import java.util.Map;
 
 import java.util.Set;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import jdk.nashorn.internal.parser.Parser;
 import sun.rmi.runtime.Log;
@@ -201,6 +204,8 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             // 整理数据
             Map<String, String> stoNameMap = getStorNameMap(storagemap);
 
+            Map<String, VmfsDataInfo> volIds = new HashMap<>();
+
             // 取得vcenter中的所有vmfs存储。
             String listStr = vcsdkUtils.getAllVmfsDataStoreInfos(DmeConstants.STORE_TYPE_VMFS);
             if (!StringUtils.isEmpty(listStr)) {
@@ -224,8 +229,23 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                             vmfsDataInfo.setObjectid(ToolUtils.jsonToStr(jo.get(OBJECTID)));
 
                             DmeVmwareRelation dvr = dvrMap.get(vmwareStoreobjectid);
-                            getVmfsDetailFromDme(relists, stoNameMap, vmfsDataInfo, dvr.getVolumeId());
+                            volIds.put(dvr.getVolumeId(), vmfsDataInfo);
                         }
+                    }
+                    Iterator<String> iterator = volIds.keySet().iterator();
+                    int k = 0;
+                    Map<String, VmfsDataInfo> tm = new HashMap<>();
+                    while(iterator.hasNext()){
+                        k++;
+                        String key = iterator.next();
+                        tm.put(key, volIds.get(key));
+                        if (k % 20 == 0){
+                            getVmfsSync(tm, relists, stoNameMap);
+                            tm = new HashMap<>();
+                        }
+                    }
+                    if (k % 20 > 0){
+                        getVmfsSync(tm, relists, stoNameMap);
                     }
                 }
             } else {
@@ -236,6 +256,22 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             throw new DmeException(e.getMessage());
         }
         return relists;
+    }
+
+    public synchronized void getVmfsSync(Map<String, VmfsDataInfo> volIds, List<VmfsDataInfo> vmfsDataInfos, Map<String, String> stoNameMap){
+        ExecutorService executorService = Executors.newFixedThreadPool(volIds.size());
+        CountDownLatch countDownLatch = new CountDownLatch(volIds.size());
+        for (Map.Entry<String, VmfsDataInfo> entry: volIds.entrySet()){
+            executorService.execute(()->{
+                getVmfsDetailFromDme(vmfsDataInfos, stoNameMap, entry.getValue(), entry.getKey());
+                countDownLatch.countDown();
+            });
+        }
+        try {
+            countDownLatch.await();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     private void getVmfsDetailFromDme(List<VmfsDataInfo> relists, Map<String, String> stoNameMap,
