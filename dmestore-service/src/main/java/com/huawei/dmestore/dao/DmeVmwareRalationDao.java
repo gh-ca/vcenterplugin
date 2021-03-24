@@ -188,6 +188,32 @@ public class DmeVmwareRalationDao extends H2DataBaseDao {
         return lists;
     }
 
+    public List<String> getAllDatastoreObjIdByType(String storeType) throws DmeSqlException {
+        List<String> lists = new ArrayList<>();
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        String sql = "SELECT VOLUME_WWN FROM " + DpSqlFileConstants.DP_DME_VMWARE_RELATION + " WHERE state = 1 ";
+        try {
+            con = getConnection();
+            if (!StringUtils.isEmpty(storeType)) {
+                sql = sql + " and STORE_TYPE = '" + storeType + "'";
+            }
+            LOGGER.info("getAllWwnByType!sql={}, connection is not null:{}", sql, con == null ? false : true);
+            ps = con.prepareStatement(sql);
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                lists.add(rs.getString(STORE_ID));
+            }
+        } catch (DataBaseException | SQLException e) {
+            LOGGER.error("Failed to get dme access info! sql={}", sql);
+            throw new DmeSqlException(e.getMessage());
+        } finally {
+            closeConnection(con, ps, rs);
+        }
+        return lists;
+    }
+
     public List<String> getAllStorageIdByType(String storeType) throws DmeSqlException {
         List<String> lists = new ArrayList<>();
         Connection con = null;

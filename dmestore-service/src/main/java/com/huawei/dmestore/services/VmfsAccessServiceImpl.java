@@ -2155,14 +2155,16 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         throws DmeSqlException {
         // 本地全量查询
         List<String> localWwns = dmeVmwareRalationDao.getAllWwnByType(storeType);
-
+        List<String> storeIds = dmeVmwareRalationDao.getAllStorageIdByType(storeType);
         List<DmeVmwareRelation> newList = new ArrayList<>();
         List<DmeVmwareRelation> upList = new ArrayList<>();
         for (DmeVmwareRelation relation : relationList) {
             String wwn = relation.getVolumeWwn();
-            if (localWwns.contains(wwn)) {
+            String storeId = relation.getStoreId();
+            if (localWwns.contains(wwn) && storeIds.contains(storeId)) {
                 upList.add(relation);
                 localWwns.remove(wwn);
+                storeIds.remove(storeId);
             } else {
                 newList.add(relation);
             }
@@ -2179,7 +2181,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         }
 
         // 删除
-        if (!localWwns.isEmpty()) {
+        if (!localWwns.isEmpty() && !storeIds.isEmpty()) {
             dmeVmwareRalationDao.deleteByWwn(localWwns);
         }
         return true;
