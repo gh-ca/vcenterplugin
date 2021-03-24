@@ -7,7 +7,7 @@ import {StorageList, StorageService} from "../storage/storage.service";
 @Component({
   selector: "device-filter",
   template: `
-      <clr-radio-container>
+      <clr-radio-container style="margin-top: 0px;">
         <clr-radio-wrapper>
           <input type="radio" clrRadio name="options" (change)="changeFunc($event)" [(ngModel)]="options" value="" />
           <label>{{'enum.status.all' | translate}}</label>
