@@ -81,6 +81,8 @@ import com.vmware.vim25.ManagedObjectReference;
 import com.vmware.vim25.NasDatastoreInfo;
 import com.vmware.vim25.VirtualDiskMode;
 import com.vmware.vim25.VirtualDiskType;
+import com.vmware.vim25.VirtualHardwareOption;
+import com.vmware.vim25.VirtualMachineFileInfo;
 import com.vmware.vim25.VirtualNicManagerNetConfig;
 import com.vmware.vim25.VmfsDatastoreExpandSpec;
 import com.vmware.vim25.VmfsDatastoreInfo;
@@ -99,10 +101,12 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
@@ -229,9 +233,11 @@ public class VCSDKUtils {
                         String objectid = vcConnectionHelpers.mor2ObjectId(ds1.getMor(),
                             vmwareContext.getServerAddress());
                         dsmap.put(OBJECT_ID, objectid);
-                        if (storeType.equalsIgnoreCase(ToolUtils.STORE_TYPE_NFS) && ds1.getSummary()
+                        if (storeType.equalsIgnoreCase(ToolUtils.STORE_TYPE_NFS) && (ds1.getSummary()
                             .getType()
-                            .equalsIgnoreCase(ToolUtils.STORE_TYPE_NFS)) {
+                            .equalsIgnoreCase(ToolUtils.STORE_TYPE_NFS) || ds1.getSummary()
+                            .getType()
+                            .equalsIgnoreCase(ToolUtils.STORE_TYPE_NFS41))) {
                             NasDatastoreInfo nasinfo = (NasDatastoreInfo) ds1.getInfo();
 
                             dsmap.put("remoteHost", nasinfo.getNas().getRemoteHost());
@@ -253,7 +259,8 @@ public class VCSDKUtils {
                         }
                         if (StringUtils.isEmpty(storeType)) {
                             lists.add(dsmap);
-                        } else if (ds1.getSummary().getType().equals(storeType)) {
+                        } else if (ds1.getSummary().getType().equals(storeType) ||
+                            ds1.getSummary().getType().equals(ToolUtils.STORE_TYPE_NFS41)) {
                             lists.add(dsmap);
                         }
                     }
@@ -2020,6 +2027,7 @@ public class VCSDKUtils {
             VmwareContext vmwareContext = vcConnectionHelpers.getServerContext(serverguid);
             VirtualMachineMo virtualMachineMo = virtualMachineMoFactorys.build(vmwareContext,
                 vcConnectionHelpers.objectId2Mor(vmObjectId));
+            String vmPathName = ToolUtils.handleString(virtualMachineMo.getFileInfo());
             HostMo hostMo = virtualMachineMo.getRunningHost();
             List<Pair<ManagedObjectReference, String>> datastoreMountsOnHost = hostMo.getDatastoreMountsOnHost();
             for (Pair<ManagedObjectReference, String> pair : datastoreMountsOnHost) {
@@ -2029,6 +2037,11 @@ public class VCSDKUtils {
                 DatastoreSummary summary = datastoreMo.getSummary();
                 if (summary.getType().equalsIgnoreCase(DmeConstants.STORE_TYPE_VMFS)) {
                     JsonObject jsonObject = gson.fromJson(gson.toJson(summary), JsonObject.class);
+                    if (vmPathName.equalsIgnoreCase(summary.getName())) {
+                        jsonObject.addProperty("vmRootpath", true);
+                    } else {
+                        jsonObject.addProperty("vmRootpath", false);
+                    }
                     jsonObject.addProperty(OBJECT_ID, objectId);
                     list.add(jsonObject);
                 }

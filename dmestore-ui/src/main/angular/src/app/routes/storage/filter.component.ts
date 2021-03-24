@@ -11,8 +11,8 @@ import {BondPort, EthernetPort, FailoverGroup, FCoEPort, FCPort, LogicPort} from
 @Component({
   selector: "storage-status-filter",
   template: `
-    <div style="max-height: 6.25rem;overflow-y: auto">
-      <clr-radio-container>
+    <div>
+      <clr-radio-container style="margin-top: 0px;">
         <label>{{'storage.list.status' | translate}}</label>
         <clr-radio-wrapper>
           <input type="radio" clrRadio name="status" (change)="changeFunc($event)" [(ngModel)]="status" value="" />
@@ -38,7 +38,7 @@ import {BondPort, EthernetPort, FailoverGroup, FCoEPort, FCPort, LogicPort} from
       <clr-radio-container>
         <label>————————————————</label>
       </clr-radio-container>
-      <clr-radio-container>
+      <clr-radio-container style="margin-top: 0px;">
         <label>{{'storage.list.synStatus' | translate}}</label>
         <clr-radio-wrapper>
           <input type="radio" clrRadio name="synStatus" (change)="changeFunc($event)" [(ngModel)]="synStatus" value="" />
@@ -101,7 +101,7 @@ export class StorageStatusFilter implements ClrDatagridFilterInterface<StorageLi
 @Component({
   selector: "storage-pool-type-filter",
   template: `
-    <clr-radio-container>
+    <clr-radio-container style="margin-top: 0px;">
       <clr-radio-wrapper>
         <input type="radio" clrRadio name="mediaType" (change)="changeFunc($event)" [(ngModel)]="mediaType" value="" />
         <label>{{'vmfs.filter.all' | translate}}</label>
@@ -151,7 +151,7 @@ export class StoragePoolTypeFilter implements ClrDatagridFilterInterface<Storage
 @Component({
   selector: "storage-pool-status-filter",
   template: `
-    <clr-radio-container>
+    <clr-radio-container style="margin-top: 0px;">
       <clr-radio-wrapper>
         <input type="radio" clrRadio name="status" (change)="changeFunc($event)" [(ngModel)]="status" value="" />
         <label>{{'vmfs.filter.all' | translate}}</label>
@@ -203,7 +203,7 @@ export class StoragePoolStatusFilter implements ClrDatagridFilterInterface<Stora
 @Component({
   selector: "vol-status-filter",
   template: `
-    <clr-radio-container style="max-height: 6.25rem;overflow-y: auto">
+    <clr-radio-container style="margin-top: 0px;">
       <clr-radio-wrapper>
         <input type="radio" clrRadio name="status" (change)="changeFunc($event)" [(ngModel)]="status" value="" />
         <label>{{'vmfs.filter.all' | translate}}</label>
@@ -271,7 +271,7 @@ export class VolStatusFilter implements ClrDatagridFilterInterface<Volume>{
 @Component({
   selector: "por-type-filter",
   template: `
-    <clr-radio-container>
+    <clr-radio-container style="margin-top: 0px;">
       <clr-radio-wrapper>
         <input type="radio" clrRadio name="type" (change)="changeFunc($event)" [(ngModel)]="type" value="" />
         <label>{{'vmfs.filter.all' | translate}}</label>
@@ -319,7 +319,7 @@ export class ProTypeFilter implements ClrDatagridFilterInterface<Volume>{
 @Component({
   selector: "map-status-filter",
   template: `
-    <clr-radio-container>
+    <clr-radio-container style="margin-top: 0px;">
       <clr-radio-wrapper>
         <input type="radio" clrRadio name="status" (change)="changeFunc($event)" [(ngModel)]="status" value="" />
         <label>{{'vmfs.filter.all' | translate}}</label>
@@ -366,7 +366,7 @@ export class MapStatusFilter implements ClrDatagridFilterInterface<Volume>{
 @Component({
   selector: "vol-pool-filter",
   template: `
-    <clr-radio-container style="max-height: 6.25rem;overflow-y: auto">
+    <clr-radio-container style="margin-top: 0px;">
       <clr-radio-wrapper>
         <input type="radio" clrRadio name="storagePoolName" (change)="changeFunc($event)" [(ngModel)]="storagePoolName" value="" />
         <label>{{'vmfs.filter.all' | translate}}</label>
@@ -415,7 +415,7 @@ export class VolStoragePoolFilter implements ClrDatagridFilterInterface<Volume>{
 @Component({
   selector: "vol-serviceLevel-filter",
   template: `
-      <clr-radio-container style="max-height: 6.25rem;overflow-y: auto">
+      <clr-radio-container style="margin-top: 0px;">
         <clr-radio-wrapper>
           <input type="radio" clrRadio name="serviceLevel" (change)="changeFunc($event)" [(ngModel)]="serviceLevel" value="all" />
           <label>{{'vmfs.filter.all' | translate}}</label>
@@ -480,7 +480,7 @@ export class VolServiceLevelFilter implements ClrDatagridFilterInterface<Volume>
 @Component({
   selector: "vol-protection-status-filter",
   template: `
-      <clr-radio-container>
+      <clr-radio-container style="margin-top: 0px;">
         <clr-radio-wrapper>
           <input type="radio" clrRadio name="protectionStatus" (change)="changeFunc($event)" [(ngModel)]="protectionStatus" value=""/>
           <label>{{'vmfs.filter.all' | translate}}</label>
@@ -528,7 +528,7 @@ export class VolProtectionStatusFilter implements ClrDatagridFilterInterface<Vol
 @Component({
   selector: "fs-status-filter",
   template: `
-      <clr-radio-container style="max-height: 6.25rem;overflow-y: auto">
+      <clr-radio-container style="margin-top: 0px;">
         <clr-radio-wrapper>
           <input type="radio" clrRadio name="fsStatus" (change)="changeFunc($event)" [(ngModel)]="fsStatus" value=""/>
           <label>{{'vmfs.filter.all' | translate}}</label>
@@ -580,7 +580,7 @@ export class FsStatusFilter implements ClrDatagridFilterInterface<FileSystem> {
 @Component({
   selector: "fs-type-filter",
   template: `
-    <clr-radio-container>
+    <clr-radio-container style="margin-top: 0px;">
       <clr-radio-wrapper>
         <input type="radio" clrRadio name="type" (change)="changeFunc($event)" [(ngModel)]="type" value="" />
         <label>{{'vmfs.filter.all' | translate}}</label>
@@ -628,7 +628,7 @@ export class FsTypeFilter implements ClrDatagridFilterInterface<FileSystem>{
 @Component({
   selector: "dtree-secMod-filter",
   template: `
-    <clr-radio-container>
+    <clr-radio-container style="margin-top: 0px;">
       <clr-radio-wrapper>
         <input type="radio" clrRadio name="secMod" (change)="changeFunc($event)" [(ngModel)]="secMod" value="all" />
         <label>{{'vmfs.filter.all' | translate}}</label>
@@ -685,7 +685,7 @@ export class DtreeSecModFilter implements ClrDatagridFilterInterface<Dtrees>{
 @Component({
   selector: "dtree-quota-filter",
   template: `
-    <clr-radio-container>
+    <clr-radio-container style="margin-top: 0px;">
       <clr-radio-wrapper>
         <input type="radio" clrRadio name="quota" (change)="changeFunc($event)" [(ngModel)]="quota" value="all" />
         <label>{{'vmfs.filter.all' | translate}}</label>
@@ -733,7 +733,7 @@ export class DtreeQuotaFilter implements ClrDatagridFilterInterface<Dtrees>{
 @Component({
   selector: "hd-status-filter",
   template: `
-    <clr-radio-container>
+    <clr-radio-container style="margin-top: 0px;">
       <clr-radio-wrapper>
         <input type="radio" clrRadio name="status" (change)="changeFunc($event)" [(ngModel)]="status" value="all" />
         <label>{{'vmfs.filter.all' | translate}}</label>
@@ -793,7 +793,7 @@ export class HardwareStatusFilter implements ClrDatagridFilterInterface<StorageC
 @Component({
   selector: "disk-status-filter",
   template: `
-    <clr-radio-container>
+    <clr-radio-container style="margin-top: 0px;">
       <clr-radio-wrapper>
         <input type="radio" clrRadio name="status" (change)="changeFunc($event)" [(ngModel)]="status" value="all" />
         <label>{{'vmfs.filter.all' | translate}}</label>
@@ -848,7 +848,7 @@ export class DiskStatusFilter implements ClrDatagridFilterInterface<StorageDisk>
 @Component({
   selector: "disk-type-filter",
   template: `
-    <clr-radio-container>
+    <clr-radio-container style="margin-top: 0px;">
       <clr-radio-wrapper>
         <input type="radio" clrRadio name="type" (change)="changeFunc($event)" [(ngModel)]="type" value="all" />
         <label>{{'vmfs.filter.all' | translate}}</label>
@@ -907,7 +907,7 @@ export class DiskTypeFilter implements ClrDatagridFilterInterface<StorageDisk>{
 @Component({
   selector: "fc-status-filter",
   template: `
-    <clr-radio-container style="max-height: 6.25rem;overflow-y: auto">
+    <clr-radio-container style="margin-top: 0px;">
       <clr-radio-wrapper>
         <input type="radio" clrRadio name="status" (change)="changeFunc($event)" [(ngModel)]="status" value="all" />
         <label>{{'vmfs.filter.all' | translate}}</label>
@@ -966,7 +966,7 @@ export class FcStatusFilter implements ClrDatagridFilterInterface<FCPort>{
 @Component({
   selector: "eth-status-filter",
   template: `
-    <clr-radio-container style="max-height: 6.25rem;overflow-y: auto">
+    <clr-radio-container style="margin-top: 0px;">
       <clr-radio-wrapper>
         <input type="radio" clrRadio name="status" (change)="changeFunc($event)" [(ngModel)]="status" value="all" />
         <label>{{'vmfs.filter.all' | translate}}</label>
@@ -1026,7 +1026,7 @@ export class EthStatusFilter implements ClrDatagridFilterInterface<EthernetPort>
 @Component({
   selector: "fcoe-status-filter",
   template: `
-    <clr-radio-container style="max-height: 6.25rem;overflow-y: auto">
+    <clr-radio-container style="margin-top: 0px;">
       <clr-radio-wrapper>
         <input type="radio" clrRadio name="status" (change)="changeFunc($event)" [(ngModel)]="status" value="all" />
         <label>{{'vmfs.filter.all' | translate}}</label>
@@ -1085,7 +1085,7 @@ export class FcoeStatusFilter implements ClrDatagridFilterInterface<FCoEPort>{
 @Component({
   selector: "logic-running-status-filter",
   template: `
-    <clr-radio-container>
+    <clr-radio-container style="margin-top: 0px;">
       <clr-radio-wrapper>
         <input type="radio" clrRadio name="status" (change)="changeFunc($event)" [(ngModel)]="status" value="all" />
         <label>{{'vmfs.filter.all' | translate}}</label>
@@ -1132,7 +1132,7 @@ export class LogicRunningStatusFilter implements ClrDatagridFilterInterface<Logi
 @Component({
   selector: "logic-status-filter",
   template: `
-    <clr-radio-container>
+    <clr-radio-container style="margin-top: 0px;">
       <clr-radio-wrapper>
         <input type="radio" clrRadio name="status" (change)="changeFunc($event)" [(ngModel)]="status" value="all" />
         <label>{{'vmfs.filter.all' | translate}}</label>
@@ -1184,7 +1184,7 @@ export class LogicStatusFilter implements ClrDatagridFilterInterface<LogicPort>{
 @Component({
   selector: "logic-ddns-status-filter",
   template: `
-    <clr-radio-container>
+    <clr-radio-container style="margin-top: 0px;">
       <clr-radio-wrapper>
         <input type="radio" clrRadio name="ddnsStatus" (change)="changeFunc($event)" [(ngModel)]="ddnsStatus" value="all" />
         <label>{{'vmfs.filter.all' | translate}}</label>
@@ -1240,7 +1240,7 @@ export class LogicDdnsStatusFilter implements ClrDatagridFilterInterface<LogicPo
 @Component({
   selector: "logic-role-filter",
   template: `
-    <clr-radio-container>
+    <clr-radio-container style="margin-top: 0px;">
       <clr-radio-wrapper>
         <input type="radio" clrRadio name="role" (change)="changeFunc($event)" [(ngModel)]="role" value="all" />
         <label>{{'vmfs.filter.all' | translate}}</label>
@@ -1291,7 +1291,7 @@ export class LogicRoleFilter implements ClrDatagridFilterInterface<LogicPort>{
 @Component({
   selector: "failover-group-type-filter",
   template: `
-    <clr-radio-container>
+    <clr-radio-container style="margin-top: 0px;">
       <clr-radio-wrapper>
         <input type="radio" clrRadio name="failoverGroupType" (change)="changeFunc($event)" [(ngModel)]="failoverGroupType" value="all" />
         <label>{{'vmfs.filter.all' | translate}}</label>
@@ -1343,7 +1343,7 @@ export class FailoverGroupTypeFilter implements ClrDatagridFilterInterface<Failo
 @Component({
   selector: "health-status-filter",
   template: `
-    <clr-radio-container style="max-height: 6.25rem;overflow-y: auto">
+    <clr-radio-container style="margin-top: 0px;">
       <clr-radio-wrapper>
         <input type="radio" clrRadio name="healthStatus" (change)="changeFunc($event)" [(ngModel)]="healthStatus" value="all" />
         <label>{{'vmfs.filter.all' | translate}}</label>
@@ -1406,7 +1406,7 @@ export class HealthStatusFilter implements ClrDatagridFilterInterface<BondPort>{
 @Component({
   selector: "ports-running-status-filter",
   template: `
-    <clr-radio-container style="max-height: 6.25rem;overflow-y: auto">
+    <clr-radio-container style="margin-top: 0px;">
       <clr-radio-wrapper>
         <input type="radio" clrRadio name="runningStatus" (change)="changeFunc($event)" [(ngModel)]="runningStatus" value="all" />
         <label>{{'vmfs.filter.all' | translate}}</label>

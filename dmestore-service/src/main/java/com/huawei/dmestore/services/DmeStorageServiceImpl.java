@@ -230,9 +230,11 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         Double protectionCapacity = 0.0;
         Double fileCapacity = 0.0;
         Double blockCapacity = 0.0;
+        Double blockFileCapacity = 0.0;
         Double dedupedCapacity = 0.0;
         Double compressedCapacity = 0.0;
         for (StoragePool storagePool : storagePools) {
+            // 块文件容量
             totalPoolCapicity += storagePool.getTotalCapacity();
             //subscriptionCapacity += storagePool.getSubscribedCapacity();
             protectionCapacity += storagePool.getProtectionCapacity();
@@ -242,17 +244,23 @@ public class DmeStorageServiceImpl implements DmeStorageService {
             if ("block".equalsIgnoreCase(storagePool.getMediaType())) {
                 blockCapacity += storagePool.getConsumedCapacity();
             }
+            if ("block-and-file".equalsIgnoreCase(storagePool.getMediaType())) {
+                blockFileCapacity += storagePool.getConsumedCapacity();
+            }
             dedupedCapacity += storagePool.getDedupedCapacity();
             compressedCapacity += storagePool.getCompressedCapacity();
         }
         if (isDorado) {
+            Double totalEffectiveCapacity = storageObj.getTotalEffectiveCapacity();
             storageObj.setFreeEffectiveCapacity(
-                storageObj.getTotalEffectiveCapacity() - fileCapacity - blockCapacity - protectionCapacity);
+                storageObj.getTotalEffectiveCapacity() - blockFileCapacity- protectionCapacity);
         } else {
+            // 总容量
             storageObj.setTotalEffectiveCapacity(totalPoolCapicity);
             storageObj.setFreeEffectiveCapacity(totalPoolCapicity - fileCapacity - blockCapacity - protectionCapacity);
         }
         //storageObj.setSubscriptionCapacity(subscriptionCapacity);
+        storageObj.setBlockFileCapacity(blockFileCapacity);
         storageObj.setProtectionCapacity(protectionCapacity);
         storageObj.setFileCapacity(fileCapacity);
         storageObj.setBlockCapacity(blockCapacity);
@@ -381,7 +389,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
     }
 
     private void parseStoragePoolCapacity(JsonObject element, StoragePool storagePool) {
-        storagePool.setConsumedCapacity(ToolUtils.jsonToDou(element.get(USED_CAPACITY), 0.0));
+
         Double totalCapacity = ToolUtils.jsonToDou(element.get("totalCapacity"), 0.0);
         storagePool.setTotalCapacity(totalCapacity);
         Double consumedCapacity = ToolUtils.jsonToDou(element.get(USED_CAPACITY), 0.0);
@@ -438,7 +446,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
     }
 
     @Override
-    public List<LogicPorts> getLogicPorts(String storageId) throws DmeException {
+    public List<LogicPorts> getLogicPorts(String storageId,String supportProtocol) throws DmeException {
         List<LogicPorts> resList = new ArrayList<>();
         String url = DmeConstants.API_LOGICPORTS_LIST;
         JsonObject param = null;
@@ -480,10 +488,16 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                     logicPorts.setCurrentPortName(ToolUtils.jsonToStr(element.get("current_port_name")));
                     logicPorts.setSupportProtocol(ToolUtils.jsonToStr(element.get("support_protocol")));
                     logicPorts.setManagementAccess(ToolUtils.jsonToStr(element.get("management_access")));
-                    logicPorts.setVstoreId(ToolUtils.jsonToStr(element.get("vstore_id")));
+                    logicPorts.setVstoreId(ToolUtils.jsonToStr(element.get("vstore_raw_id")));
                     logicPorts.setVstoreName(ToolUtils.jsonToStr(element.get("vstore_name")));
 
-                    resList.add(logicPorts);
+                    if (!StringUtils.isEmpty(supportProtocol) && supportProtocol.equalsIgnoreCase("iSCSI") &&
+                        supportProtocol.equalsIgnoreCase(logicPorts.getSupportProtocol())) {
+                        resList.add(logicPorts);
+                    } else if (supportProtocol.equalsIgnoreCase("all")) {
+                        resList.add(logicPorts);
+                    }
+
                 }
             }
         } catch (DmeException e) {

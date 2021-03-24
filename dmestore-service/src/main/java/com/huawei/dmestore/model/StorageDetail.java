@@ -1,6 +1,8 @@
 package com.huawei.dmestore.model;
 
 
+import com.vmware.vim25.DatastoreRemovedOnHostEvent;
+
 import java.util.Arrays;
 
 /**
@@ -75,6 +77,11 @@ public class StorageDetail {
      * 卷 .
      */
     private Double blockCapacity;
+
+    /**
+     * 块/文件容量
+     */
+    private Double blockFileCapacity;
     /**
      * 去重容量.
      **/
@@ -814,6 +821,14 @@ public class StorageDetail {
      */
     public void setOptimizeCapacity(final Double param) {
         this.optimizeCapacity = param;
+    }
+
+    public Double getBlockFileCapacity() {
+        return blockFileCapacity;
+    }
+
+    public void setBlockFileCapacity(Double blockFileCapacity) {
+        this.blockFileCapacity = blockFileCapacity;
     }
 
     @Override

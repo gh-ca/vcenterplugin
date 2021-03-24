@@ -21,5 +21,6 @@ export class FsDetail{
    controller: string;
    fileSystemId:string;
    isDorado:boolean;
+   dorado:boolean;
 }
 

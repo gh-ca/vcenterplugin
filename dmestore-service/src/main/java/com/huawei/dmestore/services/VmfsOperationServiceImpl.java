@@ -303,6 +303,8 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
         Map<String, Object> reqMap = new HashMap<>();
         reqMap.put("service_level_id", params.get("service_level_id"));
         reqMap.put("volume_ids", params.get("volume_ids"));
+        // 自动变更属性
+        reqMap.put("attributes_auto_change", true);
         try {
             ResponseEntity<String> responseEntity = dmeAccessService.access(DmeConstants.API_SERVICELEVEL_UPDATE,
                 HttpMethod.POST, gson.toJson(reqMap));

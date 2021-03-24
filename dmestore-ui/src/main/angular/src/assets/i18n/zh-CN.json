@@ -249,7 +249,7 @@
     "deduplication": "重复数据删除",
     "compression": "数据压缩",
     "qos": "QoS",
-    "protection": "Protection",
+    "protection": "保护",
     "volumeName": "卷名称",
     "low": "低",
     "none": "无",
@@ -267,7 +267,7 @@
     "expandTipsMax": "扩容后总容量不能超过256TB。",
     "loadingTips": "数据加载中，请稍后",
     "dataHandleLoadingTips": "数据处理中，请稍后",
-    "listNullTips": "找不到VMFS",
+    "listNullTips": "暂无数据",
     "workload": "应用类型",
     "add": {
       "success": "添加成功！"
@@ -346,7 +346,7 @@
       "wp":"维保时间",
       "alarm":"告警",
       "event":"事件",
-      "zone":"可用区",
+      "zone":"可用分区",
       "rawCap":"裸容量",
       "usedCap":"已使用容量",
       "capUsage":"容量利用率",
@@ -354,8 +354,8 @@
       "freeCap":"空闲容量",
       "supRate":"订阅率",
       "totalCap":"总容量",
-      "cpuUtilization":"CPU使用率",
-      "latency":"时延(毫秒)",
+      "cpuUtilization":"CPU利用率",
+      "latency":"平均I/O响应时间(ms)",
       "iops":"IOPS",
       "ops":"OPS",
       "bandwidth":"带宽(MB/s)",
@@ -446,7 +446,7 @@
         "unknown":"未知"
       },
       "volumes":{
-        "volumes":"LUN",
+        "volumes":"LUNs",
         "name":"名称",
         "status":"状态",
         "dataStore":"所属数据存储",
@@ -508,10 +508,10 @@
           "controller":"控制器",
           "status":"状态",
           "version":"版本",
-          "cpuUsage":"CPU使用率",
+          "cpuUsage":"CPU利用率",
           "iops":"IOPS",
           "ops":"OPS",
-          "latency":"时延(毫秒)",
+          "latency":"平均I/O响应时间(ms)",
           "bandwidth":"带宽(MB/s)"
         },
         "disks":{
@@ -521,10 +521,10 @@
           "type":"类型",
           "capacity":"容量",
           "role":"角色",
-          "diskDomain":"磁盘域",
+          "diskDomain":"硬盘域",
           "rotationalSpeed":"转速",
           "iops":"IOPS",
-          "latency":"时延(毫秒)",
+          "latency":"平均I/O响应时间(ms)",
           "bandwidth":"带宽(MB/s)",
           "usage":"使用率(%)"
         },
@@ -535,7 +535,7 @@
           "wwn":"WWN",
           "workingRate":"工作速度(Mbps)",
           "iops":"IOPS",
-          "latency":"时延(毫秒)",
+          "latency":"平均I/O响应时间(ms)",
           "bandwidth":"带宽(MB/s)",
           "usage":"使用率(%)",
           "name":"名称",
@@ -543,7 +543,7 @@
           "runningStatus":"运行状态",
           "mtu":"MTU(Byte)",
           "totalIops":"Total IOPS(IO/s)",
-          "avg":"平均I/O响应时间(微秒)",
+          "avg":"平均I/O响应时间(μs)",
           "totalBandwidth":"总带宽(MB/s)",
           "ipv4":"IPv4地址",
           "ipv6":"IPv6地址",
@@ -588,7 +588,7 @@
     "totalCapacity": "总量",
     "used": "已用",
     "free": "可用",
-    "top5T": "存储使用率前5",
+    "top5T": "存储容量利用率Top5",
     "connectT": "DME连接",
     "connectFail": "连接失败！",
     "connectSuccess": "连接成功！",
@@ -616,7 +616,22 @@
     "exeFail": "执行失败",
     "operation": "操作",
     "implementation": "实施",
-    "description": "描述",
+    "description": {
+      "name": "描述",
+      "vmfs5": "实施后将会启用VAAI ATS Heartbeat功能。在ESXi6.5以前版本可能会导致VMFS3、VMFS5对应的数据存储丢失连接，建议关闭，其他版本推荐开启。",
+      "locking": "实施后将启用VAAI ATS锁机制。ATS锁机制对比SCSI预留锁机制，提供了更细粒度的锁（扇区），并将VMFS锁操作卸载到存储侧执行，解决多台主机同时访问VMFS产生的并发问题。",
+      "init": "实施后可以利用VAAI硬件加速VMFS数据初始化，使磁盘初始置零卸载到存储侧进行，从而提高性能。",
+      "move": "实施后可利用VAAI硬件加速VMFS数据移动，使数据移动卸载到存储侧进行，从而提高性能。",
+      "delete": "实施后，使用VMFS5的虚拟机可通过执行unmap命令实现空间回收。如果要成功执行unmap命令，虚拟盘使用的数据存储的“精简制备”功能必须为“受支持”状态。",
+      "quanTum": "实施后会将虚拟盘的队列深度配置为64。队列过小的话，会导致请求阻塞。",
+      "diskMaxIOSize": "实施后会将虚拟盘的最大磁盘读/写I/O设置为当前版本ESXi的适用值。在特定版本ESXi中，I/O值设置过大可能会引起Windows EFI boot issue，最佳实践会自动使用为较小的值。",
+      "depthForQlogic": "实施后会将Qlogic HBA卡队列深度设置为512，增加ESXI主机的吞吐量。",
+      "depthForEmulex": "实施后会将Emulex HBA卡队列深度设置为512，增加ESXI主机的吞吐量。",
+      "pathSwitchPolicy": "实施后将自动为存储设备配置多路径选路策略，提高存储设备的可用性和性能。",
+      "jumboFrame": "实施后会启用巨型帧配置，ESXi Vmkernel适配器的MTU会设置为9000。推荐存储网络使用巨型帧。该配置需ESXi主机、存储设备和数据包链路上的所有物理网络设备均支持巨型帧，且上述设备的MTU都设置为9000。",
+      "reclamation": "实施后，将为VMFS6数据存储配置自动空间回收策略。",
+      "numberOfVolInDatastore": "实施后，会将单个数据存储中卷的最大数量限制为1。这是由于虚拟机不能并发处理数据存储中多个卷的请求，当一个数据存储中包含多个卷时，某个卷的请求阻塞会影响其他卷，因此不推荐一个数据存储中包含多个卷。"
+    },
     "applyBestPracticeTips": "所选数据中有违规数为0的数据，请重新选择!"
   },
   "iscsi": {
@@ -706,6 +721,8 @@
     "createRdmError": "创建RDM出错!",
     "selectOneSer": "DME存储策略不能为空！",
     "rdmSuccessMsg": "创建RDM成功!",
+    "addTips": "注：当您需要在存储上创建新LUN，并用该LUN给虚拟机创建RDM盘时，使用该方式。如果想使用已有LUN创建，可直接在虚拟机硬件编辑中选择添加RDM磁盘。",
+    "defaultStorage": "与虚拟机存储在同一目录中",
     "compatibilityMode": {
       "name": "兼容模式",
       "virtualMode": "虚拟",
@@ -843,7 +860,7 @@
     "type":{
       "block":"块",
       "file":"文件",
-      "blockAndFile": "块和文件"
+      "blockAndFile": "块/文件"
     }
   },
   "errorMsg":{

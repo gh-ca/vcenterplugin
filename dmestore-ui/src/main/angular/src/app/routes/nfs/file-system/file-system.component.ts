@@ -14,15 +14,17 @@ export class FileSystemComponent implements OnInit {
   fsDetail: FsDetail = new FsDetail();
   fsNames: string[] = [];
   defaultSelect: string;
+  isLoading = true;
   constructor(private fsService: FileSystemService, private gs: GlobalsService, private translatePipe:TranslatePipe) { }
 
   ngOnInit(): void {
     const ctx = this.gs.getClientSdk().app.getContextObjects();
    this.getFsDetail(ctx[0].id);
-   //this.getFsDetail('urn:vmomi:Datastore:datastore-6019:674908e5-ab21-4079-9cb1-596358ee5dd1');
+   // this.getFsDetail('urn:vmomi:Datastore:datastore-12024:674908e5-ab21-4079-9cb1-596358ee5dd1');
   }
   getFsDetail(objectId){
     this.fsService.getData(objectId).subscribe((result: any) => {
+      this.isLoading = false;
       this.fsDetails = result.data;
       this.fsDetails.forEach(f => {
         this.fsNames.push(f.name);

@@ -6,6 +6,7 @@
     <ng-template clrPageTitle>{{'rdm.basicSet' | translate}}</ng-template> <!-- mandatory -->
 
     <form clrForm #formPageOne="ngForm">
+      <span style="color: red">{{'rdm.addTips' | translate}}</span>
       <!--名称 -->
       <clr-input-container>
         <label  style="color: #9F9F9F;">{{'rdm.name' | translate}}<span style="color: red">*</span></label>
@@ -49,7 +50,8 @@
       <clr-select-container class="selectClass">
         <label  style="color: #9F9F9F;">{{'rdm.dataStore' | translate}}<span style="color: red">*</span></label>
         <select clrSelect (ngModelOptions)="dataStores" required [(ngModel)]="dataStoreObjectId" name="dataStoreObjectId" class="clr-select">
-          <option *ngFor="let item of dataStores" value="{{item.objectId}}">{{item.name}}</option>
+          <option *ngIf="defaultStoreObjectId" value="{{defaultStoreObjectId}}">{{('rdm.defaultStorage' | translate)}}</option>
+          <option *ngFor="let item of dataStores" value="{{item.objectId}}">{{item.vmRootpath ? ('rdm.defaultStorage' | translate):item.name}}</option>
         </select>
         <clr-control-error>{{'validations.required' | translate}}</clr-control-error>
       </clr-select-container>
@@ -85,6 +87,7 @@
 
 
     <form clrForm #formPageTwo="ngForm">
+      <span style="color: red">{{'rdm.addTips' | translate}}</span>
       <!-- 1、选择 服务等级-->
       <div [hidden]="!serviceLevelIsNull" class="errorTips" readonly ><clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{'rdm.selectOneSer' | translate}}</div>
       <div [hidden]="!isOperationErr"  class="errorTips" readonly ><clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{'rdm.createRdmError' | translate}}</div>
@@ -110,7 +113,12 @@
                 </tr>
                 <tr>
                   <th hidden></th>
-                  <th><clr-progress-bar clrValue="{{item.usedRate}}" clrSuccess clrLabeled></clr-progress-bar></th>
+                  <th>
+                    <div class="progress-block">
+                      <clr-progress-bar clrValue="{{item.usedRate}}" clrSuccess></clr-progress-bar>
+                      <span>{{item.usedRate}}%</span>
+                    </div>
+                  </th>
                   <th *ngIf="item.capabilities.qos != undefined && item.capabilities.qos.qosParam.maxIOPS != undefined">
                     IOPS <= {{item.capabilities.qos.qosParam.maxIOPS}} IOPS/TB
                   </th>
@@ -138,7 +146,7 @@
                   <th *ngIf="item.capabilities.qos != undefined
                                                 && item.capabilities.qos.enabled == true
                                                 && item.capabilities.qos.qosParam.latency != undefined">
-                    Latency= {{item.capabilities.qos.qosParam.latency}} {{item.capabilities.qos.qosParam.latencyUnit}}
+                    {{'rdm.latency' | translate}}= {{item.capabilities.qos.qosParam.latency}} {{item.capabilities.qos.qosParam.latencyUnit}}
                   </th>
                 </tr>
                 </tbody>

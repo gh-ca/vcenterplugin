@@ -25,13 +25,14 @@
           <clr-dg-column>{{'vmfs.type' | translate}}</clr-dg-column>
           <clr-dg-column class="hideFilter" [clrDgField]="'capacity'">{{'vmfs.capacity' | translate}}</clr-dg-column>
           <clr-dg-column class="hideFilter" [clrDgField]="'freeSpace'">{{'vmfs.freeSpace' | translate}}</clr-dg-column>
+          <clr-dg-placeholder>{{'vmfs.listNullTips' | translate}}</clr-dg-placeholder>
           <clr-dg-row *clrDgItems="let item of dataStores" [clrDgItem]="item">
             <clr-dg-cell hidden>{{item.id}}</clr-dg-cell>
             <clr-dg-cell hidden>{{item.objectId}}</clr-dg-cell>
-            <clr-dg-cell>{{item.name}}</clr-dg-cell>
-            <clr-dg-cell>{{item.type}}</clr-dg-cell>
-            <clr-dg-cell>{{formatCapacity(item.capacity, true)}}</clr-dg-cell>
-            <clr-dg-cell>{{formatCapacity(item.freeSpace, true)}}</clr-dg-cell>
+            <clr-dg-cell>{{item.name ? item.name:'--'}}</clr-dg-cell>
+            <clr-dg-cell>{{item.type ? item.type:'--'}}</clr-dg-cell>
+            <clr-dg-cell style="text-align: right">{{item.capacity ? formatCapacity(item.capacity, true):'--'}}</clr-dg-cell>
+            <clr-dg-cell style="text-align: right">{{item.freeSpace ? formatCapacity(item.freeSpace, true):'--'}}</clr-dg-cell>
           </clr-dg-row>
         </clr-datagrid>
       </form>
