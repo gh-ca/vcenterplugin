@@ -120,25 +120,69 @@ export class IscsiComponent implements OnInit, AfterViewInit {
     // 有存储 有ip才去load
     if (this.configModel.sn !== '' && this.configModel.vmKernel.device !== ''){
       this.portLoading = true;
-      this.portGetUrlParams.params.storageSn = this.configModel.sn;
-      this.http.get(this.portGetUrl, this.portGetUrlParams).subscribe((result: any) => {
-        this.portLoading = false;
-        if (result.code === '200'){
-          // result.data.forEach((item) => {
-          //   item.connectStatus = '';
-          // });
-          // 端口列表中不展示名称为MGMT和MAINTENANCE的端口
-          this.portList = result.data.filter(item => item.portName.toLowerCase() != 'mgmt'
-            && item.portName.toLowerCase() != 'maintenance' && item.mgmtIp);
-          this.portTotal = result.data.length;
-          // 连通状态
-          this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
-          this.testPortConnected();
-        }
-      }, err => {
-        console.error('ERROR', err);
-        this.portLoading = false;
-      });
+      const isV6 = this.storageDevices.filter(item => item.sn == this.configModel.sn)[0].storageTypeShow.dorado;
+      // V5设备访问
+      if (!isV6) {
+        this.portGetUrlParams.params.storageSn = this.configModel.sn;
+        this.http.get(this.portGetUrl, this.portGetUrlParams).subscribe((result: any) => {
+          this.portLoading = false;
+          if (result.code === '200'){
+            // result.data.forEach((item) => {
+            //   item.connectStatus = '';
+            // });
+            // 端口列表中不展示名称为MGMT和MAINTENANCE的端口
+            this.portList = result.data.filter(item => item.portName.toLowerCase().indexOf( 'mgmt') < 0
+              && item.portName.toLowerCase().indexOf('maintenance') < 0  && item.mgmtIp);
+            this.portTotal = result.data.length;
+            // 连通状态
+            this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
+            this.testPortConnected();
+          }
+        }, err => {
+          console.error('ERROR', err);
+          this.portLoading = false;
+        });
+      } else {// V6设备访问
+        this.portLoading = true;
+        const storageId = this.storageDevices.filter(item => item.sn == this.configModel.sn)[0].id;
+        this.http.get('dmestorage/logicports?storageId=' + storageId + '&supportProtocol=iSCSI').subscribe((result: any) => {
+          this.portLoading = false;
+          if (result.code === '200'){
+            const logicDatas = [];
+            for (let i = 0;i < result.data.length; i++) {
+              let logicData = {
+                id:'',
+                location: '',
+                portName: '',
+                mgmtIp: '',
+                mgmtIpv6: '',
+                mac:'',
+                maxSpeed:null,
+                speed:null,
+                status:'',
+                connectStatusType:'',
+              };
+              logicData.location = result.data[i].currentPortName;
+              logicData.id = result.data[i].id;
+              logicData.portName = result.data[i].name;
+              logicData.mgmtIp = result.data[i].mgmtIp;
+              logicData.mgmtIpv6 = result.data[i].mgmtIpv6;
+
+              logicDatas.push(logicData);
+            }
+
+            // 端口列表中不展示名称为MGMT和MAINTENANCE的端口
+            this.portList = logicDatas.filter(item => item.portName.toLowerCase().indexOf( 'mgmt') < 0
+              && item.portName.toLowerCase().indexOf('maintenance') < 0  && item.mgmtIp);
+            // 连通状态
+            this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
+            this.testPortConnected();
+          }
+        }, err => {
+          console.error('ERROR', err);
+          this.portLoading = false;
+        });
+      }
     }
   }
 
