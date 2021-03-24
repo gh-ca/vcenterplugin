@@ -288,7 +288,7 @@
 <!--                      </clr-dg-column>-->
                       <clr-dg-column [hidden]="volumeRadio!=='table1'">{{'storage.detail.volumes.dataStore' | translate}}</clr-dg-column>
 
-                      <clr-dg-column #volLatency class="hideFilter" [clrDgField]="'lantency'" [hidden]="volumeRadio!=='table2'" style="position: relative" (clrDgSortedChange)="sortFunc($event);">
+                      <clr-dg-column #volLatency class="hideFilter" [clrDgField]="'lantency'" [hidden]="volumeRadio!=='table2'" style="min-width: 9rem;position: relative" (clrDgSortedChange)="sortFunc($event);">
                         {{'storage.detail.volumes.latency' | translate}}
                         <clr-icon *ngIf="sortFunc(volLatency.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
                       </clr-dg-column>
@@ -365,7 +365,7 @@
                           {{item.datastores ? item.datastores:'--'}}
                         </clr-dg-cell>
 
-                        <clr-dg-cell [hidden]="volumeRadio!=='table2'" style="text-align: right">{{item.lantency!=null?item.lantency.toFixed(2):'--'}}</clr-dg-cell>
+                        <clr-dg-cell [hidden]="volumeRadio!=='table2'" style="text-align: right;min-width: 9rem;">{{item.lantency!=null?item.lantency.toFixed(2):'--'}}</clr-dg-cell>
                         <clr-dg-cell [hidden]="volumeRadio!=='table2'" style="text-align: right">{{item.iops!=null?item.iops.toFixed(2):'--'}}</clr-dg-cell>
                         <clr-dg-cell [hidden]="volumeRadio!=='table2'" style="text-align: right">{{item.bandwith!=null?item.bandwith.toFixed(2):'--'}}</clr-dg-cell>
                       </clr-dg-row>
