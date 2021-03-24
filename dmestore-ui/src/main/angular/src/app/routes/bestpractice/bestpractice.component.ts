@@ -218,6 +218,51 @@ export class BestpracticeComponent implements OnInit {
                 }
                 item.levelDesc = levelDesc;
                 item.levelNum = levelNum;
+
+                // 设置描述信息
+                switch (item.hostSetting) {
+                  case 'VMFS3.UseATSForHBOnVMFS5':
+                    item.description = this.translatePipe.transform('bestPractice.description.vmfs5');
+                    break;
+                  case 'VMFS3.HardwareAcceleratedLocking':
+                    item.description = this.translatePipe.transform('bestPractice.description.locking');
+                    break;
+                  case 'DataMover.HardwareAcceleratedInit':
+                    item.description = this.translatePipe.transform('bestPractice.description.init');
+                    break;
+                  case 'DataMover.HardwareAcceleratedMove':
+                    item.description = this.translatePipe.transform('bestPractice.description.move');
+                    break;
+                  case 'VMFS3.EnableBlockDelete':
+                    item.description = this.translatePipe.transform('bestPractice.description.delete');
+                    break;
+                  case 'Disk.SchedQuantum':
+                    item.description = this.translatePipe.transform('bestPractice.description.quanTum');
+                    break;
+                  case 'Disk.DiskMaxIOSize':
+                    item.description = this.translatePipe.transform('bestPractice.description.diskMaxIOSize');
+                    break;
+                  case 'LUN Queue Depth for Qlogic':
+                    item.description = this.translatePipe.transform('bestPractice.description.depthForQlogic');
+                    break;
+                  case 'LUN Queue Depth for Emulex':
+                    item.description = this.translatePipe.transform('bestPractice.description.depthForEmulex');
+                    break;
+                  case 'NMP path switch policy':
+                    item.description = this.translatePipe.transform('bestPractice.description.pathSwitchPolicy');
+                    break;
+                  case 'Jumbo Frame (MTU)':
+                    item.description = this.translatePipe.transform('bestPractice.description.jumboFrame');
+                    break;
+                  case 'VMFS-6 Auto-Space Reclamation':
+                    item.description = this.translatePipe.transform('bestPractice.description.reclamation');
+                    break;
+                  case 'Number of volumes in Datastore':
+                    item.description = this.translatePipe.transform('bestPractice.description.numberOfVolInDatastore');
+                    break;
+                  default:
+                    item.description = '--';
+                }
                 // 违规主机实际值修改
                 item.hostList.forEach(hostInfo => {
                   hostInfo.actualObjValue = this.getTypeOf(hostInfo.actualValue);
@@ -301,7 +346,28 @@ export class BestpracticeComponent implements OnInit {
     });
     return title;
   }
-}
+
+  sortFunc(obj:any) {
+    // let object;
+    // if (obj.target.type && obj.target.type == 'button') {
+    //   object = obj.target;
+    // } else {
+    //   if ((obj.target.attributes.shape && obj.target.attributes.shape.nodeValue == 'filter-grid')
+    //     || (obj.target.attributes.class && obj.target.attributes.class.value == 'datagrid-column ng-star-inserted')) {
+    //     return;
+    //   } else {
+    //     object = obj.target.parentElement;
+    //   }
+    // }
+    // const sortValue = object.children[1].attributes.shape.nodeValue;
+    // if (sortValue == 'arrow down' || sortValue == 'arrow') {
+    //   object.children[0].hidden = true;
+    // } else {
+    //   object.children[0].hidden = false;
+    // }
+    return !obj;
+  }
+} 
 
 class Bestpractice {
   hostSetting: string;
@@ -310,6 +376,7 @@ class Bestpractice {
   levelNum: number;
   levelDesc: string;
   count: number;
+  description:string;
   hostList: Host[];
 }
 

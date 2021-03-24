@@ -159,23 +159,26 @@
                           {{item.raidLevel ? item.raidLevel:'--'}}
                         </clr-dg-cell>
 
-                        <clr-dg-cell [hidden]="poolRadio!=='table2'">{{item.totalCapacity ? formatCapacity(item.totalCapacity):'--'}}</clr-dg-cell>
-                        <clr-dg-cell [hidden]="poolRadio!=='table2'">{{item.consumedCapacity ? formatCapacity(item.consumedCapacity):'--'}}</clr-dg-cell>
-                        <clr-dg-cell [hidden]="poolRadio!=='table2'">
+                        <clr-dg-cell [hidden]="poolRadio!=='table2'" style="text-align: right">{{item.totalCapacity ? formatCapacity(item.totalCapacity):'--'}}</clr-dg-cell>
+                        <clr-dg-cell [hidden]="poolRadio!=='table2'" style="text-align: right">{{item.consumedCapacity ? formatCapacity(item.consumedCapacity):'--'}}</clr-dg-cell>
+                        <clr-dg-cell [hidden]="poolRadio!=='table2'" style="text-align: right">
                           <div class="progress-block" *ngIf="item.consumedCapacity">
                             <clr-progress-bar clrValue="{{((item.consumedCapacity)/item.totalCapacity * 100).toFixed(2)}}" clrSuccess></clr-progress-bar>
                             <span>{{((item.consumedCapacity)/item.totalCapacity * 100).toFixed(2)}}%</span>
                           </div>
                           <span *ngIf="!item.consumedCapacity">--</span>
                         </clr-dg-cell>
-                        <clr-dg-cell [hidden]="poolRadio!=='table2'">{{item.freeCapacity ? formatCapacity(item.freeCapacity):'--'}}</clr-dg-cell>
-                        <clr-dg-cell [hidden]="poolRadio!=='table2'">
-                          {{item.subscribedCapacity ? (item.subscribedCapacity/item.totalCapacity*100).toFixed(2):'--'}}%
+                        <clr-dg-cell [hidden]="poolRadio!=='table2'" style="text-align: right">{{item.freeCapacity ? formatCapacity(item.freeCapacity):'--'}}</clr-dg-cell>
+                        <clr-dg-cell [hidden]="poolRadio!=='table2'" style="text-align: right">
+                          <span *ngIf="item.subscribedCapacity">
+                            {{(item.subscribedCapacity/item.totalCapacity*100).toFixed(2)}}%
+                          </span>
+                          <span *ngIf="!item.subscribedCapacity">--</span>
                         </clr-dg-cell>
 
-                        <clr-dg-cell [hidden]="poolRadio!=='table3'">{{item.maxLatency!=null?item.maxLatency.toFixed(2):'--'}}</clr-dg-cell>
-                        <clr-dg-cell [hidden]="poolRadio!=='table3'">{{item.maxIops!=null?item.maxIops.toFixed(1):'--'}}</clr-dg-cell>
-                        <clr-dg-cell [hidden]="poolRadio!=='table3'">{{item.maxBandwidth!=null?item.maxBandwidth.toFixed(1):'--'}}</clr-dg-cell>
+                        <clr-dg-cell [hidden]="poolRadio!=='table3'" style="text-align: right">{{item.maxLatency!=null?item.maxLatency.toFixed(2):'--'}}</clr-dg-cell>
+                        <clr-dg-cell [hidden]="poolRadio!=='table3'" style="text-align: right">{{item.maxIops!=null?item.maxIops.toFixed(1):'--'}}</clr-dg-cell>
+                        <clr-dg-cell [hidden]="poolRadio!=='table3'" style="text-align: right">{{item.maxBandwidth!=null?item.maxBandwidth.toFixed(1):'--'}}</clr-dg-cell>
                       </clr-dg-row>
                       <clr-dg-footer>
                         <clr-dg-pagination #pagination [clrDgPageSize]="10" [clrDgTotalItems]="poolTotal">
@@ -288,7 +291,7 @@
                             --
                           </span>
                         </clr-dg-cell>
-                        <clr-dg-cell [hidden]="volumeRadio!=='table1'">{{item.capacity ? formatCapacity(item.capacity):'--'}}</clr-dg-cell>
+                        <clr-dg-cell [hidden]="volumeRadio!=='table1'" style="text-align: right">{{item.capacity ? formatCapacity(item.capacity):'--'}}</clr-dg-cell>
                         <clr-dg-cell [hidden]="volumeRadio!=='table1'">
                           <span *ngIf="item.alloctype == 'thick'">Thick</span>
                           <span *ngIf="item.alloctype == 'thin'">Thin</span>
@@ -323,9 +326,9 @@
                           {{item.datastores ? item.datastores:'--'}}
                         </clr-dg-cell>
 
-                        <clr-dg-cell [hidden]="volumeRadio!=='table2'">{{item.lantency!=null?item.lantency.toFixed(2):'--'}}</clr-dg-cell>
-                        <clr-dg-cell [hidden]="volumeRadio!=='table2'">{{item.iops!=null?item.iops.toFixed(2):'--'}}</clr-dg-cell>
-                        <clr-dg-cell [hidden]="volumeRadio!=='table2'">{{item.bandwith!=null?item.bandwith.toFixed(2):'--'}}</clr-dg-cell>
+                        <clr-dg-cell [hidden]="volumeRadio!=='table2'" style="text-align: right">{{item.lantency!=null?item.lantency.toFixed(2):'--'}}</clr-dg-cell>
+                        <clr-dg-cell [hidden]="volumeRadio!=='table2'" style="text-align: right">{{item.iops!=null?item.iops.toFixed(2):'--'}}</clr-dg-cell>
+                        <clr-dg-cell [hidden]="volumeRadio!=='table2'" style="text-align: right">{{item.bandwith!=null?item.bandwith.toFixed(2):'--'}}</clr-dg-cell>
                       </clr-dg-row>
 <!--                      <clr-dg-footer>-->
 <!--                        <clr-dg-pagination  #paginationVolume [clrDgPageSize]="10" [clrDgTotalItems]="volumeTotal">-->
@@ -443,8 +446,8 @@
                           <span *ngIf="item.type == 'worm'">{{'enum.status.wormFs' | translate}}</span>
                           <span *ngIf="!item.type">--</span>
                         </clr-dg-cell>
-                        <clr-dg-cell class="over_flow">{{item.capacity ? formatCapacity(item.capacity):'--'}}</clr-dg-cell>
-                        <clr-dg-cell class="over_flow">{{item.availableCapacity ? formatCapacity(item.availableCapacity):'--'}}</clr-dg-cell>
+                        <clr-dg-cell class="over_flow" style="text-align: right">{{item.capacity ? formatCapacity(item.capacity):'--'}}</clr-dg-cell>
+                        <clr-dg-cell class="over_flow" style="text-align: right">{{item.availableCapacity ? formatCapacity(item.availableCapacity):'--'}}</clr-dg-cell>
                         <clr-dg-cell class="over_flow">
                           <div class="progress-block" *ngIf="item.capacityUsageRatio">
                             <clr-progress-bar clrValue="{{item.capacityUsageRatio.toFixed(2)}}" clrSuccess></clr-progress-bar>
@@ -452,10 +455,10 @@
                           </div>
                           <span *ngIf="!item.capacityUsageRatio">--</span>
                         </clr-dg-cell>
-                        <clr-dg-cell class="over_flow">{{item.storagePoolName ? item.storagePoolName:'--'}}</clr-dg-cell>
-                        <clr-dg-cell class="over_flow">{{item.nfsCount ? item.nfsCount:'--'}}</clr-dg-cell>
+                        <clr-dg-cell class="over_flow" style="text-align: right">{{item.storagePoolName ? item.storagePoolName:'--'}}</clr-dg-cell>
+                        <clr-dg-cell class="over_flow" style="text-align: right">{{item.nfsCount ? item.nfsCount:'--'}}</clr-dg-cell>
                         <!--<clr-dg-cell class="over_flow">{{item.cifs_count}}</clr-dg-cell>-->
-                        <clr-dg-cell class="over_flow">{{item.dtreeCount ? item.dtreeCount:'--'}}</clr-dg-cell>
+                        <clr-dg-cell class="over_flow" style="text-align: right">{{item.dtreeCount ? item.dtreeCount:'--'}}</clr-dg-cell>
                       </clr-dg-row>
 
                       <clr-dg-footer>
@@ -511,7 +514,7 @@
                           <span *ngIf="item.securityStyle">{{item.securityStyle}}</span>
                           <span *ngIf="!item.securityStyle||item.securityStyle==''">--</span>
                         </clr-dg-cell>
-                        <clr-dg-cell class="over_flow">{{item.nfsCount}}</clr-dg-cell>
+                        <clr-dg-cell class="over_flow" style="text-align: right">{{item.nfsCount}}</clr-dg-cell>
                         <!--<clr-dg-cell class="over_flow">{{item.cifs_count}}</clr-dg-cell>-->
                         <clr-dg-cell class="over_flow">
                           <span *ngIf="item.quotaSwitch">{{'enum.status.enabled' | translate}}</span>
@@ -819,11 +822,11 @@
                             <span *ngIf="!item.status">--</span>
                           </clr-dg-cell>
                           <clr-dg-cell class="over_flow">{{item.softVer ? item.softVer:'--'}}</clr-dg-cell>
-                          <clr-dg-cell class="over_flow">{{item.cpuUsage!=null?item.cpuUsage:'--'}}</clr-dg-cell>
-                          <clr-dg-cell class="over_flow">{{item.iops!=null?item.iops:'--'}}</clr-dg-cell>
-                          <clr-dg-cell class="over_flow">{{item.ops!=null?item.ops:'--'}}</clr-dg-cell>
-                          <clr-dg-cell class="over_flow">{{item.lantency!=null?item.lantency:'--'}}</clr-dg-cell>
-                          <clr-dg-cell class="over_flow">{{item.bandwith!=null?item.bandwith:'--'}}</clr-dg-cell>
+                          <clr-dg-cell class="over_flow" style="text-align: right">{{item.cpuUsage!=null?item.cpuUsage:'--'}}</clr-dg-cell>
+                          <clr-dg-cell class="over_flow" style="text-align: right">{{item.iops!=null?item.iops:'--'}}</clr-dg-cell>
+                          <clr-dg-cell class="over_flow" style="text-align: right">{{item.ops!=null?item.ops:'--'}}</clr-dg-cell>
+                          <clr-dg-cell class="over_flow" style="text-align: right">{{item.lantency!=null?item.lantency:'--'}}</clr-dg-cell>
+                          <clr-dg-cell class="over_flow" style="text-align: right">{{item.bandwith!=null?item.bandwith:'--'}}</clr-dg-cell>
                         </clr-dg-row>
                         <clr-dg-footer>
                           <clr-dg-pagination #paginationController [clrDgPageSize]="10" [clrDgTotalItems]="conTotal">
@@ -883,17 +886,17 @@
                             <span *ngIf="item.physicalType != null && item.physicalType != ''
                             && item.physicalType != 'unknown' && item.physicalType != 'UNKNOWN'">{{item.physicalType}}</span>
                           </clr-dg-cell>
-                          <clr-dg-cell class="over_flo w">{{formatCapacity(item.capacity)}}</clr-dg-cell>
+                          <clr-dg-cell class="over_flo w" style="text-align: right">{{formatCapacity(item.capacity)}}</clr-dg-cell>
                           <clr-dg-cell class="over_flow">
                             <span *ngIf="item.logicalType == 'member'">{{'enum.status.member' | translate}}</span>
                             <span *ngIf="!item.logicalType">--</span>
                           </clr-dg-cell>
                           <clr-dg-cell class="over_flow">{{item.diskDomain ? item.diskDomain:'--'}}</clr-dg-cell>
-                          <clr-dg-cell class="over_flow">{{item.speed ? item.speed:'--'}}</clr-dg-cell>
-                          <clr-dg-cell class="over_flow">{{item.iops!=null?item.iops.toFixed(2):'--'}}</clr-dg-cell>
-                          <clr-dg-cell class="over_flow">{{item.lantency!=null?item.lantency.toFixed(2):'--'}}</clr-dg-cell>
-                          <clr-dg-cell class="over_flow">{{item.bandwith!=null?item.bandwith.toFixed(2):'--'}}</clr-dg-cell>
-                          <clr-dg-cell class="over_flow">{{item.useage!=null?item.useage.toFixed(2):'--'}}</clr-dg-cell>
+                          <clr-dg-cell class="over_flow" style="text-align: right">{{item.speed ? item.speed:'--'}}</clr-dg-cell>
+                          <clr-dg-cell class="over_flow" style="text-align: right">{{item.iops!=null?item.iops.toFixed(2):'--'}}</clr-dg-cell>
+                          <clr-dg-cell class="over_flow" style="text-align: right">{{item.lantency!=null?item.lantency.toFixed(2):'--'}}</clr-dg-cell>
+                          <clr-dg-cell class="over_flow" style="text-align: right">{{item.bandwith!=null?item.bandwith.toFixed(2):'--'}}</clr-dg-cell>
+                          <clr-dg-cell class="over_flow" style="text-align: right">{{item.useage!=null?item.useage.toFixed(2):'--'}}</clr-dg-cell>
                         </clr-dg-row>
                         <clr-dg-footer>
                           <clr-dg-pagination #paginationDisk [clrDgPageSize]="10" [clrDgTotalItems]="diskTotal">
@@ -940,11 +943,11 @@
                                   <span *ngIf="!item.status">--</span>
                                 </clr-dg-cell>
                                 <clr-dg-cell class="over_flow">{{item.wwn ? item.wwn:'--'}}</clr-dg-cell>
-                                <clr-dg-cell class="over_flow">{{item.speed!=null?item.iops.toFixed(2):'--'}}</clr-dg-cell>
-                                <clr-dg-cell class="over_flow">{{item.iops!=null?item.iops.toFixed(2):'--'}}</clr-dg-cell>
-                                <clr-dg-cell class="over_flow">{{item.lantency!=null?item.lantency.toFixed(2):'--'}}</clr-dg-cell>
-                                <clr-dg-cell class="over_flow">{{item.bandwith!=null?item.bandwith.toFixed(2):'--'}}</clr-dg-cell>
-                                <clr-dg-cell class="over_flow">{{item.useage!=null?item.useage.toFixed(2):'--'}}</clr-dg-cell>
+                                <clr-dg-cell class="over_flow" style="text-align: right">{{item.speed!=null?item.iops.toFixed(2):'--'}}</clr-dg-cell>
+                                <clr-dg-cell class="over_flow" style="text-align: right">{{item.iops!=null?item.iops.toFixed(2):'--'}}</clr-dg-cell>
+                                <clr-dg-cell class="over_flow" style="text-align: right">{{item.lantency!=null?item.lantency.toFixed(2):'--'}}</clr-dg-cell>
+                                <clr-dg-cell class="over_flow" style="text-align: right">{{item.bandwith!=null?item.bandwith.toFixed(2):'--'}}</clr-dg-cell>
+                                <clr-dg-cell class="over_flow" style="text-align: right">{{item.useage!=null?item.useage.toFixed(2):'--'}}</clr-dg-cell>
                               </clr-dg-row>
                               <clr-dg-footer>
                                 <clr-dg-pagination #paginationPort [clrDgPageSize]="10" [clrDgTotalItems]="fcTotal">
@@ -990,11 +993,11 @@
                                 <clr-dg-cell  class="over_flow">
                                   {{item.mgmtIpv6!=null?item.mgmtIpv6!=''?item.mgmtIpv6:'--':'--'}}
                                 </clr-dg-cell>
-                                <clr-dg-cell class="over_flow">{{item.speed!=null?item.speed:'--'}}</clr-dg-cell>
-                                <clr-dg-cell class="over_flow">{{item.iops!=null?item.iops:'--'}}</clr-dg-cell>
-                                <clr-dg-cell class="over_flow">{{item.lantency!=null?item.lantency:'--'}}</clr-dg-cell>
-                                <clr-dg-cell class="over_flow">{{item.bandwith!=null?item.bandwith:'--'}}</clr-dg-cell>
-                                <clr-dg-cell class="over_flow">{{item.useage!=null?item.useage:'--'}}</clr-dg-cell>
+                                <clr-dg-cell class="over_flow" style="text-align: right">{{item.speed!=null?item.speed:'--'}}</clr-dg-cell>
+                                <clr-dg-cell class="over_flow" style="text-align: right">{{item.iops!=null?item.iops:'--'}}</clr-dg-cell>
+                                <clr-dg-cell class="over_flow" style="text-align: right">{{item.lantency!=null?item.lantency:'--'}}</clr-dg-cell>
+                                <clr-dg-cell class="over_flow" style="text-align: right">{{item.bandwith!=null?item.bandwith:'--'}}</clr-dg-cell>
+                                <clr-dg-cell class="over_flow" style="text-align: right">{{item.useage!=null?item.useage:'--'}}</clr-dg-cell>
                               </clr-dg-row>
                               <clr-dg-footer>
                                 <clr-dg-pagination #paginationEth [clrDgPageSize]="10" [clrDgTotalItems]="ethTotal">
@@ -1037,11 +1040,11 @@
                                   <span *ngIf="!item.connectStatus">--</span>
                                 </clr-dg-cell>
                                 <clr-dg-cell class="over_flow">{{item.wwn ? item.wwn:'--'}}</clr-dg-cell>
-                                <clr-dg-cell class="over_flow">{{item.speed ? item.speed:'--'}}</clr-dg-cell>
-                                <clr-dg-cell class="over_flow">{{item.iops!=null?item.iops:'--'}}</clr-dg-cell>
-                                <clr-dg-cell class="over_flow">{{item.latency!=null?item.latency:'--'}}</clr-dg-cell>
-                                <clr-dg-cell class="over_flow">{{item.bandwidth!=null?item.bandwidth:'--'}}</clr-dg-cell>
-                                <clr-dg-cell class="over_flow">{{item.usage!=null?item.usage:'--'}}</clr-dg-cell>
+                                <clr-dg-cell class="over_flow" style="text-align: right">{{item.speed ? item.speed:'--'}}</clr-dg-cell>
+                                <clr-dg-cell class="over_flow" style="text-align: right">{{item.iops!=null?item.iops:'--'}}</clr-dg-cell>
+                                <clr-dg-cell class="over_flow" style="text-align: right">{{item.latency!=null?item.latency:'--'}}</clr-dg-cell>
+                                <clr-dg-cell class="over_flow" style="text-align: right">{{item.bandwidth!=null?item.bandwidth:'--'}}</clr-dg-cell>
+                                <clr-dg-cell class="over_flow" style="text-align: right">{{item.usage!=null?item.usage:'--'}}</clr-dg-cell>
                               </clr-dg-row>
                               <clr-dg-footer>
                                 <clr-dg-pagination #paginationFcoe [clrDgPageSize]="10" [clrDgTotalItems]="fcoeTotal">
@@ -1096,10 +1099,10 @@
                                   <span *ngIf="item.runningStatus == 'initializing'">{{'enum.status.initializing' | translate}}</span>
                                   <span *ngIf="!item.runningStatus">--</span>
                                 </clr-dg-cell>
-                                <clr-dg-cell class="over_flow">{{item.mtu ? item.mtu:'--'}}</clr-dg-cell>
-                                <clr-dg-cell class="over_flow">{{item.iops!=null?item.iops:'--'}}</clr-dg-cell>
-                                <clr-dg-cell class="over_flow">{{item.latency!=null?item.latency:'--'}}</clr-dg-cell>
-                                <clr-dg-cell class="over_flow">{{item.bandwidth!=null?item.bandwidth:'--'}}</clr-dg-cell>
+                                <clr-dg-cell class="over_flow" style="text-align: right">{{item.mtu ? item.mtu:'--'}}</clr-dg-cell>
+                                <clr-dg-cell class="over_flow" style="text-align: right">{{item.iops!=null?item.iops:'--'}}</clr-dg-cell>
+                                <clr-dg-cell class="over_flow" style="text-align: right">{{item.latency!=null?item.latency:'--'}}</clr-dg-cell>
+                                <clr-dg-cell class="over_flow" style="text-align: right">{{item.bandwidth!=null?item.bandwidth:'--'}}</clr-dg-cell>
                               </clr-dg-row>
                               <clr-dg-footer>
                                 <clr-dg-pagination #paginationBond [clrDgPageSize]="10" [clrDgTotalItems]="bondTotal">

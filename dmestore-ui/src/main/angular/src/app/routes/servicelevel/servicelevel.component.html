@@ -323,15 +323,15 @@
                 <clr-dg-cell [hidden]="storagePoolRadioCheck!=='basic'">{{item.physicalType ? item.physicalType:'--'}}</clr-dg-cell>
                 <clr-dg-cell [hidden]="storagePoolRadioCheck!=='basic'">{{item.storageName ? item.storageName:'--'}}</clr-dg-cell>
 
-                <clr-dg-cell [hidden]="storagePoolRadioCheck!=='capacity'">{{item.totalCapacity ? formatCapacity(item.totalCapacity):'--'}} </clr-dg-cell>
-                <clr-dg-cell [hidden]="storagePoolRadioCheck!=='capacity'">{{item.consumedCapacity ? formatCapacity(item.consumedCapacity):'--'}} </clr-dg-cell>
+                <clr-dg-cell [hidden]="storagePoolRadioCheck!=='capacity'" style="text-align: right">{{item.totalCapacity ? formatCapacity(item.totalCapacity):'--'}} </clr-dg-cell>
+                <clr-dg-cell [hidden]="storagePoolRadioCheck!=='capacity'" style="text-align: right">{{item.consumedCapacity ? formatCapacity(item.consumedCapacity):'--'}} </clr-dg-cell>
                 <clr-dg-cell [hidden]="storagePoolRadioCheck!=='capacity'">
                   <div class="progress-block">
                     <clr-progress-bar clrValue="{{item.usedCapacity}}" clrSuccess></clr-progress-bar>
                     <span>{{item.usedCapacity}}%</span>
                   </div>
                 </clr-dg-cell>
-                <clr-dg-cell [hidden]="storagePoolRadioCheck!=='capacity'">{{item.freeCapacity ? formatCapacity(item.freeCapacity):'--'}} </clr-dg-cell>
+                <clr-dg-cell [hidden]="storagePoolRadioCheck!=='capacity'" style="text-align: right">{{item.freeCapacity ? formatCapacity(item.freeCapacity):'--'}} </clr-dg-cell>
 
                 <clr-dg-cell [hidden]="storagePoolRadioCheck!=='performance'">
                   <span *ngIf="item.runningStatus == 'offline'">
@@ -350,15 +350,15 @@
                     <span class="color-square" style="background-color: #A9A9A9; margin-right: 10px"></span>--
                   </span>
                 </clr-dg-cell>
-                <clr-dg-cell [hidden]="storagePoolRadioCheck!=='performance'">
+                <clr-dg-cell [hidden]="storagePoolRadioCheck!=='performance'" style="text-align: right">
                   <span *ngIf="item.latency != undefined">{{item.latency}}</span>
                   <span *ngIf="item.latency == undefined">--</span>
                 </clr-dg-cell>
-                <clr-dg-cell [hidden]="storagePoolRadioCheck!=='performance'">
+                <clr-dg-cell [hidden]="storagePoolRadioCheck!=='performance'" style="text-align: right">
                   <span *ngIf="item.iops != undefined">{{item.iops}}</span>
                   <span *ngIf="item.iops == undefined">--</span>
                 </clr-dg-cell>
-                <clr-dg-cell [hidden]="storagePoolRadioCheck!=='performance'">
+                <clr-dg-cell [hidden]="storagePoolRadioCheck!=='performance'" style="text-align: right">
                   <span *ngIf="item.bandwidth != undefined">{{item.bandwidth}}</span>
                   <span *ngIf="item.bandwidth == undefined">--</span>
                 </clr-dg-cell>
@@ -444,22 +444,22 @@
                           </span>
                 </clr-dg-cell>
 
-                <clr-dg-cell [hidden]="volumeRadioCheck!=='basic'">{{item.capacity}} GB</clr-dg-cell>
+                <clr-dg-cell [hidden]="volumeRadioCheck!=='basic'" style="text-align: right">{{item.capacity}} GB</clr-dg-cell>
                 <clr-dg-cell [hidden]="volumeRadioCheck!=='basic'">{{item.alloctype}}</clr-dg-cell>
                 <clr-dg-cell [hidden]="volumeRadioCheck!=='basic'" *ngIf="item.capacityUsage==''">--</clr-dg-cell>
                 <clr-dg-cell [hidden]="volumeRadioCheck!=='basic'" *ngIf="item.capacityUsage!=''">
                   <clr-progress-bar clrValue="{{item.capacity_usage}}" clrSuccess clrLabeled></clr-progress-bar>
                 </clr-dg-cell>
 
-                <clr-dg-cell [hidden]="volumeRadioCheck!=='performance'">
+                <clr-dg-cell [hidden]="volumeRadioCheck!=='performance'" style="text-align: right">
                   <span *ngIf="item.latency != undefined">{{item.latency}}</span>
                   <span *ngIf="item.latency == undefined">--</span>
                 </clr-dg-cell>
-                <clr-dg-cell [hidden]="volumeRadioCheck!=='performance'">
+                <clr-dg-cell [hidden]="volumeRadioCheck!=='performance'" style="text-align: right">
                   <span *ngIf="item.iops != undefined">{{item.iops}}</span>
                   <span *ngIf="item.iops == undefined">--</span>
                 </clr-dg-cell>
-                <clr-dg-cell [hidden]="volumeRadioCheck!=='performance'">
+                <clr-dg-cell [hidden]="volumeRadioCheck!=='performance'" style="text-align: right">
                   <span *ngIf="item.bandwidth != undefined">{{item.bandwidth}}</span>
                   <span *ngIf="item.bandwidth == undefined">--</span>
                 </clr-dg-cell>
