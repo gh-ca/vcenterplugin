@@ -381,13 +381,19 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
         throws DmeSqlException {
         // 本地全量查询NFS
         List<String> storageIds = dmeVmwareRalationDao.getAllStorageIdByType(storeType);
+        List<String> fsids = dmeVmwareRalationDao.getAllFsIdByType(storeType);
+        List<String> shareIds = dmeVmwareRalationDao.getAllShareIdByType(storeType);
         List<DmeVmwareRelation> newList = new ArrayList<>();
         List<DmeVmwareRelation> upList = new ArrayList<>();
         for (DmeVmwareRelation relation : relationList) {
             String storegeId = relation.getStoreId();
-            if (storageIds.contains(storegeId)) {
+            String fsId = relation.getFsId();
+            String shareId = relation.getShareId();
+            if (storageIds.contains(storegeId) && shareIds.contains(shareId) && fsids.contains(fsId)) {
                 upList.add(relation);
                 storageIds.remove(storegeId);
+                shareIds.remove(shareId);
+                fsids.remove(fsId);
             } else {
                 newList.add(relation);
             }
