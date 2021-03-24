@@ -152,7 +152,7 @@ public class NfsOperationServiceImplTest {
         logicPorts.setName("test1");
         List<LogicPorts> list4 = new ArrayList<>();
         list4.add(logicPorts);
-        when(dmeStorageService.getLogicPorts(storageId)).thenReturn(list4);
+        when(dmeStorageService.getLogicPorts(storageId,null)).thenReturn(list4);
         Map<String, String> map4 = new HashMap<>();
         map4.put("urn:vmomi:HostSystem:host-1034:674908e5-ab21-4079-9cb1-596358ee5dd1","192.168.200.13");
         List<Map<String, String>> list5 = new ArrayList<>();

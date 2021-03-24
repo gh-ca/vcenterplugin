@@ -10,7 +10,7 @@ import {StorageList, StorageService} from "../storage/storage.service";
 @Component({
   selector: "sl-sp-status-filter",
   template: `
-    <clr-radio-container>
+    <clr-radio-container style="margin-top: 0px;">
       <clr-radio-wrapper>
         <input type="radio" clrRadio name="status" (change)="changeFunc($event)" [(ngModel)]="status" value="all" />
         <label>{{'vmfs.filter.all' | translate}}</label>
@@ -67,7 +67,7 @@ export class SLSPStatusFilter implements ClrDatagridFilterInterface<SLStoragePoo
 @Component({
   selector: "sl-sp-disk-type-filter",
   template: `
-    <clr-radio-container>
+    <clr-radio-container style="margin-top: 0px;">
       <clr-radio-wrapper>
         <input type="radio" clrRadio name="type" (change)="changeFunc($event)" [(ngModel)]="type" value="all" />
         <label>{{'vmfs.filter.all' | translate}}</label>
@@ -164,7 +164,7 @@ export class SLSPDiskTypeFilter implements ClrDatagridFilterInterface<SLStorageP
 @Component({
   selector: "sl-sp-storage-name-filter",
   template: `
-    <clr-radio-container>
+    <clr-radio-container style="margin-top: 0px;">
       <clr-radio-wrapper>
         <input type="radio" clrRadio name="storageId" (change)="changeFunc($event)" [(ngModel)]="storageId" value="all" />
         <label>{{'vmfs.filter.all' | translate}}</label>
@@ -224,7 +224,7 @@ export class SLSPStorageNameFilter implements ClrDatagridFilterInterface<SLStora
 @Component({
   selector: "lun-status-filter",
   template: `
-    <clr-radio-container>
+    <clr-radio-container style="margin-top: 0px;">
       <clr-radio-wrapper>
         <input type="radio" clrRadio name="status" (change)="changeFunc($event)" [(ngModel)]="status" value="" />
         <label>{{'vmfs.filter.all' | translate}}</label>

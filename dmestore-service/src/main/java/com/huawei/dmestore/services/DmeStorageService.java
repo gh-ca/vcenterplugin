@@ -61,10 +61,11 @@ public interface DmeStorageService {
      * list logic ports
      *
      * @param storageId storage id
+     * @param supportProtocol supportProtocol
      * @return List
      * @throws DmeException when error
      */
-    List<LogicPorts> getLogicPorts(String storageId) throws DmeException;
+    List<LogicPorts> getLogicPorts(String storageId,String supportProtocol) throws DmeException;
 
     /**
      * list volumes by page
@@ -151,6 +152,8 @@ public interface DmeStorageService {
      * @throws DmeException when error
      */
     List<EthPortInfo> getStorageEthPorts(String storageSn) throws DmeException;
+
+
 
     /**
      * get volume detail
