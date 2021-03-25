@@ -2289,4 +2289,7 @@ export class VmfsListComponent implements OnInit {
         break;
     }
   }
+  sortFunc(obj:any) {
+    return !obj;
+  }
 }

@@ -1178,7 +1178,9 @@ public class VCSDKUtils {
                     break;
                 }
             }
-            hdsMo.unmapVmfsVolumeExTask(vmfsUuids);
+            if (hdsMo != null){
+                hdsMo.unmapVmfsVolumeExTask(vmfsUuids);
+            }
             logger.info("recycleVmfsCapacity end!");
         } catch (Exception e) {
             logger.error("recycleVmfsCapacity error:{}", e.getMessage());

@@ -29,13 +29,20 @@ export class ServicelevelComponent implements OnInit, AfterViewInit, OnDestroy {
   popShow = false;
   // 容量曲线图
   volumeCapacity={};
+  volDataIsNull = false;
   storagePoolCapacity={};
+  storagePoolDataIsNull = false;
   // 性能曲线图
   volumeMaxResponseTime={};
+  volMaxDataIsNull= false;
   volumeDensity={};
+  volDenDataIsNull=false;
   volumeThroughput={};
+  volThrDataIsNull=false;
   volumeBandwidth={};
+  volBDWTDataIsNull=false;
   storagePoolDensity={};
+  storagePoolDenDataIsNull = false;
 
   range = new Range();
 
@@ -485,6 +492,7 @@ export class ServicelevelComponent implements OnInit, AfterViewInit, OnDestroy {
       , caLunTrend
       , null).then(res => {
       this.volumeCapacity = res;
+      this.volDataIsNull = res['series'][0].data.length < 1;
       this.cdr.detectChanges();
     });
 
@@ -501,6 +509,7 @@ export class ServicelevelComponent implements OnInit, AfterViewInit, OnDestroy {
       , caStroagePoolTrend
       , null).then(res => {
       this.storagePoolCapacity = res;
+      this.storagePoolDataIsNull = res['series'][0].data.length < 1;
       this.cdr.detectChanges();
     });
   }
@@ -524,6 +533,7 @@ export class ServicelevelComponent implements OnInit, AfterViewInit, OnDestroy {
       , perfResDataNames
       , null).then(res => {
       this.volumeMaxResponseTime = res;
+      this.volMaxDataIsNull = res['series'][0].data.length < 1;
       this.cdr.detectChanges();
     });
     // 性能：'LUN I/O密度(IOPS/TB)'
@@ -539,6 +549,7 @@ export class ServicelevelComponent implements OnInit, AfterViewInit, OnDestroy {
       , perfDesDataNames
       , null).then(res => {
       this.volumeDensity = res;
+      this.volDenDataIsNull = res['series'][0].data.length < 1;
       this.cdr.detectChanges();
     });
     // 性能：'卷总吞吐量(IOPS)'
@@ -553,6 +564,7 @@ export class ServicelevelComponent implements OnInit, AfterViewInit, OnDestroy {
       , perfIOPSDataNames
       , null).then(res => {
       this.volumeThroughput = res;
+      this.volThrDataIsNull = res['series'][0].data.length < 1;
       this.cdr.detectChanges();
     });
     // 性能：'卷总带宽(MB/s)'
@@ -568,6 +580,7 @@ export class ServicelevelComponent implements OnInit, AfterViewInit, OnDestroy {
       , perfBDWTDataNames
       , null).then(res => {
       this.volumeBandwidth = res;
+      this.volBDWTDataIsNull = res['series'][0].data.length < 1;
       this.cdr.detectChanges();
     });
     // 性能：存储池I/O密度(IOPS/TB)
@@ -583,6 +596,7 @@ export class ServicelevelComponent implements OnInit, AfterViewInit, OnDestroy {
       , perfSPDDataNames,
       null).then(res => {
       this.storagePoolDensity = res;
+      this.storagePoolDenDataIsNull = res['series'][0].data.length < 1;
       this.cdr.detectChanges();
     });
   }
@@ -638,6 +652,9 @@ export class ServicelevelComponent implements OnInit, AfterViewInit, OnDestroy {
 
   setDataSetsChart(height: number, title: string, subtext: string,){
 
+  }
+  sortFunc(obj:any) {
+    return !obj;
   }
 }
 

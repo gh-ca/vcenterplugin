@@ -88,6 +88,7 @@ export class RdmComponent implements OnInit {
       this.vmObjectId = ctx[0].id;
     } else{
       this.vmObjectId = 'urn:vmomi:VirtualMachine:vm-12030:674908e5-ab21-4079-9cb1-596358ee5dd1';
+      // this.vmObjectId = 'urn:vmomi:VirtualMachine:vm-4016:674908e5-ab21-4079-9cb1-596358ee5dd1';
     }
     this.loadDataStore();
   }
@@ -297,15 +298,25 @@ export class RdmComponent implements OnInit {
       } else{
         dataStores = [];
       }
-      const selectData = dataStores.filter(item => item.vmRootpath)[0];
-      this.dataStoreObjectId = selectData.objectId;
-      this.defaultStoreObjectId = selectData.objectId;
+      if (dataStores.filter(item => item.vmRootpath).length >= 1) {
+        const selectData = dataStores.filter(item => item.vmRootpath)[0];
+        this.dataStoreObjectId = selectData.objectId;
+        this.defaultStoreObjectId = selectData.objectId;
+      }
       if (dataStores.length > 0) {
         this.dataStores = dataStores.filter(item => !item.vmRootpath);
       } else {
         this.dataStores = [];
       }
-
+      if (this.dataStores.length > 0) {
+        this.dataStores.forEach(item => {
+          if (item.name.length >=15) {
+            item.shortName = item.name.substring(0,13) + '...';
+          } else {
+            item.shortName = item.name;
+          }
+        })
+      }
 
       this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
     }, err => {
