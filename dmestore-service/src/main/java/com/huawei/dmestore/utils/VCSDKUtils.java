@@ -90,6 +90,7 @@ import com.vmware.vim25.VmfsDatastoreOption;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.util.StringUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -124,7 +125,7 @@ import javax.xml.parsers.ParserConfigurationException;
  **/
 public class VCSDKUtils {
     private static final Logger logger = LoggerFactory.getLogger(VCSDKUtils.class);
-
+    private ThreadPoolTaskExecutor threadPoolExecutor;
     private static final Class<?> VERSION = version10.class;
 
     private static final String POLICY_DESC = "policy created by dme";
@@ -200,6 +201,14 @@ public class VCSDKUtils {
     private VirtualMachineMoFactorys virtualMachineMoFactorys = VirtualMachineMoFactorys.getInstance();
 
     private Gson gson = new Gson();
+
+    public ThreadPoolTaskExecutor getThreadPoolExecutor() {
+        return threadPoolExecutor;
+    }
+
+    public void setThreadPoolExecutor(ThreadPoolTaskExecutor threadPoolExecutor) {
+        this.threadPoolExecutor = threadPoolExecutor;
+    }
 
     public CipherUtils getCipherUtils() {
         return cipherUtils;
@@ -2962,7 +2971,7 @@ public class VCSDKUtils {
                 }
 
                 List<Map<String, Object>> reEthPorts = new ArrayList<>();
-                ExecutorService taskExecutor = Executors.newFixedThreadPool(THREAD_POOL_SIZE);
+                //ExecutorService taskExecutor = Executors.newFixedThreadPool(THREAD_POOL_SIZE);
 
                 // 用于判断所有的线程是否结束
                 final CountDownLatch latch = new CountDownLatch(ethPorts.size());
@@ -3033,7 +3042,7 @@ public class VCSDKUtils {
                             }
                         }
                     };
-                    taskExecutor.execute(run);
+                    threadPoolExecutor.execute(run);
                 }
                 try {
                     // 等待所有线程执行完毕
@@ -3043,7 +3052,7 @@ public class VCSDKUtils {
                 }
 
                 // 关闭线程池
-                taskExecutor.shutdown();
+                //taskExecutor.shutdown();
 
                 if (reEthPorts.size() > 0) {
                     reStr = gson.toJson(reEthPorts);

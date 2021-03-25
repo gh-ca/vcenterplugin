@@ -37,6 +37,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
@@ -49,9 +50,7 @@ import java.util.List;
 import java.util.Map;
 
 import java.util.Set;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.*;
 
 import jdk.nashorn.internal.parser.Parser;
 import sun.rmi.runtime.Log;
@@ -65,6 +64,8 @@ import sun.rmi.runtime.Log;
 public class VmfsAccessServiceImpl implements VmfsAccessService {
     private static final Logger LOG = LoggerFactory.getLogger(VmfsAccessServiceImpl.class);
 
+    private ThreadPoolTaskExecutor threadPoolExecutor;
+
     private static final String VOLUME_IDS = "volume_ids";
 
     private static final String HOST_OBJ_IDS = "hostObjIds";
@@ -77,7 +78,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
 
     private static final int HTTP_SUCCESS = 2;
 
-    private static final int SIZE = 10;
+    private static final int SIZE = 20;
 
     private static final String DATASTORE_NAMES = "dataStoreNames";
 
@@ -175,6 +176,14 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
 
     private VCenterInfoService vcenterinfoservice;
 
+    public ThreadPoolTaskExecutor getThreadPoolExecutor() {
+        return threadPoolExecutor;
+    }
+
+    public void setThreadPoolExecutor(ThreadPoolTaskExecutor threadPoolExecutor) {
+        this.threadPoolExecutor = threadPoolExecutor;
+    }
+
     public void setVcenterinfoservice(VCenterInfoService vcenterinfoservice) {
         this.vcenterinfoservice = vcenterinfoservice;
     }
@@ -265,10 +274,10 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
     }
 
     public synchronized void getVmfsSync(Map<String, VmfsDataInfo> volIds, List<VmfsDataInfo> vmfsDataInfos, Map<String, String> stoNameMap){
-        ExecutorService executorService = Executors.newFixedThreadPool(volIds.size());
+        //ExecutorService executorService = Executors.newFixedThreadPool(volIds.size());
         CountDownLatch countDownLatch = new CountDownLatch(volIds.size());
         for (Map.Entry<String, VmfsDataInfo> entry: volIds.entrySet()){
-            executorService.execute(()->{
+            threadPoolExecutor.execute(()->{
                 getVmfsDetailFromDme(vmfsDataInfos, stoNameMap, entry.getValue(), entry.getKey());
                 countDownLatch.countDown();
             });
@@ -2114,7 +2123,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         int k = 0;
         List<Ob> ps = splitOb(pa);
         long start1 = System.currentTimeMillis();
-        for (Ob w : ps){
+        /*for (Ob w : ps){
             if(k + w.wwns.size() <= SIZE){
                 k = k + w.wwns.size();
                 tm.add(w);
@@ -2127,7 +2136,8 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         }
         if (tm.size() > 0){
             getRelationSync(tm, k, storageIds, relationList);
-        }
+        }*/
+        getRelationSync(ps, SIZE, storageIds, relationList);
         LOG.info("调用vmfs volume_wwn接口时间：{}ms", System.currentTimeMillis() - start1);
 
         if (relationList.size() > 0) {
@@ -2178,11 +2188,12 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
     }
 
     public synchronized void getRelationSync(List<Ob> obs, int size, Map<String, String> storageIds, List<DmeVmwareRelation> relationList){
-        ExecutorService executorService = Executors.newFixedThreadPool(size);
-        CountDownLatch countDownLatch = new CountDownLatch(size);
+        //ExecutorService executorService = Executors.newFixedThreadPool(size);
+        //CountDownLatch countDownLatch = new CountDownLatch(size);
+        List<Future> futures=new ArrayList<>();
         for (Ob ob : obs){
             for(String wwn: ob.wwns){
-                executorService.execute(()->{
+                Future future=threadPoolExecutor.submit(()->{
                     // 根据wwn从DME中查询卷信息
                     String volumeUrlByName = DmeConstants.DME_VOLUME_BASE_URL + "?volume_wwn=" + wwn;
                     try {
@@ -2214,15 +2225,25 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                     } catch (DmeException e) {
                         e.printStackTrace();
                     }
-                    countDownLatch.countDown();
+                   // countDownLatch.countDown();
                 });
+                futures.add(future);
             }
         }
-        try {
+        for (Future ff: futures){
+            try {
+                ff.get();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+            }
+        }
+        /*try {
             countDownLatch.await();
         } catch (InterruptedException e) {
             e.printStackTrace();
-        }
+        }*/
     }
 
     private DmeVmwareRelation getDmeVmwareRelation(String storeType, String vmfsDatastoreId, String vmfsDatastoreName,

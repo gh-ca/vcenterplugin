@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.util.StringUtils;
 
 import java.util.*;
@@ -39,6 +40,8 @@ import java.util.concurrent.Executors;
  **/
 public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
     private static final Logger LOG = LoggerFactory.getLogger(DmeNFSAccessServiceImpl.class);
+
+    private ThreadPoolTaskExecutor threadPoolExecutor;
 
     private static final int DIGIT_100 = 100;
 
@@ -140,6 +143,14 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
 
     public void setTaskService(TaskService taskService) {
         this.taskService = taskService;
+    }
+
+    public ThreadPoolTaskExecutor getThreadPoolExecutor() {
+        return threadPoolExecutor;
+    }
+
+    public void setThreadPoolExecutor(ThreadPoolTaskExecutor threadPoolExecutor) {
+        this.threadPoolExecutor = threadPoolExecutor;
     }
 
     @Override
@@ -317,10 +328,10 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
     }
 
     public synchronized void getRelationSync(List<JsonObject> js, String storeType,  Map<String, Storage> storageMap, List<DmeVmwareRelation> relationList){
-        ExecutorService executorService = Executors.newFixedThreadPool(js.size());
+        //ExecutorService executorService = Executors.newFixedThreadPool(js.size());
         CountDownLatch countDownLatch = new CountDownLatch(js.size());
         for (JsonObject j : js) {
-            executorService.execute(()->{
+            threadPoolExecutor.execute(()->{
                 try {
                     relationList.addAll(parseNfsDatastore(storeType, storageMap, j));
                 } catch (DmeException e) {
@@ -673,10 +684,10 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
     }
 
     public synchronized void getNfsSync(Map<String, NfsDataInfo> volIds){
-        ExecutorService executorService = Executors.newFixedThreadPool(volIds.size());
+       // ExecutorService executorService = Executors.newFixedThreadPool(volIds.size());
         CountDownLatch countDownLatch = new CountDownLatch(volIds.size());
         for (Map.Entry<String, NfsDataInfo> entry: volIds.entrySet()){
-            executorService.execute(()->{
+            threadPoolExecutor.execute(()->{
                 getFsDetailInfo(entry.getValue(), entry.getKey());
                 countDownLatch.countDown();
             });

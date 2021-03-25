@@ -1,5 +1,6 @@
 package com.huawei.dmestore.services.bestpractice;
 
+import com.google.common.util.concurrent.Futures;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -13,11 +14,14 @@ import com.huawei.vmware.util.VmwareContext;
 import com.vmware.vim25.*;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 /**
  * NMPPathSwitchPolicyImpl
@@ -26,11 +30,22 @@ import java.util.concurrent.Executors;
  * @since 2020-11-30
  **/
 public class NMPPathSwitchPolicyImpl extends BaseBestPracticeService implements BestPracticeService {
+    private ThreadPoolTaskExecutor threadPoolExecutor;
     private DmeAccessService dmeAccessService;
 
     private static final int DIVISOR_100 = 100;
 
     private static final int HTTP_SUCCESS = 2;
+
+    private final int SIZE=20;
+
+    public ThreadPoolTaskExecutor getThreadPoolExecutor() {
+        return threadPoolExecutor;
+    }
+
+    public void setThreadPoolExecutor(ThreadPoolTaskExecutor threadPoolExecutor) {
+        this.threadPoolExecutor = threadPoolExecutor;
+    }
 
     @Override
     public String getHostSetting() {
@@ -102,9 +117,9 @@ public class NMPPathSwitchPolicyImpl extends BaseBestPracticeService implements 
         HostStorageSystemMo hostStorageSystemMo = hostMo.getHostStorageSystemMo();
         List<HostMultipathInfoLogicalUnit> lunList = getLuns(vcsdkUtils, objectId);
         if (lunList != null && lunList.size() > 0) {
-            ExecutorService executor = Executors.newFixedThreadPool(lunList.size());
+            //ExecutorService executor = Executors.newFixedThreadPool(lunList.size());
             for (HostMultipathInfoLogicalUnit lun : lunList) {
-                executor.execute(() -> {
+                threadPoolExecutor.execute(() -> {
                     HostMultipathInfoLogicalUnitPolicy policy = lun.getPolicy();
                     String pspPolicy = policy.getPolicy();
                     // 多路径选路策略，集中式存储选择VMW_SATP_ALUA, VMW_PSP_RR
@@ -134,30 +149,49 @@ public class NMPPathSwitchPolicyImpl extends BaseBestPracticeService implements 
 
     private List<HostMultipathInfoLogicalUnit> pickupDmeLun(List<HostMultipathInfoLogicalUnit> lunList) {
         List<HostMultipathInfoLogicalUnit> targetList = new ArrayList<>();
+        //ExecutorService executorService = Executors.newFixedThreadPool(SIZE);
+
+        List<Future> futures=new ArrayList<>();
         for (int index = 0; index < lunList.size(); index++) {
-            HostMultipathInfoLogicalUnit logicalUnit = lunList.get(index);
-            String id = logicalUnit.getId();
-            if(id.length() < 42){
-                logger.debug("hostMultipathInfoLogicalUnit is not dme volume!id={}", id);
-                continue;
-            }
-            String wwn = id.substring(10, 42);
-            // 根据wwn从DME中查询卷信息,如果查找到则说明是华为存储。
-            String volumeUrlByName = DmeConstants.DME_VOLUME_BASE_URL + "?volume_wwn=" + wwn;
+            int finalIndex = index;
+            Future future=threadPoolExecutor.submit(()-> {
+                HostMultipathInfoLogicalUnit logicalUnit = lunList.get(finalIndex);
+                String id = logicalUnit.getId();
+                if (id.length() < 42) {
+                    logger.debug("hostMultipathInfoLogicalUnit is not dme volume!id={}", id);
+                    //continue;
+                    return;
+                }
+                String wwn = id.substring(10, 42);
+                // 根据wwn从DME中查询卷信息,如果查找到则说明是华为存储。
+                String volumeUrlByName = DmeConstants.DME_VOLUME_BASE_URL + "?volume_wwn=" + wwn;
+                try {
+                    ResponseEntity<String> responseEntity = dmeAccessService.access(volumeUrlByName, HttpMethod.GET, null);
+                    if (responseEntity.getStatusCodeValue() / DIVISOR_100 != HTTP_SUCCESS) {
+                        //continue;
+                        return;
+                    }
+                    JsonObject jsonObject = new Gson().fromJson(responseEntity.getBody(), JsonObject.class);
+                    if (jsonObject.get("volumes").getAsJsonArray().size() > 0) {
+                        targetList.add(logicalUnit);
+                    } else {
+                        logger.debug("not found the volume！wwn={}", wwn);
+                    }
+                } catch (DmeException e) {
+                    logger.error("get dme volume error！wwn={}", wwn);
+                    //continue;
+                    return;
+                }
+            });
+            futures.add(future);
+        }
+        for (Future ff: futures){
             try {
-                ResponseEntity<String> responseEntity = dmeAccessService.access(volumeUrlByName, HttpMethod.GET, null);
-                if (responseEntity.getStatusCodeValue() / DIVISOR_100 != HTTP_SUCCESS) {
-                    continue;
-                }
-                JsonObject jsonObject = new Gson().fromJson(responseEntity.getBody(), JsonObject.class);
-                if (jsonObject.get("volumes").getAsJsonArray().size() > 0) {
-                    targetList.add(logicalUnit);
-                } else {
-                    logger.debug("not found the volume！wwn={}", wwn);
-                }
-            } catch (DmeException e) {
-                logger.error("get dme volume error！wwn={}", wwn);
-               continue;
+                ff.get();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (ExecutionException e) {
+                e.printStackTrace();
             }
         }
         return targetList;
