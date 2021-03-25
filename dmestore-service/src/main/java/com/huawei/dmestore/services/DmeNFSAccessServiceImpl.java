@@ -48,6 +48,8 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
 
     private static final int DIGIT_202 = 202;
 
+    private static final int SIZE = 10;
+
     private static final String TASK_ID = "task_id";
 
     private static final String HOSTVKERNELIP = "hostVkernelIp";
@@ -290,15 +292,48 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
         LOG.info("get dme storage success!storages size={}", storages.size());
         JsonArray jsonArray = new JsonParser().parse(listStr).getAsJsonArray();
         List<DmeVmwareRelation> relationList = new ArrayList<>();
+        List<JsonObject> ns = new ArrayList<>();
+        int k = 0;
+        long start = System.currentTimeMillis();
         for (int index = 0; index < jsonArray.size(); index++) {
             JsonObject nfsDatastore = jsonArray.get(index).getAsJsonObject();
-            relationList.addAll(parseNfsDatastore(storeType, storageMap, nfsDatastore));
+            k++;
+            if(k % SIZE == 0){
+                getRelationSync(ns, storeType, storageMap, relationList);
+                ns = new ArrayList<>();
+            } else{
+                ns.add(nfsDatastore);
+            }
         }
+        if (ns.size() > 0){
+            getRelationSync(ns, storeType, storageMap, relationList);
+        }
+        LOG.info("scanNfs cost time:{} ms", System.currentTimeMillis() - start);
         LOG.info("scanNfs end!relationList size={}", relationList.size());
         if (relationList.size() > 0) {
             return dmeVmWareRelationDbProcess(relationList, storeType);
         }
         return false;
+    }
+
+    public synchronized void getRelationSync(List<JsonObject> js, String storeType,  Map<String, Storage> storageMap, List<DmeVmwareRelation> relationList){
+        ExecutorService executorService = Executors.newFixedThreadPool(js.size());
+        CountDownLatch countDownLatch = new CountDownLatch(js.size());
+        for (JsonObject j : js) {
+            executorService.execute(()->{
+                try {
+                    relationList.addAll(parseNfsDatastore(storeType, storageMap, j));
+                } catch (DmeException e) {
+                    e.printStackTrace();
+                }
+                countDownLatch.countDown();
+            });
+        }
+        try {
+            countDownLatch.await();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     private List<DmeVmwareRelation> parseNfsDatastore(String storeType, Map<String, Storage> storageMap,
