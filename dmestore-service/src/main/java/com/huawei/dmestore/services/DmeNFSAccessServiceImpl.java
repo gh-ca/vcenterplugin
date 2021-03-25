@@ -308,17 +308,14 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
         long start = System.currentTimeMillis();
         for (int index = 0; index < jsonArray.size(); index++) {
             JsonObject nfsDatastore = jsonArray.get(index).getAsJsonObject();
-            k++;
-            if(k % SIZE == 0){
-                getRelationSync(ns, storeType, storageMap, relationList);
-                ns = new ArrayList<>();
-            } else{
+
                 ns.add(nfsDatastore);
-            }
+
         }
-        if (ns.size() > 0){
-            getRelationSync(ns, storeType, storageMap, relationList);
-        }
+        List<Map<String, Object>> shareInfos=queryShareInfo();
+        List<Map<String, Object>> fsInfos=queryFsInfo();
+            getRelationSync(ns, storeType, storageMap, relationList,shareInfos,fsInfos);
+
         LOG.info("scanNfs cost time:{} ms", System.currentTimeMillis() - start);
         LOG.info("scanNfs end!relationList size={}", relationList.size());
         if (relationList.size() > 0) {
@@ -327,13 +324,14 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
         return false;
     }
 
-    public synchronized void getRelationSync(List<JsonObject> js, String storeType,  Map<String, Storage> storageMap, List<DmeVmwareRelation> relationList){
+    public synchronized void getRelationSync(List<JsonObject> js, String storeType,  Map<String, Storage> storageMap, List<DmeVmwareRelation> relationList,List<Map<String, Object>> shareInfos,List<Map<String, Object>> fsInfos) throws DmeException {
         //ExecutorService executorService = Executors.newFixedThreadPool(js.size());
+
         CountDownLatch countDownLatch = new CountDownLatch(js.size());
         for (JsonObject j : js) {
             threadPoolExecutor.execute(()->{
                 try {
-                    relationList.addAll(parseNfsDatastore(storeType, storageMap, j));
+                    relationList.addAll(parseNfsDatastore(storeType, storageMap, j,shareInfos,fsInfos));
                 } catch (DmeException e) {
                     e.printStackTrace();
                 }
@@ -348,14 +346,17 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
     }
 
     private List<DmeVmwareRelation> parseNfsDatastore(String storeType, Map<String, Storage> storageMap,
-        JsonObject nfsDatastore) throws DmeException {
+        JsonObject nfsDatastore,List<Map<String, Object>> shareInfos,List<Map<String, Object>> fsInfos) throws DmeException {
         String nfsStorageId = ToolUtils.jsonToStr(nfsDatastore.get(OBJECTID));
         String nfsDatastoreIp = ToolUtils.jsonToStr(nfsDatastore.get("remoteHost"));
         String nfsDataStoreShareName = ToolUtils.jsonToStr(nfsDatastore.get("remotePath"));
         String nfsDataStorageName = ToolUtils.jsonToStr(nfsDatastore.get(NAME_FIELD));
         List<DmeVmwareRelation> relationList = new ArrayList<>();
         Map<String, String> storageIds = new HashMap<>();
+        //List<Map<String, Object>> shareInfos=new ArrayList<>();
+        //List<Map<String, Object>> fsInfos=new ArrayList<>();
         for (Map.Entry<String, Storage> entry : storageMap.entrySet()) {
+            List<Map<String, Object>> logicPortInfos=new ArrayList<>();
             Storage storageInfo = entry.getValue();
             String storageId = storageInfo.getId();
             DmeVmwareRelation relation = new DmeVmwareRelation();
@@ -372,27 +373,51 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
                 relation.setStorageType(storageIds.get("storageId"));
             }
             // 获取logicPort信息
-            boolean withLogicPort = getLogicPort(nfsDatastoreIp, storageId, relation);
+           // boolean withLogicPort = getLogicPort(nfsDatastoreIp, storageId, relation);
+            boolean withLogicPort = false;
+
+             logicPortInfos = queryLogicPortInfo(storageId);
+            if (null != logicPortInfos && logicPortInfos.size() > 0) {
+                for (Map<String, Object> logicPortInfo : logicPortInfos) {
+                    String id = ToolUtils.getStr(logicPortInfo.get(ID_FIELD));
+                    String name = ToolUtils.getStr(logicPortInfo.get(HOME_PORT_NAME));
+                    String mgmtIp = ToolUtils.getStr(logicPortInfo.get(MGMT_IP));
+                    if (nfsDatastoreIp.equals(mgmtIp)) {
+                        relation.setLogicPortId(id);
+                        relation.setLogicPortName(name);
+                        withLogicPort = true;
+                        break;
+                    }
+                }
+            }
+            //return isFound;
             String fsName = "";
             boolean withShare = false;
-            Map<String, Object> shareInfo = queryShareInfo(storageId,nfsDataStoreShareName);
-            if (null != shareInfo && shareInfo.size() > 0) {
-                fsName = ToolUtils.getStr(shareInfo.get(FS_NAME));
-                String id = ToolUtils.getStr(shareInfo.get(ID_FIELD));
-                String name = ToolUtils.getStr(shareInfo.get(NAME_FIELD));
-                relation.setShareId(id);
-                relation.setShareName(name);
-                withShare = true;
+            //if (shareInfos.size()<=0)
+             //shareInfos = queryShareInfo();
+            for (Map<String,Object> shareInfo:shareInfos) {
+                if (null != shareInfo && shareInfo.size() > 0&&nfsDataStoreShareName.equalsIgnoreCase(ToolUtils.getStr(shareInfo.get("name")))) {
+                    fsName = ToolUtils.getStr(shareInfo.get(FS_NAME));
+                    String id = ToolUtils.getStr(shareInfo.get(ID_FIELD));
+                    String name = ToolUtils.getStr(shareInfo.get(NAME_FIELD));
+                    relation.setShareId(id);
+                    relation.setShareName(name);
+                    withShare = true;
+                }
             }
+
             boolean withFs = false;
             if (!StringUtils.isEmpty(fsName)) {
-                Map<String, Object> fsInfo = queryFsInfo(storageId, fsName);
-                if (null != fsInfo && fsInfo.size() > 0) {
-                    String id = ToolUtils.getStr(fsInfo.get(ID_FIELD));
-                    String name = ToolUtils.getStr(fsInfo.get(NAME_FIELD));
-                    relation.setFsId(id);
-                    relation.setFsName(name);
-                    withFs = true;
+                //if (fsInfos.size()<=0)
+                // fsInfos = queryFsInfo();
+                for (Map<String,Object> fsInfo:fsInfos) {
+                    if (null != fsInfo && fsInfo.size() > 0&&fsName.equalsIgnoreCase(ToolUtils.getStr(fsInfo.get("name")))) {
+                        String id = ToolUtils.getStr(fsInfo.get(ID_FIELD));
+                        String name = ToolUtils.getStr(fsInfo.get(NAME_FIELD));
+                        relation.setFsId(id);
+                        relation.setFsName(name);
+                        withFs = true;
+                    }
                 }
             }
 
@@ -465,22 +490,21 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
         return true;
     }
 
-    private Map<String, Object> queryShareInfo(String storageId,String shareName) throws DmeException {
-        ResponseEntity<String> responseEntity = listShareBySharePath(storageId,shareName);
+    private List<Map<String, Object>> queryShareInfo() throws DmeException {
+        ResponseEntity<String> responseEntity = listShares();
         if (responseEntity.getStatusCodeValue() / DIGIT_100 == DIGIT_2) {
             String object = responseEntity.getBody();
             List<Map<String, Object>> list = converShare(object);
-            if (list.size() > 0) {
-                return list.get(0);
-            }
+            return list;
         }
-        return Collections.EMPTY_MAP;
+        return new ArrayList<>();
     }
 
-    private ResponseEntity<String> listShareBySharePath(String storageId,String shareName) throws DmeException {
+    private ResponseEntity<String> listShares() throws DmeException {
         Map<String, Object> requestbody = new HashMap<>();
-        requestbody.put("name", shareName);
-        requestbody.put(STORAGE_ID, storageId);
+        //requestbody.put("name", shareName);
+        //requestbody.put(STORAGE_ID, storageId);
+        requestbody.put("page_size",1000);
         String url = DmeConstants.DME_NFS_SHARE_URL;
         return dmeAccessService.access(url, HttpMethod.POST, gson.toJson(requestbody));
     }
@@ -507,24 +531,23 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
         return shareList;
     }
 
-    private Map<String, Object> queryFsInfo(String storageId, String fsName) throws DmeException {
-        ResponseEntity responseEntity = listFsByStorageId(storageId, fsName);
+    private List<Map<String, Object>> queryFsInfo() throws DmeException {
+        ResponseEntity responseEntity = listFs();
         if (responseEntity.getStatusCodeValue() / DIGIT_100 == DIGIT_2) {
             Object object = responseEntity.getBody();
             List<Map<String, Object>> list = converFs(object);
-            if (list.size() > 0) {
-                return list.get(0);
-            }
+            return list;
         }
-        return Collections.EMPTY_MAP;
+        return new ArrayList<>();
     }
 
-    private ResponseEntity listFsByStorageId(String storageId, String fsName) throws DmeException {
+    private ResponseEntity listFs() throws DmeException {
         Map<String, Object> requestbody = new HashMap<>();
-        requestbody.put(STORAGE_ID, storageId);
-        if (!StringUtils.isEmpty(fsName)) {
+        //requestbody.put(STORAGE_ID, storageId);
+       /* if (!StringUtils.isEmpty(fsName)) {
             requestbody.put(NAME_FIELD, fsName);
-        }
+        }*/
+        requestbody.put("page_size",1000);
         ResponseEntity responseEntity = dmeAccessService.access(DmeConstants.DME_NFS_FILESERVICE_QUERY_URL,
             HttpMethod.POST, gson.toJson(requestbody));
         return responseEntity;
