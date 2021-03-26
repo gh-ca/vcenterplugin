@@ -119,6 +119,7 @@ export class VmfsListComponent implements OnInit {
   mountSuccessShow = false; // 挂载成功窗口
   delShow = false; // 删除窗口
   delSuccessShow = false; // 删除成功窗口
+  syncSuccessTips = false // 同步成功提示
   unmountShow = false; // 卸载窗口
   unmountSuccessShow = false; // 卸载窗口
   unmountTipsShow = false; // 卸载窗口
@@ -391,8 +392,10 @@ export class VmfsListComponent implements OnInit {
     // this.protectionStatusFilter.initProtectionStatus();
     this.isFirstLoadChartData = true;
     this.remoteSrv.scanVMFS(this.storageType).subscribe((res: any) => {
+      this.isLoading = false;
+      this.syncSuccessTips = true;
       if (res.code === '200') {
-        this.refresh();
+        // this.refresh();
         console.log('Scan success');
       } else {
         console.log('Scan faild');
