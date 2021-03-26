@@ -124,10 +124,10 @@
         <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='list'">{{item.sharePath ? item.sharePath:'--'}}</clr-dg-cell>
         <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='list'">{{item.fs ? item.fs:'--'}}</clr-dg-cell>
 
-        <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='chart'" style="text-align: right">{{item.ops ? item.ops:'--'}}</clr-dg-cell>
-        <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='chart'" style="text-align: right">{{item.bandwidth ? item.bandwidth:'--'}}</clr-dg-cell>
-        <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='chart'" style="text-align: right">{{item.readResponseTime ? item.readResponseTime:'--'}}</clr-dg-cell>
-        <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='chart'" style="text-align: right">{{item.writeResponseTime ? item.writeResponseTime:'--'}}</clr-dg-cell>
+        <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='chart'" style="text-align: right">{{item.ops!=null ? item.ops:'--'}}</clr-dg-cell>
+        <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='chart'" style="text-align: right">{{item.bandwidth!=null ? item.bandwidth:'--'}}</clr-dg-cell>
+        <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='chart'" style="text-align: right">{{item.readResponseTime!=null ? item.readResponseTime:'--'}}</clr-dg-cell>
+        <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='chart'" style="text-align: right">{{item.writeResponseTime!=null ? item.writeResponseTime:'--'}}</clr-dg-cell>
       </clr-dg-row>
       <clr-dg-footer>
         <clr-dg-pagination #pagination [clrDgPageSize]="5" [clrDgTotalItems]="total">
