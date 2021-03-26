@@ -204,6 +204,20 @@ public class BestPracticeProcessServiceImpl implements BestPracticeProcessServic
         log.info("====best practice check end====");
     }
 
+    @Override
+    public void checkByCluster(String clusterObjectId) throws VcenterException {
+        // 查询集群下的所有主机信息
+        String hostsOnCluster = vcsdkUtils.getHostsOnCluster(clusterObjectId);
+        if (StringUtil.isNotBlank(hostsOnCluster)) {
+            List<Map<String, String>> hostList = gson.fromJson(hostsOnCluster,
+                new TypeToken<List<Map<String, String>>>() { }.getType());
+            for (int index = 0; index < hostList.size(); index++) {
+                String tempHostObjectId = hostList.get(index).get("hostId");
+                check(tempHostObjectId);
+            }
+        }
+    }
+
     private void bachDbProcess(Map<String, List<BestPracticeBean>> map) {
         map.forEach((hostSetting, bestPracticeBeans) -> {
             // 本地全量查询
