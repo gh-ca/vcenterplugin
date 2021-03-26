@@ -347,7 +347,9 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                     vmfsDataInfo.setDevice(stoNameMap == null ? "" : stoNameMap.get(storageId));
 
                     parseTuning(vmfsDataInfo, jsonObject);
-                    relists.add(vmfsDataInfo);
+                    if (vmfsDataInfo != null) {
+                        relists.add(vmfsDataInfo);
+                    }
                     break;
                 }
             }
