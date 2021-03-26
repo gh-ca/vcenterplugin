@@ -20,21 +20,25 @@
             <groupId>commons-logging</groupId>
             <artifactId>commons-logging</artifactId>
             <version>1.1.1</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
             <version>3.1.0</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-beans</artifactId>
             <version>4.3.24.RELEASE</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>
             <version>4.3.24.RELEASE</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
@@ -46,6 +50,7 @@
                     <groupId>commons-logging</groupId>
                 </exclusion>
             </exclusions>
+            <scope>provided</scope>
         </dependency>
         <!--<dependency>
             <groupId>org.springframework</groupId>
@@ -57,6 +62,7 @@
             <groupId>joda-time</groupId>
             <artifactId>joda-time</artifactId>
             <version>2.10</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.vmware</groupId>
@@ -69,8 +75,8 @@
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcprov-jdk15on</artifactId>
             <version>1.59</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/extlib/bcprov-jdk15on-1.59.jar</systemPath>
+           <!-- <scope>system</scope>
+            <systemPath>${project.basedir}/extlib/bcprov-jdk15on-1.59.jar</systemPath>-->
         </dependency>
         <dependency>
             <groupId>com.vmware</groupId>
@@ -80,24 +86,34 @@
             <systemPath>${project.basedir}/extlib/pbm.jar</systemPath>
         </dependency>
         <dependency>
-            <groupId>com.quartz-scheduler</groupId>
+            <groupId>org.quartz-scheduler</groupId>
             <artifactId>quartz</artifactId>
-            <scope>system</scope>
+          <!--  <scope>system</scope>-->
             <version>2.3.2</version>
-            <systemPath>${project.basedir}/extlib/quartz-2.3.2.jar</systemPath>
+           <!-- <systemPath>${project.basedir}/extlib/quartz-2.3.2.jar</systemPath>-->
             <exclusions>
                 <exclusion>
                     <artifactId>slf4j-api</artifactId>
                     <groupId>org.slf4j</groupId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.mchange</groupId>
+                    <artifactId>c3p0</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.mchange</groupId>
+                    <artifactId>mchange-commons-java</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.zaxxer</groupId>
+                    <artifactId>HikariCP-java7</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
-            <scope>system</scope>
             <version>1.4.199</version>
-            <systemPath>${project.basedir}/extlib/h2-1.4.199.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>com.vmware</groupId>
@@ -117,16 +133,19 @@
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
             <version>2.3.1</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
             <version>1.7.26</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
             <version>1.2.14</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
@@ -138,11 +157,13 @@
                     <groupId>commons-logging</groupId>
                 </exclusion>
             </exclusions>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpcore</artifactId>
             <version>4.3.2</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -174,6 +195,7 @@
                     <groupId>com.fasterxml</groupId>
                 </exclusion>
             </exclusions>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -185,6 +207,7 @@
                     <groupId>org.slf4j</groupId>
                 </exclusion>
             </exclusions>
+            <scope>provided</scope>
         </dependency>
 
         <!-- swagger -->
@@ -214,11 +237,13 @@
                     <groupId>org.springframework</groupId>
                 </exclusion>
             </exclusions>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>io.springfox</groupId>
             <artifactId>springfox-swagger-ui</artifactId>
             <version>2.9.2</version>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
@@ -246,16 +271,19 @@
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
             <version>2.8.11.3</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-core</artifactId>
             <version>2.8.10</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-annotations</artifactId>
             <version>2.8.0</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.vmware</groupId>
@@ -321,20 +349,67 @@
                 <directory>${project.basedir}/src/main/resources</directory>
 
             </resource>
+            <resource>
+                <directory>${project.build.directory}/dependency/</directory>
+                <includes>
+                    <include>*.jar</include>
+                </includes>
+
+            </resource>
         </resources>
         <plugins>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
                 <version>3.0.2</version>
                  <configuration>
                     <archive>
-                       <manifestFile>src/main/resources/META-INF/MANIFEST.MF</manifestFile>
+                        <manifest>
+                            <addClasspath>true</addClasspath>
+                        </manifest>
+                        <manifestFile>src/main/resources/META-INF/MANIFEST.MF</manifestFile>
                         <addMavenDescriptor>false</addMavenDescriptor>
                     </archive>
                 </configuration>
 
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+              <!--  <version>2.10</version>-->
+                <executions>
+                    <execution>
+                        <id>copy-dependencies</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <includeScope>runtime</includeScope>
+                </configuration>
+            </plugin>
+
+
+            <!--<plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.1.1</version>
+                <configuration>
+                    &lt;!&ndash; put your configurations here &ndash;&gt;
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>-->
+
 
         </plugins>
     </build>

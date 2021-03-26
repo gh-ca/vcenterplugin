@@ -72,6 +72,8 @@ export class RdmComponent implements OnInit {
   iopsMinErrTips = false;// IOPS下限错误提示
   latencyErrTips = false;// 时延错误提示
 
+  bandwidthLimitErr = false; // v6 设备 带宽 下限大于上限
+  iopsLimitErr = false; // v6 设备 IOPS 下限大于上限
 
   constructor(private cdr: ChangeDetectorRef,
               private http: HttpClient,
@@ -88,6 +90,7 @@ export class RdmComponent implements OnInit {
       this.vmObjectId = ctx[0].id;
     } else{
       this.vmObjectId = 'urn:vmomi:VirtualMachine:vm-12030:674908e5-ab21-4079-9cb1-596358ee5dd1';
+      // this.vmObjectId = 'urn:vmomi:VirtualMachine:vm-4016:674908e5-ab21-4079-9cb1-596358ee5dd1';
     }
     this.loadDataStore();
   }
@@ -137,7 +140,7 @@ export class RdmComponent implements OnInit {
 
   submit(): void {
     if (this.bandWidthMaxErrTips || this.iopsMaxErrTips
-      || this.bandWidthMinErrTips || this.iopsMinErrTips || this.latencyErrTips) {
+      || this.bandWidthMinErrTips || this.iopsMinErrTips || this.latencyErrTips || this.bandwidthLimitErr || this.iopsLimitErr) {
       return;
     }
     if (!this.ownershipController) {
@@ -297,15 +300,25 @@ export class RdmComponent implements OnInit {
       } else{
         dataStores = [];
       }
-      const selectData = dataStores.filter(item => item.vmRootpath)[0];
-      this.dataStoreObjectId = selectData.objectId;
-      this.defaultStoreObjectId = selectData.objectId;
+      if (dataStores.filter(item => item.vmRootpath).length >= 1) {
+        const selectData = dataStores.filter(item => item.vmRootpath)[0];
+        this.dataStoreObjectId = selectData.objectId;
+        this.defaultStoreObjectId = selectData.objectId;
+      }
       if (dataStores.length > 0) {
         this.dataStores = dataStores.filter(item => !item.vmRootpath);
       } else {
         this.dataStores = [];
       }
-
+      if (this.dataStores.length > 0) {
+        this.dataStores.forEach(item => {
+          if (item.name.length >=15) {
+            item.shortName = item.name.substring(0,13) + '...';
+          } else {
+            item.shortName = item.name;
+          }
+        })
+      }
 
       this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
     }, err => {
@@ -392,6 +405,16 @@ export class RdmComponent implements OnInit {
         upperObj.checked = false;
       }
     }
+    if (form.flagInfo.control_policyUpper == undefined) {
+      form.flagInfo.maxBandwidthChoose = false;
+      form.flagInfo.maxIopsChoose = false;
+    }
+    if (form.flagInfo.control_policyLower == undefined) {
+      form.flagInfo.minBandwidthChoose = false;
+      form.flagInfo.minIopsChoose = false;
+      form.flagInfo.latencyChoose = false;
+    }
+    this.qosV6Check('add');
   }
   /**
    * 获取选中的存储的 QosTag
@@ -651,6 +674,9 @@ export class RdmComponent implements OnInit {
           break;
       }
     this.iopsErrTips(objVal, operationType);
+
+    // 下限大于上限 检测
+    this.qosV6Check('add');
   }
 
   /**
@@ -741,6 +767,52 @@ export class RdmComponent implements OnInit {
           this.latencyErrTips = false;
         }
         break;
+    }
+  }
+  qosV6Check(type:string) {
+    if (type == 'add') {
+      if (this.configModel.storageId) {
+        const chooseStorage = this.storageDevices.filter(item => item.id == this.configModel.storageId)[0];
+        if (chooseStorage) {
+          const qosTag = chooseStorage.storageTypeShow.qosTag
+          if (qosTag == 1) {
+            if (this.configModel.flagInfo.minBandwidthChoose && this.configModel.flagInfo.maxBandwidthChoose) {
+              // 带宽上限小于下限
+              if (this.configModel.tuning.smartqos.minbandwidth && this.configModel.tuning.smartqos.maxbandwidth && Number(this.configModel.tuning.smartqos.minbandwidth) > Number(this.configModel.tuning.smartqos.maxbandwidth)) {
+                this.bandwidthLimitErr = true;
+              } else {
+                this.bandwidthLimitErr = false;
+              }
+            } else {
+              this.bandwidthLimitErr = false;
+            }
+            if (this.configModel.flagInfo.minIopsChoose && this.configModel.flagInfo.maxIopsChoose) {
+              // iops上限小于下限
+              if (this.configModel.tuning.smartqos.miniops && this.configModel.tuning.smartqos.maxiops && Number(this.configModel.tuning.smartqos.miniops) > Number(this.configModel.tuning.smartqos.maxiops)) {
+                this.iopsLimitErr = true;
+              } else {
+                this.iopsLimitErr = false;
+              }
+            } else {
+              this.iopsLimitErr = false;
+            }
+          } else {
+            this.iopsLimitErr = false;
+            this.bandwidthLimitErr = false;
+          }
+          if (this.configModel.flagInfo.maxIopsChoose && this.configModel.tuning.smartqos.maxiops && Number(this.configModel.tuning.smartqos.maxiops) < 100) {
+            this.iopsLimitErr = true;
+          }
+          if (this.configModel.flagInfo.control_policyUpper == undefined) {
+            this.iopsLimitErr = false;
+            this.bandwidthLimitErr = false;
+          }
+          if (this.configModel.flagInfo.control_policyLower == undefined) {
+            this.bandwidthLimitErr = false;
+          }
+        }
+
+      }
     }
   }
 }

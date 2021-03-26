@@ -122,13 +122,16 @@ public class DmeVmwareRalationDao extends H2DataBaseDao {
         DmeVmwareRelation dvr = null;
         try {
             con = getConnection();
-            String sql = " SELECT * FROM " + DpSqlFileConstants.DP_DME_VMWARE_RELATION + " WHERE state = 1";
+            String sql = "SELECT ID,STORE_ID,STORE_NAME,VOLUME_ID,VOLUME_NAME,VOLUME_WWN,VOLUME_SHARE,VOLUME_FS,"
+                + "SHARE_ID,SHARE_NAME,FS_ID,FS_NAME,LOGICPORT_ID,LOGICPORT_NAME,STORE_TYPE,CREATETIME,UPDATETIME,"
+                + "STATE,STORAGE_TYPE,STORAGE_DEVICE_ID FROM DP_DME_VMWARE_RELATION WHERE state = 1";
             if (!StringUtils.isEmpty(storeId)) {
-                sql = sql + " and STORE_ID='" + storeId + "'";
+                sql = sql + " and STORE_ID=?";
+                ps = con.prepareStatement(sql);
+                ps.setString(1, storeId);
+            } else {
+                ps = con.prepareStatement(sql);
             }
-            LOGGER.info("getDmeVmwareRelationByDsId!sql={}, connection is not null:{}", sql,
-                con == null ? false : true);
-            ps = con.prepareStatement(sql);
             rs = ps.executeQuery();
             while (rs.next()) {
                 dvr = new DmeVmwareRelation();
@@ -143,12 +146,12 @@ public class DmeVmwareRalationDao extends H2DataBaseDao {
                 dvr.setShareId(rs.getString(SHARE_ID));
                 dvr.setShareName(rs.getString(SHARE_NAME));
                 dvr.setFsId(rs.getString(FS_ID));
-                dvr.setFsName(rs.getString("FS_NAME"));
+                dvr.setFsName(rs.getString(FS_NAME));
                 dvr.setLogicPortId(rs.getString(LOGICPORT_ID));
-                dvr.setLogicPortName(rs.getString("LOGICPORT_NAME"));
-                dvr.setStoreType(rs.getString("STORE_TYPE"));
-                dvr.setCreateTime(rs.getTimestamp("CREATETIME"));
-                dvr.setUpdateTime(rs.getTimestamp("UPDATETIME"));
+                dvr.setLogicPortName(rs.getString(LOGICPORT_NAME));
+                dvr.setStoreType(rs.getString(STORE_TYPE));
+                dvr.setCreateTime(rs.getTimestamp(CREATETIME));
+                dvr.setUpdateTime(rs.getTimestamp(UPDATETIME));
                 dvr.setState(rs.getInt(STATE));
                 dvr.setStorageType(rs.getString(STORAGE_TYPE));
                 dvr.setStorageDeviceId(rs.getString(STORAGE_DEVICE_ID));
@@ -195,7 +198,35 @@ public class DmeVmwareRalationDao extends H2DataBaseDao {
         ResultSet rs = null;
         try {
             con = getConnection();
-            String sql = "SELECT STORE_ID FROM " + DpSqlFileConstants.DP_DME_VMWARE_RELATION + " WHERE state = 1 ";
+            String sql = "SELECT STORE_ID FROM DP_DME_VMWARE_RELATION WHERE state = 1 ";
+            if (!StringUtils.isEmpty(storeType)) {
+                sql = sql + " and STORE_TYPE=?";
+                ps = con.prepareStatement(sql);
+                ps.setString(1, storeType);
+            } else {
+                ps = con.prepareStatement(sql);
+            }
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                lists.add(rs.getString(STORE_ID));
+            }
+        } catch (DataBaseException | SQLException e) {
+            LOGGER.error("Failed to get dme store info:{}", e.getMessage());
+            throw new DmeSqlException(e.getMessage());
+        } finally {
+            closeConnection(con, ps, rs);
+        }
+        return lists;
+    }
+
+    public List<String> getAllFsIdByType(String storeType) throws DmeSqlException {
+        List<String> lists = new ArrayList<>();
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        try {
+            con = getConnection();
+            String sql = "SELECT FS_ID FROM " + DpSqlFileConstants.DP_DME_VMWARE_RELATION + " WHERE state = 1 ";
             if (!StringUtils.isEmpty(storeType)) {
                 sql = sql + " and STORE_TYPE='" + storeType + "' ";
             }
@@ -203,7 +234,35 @@ public class DmeVmwareRalationDao extends H2DataBaseDao {
             ps = con.prepareStatement(sql);
             rs = ps.executeQuery();
             while (rs.next()) {
-                lists.add(rs.getString(STORE_ID));
+                if (!StringUtils.isEmpty(rs.getString(FS_ID))) {
+                    lists.add(rs.getString(FS_ID));
+                }
+            }
+        } catch (DataBaseException | SQLException e) {
+            LOGGER.error("Failed to get dme store info:{}", e.getMessage());
+            throw new DmeSqlException(e.getMessage());
+        } finally {
+            closeConnection(con, ps, rs);
+        }
+        return lists;
+    }
+
+    public List<String> getAllShareIdByType(String storeType) throws DmeSqlException {
+        List<String> lists = new ArrayList<>();
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        try {
+            con = getConnection();
+            String sql = "SELECT SHARE_ID FROM " + DpSqlFileConstants.DP_DME_VMWARE_RELATION + " WHERE state = 1 ";
+            if (!StringUtils.isEmpty(storeType)) {
+                sql = sql + " and STORE_TYPE='" + storeType + "' ";
+            }
+            LOGGER.info("getAllStorageIdByType!sql={}, connection is not null:{}", sql, con == null ? false : true);
+            ps = con.prepareStatement(sql);
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                lists.add(rs.getString(SHARE_ID));
             }
         } catch (DataBaseException | SQLException e) {
             LOGGER.error("Failed to get dme store info:{}", e.getMessage());
@@ -237,6 +296,8 @@ public class DmeVmwareRalationDao extends H2DataBaseDao {
                 pstm.setDate(DpSqlFileConstants.DIGIT_5, new Date(System.currentTimeMillis()));
                 pstm.setString(DpSqlFileConstants.DIGIT_6, relation.getStoreType());
                 pstm.setString(DpSqlFileConstants.DIGIT_7, relation.getFsId());
+                pstm.setString(DpSqlFileConstants.DIGIT_8, relation.getShareId());
+                pstm.setString(DpSqlFileConstants.DIGIT_9, relation.getShareName());
                 pstm.addBatch();
             }
             pstm.executeBatch();
@@ -267,21 +328,21 @@ public class DmeVmwareRalationDao extends H2DataBaseDao {
         }
 
         Connection con = null;
-        Statement pstm = null;
+        PreparedStatement pstm = null;
         try {
             con = getConnection();
-            String sql = "UPDATE " + DpSqlFileConstants.DP_DME_VMWARE_RELATION + " SET " +
-                "STORE_ID='"+dmeVmwareRelation.getStoreId()+"'" +
-                ",FS_ID='"+dmeVmwareRelation.getFsId()+"'," +
-                "STORE_NAME='"+dmeVmwareRelation.getStoreName()+"'," +
-                "FS_NAME='"+dmeVmwareRelation.getFsName()+"'," +
-                "UPDATETIME='"+new Date(System.currentTimeMillis())+"'," +
-                "SHARE_ID='"+dmeVmwareRelation.getShareId()+"'," +
-                "SHARE_NAME='"+dmeVmwareRelation.getShareName()+"'," +
-                "STORE_TYPE='"+dmeVmwareRelation.getStoreType()+"' " +
-                "where FS_ID='"+dmeVmwareRelation.getFsId()+"'";
-            pstm = con.createStatement();
-            LOGGER.info("updateNfs!sql={}, connection is not null:{}", sql, con == null ? false : true);
+            String sql = "UPDATE " + DpSqlFileConstants.DP_DME_VMWARE_RELATION
+                + " SET STORE_ID=?,FS_ID=?,STORE_NAME=?,FS_NAME=?,UPDATETIME=?,SHARE_ID=?,SHARE_NAME=?,STORE_TYPE=? where FS_ID=?";
+            pstm = con.prepareStatement(sql);
+            pstm.setString(DpSqlFileConstants.DIGIT_1, dmeVmwareRelation.getStoreId());
+            pstm.setString(DpSqlFileConstants.DIGIT_2, dmeVmwareRelation.getFsId());
+            pstm.setString(DpSqlFileConstants.DIGIT_3, dmeVmwareRelation.getStoreName());
+            pstm.setString(DpSqlFileConstants.DIGIT_4, dmeVmwareRelation.getFsName());
+            pstm.setDate(DpSqlFileConstants.DIGIT_5, new Date(System.currentTimeMillis()));
+            pstm.setString(DpSqlFileConstants.DIGIT_6, dmeVmwareRelation.getShareId());
+            pstm.setString(DpSqlFileConstants.DIGIT_7, dmeVmwareRelation.getShareName());
+            pstm.setString(DpSqlFileConstants.DIGIT_8, dmeVmwareRelation.getStoreType());
+            pstm.setString(DpSqlFileConstants.DIGIT_9, dmeVmwareRelation.getFsId());
             pstm.executeUpdate(sql);
             con.commit();
         } catch (SQLException ex) {
@@ -503,7 +564,7 @@ public class DmeVmwareRalationDao extends H2DataBaseDao {
      * NFS存储 获取指定存储下的fileId的一个值
      *
      * @param storeId storeId
-     * @param fileId fileId
+     * @param fileId  fileId
      * @return List
      * @throws DmeSqlException DmeSqlException
      */
@@ -515,8 +576,9 @@ public class DmeVmwareRalationDao extends H2DataBaseDao {
         try {
             con = getConnection();
             String sql = "SELECT " + fileId + " FROM " + DpSqlFileConstants.DP_DME_VMWARE_RELATION
-                + " WHERE state = 1 and STORE_TYPE='" + ToolUtils.STORE_TYPE_NFS + "'and STORE_ID = '" + storeId + "' ";
+                + " WHERE state = 1 and STORE_TYPE='" + ToolUtils.STORE_TYPE_NFS + "'and STORE_ID =?";
             ps = con.prepareStatement(sql);
+            ps.setString(1, storeId);
             rs = ps.executeQuery();
             while (rs.next()) {
                 id = rs.getString(fileId);
@@ -557,8 +619,10 @@ public class DmeVmwareRalationDao extends H2DataBaseDao {
         try {
             con = getConnection();
             String sql = "SELECT " + fileId + " FROM " + DpSqlFileConstants.DP_DME_VMWARE_RELATION
-                + " WHERE state=1 and STORE_TYPE='" + storeType + "'and STORE_ID='" + storeId + "'";
+                + " WHERE state=1 and STORE_TYPE=? and STORE_ID=?";
             ps = con.prepareStatement(sql);
+            ps.setString(1, storeType);
+            ps.setString(2, storeId);
             rs = ps.executeQuery();
             while (rs.next()) {
                 lists.add(rs.getString(fileId));
@@ -673,8 +737,9 @@ public class DmeVmwareRalationDao extends H2DataBaseDao {
         try {
             con = getConnection();
             String sql = "SELECT * FROM " + DpSqlFileConstants.DP_DME_VMWARE_RELATION
-                + " WHERE state=1 and STORE_NAME='" + name + "'";
+                + " WHERE state=1 and STORE_NAME=?";
             ps = con.prepareStatement(sql);
+            ps.setString(1, name);
             rs = ps.executeQuery();
             while (rs.next()) {
                 vmfsDatastoreName = rs.getString(STORE_NAME);
@@ -697,8 +762,8 @@ public class DmeVmwareRalationDao extends H2DataBaseDao {
         ResultSet rs = null;
         try {
             con = getConnection();
-            String sql = "SELECT * FROM " + DpSqlFileConstants.DP_DME_VMWARE_RELATION
-                + " WHERE state=1 and FS_ID='" + fsId + "'";
+            String sql = "SELECT * FROM " + DpSqlFileConstants.DP_DME_VMWARE_RELATION + " WHERE state=1 and FS_ID='"
+                + fsId + "'";
             ps = con.prepareStatement(sql);
             rs = ps.executeQuery();
             while (rs.next()) {
@@ -728,8 +793,7 @@ public class DmeVmwareRalationDao extends H2DataBaseDao {
         return dmeVmwareRelation;
     }
 
-
-    public String getStorageModelByWwn(String wwn) throws DmeSqlException{
+    public String getStorageModelByWwn(String wwn) throws DmeSqlException {
         String storageModel = "";
         Connection con = null;
         PreparedStatement ps = null;
@@ -737,8 +801,7 @@ public class DmeVmwareRalationDao extends H2DataBaseDao {
         try {
             con = getConnection();
             String sql = "SELECT * FROM " + DpSqlFileConstants.DP_DME_VMWARE_RELATION
-                + " WHERE state=1 and STORE_TYPE='" + DmeConstants.STORE_TYPE_VMFS + "'and VOLUME_WWN ='" + wwn
-                + "'";
+                + " WHERE state=1 and STORE_TYPE='" + DmeConstants.STORE_TYPE_VMFS + "'and VOLUME_WWN ='" + wwn + "'";
             ps = con.prepareStatement(sql);
             rs = ps.executeQuery();
             while (rs.next()) {
@@ -754,7 +817,7 @@ public class DmeVmwareRalationDao extends H2DataBaseDao {
         return storageModel;
     }
 
-    public String getStorageIdlByObjectId(String objectId) throws DmeSqlException{
+    public String getStorageIdlByObjectId(String objectId) throws DmeSqlException {
         String storageId = "";
         Connection con = null;
         PreparedStatement ps = null;
@@ -762,9 +825,9 @@ public class DmeVmwareRalationDao extends H2DataBaseDao {
         try {
             con = getConnection();
             String sql = "SELECT * FROM " + DpSqlFileConstants.DP_DME_VMWARE_RELATION
-                + " WHERE state=1 and STORE_TYPE='" + DmeConstants.STORE_TYPE_NFS + "'and STORE_ID ='" + objectId
-                + "'";
+                + " WHERE state=1 and STORE_TYPE='" + DmeConstants.STORE_TYPE_NFS + "'and STORE_ID =?";
             ps = con.prepareStatement(sql);
+            ps.setString(1, objectId);
             rs = ps.executeQuery();
             while (rs.next()) {
                 storageId = rs.getString(STORAGE_DEVICE_ID);
@@ -779,7 +842,7 @@ public class DmeVmwareRalationDao extends H2DataBaseDao {
         return storageId;
     }
 
-    public String getVolumeIdlByStoreId(String objectId) throws DmeSqlException{
+    public String getVolumeIdlByStoreId(String objectId) throws DmeSqlException {
         String volumeId = "";
         Connection con = null;
         PreparedStatement ps = null;

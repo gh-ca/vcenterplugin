@@ -49,7 +49,7 @@ public class InstantiationBeanServiceImpl implements InstantiationBeanService {
                 if (new File(oldDbFile).exists() && !newDbFile.exists()) {
                     // move db file
                     LOGGER.info("Copying DB file from {} to {}", H2DataBaseDao.getDbFileName(), newDbFile.getName());
-                    Files.copy(Paths.get(oldDbFile), Paths.get(newDbFile.getAbsolutePath()),
+                    Files.copy(Paths.get(oldDbFile), Paths.get(newDbFile.getCanonicalPath()),
                         StandardCopyOption.REPLACE_EXISTING);
 
                     // move key files

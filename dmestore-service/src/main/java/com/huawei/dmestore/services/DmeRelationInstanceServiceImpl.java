@@ -5,6 +5,7 @@ import com.huawei.dmestore.exception.DmeException;
 import com.huawei.dmestore.model.RelationInstance;
 import com.huawei.dmestore.utils.ToolUtils;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -192,6 +193,7 @@ public class DmeRelationInstanceServiceImpl implements DmeRelationInstanceServic
     }
 
     public void listInstanceLun() throws DmeException {
+        LOG.info("性能-listInstanceLun");
         String instanceName = "SYS_Lun";
         JsonObject jsonObject = listInstancdByInstanceName(instanceName);
         if (jsonObject != null && jsonObject.get("totalNum").getAsInt() > 0) {
@@ -267,6 +269,7 @@ public class DmeRelationInstanceServiceImpl implements DmeRelationInstanceServic
 
     @Override
     public Map<String, Map<String, Object>> getLunInstance() throws DmeException {
+        LOG.info("实例-getLunInstance：{}");
         if (LUN_INSTANCE.size() == 0) {
             listInstanceLun();
         }
@@ -298,13 +301,16 @@ public class DmeRelationInstanceServiceImpl implements DmeRelationInstanceServic
     }
 
     private JsonObject listInstancdByInstanceName(String instanceName) {
+        LOG.info("性能-listInstancdByInstanceName{}", instanceName);
         JsonObject jsonObject = null;
         String url = DmeConstants.LIST_INSTANCE_URL.replace("{className}", instanceName);
         try {
             ResponseEntity responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
             if (responseEntity != null && responseEntity.getStatusCodeValue() == HttpStatus.OK.value()) {
                 Object object = responseEntity.getBody();
-                jsonObject = new JsonParser().parse(object.toString()).getAsJsonObject();
+                Gson gson = new Gson();
+                LOG.info("性能数据-获取lun的实例"+instanceName+":{}", gson.toJson(object));
+                jsonObject = new JsonParser().parse(ToolUtils.getStr(object)).getAsJsonObject();
             }
         } catch (DmeException e) {
             LOG.warn("List instance error by instanceName:{},{}", instanceName, e);

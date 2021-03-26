@@ -355,7 +355,7 @@
       "supRate":"supscription Capacity",
       "totalCap":"Total Capacity",
       "cpuUtilization":"CPU Usage",
-      "latency":"Latency(ms)",
+      "latency":"Average I/O Response Time (ms)",
       "iops":"IOPS",
       "ops":"OPS",
       "bandwidth":"Bandwith(MB/s)",
@@ -401,7 +401,7 @@
         "az":"AZ",
         "wp":"Warranty Period",
         "location":"Location",
-        "latency": "Latency(ms)",
+        "latency": "Average I/O Response Time (ms)",
         "iops": "IOPS",
         "bandwidth": "Bandwidth(MB/s)"
       },
@@ -437,7 +437,7 @@
         "capUsage":"Capacity Usage",
         "freeCap":"Free Capacity",
         "supRate":"supscription Rate",
-        "latency": "Latency(ms)",
+        "latency": "Average I/O Response Time (ms)",
         "iops": "IOPS",
         "bandwidth": "Bandwidth(MB/s)",
         "normal":"Normal",
@@ -457,7 +457,7 @@
         "stoPool":"Storage Pools",
         "serviceLevel":"DME Storage Strategy",
         "protStatus":"Protection Status",
-        "latency": "Latency(ms)",
+        "latency": "Average I/O Response Time (ms)",
         "iops": "IOPS",
         "bandwidth": "Bandwidth(MB/s)"
       },
@@ -511,7 +511,7 @@
           "cpuUsage":"CPU Usage",
           "iops":"IOPS",
           "ops":"OPS",
-          "latency":"Latency(ms)",
+          "latency":"Average I/O Response Time (ms)",
           "bandwidth":"Bandwidth(MB/s)"
         },
         "disks":{
@@ -524,7 +524,7 @@
           "diskDomain":"Disk Domain",
           "rotationalSpeed":"Rotational Speed",
           "iops":"IOPS",
-          "latency":"Latency(ms)",
+          "latency":"Average I/O Response Time (ms)",
           "bandwidth":"Bandwidth(MB/s)",
           "usage":"Usage(%)"
         },
@@ -535,7 +535,7 @@
           "wwn":"WWN",
           "workingRate":"Working Rate(Mbps)",
           "iops":"IOPS",
-          "latency":"Latency(ms)",
+          "latency":"Average I/O Response Time (ms)",
           "bandwidth":"Bandwidth(MB/s)",
           "usage":"Usage(%)",
           "name":"Name",
@@ -669,7 +669,7 @@
     "storage1": "Storage/Storage Pool",
     "storage": "Storage Device",
     "sPool": "Storage Pool",
-    "dataStore": "DataStore",
+    "dataStore": "Location",
     "ownerC": "Owner Controller",
     "idp": "Initial Distribute Policy",
     "fetchP": "Prefetch Policy",
@@ -757,7 +757,7 @@
     "diskType": "Disk Type",
     "storage": "Storage Device",
     "bandwidthm": "BandWidth(MB/s)",
-    "latencyms": "Latency(ms)",
+    "latencyms": "Average I/O Response Time (ms)",
     "appType": "Application Type",
 
     "general": "General",
@@ -906,7 +906,9 @@
     "noData": "No data",
     "addVmfsConnFail": "Create vmfs failure,connectivity of host or hostgroup on dme error!",
     "mountVmfsConnFail": "Mount failure,connectivity of host or hostgroup on dme error!",
-    "details": "Details"
+    "details": "Details",
+    "bandwidthLimitErr": "The lower limit of bandwidth cannot be greater than the upper limit!",
+    "iopsLimitErr": "The upper limit of IOPS is at least 100, and the lower limit cannot be greater than the upper limit!"
   },
   "chart": {
     "select": {

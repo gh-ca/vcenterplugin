@@ -1383,16 +1383,18 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                         if (statisticObject != null) {
                             StoragePool sp = new StoragePool();
                             sp.setId(storagePoolId);
-                            if (statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORAGEPOOL_THROUGHPUT) != null) {
+                            if (ToolUtils.jsonToFloat(
+                                statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORAGEPOOL_THROUGHPUT)) != 0.0f) {
                                 sp.setMaxIops(ToolUtils.jsonToFloat(
                                     statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORAGEPOOL_THROUGHPUT)));
                             }
-                            if (statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORAGEPOOL_BANDWIDTH) != null) {
+                            if (ToolUtils.jsonToFloat(
+                                statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORAGEPOOL_BANDWIDTH)) != 0.0f) {
                                 sp.setMaxBandwidth(ToolUtils.jsonToFloat(
                                     statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORAGEPOOL_BANDWIDTH)));
                             }
-                            if (statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORAGEPOOL_RESPONSETIME) !=
-                                null) {
+                            if (ToolUtils.jsonToFloat(
+                                statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORAGEPOOL_RESPONSETIME)) != 0.0f) {
                                 sp.setMaxLatency(ToolUtils.jsonToFloat(
                                     statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORAGEPOOL_RESPONSETIME)));
                             }
@@ -1544,18 +1546,21 @@ public class DmeStorageServiceImpl implements DmeStorageService {
 
     @Override
     public List<Volume> listVolumesPerformance(List<String> volumeWwns) throws DmeException {
+        LOG.info("性能-listVolumesPerformance{}：", volumeWwns);
         List<Volume> relists = new ArrayList<>();
         try {
             if (volumeWwns != null && volumeWwns.size() > 0) {
                 Map<String, Object> params = new HashMap<>();
                 params.put(OBJ_IDS, volumeWwns);
                 Map<String, Object> remap = dataStoreStatisticHistoryService.queryCurrentStatistic(
-                    DmeIndicatorConstants.RESOURCE_TYPE_NAME_LUN, params);
+                DmeIndicatorConstants.RESOURCE_TYPE_NAME_LUN, params);
+                LOG.info("LUN_性能_DmeStorageServiceImpl_1557",gson.toJson(remap));
                 if (remap != null && remap.size() > 0) {
-                    JsonObject dataJson = new JsonParser().parse(remap.toString()).getAsJsonObject();
+                    JsonObject dataJson = new JsonParser().parse(gson.toJson(remap)).getAsJsonObject();
                     relists = new ArrayList<>();
                     for (String wwnid : volumeWwns) {
                         JsonObject statisticObject = dataJson.getAsJsonObject(wwnid);
+                        LOG.info("LUN_性能_DmeStorageServiceImpl_1557",gson.toJson(dataJson));
                         if (statisticObject != null) {
                             Volume sp = new Volume();
                             sp.setWwn(wwnid);

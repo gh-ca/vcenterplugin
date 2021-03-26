@@ -46,13 +46,23 @@
           <status-filter #statusFilter></status-filter>
         </clr-dg-filter>
       </clr-dg-column>
-      <clr-dg-column [hidden]="radioCheck!=='list'" class="hideFilter" [clrDgField]="'capacity'">{{'nfs.totalCapacity' | translate}}</clr-dg-column>
-      <clr-dg-column [hidden]="radioCheck!=='list'" class="hideFilter" [clrDgField]="'freeSpace'">
-        {{'nfs.freeCapacity' | translate}}
+      <clr-dg-column #capacity [hidden]="radioCheck!=='list'" class="hideFilter" [clrDgField]="'capacity'" style="position: relative" (clrDgSortedChange)="sortFunc($event);">
+        {{'nfs.totalCapacity' | translate}}
+        <clr-icon *ngIf="sortFunc(capacity.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
       </clr-dg-column>
-      <clr-dg-column [hidden]="radioCheck!=='list'" class="hideFilter" style="width: 11rem;" [clrDgField]="'capacityUsage'">{{'nfs.capacityUsage' | translate}}</clr-dg-column>
-      <clr-dg-column [hidden]="radioCheck!=='list'" class="hideFilter" [clrDgField]="'reserveCapacity'">{{'nfs.provisioningCapacity' | translate}}</clr-dg-column>
-      <clr-dg-column [hidden]="radioCheck!=='list'" >
+      <clr-dg-column #freeSpace [hidden]="radioCheck!=='list'" class="hideFilter" [clrDgField]="'freeSpace'" style="position: relative" (clrDgSortedChange)="sortFunc($event);">
+        {{'nfs.freeCapacity' | translate}}
+        <clr-icon *ngIf="sortFunc(freeSpace.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+      </clr-dg-column>
+      <clr-dg-column #capacityUsage [hidden]="radioCheck!=='list'" class="hideFilter" [clrDgField]="'capacityUsage'" style="min-width:11rem;position: relative" (clrDgSortedChange)="sortFunc($event);">
+        {{'nfs.capacityUsage' | translate}}
+        <clr-icon *ngIf="sortFunc(capacityUsage.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+      </clr-dg-column>
+      <clr-dg-column #reserveCapacity [hidden]="radioCheck!=='list'" class="hideFilter" [clrDgField]="'reserveCapacity'" style="position: relative" (clrDgSortedChange)="sortFunc($event);">
+        {{'nfs.provisioningCapacity' | translate}}
+        <clr-icon *ngIf="sortFunc(reserveCapacity.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+      </clr-dg-column>
+      <clr-dg-column #deviceFilter [hidden]="radioCheck!=='list'" >
         {{'nfs.device' | translate}}
         <clr-dg-filter [clrDgFilter]="deviceFilter">
           <device-filter #deviceFilter></device-filter>
@@ -63,10 +73,22 @@
       <clr-dg-column [hidden]="radioCheck!=='list'" [clrDgField]="'sharePath'">{{'nfs.sharePath' | translate}}</clr-dg-column>
       <clr-dg-column [hidden]="radioCheck!=='list'" [clrDgField]="'fs'">{{'nfs.fileSystem' | translate}}</clr-dg-column>
 
-      <clr-dg-column [hidden]="radioCheck!=='chart'" class="hideFilter" [clrDgField]="'ops'">{{'nfs.ops' | translate}}</clr-dg-column>
-      <clr-dg-column [hidden]="radioCheck!=='chart'" class="hideFilter" [clrDgField]="'bandwidth'">{{'nfs.bandwidth' | translate}}</clr-dg-column>
-      <clr-dg-column [hidden]="radioCheck!=='chart'" class="hideFilter" [clrDgField]="'readResponseTime'">{{'nfs.respRt' | translate}}</clr-dg-column>
-      <clr-dg-column [hidden]="radioCheck!=='chart'" class="hideFilter" [clrDgField]="'writeResponseTime'">{{'nfs.respWt' | translate}}</clr-dg-column>
+      <clr-dg-column #ops [hidden]="radioCheck!=='chart'" class="hideFilter" [clrDgField]="'ops'" style="position: relative" (clrDgSortedChange)="sortFunc($event);">
+        {{'nfs.ops' | translate}}
+        <clr-icon *ngIf="sortFunc(ops.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+      </clr-dg-column>
+      <clr-dg-column #bandwidth [hidden]="radioCheck!=='chart'" class="hideFilter" [clrDgField]="'bandwidth'" style="position: relative" (clrDgSortedChange)="sortFunc($event);">
+        {{'nfs.bandwidth' | translate}}
+        <clr-icon *ngIf="sortFunc(bandwidth.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+      </clr-dg-column>
+      <clr-dg-column #readResponseTime [hidden]="radioCheck!=='chart'" class="hideFilter" [clrDgField]="'readResponseTime'" style="position: relative" (clrDgSortedChange)="sortFunc($event);">
+        {{'nfs.respRt' | translate}}
+        <clr-icon *ngIf="sortFunc(readResponseTime.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+      </clr-dg-column>
+      <clr-dg-column #writeResponseTime [hidden]="radioCheck!=='chart'" class="hideFilter" [clrDgField]="'writeResponseTime'" style="position: relative" (clrDgSortedChange)="sortFunc($event);">
+        {{'nfs.respWt' | translate}}
+        <clr-icon *ngIf="sortFunc(writeResponseTime.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+      </clr-dg-column>
 
       <clr-dg-placeholder>{{'tips.noData' | translate}}</clr-dg-placeholder>
       <clr-dg-row *clrDgItems="let item of list" [clrDgItem]="item">
@@ -88,7 +110,7 @@
         </clr-dg-cell>
         <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='list'" style="text-align: right">{{item.capacity ? formatCapacity(item.capacity):'--'}}</clr-dg-cell>
         <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='list'" style="text-align: right">{{item.freeSpace ? formatCapacity(item.freeSpace):'--'}}</clr-dg-cell>
-        <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='list'">
+        <clr-dg-cell class="over_flow" style="min-width: 11rem;" [hidden]="radioCheck!=='list'">
           <div class="progress-block" *ngIf="item.capacity && item.freeSpace">
             <clr-progress-bar clrValue="{{((item.capacity - item.freeSpace)/item.capacity * 100).toFixed(2)}}" clrSuccess></clr-progress-bar>
             <span>{{((item.capacity - item.freeSpace)/item.capacity * 100).toFixed(2)}}%</span>
@@ -102,10 +124,10 @@
         <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='list'">{{item.sharePath ? item.sharePath:'--'}}</clr-dg-cell>
         <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='list'">{{item.fs ? item.fs:'--'}}</clr-dg-cell>
 
-        <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='chart'" style="text-align: right">{{item.ops ? item.ops:'--'}}</clr-dg-cell>
-        <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='chart'" style="text-align: right">{{item.bandwidth ? item.bandwidth:'--'}}</clr-dg-cell>
-        <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='chart'" style="text-align: right">{{item.readResponseTime ? item.readResponseTime:'--'}}</clr-dg-cell>
-        <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='chart'" style="text-align: right">{{item.writeResponseTime ? item.writeResponseTime:'--'}}</clr-dg-cell>
+        <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='chart'" style="text-align: right">{{item.ops!=null ? item.ops:'--'}}</clr-dg-cell>
+        <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='chart'" style="text-align: right">{{item.bandwidth!=null ? item.bandwidth:'--'}}</clr-dg-cell>
+        <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='chart'" style="text-align: right">{{item.readResponseTime!=null ? item.readResponseTime:'--'}}</clr-dg-cell>
+        <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='chart'" style="text-align: right">{{item.writeResponseTime!=null ? item.writeResponseTime:'--'}}</clr-dg-cell>
       </clr-dg-row>
       <clr-dg-footer>
         <clr-dg-pagination #pagination [clrDgPageSize]="5" [clrDgTotalItems]="total">
@@ -138,7 +160,7 @@
         <clr-select-container class="selectClass">
           <label>{{'nfs.storeageDevice' | translate}}</label>
           <select class="inputWidth100Percent" clrSelect (ngModelOptions)="storageList" [(ngModel)]="addForm.storagId"
-                  name="storagId" class="clr-select" (change)="selectStoragePool()" formControlName="storagId" required>
+                  name="storagId" class="clr-select" (change)="selectStoragePool();qosV6Check('add')" formControlName="storagId" required>
             <option *ngFor="let item of storageList" value="{{item.id}}">{{item.name+'('+item.ip+')'}}</option>
           </select>
           <clr-control-error>{{'errorMsg.require' | translate}}</clr-control-error>
@@ -330,7 +352,7 @@
               <clr-checkbox-container *ngIf="addForm.control_policyUpper == '1'">
                 <label style="color: #9F9F9F;">{{'vmfs.trafficControlObject' | translate}}</label>
                 <clr-checkbox-wrapper>
-                  <input type="checkbox" [(ngModel)]="addForm.maxBandwidthChoose" (ngModelChange)="resetQosFlag(addForm.maxBandwidthChoose, 'maxbandwidth')" name="maxbandwidthChoose" clrCheckbox/>
+                  <input type="checkbox" [(ngModel)]="addForm.maxBandwidthChoose" (ngModelChange)="resetQosFlag(addForm.maxBandwidthChoose, 'maxbandwidth');qosV6Check('add');" name="maxbandwidthChoose" clrCheckbox/>
                   <label style="width: 200px;" >
                     {{'vmfs.bandwidthLimitUpper' | translate}}
                     <input type="number"  min="0" oninput="if (value.length > 11) {value=value.slice(0,11)}" [(readOnly)]="!addForm.maxBandwidthChoose" class="inputOneLine" name="maxBandwidth"
@@ -345,7 +367,7 @@
               <clr-checkbox-container *ngIf="addForm.control_policyUpper == '1'">
                 <label></label>
                 <clr-checkbox-wrapper>
-                  <input type="checkbox" [(ngModel)]="addForm.maxIopsChoose" (ngModelChange)="resetQosFlag(addForm.maxIopsChoose, 'maxiops')" name="maxiopsChoose" clrCheckbox/>
+                  <input type="checkbox" [(ngModel)]="addForm.maxIopsChoose" (ngModelChange)="resetQosFlag(addForm.maxIopsChoose, 'maxiops');qosV6Check('add');" name="maxiopsChoose" clrCheckbox/>
                   <label  style="width: 200px;">
                     {{'vmfs.IOPSLimitUpper' | translate}}
                     <input type="number" min="0" oninput="if (value.length > 11) {value=value.slice(0,11)}" [(readOnly)]="!addForm.maxIopsChoose" class="inputOneLine" name="maxIops"
@@ -362,7 +384,7 @@
                   <label *ngIf="addForm.control_policyLower == '0' && addForm.control_policyUpper != '1'" style="color: #9F9F9F;">{{'vmfs.trafficControlObject' | translate}}</label>
                   <label *ngIf="addForm.control_policyLower == '0' && addForm.control_policyUpper == '1'" style="color: #9F9F9F;"></label>
                   <clr-checkbox-wrapper *ngIf="addForm.control_policyLower == '0'">
-                    <input type="checkbox" [(ngModel)]="addForm.minBandwidthChoose" (ngModelChange)="resetQosFlag(addForm.minBandwidthChoose, 'minbandwidth')" name="minbandwidthChoose" clrCheckbox/>
+                    <input type="checkbox" [(ngModel)]="addForm.minBandwidthChoose" (ngModelChange)="resetQosFlag(addForm.minBandwidthChoose, 'minbandwidth');qosV6Check('add');" name="minbandwidthChoose" clrCheckbox/>
                     <label style="width: 200px;" >
                       {{'vmfs.bandwidthLimitLower' | translate}}
                       <input type="number" min="0" oninput="if (value.length > 11) {value=value.slice(0,11)}" [(readOnly)]="!addForm.minBandwidthChoose" class="inputOneLine"
@@ -377,7 +399,7 @@
                 <clr-checkbox-container *ngIf="addForm.control_policyLower == '0'">
                   <label></label>
                   <clr-checkbox-wrapper>
-                    <input type="checkbox" [(ngModel)]="addForm.minIopsChoose" (ngModelChange)="resetQosFlag(addForm.minIopsChoose, 'miniops')" name="minIopsChoose" clrCheckbox/>
+                    <input type="checkbox" [(ngModel)]="addForm.minIopsChoose" (ngModelChange)="resetQosFlag(addForm.minIopsChoose, 'miniops');qosV6Check('add');" name="minIopsChoose" clrCheckbox/>
                     <label style="width: 200px;" >
                       {{'vmfs.IOPSLimitLower' | translate}}
                       <input type="number" min="0" oninput="if (value.length > 11) {value=value.slice(0,11)}" [(readOnly)]="!addForm.minIopsChoose" class="inputOneLine" name="minIops"
@@ -411,6 +433,12 @@
                   </clr-checkbox-wrapper>
                   <clr-control-helper *ngIf="latencyErrTips" style="color: red"><clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{'errorMsg.iposMaxMinTips' | translate}}</clr-control-helper>
                   <clr-control-helper *ngIf="!latencyErrTips && addForm.latencyChoose && !addForm.latency">{{'errorMsg.require' | translate}}</clr-control-helper>
+                </clr-checkbox-container>
+                <clr-checkbox-container *ngIf="bandwidthLimitErr">
+                  <clr-control-helper  style="color: red"><clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{'tips.bandwidthLimitErr' | translate}}</clr-control-helper>
+                </clr-checkbox-container>
+                <clr-checkbox-container *ngIf="iopsLimitErr">
+                  <clr-control-helper style="color: red"><clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{'tips.iopsLimitErr' | translate}}</clr-control-helper>
                 </clr-checkbox-container>
               </div>
             </div>
