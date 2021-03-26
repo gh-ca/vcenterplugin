@@ -22,6 +22,7 @@ import java.util.concurrent.Executors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 /**
  * Vmfs6AutoReclaimImpl
@@ -31,6 +32,15 @@ import org.slf4j.LoggerFactory;
  **/
 public class Vmfs6AutoReclaimImpl extends BaseBestPracticeService implements BestPracticeService {
     protected final Logger logger = LoggerFactory.getLogger(BaseBestPracticeService.class);
+    private ThreadPoolTaskExecutor threadPoolExecutor;
+
+    public ThreadPoolTaskExecutor getThreadPoolExecutor() {
+        return threadPoolExecutor;
+    }
+
+    public void setThreadPoolExecutor(ThreadPoolTaskExecutor threadPoolExecutor) {
+        this.threadPoolExecutor = threadPoolExecutor;
+    }
 
     @Override
     public String getHostSetting() {
@@ -125,13 +135,13 @@ public class Vmfs6AutoReclaimImpl extends BaseBestPracticeService implements Bes
         HostMo hostMo = this.getHostMoFactory().build(context, mor);
         List<VmfsDatastoreInfo> list = getVmfs6DatastoreInfo(vcsdkUtils, objectId);
         if (list.size() > 0) {
-            ExecutorService executor = Executors.newFixedThreadPool(list.size());
+            //ExecutorService executor = Executors.newFixedThreadPool(list.size());
             for (VmfsDatastoreInfo vmfsDatastoreInfo : list) {
                 HostVmfsVolume hostVmfsVolume = vmfsDatastoreInfo.getVmfs();
                 String uuid = hostVmfsVolume.getUuid();
                 String unmapPriority = hostVmfsVolume.getUnmapPriority();
                 if (null != unmapPriority && !unmapPriority.equals((String)getRecommendValue())) {
-                    executor.execute(() -> {
+                    threadPoolExecutor.execute(() -> {
                         try {
                             hostMo.getHostStorageSystemMo().updateVmfsUnmapPriority(uuid, (String) getRecommendValue());
                         } catch (Exception exception) {

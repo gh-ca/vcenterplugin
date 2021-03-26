@@ -44,7 +44,7 @@ public class RestUtils {
             CloseableHttpClient httpClient = HttpClients.custom()
                 .setSSLSocketFactory(csf)
                 .setMaxConnTotal(200)
-                .setMaxConnPerRoute(20)
+                .setMaxConnPerRoute(50)
                 .build();
             HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory();
             requestFactory.setHttpClient(httpClient);

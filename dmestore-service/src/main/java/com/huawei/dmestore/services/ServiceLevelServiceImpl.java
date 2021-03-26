@@ -540,7 +540,7 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
         ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.POST, queryBody.toString());
         if (responseEntity.getStatusCodeValue() == HttpStatus.OK.value()) {
             String responseBody = responseEntity.getBody();
-            log.info("数据集统计信息查询成功！返回信息:{}", responseBody);
+            //log.info("数据集统计信息查询成功！返回信息:{}", responseBody);
             return responseBody;
         }else {
             log.info("数据集统计信息查询失败！url={}", url);

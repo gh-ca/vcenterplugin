@@ -506,15 +506,18 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
         }
         Map<String, String> idInstancdIdMap = new HashMap<>(DmeConstants.COLLECTION_CAPACITY_16);
         List<String> instanceIds = new ArrayList<>();
-        Object indicatorIds = params.get(INDICATOR_IDS_FIELD);
         Object objIds = params.get(OBJ_IDS_FIELD);
         List<String> ids = getObjIds(objIds);
+        Object indicatorIds = params.get(INDICATOR_IDS_FIELD);
         if (ids.size() > 0) {
             // ids若为wwn的集合则转换为对应的instanceId集合,也有可能ids直接就是volume的instanceId集合
             Map<String, Map<String, Object>> sysLunMap = dmeRelationInstanceService.getLunInstance();
+            log.info("LUN性能_DataStoreStatisticHistoryServiceImpl_515:sysLunMap:{}",gson.toJson(sysLunMap));
             if (sysLunMap != null && sysLunMap.size() > 0) {
                 for (String id : ids) {
-                    String instanceId = ToolUtils.getStr(sysLunMap.get(id).get("id"));
+                    String instanceId = ToolUtils.getStr(sysLunMap.get(id).get(RESID_FIELD));
+                    log.info("LUN性能_" +
+                        "DataStoreStatisticHistoryServiceImpl_518:instanceId:{}",instanceId);
                     if (!StringUtils.isEmpty(instanceId)) {
                         idInstancdIdMap.put(id, instanceId);
                         instanceIds.add(instanceId);
@@ -527,8 +530,7 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
         }
 
         // SYS_Lun
-        String objTypeId = SYS_LUN_OBJTYPEID;
-        params.put(OBJ_TYPE_ID_FIELD, objTypeId);
+        params.put(OBJ_TYPE_ID_FIELD, SYS_LUN_OBJTYPEID);
         if (null == indicatorIds) {
             indicatorIds = initVolumeIndicator(isCurrent);
             params.put(INDICATOR_IDS_FIELD, indicatorIds);
@@ -644,7 +646,7 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
     private List<String> getObjIds(Object objIds) {
         List<String> objectIds = new ArrayList<>();
         if (null != objIds) {
-            JsonArray objIdJsonArray = new JsonParser().parse(objIds.toString()).getAsJsonArray();
+            JsonArray objIdJsonArray = new JsonParser().parse(ToolUtils.getStr(objIds)).getAsJsonArray();
             for (JsonElement element : objIdJsonArray) {
                 String id = element.getAsString();
                 objectIds.add(id);
