@@ -421,7 +421,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
                 }
             }
 
-            if (withFs || withShare || withLogicPort) {
+            if ((withFs || withShare) && withLogicPort) {
                 relationList.add(relation);
             }
         }
