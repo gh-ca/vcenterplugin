@@ -383,6 +383,7 @@ public class DmeStorageController extends BaseController {
     @RequestMapping(value = "/listVolumesPerformance", method = RequestMethod.GET)
     public ResponseBodyBean listVolumesPerformance(@RequestParam("volumeId") List<String> volumeId) {
         try {
+            LOG.info("LUN_性能 listVolumesPerformance 请求数据：{}", volumeId);
             return success(dmeStorageService.listVolumesPerformance(volumeId));
         } catch (DmeException e) {
             LOG.error("get Storage volume performance failure:", e);
