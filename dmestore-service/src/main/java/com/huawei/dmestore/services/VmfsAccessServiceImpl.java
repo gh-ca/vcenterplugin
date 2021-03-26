@@ -2026,7 +2026,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                     JsonArray jsonArray = jsonObject.getAsJsonArray(DmeConstants.DATAS);
                     for (int index = 0; index < jsonArray.size(); index++) {
                         JsonObject vjson = jsonArray.get(index).getAsJsonObject();
-                        if (!StringUtils.isEmpty(workLoadType) && workLoadType.equals(vjson.get("id"))) {
+                        if (!StringUtils.isEmpty(workLoadType) && workLoadType.equals(ToolUtils.jsonToStr(vjson.get("id")))) {
                             name = ToolUtils.jsonToStr(vjson.get("name"));
                             break;
                         }

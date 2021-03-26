@@ -514,7 +514,7 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
             Map<String, Map<String, Object>> sysLunMap = dmeRelationInstanceService.getLunInstance();
             if (sysLunMap != null && sysLunMap.size() > 0) {
                 for (String id : ids) {
-                    String instanceId = ToolUtils.getStr(sysLunMap.get(id).get("id"));
+                    String instanceId = ToolUtils.getStr(sysLunMap.get(id).get(RESID_FIELD));
                     if (!StringUtils.isEmpty(instanceId)) {
                         idInstancdIdMap.put(id, instanceId);
                         instanceIds.add(instanceId);
