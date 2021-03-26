@@ -174,6 +174,8 @@ export class VmfsListComponent implements OnInit {
   iopsMaxErrTips = false;// IOPS上限错误提示
   iopsMinErrTips = false;// IOPS下限错误提示
   latencyErrTips = false;// 时延错误提示
+  bandwidthLimitErr = false; // v6 设备 带宽 下限大于上限
+  iopsLimitErr = false; // v6 设备 IOPS 下限大于上限
 
 
   ngOnInit() {
@@ -185,6 +187,9 @@ export class VmfsListComponent implements OnInit {
     console.log('this.rowSelected[0]', this.rowSelected[0]);
     // 名称变化校验初始化
     this.modifyNameChanged = false;
+    // qos错误提示初始化
+    this.iopsLimitErr = false;
+    this.bandwidthLimitErr = false;
     // 初始化form
     this.modifyForm = new GetForm().getEditForm();
     this.initIopsErrTips(true, true);
@@ -664,6 +669,9 @@ export class VmfsListComponent implements OnInit {
     this.connectivityFailure = false;
     this.connFailData = [];
     this.showDetail = false;
+    // qos错误提示初始化
+    this.iopsLimitErr = false;
+    this.bandwidthLimitErr = false;
 
     // 初始化表单
     this.form = new GetForm().getAddForm();
@@ -721,7 +729,7 @@ export class VmfsListComponent implements OnInit {
   // 添加vmfs 处理
   addVmfsHanlde() {
     if (this.bandWidthMaxErrTips || this.iopsMaxErrTips
-      || this.bandWidthMinErrTips || this.iopsMinErrTips || this.latencyErrTips) {
+      || this.bandWidthMinErrTips || this.iopsMinErrTips || this.latencyErrTips || this.bandwidthLimitErr || this.iopsLimitErr) {
       return;
     }
 
@@ -1641,6 +1649,9 @@ export class VmfsListComponent implements OnInit {
     }
 
     this.iopsErrTips(objVal, operationType, type);
+
+    // 下限大于上限 检测
+    this.qosV6Check(type);
   }
 
   /**
@@ -1861,7 +1872,10 @@ export class VmfsListComponent implements OnInit {
     this.volNameRepeatErr = false;
     this.matchErr = false;
     let reg5:RegExp = new RegExp('^[0-9a-zA-Z-\u4e00-\u9fa5a"_""."]*$');
-
+    if (this.bandWidthMaxErrTips || this.iopsMaxErrTips
+      || this.bandWidthMinErrTips || this.iopsMinErrTips || this.latencyErrTips || this.bandwidthLimitErr || this.iopsLimitErr) {
+      return;
+    }
     if (this.modifyForm.name) {
       if (reg5.test(this.modifyForm.name)) {
         // 校验VMFS名称重复
@@ -2248,7 +2262,18 @@ export class VmfsListComponent implements OnInit {
     } else {
       this.form = form;
     }
+    if (form.control_policyUpper == undefined) {
+      form.maxbandwidthChoose = false;
+      form.maxiopsChoose = false;
+    }
+    if (form.control_policyLower == undefined) {
+      form.minbandwidthChoose = false;
+      form.miniopsChoose = false;
+      form.latencyChoose = false;
+    }
     console.log("lowerChecked", this.form)
+    const type = isEdit ? 'edit':'add';
+    this.qosV6Check(type);
   }
 
   /**
@@ -2291,5 +2316,92 @@ export class VmfsListComponent implements OnInit {
   }
   sortFunc(obj:any) {
     return !obj;
+  }
+
+  qosV6Check(type:string) {
+    if (type == 'add') {
+      if (this.form.storage_id) {
+        const chooseStorage = this.storageList.filter(item => item.id == this.form.storage_id)[0];
+        if (chooseStorage) {
+          const qosTag = chooseStorage.storageTypeShow.qosTag
+          if (qosTag == 1) {
+            if (this.form.minbandwidthChoose && this.form.maxbandwidthChoose) {
+              // 带宽上限小于下限
+              if (this.form.minbandwidth && this.form.maxbandwidth && Number(this.form.minbandwidth) > Number(this.form.maxbandwidth)) {
+                this.bandwidthLimitErr = true;
+              } else {
+                this.bandwidthLimitErr = false;
+              }
+            } else {
+              this.bandwidthLimitErr = false;
+            }
+            if (this.form.miniopsChoose && this.form.maxiopsChoose) {
+              // iops上限小于下限
+              if (this.form.miniops && this.form.maxiops && Number(this.form.miniops) > Number(this.form.maxiops)) {
+                this.iopsLimitErr = true;
+              } else {
+                this.iopsLimitErr = false;
+              }
+            } else {
+              this.iopsLimitErr = false;
+            }
+          } else {
+            this.iopsLimitErr = false;
+            this.bandwidthLimitErr = false;
+          }
+          if (this.form.maxiopsChoose && this.form.maxiops && Number(this.form.maxiops) < 100) {
+            this.iopsLimitErr = true;
+          }
+          if (this.form.control_policyUpper == undefined) {
+            this.iopsLimitErr = false;
+            this.bandwidthLimitErr = false;
+          }
+          if (this.form.control_policyLower == undefined) {
+            this.bandwidthLimitErr = false;
+          }
+        }
+
+      }
+    } else {
+
+      if (this.storage) {
+        const qosTag = this.storage.storageTypeShow.qosTag
+        if (qosTag == 1) {
+          if (this.modifyForm.minbandwidthChoose && this.modifyForm.maxbandwidthChoose) {
+            // 带宽上限小于下限
+            if (this.modifyForm.min_bandwidth && this.modifyForm.max_bandwidth && Number(this.modifyForm.min_bandwidth) > Number(this.modifyForm.max_bandwidth)) {
+              this.bandwidthLimitErr = true;
+            } else {
+              this.bandwidthLimitErr = false;
+            }
+          } else {
+            this.bandwidthLimitErr = false;
+          }
+          if (this.modifyForm.miniopsChoose && this.modifyForm.maxiopsChoose) {
+            // iops上限小于下限
+            if (this.modifyForm.min_iops && this.modifyForm.max_iops && Number(this.modifyForm.min_iops) > Number(this.modifyForm.max_iops)) {
+              this.iopsLimitErr = true;
+            } else {
+              this.iopsLimitErr = false;
+            }
+          } else {
+            this.iopsLimitErr = false;
+          }
+        } else {
+          this.iopsLimitErr = false;
+          this.bandwidthLimitErr = false;
+        }
+        if (this.modifyForm.maxiopsChoose && this.modifyForm.max_iops && Number(this.modifyForm.max_iops) < 100) {
+          this.iopsLimitErr = true;
+        }
+        if (this.modifyForm.control_policyUpper == undefined) {
+          this.iopsLimitErr = false;
+          this.bandwidthLimitErr = false;
+        }
+        if (this.modifyForm.control_policyLower == undefined) {
+          this.bandwidthLimitErr = false;
+        }
+      }
+    }
   }
 }
