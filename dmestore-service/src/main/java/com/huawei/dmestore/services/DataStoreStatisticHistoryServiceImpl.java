@@ -249,7 +249,6 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
     }
 
     public Map<String, Object> queryVolumeCurrentStatistic(Map<String, Object> params) throws DmeException {
-        log.info("性能-queryVolumeCurrentStatistic:{}");
         Map<String, String> idInstancdIdMap = initParamVolume(params, true);
         return queryCurrentStatistic(VOLUME_INSTANCE, params, idInstancdIdMap);
     }
@@ -400,7 +399,6 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
 
     private Map<String, Object> queryCurrentStatistic(String relationOrInstance, Map<String, Object> params,
         Map<String, String> idInstanceIdMap) {
-        log.info("Lun_指标_DataStoreStatisticHistoryServiceImpl_405:{}", params);
         Map<String, Object> resultmap = new HashMap<>();
         String label = MAX_LABEL;
         ResponseEntity responseEntity;
@@ -511,7 +509,6 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
 
     // 预处理卷参数
     private Map<String, String> initParamVolume(Map<String, Object> params, boolean isCurrent) throws DmeException {
-        log.info("性能-initParamVolume：{}",params);
         if (null == params || params.size() == 0) {
             return Collections.EMPTY_MAP;
         }
@@ -523,14 +520,11 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
         if (ids.size() > 0) {
             // ids若为wwn的集合则转换为对应的instanceId集合,也有可能ids直接就是volume的instanceId集合
             Map<String, Map<String, Object>> sysLunMap = dmeRelationInstanceService.getLunInstance();
-            log.info("LUN性能_DataStoreStatisticHistoryServiceImpl_515:sysLunMap:{}",gson.toJson(sysLunMap));
             if (sysLunMap != null && sysLunMap.size() > 0) {
                 for (String id : ids) {
                     Map<String, Object> map = sysLunMap.get(id);
                     if (map != null && map.size() != 0) {
                         String instanceId = ToolUtils.getStr(map.get(RESID_FIELD));
-                        log.info("LUN性能_" +
-                            "DataStoreStatisticHistoryServiceImpl_518:instanceId:{}",instanceId);
                         if (!StringUtils.isEmpty(instanceId)) {
                             idInstancdIdMap.put(id, instanceId);
                             instanceIds.add(instanceId);
@@ -671,7 +665,6 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
 
     // query statistic
     private ResponseEntity queryStatistic(Map<String, Object> paramMap) throws DmeException {
-        log.info("性能——queryStatistic-661");
         Map<String, Object> params = initParams(paramMap);
         String objTypeId = params.get(OBJ_TYPE_ID_FIELD).toString();
         Object indicatorIds = params.get(INDICATOR_IDS_FIELD);
@@ -943,7 +936,6 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
 
     // 消息转换 object-map 提取指定的标签
     private Map<String, Object> convertMap(JsonElement jsonElement, String label) {
-        log.info("性能-convertMap{}");
         Map<String, Object> objectMap = new HashMap<>();
         if (!ToolUtils.jsonIsNull(jsonElement)) {
             Set<Map.Entry<String, JsonElement>> objectSet = jsonElement.getAsJsonObject().entrySet();
