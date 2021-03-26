@@ -306,7 +306,7 @@ public class DmeRelationInstanceServiceImpl implements DmeRelationInstanceServic
             if (responseEntity != null && responseEntity.getStatusCodeValue() == HttpStatus.OK.value()) {
                 Object object = responseEntity.getBody();
                 Gson gson = new Gson();
-                LOG.info("性能数据-获取lun的实例Id:{}", gson.toJson(object));
+                LOG.info("性能数据-获取lun的实例"+instanceName+"Id:{}", gson.toJson(object));
                 jsonObject = new JsonParser().parse(object.toString()).getAsJsonObject();
             }
         } catch (DmeException e) {
