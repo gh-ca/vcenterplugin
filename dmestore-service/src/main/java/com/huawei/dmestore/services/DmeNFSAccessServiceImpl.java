@@ -23,6 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.util.StringUtils;
@@ -491,20 +492,38 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
     }
 
     private List<Map<String, Object>> queryShareInfo() throws DmeException {
-        ResponseEntity<String> responseEntity = listShares();
-        if (responseEntity.getStatusCodeValue() / DIGIT_100 == DIGIT_2) {
-            String object = responseEntity.getBody();
-            List<Map<String, Object>> list = converShare(object);
-            return list;
+        List<Map<String, Object>> shareList = new ArrayList<>();
+        int total=0;
+        int pageno=1;
+        int allpageno=1;
+
+        while (pageno<=allpageno) {
+            Map<String, Object> requestbody = new HashMap<>();
+            requestbody.put("page_no", pageno);
+            requestbody.put("page_size", PAGE_SIZE_1000);
+            String url = DmeConstants.DME_NFS_SHARE_URL;
+
+            ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.POST, gson.toJson(requestbody));
+            if (responseEntity.getStatusCodeValue() / DIGIT_100 == DIGIT_2) {
+                String object = responseEntity.getBody();
+                List<Map<String, Object>> list = converShare(object);
+                shareList.addAll(list);
+            }
+            JsonObject nfsjson = gson.fromJson(responseEntity.getBody(), JsonObject.class);
+            total = ToolUtils.jsonToInt(nfsjson.get("total"));
+            allpageno = total / PAGE_SIZE_1000;
+            if (total % PAGE_SIZE_1000 != 0)
+                allpageno += 1;
+            pageno++;
         }
-        return new ArrayList<>();
+        return shareList;
     }
 
     private ResponseEntity<String> listShares() throws DmeException {
         Map<String, Object> requestbody = new HashMap<>();
         //requestbody.put("name", shareName);
         //requestbody.put(STORAGE_ID, storageId);
-        requestbody.put("page_size",1000);
+        requestbody.put("page_size",PAGE_SIZE_1000);
         String url = DmeConstants.DME_NFS_SHARE_URL;
         return dmeAccessService.access(url, HttpMethod.POST, gson.toJson(requestbody));
     }
@@ -532,13 +551,30 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
     }
 
     private List<Map<String, Object>> queryFsInfo() throws DmeException {
-        ResponseEntity responseEntity = listFs();
-        if (responseEntity.getStatusCodeValue() / DIGIT_100 == DIGIT_2) {
-            Object object = responseEntity.getBody();
-            List<Map<String, Object>> list = converFs(object);
-            return list;
+        List<Map<String, Object>> fsList = new ArrayList<>();
+        int total=0;
+        int pageno=1;
+        int allpageno=1;
+
+        while (pageno<=allpageno) {
+            Map<String, Object> requestbody = new HashMap<>();
+            requestbody.put("page_no", pageno);
+            requestbody.put("page_size",PAGE_SIZE_1000);
+            ResponseEntity<String> responseEntity = dmeAccessService.access(DmeConstants.DME_NFS_FILESERVICE_QUERY_URL,
+                    HttpMethod.POST, gson.toJson(requestbody));
+            if (responseEntity.getStatusCodeValue() / DIGIT_100 == DIGIT_2) {
+                Object object = responseEntity.getBody();
+                List<Map<String, Object>> list = converFs(object);
+                fsList.addAll(list);
+            }
+            JsonObject nfsjson = gson.fromJson(responseEntity.getBody(), JsonObject.class);
+            total = ToolUtils.jsonToInt(nfsjson.get("total"));
+            allpageno = total / PAGE_SIZE_1000;
+            if (total % PAGE_SIZE_1000 != 0)
+                allpageno += 1;
+            pageno++;
         }
-        return new ArrayList<>();
+        return fsList;
     }
 
     private ResponseEntity listFs() throws DmeException {
@@ -547,7 +583,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
        /* if (!StringUtils.isEmpty(fsName)) {
             requestbody.put(NAME_FIELD, fsName);
         }*/
-        requestbody.put("page_size",1000);
+        requestbody.put("page_size",PAGE_SIZE_1000);
         ResponseEntity responseEntity = dmeAccessService.access(DmeConstants.DME_NFS_FILESERVICE_QUERY_URL,
             HttpMethod.POST, gson.toJson(requestbody));
         return responseEntity;
@@ -689,7 +725,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
         int k = 0;
         Map<String, NfsDataInfo> tm = new HashMap<>();
         long start1 = System.currentTimeMillis();
-        while(iterator.hasNext()){
+        /*while(iterator.hasNext()){
             k++;
             String key = iterator.next();
             tm.put(key, volIds.get(key));
@@ -700,18 +736,51 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
         }
         if (k % 20 > 0){
             getNfsSync(tm);
-        }
+        }*/
+        getNfsSync(volIds);
         LOG.info("调用nfs存储接口时间：{}ms", System.currentTimeMillis() - start1);
 
         return relists;
     }
 
-    public synchronized void getNfsSync(Map<String, NfsDataInfo> volIds){
+    public synchronized void getNfsSync(Map<String, NfsDataInfo> volIds) throws DmeException {
        // ExecutorService executorService = Executors.newFixedThreadPool(volIds.size());
+        int total=0;
+        int pageno=1;
+        int allpageno=1;
+        List<JsonObject> fslists = new ArrayList<>();
+        while (pageno<=allpageno) {
+            Map<String, Object> params = new HashMap<>();
+            params.put("page_no", pageno);
+            params.put("page_size", PAGE_SIZE_1000);
+            String jsonParams = gson.toJson(params);
+
+            ResponseEntity<String> responseEntity = dmeAccessService.access(DmeConstants.DME_NFS_FILESERVICE_QUERY_URL,
+                    HttpMethod.POST, jsonParams);
+            int code = responseEntity.getStatusCodeValue();
+            if (code != HttpStatus.OK.value()) {
+                throw new DmeException("503", "list filesystem error!");
+            }
+            JsonObject nfsjson = gson.fromJson(responseEntity.getBody(), JsonObject.class);
+            total = ToolUtils.jsonToInt(nfsjson.get("total"));
+             allpageno=total/PAGE_SIZE_1000;
+            if (total%PAGE_SIZE_1000!=0)
+                allpageno+=1;
+            String respObject = responseEntity.getBody();
+            if (!StringUtils.isEmpty(respObject)) {
+                JsonObject jsonObject = new JsonParser().parse(respObject).getAsJsonObject();
+                JsonArray jsonArray = jsonObject.get("data").getAsJsonArray();
+                for (JsonElement jsonElement : jsonArray) {
+                    JsonObject element = jsonElement.getAsJsonObject();
+                    fslists.add(element);
+                }
+            }
+            pageno++;
+        }
         CountDownLatch countDownLatch = new CountDownLatch(volIds.size());
-        for (Map.Entry<String, NfsDataInfo> entry: volIds.entrySet()){
-            threadPoolExecutor.execute(()->{
-                getFsDetailInfo(entry.getValue(), entry.getKey());
+        for (Map.Entry<String, NfsDataInfo> entry : volIds.entrySet()) {
+            threadPoolExecutor.execute(() -> {
+                getFsDetailInfo(entry.getValue(), entry.getKey(),fslists);
                 countDownLatch.countDown();
             });
         }
@@ -722,22 +791,25 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
         }
     }
 
-    private void getFsDetailInfo(NfsDataInfo nfsDataInfo, String fsId) {
-        try {
+    private void getFsDetailInfo(NfsDataInfo nfsDataInfo, String fsId,List<JsonObject> fslists) {
+
             if (StringUtils.isEmpty(fsId)) {
                 return;
             }
-            String fsUrl = DmeConstants.DME_NFS_FILESERVICE_DETAIL_URL.replace("{file_system_id}", fsId);
-            ResponseEntity<String> responseTuning = dmeAccessService.access(fsUrl, HttpMethod.GET, null);
-            if (responseTuning.getStatusCodeValue() / DIGIT_100 == DIGIT_2) {
-                JsonObject fsDetail = gson.fromJson(responseTuning.getBody(), JsonObject.class);
-                nfsDataInfo.setStatus(ToolUtils.jsonToStr(fsDetail.get("health_status")));
-                nfsDataInfo.setDeviceId(ToolUtils.jsonToStr(fsDetail.get(STORAGE_ID)));
-                nfsDataInfo.setDevice(ToolUtils.jsonToStr(fsDetail.get(STORAGE_NAME)));
+           // String fsUrl = DmeConstants.DME_NFS_FILESERVICE_DETAIL_URL.replace("{file_system_id}", fsId);
+            //ResponseEntity<String> responseTuning = dmeAccessService.access(fsUrl, HttpMethod.GET, null);
+            //if (responseTuning.getStatusCodeValue() / DIGIT_100 == DIGIT_2) {
+                //JsonObject fsDetail = gson.fromJson(responseTuning.getBody(), JsonObject.class);
+            for (JsonObject fsDetail:fslists) {
+                if (fsId.equalsIgnoreCase(ToolUtils.jsonToStr(fsDetail.get(ID_FIELD)))) {
+                    nfsDataInfo.setStatus(ToolUtils.jsonToStr(fsDetail.get("health_status")));
+                    nfsDataInfo.setDeviceId(ToolUtils.jsonToStr(fsDetail.get(STORAGE_ID)));
+                    nfsDataInfo.setDevice(ToolUtils.jsonToStr(fsDetail.get(STORAGE_NAME)));
+                    break;
+                }
             }
-        } catch (DmeException e) {
-            LOG.error("list Nfs from DME failed!");
-        }
+           // }
+
     }
 
     private Map<String, DmeVmwareRelation> getDvrMap(List<DmeVmwareRelation> dvrlist) {

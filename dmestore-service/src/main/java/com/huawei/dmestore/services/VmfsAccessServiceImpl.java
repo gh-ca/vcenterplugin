@@ -274,12 +274,47 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         return relists;
     }
 
-    public synchronized void getVmfsSync(Map<String, VmfsDataInfo> volIds, List<VmfsDataInfo> vmfsDataInfos, Map<String, String> stoNameMap){
+    public synchronized void getVmfsSync(Map<String, VmfsDataInfo> volIds, List<VmfsDataInfo> vmfsDataInfos, Map<String, String> stoNameMap) throws DmeException {
         //ExecutorService executorService = Executors.newFixedThreadPool(volIds.size());
+        Map<String, Object> requestbody = new HashMap<>();
+        int total=0;
+        int pageno=1;
+        int allpageno=1;
         CountDownLatch countDownLatch = new CountDownLatch(volIds.size());
+        List<JsonObject> volumeobjectlist = new ArrayList<>();
+        while (pageno<=allpageno) {
+            requestbody.put("page_no", pageno);
+            requestbody.put("page_size", 1000);
+
+            String volumeUrlByName = DmeConstants.DME_VOLUME_BASE_URL;
+
+            ResponseEntity<String> responseEntity = dmeAccessService.access(volumeUrlByName, HttpMethod.GET, gson.toJson(requestbody));
+            if (responseEntity.getStatusCodeValue() / DIVISOR_100 != HTTP_SUCCESS) {
+                LOG.info(" Query DME volume failed! errorMsg:{}", responseEntity.toString());
+            } else {
+                JsonObject jsonObject = gson.fromJson(responseEntity.getBody(), JsonObject.class);
+                JsonElement volumesElement = jsonObject.get("volumes");
+                if (!ToolUtils.jsonIsNull(volumesElement)) {
+                    JsonArray volumeArray = volumesElement.getAsJsonArray();
+                    for (JsonElement volumeObjectelement : volumeArray) {
+                        JsonObject volumeObject = volumeObjectelement.getAsJsonObject();
+                        volumeobjectlist.add(volumeObject);
+                    }
+                }
+                JsonObject nfsjson = gson.fromJson(responseEntity.getBody(), JsonObject.class);
+                total = ToolUtils.jsonToInt(nfsjson.get("total"));
+                allpageno = total / 1000;
+                if (total % 1000 != 0)
+                    allpageno += 1;
+                pageno++;
+            }
+        }
+
+
+
         for (Map.Entry<String, VmfsDataInfo> entry: volIds.entrySet()){
             threadPoolExecutor.execute(()->{
-                getVmfsDetailFromDme(vmfsDataInfos, stoNameMap, entry.getValue(), entry.getKey());
+                getVmfsDetailFromDme(vmfsDataInfos, stoNameMap, entry.getValue(),entry.getKey(), volumeobjectlist);
                 countDownLatch.countDown();
             });
         }
@@ -291,27 +326,34 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
     }
 
     private void getVmfsDetailFromDme(List<VmfsDataInfo> relists, Map<String, String> stoNameMap,
-        VmfsDataInfo vmfsDataInfo, String volumeId) {
-        String detailedVolumeUrl = DmeConstants.DME_VOLUME_BASE_URL + FIEL_SEPARATOR + volumeId;
+        VmfsDataInfo vmfsDataInfo, String volumeid,List<JsonObject> volumeobjectlist) {
+       // String detailedVolumeUrl = DmeConstants.DME_VOLUME_BASE_URL + FIEL_SEPARATOR + volumeId;
         try {
-            ResponseEntity responseEntity = dmeAccessService.access(detailedVolumeUrl, HttpMethod.GET, null);
-            if (responseEntity.getStatusCodeValue() == RestUtils.RES_STATE_I_200) {
-                JsonObject voljson = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonObject();
-                JsonObject vjson2 = voljson.getAsJsonObject(VOLUME_FIELD);
+            //ResponseEntity responseEntity = dmeAccessService.access(detailedVolumeUrl, HttpMethod.GET, null);
+           // if (responseEntity.getStatusCodeValue() == RestUtils.RES_STATE_I_200) {
+               // JsonObject voljson = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonObject();
+            for (JsonObject jsonObject:volumeobjectlist){
+                //JsonObject vjson2 = new JsonObject();//voljson.getAsJsonObject(VOLUME_FIELD);
+                if (volumeid.equalsIgnoreCase(ToolUtils.jsonToStr(jsonObject.get(ID_FIELD)))) {
 
-                vmfsDataInfo.setVolumeId(ToolUtils.jsonToStr(vjson2.get(ID_FIELD)));
-                vmfsDataInfo.setVolumeName(ToolUtils.jsonToStr(vjson2.get(NAME_FIELD)));
-                vmfsDataInfo.setStatus(ToolUtils.jsonToStr(vjson2.get("status")));
-                vmfsDataInfo.setServiceLevelName(ToolUtils.jsonToStr(vjson2.get(SERVICE_LEVEL_NAME)));
-                vmfsDataInfo.setVmfsProtected(ToolUtils.jsonToBoo(vjson2.get("protected")));
-                vmfsDataInfo.setWwn(ToolUtils.jsonToStr(vjson2.get(VOLUME_WWN)));
-                String storageId = ToolUtils.jsonToStr(vjson2.get(STORAGE_ID));
-                vmfsDataInfo.setDeviceId(storageId);
-                vmfsDataInfo.setDevice(stoNameMap == null ? "" : stoNameMap.get(storageId));
+                    vmfsDataInfo.setVolumeId(ToolUtils.jsonToStr(jsonObject.get(ID_FIELD)));
+                    vmfsDataInfo.setVolumeName(ToolUtils.jsonToStr(jsonObject.get(NAME_FIELD)));
+                    vmfsDataInfo.setStatus(ToolUtils.jsonToStr(jsonObject.get("status")));
+                    vmfsDataInfo.setServiceLevelName(ToolUtils.jsonToStr(jsonObject.get(SERVICE_LEVEL_NAME)));
+                    vmfsDataInfo.setVmfsProtected(ToolUtils.jsonToBoo(jsonObject.get("protected")));
+                    vmfsDataInfo.setWwn(ToolUtils.jsonToStr(jsonObject.get(VOLUME_WWN)));
+                    String storageId = ToolUtils.jsonToStr(jsonObject.get(STORAGE_ID));
+                    vmfsDataInfo.setDeviceId(storageId);
+                    vmfsDataInfo.setDevice(stoNameMap == null ? "" : stoNameMap.get(storageId));
 
-                parseTuning(vmfsDataInfo, vjson2);
-                relists.add(vmfsDataInfo);
+                    parseTuning(vmfsDataInfo, jsonObject);
+                    relists.add(vmfsDataInfo);
+                    break;
+                }
             }
+
+
+           // }
         } catch (DmeException e) {
             LOG.error("get volume from dme error!errMsg={}", e.getMessage());
         }
