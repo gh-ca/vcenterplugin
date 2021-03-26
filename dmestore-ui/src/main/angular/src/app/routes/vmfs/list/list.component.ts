@@ -181,7 +181,7 @@ export class VmfsListComponent implements OnInit {
 
   ngOnInit() {
     // 列表数据
-    this.refresh();
+    this.refreshVmfs();
   }
   // 修改
   modifyBtnClick() {
@@ -354,7 +354,7 @@ export class VmfsListComponent implements OnInit {
     });
   }
   // table数据处理
-  refresh() {
+  refreshVmfs() {
     this.isLoading = true;
     // 进行数据加载
     this.remoteSrv.getData()
@@ -1774,7 +1774,7 @@ export class VmfsListComponent implements OnInit {
     this.isFirstLoadChartData = true;
     // this.backToListPage();
     // 重新请求数据
-    this.refresh();
+    this.refreshVmfs();
   }
 
   /**
