@@ -24,6 +24,8 @@ public interface BestPracticeProcessService {
 
     void check(String objectId) throws VcenterException;
 
+    void checkByCluster(String clusterObjectId) throws VcenterException;
+
     /**
      * 最佳实践实施
      *
