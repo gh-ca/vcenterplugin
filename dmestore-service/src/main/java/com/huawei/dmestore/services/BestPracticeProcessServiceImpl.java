@@ -78,7 +78,7 @@ public class BestPracticeProcessServiceImpl implements BestPracticeProcessServic
         if (StringUtil.isNotBlank(type)) {
             objectIds = new ArrayList<>();
             if (type.equals("host")) {
-                check(objectId);
+                //check(objectId);
                 objectIds.add(objectId);
             } else if (type.equals("cluster")) {
                 // 查询集群下的所有主机信息
@@ -88,7 +88,7 @@ public class BestPracticeProcessServiceImpl implements BestPracticeProcessServic
                         new TypeToken<List<Map<String, String>>>() { }.getType());
                     for (int index = 0; index < hostList.size(); index++) {
                         String tempHostObjectId = hostList.get(index).get("hostId");
-                        check(tempHostObjectId);
+                        //check(tempHostObjectId);
                         objectIds.add(tempHostObjectId);
                     }
                 }
