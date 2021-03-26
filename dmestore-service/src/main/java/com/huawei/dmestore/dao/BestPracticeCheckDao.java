@@ -189,7 +189,7 @@ public class BestPracticeCheckDao extends H2DataBaseDao {
         return lists;
     }
 
-    public List<BestPracticeBean> getRecordBeanByHostsetting(String hostSetting) throws SQLException {
+    public List<BestPracticeBean> getRecordBeanByHostsetting(String hostSetting, String id) throws SQLException {
         List<BestPracticeBean> lists = new ArrayList<>();
         Connection con = null;
         PreparedStatement ps = null;
@@ -200,9 +200,16 @@ public class BestPracticeCheckDao extends H2DataBaseDao {
                 + "AUTO_REPAIR from DP_DME_BEST_PRACTICE_CHECK where 1=1 ";
             if (!StringUtils.isEmpty(hostSetting)) {
                 sql = sql + " and HOST_SETTING=?";
+                boolean hasId = !StringUtils.isEmpty(id);
+                if (hasId) {
+                    sql = sql + " and HOST_ID=?";
+                }
                 ps = con.prepareStatement(sql);
                 ps.setString(1, hostSetting);
-            }else {
+                if (hasId) {
+                    ps.setString(2, id);
+                }
+            } else {
                 ps = con.prepareStatement(sql);
             }
             rs = ps.executeQuery();

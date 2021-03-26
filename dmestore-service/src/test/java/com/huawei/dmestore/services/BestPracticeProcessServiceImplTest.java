@@ -72,8 +72,8 @@ public class BestPracticeProcessServiceImplTest {
         List<BestPracticeBean> hostBeanList = new ArrayList<>();
         BestPracticeBean bestPracticeBean = new BestPracticeBean();
         hostBeanList.add(bestPracticeBean);
-        when(bestPracticeCheckDao.getRecordBeanByHostsetting(anyString())).thenReturn(hostBeanList);
-        bestPracticeProcessService.getCheckRecord();
+        when(bestPracticeCheckDao.getRecordBeanByHostsetting(anyString(), anyString())).thenReturn(hostBeanList);
+        bestPracticeProcessService.getCheckRecord(null, null);
     }
 
     /**
