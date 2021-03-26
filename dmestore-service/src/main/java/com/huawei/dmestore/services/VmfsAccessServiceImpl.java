@@ -249,7 +249,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                     int k = 0;
                     Map<String, VmfsDataInfo> tm = new HashMap<>();
                     long start1 = System.currentTimeMillis();
-                    while(iterator.hasNext()){
+                    /*while(iterator.hasNext()){
                         k++;
                         String key = iterator.next();
                         tm.put(key, volIds.get(key));
@@ -260,7 +260,8 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                     }
                     if (k % 20 > 0){
                         getVmfsSync(tm, relists, stoNameMap);
-                    }
+                    }*/
+                    getVmfsSync(volIds,relists,stoNameMap);
                     LOG.info("调用vmfs存储接口时间：{}ms", System.currentTimeMillis() - start1);
                 }
             } else {
