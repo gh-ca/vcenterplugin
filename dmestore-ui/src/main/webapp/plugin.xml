@@ -444,7 +444,7 @@
                      <root>
                         <actionUrl>/ui/dmestore/index.html?view=best/host/applybp</actionUrl>
                         <dialogTitle>#{tip}</dialogTitle>
-                        <dialogSize>380,180</dialogSize>
+                        <dialogSize>900,600</dialogSize>
                      </root>
                   </object>
                </delegate>
@@ -1130,7 +1130,7 @@
                      <root>
                         <actionUrl>/ui/dmestore/index.html?view=best/cluster/applybp</actionUrl>
                         <dialogTitle>#{tip}</dialogTitle>
-                        <dialogSize>380,180</dialogSize>
+                        <dialogSize>900,600</dialogSize>
                      </root>
                   </object>
                </delegate>

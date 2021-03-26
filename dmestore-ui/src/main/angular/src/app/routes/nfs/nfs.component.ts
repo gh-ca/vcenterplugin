@@ -89,6 +89,7 @@ export class NfsComponent implements OnInit {
   @ViewChild('addPageTwo') addPageTwo: ClrWizardPage;
   addSuccessShow = false; // 添加成功提示
   modifySuccessShow = false; // 添加成功提示
+  syncSuccessTips = false; // 同步成功提
 
   logicPorts: LogicPort[] = [];
   oldNfsName:string;
@@ -548,8 +549,9 @@ export class NfsComponent implements OnInit {
     this.isLoading = true;
     this.vmfsListService.scanVMFS('nfs').subscribe((res: any) => {
       this.isLoading = false;
+      this.syncSuccessTips = true;
       if (res.code === '200') {
-        this.getNfsList();
+        // this.getNfsList();
         console.log('Scan success');
         this.router.navigate(['nfs'], {
           queryParams: {t: new Date().getTime()}

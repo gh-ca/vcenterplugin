@@ -1546,7 +1546,6 @@ public class DmeStorageServiceImpl implements DmeStorageService {
 
     @Override
     public List<Volume> listVolumesPerformance(List<String> volumeWwns) throws DmeException {
-        LOG.info("性能-listVolumesPerformance{}：", volumeWwns);
         List<Volume> relists = new ArrayList<>();
         try {
             if (volumeWwns != null && volumeWwns.size() > 0) {

@@ -29,6 +29,8 @@
           <div class="dropdown-divider" role="separator" aria-hidden="true"></div>
           <!--删除-->
           <div aria-label="Dropdown header Action 2" (click)="delBtnClickFUnc();" [disabled]="rowSelected.length < 1" clrDropdownItem>{{'menu.del' | translate}}</div>
+          <!--同步-->
+          <div aria-label="Dropdown header Action 2" clrDropdownItem (click)="scanDataStore();">{{'menu.Synchronize' | translate}}</div>
         </clr-dropdown-menu>
       </clr-dropdown>
     </div>
@@ -44,7 +46,7 @@
       </div>
       <div class="radio btn merginLeft" title="{{'menu.refresh' | translate}}">
         <!--<input type="radio" name="btn-group-demo-radios" id="btn-demo-radio-3">-->
-        <label><clr-icon shape="refresh" size="20" (click)="scanDataStore();"></clr-icon></label>
+        <label><clr-icon shape="refresh" size="20" (click)="refresh();"></clr-icon></label>
       </div>
     </div>
   </div>
@@ -1178,7 +1180,16 @@
       <p *ngIf="delSuccessShow">{{'vmfs.del.success' | translate}}</p>
     </div>
     <div class="modal-footer">
-      <button type="submit" class="btn btn-primary" (click)="closeSuccessTips();">{{'menu.ok' | translate}}</button>
+      <button type="submit" class="btn btn-primary" (click)="syncSuccessTips = false;closeSuccessTips();">{{'menu.ok' | translate}}</button>
+    </div>
+  </clr-modal>
+  <clr-modal [(clrModalOpen)]="syncSuccessTips" [clrModalSize]="'sm'" [clrModalClosable]="false">
+    <h3 class="modal-title modelTile">{{'vmfs.reclaim.title' | translate}}</h3>
+    <div class="modal-body">
+      <p *ngIf="syncSuccessTips">{{'tips.syncSuccess' | translate}}</p>
+    </div>
+    <div class="modal-footer">
+      <button type="submit" class="btn btn-primary" (click)="syncSuccessTips = false;">{{'menu.ok' | translate}}</button>
     </div>
   </clr-modal>
 </div>
