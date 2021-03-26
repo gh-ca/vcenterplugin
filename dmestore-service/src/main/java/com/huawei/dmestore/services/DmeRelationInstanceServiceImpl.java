@@ -193,6 +193,7 @@ public class DmeRelationInstanceServiceImpl implements DmeRelationInstanceServic
     }
 
     public void listInstanceLun() throws DmeException {
+        LOG.info("性能-listInstanceLun");
         String instanceName = "SYS_Lun";
         JsonObject jsonObject = listInstancdByInstanceName(instanceName);
         if (jsonObject != null && jsonObject.get("totalNum").getAsInt() > 0) {
@@ -268,6 +269,7 @@ public class DmeRelationInstanceServiceImpl implements DmeRelationInstanceServic
 
     @Override
     public Map<String, Map<String, Object>> getLunInstance() throws DmeException {
+        LOG.info("实例-getLunInstance：{}");
         if (LUN_INSTANCE.size() == 0) {
             listInstanceLun();
         }
@@ -299,6 +301,7 @@ public class DmeRelationInstanceServiceImpl implements DmeRelationInstanceServic
     }
 
     private JsonObject listInstancdByInstanceName(String instanceName) {
+        LOG.info("性能-listInstancdByInstanceName{}", instanceName);
         JsonObject jsonObject = null;
         String url = DmeConstants.LIST_INSTANCE_URL.replace("{className}", instanceName);
         try {
@@ -306,8 +309,8 @@ public class DmeRelationInstanceServiceImpl implements DmeRelationInstanceServic
             if (responseEntity != null && responseEntity.getStatusCodeValue() == HttpStatus.OK.value()) {
                 Object object = responseEntity.getBody();
                 Gson gson = new Gson();
-                LOG.info("性能数据-获取lun的实例"+instanceName+"Id:{}", gson.toJson(object));
-                jsonObject = new JsonParser().parse(object.toString()).getAsJsonObject();
+                LOG.info("性能数据-获取lun的实例"+instanceName+":{}", gson.toJson(object));
+                jsonObject = new JsonParser().parse(ToolUtils.getStr(object)).getAsJsonObject();
             }
         } catch (DmeException e) {
             LOG.warn("List instance error by instanceName:{},{}", instanceName, e);
