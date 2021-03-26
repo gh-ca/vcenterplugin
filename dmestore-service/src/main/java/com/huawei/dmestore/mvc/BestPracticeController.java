@@ -45,9 +45,24 @@ public class BestPracticeController extends BaseController {
      * @return ResponseBodyBean
      */
     @RequestMapping(value = "/check", method = RequestMethod.POST)
-    public ResponseBodyBean bestPractice() {
+    public ResponseBodyBean bestPractice(@RequestParam(required = false) String objectId) {
         try {
-            bestPracticeProcessService.check(null);
+            bestPracticeProcessService.check(objectId);
+            return success();
+        } catch (VcenterException ex) {
+            return failure(ex.getMessage());
+        }
+    }
+
+    /**
+     * bestPractice
+     *
+     * @return ResponseBodyBean
+     */
+    @RequestMapping(value = "/check/byCluster", method = RequestMethod.POST)
+    public ResponseBodyBean checkByCluster(@RequestParam String clusterObjId) {
+        try {
+            bestPracticeProcessService.checkByCluster(clusterObjId);
             return success();
         } catch (VcenterException ex) {
             return failure(ex.getMessage());

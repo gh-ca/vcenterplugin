@@ -46,7 +46,7 @@
       </div>
       <div class="radio btn merginLeft" title="{{'menu.refresh' | translate}}">
         <!--<input type="radio" name="btn-group-demo-radios" id="btn-demo-radio-3">-->
-        <label><clr-icon shape="refresh" size="20" (click)="refresh();"></clr-icon></label>
+        <label><clr-icon shape="refresh" size="20" (click)="refreshVmfs();"></clr-icon></label>
       </div>
     </div>
   </div>
@@ -70,11 +70,11 @@
       {{'vmfs.capacity' | translate}}
       <clr-icon *ngIf="sortFunc(listCapacity.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
     </clr-dg-column>
-    <clr-dg-column #listUsedCapacity [hidden]="radioCheck!=='list'" class="hideFilter" [clrDgField]="'usedCapacity'" class="hideFilter" [clrDgField]="'capacity'" style="position: relative;" (clrDgSortedChange)="sortFunc($event);">
+    <clr-dg-column #listUsedCapacity [hidden]="radioCheck!=='list'" class="hideFilter" [clrDgField]="'usedCapacity'" class="hideFilter" style="position: relative;" (clrDgSortedChange)="sortFunc($event);">
       {{'vmfs.usedCapacity' | translate}}
       <clr-icon *ngIf="sortFunc(listUsedCapacity.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
     </clr-dg-column>
-    <clr-dg-column #listCapacityUsage [hidden]="radioCheck!=='list'" class="hideFilter" [clrDgField]="'capacityUsage'" style="min-width: 11rem;position: relative;" class="hideFilter" [clrDgField]="'capacity'" (clrDgSortedChange)="sortFunc($event);">
+    <clr-dg-column #listCapacityUsage [hidden]="radioCheck!=='list'" class="hideFilter" [clrDgField]="'capacityUsage'" style="min-width: 11rem;position: relative;" class="hideFilter" (clrDgSortedChange)="sortFunc($event);">
       {{'vmfs.capacityUsage' | translate}}
       <clr-icon *ngIf="sortFunc(listCapacityUsage.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
     </clr-dg-column>
