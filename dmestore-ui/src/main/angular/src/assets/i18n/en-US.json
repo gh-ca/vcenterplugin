@@ -26,7 +26,8 @@
     "back":"Back",
     "performance": "Performance",
     "conventional": "Conventional",
-    "capacity": "Capacity"
+    "capacity": "Capacity",
+    "Synchronize": "Synchronize"
   },
   "validations": {
     "required": "This field is required!",
@@ -906,7 +907,10 @@
     "noData": "No data",
     "addVmfsConnFail": "Create vmfs failure,connectivity of host or hostgroup on dme error!",
     "mountVmfsConnFail": "Mount failure,connectivity of host or hostgroup on dme error!",
-    "details": "Details"
+    "details": "Details",
+    "bandwidthLimitErr": "The lower limit of bandwidth cannot be greater than the upper limit!",
+    "iopsLimitErr": "The upper limit of IOPS is at least 100, and the lower limit cannot be greater than the upper limit!",
+    "syncSuccess": "Data synchronization is successful!"
   },
   "chart": {
     "select": {

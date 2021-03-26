@@ -71,7 +71,29 @@ public class BestPracticeProcessServiceImpl implements BestPracticeProcessServic
     }
 
     @Override
-    public List<BestPracticeCheckRecordBean> getCheckRecord() {
+    public List<BestPracticeCheckRecordBean> getCheckRecord(String type, String objectId) throws DmeException {
+        List<String> objectIds = null;
+
+        // 先检查，后获取值
+        if (StringUtil.isNotBlank(type)) {
+            objectIds = new ArrayList<>();
+            if (type.equals("host")) {
+                //check(objectId);
+                objectIds.add(objectId);
+            } else if (type.equals("cluster")) {
+                // 查询集群下的所有主机信息
+                String hostsOnCluster = vcsdkUtils.getHostsOnCluster(objectId);
+                if (StringUtil.isNotBlank(hostsOnCluster)) {
+                    List<Map<String, String>> hostList = gson.fromJson(hostsOnCluster,
+                        new TypeToken<List<Map<String, String>>>() { }.getType());
+                    for (int index = 0; index < hostList.size(); index++) {
+                        String tempHostObjectId = hostList.get(index).get("hostId");
+                        //check(tempHostObjectId);
+                        objectIds.add(tempHostObjectId);
+                    }
+                }
+            }
+        }
         List<BestPracticeCheckRecordBean> list = new ArrayList<>();
         for (BestPracticeService bestPracticeService : bestPracticeServices) {
             BestPracticeCheckRecordBean bean = new BestPracticeCheckRecordBean();
@@ -79,10 +101,21 @@ public class BestPracticeProcessServiceImpl implements BestPracticeProcessServic
             bean.setLevel(bestPracticeService.getLevel());
             bean.setRecommendValue(String.valueOf(bestPracticeService.getRecommendValue()));
             try {
-                List<BestPracticeBean> hostBean = bestPracticeCheckDao.getRecordBeanByHostsetting(
-                    bestPracticeService.getHostSetting());
-                bean.setHostList(hostBean);
-                bean.setCount(hostBean.size());
+                if (objectIds != null && objectIds.size() > 0) {
+                    List<BestPracticeBean> tempList = new ArrayList<>();
+                    for (String id : objectIds) {
+                        List<BestPracticeBean> hostBeanTemp = bestPracticeCheckDao.getRecordBeanByHostsetting(
+                            bestPracticeService.getHostSetting(), id);
+                        tempList.addAll(hostBeanTemp);
+                    }
+                    bean.setHostList(tempList);
+                    bean.setCount(tempList.size());
+                } else {
+                    List<BestPracticeBean> hostBean = bestPracticeCheckDao.getRecordBeanByHostsetting(
+                        bestPracticeService.getHostSetting(), null);
+                    bean.setHostList(hostBean);
+                    bean.setCount(hostBean.size());
+                }
             } catch (SQLException ex) {
                 continue;
             }
@@ -118,7 +151,7 @@ public class BestPracticeProcessServiceImpl implements BestPracticeProcessServic
             hostsStr = vcsdkUtils.getAllHosts();
         }
         JsonArray hostArray = gson.fromJson(hostsStr, JsonArray.class);
-        if (null!=hostArray) {
+        if (null != hostArray) {
             Map<String, List<BestPracticeBean>> checkMap = new HashMap<>(DmeConstants.COLLECTION_CAPACITY_16);
             List<String> unConnectedIds = new ArrayList<>();
             for (int index = 0; index < hostArray.size(); index++) {
@@ -156,7 +189,7 @@ public class BestPracticeProcessServiceImpl implements BestPracticeProcessServic
                     } catch (Exception ex) {
                         // 报错，跳过当前项检查
                         log.error("{} check failed! hostSetting={}, errorMsg={}", hostName,
-                                bestPracticeService.getHostSetting(), ex.getMessage());
+                            bestPracticeService.getHostSetting(), ex.getMessage());
                     }
                 }
             }
@@ -280,7 +313,7 @@ public class BestPracticeProcessServiceImpl implements BestPracticeProcessServic
                 base.setNeedReboot(service.needReboot());
                 try {
                     boolean checkFlag = service.check(vcsdkUtils, objectId);
-                    if(!checkFlag){
+                    if (!checkFlag) {
                         service.update(vcsdkUtils, objectId);
                         // 更新成功后，只要有一项是需要重启的则该主机需要重启后生效
                         if (service.needReboot()) {

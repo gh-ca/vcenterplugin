@@ -156,7 +156,7 @@ public class OverviewServiceImpl implements OverviewService {
             int major = 0;
             int warning = 0;
             int info = 0;
-            List<BestPracticeCheckRecordBean> rs = bestPracticeProcessService.getCheckRecord();
+            List<BestPracticeCheckRecordBean> rs = bestPracticeProcessService.getCheckRecord(null, null);
             for (BestPracticeCheckRecordBean recordBean : rs) {
                 int count = recordBean.getCount();
                 if(count == 0){
