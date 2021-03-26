@@ -51,6 +51,9 @@ export class NfsAddComponent implements OnInit{
   iopsMinErrTips = false;// IOPS下限错误提示
   latencyErrTips = false;// 时延错误提示
 
+  bandwidthLimitErr = false; // v6 设备 带宽 下限大于上限
+  iopsLimitErr = false; // v6 设备 IOPS 下限大于上限
+
   // 添加页面窗口
   @ViewChild('wizard') wizard: ClrWizard;
   @ViewChild('addPageOne') addPageOne: ClrWizardPage;
@@ -129,7 +132,7 @@ export class NfsAddComponent implements OnInit{
   }
   addNfs(){
     if (this.bandWidthMaxErrTips || this.iopsMaxErrTips
-      || this.bandWidthMinErrTips || this.iopsMinErrTips || this.latencyErrTips) {
+      || this.bandWidthMinErrTips || this.iopsMinErrTips || this.latencyErrTips  || this.bandwidthLimitErr || this.iopsLimitErr) {
       return;
     }
     //
@@ -318,6 +321,8 @@ export class NfsAddComponent implements OnInit{
       }
     }
     this.iopsErrTips(objVal, operationType);
+    // 下限大于上限 检测
+    this.qosV6Check('add');
   }
   /**
    * iops错误提示
@@ -662,6 +667,17 @@ export class NfsAddComponent implements OnInit{
       }
     }
     console.log("lowerChecked", form)
+    console.log("lowerChecked", form)
+    if (form.control_policyUpper == undefined) {
+      form.maxBandwidthChoose = false;
+      form.maxIopsChoose = false;
+    }
+    if (form.control_policyLower == undefined) {
+      form.minBandwidthChoose = false;
+      form.minIopsChoose = false;
+      form.latencyChoose = false;
+    }
+    this.qosV6Check('add');
   }
 
   /**
@@ -774,6 +790,51 @@ export class NfsAddComponent implements OnInit{
       this.addForm.securityType = '';
     }
   }
+  qosV6Check(type:string) {
+    if (type == 'add') {
+      if (this.addForm.storagId) {
+        const chooseStorage = this.storageList.filter(item => item.id == this.addForm.storagId)[0];
+        if (chooseStorage) {
+          const qosTag = chooseStorage.storageTypeShow.qosTag
+          if (qosTag == 1) {
+            if (this.addForm.minBandwidthChoose && this.addForm.maxBandwidthChoose) {
+              // 带宽上限小于下限
+              if (this.addForm.minBandwidth && this.addForm.maxBandwidth && Number(this.addForm.minBandwidth) > Number(this.addForm.maxBandwidth)) {
+                this.bandwidthLimitErr = true;
+              } else {
+                this.bandwidthLimitErr = false;
+              }
+            } else {
+              this.bandwidthLimitErr = false;
+            }
+            if (this.addForm.minIopsChoose && this.addForm.maxIopsChoose) {
+              // iops上限小于下限
+              if (this.addForm.minIops && this.addForm.maxIops && Number(this.addForm.minIops) > Number(this.addForm.maxIops)) {
+                this.iopsLimitErr = true;
+              } else {
+                this.iopsLimitErr = false;
+              }
+            } else {
+              this.iopsLimitErr = false;
+            }
+          } else {
+            this.iopsLimitErr = false;
+            this.bandwidthLimitErr = false;
+          }
+          if (this.addForm.maxIopsChoose && this.addForm.maxIops && Number(this.addForm.maxIops) < 100) {
+            this.iopsLimitErr = true;
+          }
+          if (this.addForm.control_policyUpper == undefined) {
+            this.iopsLimitErr = false;
+            this.bandwidthLimitErr = false;
+          }
+          if (this.addForm.control_policyLower == undefined) {
+            this.bandwidthLimitErr = false;
+          }
+        }
 
+      }
+    }
+  }
 }
 

@@ -906,7 +906,9 @@
     "noData": "暂无数据",
     "addVmfsConnFail": "创建VMFS失败，主机或集群连通性异常！",
     "mountVmfsConnFail": "挂载失败，主机或集群连通性异常！",
-    "details": "详情"
+    "details": "详情",
+    "bandwidthLimitErr": "带宽下限不能大于上限！",
+    "iopsLimitErr": "IOPS上限值最小为100,且下限不能大于上限！"
   },
   "chart": {
     "select": {

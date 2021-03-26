@@ -246,7 +246,7 @@
         </clr-input-container>
         <clr-select-container class="selectClass">
           <label style="color: #9F9F9F;">{{'vmfs.storageDevice' | translate}}</label>
-          <select clrSelect  [(ngModel)]="form.storage_id" name="storage_id" (ngModelChange)="getStoragePoolsByStorId();" required>
+          <select clrSelect  [(ngModel)]="form.storage_id" name="storage_id" (ngModelChange)="getStoragePoolsByStorId();qosV6Check('add');" required>
             <option *ngFor="let item of storageList" value="{{item.id}}">{{item.name+'('+item.ip+')'}}</option>
           </select>
           <clr-control-error>{{'validations.required' | translate}}</clr-control-error>
@@ -308,7 +308,7 @@
           <clr-checkbox-container *ngIf="form.control_policyUpper === '1'">
             <label style="color: #9F9F9F;">{{'vmfs.trafficControlObject' | translate}}</label>
             <clr-checkbox-wrapper>
-              <input type="checkbox" [(ngModel)]="form.maxbandwidthChoose" (ngModelChange)="resetQosFlag(form.maxbandwidthChoose, 'maxbandwidth')" name="maxbandwidthChoose" clrCheckbox/>
+              <input type="checkbox" [(ngModel)]="form.maxbandwidthChoose" (ngModelChange)="resetQosFlag(form.maxbandwidthChoose, 'maxbandwidth');qosV6Check('add');" name="maxbandwidthChoose" clrCheckbox/>
               <label style="width: 190px;">
                 {{'vmfs.bandwidthLimitUpper' | translate}}
                 <input type="number" [(readOnly)]="!form.maxbandwidthChoose" class="inputOneLine" name="maxbandwidth" [(ngModel)]="form.maxbandwidth" min="0" oninput="if (value.length > 11) {value=value.slice(0,11)}" (blur)="qosBlur('add', 'maxbandwidth');"
@@ -322,7 +322,7 @@
           <clr-checkbox-container *ngIf="form.control_policyUpper === '1'">
             <label></label>
             <clr-checkbox-wrapper>
-              <input type="checkbox" [(ngModel)]="form.maxiopsChoose" (ngModelChange)="resetQosFlag(form.maxiopsChoose, 'maxiops')" name="maxiopsChoose" clrCheckbox/>
+              <input type="checkbox" [(ngModel)]="form.maxiopsChoose" (ngModelChange)="resetQosFlag(form.maxiopsChoose, 'maxiops');qosV6Check('add');" name="maxiopsChoose" clrCheckbox/>
               <label style="width: 190px;">
                 {{'vmfs.IOPSLimitUpper' | translate}}
                 <input type="number" [(readOnly)]="!form.maxiopsChoose" class="inputOneLine" name="maxiops" [(ngModel)]="form.maxiops" min="0" oninput="if (value.length > 11) {value=value.slice(0,11)}" (blur)="qosBlur('add', 'maxiops');"
@@ -338,7 +338,7 @@
               <label *ngIf="form.control_policyLower == '0' && form.control_policyUpper != '1'" style="color: #9F9F9F;">{{'vmfs.trafficControlObject' | translate}}</label>
               <label *ngIf="form.control_policyLower == '0' && form.control_policyUpper == '1'" style="color: #9F9F9F;"></label>
               <clr-checkbox-wrapper *ngIf="form.control_policyLower == '0'">
-                <input type="checkbox" [(ngModel)]="form.minbandwidthChoose" (ngModelChange)="resetQosFlag(form.minbandwidthChoose, 'minbandwidth')" name="minbandwidthChoose" clrCheckbox/>
+                <input type="checkbox" [(ngModel)]="form.minbandwidthChoose" (ngModelChange)="resetQosFlag(form.minbandwidthChoose, 'minbandwidth');qosV6Check('add');" name="minbandwidthChoose" clrCheckbox/>
                 <label style="width: 190px;">
                   {{'vmfs.bandwidthLimitLower' | translate}}
                   <input type="number" [(readOnly)]="!form.minbandwidthChoose" min="0" oninput="if (value.length > 11) {value=value.slice(0,11)}" class="inputOneLine" name="minbandwidth" [(ngModel)]="form.minbandwidth" (blur)="qosBlur('add', 'minbandwidth');"
@@ -352,7 +352,7 @@
             <clr-checkbox-container *ngIf="form.control_policyLower === '0'">
               <label></label>
               <clr-checkbox-wrapper>
-                <input type="checkbox" [(ngModel)]="form.miniopsChoose" (ngModelChange)="resetQosFlag(form.miniopsChoose, 'miniops')" name="minbandwidthChoose" clrCheckbox/>
+                <input type="checkbox" [(ngModel)]="form.miniopsChoose" (ngModelChange)="resetQosFlag(form.miniopsChoose, 'miniops');qosV6Check('add');" name="minbandwidthChoose" clrCheckbox/>
                 <label style="width: 190px;">
                   {{'vmfs.IOPSLimitLower' | translate}}
                   <input type="number" [(readOnly)]="!form.miniopsChoose" min="0" oninput="if (value.length > 11) {value=value.slice(0,11)}" class="inputOneLine" name="miniops" [(ngModel)]="form.miniops" (blur)="qosBlur('add', 'miniops');"
@@ -387,6 +387,12 @@
               </clr-checkbox-wrapper>
               <clr-control-helper *ngIf="latencyErrTips" style="color: red"><clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{'errorMsg.iposMaxMinTips' | translate}}</clr-control-helper>
               <clr-control-helper *ngIf="!latencyErrTips && form.latencyChoose && !form.latency">{{'errorMsg.require' | translate}}</clr-control-helper>
+            </clr-checkbox-container>
+            <clr-checkbox-container *ngIf="bandwidthLimitErr">
+              <clr-control-helper  style="color: red"><clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{'tips.bandwidthLimitErr' | translate}}</clr-control-helper>
+            </clr-checkbox-container>
+            <clr-checkbox-container *ngIf="iopsLimitErr">
+              <clr-control-helper style="color: red"><clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{'tips.iopsLimitErr' | translate}}</clr-control-helper>
             </clr-checkbox-container>
           </div>
         </div>
