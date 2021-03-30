@@ -25,13 +25,13 @@ public class CipherUtils {
     public  String encryptString(String sSrc) {
 
         //return aesEncode(sSrc, multitypeutil);
-        return aesCipher.encryptByAES(sSrc);
+        return aesCipher.encryptByAes(sSrc);
     }
 
 
     public  String decryptString(String sSrc) {
         //return aesDncode(sSrc, multitypeutil);
-        return aesCipher.decryptByAES(sSrc);
+        return aesCipher.decryptByAes(sSrc);
     }
 
 

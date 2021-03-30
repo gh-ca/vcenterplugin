@@ -8,7 +8,6 @@ import com.huawei.dmestore.entity.VCenterInfo;
 import com.huawei.dmestore.exception.DmeException;
 import com.huawei.dmestore.exception.DmeSqlException;
 import com.huawei.dmestore.exception.VcenterException;
-import com.huawei.dmestore.model.ResponseBodyBean;
 import com.huawei.dmestore.model.SmartQos;
 import com.huawei.dmestore.model.Storage;
 import com.huawei.dmestore.model.StorageDetail;
@@ -28,7 +27,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 import com.sun.org.apache.bcel.internal.generic.NEW;
-import com.vmware.vim.binding.vmodl.list;
 import com.vmware.vim.binding.vmodl.map;
 import com.vmware.vim.binding.vmodl.name;
 
@@ -42,16 +40,14 @@ import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import java.util.Set;
-import java.util.concurrent.*;
-
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.CountDownLatch;
 import jdk.nashorn.internal.parser.Parser;
 import sun.rmi.runtime.Log;
 
@@ -64,7 +60,6 @@ import sun.rmi.runtime.Log;
 public class VmfsAccessServiceImpl implements VmfsAccessService {
     private static final Logger LOG = LoggerFactory.getLogger(VmfsAccessServiceImpl.class);
 
-    private ThreadPoolTaskExecutor threadPoolExecutor;
 
     private static final String VOLUME_IDS = "volume_ids";
 
@@ -160,6 +155,8 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
 
     private final String CONNECTIVITY_NORMAL = "normal";
 
+    private ThreadPoolTaskExecutor threadPoolExecutor;
+
     private Gson gson = new Gson();
 
     private DmeVmwareRalationDao dmeVmwareRalationDao;
@@ -250,7 +247,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                     Map<String, VmfsDataInfo> tm = new HashMap<>();
                     long start1 = System.currentTimeMillis();
                     getVmfsSync(volIds,relists,stoNameMap);
-                    LOG.info("调用vmfs存储接口时间：{}ms", System.currentTimeMillis() - start1);
+                    LOG.info("vmfs list response：{}ms", System.currentTimeMillis() - start1);
                 }
             } else {
                 LOG.info("list vmfs return empty");
@@ -263,7 +260,6 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
     }
 
     public synchronized void getVmfsSync(Map<String, VmfsDataInfo> volIds, List<VmfsDataInfo> vmfsDataInfos, Map<String, String> stoNameMap) throws DmeException {
-        //ExecutorService executorService = Executors.newFixedThreadPool(volIds.size());
         Map<String, Object> requestbody = new HashMap<>();
         int total=0;
         int pageno=1;
