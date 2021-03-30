@@ -1,4 +1,4 @@
-<div>
+<div *ngIf="selectVolume">
   <clr-select-container>
     <select clrSelect (ngModelOptions)="volNames" [(ngModel)]="selectVolName" name="defaultSelect" class="clr-select" (change)="changeVolFunc()">
       <option *ngFor="let item of volNames" value="{{item}}">{{item}}</option>
@@ -13,32 +13,26 @@
     <tr>
       <th hidden></th>
       <td class="left">{{'vmfs.name' | translate}}</td>
-      <td class="left">{{selectVolume.name}}</td>
+      <td class="left" *ngIf="selectVolume.name != null && selectVolume.name != ''">{{selectVolume.name}}</td>
+      <td class="left" *ngIf="selectVolume.name == null || selectVolume.name == ''">--</td>
       <td class="left">{{'vmfs.wwn' | translate}}</td>
-      <td class="left">{{selectVolume.wwn}}</td>
+      <td class="left" *ngIf="selectVolume.wwn != null && selectVolume.wwn != ''">{{selectVolume.wwn}}</td>
+      <td class="left" *ngIf="selectVolume.wwn == null || selectVolume.wwn == ''">--</td>
     </tr>
     <tr>
       <th hidden></th>
       <td class="left">{{'vmfs.storage' | translate}}</td>
-      <td class="left">{{selectVolume.storage}}</td>
+      <td class="left" *ngIf="selectVolume.storage != null && selectVolume.storage != ''">{{selectVolume.storage}}</td>
+      <td class="left" *ngIf="selectVolume.storage == null && selectVolume.storage == ''">--</td>
       <td class="left">{{'vmfs.storagePool' | translate}}</td>
-      <td class="left">{{selectVolume.storagePool}}</td>
+      <td class="left" *ngIf="selectVolume.storagePool != null && selectVolume.storagePool != ''">{{selectVolume.storagePool}}</td>
+      <td class="left" *ngIf="selectVolume.storagePool == null || selectVolume.storagePool == ''">--</td>
     </tr>
     <tr>
       <th hidden></th>
       <td class="left">{{'vmfs.serviceLevelName' | translate}}</td>
-      <td class="left">{{selectVolume.serviceLevel}}</td>
-    </tr>
-    <!-- Qos Policy -->
-    <tr>
-      <th>{{'vmfs.qosPolicy' | translate}}</th>
-    </tr>
-    <tr>
-      <th hidden></th>
-      <td class="left">{{'vmfs.controlPolicy' | translate}}</td>
-      <td class="left">{{selectVolume.controlPolicy}}</td>
-      <td class="left">{{'vmfs.trafficControlObject' | translate}}</td>
-      <td class="left">{{selectVolume.trafficControl}}</td>
+      <td class="left" *ngIf="selectVolume.serviceLevel != null && selectVolume.serviceLevel != ''">{{selectVolume.serviceLevel}}</td>
+      <td class="left" *ngIf="selectVolume.serviceLevel == null || selectVolume.serviceLevel == ''">--</td>
     </tr>
     <!-- Qos SmartTier -->
     <tr>
@@ -47,7 +41,105 @@
     <tr>
       <th hidden></th>
       <td class="left">{{'vmfs.smartTierPolicy' | translate}}</td>
-      <td class="left">{{selectVolume.smartTier}}</td>
+      <td class="left" *ngIf="selectVolume.smartTier == '0'">{{'rdm.notMove' | translate}}</td>
+      <td class="left" *ngIf="selectVolume.smartTier == '1'">{{'rdm.autoMove' | translate}}</td>
+      <td class="left" *ngIf="selectVolume.smartTier == '2'">{{'rdm.highPMove' | translate}}</td>
+      <td class="left" *ngIf="selectVolume.smartTier == '3'">{{'rdm.lowPMove' | translate}}</td>
+      <td class="left" *ngIf="selectVolume.smartTier == '' || selectVolume.smartTier == null">--</td>
+    </tr>
+    <!-- Qos Policy -->
+    <tr>
+      <th>{{'vmfs.qosPolicy' | translate}}</th>
+    </tr>
+    <tr>
+      <th hidden></th>
+      <td class="left">{{'vmfs.controlPolicy' | translate}}</td>
+      <td class="left">
+        <span *ngIf="selectVolume.smartQos == null || selectVolume.controlPolicy == null">
+          --
+        </span>
+        <!--下限-->
+        <span *ngIf="selectVolume.smartQos != null && selectVolume.controlPolicy == '0'">
+          {{'vmfs.lowerProtectionLimit' | translate}}
+        </span>
+        <!--上限-->
+        <span *ngIf="selectVolume.smartQos != null && selectVolume.controlPolicy == '1'">
+          {{'vmfs.upperControlLimit' | translate}}
+        </span>
+        <!--上限&下限-->
+        <span *ngIf="selectVolume.smartQos != null && selectVolume.controlPolicy == '2'">
+           {{'vmfs.upperControlLimit' | translate}} & {{'vmfs.lowerProtectionLimit' | translate}}
+        </span>
+      </td>
+      <td class="left">{{'vmfs.trafficControlObject' | translate}}</td>
+      <td class="left">
+        <span *ngIf="selectVolume.smartQos == null || selectVolume.controlPolicy == null
+        || (selectVolume.smartQos.minbandwidth == 0 && selectVolume.smartQos.miniops ==0
+        && selectVolume.smartQos.latency==0 && selectVolume.smartQos.maxbandwidth ==0 && selectVolume.smartQos.maxiops==0)">
+          --
+        </span>
+        <!--下限-->
+        <span *ngIf="selectVolume.smartQos != null && selectVolume.controlPolicy == '0'">
+          <span *ngIf="selectVolume.smartQos.minbandwidth != 0">
+            {{'vmfs.bandwidthLimitLower' | translate}}
+            {{selectVolume.smartQos.minbandwidth}}
+            {{'vmfs.unitM' | translate}},
+          </span>
+          <span *ngIf="selectVolume.smartQos.miniops != 0">
+            {{'vmfs.IOPSLimitLower' | translate}}
+            {{selectVolume.smartQos.miniops}}
+            {{'vmfs.iopsUnit' | translate}},
+          </span>
+          <span *ngIf="selectVolume.smartQos.latency != 0">
+            {{'vmfs.latencyMax' | translate}}
+            {{selectVolume.smartQos.latency}}
+            {{selectVolume.smartQos.latencyUnit}}
+          </span>
+        </span>
+        <!--上限-->
+        <span *ngIf="selectVolume.smartQos != null && selectVolume.controlPolicy == '1'">
+          <span *ngIf="selectVolume.smartQos.maxbandwidth != 0">
+            {{'vmfs.bandwidthLimitUpper' | translate}}
+            {{selectVolume.smartQos.maxbandwidth}}
+            {{'vmfs.unitM' | translate}},
+          </span>
+          <span *ngIf="selectVolume.smartQos.maxiops != 0">
+             {{'vmfs.IOPSLimitUpper' | translate}}
+            {{selectVolume.smartQos.maxiops}}
+            {{'vmfs.iopsUnit' | translate}}
+          </span>
+        </span>
+        <!--上限&下限-->
+        <span *ngIf="selectVolume.smartQos != null && selectVolume.controlPolicy == '2'">
+          <span *ngIf="selectVolume.smartQos.minbandwidth != 0">
+            {{selectVolume.smartQos.minbandwidth}}
+            {{'vmfs.unitM' | translate}} <=
+          </span>
+          <span *ngIf="selectVolume.smartQos.minbandwidth != 0 || selectVolume.smartQos.maxbandwidth != 0">
+            {{'vmfs.bandwidth' | translate}}
+          </span>
+          <span *ngIf="selectVolume.smartQos.maxbandwidth != 0 || selectVolume.smartQos.maxbandwidth != 0">
+            <={{selectVolume.smartQos.maxbandwidth}}
+            {{'vmfs.unitM' | translate}},
+          </span>
+          <span *ngIf="selectVolume.smartQos.miniops != 0">
+            {{selectVolume.smartQos.miniops}}
+            {{'vmfs.iopsUnit' | translate}} <=
+          </span>
+          <span *ngIf="selectVolume.smartQos.maxiops != 0 || selectVolume.smartQos.miniops != 0">
+            {{'vmfs.iops' | translate}}
+          </span>
+          <span *ngIf="selectVolume.smartQos.maxiops != 0">
+            <={{selectVolume.smartQos.maxiops}}
+            {{'vmfs.iopsUnit' | translate}},
+          </span>
+
+          <span *ngIf="selectVolume.smartQos.latency != 0">
+            {{'vmfs.latencyMax' | translate}}
+            {{selectVolume.smartQos.latency/1000}} ms
+          </span>
+        </span>
+      </td>
     </tr>
     <!-- Resource Tuning -->
     <tr>
@@ -56,17 +148,33 @@
     <tr>
       <th hidden></th>
       <td class="left">{{'vmfs.applicationType' | translate}}</td>
-      <td class="left">{{selectVolume.provisionType}}</td>
+      <td class="left" *ngIf="selectVolume.applicationType != null && selectVolume.applicationType != ''">{{selectVolume.applicationType}}</td>
+      <td class="left" *ngIf="selectVolume.applicationType == null || selectVolume.applicationType == ''">--</td>
       <td class="left">{{'vmfs.provisioningType' | translate}}</td>
-      <td class="left">{{selectVolume.provisionType}}</td>
+      <td class="left" *ngIf="selectVolume.provisionType != null && selectVolume.provisionType != ''">{{selectVolume.provisionType}}</td>
+      <td class="left" *ngIf="selectVolume.provisionType == null || selectVolume.provisionType == ''">--</td>
     </tr>
     <tr>
       <th hidden></th>
       <td class="left">{{'vmfs.deduplication' | translate}}</td>
-      <td class="left">{{selectVolume.dudeplication}}</td>
+      <td class="left" *ngIf="selectVolume.dudeplication == true">{{'tier.enable' | translate}}</td>
+      <td class="left" *ngIf="selectVolume.dudeplication == false">{{'tier.disable' | translate}}</td>
+      <td class="left" *ngIf="selectVolume.dudeplication == null">--</td>
       <td class="left">{{'vmfs.compression' | translate}}</td>
-      <td class="left">{{selectVolume.compression}}</td>
+      <td class="left" *ngIf="selectVolume.compression == true">{{'tier.enable' | translate}}</td>
+      <td class="left" *ngIf="selectVolume.compression == false">{{'tier.disable' | translate}}</td>
+      <td class="left" *ngIf="selectVolume.compression == null">--</td>
     </tr>
     </tbody>
   </table>
+</div>
+<div *ngIf="isLoading" class="loadingDiv">
+    <span>
+      {{'vmfs.loadingTips' | translate}}<img src="./assets/images/loading.gif"  width="20px" height="20px" style="margin-left: 20px;">
+    </span>
+</div>
+<div *ngIf="!selectVolume && !isLoading">
+  <span style="color: #b3b3b3;display: inline-block;width: 100%;text-align: center;font-size: 20px;font-weight: 600;">
+    <clr-icon shape="info-standard" class="is-warning" size="20"></clr-icon>&nbsp;{{'tips.noData' | translate}}
+  </span>
 </div>

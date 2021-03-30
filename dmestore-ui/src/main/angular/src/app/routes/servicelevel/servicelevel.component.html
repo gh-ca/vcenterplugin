@@ -28,9 +28,9 @@
   </div>
   <div class="clr-row">
     <div class="clr-col-4" *ngFor="let item of serviceLevels" [clrDgItem]="item">
-      <div class="info-card" style="margin-left: 10px;margin-top: 30px; height: 260px">
+      <div class="info-card" style="margin-left: 10px;margin-top: 30px; height: 260px; overflow: auto">
         <div class="info-card-header">
-          <div class="info-card-title" style="cursor:pointer" (click)="clickName(item)">{{item.name}}</div>
+          <div class="info-card-title" style="color:#829DE6;cursor:pointer;overflow: hidden" title="{{item.name}}" (click)="clickName(item)">{{item.name}}</div>
           <!--<clr-dropdown [clrCloseMenuOnItemClick]="false">
             <button clrDropdownTrigger class="dropdown-toggle btn btn-link">
               Operation
@@ -44,7 +44,7 @@
         </div>
         <div class="info-card-content">
           <div class="info-card-squre">
-            <div class="squre-per-box" [ngStyle]="{'height':(item.usedRate/100*200)+'px'}"></div>
+            <div class="squre-per-box" [ngStyle]="{'height':item.usedRate+'%'}"></div>
             <div class="squre-num">{{item.usedRate}}%</div>
           </div>
           <div style="width: 70%;">
@@ -93,31 +93,36 @@
           <div class="gh-info-wrap clr-row">
             <div class="gh-info-item clr-col-4">
               <span class="gh-info-lable">{{'tier.name'|translate}}</span>
-              <span class="gh-info-value">{{selectedModel.name}}</span>
+              <span class="gh-info-value" *ngIf="selectedModel.name">{{selectedModel.name}}</span>
+              <span class="gh-info-value" *ngIf="!selectedModel.name">--</span>
             </div>
             <div class="gh-info-item clr-col-4">
               <span class="gh-info-lable">{{'tier.total'|translate}}</span>
-              <span class="gh-info-value">{{selectedModel.totalCapacity}} GB</span>
+              <span class="gh-info-value" *ngIf="selectedModel.totalCapacity">{{selectedModel.totalCapacity}} GB</span>
+              <span class="gh-info-value" *ngIf="!selectedModel.totalCapacity">--</span>
             </div>
             <div class="gh-info-item clr-col-4">
               <span class="gh-info-lable">{{'tier.free'|translate}}</span>
-              <span class="gh-info-value">{{selectedModel.freeCapacity}} GB</span>
+              <span class="gh-info-value" *ngIf="selectedModel.freeCapacity">{{selectedModel.freeCapacity}} GB</span>
+              <span class="gh-info-value" *ngIf="!selectedModel.freeCapacity">--</span>
             </div>
             <div class="gh-info-item clr-col-4">
               <span class="gh-info-lable">{{'tier.used'|translate}}</span>
-              <span class="gh-info-value">{{selectedModel.usedCapacity}} GB</span>
+              <span class="gh-info-value" *ngIf="selectedModel.usedCapacity">{{selectedModel.usedCapacity}} GB</span>
+              <span class="gh-info-value" *ngIf="!selectedModel.usedCapacity">--</span>
             </div>
             <div class="gh-info-item clr-col-4">
               <span class="gh-info-lable">{{'tier.usage'|translate}}</span>
-              <span class="gh-info-value" style="width: 60%"><clr-progress-bar clrValue="{{selectedModel.usedRate}}" clrLabeled></clr-progress-bar></span>
+              <span class="gh-info-value" style="width: 60%" *ngIf="selectedModel.usedRate"><clr-progress-bar clrValue="{{selectedModel.usedRate}}" clrLabeled></clr-progress-bar></span>
+              <span class="gh-info-value" style="width: 60%" *ngIf="!selectedModel.usedRate">--</span>
             </div>
             <div class="gh-info-item clr-col-4">
               <span class="gh-info-lable">{{'tier.iop'|translate}}</span>
               <span class="gh-info-value" *ngIf="selectedModel.capabilities.iopriority !== undefined
                                             && selectedModel.capabilities.iopriority.enabled === true">
-                  <span *ngIf="selectedModel.capabilities.iopriority.policy == 1">Lower</span>
-                  <span *ngIf="selectedModel.capabilities.iopriority.policy == 2">Middle</span>
-                  <span *ngIf="selectedModel.capabilities.iopriority.policy == 3">High</span>
+                  <span *ngIf="selectedModel.capabilities.iopriority.policy == 1">{{'vmfs.low'|translate}}</span>
+                  <span *ngIf="selectedModel.capabilities.iopriority.policy == 2">{{'tier.middle'|translate}}</span>
+                  <span *ngIf="selectedModel.capabilities.iopriority.policy == 3">{{'tier.high'|translate}}</span>
               </span>
               <span class="gh-info-value" *ngIf="selectedModel.capabilities.iopriority === undefined
                                             || selectedModel.capabilities.iopriority.enabled === false">
@@ -183,11 +188,14 @@
               <span class="gh-info-lable">{{'tier.dedupe'|translate}}</span>
               <span class="gh-info-value" *ngIf="selectedModel.capabilities.deduplication == undefined">--</span>
               <span class="gh-info-value" *ngIf="selectedModel.capabilities.deduplication != undefined">
-                <span *ngIf="selectedModel.capabilities.deduplication == true">
+                <span *ngIf="selectedModel.capabilities.deduplication == 'enabled'">
                    {{'tier.enable'|translate}}
                 </span>
-                <span *ngIf="selectedModel.capabilities.deduplication == false">
+                <span *ngIf="selectedModel.capabilities.deduplication == 'disabled'">
                    {{'tier.disable'|translate}}
+                </span>
+                 <span *ngIf="selectedModel.capabilities.deduplication == 'default_type'">
+                   {{'rdm.default'|translate}}
                 </span>
               </span>
             </div>
@@ -239,19 +247,19 @@
 
             <div class="btn-group btn-icon">
               <div class="radio btn">
-                <input (click)="storagePoolRadioCheck = 'basic'" type="radio" name="btn-group-demo-radios" id="btn-demo-radio-1" checked>
+                <input (click)="storagePoolRadioCheck = 'basic';initStoragePoolListFilter()" type="radio" name="btn-group-demo-radios" id="btn-demo-radio-1" checked>
                 <label for="btn-demo-radio-1"><clr-icon shape="list" size="20"></clr-icon></label>
               </div>
               <div class="radio btn">
-                <input (click)="storagePoolRadioCheck = 'capacity'" type="radio" name="btn-group-demo-radios" id="btn-demo-radio-2">
+                <input (click)="storagePoolRadioCheck = 'capacity';initStoragePoolListFilter()" type="radio" name="btn-group-demo-radios" id="btn-demo-radio-2">
                 <label for="btn-demo-radio-2"><clr-icon shape="dashboard" size="20"></clr-icon></label>
               </div>
               <div class="radio btn">
-                <input (click)="storagePoolRadioCheck = 'performance'" type="radio" name="btn-group-demo-radios" id="btn-demo-radio-3">
+                <input (click)="storagePoolRadioCheck = 'performance';initStoragePoolListFilter();" type="radio" name="btn-group-demo-radios" id="btn-demo-radio-3">
                 <label for="btn-demo-radio-3"><clr-icon shape="radar" size="20"></clr-icon></label>
               </div>
               <div class="radio btn merginLeft">
-                <label><clr-icon shape="refresh" size="20" (click)="storagePoolRefresh()"></clr-icon></label>
+                <label><clr-icon shape="refresh" size="20" (click)="storagePoolRefresh();initStoragePoolListFilter()"></clr-icon></label>
               </div>
             </div>
 
@@ -260,20 +268,58 @@
 
               <clr-dg-column [clrDgField]="'name'">{{'tier.name'|translate}}</clr-dg-column>
 
-              <clr-dg-column [hidden]="storagePoolRadioCheck!=='basic'" [clrDgField]="'runningStatus'">{{'tier.status'|translate}}</clr-dg-column>
-              <clr-dg-column [hidden]="storagePoolRadioCheck!=='basic'" [clrDgField]="'physicalType'">{{'tier.diskType'|translate}}</clr-dg-column>
-              <clr-dg-column [hidden]="storagePoolRadioCheck!=='basic'" [clrDgField]="'storageName'">{{'tier.storage'|translate}}</clr-dg-column>
+              <clr-dg-column [hidden]="storagePoolRadioCheck!=='basic'">
+                {{'tier.status'|translate}}
+                <clr-dg-filter [clrDgFilter]="slspStatusFilter">
+                  <sl-sp-status-filter #slspStatusFilter></sl-sp-status-filter>
+                </clr-dg-filter>
+              </clr-dg-column>
+              <clr-dg-column [hidden]="storagePoolRadioCheck!=='basic'" [clrDgField]="'physicalType'">
+                {{'tier.diskType'|translate}}
+              </clr-dg-column>
+              <clr-dg-column [hidden]="storagePoolRadioCheck!=='basic'" [clrDgField]="'storageName'">
+                {{'tier.storage'|translate}}
+                <clr-dg-filter [clrDgFilter]="sLSPStorageNameFilter">
+                  <sl-sp-storage-name-filter #sLSPStorageNameFilter></sl-sp-storage-name-filter>
+                </clr-dg-filter>
+              </clr-dg-column>
 
-              <clr-dg-column [hidden]="storagePoolRadioCheck!=='capacity'" [clrDgField]="'totalCapacity'">{{'tier.total'|translate}}</clr-dg-column>
-              <clr-dg-column [hidden]="storagePoolRadioCheck!=='capacity'" [clrDgField]="'consumedCapacity'">{{'tier.used'|translate}}</clr-dg-column>
-              <clr-dg-column [hidden]="storagePoolRadioCheck!=='capacity'" [clrDgField]="'consumedCapacityPercentage'">{{'tier.usage'|translate}}</clr-dg-column>
-              <clr-dg-column [hidden]="storagePoolRadioCheck!=='capacity'" [clrDgField]="'freeCapacity'">{{'tier.free'|translate}}</clr-dg-column>
+              <clr-dg-column #poolTotalCapacity [hidden]="storagePoolRadioCheck!=='capacity'" class="hideFilter" [clrDgField]="'totalCapacity'" style="position: relative" (clrDgSortedChange)="sortFunc($event);">
+                {{'tier.total'|translate}}
+                <clr-icon *ngIf="sortFunc(poolTotalCapacity.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+              </clr-dg-column>
+              <clr-dg-column  #poolConsumedCapacity [hidden]="storagePoolRadioCheck!=='capacity'" class="hideFilter" [clrDgField]="'consumedCapacity'" style="position: relative" (clrDgSortedChange)="sortFunc($event);">
+                {{'tier.used'|translate}}
+                <clr-icon *ngIf="sortFunc(poolConsumedCapacity.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+              </clr-dg-column>
+              <clr-dg-column #poolUsedCapacity [hidden]="storagePoolRadioCheck!=='capacity'" class="hideFilter" [clrDgField]="'usedCapacity'" style="position: relative" (clrDgSortedChange)="sortFunc($event);">
+                {{'tier.usage'|translate}}
+                <clr-icon *ngIf="sortFunc(poolUsedCapacity.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+              </clr-dg-column>
+              <clr-dg-column #poolFreeCapacity [hidden]="storagePoolRadioCheck!=='capacity'" class="hideFilter" [clrDgField]="'freeCapacity'" style="position: relative" (clrDgSortedChange)="sortFunc($event);">
+                {{'tier.free'|translate}}
+                <clr-icon *ngIf="sortFunc(poolFreeCapacity.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+              </clr-dg-column>
 
-              <clr-dg-column [hidden]="storagePoolRadioCheck!=='performance'" [clrDgField]="'runningStatus'">{{'tier.status'|translate}}</clr-dg-column>
-              <clr-dg-column [hidden]="storagePoolRadioCheck!=='performance'" [clrDgField]="'latency'">{{'tier.latencyms'|translate}}</clr-dg-column>
-              <clr-dg-column [hidden]="storagePoolRadioCheck!=='performance'" [clrDgField]="'iops'">IOPS</clr-dg-column>
-              <clr-dg-column [hidden]="storagePoolRadioCheck!=='performance'" [clrDgField]="'bandwidth'">{{'tier.bandwidthm'|translate}}</clr-dg-column>
-
+              <clr-dg-column [hidden]="storagePoolRadioCheck!=='performance'" [clrDgField]="'runningStatus'">
+                {{'tier.status'|translate}}
+                <clr-dg-filter [clrDgFilter]="runningStatusFilter">
+                  <sl-sp-status-filter #runningStatusFilter></sl-sp-status-filter>
+                </clr-dg-filter>
+              </clr-dg-column>
+              <clr-dg-column #poolLatency [hidden]="storagePoolRadioCheck!=='performance'" class="hideFilter" [clrDgField]="'latency'" style="position: relative" (clrDgSortedChange)="sortFunc($event);">
+                {{'tier.latencyms'|translate}}
+                <clr-icon *ngIf="sortFunc(poolLatency.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+              </clr-dg-column>
+              <clr-dg-column #poolIOPS [hidden]="storagePoolRadioCheck!=='performance'" class="hideFilter" [clrDgField]="'iops'" style="position: relative" (clrDgSortedChange)="sortFunc($event);">
+                IOPS
+                <clr-icon *ngIf="sortFunc(poolIOPS.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+              </clr-dg-column>
+              <clr-dg-column #poolBandwidth [hidden]="storagePoolRadioCheck!=='performance'" class="hideFilter" [clrDgField]="'bandwidth'" style="position: relative" (clrDgSortedChange)="sortFunc($event);">
+                {{'tier.bandwidthm'|translate}}
+                <clr-icon *ngIf="sortFunc(poolBandwidth.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+              </clr-dg-column>
+              <clr-dg-placeholder>{{'tips.noData' | translate}}</clr-dg-placeholder>
               <clr-dg-row *clrDgItems="let item of storagePoolList" [clrDgItem]="item">
 
                 <clr-dg-cell>{{item.name}}</clr-dg-cell>
@@ -295,15 +341,18 @@
                     <span class="color-square" style="background-color: #A9A9A9; margin-right: 10px"></span>--
                   </span>
                 </clr-dg-cell>
-                <clr-dg-cell [hidden]="storagePoolRadioCheck!=='basic'">{{item.physicalType}}</clr-dg-cell>
-                <clr-dg-cell [hidden]="storagePoolRadioCheck!=='basic'">{{item.storageName}}</clr-dg-cell>
+                <clr-dg-cell [hidden]="storagePoolRadioCheck!=='basic'">{{item.physicalType ? item.physicalType:'--'}}</clr-dg-cell>
+                <clr-dg-cell [hidden]="storagePoolRadioCheck!=='basic'">{{item.storageName ? item.storageName:'--'}}</clr-dg-cell>
 
-                <clr-dg-cell [hidden]="storagePoolRadioCheck!=='capacity'">{{item.totalCapacity}} GB</clr-dg-cell>
-                <clr-dg-cell [hidden]="storagePoolRadioCheck!=='capacity'">{{item.consumedCapacity}} GB</clr-dg-cell>
+                <clr-dg-cell [hidden]="storagePoolRadioCheck!=='capacity'" style="text-align: right">{{item.totalCapacity ? formatCapacity(item.totalCapacity):'--'}} </clr-dg-cell>
+                <clr-dg-cell [hidden]="storagePoolRadioCheck!=='capacity'" style="text-align: right">{{item.consumedCapacity ? formatCapacity(item.consumedCapacity):'--'}} </clr-dg-cell>
                 <clr-dg-cell [hidden]="storagePoolRadioCheck!=='capacity'">
-                  <clr-progress-bar clrValue="{{item.consumedCapacityPercentage}}" clrSuccess clrLabeled></clr-progress-bar>
+                  <div class="progress-block">
+                    <clr-progress-bar clrValue="{{item.usedCapacity}}" clrSuccess></clr-progress-bar>
+                    <span>{{item.usedCapacity}}%</span>
+                  </div>
                 </clr-dg-cell>
-                <clr-dg-cell [hidden]="storagePoolRadioCheck!=='capacity'">{{item.freeCapacity}} GB</clr-dg-cell>
+                <clr-dg-cell [hidden]="storagePoolRadioCheck!=='capacity'" style="text-align: right">{{item.freeCapacity ? formatCapacity(item.freeCapacity):'--'}} </clr-dg-cell>
 
                 <clr-dg-cell [hidden]="storagePoolRadioCheck!=='performance'">
                   <span *ngIf="item.runningStatus == 'offline'">
@@ -322,15 +371,15 @@
                     <span class="color-square" style="background-color: #A9A9A9; margin-right: 10px"></span>--
                   </span>
                 </clr-dg-cell>
-                <clr-dg-cell [hidden]="storagePoolRadioCheck!=='performance'">
+                <clr-dg-cell [hidden]="storagePoolRadioCheck!=='performance'" style="text-align: right">
                   <span *ngIf="item.latency != undefined">{{item.latency}}</span>
                   <span *ngIf="item.latency == undefined">--</span>
                 </clr-dg-cell>
-                <clr-dg-cell [hidden]="storagePoolRadioCheck!=='performance'">
+                <clr-dg-cell [hidden]="storagePoolRadioCheck!=='performance'" style="text-align: right">
                   <span *ngIf="item.iops != undefined">{{item.iops}}</span>
                   <span *ngIf="item.iops == undefined">--</span>
                 </clr-dg-cell>
-                <clr-dg-cell [hidden]="storagePoolRadioCheck!=='performance'">
+                <clr-dg-cell [hidden]="storagePoolRadioCheck!=='performance'" style="text-align: right">
                   <span *ngIf="item.bandwidth != undefined">{{item.bandwidth}}</span>
                   <span *ngIf="item.bandwidth == undefined">--</span>
                 </clr-dg-cell>
@@ -351,7 +400,7 @@
         </clr-tab-content>
       </clr-tab>
       <clr-tab>
-        <button clrTabLink (click)="volumeRefresh()">{{'tier.volume'|translate}}</button>
+        <button clrTabLink (click)="volumeRefresh()">{{'storage.chart.volume'|translate}}</button>
         <clr-tab-content *clrIfActive>
 
           <div class="gh-info-head"></div>
@@ -372,46 +421,81 @@
 
           <clr-datagrid [clrDgLoading]="volumeIsloading">
             <clr-dg-column [clrDgField]="'name'">{{'tier.name'|translate}}</clr-dg-column>
-            <clr-dg-column [clrDgField]="'status'">{{'tier.status'|translate}}</clr-dg-column>
-            <clr-dg-column [hidden]="volumeRadioCheck!=='basic'" [clrDgField]="'capacity'">{{'tier.total'|translate}}</clr-dg-column>
+            <clr-dg-column>
+              {{'tier.status'|translate}}
+              <clr-dg-filter [clrDgFilter]="lunStatusFilter">
+                <lun-status-filter #lunStatusFilter></lun-status-filter>
+              </clr-dg-filter>
+            </clr-dg-column>
+            <clr-dg-column #lunCapacity [hidden]="volumeRadioCheck!=='basic'" class="hideFilter" [clrDgField]="'capacity'" style="position: relative" (clrDgSortedChange)="sortFunc($event);">
+              {{'tier.total'|translate}}
+              <clr-icon *ngIf="sortFunc(lunCapacity.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+            </clr-dg-column>
             <clr-dg-column [hidden]="volumeRadioCheck!=='basic'" [clrDgField]="'alloctype'">{{'tier.alloctype'|translate}}</clr-dg-column>
-            <clr-dg-column [hidden]="volumeRadioCheck!=='basic'" [clrDgField]="'capacityUsage'">{{'tier.used'|translate}}</clr-dg-column>
+            <clr-dg-column #lunCapacityUsage [hidden]="volumeRadioCheck!=='basic'" class="hideFilter" [clrDgField]="'capacityUsage'" style="position: relative" (clrDgSortedChange)="sortFunc($event);">
+              {{'tier.used'|translate}}
+              <clr-icon *ngIf="sortFunc(lunCapacityUsage.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+            </clr-dg-column>
 
-            <clr-dg-column [hidden]="volumeRadioCheck!=='performance'" [clrDgField]="'latency'">{{'tier.latencyms'|translate}}</clr-dg-column>
-            <clr-dg-column [hidden]="volumeRadioCheck!=='performance'" [clrDgField]="'iops'">IOPS</clr-dg-column>
-            <clr-dg-column [hidden]="volumeRadioCheck!=='performance'" [clrDgField]="'bandwidth'">{{'tier.bandwidthm'|translate}}</clr-dg-column>
-
+            <clr-dg-column #lunLatency [hidden]="volumeRadioCheck!=='performance'" class="hideFilter" [clrDgField]="'latency'" style="position: relative" (clrDgSortedChange)="sortFunc($event);">
+              {{'tier.latencyms'|translate}}
+              <clr-icon *ngIf="sortFunc(lunLatency.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+            </clr-dg-column>
+            <clr-dg-column #lunIOPS [hidden]="volumeRadioCheck!=='performance'" class="hideFilter" [clrDgField]="'iops'" style="position: relative" (clrDgSortedChange)="sortFunc($event);">
+              IOPS
+              <clr-icon *ngIf="sortFunc(lunIOPS.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+            </clr-dg-column>
+            <clr-dg-column #lunBandwidth [hidden]="volumeRadioCheck!=='performance'" class="hideFilter" [clrDgField]="'bandwidth'" style="position: relative" (clrDgSortedChange)="sortFunc($event);">
+              {{'tier.bandwidthm'|translate}}
+              <clr-icon *ngIf="sortFunc(lunBandwidth.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+            </clr-dg-column>
+            <clr-dg-placeholder>{{'tips.noData' | translate}}</clr-dg-placeholder>
             <clr-dg-row *clrDgItems="let item of volumeList" [clrDgItem]="item">
 
                 <clr-dg-cell>{{item.name}}</clr-dg-cell>
-                <clr-dg-cell>
-                  <span *ngIf="item.status == 'deleted'">
-                    <span class="color-square" style="background-color: #A9A9A9; margin-right: 10px"></span>{{'tier.offLine' | translate}}
-                  </span>
+                <clr-dg-cell class="over_flow">
+                 <span *ngIf="item.status == 'creating'">
+                            <span class="color-square" style="background-color: green; margin-right: 10px"></span>{{'enum.status.creating' | translate}}
+                          </span>
                   <span *ngIf="item.status == 'normal'">
-                    <span class="color-square" style="background-color: #7CDFA0; margin-right: 10px;"></span>{{'tier.normal' | translate}}
-                  </span>
-                  <span *ngIf="item.status == 'na'">
-                    --
-                  </span>
+                            <span class="color-square" style="background-color: #7CDFA0; margin-right: 10px"></span>{{'enum.status.normal' | translate}}
+                          </span>
+                  <span *ngIf="item.status == 'mapping'">
+                            <span class="color-square" style="background-color: gold; margin-right: 10px"></span>{{'enum.status.mapping' | translate}}
+                          </span>
+                  <span *ngIf="item.status == 'unmapping'">
+                            <span class="color-square" style="background-color: blueviolet; margin-right: 10px"></span>{{'enum.status.unmapping' | translate}}
+                          </span>
+                  <span *ngIf="item.status == 'deleting'">
+                            <span class="color-square" style="background-color: bisque; margin-right: 10px"></span>{{'enum.status.deleting' | translate}}
+                          </span>
+                  <span *ngIf="item.status == 'error'">
+                            <span class="color-square" style="background-color: red; margin-right: 10px"></span>{{'enum.status.error' | translate}}
+                          </span>
+                  <span *ngIf="item.status == 'expanding'">
+                            <span class="color-square" style="background-color: darkmagenta; margin-right: 10px"></span>{{'enum.status.expanding' | translate}}
+                          </span>
+                  <span *ngIf="!item.status">
+                            --
+                          </span>
                 </clr-dg-cell>
 
-                <clr-dg-cell [hidden]="volumeRadioCheck!=='basic'">{{item.capacity}} GB</clr-dg-cell>
+                <clr-dg-cell [hidden]="volumeRadioCheck!=='basic'" style="text-align: right">{{item.capacity}} GB</clr-dg-cell>
                 <clr-dg-cell [hidden]="volumeRadioCheck!=='basic'">{{item.alloctype}}</clr-dg-cell>
                 <clr-dg-cell [hidden]="volumeRadioCheck!=='basic'" *ngIf="item.capacityUsage==''">--</clr-dg-cell>
                 <clr-dg-cell [hidden]="volumeRadioCheck!=='basic'" *ngIf="item.capacityUsage!=''">
                   <clr-progress-bar clrValue="{{item.capacity_usage}}" clrSuccess clrLabeled></clr-progress-bar>
                 </clr-dg-cell>
 
-                <clr-dg-cell [hidden]="volumeRadioCheck!=='performance'">
+                <clr-dg-cell [hidden]="volumeRadioCheck!=='performance'" style="text-align: right">
                   <span *ngIf="item.latency != undefined">{{item.latency}}</span>
                   <span *ngIf="item.latency == undefined">--</span>
                 </clr-dg-cell>
-                <clr-dg-cell [hidden]="volumeRadioCheck!=='performance'">
+                <clr-dg-cell [hidden]="volumeRadioCheck!=='performance'" style="text-align: right">
                   <span *ngIf="item.iops != undefined">{{item.iops}}</span>
                   <span *ngIf="item.iops == undefined">--</span>
                 </clr-dg-cell>
-                <clr-dg-cell [hidden]="volumeRadioCheck!=='performance'">
+                <clr-dg-cell [hidden]="volumeRadioCheck!=='performance'" style="text-align: right">
                   <span *ngIf="item.bandwidth != undefined">{{item.bandwidth}}</span>
                   <span *ngIf="item.bandwidth == undefined">--</span>
                 </clr-dg-cell>
@@ -433,38 +517,80 @@
       <clr-tab>
         <button clrTabLink>{{'tier.capacity'|translate}}</button>
         <clr-tab-content *clrIfActive>
-          <div style="float:right; height: 50px;">
-            <clr-select-container style="margin-right: 50px">
-              <select clrSelect>
-                <option value="1">{{'tier.last1M'|translate}}</option>
-                <option value="2">{{'tier.last3M'|translate}}</option>
-                <option value="3">{{'tier.last6M'|translate}}</option>
-                <option value="4">{{'tier.last1Y'|translate}}</option>
-              </select>
-            </clr-select-container>
+          <div style="position:relative;">
+            <div style="float:right; height: 50px;">
+              <clr-select-container style="margin-right: 50px">
+                <select clrSelect (change)="initCapacityChart(capacityRange)" [(ngModel)]="capacityRange.range">
+                  <option value="LAST_1_MONTH">{{'tier.last1M'|translate}}</option>
+                  <option value="LAST_3_MONTH">{{'tier.last3M'|translate}}</option>
+                  <option value="LAST_6_MONTH">{{'tier.last6M'|translate}}</option>
+                  <option value="LAST_1_YEAR">{{'tier.last1Y'|translate}}</option>
+                </select>
+              </clr-select-container>
+            </div>
+            <div style="margin-top: 30px;" echarts [options]="volumeCapacity"></div>
+
+            <div *ngIf="volDataIsNull" style="position: absolute;width: 100%;top: 15%;">
+              <span style="color: #b3b3b3;display: inline-block;width: 100%;text-align: center;font-size: 20px;font-weight: 600;">
+                <clr-icon shape="info-standard" class="is-warning" size="20"></clr-icon>&nbsp;{{'tips.noData' | translate}}
+              </span>
+            </div>
+
+            <div style="margin-top: 30px;" echarts [options]="storagePoolCapacity"></div>
+
+            <div *ngIf="storagePoolDataIsNull" style="position: absolute;width: 100%;top: 70%;">
+              <span style="color: #b3b3b3;display: inline-block;width: 100%;text-align: center;font-size: 20px;font-weight: 600;">
+                <clr-icon shape="info-standard" class="is-warning" size="20"></clr-icon>&nbsp;{{'tips.noData' | translate}}
+              </span>
+            </div>
           </div>
-          <div style="margin-top: 50px" echarts [options]="volumeCapacity"></div>
-          <div style="margin-top: 30px" echarts [options]="storagePoolCapacity"></div>
         </clr-tab-content>
       </clr-tab>
       <clr-tab>
         <button clrTabLink>{{'tier.performance'|translate}}</button>
         <clr-tab-content *clrIfActive>
-          <div style="float:right; height: 50px;">
-            <clr-select-container style="margin-right: 50px">
-              <select clrSelect (change)="initChart(range)"  [(ngModel)]="range.range">
-                <option value="LAST_1_DAY">{{'tier.last1D'|translate}}</option>
-                <option value="LAST_1_WEEK">{{'tier.last1W'|translate}}</option>
-                <option value="LAST_1_MONTH">{{'tier.last1M'|translate}}</option>
-                <option value="LAST_1_YEAR">{{'tier.last1Y'|translate}}</option>
-              </select>
-            </clr-select-container>
+          <div style="position:relative;">
+            <div style="float:right; height: 50px;">
+              <clr-select-container style="margin-right: 50px">
+                <select clrSelect (change)="initChart(range)"  [(ngModel)]="range.range">
+                  <option value="LAST_1_DAY">{{'tier.last1D'|translate}}</option>
+                  <option value="LAST_1_WEEK">{{'tier.last1W'|translate}}</option>
+                  <option value="LAST_1_MONTH">{{'tier.last1M'|translate}}</option>
+                  <option value="LAST_1_YEAR">{{'tier.last1Y'|translate}}</option>
+                </select>
+              </clr-select-container>
+            </div>
+            <div style="margin-top: 50px" echarts [options]="volumeMaxResponseTime"></div>
+            <div style="margin-top: 30px" echarts [options]="volumeDensity"></div>
+            <div style="margin-top: 30px" echarts [options]="volumeThroughput"></div>
+            <div style="margin-top: 30px" echarts [options]="volumeBandwidth"></div>
+            <div style="margin-top: 30px" echarts [options]="storagePoolDensity"></div>
+            <div *ngIf="volMaxDataIsNull" style="position: absolute;width: 100%;top: 7%;">
+              <span style="color: #b3b3b3;display: inline-block;width: 100%;text-align: center;font-size: 20px;font-weight: 600;">
+                <clr-icon shape="info-standard" class="is-warning" size="20"></clr-icon>&nbsp;{{'tips.noData' | translate}}
+              </span>
+            </div>
+            <div *ngIf="volDenDataIsNull" style="position: absolute;width: 100%;top: 27%;">
+              <span style="color: #b3b3b3;display: inline-block;width: 100%;text-align: center;font-size: 20px;font-weight: 600;">
+                <clr-icon shape="info-standard" class="is-warning" size="20"></clr-icon>&nbsp;{{'tips.noData' | translate}}
+              </span>
+            </div>
+            <div *ngIf="volThrDataIsNull" style="position: absolute;width: 100%;top: 47%;">
+              <span style="color: #b3b3b3;display: inline-block;width: 100%;text-align: center;font-size: 20px;font-weight: 600;">
+                <clr-icon shape="info-standard" class="is-warning" size="20"></clr-icon>&nbsp;{{'tips.noData' | translate}}
+              </span>
+            </div>
+            <div *ngIf="volBDWTDataIsNull" style="position: absolute;width: 100%;top: 67%;">
+              <span style="color: #b3b3b3;display: inline-block;width: 100%;text-align: center;font-size: 20px;font-weight: 600;">
+                <clr-icon shape="info-standard" class="is-warning" size="20"></clr-icon>&nbsp;{{'tips.noData' | translate}}
+              </span>
+            </div>
+            <div *ngIf="storagePoolDenDataIsNull" style="position: absolute;width: 100%;top: 87%;">
+              <span style="color: #b3b3b3;display: inline-block;width: 100%;text-align: center;font-size: 20px;font-weight: 600;">
+                <clr-icon shape="info-standard" class="is-warning" size="20"></clr-icon>&nbsp;{{'tips.noData' | translate}}
+              </span>
+            </div>
           </div>
-          <div style="margin-top: 50px" echarts [options]="volumeMaxResponseTime"></div>
-          <div style="margin-top: 30px" echarts [options]="volumeDensity"></div>
-          <div style="margin-top: 30px" echarts [options]="volumeThroughput"></div>
-          <div style="margin-top: 30px" echarts [options]="volumeBandwidth"></div>
-          <div style="margin-top: 30px" echarts [options]="storagePoolDensity"></div>
         </clr-tab-content>
       </clr-tab>
       <clr-tab>
@@ -474,7 +600,7 @@
 
             <clr-dg-column [clrDgField]="'storageDevice'">{{'tier.storage'|translate}}</clr-dg-column>
             <clr-dg-column [clrDgField]="'applicationType'">{{'tier.appType'|translate}}</clr-dg-column>
-
+            <clr-dg-placeholder>{{'tips.noData' | translate}}</clr-dg-placeholder>
             <clr-dg-row *clrDgItems="let item of applicationTypeList" [clrDgItem]="item">
               <clr-dg-cell>{{item.storageDevice}}</clr-dg-cell>
               <clr-dg-cell>{{item.applicationType}}</clr-dg-cell>

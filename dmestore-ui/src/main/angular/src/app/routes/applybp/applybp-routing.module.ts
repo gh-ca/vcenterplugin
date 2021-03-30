@@ -3,7 +3,10 @@ import { Routes, RouterModule } from '@angular/router';
 
 import { ApplybpComponent } from './applybp.component';
 
-const routes: Routes = [{ path: '', component: ApplybpComponent }];
+const routes: Routes = [
+  { path: 'host/applybp', component: ApplybpComponent },
+  { path: 'cluster/applybp', component: ApplybpComponent }
+  ];
 
 @NgModule({
   imports: [RouterModule.forChild(routes)],

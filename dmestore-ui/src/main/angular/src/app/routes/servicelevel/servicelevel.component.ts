@@ -4,7 +4,7 @@ import {
   AfterViewInit,
   ChangeDetectorRef,
   OnDestroy,
-  NgZone
+  NgZone, ViewChild
 } from '@angular/core';
 
 import {HttpClient} from '@angular/common/http';
@@ -12,12 +12,15 @@ import { CommonService } from '../common.service';
 import {MakePerformance, NfsService} from "../nfs/nfs.service";
 import { GlobalsService }     from "../../shared/globals.service";
 import {TranslatePipe} from "@ngx-translate/core";
+import {ServicelevelService, SLStoragePool} from "./servicelevel.service";
+import {ServiceLevelFilter} from "../vmfs/list/filter.component";
+import {LUNStatusFilter, SLSPDiskTypeFilter, SLSPStatusFilter, SLSPStorageNameFilter} from "./filter.component";
 
 @Component({
   selector: 'app-servicelevel',
   templateUrl: './servicelevel.component.html',
   styleUrls: ['./servicelevel.component.scss'],
-  providers: [ CommonService, TranslatePipe,MakePerformance, NfsService ]
+  providers: [ CommonService, TranslatePipe,MakePerformance, NfsService, ServicelevelService]
 })
 export class ServicelevelComponent implements OnInit, AfterViewInit, OnDestroy {
 
@@ -26,15 +29,24 @@ export class ServicelevelComponent implements OnInit, AfterViewInit, OnDestroy {
   popShow = false;
   // 容量曲线图
   volumeCapacity={};
+  volDataIsNull = false;
   storagePoolCapacity={};
+  storagePoolDataIsNull = false;
   // 性能曲线图
   volumeMaxResponseTime={};
+  volMaxDataIsNull= false;
   volumeDensity={};
+  volDenDataIsNull=false;
   volumeThroughput={};
+  volThrDataIsNull=false;
   volumeBandwidth={};
+  volBDWTDataIsNull=false;
   storagePoolDensity={};
+  storagePoolDenDataIsNull = false;
 
   range = new Range();
+
+  capacityRange = new CapacityRange();
 
   // 详情列表按钮控制
   storagePoolRadioCheck = 'basic';
@@ -128,7 +140,7 @@ export class ServicelevelComponent implements OnInit, AfterViewInit, OnDestroy {
   // 表格loading标志
   storeagePoolIsloading = false;
   // 数据列表
-  storagePoolList: StoragePool[] = [];
+  storagePoolList: SLStoragePool[] = [];
   storagePoolTotal = 0;
   // ===============storage pool end==============
 
@@ -157,6 +169,13 @@ export class ServicelevelComponent implements OnInit, AfterViewInit, OnDestroy {
 
   tierLoading = false;
   syncLoading = false;
+
+  @ViewChild('slspStatusFilter') slspStatusFilter: SLSPStatusFilter;
+  @ViewChild('runningStatusFilter') runningStatusFilter: SLSPStatusFilter;
+  @ViewChild('slspDiskTypeFilter') slspDiskTypeFilter: SLSPDiskTypeFilter;
+  @ViewChild('sLSPStorageNameFilter') sLSPStorageNameFilter: SLSPStorageNameFilter;
+  @ViewChild('lunStatusFilter') lunStatusFilter: LUNStatusFilter;
+
   constructor(private ngZone: NgZone,
               private cdr: ChangeDetectorRef,
               private http: HttpClient,
@@ -179,8 +198,10 @@ export class ServicelevelComponent implements OnInit, AfterViewInit, OnDestroy {
     this.volumeRadioCheck = 'basic';
     this.storagePoolRadioCheck = 'basic';
     this.selectedModel=o;
-
+    // 性能折线图
     this.initChart(this.range);
+    // 容量折线图
+    this.initCapacityChart(this.capacityRange);
   }
 
   closeS(){
@@ -199,6 +220,10 @@ export class ServicelevelComponent implements OnInit, AfterViewInit, OnDestroy {
         } else{
           this.storagePoolList = [];
         }
+        const allName = this.storagePoolList.map(item => item.storageName);
+        // 设置设备名称过滤相关
+        // this.sLSPStorageNameFilter.setStorageNameFilter(allName)
+        this.storagePoolList.forEach(item => item.usedCapacity = Number(((item.consumedCapacity)/item.totalCapacity * 100).toFixed(2)));
         this.storagePoolTotal = this.storagePoolList.length;
         this.storeagePoolIsloading = false;
         this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
@@ -350,6 +375,12 @@ export class ServicelevelComponent implements OnInit, AfterViewInit, OnDestroy {
       if (val2 === undefined) {
         val2 = '';
       }
+      if(parseFloat(val1).toString() != "NaN"){
+        val1 = parseFloat(val1);
+      }
+      if(parseFloat(val2).toString() != "NaN"){
+        val2 = parseFloat(val2);
+      }
       if (val1 < val2) {
         if (sort === 'asc'){
           return -1;
@@ -409,8 +440,8 @@ export class ServicelevelComponent implements OnInit, AfterViewInit, OnDestroy {
   lastStorePool24HPeak(){
     let obj_ids = [];
     this.storagePoolList.forEach((item)=>{
-      if(item.storage_instance_id){
-        obj_ids.push(item.storage_instance_id);
+      if(item.storageInstanceId){
+        obj_ids.push(item.storageInstanceId);
       }
     });
     const p = {
@@ -423,7 +454,7 @@ export class ServicelevelComponent implements OnInit, AfterViewInit, OnDestroy {
     this.http.post('datastorestatistichistrory/servicelevelStoragePool', p).subscribe((response: any) => {
       if (response.code == '200'){
         this.storagePoolList.forEach((item)=>{
-          let i = response.data[item.storage_instance_id];
+          let i = response.data[item.storageInstanceId];
           if (i != undefined){
             let iops = i['1125912791810049'].max;
             let latency = i['1125912791810050'].max;
@@ -443,82 +474,131 @@ export class ServicelevelComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
-  async initChart(range: Range) {
-    this.makePerformance.setChartSingle(
-      300,
-      // '卷最大I/O响应时间(ms)',
-      this.translatePipe.transform('performance.volumeMaximumIORespTime'),
-      '',
-      ["1125921381744655"],
-      [this.selectedModel.id],
-      range.range,
-      'datastorestatistichistrory/servicelevelLun',
-      null,
-      null).then(
-        res => {
-      this.volumeMaxResponseTime = res;
+  /**
+   * 容量折线图
+   * @param range
+   */
+  async initCapacityChart(range: CapacityRange) {
+    // 容量：LUN容量趋势
+    const caLunTrend = [this.translatePipe.transform('chart.title.allocatedCapacity'), this.translatePipe.transform('chart.title.totalCapacity')];
+    this.makePerformance.setDataSetsChart(
+      300
+      , this.translatePipe.transform('chart.title.lunCapacityTrends')
+      , ''
+      , range.range
+      , '/servicelevel/capacity/stat-lun'
+      , this.selectedModel.id
+      , 'statLun'
+      , caLunTrend
+      , null).then(res => {
+      this.volumeCapacity = res;
+      this.volDataIsNull = res['series'][0].data.length < 1;
       this.cdr.detectChanges();
     });
-    this.makePerformance.setChartSingle(
-      300,
-      // '卷I/O密度(IOPS/TB)',
-      this.translatePipe.transform('performance.volumeIODensity'),
-      '',
-      ["1223"],
-      [this.selectedModel.id],
-      range.range,
-      'datastorestatistichistrory/servicelevelLun',
-      null,
-      null).then(
-      res => {
-        this.volumeDensity = res;
-        this.cdr.detectChanges();
-      });
-    this.makePerformance.setChartSingle(
-      300,
-      // '卷总吞吐量(IOPS)',
-      this.translatePipe.transform('performance.totalVolumeThroughput'),
-      '',
-      ["1125921381744641"],
-      [this.selectedModel.id],
-      range.range,
-      'datastorestatistichistrory/servicelevelLun',
-      null,
-      null).then(
-      res => {
-        this.volumeThroughput = res;
-        this.cdr.detectChanges();
-      });
-    this.makePerformance.setChartSingle(
-      300,
-      // '卷总带宽(MB/s)',
-      this.translatePipe.transform('performance.volumeTotalBandwidth'),
-      '',
-      ["1125921381744643"],
-      [this.selectedModel.id],
-      range.range,
-      'datastorestatistichistrory/servicelevelLun',
-      null,
-      null).then(
-      res => {
-        this.volumeBandwidth = res;
-        this.cdr.detectChanges();
-      });
-    this.makePerformance.setChartSingle(
-      300,
-      // '存储池I/O密度(IOPS/TB)',
-      this.translatePipe.transform('performance.storagePoolIODensity'),
-      '',
-      ["111"],
-      [this.selectedModel.id],
-      range.range,
-      'datastorestatistichistrory/servicelevelLun',
-      null,
-      null).then(
-      res => {
-        this.storagePoolDensity = res;
-        this.cdr.detectChanges();
-      });
+
+    // 容量：存储池容量趋势
+    const caStroagePoolTrend = [this.translatePipe.transform('chart.title.usedCapacity'), this.translatePipe.transform('chart.title.totalCapacity')];
+    this.makePerformance.setDataSetsChart(
+      300
+      , this.translatePipe.transform('chart.title.storagePoolCapacityTrends')
+      , ''
+      , range.range
+      , '/servicelevel/capacity/stat-storage-pool'
+      , this.selectedModel.id
+      , 'statStoragePool'
+      , caStroagePoolTrend
+      , null).then(res => {
+      this.storagePoolCapacity = res;
+      this.storagePoolDataIsNull = res['series'][0].data.length < 1;
+      this.cdr.detectChanges();
+    });
+  }
+
+  /**
+   * 性能折线图
+   * @param range
+   */
+  async initChart(range: Range) {
+
+    // 性能： 'Lun最大I/O响应时间(ms)'
+    const perfResDataNames = [this.translatePipe.transform('performance.volumeMaximumIORespTime')]
+    this.makePerformance.setDataSetsChart(
+      300
+      , this.translatePipe.transform('performance.volumeMaximumIORespTime')
+      , ''
+      , range.range
+      , '/servicelevel/performance/perf-stat-lun-details'
+      , this.selectedModel.id
+      , 'responseTime'
+      , perfResDataNames
+      , null).then(res => {
+      this.volumeMaxResponseTime = res;
+      this.volMaxDataIsNull = res['series'][0].data.length < 1;
+      this.cdr.detectChanges();
+    });
+    // 性能：'LUN I/O密度(IOPS/TB)'
+    const perfDesDataNames = [this.translatePipe.transform('performance.volumeIODensity')]
+    this.makePerformance.setDataSetsChart(
+      300
+      , this.translatePipe.transform('performance.volumeIODensity')
+      , ''
+      , range.range
+      , '/servicelevel/performance/perf-stat-lun-details'
+      , this.selectedModel.id
+      , 'perfDensity'
+      , perfDesDataNames
+      , null).then(res => {
+      this.volumeDensity = res;
+      this.volDenDataIsNull = res['series'][0].data.length < 1;
+      this.cdr.detectChanges();
+    });
+    // 性能：'卷总吞吐量(IOPS)'
+    const perfIOPSDataNames = [this.translatePipe.transform('performance.totalVolumeThroughput')]
+    this.makePerformance.setDataSetsChart(
+      300
+      , this.translatePipe.transform('performance.totalVolumeThroughput')
+      , '', range.range
+      , '/servicelevel/performance/perf-stat-lun-details'
+      , this.selectedModel.id
+      , 'perfLUNIOPS'
+      , perfIOPSDataNames
+      , null).then(res => {
+      this.volumeThroughput = res;
+      this.volThrDataIsNull = res['series'][0].data.length < 1;
+      this.cdr.detectChanges();
+    });
+    // 性能：'卷总带宽(MB/s)'
+    const perfBDWTDataNames = [this.translatePipe.transform('performance.volumeTotalBandwidth')]
+    this.makePerformance.setDataSetsChart(
+      300
+      , this.translatePipe.transform('performance.volumeTotalBandwidth')
+      , ''
+      , range.range
+      , '/servicelevel/performance/perf-stat-lun-details'
+      , this.selectedModel.id
+      , 'perfBandwidth'
+      , perfBDWTDataNames
+      , null).then(res => {
+      this.volumeBandwidth = res;
+      this.volBDWTDataIsNull = res['series'][0].data.length < 1;
+      this.cdr.detectChanges();
+    });
+    // 性能：存储池I/O密度(IOPS/TB)
+    const perfSPDDataNames = [this.translatePipe.transform('performance.storagePoolIODensity')]
+    this.makePerformance.setDataSetsChart(
+      300
+      , this.translatePipe.transform('performance.storagePoolIODensity')
+      , ''
+      ,range.range
+      ,'/servicelevel/performance/perf-stat-storage-pool-details'
+      , this.selectedModel.id
+      ,'perfStoragePoolDetails'
+      , perfSPDDataNames,
+      null).then(res => {
+      this.storagePoolDensity = res;
+      this.storagePoolDenDataIsNull = res['series'][0].data.length < 1;
+      this.cdr.detectChanges();
+    });
   }
 
   /**
@@ -538,6 +618,43 @@ export class ServicelevelComponent implements OnInit, AfterViewInit, OnDestroy {
       console.error('ERROR', err);
       alert("同步失败");
     });
+  }
+  formatCapacity(c: number){
+    if (c < 1024){
+      return c.toFixed(3)+" GB";
+    }else if(c >= 1024 && c< 1048576){
+      return (c/1024).toFixed(3) +" TB";
+    }else if(c>= 1048576){
+      return (c/1024/1024).toFixed(3)+" PB"
+    }
+  }
+
+  /**
+   * 初始化过滤器
+   */
+  initStoragePoolListFilter(){
+    if (this.slspStatusFilter){
+      this.slspStatusFilter.initStatus();
+    }
+    if (this.runningStatusFilter) {
+      this.runningStatusFilter.initStatus();
+    }
+    if (this.slspDiskTypeFilter) {
+      this.slspDiskTypeFilter.initType();
+    }
+    if (this.sLSPStorageNameFilter) {
+      this.sLSPStorageNameFilter.initName();
+    }
+    if (this.lunStatusFilter) {
+      this.lunStatusFilter.initName();
+    }
+  }
+
+  setDataSetsChart(height: number, title: string, subtext: string,){
+
+  }
+  sortFunc(obj:any) {
+    return !obj;
   }
 }
 
@@ -577,24 +694,6 @@ class Servicelevel {
   };
 }
 
-interface StoragePool {
-  id: string;
-  name: string;
-  running_status: string;
-  physicalType: string;
-  storage_name: string;
-  storage_instance_id: string;
-
-  total_capacity: number;
-  consumed_capacity: number;
-  consumed_capacity_percentage: number;
-  free_capacity: number;
-
-  latency: string;
-  iops: string;
-  bandwidth: string;
-}
-
 interface Volume {
   id: string;
   name: string;
@@ -621,6 +720,14 @@ class Range{
   interval: string;
   constructor(){
     this.range = "LAST_1_DAY" ;
+    this.interval = "MINUTE";
+  }
+}
+class CapacityRange{
+  range: string;
+  interval: string;
+  constructor(){
+    this.range = "LAST_1_MONTH" ;
     this.interval = "MINUTE";
   }
 }

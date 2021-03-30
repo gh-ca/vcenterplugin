@@ -103,10 +103,10 @@
     border-radius: 2px;
   }
   .total{
-    background-color: hsl(198, 80%, 46%);
+    background-color: hsl(198, 100%, 32%);
   }
   .used{
-    background-color: hsl(198, 78%, 78%);
+    background-color: hsl(198, 100%, 32%);
   }
   .free{
     background-color: hsl(198, 83%, 94%);
@@ -125,6 +125,11 @@
 .unit-label{
   width: 100px;
   color: hsl(198, 0%, 0%);
+}
+.unit-tips{
+  width: 100px;
+  color: hsl(198, 0%, 0%);
+  font-weight: lighter;
 }
 .unit-outer{
   width: 300px;
@@ -309,5 +314,22 @@ input[type=number] {
   }
 
   -moz-appearance: textfield;
+}
+::ng-deep .num-bar_outer .progress, .progress-static {
+  height: 16px;
+  max-height: none;
+}
+.hideFilter ::ng-deep clr-dg-string-filter{
+  display: none;
+}
+::ng-deep .datagrid-table .datagrid-column .datagrid-filter-toggle{
+  margin: auto;
+}
+
+input::-ms-clear{
+  display: none;
+}
+::ng-deep .datagrid {
+  -ms-overflow-style:scrollbar;
 }
 

@@ -6,10 +6,11 @@
     "del": "Delete",
     "expand": "Expand",
     "more": "More",
+    "otherOperations": "Other operations",
     "mount": "Mount",
     "unmount": "Unmount",
     "reclaim": "Reclaim",
-    "changeServiceLevel": "Change Service Level",
+    "changeServiceLevel": "Change DME Storage Strategy",
     "save": "OK",
     "cancel": "Cancel",
     "next": "Next",
@@ -25,11 +26,14 @@
     "back":"Back",
     "performance": "Performance",
     "conventional": "Conventional",
-    "capacity": "Capacity"
+    "capacity": "Capacity",
+    "Synchronize": "Synchronize"
   },
   "validations": {
     "required": "This field is required!",
-    "nameRequired": "This field is required! And can only contain half-width letters, half-width numbers, “_”、“-”、“.”、, Chinese characters.",
+    "nameRequired": "This field is required! And can only contain half-width letters, half-width numbers, “_”、“-”、“.”、and Chinese characters.",
+    "nameRequiredTwo": "This field is required! And can only contain half-width letters, half-width numbers, “_”、and Chinese characters.",
+    "shareNameRequired": "This field is required! And can only contain half-width letters, half-width numbers, “_”.",
     "minlength": "Should have atleast {{number}} characters",
     "maxlength": "This value should be less than {{number}} characters",
     "min": "This value should be more than {{number}}",
@@ -42,7 +46,8 @@
   "table": {
     "name": "Name",
     "id": "ID",
-    "description": "Description"
+    "description": "Description",
+    "createDmeStorage": "Create DME data store"
   },
   "nfs":{
     "name":"Name",
@@ -92,6 +97,7 @@
     "enable":"Enable",
     "capAuto":"Capacity Autonegotiation",
     "sameName":"The Filesystem/share name is the same as the datastore name.",
+    "modifySameName":"The Filesystem is the same as the datastore name.",
     "mountType":"Mount Type",
     "readWrite":"Read Write",
     "readOnly":"Read Only",
@@ -109,6 +115,7 @@
     "nfsStore":"NFS DataStore",
     "respRt":"Response Time-Read(ms)",
     "respWt":"Response Time-Write(ms)",
+    "characterEncoding":"Character Encoding",
     "logic":{
       "logic":"Logic Port",
       "name":"Name",
@@ -139,7 +146,10 @@
       "provisionType":"Provision Type",
       "appSce":"Application Scenario",
       "dataDed":"Data Deduplication",
-      "dataCom":"Data Compression"
+      "dataCom":"Data Compression",
+      "database":"database",
+      "vm":"VM",
+      "userDefine":"user_defined"
     },
     "mount":{
       "mount":"Mount",
@@ -162,19 +172,32 @@
     },
     "reduce": {
       "success": "Successfully reduce!"
+    },
+    "expand":{
+      "capacityErr":"Input exceeds capacity limit!",
+      "maxCapTip":"Maximum capacity limit：16384 TB",
+      "minCapTip":"Minimum capacity limit：",
+      "expandErrTips":"The minimum disk expansion capacity is 1GB, and the expanded capacity cannot be greater than 16384TB!",
+      "reduceThinTips": "The disk type is Thin, and the modified capacity must not be less than ",
+      "reduceThickTips": "The disk type is Thick, and the modified capacity must not be less than "
     }
   },
   "vmfs": {
     "controlPolicy": "Control Policy",
+    "controlPolicyDescOne": "Control Policy",
+    "controlPolicyDescZero": "Control Policy",
     "trafficControlObject": "Traffic Control Object",
     "modifyNameDesc": "Automatically Changing a Volume Name",
     "upperLimitControl": "Upper Limit Control",
     "lowerLimitControl": "Lower Limit Control",
+    "upperControlLimit": "Upper Limit Control",
+    "lowerProtectionLimit": "Lower Limit Control",
     "bandwidthLimitUpper": "Bandwidth <= ",
     "IOPSLimitUpper": "IOPS <= ",
     "bandwidthLimitLower": "Bandwidth >= ",
     "IOPSLimitLower": "IOPS >= ",
     "unitM": "MB/s",
+    "iopsUnit": "IO/s",
     "addTitle": "Create Datastore on HUAWEI DME",
     "datastoreSetting": "Datastore Setting",
     "storageSetting": "Storage Setting",
@@ -185,6 +208,7 @@
     "spaceReclamationPriority": "Space Reclamation Priority",
     "hostOrCluster": "Host/Cluster",
     "name": "Name",
+    "nameChecking": "Name verification...",
     "id": "ID",
     "description": "Description",
     "status": "status",
@@ -194,18 +218,18 @@
     "freeSpace": "FreeSpace",
     "reserveCapacity": "Reserve Capacity",
     "device": "Device",
-    "serviceLevelName": "ServiceLevel Name",
-    "protectionStatus": "Protection Status",
+    "serviceLevelName": "DME Storage Strategy",
     "multiply": "X",
-    "IOPS": "IOPS",
+    "iops": "IOPS",
     "IOPSQoSTarget": "IOPS QoS Target",
     "bandwidth": "Bandwidth",
     "bandwidthQoSTarget": "Bandwidth QoS Target",
     "readResponseTime": "Read Response Time(ms)",
     "writeResponseTime": "Write Response Time(ms)",
     "latency": "Latency",
-    "latency": "Latency <= ",
+    "latencyMax": "Latency <= ",
     "latencyUnit": "ms",
+    "latencyUnitUs": "us",
     "latencyQoSTarget": "Latency QoS Target",
     "upper": "Upper",
     "lower": "Lower",
@@ -214,9 +238,9 @@
     "qosPolicy": "QoS Policy",
     "thin": "Thin",
     "resourceTuning": "Resource Tuning",
-    "provisioningType": "Provisioning Type",
+    "provisioningType": "Provision Type",
     "basicInformation": "Basic Information",
-    "byServiceLevel": "By Service Level",
+    "byServiceLevel": "By DME Storage Strategy",
     "custom": "Custom",
     "wwn": "WWN",
     "storage": "Storage",
@@ -230,7 +254,7 @@
     "volumeName": "Volume Name",
     "low": "Low",
     "none": "None",
-    "changeServiceLevel": "Change Service Level",
+    "changeServiceLevel": "Change DME Storage Strategy",
     "expandSize":"Expand Size",
     "host": "host",
     "cluster": "cluster",
@@ -239,11 +263,12 @@
     "endTime": "End Time",
     "timeInputTips": "Please enter start-end time！",
     "capacityTips": "If the version is VMFS5, the minimum capacity is 1G, if the version is VMFS6, the minimum capacity is 2G, and the capacity must be a positive integer in G, and the quantity must be a positive integer!",
-    "serviceLevelCantBeNull": "The service level is a must, and you can only choose the service level whose capacity is not 0!",
+    "serviceLevelCantBeNull": "The DME Storage Strategy is a must, and you can only choose the DME Storage Strategy whose capacity is not 0!",
     "expandTips": "Expansion capacity can only be a positive integer of GB",
+    "expandTipsMax": "After expansion, the total capacity cannot exceed 256TB.",
     "loadingTips": "Data loading, please wait",
     "dataHandleLoadingTips": "Data processing, please wait",
-    "listNullTips": "We couldn't find any users",
+    "listNullTips": "No data",
     "workload": "Workload",
     "add": {
       "success": "Added successfully!"
@@ -255,9 +280,10 @@
       "success": "Successfully expansion!"
     },
     "serviceLevel": {
-      "success": "The service level changed successfully!"
+      "success": "The DME Storage Strategy changed successfully!"
     },
     "protectionStatus": {
+      "name": "Protection Status",
       "protected": "Protected",
       "unprotected": "Unprotected"
     },
@@ -292,10 +318,12 @@
     "reclaim": {
       "title":"Tips",
       "content":"Are you sure to reclaim?",
-      "success": "Successfully reclaimed space!"
+      "success": "Successfully reclaimed space!",
+      "error": "Cannot recycle thick vmfs storage"
     },
     "filter": {
       "all": "All",
+      "empty": "Empty",
       "status": {
         "normal": "Normal"
       },
@@ -323,12 +351,12 @@
       "rawCap":"Raw Capacity",
       "usedCap":"Used Capacity",
       "capUsage":"Capacity Usage",
-      "tec":"Total Effective Capacity",
+      "tec":"Effective Capacity",
       "freeCap":"Free Capacity",
       "supRate":"supscription Capacity",
       "totalCap":"Total Capacity",
-      "cpuUtilization":"CpuUtilization",
-      "latency":"Latency(ms)",
+      "cpuUtilization":"CPU Usage",
+      "latency":"Average I/O Response Time (ms)",
       "iops":"IOPS",
       "ops":"OPS",
       "bandwidth":"Bandwith(MB/s)",
@@ -338,13 +366,16 @@
       "notMgr": "Not Manage",
       "notSync": "Not Sync",
       "inSync": "in Sync",
-      "synced": "Synchronized"
+      "synced": "Synchronized",
+      "status": "Running Status",
+      "synStatus": "Synchronized State"
     },
     "chart":{
       "total":" Total",
       "protection":" Protection",
       "fileSystem":" File System",
-      "volume":" Volume",
+      "file":" File",
+      "volume":" LUN",
       "freeCapacity":" Free Capacity",
       "used":" Used",
       "free":" Free",
@@ -352,9 +383,10 @@
       "events":" Events",
       "iops":"IOPS(IO/s)",
       "bandwidth":"Bandwidth(MS/s)",
-      "capacity":"Capacity",
+      "capacity":"Capacity Distribution",
       "health":"Health",
-      "performance":"Performance - Last 24 Hours"
+      "performance":"Performance - Last 24 Hours",
+      "blockFile":"Block/File"
     },
     "detail":{
       "conf":{
@@ -363,27 +395,30 @@
         "ip":"IP Address",
         "sn":"SN",
         "status":"Status",
-        "fv":"Firmware Version",
+        "fv":"Version",
         "pv":"Patch Version",
         "vendor":"Vendor",
         "model":"Model",
         "az":"AZ",
         "wp":"Warranty Period",
-        "location":"Location"
+        "location":"Location",
+        "latency": "Average I/O Response Time (ms)",
+        "iops": "IOPS",
+        "bandwidth": "Bandwidth(MB/s)"
       },
       "cap":{
         "capacity":"Capacity",
         "capacityUsage":"Capacity Usage",
-        "bareCapacity":"Bare Capacity",
+        "bareCapacity":"Raw Capacity",
         "totalCapacity":"Total Capacity",
-        "useFree":"Use/Free",
+        "useFree":"Use|Free",
         "subscribe":"Subscribed",
         "storagePool":"Storage Pool List",
         "used":"Used:",
-        "capacitySavings":"Capacity Savings",
-        "beforeSave":"Before Savings",
-        "afterSave":"After Savings",
-        "dedupe": "Dedupe",
+        "capacitySavings":"Capacity Saving",
+        "beforeSave":"Pre-saving",
+        "afterSave":"Post-saving",
+        "dedupe": "Deduplication",
         "compression": "Compression"
       },
       "performance":{
@@ -394,16 +429,16 @@
         "storagePool":"Storage Pools",
         "name":"Name",
         "status":"Status",
-        "diskType":"disk Type",
+        "diskType":"Disk Type",
         "type":"Type",
-        "serviceLevel":"Service Level",
+        "serviceLevel":"DME Storage Strategy",
         "raidLevel":"RAID Level",
         "totalCap":"Total Capacity",
         "usedCap":"Used Capacity",
         "capUsage":"Capacity Usage",
         "freeCap":"Free Capacity",
         "supRate":"supscription Rate",
-        "latency": "Latency(ms)",
+        "latency": "Average I/O Response Time (ms)",
         "iops": "IOPS",
         "bandwidth": "Bandwidth(MB/s)",
         "normal":"Normal",
@@ -412,7 +447,7 @@
         "unknown":"Unknown"
       },
       "volumes":{
-        "volumes":"Volumes",
+        "volumes":"LUNs",
         "name":"Name",
         "status":"Status",
         "dataStore":"Data Store",
@@ -420,10 +455,10 @@
         "proType":"Provisioning Type",
         "capUsage":"Capacity Usage",
         "mapStatus":"Mapping Status",
-        "stoPool":"Storage Pool",
-        "serviceLevel":"Service Level",
+        "stoPool":"Storage Pools",
+        "serviceLevel":"DME Storage Strategy",
         "protStatus":"Protection Status",
-        "latency": "Latency(ms)",
+        "latency": "Average I/O Response Time (ms)",
         "iops": "IOPS",
         "bandwidth": "Bandwidth(MB/s)"
       },
@@ -434,11 +469,11 @@
         "proType":"Provisioning Type",
         "totalCap":"Total Capacity",
         "capUsage":"Capacity Usage",
-        "ownSto":"Owning Storage",
+        "ownSto":"Owning Storage Pool",
         "nfs":"NFS",
         "cifs":"CIFS",
         "dtree":"Dtree",
-        "fileType":"Filesystem Type",
+        "fileType":"File System Type",
         "freeCap": "Free Capacity",
         "capacityUsage":"Capacity Usage"
       },
@@ -446,7 +481,7 @@
         "dtrees":"DTrees",
         "name":"Name",
         "ofs":"Owning File System",
-        "osl":"Owning Service Level",
+        "osl":"Owning DME Storage Strategy",
         "secMod":"Security Mode",
         "nfs":"NFS",
         "cifs":"CIFS",
@@ -458,7 +493,7 @@
         "sharePath":"Share Path",
         "ofs":"Owning File System",
         "od":"Owning Dtree",
-        "osl":"Owning Service Level"
+        "osl":"Owning DME Storage Strategy"
       },
       "capacity":{
         "pool":{
@@ -477,7 +512,7 @@
           "cpuUsage":"CPU Usage",
           "iops":"IOPS",
           "ops":"OPS",
-          "latency":"Latency(ms)",
+          "latency":"Average I/O Response Time (ms)",
           "bandwidth":"Bandwidth(MB/s)"
         },
         "disks":{
@@ -490,7 +525,7 @@
           "diskDomain":"Disk Domain",
           "rotationalSpeed":"Rotational Speed",
           "iops":"IOPS",
-          "latency":"Latency(ms)",
+          "latency":"Average I/O Response Time (ms)",
           "bandwidth":"Bandwidth(MB/s)",
           "usage":"Usage(%)"
         },
@@ -501,7 +536,7 @@
           "wwn":"WWN",
           "workingRate":"Working Rate(Mbps)",
           "iops":"IOPS",
-          "latency":"Latency(ms)",
+          "latency":"Average I/O Response Time (ms)",
           "bandwidth":"Bandwidth(MB/s)",
           "usage":"Usage(%)",
           "name":"Name",
@@ -519,8 +554,8 @@
           "dataProtocol":"Data Protocol",
           "manageAccess":"Manage Access",
           "vStoreName":"VStore Name",
-          "type":"类型",
-          "fc":"FC Ports",
+          "type":"Type",
+          "fc":"FC Port",
           "eth":"Ethernet Port",
           "fcoe":"FCoE Port",
           "bond":"Bond Port",
@@ -537,6 +572,7 @@
     "user": "User",
     "password": "Password",
     "connected": "Connected",
+    "connectionError": "Connection Error",
     "storage": "Storage",
     "total": "Total",
     "normal": "Normal",
@@ -553,11 +589,12 @@
     "totalCapacity": "Total",
     "used": "Used",
     "free": "Free",
-    "top5T": "Top 5 DataStore",
+    "top5T": "Top 5 storage capacity utilization",
     "connectT": "DME Connect",
     "connectFail": "Connect Failed!",
     "connectSuccess": "Connect Success!",
-    "portholder": "Port Default 26335"
+    "portholder": "Port Default 26335",
+    "disconnect": "Disconnect"
   },
   "bestPractice": {
     "apply": "Apply Best Practice",
@@ -577,7 +614,26 @@
     "syncSuccess": "Sync Success",
     "syncFail": "Sync Failed",
     "exeSuccess": "Execute Success",
-    "exeFail": "Execute Failed"
+    "exeFail": "Execute Failed",
+    "operation": "Operation",
+    "implementation": "Apply",
+    "description": {
+      "name": "Description",
+      "vmfs5": "This item is configured to enable VAAI ATS heartbeat. In versions earlier than ESXi 6.5, connections to the datastores corresponding to VMFS3 and VMFS5 may be lost and you are advised to disable this function. For other versions, you are advised to enable this function.",
+      "locking": "This item is configured to enable VAAI ATS locking. Compared with the SCSI reservation locking mechanism, the ATS locking mechanism uses a finer-grained lock (sector) and offloads VMFS locking operations to storage devices. This prevents multiple hosts from concurrently accessing the VMFS.",
+      "init": "This item is configured to use VAAI to accelerate VMFS data initialization and offload initial zeroing of disks to storage devices to improve performance.",
+      "move": "This item is configured to use VAAI to accelerate VMFS data movement and offload data movement to storage devices to improve performance.",
+      "delete": " This item is configured to reclaim the space of VMs that use VMFS5 by running the unmap command.To execute the unmap command successfully, the datastore used by virtual disks must support thin provisioning.",
+      "quanTum": "This item is configured to set the queue depth of virtual disks to 64. If the queue depth is set to a too small value, requests will be blocked.",
+      "diskMaxIOSize": "This item is configured to set the maximum number of I/Os for virtual disks to the applicable value of ESXi of the current version. In specific ESXi versions, if the number is set to a large value, Windows EFI boot issues may occur. A small value is automatically used in the best practice.",
+      "depthForQlogic": "This item is configured to set the QLogic HBA queue depth to 512 and increase the throughput of ESXi hosts.",
+      "depthForEmulex": "This item is configured to set the Emulex HBA queue depth to 512 and increase the throughput of ESXi hosts.",
+      "pathSwitchPolicy": "his item is configured to automatically configure the multipathing policy for storage devices to improve their availability and performance.",
+      "jumboFrame": "This item is configured to enable jumbo frame configuration and the MTU value of ESXi vmkernel adapters is set to 9000. Jumbo frames are recommended for the storage network.\nThis configuration requires that ESXi hosts, storage devices, and all physical network devices in the data packet link support jumbo frames, and their MTU values are set to 9000.",
+      "reclamation": "This item is configured to configure the automatic space reclamation policy for VMFS6 datastores.",
+      "numberOfVolInDatastore": "This item is configured to limit the maximum number of volumes in a single datastore to 1. A VM cannot concurrently process multiple volumes requests in a datastore. If a datastore contains multiple volumes, request blocking of a volume will affect other volumes. Therefore, it is not recommended that a datastore contain multiple volumes."
+    },
+    "applyBestPracticeTips": "There are data with 0 violations in the selected data, please select again!"
   },
   "iscsi": {
     "hostIp": "Host VmKernel IP",
@@ -591,8 +647,17 @@
     "speed": "Working Rate(Mbps)",
     "hStatus": "Health Status",
     "cStatus": "Connect Status",
+    "cStatusType": "Connection status type",
+    "phyPortNotConn": "The physical port is not connected",
+    "ipUnreachable": "IP unreachable",
+    "connected": "Connected",
+    "toBeConnected": "To be connected",
     "ports": "Please Select Storage Device Ports",
-    "portNullMessage": "Port is not be Empty!"
+    "portNullMessage": "Port is not be Empty!",
+    "establishConnect": "Establish an iSCSI connection",
+    "showCol": "Display Column",
+    "selectAll": "Select All",
+    "hideIpTips": "Note: The following data will not include data with empty IPv4 addresses!"
   },
   "rdm": {
     "name": "Name",
@@ -601,11 +666,11 @@
     "operation": "Operation",
     "add": "Add",
     "storageType": "Storage Type",
-    "tier": "Tier",
+    "tier": "DME Storage Strategy",
     "storage1": "Storage/Storage Pool",
     "storage": "Storage Device",
     "sPool": "Storage Pool",
-    "dataStore": "DataStore",
+    "dataStore": "Location",
     "ownerC": "Owner Controller",
     "idp": "Initial Distribute Policy",
     "fetchP": "Prefetch Policy",
@@ -620,8 +685,8 @@
     "bandwidth": "BandWidth",
     "latency": "Latency",
     "rtuning": "Resource Tuning",
-    "alloctype": "Allocate Type",
-    "dedupe": "Dedupe",
+    "alloctype": "Provisioning Type",
+    "dedupe": "Deduplication",
     "compression": "Compression",
     "remove": "Remove",
 
@@ -655,8 +720,15 @@
     "storeSet": "Storage Setting",
 
     "createRdmError": "Create RDM Error!",
-    "selectOneSer": "Service Level is not be Null！",
-    "rdmSuccessMsg": "Create RDM Success!"
+    "selectOneSer": "DME Storage Strategy is not be Null！",
+    "rdmSuccessMsg": "Create RDM Success!",
+    "addTips": "Note: Use this method when you need to create a new LUN on the storage and use the LUN to create an RDM disk for the virtual machine. If you want to use an existing LUN to create, you can directly choose to add RDM disks in the virtual machine hardware editor.",
+    "defaultStorage": "Store with the virtual machine",
+    "compatibilityMode": {
+      "name": "Compatibility Mode",
+      "virtualMode": "Virtual Mode",
+      "physicalMode": "Physical Mode"
+    }
   },
   "tier": {
     "name": "Name",
@@ -678,15 +750,15 @@
     "bandwidth": "BandWidth",
     "latency": "Latency",
     "rtuning": "Resource Tuning",
-    "alloctype": "Allocate Type",
-    "dedupe": "Dedupe",
+    "alloctype": "Provisioning Type",
+    "dedupe": "Deduplication",
     "compression": "Compression",
 
     "status": "Status",
     "diskType": "Disk Type",
     "storage": "Storage Device",
     "bandwidthm": "BandWidth(MB/s)",
-    "latencyms": "Latency(ms)",
+    "latencyms": "Average I/O Response Time (ms)",
     "appType": "Application Type",
 
     "general": "General",
@@ -729,7 +801,10 @@
     "offLine": "Offline",
     "normal": "Normal",
     "abnormal": "Abnormal",
-    "unknown": "Unknown"
+    "unknown": "Unknown",
+    "faulty": "Faulty",
+    "middle": "Middle",
+    "high": "High"
   },
   "applybp": {
     "ing": "Best Practice is Executing",
@@ -744,6 +819,7 @@
        "connected":"Connected",
        "creating":"Creating",
        "normal":"Normal",
+       "abnormal":"Abnormal",
        "mapping":"Mapping",
        "unmapping":"Unmapping",
        "deleting":"Deleting",
@@ -753,9 +829,9 @@
        "mapped":"Mapped",
        "unprotected":"Unprotected",
        "protected":"Protected",
-       "notEnabled":"Not Enabled",
+       "notEnabled":"Disabled",
        "enabled":"Enabled",
-       "normalFs":"Normal FileSystem",
+       "normalFs":"Common File System",
        "wormFs":"WORM FileSystem",
        "unknown":"Unknown",
        "running":"Running",
@@ -764,13 +840,28 @@
        "member":"Member",
        "linkDown":"Link Down",
        "linkUp":"Link Up",
-       "activated":"Activated",
-       "unActivated":"unActivated",
-       "all":"ALL"
+       "activated":"Active",
+       "unActivated":"Inactive",
+       "all":"ALL",
+       "invalid":"INVALID",
+       "enable":"Enabled",
+       "notActivated":"NOTACTIVATED",
+       "service":"Service",
+       "management":"Management",
+       "managementAndService":"Management+Service",
+       "aboutToFail": "About To Fail",
+       "partiallyDamaged": "Partially Damaged",
+       "system": "System",
+       "vlan": "VLAN",
+       "customized": "Customized",
+       "inconsistent": "Inconsistent",
+       "toBeRecovered": "To be recovered",
+       "initializing": "Initializing"
      },
      "type":{
       "block":"Block",
-      "file":"File"
+      "file":"File",
+      "blockAndFile": "Block And File"
      }
   },
   "errorMsg":{
@@ -779,17 +870,22 @@
     "expandError":"Expand failed!Please contact management!",
     "reduceError":"Reduce failed!Please contact management!",
     "deleteError":"Delete failed!Please contact management!",
-    "addError":"Delete failed!Please contact management!",
-    "modifyError":"Delete failed!Please contact management!",
+    "addError":"Add failed!Please contact management!",
+    "modifyError":"Modification failed!Please contact management!",
     "reclaimError":"Space reclamation failed! Please contact the administrator!",
-    "serviceLevelError":"Service level change failed! Please contact the administrator!",
+    "serviceLevelError":"DME Storage Strategy change failed! Please contact the administrator!",
     "require":"This field is required!",
     "nfsrepeat":"NFS name already exists!",
     "sharerepeat":"Share name already exists!",
     "fsrepeat":"FileSystem name already exists!",
     "vmfsNameRepeat":"VMFS name already exists!",
     "volNameRepeat":"volume name already exists!",
-    "numberAndLetter":"Only numbers and letters can be entered!"
+    "numberAndLetter":"Only numbers and letters can be entered!",
+    "cantFindData":"Sorry, no relevant data is found!",
+    "getDataFailed": "Failed to get data!",
+    "cantChangeServiceLevel": "This device is a Custom type and does not support DME Storage Strategy change operation!",
+    "iposMaxMinTips": "Can only be an integer from 1 to 999999999.",
+    "nfsSecurityTips": "To use Kerberos authentication, each host that mounts this datastore has to be a part of an Active Directory domain and its NFS authentication credentials need to be set. This is done on the Authentication Services page on each host."
   },
   "page": {
     "perPage": "Per Page",
@@ -797,10 +893,43 @@
     "all": "Total"
   },
   "performance": {
-    "volumeMaximumIORespTime": "Volume maximum I/O response time (ms)",
-    "volumeIODensity": "Volume I/O density (IOPS/TB)",
-    "totalVolumeThroughput": "Total volume throughput(IOPS)",
-    "volumeTotalBandwidth": "Volume total bandwidth(MB/s)",
+    "volumeMaximumIORespTime": "LUN maximum I/O response time (ms)",
+    "volumeIODensity": "LUN I/O density (IOPS/TB)",
+    "totalVolumeThroughput": "Total LUN throughput(IOPS)",
+    "volumeTotalBandwidth": "LUN total bandwidth(MB/s)",
     "storagePoolIODensity": "Storage pool I/O density(IOPS/TB)"
+  },
+  "tips": {
+    "select": "Please select",
+    "disconnected": "Whether to disconnect DME ?",
+    "operationSuccessful": "Operation successful!",
+    "operationFailed": "Operation failed!",
+    "noData": "No data",
+    "addVmfsConnFail": "Create vmfs failure,connectivity of host or hostgroup on dme error!",
+    "mountVmfsConnFail": "Mount failure,connectivity of host or hostgroup on dme error!",
+    "details": "Details",
+    "bandwidthLimitErr": "The lower limit of bandwidth cannot be greater than the upper limit!",
+    "iopsLimitErr": "The upper limit of IOPS is at least 100, and the lower limit cannot be greater than the upper limit!",
+    "syncSuccess": "Data synchronization is successful!"
+  },
+  "chart": {
+    "select": {
+      "last5Minute": "Last 5 minutes",
+      "last1Hour": "Last 1 hour",
+      "last1Day": "Last day",
+      "last1Week": "Last week",
+      "last1Month": "Last month",
+      "last1Quarter": "Last quarter",
+      "half1Year": "Last half year",
+      "last1Year": "Last year",
+      "invalid": "invalid"
+    },
+    "title": {
+      "allocatedCapacity": "Allocated Capacity(GB)",
+      "totalCapacity": "Total Capacity(GB)",
+      "usedCapacity": "Used Capacity(GB)",
+      "lunCapacityTrends": "LUN Capacity Trends",
+      "storagePoolCapacityTrends": "Storage Pool Capacity Trends"
+    }
   }
 }

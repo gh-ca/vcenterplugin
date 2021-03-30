@@ -1,4 +1,2 @@
 /.idea/
 *.iml
-*.class
-/dmestore-ui/src/main/angular/node_modules

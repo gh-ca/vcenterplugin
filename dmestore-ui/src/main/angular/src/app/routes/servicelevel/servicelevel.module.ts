@@ -4,14 +4,28 @@ import { CommonModule } from '@angular/common';
 import { ServicelevelRoutingModule } from './servicelevel-routing.module';
 import { ServicelevelComponent } from './servicelevel.component';
 import {SharedModule} from '../../shared';
+import {LUNStatusFilter, SLSPDiskTypeFilter, SLSPStatusFilter, SLSPStorageNameFilter} from "./filter.component";
+import {StorageService} from "../storage/storage.service";
+import {ServicelevelService} from "./servicelevel.service";
+import {TranslateModule} from "@ngx-translate/core";
+import {NgxEchartsModule} from "ngx-echarts";
+import {FormsModule} from "@angular/forms";
+import {ClarityModule} from "@clr/angular";
 
+const COMPONENTS = [ServicelevelComponent, SLSPStatusFilter, SLSPDiskTypeFilter, SLSPStorageNameFilter, LUNStatusFilter];
+const COMPONENTS_DYNAMIC = [];
 
 @NgModule({
-  declarations: [ServicelevelComponent],
+  declarations: [...COMPONENTS, ...COMPONENTS_DYNAMIC, ServicelevelComponent],
   imports: [
     CommonModule,
     SharedModule,
-    ServicelevelRoutingModule
-  ]
+    ServicelevelRoutingModule,
+    TranslateModule,
+    SharedModule,
+    NgxEchartsModule, FormsModule, ClarityModule
+  ],
+  entryComponents: COMPONENTS_DYNAMIC,
+  providers: [ServicelevelService]
 })
 export class ServicelevelModule { }

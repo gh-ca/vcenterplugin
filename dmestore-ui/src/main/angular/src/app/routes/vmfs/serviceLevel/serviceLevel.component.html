@@ -3,12 +3,14 @@
     <form clrForm>
 
       <div *ngIf="isOperationErr" class="errorTips" readonly ><clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{'errorMsg.serviceLevelError' | translate}}</div>
+      <div *ngIf="isStorageVmfs" class="errorTips" readonly ><clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{'errorMsg.cantChangeServiceLevel' | translate}}</div>
+      <div *ngIf="getDataFailed" class="errorTips" readonly ><clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{'errorMsg.getDataFailed' | translate}}</div>
       <div *ngIf="modalHandleLoading" class="loadingDiv">
           <span>
             {{'vmfs.dataHandleLoadingTips' | translate}}<img src="./assets/images/loading.gif"  width="20px" height="20px" style="margin-left: 20px;">
           </span>
       </div>
-      <div *ngIf="modalLoading" class="loadingDiv">
+      <div *ngIf="modalLoading || loadingData" class="loadingDiv">
           <span>
             {{'vmfs.loadingTips' | translate}}<img src="./assets/images/loading.gif"  width="20px" height="20px" style="margin-left: 20px;">
           </span>
@@ -37,7 +39,12 @@
                 </tr>
                 <tr>
                   <th hidden></th>
-                  <th><clr-progress-bar clrValue="{{(item.usedCapacity/item.totalCapacity * 100 || 0).toFixed(2)}}" clrSuccess clrLabeled></clr-progress-bar></th>
+                  <th>
+                    <div class="progress-block">
+                      <clr-progress-bar clrValue="{{(item.usedCapacity/item.totalCapacity * 100 || 0).toFixed(2)}}" clrSuccess></clr-progress-bar>
+                      <span>{{(item.usedCapacity/item.totalCapacity * 100 || 0).toFixed(2)}}%</span>
+                    </div>
+                  </th>
                   <th *ngIf="item.capabilities !== null && item.capabilities.qos !== null
                         && item.capabilities.qos.qosParam !== null
                         && item.capabilities.qos.qosParam.maxBandWidth !== 0">{{'vmfs.bandwidth' | translate}} <= {{item.capabilities.qos.qosParam.maxBandWidth}}MBPS/TB</th>
@@ -60,7 +67,7 @@
                   <th>{{formatCapacity(item.usedCapacity, false)}} /{{formatCapacity(item.totalCapacity, false)}}</th>
                   <th *ngIf="item.capabilities !== null && item.capabilities.qos !== null
                         && item.capabilities.qos.qosParam !== null
-                        && item.capabilities.qos.qosParam.latency !== 0 ">Latency: {{item.capabilities.qos.qosParam.latency + item.capabilities.qos.qosParam.latencyUnit}}</th>
+                        && item.capabilities.qos.qosParam.latency !== 0 ">{{'rdm.latency' | translate}}: {{item.capabilities.qos.qosParam.latency + item.capabilities.qos.qosParam.latencyUnit}}</th>
                   <th *ngIf="item.capabilities === null || item.capabilities.qos === null || item.capabilities.qos.qosParam === null || item.capabilities.qos.qosParam.latency === 0">--</th>
                 </tr>
                 </tbody>
@@ -74,7 +81,7 @@
   </div>
   <div class="modal-footer">
     <button type="button" class="btn btn-outline" (click)="cancel()">{{'menu.cancel' | translate}}</button>
-    <button type="button" class="btn btn-primary" (click)="changeSLHandleFunc()">{{'menu.ok' | translate}}</button>
+    <button type="button" class="btn btn-primary" [disabled]="getDataFailed || isStorageVmfs" (click)="changeSLHandleFunc()">{{'menu.ok' | translate}}</button>
   </div>
 </clr-modal>
 <!--操作成功提示-->

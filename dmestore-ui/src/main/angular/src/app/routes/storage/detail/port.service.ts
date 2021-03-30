@@ -7,12 +7,15 @@ export class FCPort{
   lantency:number;
   bandwith:number;
   useage:number;
+  connectStatus:string;
 }
 export class EthernetPort{
   location:string;
   connectStatus:string;
   ipv4:string;
   ipv6: number;
+  mgmtIp:string;
+  mgmtIpv6:string;
   speed: number;
   iops:number;
   lantency:number;
@@ -28,6 +31,10 @@ export class FCoEPort{
   lantency:number;
   bandwith:number;
   useage:number;
+  connectStatus:string;
+  latency:string;
+  bandwidth:string;
+  usage:string;
 }
 export class BondPort{
   name:string;

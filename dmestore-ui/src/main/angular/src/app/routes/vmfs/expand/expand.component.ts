@@ -61,14 +61,14 @@ export class ExpandComponent implements OnInit{
         } else {
           const ctx = this.globalsService.getClientSdk().app.getContextObjects();
           this.objectId = ctx[0].id;
+          // this.objectId = "urn:vmomi:Datastore:datastore-4082:674908e5-ab21-4079-9cb1-596358ee5dd1";
         }
-        this.remoteSrv.getVmfsById(this.objectId).subscribe((result: any) => {
+        this.remoteSrv.getStorageById(this.objectId).subscribe((result: any) => {
           console.log('VmfsInfo:', result);
           if (result.code === '200' && null != result.data) {
-            this.vmfsInfo = result.data[0];
             // form表单数据初始化
-            this.expandForm.volume_id = this.vmfsInfo.volumeId;
-            this.expandForm.ds_name = this.vmfsInfo.name;
+            this.expandForm.volume_id = result.data.volumeId;
+            this.expandForm.ds_name = result.data.storeName;
           }
           this.modalLoading = false;
           this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
@@ -96,14 +96,16 @@ export class ExpandComponent implements OnInit{
    * 扩容
    */
   expandHandleFunc() {
+    const expandSubmitForm = new GetForm().getExpandForm();
+    Object.assign(expandSubmitForm, this.expandForm);
     if (this.expandForm.vo_add_capacity) {
       // 容量单位转换
       switch (this.expandForm.capacityUnit) {
         case 'TB':
-          this.expandForm.vo_add_capacity = this.expandForm.vo_add_capacity * 1024;
+          expandSubmitForm.vo_add_capacity = this.expandForm.vo_add_capacity * 1024;
           break;
         case 'MB':
-          this.expandForm.vo_add_capacity = this.expandForm.vo_add_capacity / 1024;
+          expandSubmitForm.vo_add_capacity = this.expandForm.vo_add_capacity / 1024;
           break;
         // case 'KB':
         //   this.expandForm.vo_add_capacity = this.expandForm.vo_add_capacity / (1024 * 1024);
@@ -111,11 +113,11 @@ export class ExpandComponent implements OnInit{
         default: // 默认GB 不变
           break;
       }
-      this.expandForm.capacityUnit = 'GB';
-      this.expandForm.obj_id = this.objectId;
+      expandSubmitForm.capacityUnit = 'GB';
+      expandSubmitForm.obj_id = this.objectId;
       this.modalHandleLoading = true;
       // 参数封装
-      this.remoteSrv.expandVMFS(this.expandForm).subscribe((result: any) => {
+      this.remoteSrv.expandVMFS(expandSubmitForm).subscribe((result: any) => {
         this.modalHandleLoading = false;
         if (result.code === '200'){
           console.log('expand success:' + name);
@@ -137,13 +139,13 @@ export class ExpandComponent implements OnInit{
   expandOnblur() {
     let expand = this.expandForm.vo_add_capacity;
     console.log('expand', expand);
-    if (expand && expand !== null && expand !== '') {
+    if (expand && expand !== null && expand !== undefined) {
       if (expand > 0) {
         switch (this.expandForm.capacityUnit) {
           case 'TB':
             if ((expand*1024).toString().indexOf(".")!==-1) { // 小数
               this.expandErr = true;
-              expand = '';
+              expand = null;
             } else {
               this.expandErr = false;
             }
@@ -151,7 +153,7 @@ export class ExpandComponent implements OnInit{
           default: // 默认GB 不变
             if (expand.toString().indexOf(".")!==-1) { // 小数
               this.expandErr = true;
-              expand = '';
+              expand = null;
             } else {
               this.expandErr = false;
             }
@@ -159,10 +161,10 @@ export class ExpandComponent implements OnInit{
         }
       } else {
         this.expandErr = true;
-        expand = '';
+        expand = null;
       }
     } else {
-      expand = '';
+      expand = null;
     }
     console.log('expand2', expand);
     console.log('this.expandErr', this.expandErr);

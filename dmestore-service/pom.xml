@@ -1,7 +1,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <groupId>com.dmeplugin.dmestore</groupId>
+        <groupId>com.huawei.dmestore</groupId>
         <artifactId>dmerelease</artifactId>
         <version>0.0.2-SNAPSHOT</version>
     </parent>
@@ -17,46 +17,40 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.apache</groupId>
+            <groupId>commons-logging</groupId>
             <artifactId>commons-logging</artifactId>
             <version>1.1.1</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/lib/commons-logging-1.1.1.jar</systemPath>
+            <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>javax</groupId>
-            <artifactId>servlet-api</artifactId>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
             <version>3.1.0</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/lib/javax.servlet-api-3.1.0.jar</systemPath>
+            <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>com.springframework</groupId>
+            <groupId>org.springframework</groupId>
             <artifactId>spring-beans</artifactId>
             <version>4.3.24.RELEASE</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/lib/spring-beans-4.3.24.RELEASE.jar</systemPath>
+            <scope>provided</scope>
         </dependency>
-      <!--  <dependency>
-            <groupId>com.springframework</groupId>
-            <artifactId>spring-web</artifactId>
-            <version>4.3.24.RELEASE</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/lib/spring-web-4.3.24.RELEASE.jar</systemPath>
-        </dependency>-->
         <dependency>
-            <groupId>com.springframework</groupId>
+            <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>
             <version>4.3.24.RELEASE</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/lib/spring-context-4.3.24.RELEASE.jar</systemPath>
+            <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>com.springframework</groupId>
+            <groupId>org.springframework</groupId>
             <artifactId>spring-core</artifactId>
             <version>4.3.24.RELEASE</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/lib/spring-core-4.3.24.RELEASE.jar</systemPath>
+            <exclusions>
+                <exclusion>
+                    <artifactId>commons-logging</artifactId>
+                    <groupId>commons-logging</groupId>
+                </exclusion>
+            </exclusions>
+            <scope>provided</scope>
         </dependency>
         <!--<dependency>
             <groupId>org.springframework</groupId>
@@ -68,8 +62,7 @@
             <groupId>joda-time</groupId>
             <artifactId>joda-time</artifactId>
             <version>2.10</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/lib/joda-time-2.10.jar</systemPath>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.vmware</groupId>
@@ -79,6 +72,13 @@
             <systemPath>${project.basedir}/extlib/vim25.jar</systemPath>
         </dependency>
         <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcprov-jdk15on</artifactId>
+            <version>1.59</version>
+           <!-- <scope>system</scope>
+            <systemPath>${project.basedir}/extlib/bcprov-jdk15on-1.59.jar</systemPath>-->
+        </dependency>
+        <dependency>
             <groupId>com.vmware</groupId>
             <artifactId>pbm</artifactId>
             <version>1.0</version>
@@ -86,11 +86,34 @@
             <systemPath>${project.basedir}/extlib/pbm.jar</systemPath>
         </dependency>
         <dependency>
-            <groupId>com.vmware</groupId>
+            <groupId>org.quartz-scheduler</groupId>
             <artifactId>quartz</artifactId>
-            <version>1.0</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/extlib/quartz-2.3.2.jar</systemPath>
+          <!--  <scope>system</scope>-->
+            <version>2.3.2</version>
+           <!-- <systemPath>${project.basedir}/extlib/quartz-2.3.2.jar</systemPath>-->
+            <exclusions>
+                <exclusion>
+                    <artifactId>slf4j-api</artifactId>
+                    <groupId>org.slf4j</groupId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.mchange</groupId>
+                    <artifactId>c3p0</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.mchange</groupId>
+                    <artifactId>mchange-commons-java</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.zaxxer</groupId>
+                    <artifactId>HikariCP-java7</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>1.4.199</version>
         </dependency>
         <dependency>
             <groupId>com.vmware</groupId>
@@ -107,46 +130,40 @@
             <systemPath>${project.basedir}/extlib/wssamples.jar</systemPath>
         </dependency>
         <dependency>
-            <groupId>com.google</groupId>
+            <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
             <version>2.3.1</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/lib/gson-2.3.1.jar</systemPath>
+            <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>com</groupId>
-            <artifactId>h2</artifactId>
-            <version>1.4.199</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/extlib/h2-1.4.199.jar</systemPath>
-        </dependency>
-        <dependency>
-            <groupId>com.apache</groupId>
-            <artifactId>slf4j</artifactId>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
             <version>1.7.26</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/lib/slf4j-api-1.7.26.jar</systemPath>
+            <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>com.apache</groupId>
+            <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
             <version>1.2.14</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/lib/log4j-1.2.14.jar</systemPath>
+            <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>com.apache</groupId>
+            <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
             <version>4.3.5</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/lib/httpclient-4.3.5.jar</systemPath>
+            <exclusions>
+                <exclusion>
+                    <artifactId>commons-logging</artifactId>
+                    <groupId>commons-logging</groupId>
+                </exclusion>
+            </exclusions>
+            <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>com.apache</groupId>
+            <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpcore</artifactId>
             <version>4.3.2</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/lib/httpcore-4.3.2.jar</systemPath>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -161,6 +178,10 @@
                     <artifactId>slf4j-api</artifactId>
                     <groupId>org.slf4j</groupId>
                 </exclusion>
+                <exclusion>
+                    <artifactId>hamcrest-core</artifactId>
+                    <groupId>org.hamcrest</groupId>
+                </exclusion>
             </exclusions>
             <version>1.5.21.RELEASE</version>
         </dependency>
@@ -168,6 +189,13 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
             <version>1.5.21.RELEASE</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>classmate</artifactId>
+                    <groupId>com.fasterxml</groupId>
+                </exclusion>
+            </exclusions>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -179,6 +207,7 @@
                     <groupId>org.slf4j</groupId>
                 </exclusion>
             </exclusions>
+            <scope>provided</scope>
         </dependency>
 
         <!-- swagger -->
@@ -208,11 +237,13 @@
                     <groupId>org.springframework</groupId>
                 </exclusion>
             </exclusions>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>io.springfox</groupId>
             <artifactId>springfox-swagger-ui</artifactId>
             <version>2.9.2</version>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
@@ -229,13 +260,6 @@
             <scope>system</scope>
             <systemPath>${project.basedir}/lib/vsphereautomation-client-sdk-3.3.0.jar</systemPath>
         </dependency>
-  <!--      <dependency>
-            <groupId>com.vmware</groupId>
-            <artifactId>vapisamltoken</artifactId>
-            <version>1.0</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/extlib/vapi-samltoken-2.15.0.jar</systemPath>
-        </dependency>-->
         <dependency>
             <groupId>com.vmware</groupId>
             <artifactId>vapiauth</artifactId>
@@ -244,46 +268,22 @@
             <systemPath>${project.basedir}/lib/vapi-authentication-2.15.0.jar</systemPath>
         </dependency>
         <dependency>
-            <groupId>jackson</groupId>
+            <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-            <version>1.0</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/lib/jackson-databind-2.8.11.3.jar</systemPath>
+            <version>2.8.11.3</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>jackson</groupId>
+            <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-core</artifactId>
-            <version>1.0</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/lib/jackson-core-2.8.10.jar</systemPath>
+            <version>2.8.10</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>jackson</groupId>
-            <artifactId>jackson-annotation</artifactId>
-            <version>1.0</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/lib/jackson-annotations-2.8.0.jar</systemPath>
-        </dependency>
-        <dependency>
-            <groupId>org.apache</groupId>
-            <artifactId>http-core</artifactId>
-            <version>1.0</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/lib/httpcore-4.3.2.jar</systemPath>
-        </dependency>
-        <dependency>
-            <groupId>org.apache</groupId>
-            <artifactId>http-client</artifactId>
-            <version>1.0</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/lib/httpclient-4.3.5.jar</systemPath>
-        </dependency>
-        <dependency>
-            <groupId>org.apache</groupId>
-            <artifactId>commmons-logging</artifactId>
-            <version>1.0</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/lib/commons-logging.jar</systemPath>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+            <version>2.8.0</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.vmware</groupId>
@@ -349,20 +349,67 @@
                 <directory>${project.basedir}/src/main/resources</directory>
 
             </resource>
+            <resource>
+                <directory>${project.build.directory}/dependency/</directory>
+                <includes>
+                    <include>*.jar</include>
+                </includes>
+
+            </resource>
         </resources>
         <plugins>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
                 <version>3.0.2</version>
                  <configuration>
                     <archive>
-                       <manifestFile>src/main/resources/META-INF/MANIFEST.MF</manifestFile>
+                        <manifest>
+                            <addClasspath>true</addClasspath>
+                        </manifest>
+                        <manifestFile>src/main/resources/META-INF/MANIFEST.MF</manifestFile>
                         <addMavenDescriptor>false</addMavenDescriptor>
                     </archive>
                 </configuration>
 
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+              <!--  <version>2.10</version>-->
+                <executions>
+                    <execution>
+                        <id>copy-dependencies</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <includeScope>runtime</includeScope>
+                </configuration>
+            </plugin>
+
+
+            <!--<plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.1.1</version>
+                <configuration>
+                    &lt;!&ndash; put your configurations here &ndash;&gt;
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>-->
+
 
         </plugins>
     </build>

@@ -32,12 +32,23 @@ import {FormControl, FormGroup} from "@angular/forms";
 import {GlobalsService} from "../../../shared/globals.service";
 import {ClrDatagridPagination} from "@clr/angular";
 import {TranslatePipe} from "@ngx-translate/core";
+import {DeviceFilter} from "../../vmfs/list/filter.component";
+import {
+  DtreeQuotaFilter, DtreeSecModFilter,
+  FsStatusFilter, FsTypeFilter,
+  MapStatusFilter,
+  ProTypeFilter,
+  StoragePoolStatusFilter,
+  StoragePoolTypeFilter, VolProtectionStatusFilter, VolServiceLevelFilter,
+  VolStatusFilter, VolStoragePoolFilter
+} from "../filter.component";
+import {ServiceLevelList, VmfsListService} from "../../vmfs/list/list.service";
 @Component({
   selector: 'app-detail',
   templateUrl: './detail.component.html',
   styleUrls: ['./detail.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [DetailService, TranslatePipe, MakePerformance, NfsService],
+  providers: [DetailService, TranslatePipe, MakePerformance, NfsService, VmfsListService],
 })
 export class DetailComponent implements OnInit, AfterViewInit {
 
@@ -103,8 +114,10 @@ export class DetailComponent implements OnInit, AfterViewInit {
   // 创建表格对象
   // IOPS+QoS上下限
   iopsChart: EChartOption = {};
+  iopsChartDataIsNull = false;
   // 带宽+QoS上下限
   bandwidthChart: EChartOption = {};
+  bdwtChartDataIsNull = false;
   range;
   // 定时函数执行时间 默认一天
   poolRadio = 'table1'; // 存储池列表切换
@@ -113,8 +126,8 @@ export class DetailComponent implements OnInit, AfterViewInit {
   storageName= "";
   constructor(private nfsService:NfsService, private makePerformance: MakePerformance,
               private detailService: DetailService, private cdr: ChangeDetectorRef, private ngZone: NgZone,
-              private gs: GlobalsService,private activatedRoute: ActivatedRoute,private router:Router,
-              private translatePipe:TranslatePipe) { }
+              /*private gs: GlobalsService,*/private activatedRoute: ActivatedRoute,private router:Router,
+              private translatePipe:TranslatePipe, private vmfsListService: VmfsListService) { }
   detail: StorageDetail;
   storagePool: StoragePool[];
   volumes: Volume[];
@@ -160,16 +173,28 @@ export class DetailComponent implements OnInit, AfterViewInit {
   });
   // ranges
   ranges =  [
-    {key: 'LAST_5_MINUTE', value: '最近5分钟'},
-    {key: 'LAST_1_HOUR', value: '最近1小时'},
-    {key: 'LAST_1_DAY', value: '最近1天'},
-    {key: 'LAST_1_WEEK', value: '最近1周'},
-    {key: 'LAST_1_MONTH', value: '最近1个月'},
-    {key: 'LAST_1_QUARTER', value: '最近1个季度'},
-    {key: 'HALF_1_YEAR', value: '最近半年'},
-    {key: 'LAST_1_YEAR', value: '最近1年'},
+    {key: 'LAST_5_MINUTE', value: this.translatePipe.transform('chart.select.last5Minute')},
+    {key: 'LAST_1_HOUR', value: this.translatePipe.transform('chart.select.last1Hour')},
+    {key: 'LAST_1_DAY', value: this.translatePipe.transform('chart.select.last1Day')},
+    {key: 'LAST_1_WEEK', value: this.translatePipe.transform('chart.select.last1Week')},
+    {key: 'LAST_1_MONTH', value: this.translatePipe.transform('chart.select.last1Month')},
+    {key: 'LAST_1_QUARTER', value: this.translatePipe.transform('chart.select.last1Quarter')},
+    {key: 'HALF_1_YEAR', value: this.translatePipe.transform('chart.select.half1Year')},
+    {key: 'LAST_1_YEAR', value: this.translatePipe.transform('chart.select.last1Year')},
   ];
   isLoading = false;
+  volIsLoading = false;
+  fsIsLoading = false;
+  dtreeIsLoading = false;
+  shareIsLoading = false;
+  controIsLoading = false;
+  diskIsLoading = false;
+  fcportIsLoading = false;
+  fcoeportIsLoading = false;
+  ethsIsLoading = false;
+  bondIsLoading = false;
+  logicPortIsLoading = false;
+  fgsIsLoading = false;
   @ViewChild('paginationVolume')pagination:ClrDatagridPagination;
 
   volumeFooter = '1 - 10'; // 卷信息当前页数据
@@ -177,6 +202,28 @@ export class DetailComponent implements OnInit, AfterViewInit {
   volumeCurrentPage = 1;// 卷信息当前页
   volumePageSize = 10; // 当前页数据数
 
+  @ViewChild('storagePoolTypeFilter') storagePoolTypeFilter:StoragePoolTypeFilter;
+  @ViewChild('storagePoolStatusFilter') storagePoolStatusFilter:StoragePoolStatusFilter;
+  @ViewChild('volStatusFilter') volStatusFilter:VolStatusFilter;
+  @ViewChild('portTypeFilter') portTypeFilter:ProTypeFilter;
+  @ViewChild('mapStatusFilter') mapStatusFilter:MapStatusFilter;
+  @ViewChild('volStoragePoolFilter') volStoragePoolFilter:VolStoragePoolFilter;
+  @ViewChild('volServiceLevelFilter') volServiceLevelFilter:VolServiceLevelFilter;
+  @ViewChild('volProtectionStatusFilter') volProtectionStatusFilter:VolProtectionStatusFilter;
+  @ViewChild('fsStatusFilter') fsStatusFilter:FsStatusFilter;
+  @ViewChild('fsTypeFilter') fsTypeFilter:FsTypeFilter;
+  @ViewChild('dtreeQuotaFilter') dtreeQuotaFilter:DtreeQuotaFilter;
+  @ViewChild('dtreeQuotaFilter') dtreeSecModFilter:DtreeSecModFilter;
+
+  serviceLevelList: ServiceLevelList[] = []; // 服务等级列表
+  volName:string; // 卷名称 筛选
+  volSortDir:any;// 卷 排序方式-1 降序 1 升序
+  volSortKey:string; //卷 排序字段名称 capacity_usage/capacity
+  volReqParam; // 卷请求参数
+
+  storageDetailTag:number;
+
+  detailLoading = false;
   //portList:
   ngOnInit(): void {
     this.activatedRoute.queryParams.subscribe(queryParam => {
@@ -184,43 +231,66 @@ export class DetailComponent implements OnInit, AfterViewInit {
       this.storageName = queryParam.name;
     });
     this.getStorageDetail(true);
-    this.getStoragePoolList(true);
 
+    // 初始化服务等级数据
+    this.setServiceLevelList();
+
+  }
+  // 获取服务等级数据
+  setServiceLevelList() {
+    // 初始化服务等级选择参数
+    // this.gs.loading=true;
+    // 获取服务等级数据
+    this.vmfsListService.getServiceLevelList().subscribe((result: any) => {
+      if (result.code === '200' && result.data !== null) {
+        this.serviceLevelList = result.data.filter(item => item.totalCapacity !== 0);
+      }
+      // 隐藏loading
+      // this.gs.loading=false;
+      // this.gs.loading = false;
+      this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
+    });
   }
   ngAfterViewInit() {
     this.ngZone.runOutsideAngular(() => this.initChart());
   }
   // 初始化表格对象
   async initChart() {
-    this.gs.loading=true;
+    // this.gs.loading = false;=true;
     const fsNames:string[] = [];
     fsNames.push(this.storageId);
      // IOPS
-    this.setChart(150,this.translatePipe.transform('vmfs.iops'),"IO/s",
+    this.setChart(150,this.translatePipe.transform('vmfs.iops')+'(IO/s)', null,
      NfsService.storageIOPS,fsNames,this.selectRange,NfsService.storageUrl, this.startTime, this.endTime).then(res=>{
-      this.gs.loading=false;
+     // this.gs.loading = false;
       this.iopsChart = res;
+      this.iopsChartDataIsNull = res['series'][0].data.length < 1;
       this.cdr.detectChanges();
     });
 
     // 带宽
-    this.setChart(150, this.translatePipe.transform('nfs.qos_bandwidth'), 'MB/s',
+    this.setChart(150, this.translatePipe.transform('nfs.qos_bandwidth') + '(MB/s)', '',
       NfsService.storageBDWT, fsNames, this.selectRange, NfsService.storageUrl, this.startTime, this.endTime).then(res => {
-      this.gs.loading=false;
+     // this.gs.loading = false;
       this.bandwidthChart = res;
+      this.bdwtChartDataIsNull = res['series'][0].data.length < 1;
       this.cdr.detectChanges();
     });
   }
 
   changeTab(page: string){
-    this.gs.loading=false;
+   console.log('点击：',page);
     if (page === 'conf'){
+      this.poolRadio='table1';
       this.getStorageDetail(false);
     }
     if (page === 'pool'){
+      this.poolRadio='table1';
+      this.cdr.detectChanges();
       this.getStoragePoolList(false);
     }
     if (page === 'volume'){
+      //this.volumeRadio='table1';
       this.getStorageVolumeList(false);
     }
     if (page === 'fs'){
@@ -251,40 +321,105 @@ export class DetailComponent implements OnInit, AfterViewInit {
   }
   getStorageDetail(fresh: boolean){
     if (fresh){
-      this.gs.loading=true;
+      // this.gs.loading=true;
+      this.detailLoading = true;
       this.detailService.getStorageDetail(this.storageId).subscribe((r: any) => {
-        this.gs.loading=false;
+       // this.gs.loading = false; = false;
+        this.detailLoading = false;
         if (r.code === '200'){
           this.detail = r.data;
-          this.initCapacity();
-          this.cdr.detectChanges();
-        }else{
 
+          this.detail.location = this.HTMLDecode(this.detail.location);
+          // 如果是V6设备可得容量单位为M，此处修改为G
+          if(this.detail.storageTypeShow.dorado) {
+            this.detail.totalEffectiveCapacity = this.detail.totalEffectiveCapacity/1024;
+          }
+          this.storageDetailTag = this.detail.storageTypeShow.storageDetailTag;
+        }else{
         }
+        this.getStoragePoolList(true);
+        this.cdr.detectChanges();
       });
     }else {
       // 此处防止重复切换tab每次都去后台请求数据
       if (this.detail === null){
-        this.gs.loading=true;
+        // this.gs.loading = false;=true;
+        this.detailLoading = true;
         this.detailService.getStorageDetail(this.storageId).subscribe((r: any) => {
-          this.gs.loading=false;
+         // this.gs.loading = false;
+          this.detailLoading = false;
           if (r.code === '200'){
             this.detail = r.data;
-            this.initCapacity();
-            this.cdr.detectChanges();
+            this.detail.location = this.HTMLDecode(this.detail.location);
+            // 如果是V6设备可得容量单位为M，此处修改为G
+            if(this.detail.storageTypeShow.dorado) {
+              this.detail.totalEffectiveCapacity = this.detail.totalEffectiveCapacity/1024;
+            }
+            this.storageDetailTag = this.detail.storageTypeShow.storageDetailTag;
+            this.getStoragePoolList(true);
           }
+          this.cdr.detectChanges();
         });
       }
     }
   }
+
+  /**
+   * location处理
+   * @param strParam
+   * @constructor
+   */
+  HTMLDecode(strParam) {
+    if (!strParam) return strParam;
+
+    // 避免嵌套转义的情况, e.g.&amp;#39
+    let str = strParam;
+    while (str.indexOf('&amp;') > -1) {
+      str = str.replace(/&amp;/g, '&');
+    }
+
+    // 判断是否存在HTML字符实体
+    if (/&[a-zA-Z]{2,5};/.test(str) || /&#\d{2,5};/.test(str)) {
+      const div = document.createElement('div');
+      div.innerHTML = str;
+      str = div.innerText;
+    }
+    return  str;
+  }
+  refreshStoragePool() {
+    if (this.storagePoolStatusFilter) {
+      this.storagePoolStatusFilter.initStatus();
+    }
+    if (this.storagePoolTypeFilter) {
+      this.storagePoolTypeFilter.initType();
+    }
+    this.getStoragePoolList(true);
+  }
   getStoragePoolList(fresh: boolean){
     if (fresh){
-      this.gs.loading=true;
+      // this.gs.loading = false;=true;
+      this.isLoading = true;
       this.detailService.getStoragePoolList(this.storageId).subscribe((r: any) =>{
-        this.gs.loading=false;
+       // this.gs.loading = false; = false;
+        this.isLoading = false;
         if (r.code === '200'){
           this.storagePool = r.data;
+          // 设置容量个利用率
+          this.storagePool.forEach(item => {
+            item.capUsage = item.consumedCapacity/item.totalCapacity * 100;
+            item.supRate = item.subscribedCapacity/item.totalCapacity*100
+          });
+          // 如果是v6设备存储池的类型为Block/File
+          if (this.detail.storageTypeShow.dorado){
+            this.storagePool.forEach(item => item.mediaType = "block/file");
+          }
+          const allName = this.storagePool.map(item => item.name);
+          if (this.volStoragePoolFilter) {
+            this.volStoragePoolFilter.initAllName(allName);
+          }
           this.poolTotal=this.storagePool.length==null?0:this.storagePool.length;
+          this.storageListInitHandle();
+          this.initCapacity();
           this.cdr.detectChanges();
           this.liststoragepoolperformance();
         }
@@ -292,17 +427,102 @@ export class DetailComponent implements OnInit, AfterViewInit {
     }else {
       // 此处防止重复切换tab每次都去后台请求数据
       if (this.storagePool === null){
-        this.gs.loading=true;
+        // this.gs.loading = false;=true;
         this.detailService.getStoragePoolList(this.storageId).subscribe((r: any) =>{
-          this.gs.loading=false;
+         // this.gs.loading = false;
           if (r.code === '200'){
             this.storagePool = r.data;
+            // 设置容量个利用率
+            this.storagePool.forEach(item => {
+              item.capUsage = item.consumedCapacity/item.totalCapacity * 100;
+              item.supRate = item.subscribedCapacity/item.totalCapacity*100
+            });
+            // 如果是v6设备存储池的类型为Block/File
+            if (this.detail.storageTypeShow.dorado){
+              this.storagePool.forEach(item => item.mediaType = "block/file");
+            }
+            const allName = this.storagePool.map(item => item.name);
+            if (this.volStoragePoolFilter) {
+              this.volStoragePoolFilter.initAllName(allName);
+            }
             this.poolTotal=this.storagePool.length==null?0:this.storagePool.length;
+            this.storageListInitHandle();
+            this.initCapacity();
             this.cdr.detectChanges();
             this.liststoragepoolperformance();
           }
         });
       }
+    }
+  }
+
+  /**
+   * 存储池数据初始化
+   */
+  storageListInitHandle() {
+    if(this.storagePool) {
+      this.storagePool.forEach(item => {
+        // switch (item.tier1RaidLv) {
+        //   case "1":
+        //     item.tier1RaidLvDesc = "RAID10";
+        //     break;
+        //   case "2":
+        //     item.tier1RaidLvDesc = "RAID5";
+        //     break;
+        //   case "3":
+        //     item.tier1RaidLvDesc = "RAID0";
+        //     break;
+        //   case "4":
+        //     item.tier1RaidLvDesc = "RAID1";
+        //     break;
+        //   case "5":
+        //     item.tier1RaidLvDesc = "RAID6";
+        //     break;
+        //   case "6":
+        //     item.tier1RaidLvDesc = "RAID50";
+        //     break;
+        //   case "7":
+        //     item.tier1RaidLvDesc = "RAID3";
+        //     break;
+        //   case "11":
+        //     item.tier1RaidLvDesc = "RAIDTP";
+        //     break;
+        //   default:
+        //     item.tier1RaidLvDesc = item.tier1RaidLv;
+        //     break;
+        // }
+        // switch (item.physicalType) {
+        //   case "sata":
+        //     item.physicalTypeDesc = "SATA";
+        //     break;
+        //   case "sas":
+        //     item.physicalTypeDesc = "SAS";
+        //     break;
+        //   case "ssd":
+        //     item.physicalTypeDesc = "SSD";
+        //     break;
+        //   case "nl-sas":
+        //     item.physicalTypeDesc = "NL-SAS";
+        //     break;
+        //   case "unknown":
+        //     item.physicalTypeDesc = this.translatePipe.transform('storage.detail.storagePool.unknown');
+        //     break;
+        //   default:
+        //     item.physicalTypeDesc = item.physicalType;
+        //     break;
+        // }
+        switch (item.mediaType) {
+          case "file":
+            item.mediaTypeDesc = this.translatePipe.transform('enum.type.file');
+            break;
+          case "block":
+            item.mediaTypeDesc = this.translatePipe.transform('enum.type.block');
+            break;
+          default:
+            item.mediaTypeDesc = item.mediaType;
+            break;
+        }
+      });
     }
   }
   liststoragepoolperformance(){
@@ -330,29 +550,56 @@ export class DetailComponent implements OnInit, AfterViewInit {
       }
     });
   }
-  getStorageVolumeList(fresh: boolean){
-    console.log('paginationVolume');
-    const reqParams = {
-      storageId: this.storageId,
-      pageSize: this.volumePageSize,
-      pageNo: (this.volumeCurrentPage - 1) * this.volumePageSize,
+  refreshVolList() {
+    if (this.volStatusFilter) {
+      this.volStatusFilter.initStatus();
     }
-    console.log('reqParams', reqParams)
+    if (this.portTypeFilter) {
+      this.portTypeFilter.initType();
+    }
+    if (this.mapStatusFilter) {
+      this.mapStatusFilter.initStatus();
+    }
+    if (this.volStoragePoolFilter) {
+      this.volStoragePoolFilter.initPoolNameStatus();
+    }
+    if (this.volServiceLevelFilter) {
+      this.volServiceLevelFilter.initServiceLevel();
+    }
+
+    // this.volProtectionStatusFilter.initProtectionStatus();
+    // 清空查询条件
+    this.clearVolSearchInfo();
+    this.getStorageVolumeList(true);
+  }
+  getStorageVolumeList(fresh: boolean){
+    let reqParams;
+    if (this.volReqParam != null) {
+      reqParams = this.volReqParam;
+      this.volReqParam.pageSize = this.volumePageSize;
+      this.volReqParam.pageNo = (this.volumeCurrentPage - 1) * this.volumePageSize;
+    } else {
+      reqParams = {
+        storageId: this.storageId,
+        pageSize: this.volumePageSize,
+        pageNo: (this.volumeCurrentPage - 1) * this.volumePageSize,
+      }
+    }
     if (fresh){
-      this.gs.loading=true;
+      this.volIsLoading = true;
       this.detailService.getVolumeListListByPage(reqParams).subscribe((r: any) => {
-        this.gs.loading=false;
-        console.log("result", r);
+        this.volIsLoading = false;
         if (r.code === '200'){
 
           this.volumes = r.data.volumeList;
           this.volumeTotal=r.data.count;
-
+          this.volumes.forEach(vol => {
+            vol.capacityUsageNum = vol.capacityUsage ? Number.parseFloat(vol.capacityUsage):0;
+          });
           // 设置总页数、footer
           this.setVolumeTotalAndFooter();
 
           // this.totalPageNum = '/' + ' ' + Math.ceil(this.volumeTotal/(query ? query.pageSize:10));
-          console.log('this.totalPageNum', this.totalPageNum);
           if (this.volumeRadio === 'table2') {
             this.listVolumesperformance();
           }
@@ -362,18 +609,18 @@ export class DetailComponent implements OnInit, AfterViewInit {
     }else {
       // 此处防止重复切换tab每次都去后台请求数据
       if (this.volumes == null){
-        this.gs.loading=true;
+        this.volIsLoading = true;
         this.detailService.getVolumeListListByPage(reqParams).subscribe((r: any) => {
-          this.gs.loading=false;
-          console.log("result", r);
+          this.volIsLoading = false;
           if (r.code === '200'){
             this.volumes = r.data.volumeList;
             this.volumeTotal=r.data.count;
-
+            this.volumes.forEach(vol => {
+              vol.capacityUsageNum = vol.capacityUsage ? Number.parseFloat(vol.capacityUsage):0;
+            });
             // 设置总页数、footer
             this.setVolumeTotalAndFooter();
             // this.totalPageNum = '/' + ' ' + Math.ceil(this.volumeTotal/(query ? query.pageSize:10));
-            console.log('this.totalPageNum', this.totalPageNum);
 
             if (this.volumeRadio === 'table2') {
               this.listVolumesperformance();
@@ -392,7 +639,7 @@ export class DetailComponent implements OnInit, AfterViewInit {
       volumeIds.push(item.wwn);
     });
     this.volumeIds = volumeIds;
-    this.gs.loading=true;
+    this.volIsLoading=true;
     this.detailService.listVolumesperformance(this.volumeIds).subscribe((result: any) => {
       if (result.code === '200'){
         const chartList: Volume [] = result.data;
@@ -406,101 +653,115 @@ export class DetailComponent implements OnInit, AfterViewInit {
               }
             });
           });
-          this.gs.loading=false;
-          this.cdr.detectChanges();
         }
       }
+      this.volIsLoading=false;
+      this.cdr.detectChanges();
     });
+  }
+  refreshFileSystem() {
+    if (this.fsStatusFilter) {
+      this.fsStatusFilter.initStatus();
+    }
+    if (this.fsTypeFilter) {
+      this.fsTypeFilter.initType();
+    }
+
+    this.getFileSystemList(true);
   }
   getFileSystemList(fresh: boolean){
     if (fresh){
-      this.gs.loading=true;
+      this.fsIsLoading=true;
       this.detailService.getFileSystemList(this.storageId).subscribe((r: any) => {
-        this.gs.loading=false;
+        this.fsIsLoading=false;
         if (r.code === '200'){
           this.fsList = r.data;
           this.fsTotal=this.fsList==null?0:this.fsList.length;
-          this.cdr.detectChanges();
         }
+        this.cdr.detectChanges();
       });
     }else {
       // 此处防止重复切换tab每次都去后台请求数据
       if (this.fsList == null){
-        this.gs.loading=true;
+        this.fsIsLoading=true;
         this.detailService.getFileSystemList(this.storageId).subscribe((r: any) => {
-          this.gs.loading=false;
+          this.fsIsLoading=false;
           if (r.code === '200'){
             this.fsList = r.data;
             this.fsTotal=this.fsList==null?0:this.fsList.length;
-            this.cdr.detectChanges();
           }
+          this.cdr.detectChanges();
         });
       }
     }
   }
+  refreshDtree() {
+    if (this.dtreeSecModFilter) {
+      this.dtreeSecModFilter.initSecMod();
+    }
+    if (this.dtreeQuotaFilter) {
+      this.dtreeQuotaFilter.initQuota();
+    }
+
+    this.getDtreeList(true);
+  }
   getDtreeList(fresh: boolean){
     if (fresh){
-      this.gs.loading=true;
+      this.dtreeIsLoading=true;
       this.detailService.getDtreeList(this.storageId).subscribe((r: any) => {
-        this.gs.loading=false;
+        this.dtreeIsLoading=false;
         if (r.code === '200'){
           this.dtrees = r.data;
           this.dtreeTotal=this.dtrees==null?0:this.dtrees.length;
-          this.cdr.detectChanges();
         }
+        this.cdr.detectChanges();
       });
     }else {
-      // 此处防止重复切换tab每次都去后台请求数据
-      this.gs.loading=true;
       if (this.dtrees == null){
+        // 此处防止重复切换tab每次都去后台请求数据
+        this.dtreeIsLoading=true;
         this.detailService.getDtreeList(this.storageId).subscribe((r: any) => {
-          this.gs.loading=false;
+          this.dtreeIsLoading=false;
           if (r.code === '200'){
             this.dtrees = r.data;
             this.dtreeTotal=this.dtrees==null?0:this.dtrees.length;
-            this.cdr.detectChanges();
           }
+          this.cdr.detectChanges();
         });
       }
     }
   }
   getShareList(fresh: boolean){
-    console.log(11)
     if (fresh){
-      console.log(22)
-      this.gs.loading=true;
+      this.shareIsLoading=true;
       this.detailService.getShareList(this.storageId).subscribe((r: any) => {
-        this.gs.loading=false;
-        console.log(33)
+        this.shareIsLoading=false;
         if (r.code === '200'){
           this.shares = r.data;
           this.shareTotal=this.shares==null?0:this.shares.length;
-          this.cdr.detectChanges();
         }
+        this.cdr.detectChanges();
       });
     }else {
-      console.log(44)
       // 此处防止重复切换tab每次都去后台请求数据
       if (this.shares == null){
-        console.log(55)
-        this.gs.loading=true;
+        this.shareIsLoading=true;
         this.detailService.getShareList(this.storageId).subscribe((r: any) => {
-          this.gs.loading=false;
-          console.log(66)
+          this.shareIsLoading=false;
           if (r.code === '200'){
             this.shares = r.data;
             this.shareTotal=this.shares==null?0:this.shares.length;
-            this.cdr.detectChanges();
           }
+          this.cdr.detectChanges();
         });
       }
     }
   }
   getControllerList(fresh: boolean){
     if (fresh){
-      this.gs.loading=true;
+      this.controIsLoading=true;
       this.detailService.getControllerList(this.storageId).subscribe((r: any) => {
-        this.gs.loading=false;
+        this.controIsLoading=false;
         if (r.code === '200'){
           this.controllers = r.data;
           this.conTotal=this.controllers==null?0:this.controllers.length;
@@ -510,9 +771,9 @@ export class DetailComponent implements OnInit, AfterViewInit {
     }else {
       // 此处防止重复切换tab每次都去后台请求数据
       if (this.controllers == null){
-        this.gs.loading=true;
+        this.controIsLoading=true;
         this.detailService.getControllerList(this.storageId).subscribe((r: any) => {
-          this.gs.loading=false;
+          this.controIsLoading=false;
           if (r.code === '200'){
             this.controllers = r.data;
             this.conTotal=this.controllers==null?0:this.controllers.length;
@@ -524,9 +785,9 @@ export class DetailComponent implements OnInit, AfterViewInit {
   }
   getDisksList(fresh: boolean){
     if (fresh){
-      this.gs.loading=true;
+      this.diskIsLoading=true;
       this.detailService.getDiskList(this.storageId).subscribe((r: any) => {
-        this.gs.loading=false;
+        this.diskIsLoading=false;
         if (r.code === '200'){
           this.disks = r.data;
           this.diskTotal=this.disks==null?0:this.disks.length;
@@ -536,9 +797,9 @@ export class DetailComponent implements OnInit, AfterViewInit {
     }else {
       // 此处防止重复切换tab每次都去后台请求数据
       if (this.disks == null){
-        this.gs.loading=true;
+        this.diskIsLoading=true;
         this.detailService.getDiskList(this.storageId).subscribe((r: any) => {
-          this.gs.loading=false;
+          this.diskIsLoading=false;
           if (r.code === '200'){
             this.disks = r.data;
             this.diskTotal=this.disks==null?0:this.disks.length;
@@ -557,9 +818,9 @@ export class DetailComponent implements OnInit, AfterViewInit {
     this.getFailoverGroups();
   }
   getFCPortList(){
-    this.gs.loading=true;
+    this.fcportIsLoading=true;
       this.detailService.getFCPortList({"storageDeviceId":this.storageId,"portType":"FC"}).subscribe((r: any) => {
-        this.gs.loading=false;
+        this.fcportIsLoading=false;
         if (r.code === '200'){
           this.fcs = r.data;
           this.fcTotal=this.fcs==null?0:this.fcs.length;
@@ -568,9 +829,9 @@ export class DetailComponent implements OnInit, AfterViewInit {
       });
   }
   getFCoEPortList(){
-    this.gs.loading=true;
+    this.fcoeportIsLoading=true;
     this.detailService.getFCPortList({"storageDeviceId":this.storageId,"portType":"FCoE"}).subscribe((r: any) => {
-      this.gs.loading=false;
+      this.fcoeportIsLoading=false;
       if (r.code === '200'){
         this.fcoes = r.data;
         this.fcoeTotal=this.fcoes==null?0:this.fcoes.length;
@@ -579,9 +840,9 @@ export class DetailComponent implements OnInit, AfterViewInit {
     });
   }
   getEthernetPortList(){
-    this.gs.loading=true;
+    this.ethsIsLoading=true;
     this.detailService.getFCPortList({"storageDeviceId":this.storageId,"portType":"ETH"}).subscribe((r: any) => {
-      this.gs.loading=false;
+      this.ethsIsLoading=false;
       if (r.code === '200'){
         this.eths = r.data;
         this.ethTotal=this.eths==null?0:this.eths.length;
@@ -590,9 +851,9 @@ export class DetailComponent implements OnInit, AfterViewInit {
     });
   }
   getBondPortList(){
-    this.gs.loading=true;
+    this.bondIsLoading=true;
     this.detailService.getBondPortList(this.storageId).subscribe((r: any) => {
-      this.gs.loading=false;
+      this.bondIsLoading=false;
       if (r.code === '200'){
         this.bonds = r.data;
         this.bondTotal=this.bonds==null?0:this.bonds.length;
@@ -601,9 +862,9 @@ export class DetailComponent implements OnInit, AfterViewInit {
     });
   }
   getLogicPortsList(){
-    this.gs.loading=true;
+    this.logicPortIsLoading=true;
     this.detailService.getLogicPortList(this.storageId).subscribe((r: any) => {
-      this.gs.loading=false;
+      this.logicPortIsLoading=false;
       if (r.code === '200'){
         this.logicports = r.data;
         this.logicTotal=this.logicports==null?0:this.logicports.length;
@@ -612,9 +873,9 @@ export class DetailComponent implements OnInit, AfterViewInit {
     });
   }
   getFailoverGroups(){
-    this.gs.loading=true;
+    this.fgsIsLoading=true;
     this.detailService.getFailoverGroups(this.storageId).subscribe((r: any) => {
-      this.gs.loading=false;
+      this.fgsIsLoading=false;
       if (r.code === '200'){
         this.fgs = r.data;
         this.failTotal=this.fgs==null?0:this.fgs.length;
@@ -664,7 +925,6 @@ export class DetailComponent implements OnInit, AfterViewInit {
     }
     this.capSave.bars=bars;
     this.capSave.rate=(this.capSave.beforeSave/this.capSave.afterSave).toFixed(0) +": 1";
-    console.log('capSave',this.capSave);
 
   }
   initCapacityDistribution(){
@@ -672,16 +932,30 @@ export class DetailComponent implements OnInit, AfterViewInit {
     const p= 0;
     this.detail.protectionCapacity
     this.cd.protection = this.formatCapacity(this.detail.protectionCapacity);
-    this.cd.fileSystem =this.formatCapacity(this.detail.fileCapacity);
-    this.cd.volume =this.formatCapacity(this.detail.blockCapacity);
-     this.cd.freeCapacity= this.getFreeCapacity(this.detail.totalEffectiveCapacity,this.detail.usedCapacity);
+    let storagePoolAllUsedCap;
+    let freeCapacity;
+    if (this.detail.storageTypeShow.dorado) { // dorado v6.1版本及高版本
+      // storagePoolAllUsedCap = this.storagePool.map(item => item.consumedCapacity).reduce(this.getSum, 0).toFixed(3);
+      storagePoolAllUsedCap = this.formatCapacity(this.detail.blockFileCapacity);
+      this.cd.blockFile = storagePoolAllUsedCap;
+      freeCapacity = (this.detail.totalEffectiveCapacity-this.detail.protectionCapacity - this.detail.blockFileCapacity).toFixed(3);
+    } else { // dorado v 6.0版本及更低版本
+      this.cd.fileSystem =this.formatCapacity(this.detail.fileCapacity);
+      this.cd.volume =this.formatCapacity(this.detail.blockCapacity);
+      freeCapacity = (this.detail.totalEffectiveCapacity-this.detail.usedCapacity).toFixed(3);
+    }
+     this.cd.freeCapacity= this.formatCapacity(freeCapacity);
 
-    const cc = new CapacityChart(this.formatCapacity(this.detail.totalEffectiveCapacity));
-    const cs = new CapacitySerie(this.detail.protectionCapacity
-      ,this.detail.fileCapacity,this.detail.blockCapacity,
-      this.detail.totalEffectiveCapacity-this.detail.usedCapacity);
+    const title = this.formatCapacity(this.detail.totalEffectiveCapacity) + '\n' + this.translatePipe.transform('storage.chart.total');
+    const cc = new CapacityChart(title);
+    let cs = new CapacitySerie(this.detail.protectionCapacity
+        ,this.detail.fileCapacity,this.detail.blockCapacity,
+      Number(freeCapacity), Number(this.detail.blockFileCapacity), this.detail.storageTypeShow.dorado, this.translatePipe);
     cc.series.push(cs);
     this.cd.chart = cc;
+  }
+  getSum(total, num) {
+    return total + Math.round(num);
   }
   backToList(){
     this.router.navigate(['storage']);
@@ -734,8 +1008,7 @@ export class DetailComponent implements OnInit, AfterViewInit {
         end_time: endTime,
       }
       this.nfsService.getLineChartData(url, params).subscribe((result: any) => {
-        console.log('chartData: ', title, result);
-        if (result.code === '200' && result.data !== null && result.data !== null) {
+        if (result.code === '200' && result.data && result.data[objIds[0]]) {
           const resData = result.data;
           // 设置标题
           chart.title.text = title;
@@ -756,8 +1029,6 @@ export class DetailComponent implements OnInit, AfterViewInit {
           this.makePerformance.setXAxisData(uppers, chart);
           // 设置y轴最大值
           chart.yAxis.max = (pmaxData > lmaxData ? pmaxData : lmaxData);
-          console.log('chart.yAxis.pmaxData', pmaxData);
-          console.log('chart.yAxis.lmaxData', lmaxData);
           // 设置Read 折线图数据
           uppers.forEach(item => {
             for (const key of Object.keys(item)) {
@@ -771,10 +1042,10 @@ export class DetailComponent implements OnInit, AfterViewInit {
               chart.series[1].data.push({value: Number(item[key]), symbol: 'none'});
             }
           });
-          resolve(chart);
         } else {
           console.log('get chartData fail: ', result.description);
         }
+        resolve(chart);
       });
     });
   }
@@ -792,10 +1063,13 @@ export class DetailComponent implements OnInit, AfterViewInit {
     // 标题
     const titleInfo:Title = new Title();
     titleInfo.text = title;
-    titleInfo.subtext = subtext;
+    if (subtext) {
+      titleInfo.subtext = subtext;
+    }
     titleInfo.textAlign = 'bottom';
     const textStyle:TextStyle  = new TextStyle();
     textStyle.fontStyle = 'normal';
+    textStyle.fontWeight = 'normal';
     titleInfo.textStyle = textStyle;
 
     chart.title = titleInfo;
@@ -869,8 +1143,6 @@ export class DetailComponent implements OnInit, AfterViewInit {
       && this.rangeTime.controls.start.value !== null && this.rangeTime.controls.end.value !== null) { // 需满足输入规范且不为空
       this.startTime = this.rangeTime.controls.start.value._d.getTime();
       this.endTime = this.rangeTime.controls.end.value._d.getTime();
-      console.log('startTime', this.startTime);
-      console.log('endTime', this.endTime);
       this.changeFunc();
     } else {
       return;
@@ -879,7 +1151,6 @@ export class DetailComponent implements OnInit, AfterViewInit {
 
   // 切换卷函数
   changeFunc() {
-    console.log(this.selectRange);
     if (this.selectRange === 'BEGIN_END_TIME') {
       if (this.startTime === null || this.endTime === null) {
         console.log('开始结束时间不能为空');
@@ -989,5 +1260,72 @@ export class DetailComponent implements OnInit, AfterViewInit {
       this.volumeTotal:this.volumeCurrentPage*this.volumePageSize;
     const first = (this.volumeCurrentPage - 1)*this.volumePageSize + 1;
     this.volumeFooter = first + ' - ' + last;
+  }
+
+  /**
+   * vol 条件查询
+   */
+  volQueryChange(name, caObject, caUObject) {
+    let serviceLevelId;
+    if (this.volServiceLevelFilter.serviceLevel) {
+      serviceLevelId = this.serviceLevelList.filter(item => item.name == this.volServiceLevelFilter.serviceLevel)[0].id;
+    }
+    if (name != null) {
+      this.volName = name;
+    }
+    if (caObject != null || caUObject != null) {
+      if (caObject != null) {
+        this.volSortKey = 'size';
+      } else if (caUObject != null) {
+        // this.volSortKey = 'capacity_usage';
+      }
+      if (caObject == 1 || caUObject == 1) {
+        this.volSortDir = "asc";
+      } else if (caObject == -1 || caUObject == -1) {
+        this.volSortDir = "desc";
+      } else {
+        this.volSortDir = null;
+        return !caObject;
+      }
+    }
+    this.volumeCurrentPage = 1;
+    const requestParams = {
+      name:this.volName ? this.volName:"", //名称
+      status:this.volStatusFilter.status ? this.volStatusFilter.status:"", //状态
+      allocateType:this.portTypeFilter.type ? this.portTypeFilter.type:"", //分配类型
+      attached:this.mapStatusFilter.status ? this.mapStatusFilter.status:"", // 映射状态
+      servicelevelId:serviceLevelId ? serviceLevelId:"", //服务等级ID
+      sortDir:this.volSortDir ? this.volSortDir:"", // 排序方式 desc 降序 asc 升序
+      sortKey:this.volSortKey ? this.volSortKey:"", // 排序字段名称
+      storageId: this.storageId,
+      pageSize: this.volumePageSize,
+      pageNo: (this.volumeCurrentPage - 1) * this.volumePageSize,
+    }
+    this.volReqParam = requestParams;
+    this.getStorageVolumeList(true);
+    return  !caObject;
+  }
+
+  /**
+   * vol 查询条件清空
+   */
+  clearVolSearchInfo() {
+    this.volName = null;
+    if (this.volStatusFilter) {
+      this.volStatusFilter.initStatus();
+    }
+    if (this.portTypeFilter) {
+      this.portTypeFilter.initType();
+    }
+    if (this.mapStatusFilter) {
+      this.mapStatusFilter.initStatus();
+    }
+
+    this.volSortDir = null;
+    this.volSortKey = null;
+    this.volReqParam = null;
+  }
+  sortFunc(obj:any) {
+    return !obj;
   }
 }

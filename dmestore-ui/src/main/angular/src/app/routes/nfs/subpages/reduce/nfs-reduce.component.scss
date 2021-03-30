@@ -35,3 +35,13 @@
   color: white;
   font-weight: bolder;
 }
+.errorTips{
+  border: none;
+  color: red;
+}
+input::-ms-clear{
+  display: none;
+}
+::ng-deep .datagrid {
+  -ms-overflow-style:scrollbar;
+}

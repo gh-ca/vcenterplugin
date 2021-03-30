@@ -20,5 +20,7 @@ export class FsDetail{
    dateCompression: boolean;
    controller: string;
    fileSystemId:string;
+   isDorado:boolean;
+   dorado:boolean;
 }
 

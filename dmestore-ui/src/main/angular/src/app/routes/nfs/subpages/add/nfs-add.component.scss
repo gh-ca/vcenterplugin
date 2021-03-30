@@ -354,3 +354,9 @@ input[type=number] {
   color: white;
   font-weight: bolder;
 }
+input::-ms-clear{
+  display: none;
+}
+::ng-deep .datagrid {
+  -ms-overflow-style:scrollbar;
+}

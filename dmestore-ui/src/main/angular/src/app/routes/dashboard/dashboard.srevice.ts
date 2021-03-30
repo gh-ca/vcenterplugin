@@ -314,7 +314,8 @@ export class DashboardService {
   storageCapacityOption = {
     tooltip: {
       trigger: 'item',
-      formatter: ' {b}: {c} ({d}%)'
+      formatter: ' {b}: {c} ({d}%)',
+      position: 'right'
     },
     title: {
       text: '0.0 %',

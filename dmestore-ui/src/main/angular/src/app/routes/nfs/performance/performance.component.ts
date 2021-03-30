@@ -27,12 +27,25 @@ export class NfsPerformanceComponent implements OnInit, AfterViewInit {
   // 创建表格对象
   // OPS+QoS上下限
   opsChart: EChartOption = {};
+  opsChartDataIsNull = false;
   // 带宽+QoS上下限
   bandwidthChart: EChartOption = {};
+  bandwidthChartDataIsNull = false;
   // 响应时间+QoS下限
   latencyChart: EChartOption = {};
+  latencyChartDataIsNull = false;
   // ranges
-  ranges = NfsService.perRanges;
+  ranges = [
+    {key: 'LAST_5_MINUTE', value: this.translatePipe.transform('chart.select.last5Minute')},
+    {key: 'LAST_1_HOUR', value: this.translatePipe.transform('chart.select.last1Hour')},
+    {key: 'LAST_1_DAY', value: this.translatePipe.transform('chart.select.last1Day')},
+    {key: 'LAST_1_WEEK', value: this.translatePipe.transform('chart.select.last1Week')},
+    {key: 'LAST_1_MONTH', value: this.translatePipe.transform('chart.select.last1Month')},
+    {key: 'LAST_1_QUARTER', value: this.translatePipe.transform('chart.select.last1Quarter')},
+    {key: 'HALF_1_YEAR', value: this.translatePipe.transform('chart.select.half1Year')},
+    {key: 'LAST_1_YEAR', value: this.translatePipe.transform('chart.select.last1Year')},
+    {key: 'INVALID', value: this.translatePipe.transform('chart.select.invalid')},
+  ];
   selectRange = 'LAST_1_DAY';
   startTime = null;
   // endTime
@@ -49,7 +62,7 @@ export class NfsPerformanceComponent implements OnInit, AfterViewInit {
   ngOnInit(): void {
     const ctx = this.gs.getClientSdk().app.getContextObjects();
     this.getFsDetail(ctx[0].id);
-    // this.getFsDetail('urn:vmomi:Datastore:datastore-1115:674908e5-ab21-4079-9cb1-596358ee5dd1');
+    // this.getFsDetail('urn:vmomi:Datastore:datastore-12024:674908e5-ab21-4079-9cb1-596358ee5dd1');
   }
   changeFs(){
     if (this.selectRange === 'BEGIN_END_TIME') {
@@ -92,17 +105,20 @@ export class NfsPerformanceComponent implements OnInit, AfterViewInit {
     this.makePerformance.setChart(300,this.translatePipe.transform('nfs.ops'),"IO/s",
       NfsService.nfsOPS,fsNames,this.selectRange,NfsService.nfsUrl, this.startTime, this.endTime).then(res=>{
       this.opsChart = res;
+      this.opsChartDataIsNull = res['series'][0].data.length < 1;
       this.cdr.detectChanges();
     });
     // 带宽
     this.makePerformance.setChart(300,this.translatePipe.transform('nfs.qos_bandwidth'), 'MB/s', NfsService.nfsBDWT,
       fsNames, this.selectRange, NfsService.nfsUrl, this.startTime, this.endTime).then(res => {
       this.bandwidthChart = res;
+      this.bandwidthChartDataIsNull = res['series'][0].data.length < 1;
       this.cdr.detectChanges();
     });
     this.makePerformance.setChart(300,this.translatePipe.transform('nfs.qos_latency'), 'ms', NfsService.nfsLatency, fsNames,
       this.selectRange, NfsService.nfsUrl, this.startTime, this.endTime).then(res => {
       this.latencyChart = res;
+      this.latencyChartDataIsNull = res['series'][0].data.length < 1;
       this.cdr.detectChanges();
     });
   }

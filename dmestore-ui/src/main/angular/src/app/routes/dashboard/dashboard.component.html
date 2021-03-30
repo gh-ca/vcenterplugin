@@ -13,8 +13,8 @@
             <div class="info-content">
               <div class="gh-info-item">
                 <span class="gh-info-lable">IP</span>
-                <span class="gh-info-value" *ngIf="hostModel.hostIp == ''">--</span>
-                <span class="gh-info-value" *ngIf="hostModel.hostIp != ''">{{hostModel.hostIp}}</span>
+                <span class="gh-info-value" *ngIf="hostModel.hostIp == '' || hostModel.hostIp == null">--</span>
+                <span class="gh-info-value" *ngIf="hostModel.hostIp != '' && hostModel.hostIp != null">{{hostModel.hostIp}}</span>
               </div>
               <div class="gh-info-item">
                 <span class="gh-info-lable">{{'overview.port' | translate}}</span>
@@ -25,12 +25,26 @@
                 <span class="gh-info-lable">{{'overview.status' | translate}}</span>
                 <span class="gh-info-value">
                 </span>
-                <span class="gh-info-value" *ngIf="hostModel.hostIp != ''">
+                <span class="gh-info-value" *ngIf="hostModel.hostIp != '' && hostModel.hostIp != null && hostModel.code == '200'">
                   <clr-icon shape="success-standard" class="is-solid" style="color: #59A220;margin-right: 5px;"></clr-icon>
                   {{'overview.connected' | translate}}</span>
-                <span class="gh-info-value" *ngIf="hostModel.hostIp == ''">
+                <span class="gh-info-value" *ngIf="hostModel.hostIp != '' && hostModel.hostIp != null && hostModel.code != '200'">
+                  <span class="gh-info-value" style="color: red">{{'overview.connectionError' | translate}}</span>
+                </span>
+                <span class="gh-info-value" *ngIf="(hostModel.hostIp == '' || hostModel.hostIp == null) && hostModel.code == '200'">
                   <button type="button" (click)="showPop()" class="btn btn-icon" aria-label="home"><clr-icon shape="add"></clr-icon>
                   </button>
+                </span>
+                <span class="gh-info-value" *ngIf="(hostModel.hostIp == '') && hostModel.code == ''">
+                  <span class="gh-info-value">--</span>
+                </span>
+              </div>
+              <div class="gh-info-item" *ngIf="hostModel.hostIp != '' && hostModel.hostIp != null">
+                <span class="gh-info-lable">{{'menu.otherOperations' | translate}}</span>
+                <span class="gh-info-value">
+                   <button type="button" (click)="disconnectFlag=true;" class="btn btn-icon" aria-label="home">
+                     {{'overview.disconnect' | translate}}
+                    </button>
                 </span>
               </div>
             </div>
@@ -53,16 +67,16 @@
             <div class="info-content" style="cursor:pointer" (click)="toDatastoreDeviceViewSdk()">
               <div class="info-content-text">
                 <span>{{'overview.total' | translate}}</span>
-                <span>{{storageNum.total}}</span>
+                <span style="color:#829DE6;">{{storageNum.total}}</span>
               </div>
               <div class="info-content-text">
                 <span>{{'overview.normal' | translate}}</span>
-                <span>{{storageNum.normal}}</span>
+                <span style="color:#829DE6;">{{storageNum.normal}}</span>
                 <span class="squre normal"></span>
               </div>
               <div class="info-content-text">
                 <span>{{'overview.abnormal' | translate}}</span>
-                <span>{{storageNum.abnormal}}</span>
+                <span style="color:#829DE6;">{{storageNum.abnormal}}</span>
                 <span class="squre abnormal"></span>
               </div>
             </div>
@@ -81,22 +95,22 @@
       <div class="info-card-content bestprac" [hidden]="bestShowLoading">
         <div class="count-wrap clr-row">
           <div class="count-item clr-col-3">
-            <div (click)="toBestParcticeViewSdk('critical')"  style="cursor:pointer" class="num">{{bestPracticeViolations.critical || 0}}</div>
+            <div (click)="toBestParcticeViewSdk('critical')"  style="color:#829DE6;cursor:pointer" class="num">{{bestPracticeViolations.critical || 0}}</div>
             <div class="color-divide critical"></div>
             <div class="text">{{'overview.critical' | translate}}</div>
           </div>
           <div class="count-item clr-col-3">
-            <div (click)="toBestParcticeViewSdk('major')" style="cursor:pointer" class="num">{{bestPracticeViolations.major || 0}}</div>
+            <div (click)="toBestParcticeViewSdk('major')" style="color:#829DE6;cursor:pointer" class="num">{{bestPracticeViolations.major || 0}}</div>
             <div class="color-divide major"></div>
             <div class="text">{{'overview.major' | translate}}</div>
           </div>
           <div class="count-item clr-col-3">
-            <div (click)="toBestParcticeViewSdk('warning')" style="cursor:pointer" class="num">{{bestPracticeViolations.warning || 0}}</div>
+            <div (click)="toBestParcticeViewSdk('warning')" style="color:#829DE6;cursor:pointer" class="num">{{bestPracticeViolations.warning || 0}}</div>
             <div class="color-divide warning"></div>
             <div class="text">{{'overview.warning' | translate}}</div>
           </div>
           <div class="count-item clr-col-3">
-            <div (click)="toBestParcticeViewSdk('info')" style="cursor:pointer" class="num">{{bestPracticeViolations.info || 0}}</div>
+            <div (click)="toBestParcticeViewSdk('info')" style="color:#829DE6;cursor:pointer" class="num">{{bestPracticeViolations.info || 0}}</div>
             <div class="color-divide info"></div>
             <div class="text">{{'overview.info' | translate}}</div>
           </div>
@@ -112,13 +126,13 @@
     <div class="info-card">
       <div class="ds-left">
         <div class="info-card-header">
-          <div class="info-header-left">
+          <div style="width: 100%;text-align: right">
             <clr-dropdown [clrCloseMenuOnItemClick]="true">
               <button clrDropdownTrigger class="dropdown-toggle  btn btn-link">
                 {{capadataStoreName}}
                 <clr-icon shape="caret down"></clr-icon>
               </button>
-              <clr-dropdown-menu *clrIfOpen>
+              <clr-dropdown-menu *clrIfOpen >
                 <div clrDropdownItem (click)="loadstorageCapacity('0', 'overview.allDataStore')">{{'overview.allDataStore' | translate}}</div>
                 <div clrDropdownItem (click)="loadstorageCapacity('1', 'overview.VMFS')">{{'overview.VMFS' | translate}}</div>
                 <div clrDropdownItem (click)="loadstorageCapacity('2', 'overview.NFS')">{{'overview.NFS' | translate}}</div>
@@ -152,7 +166,7 @@
       </div>
       <div class="ds-right">
         <div class="info-card-header">
-          <div class="info-header-left">
+          <div style="width: 100%;text-align: right">
             <!--  -->
             <clr-dropdown [clrCloseMenuOnItemClick]="true">
               <button clrDropdownTrigger class="dropdown-toggle  btn btn-link" style="margin-right: 10px">
@@ -165,7 +179,7 @@
                 <div clrDropdownItem (click)="loadTop5DataStore('2', 'overview.NFS')">{{'overview.NFS' | translate}}</div>
               </clr-dropdown-menu>
             </clr-dropdown>
-            <div>{{'overview.top5T' | translate}}</div>
+            <div style="text-align: center">{{'overview.top5T' | translate}}</div>
           </div>
         </div>
         <div class="info-card-content clr-row loading">
@@ -184,6 +198,11 @@
             </div>
           </div>
           <img [hidden]="!top5ShowLoading" src="./assets/images/loading.gif" >
+          <div *ngIf="!top5ShowLoading && (!storeageTopN || storeageTopN.length < 1)" style="width: 100%;height: 100%;">
+            <span style="color: #b3b3b3;display: inline-block;width: 100%;text-align: center;font-size: 20px;font-weight: 600;">
+              <clr-icon shape="info-standard" class="is-warning" size="20"></clr-icon>&nbsp;{{'tips.noData' | translate}}
+            </span>
+          </div>
         </div>
       </div>
     </div>
@@ -194,21 +213,30 @@
   <h3 class="modal-title">{{'overview.connectT' | translate}}</h3>
   <div class="modal-body">
     <form clrForm [formGroup]="connectForm">
-      <clr-input-container>
+      <clr-input-container class="dme_access">
         <label>IP</label>
         <input clrInput formControlName="ip" type="text" [(ngModel)]="connectModel.hostIp" name="ip" />
       </clr-input-container>
-      <clr-input-container>
+      <clr-input-container class="dme_access">
         <label>{{'overview.port' | translate}}</label>
-        <input clrInput formControlName="port" type="text" placeholder="{{'overview.portholder'|translate}}" [(ngModel)]="connectModel.hostPort" name="port" />
+        <input clrInput formControlName="port" type="text" placeholder="{{'overview.portholder'|translate}}" [(ngModel)]="connectModel.port" name="port" />
       </clr-input-container>
-      <clr-input-container>
+      <clr-input-container class="dme_access">
         <label>{{'overview.user' | translate}}</label>
         <input clrInput formControlName="username" type="text" [(ngModel)]="connectModel.userName" name="username" />
       </clr-input-container>
-      <clr-password-container>
+<!--      <clr-input-container>-->
+<!--        <label>{{'overview.password' | translate}}</label>-->
+<!--        &lt;!&ndash;<input clrInput formControlName="password" name="password" [(ngModel)]="connectModel.password" />&ndash;&gt;-->
+<!--        <div clrInput style="float: left;position: relative;width: 82%">-->
+<!--          <input clrInput style="width: 90%" oncopy="return false" onpaste="return false" oncut="return false" formControlName="password" name="password"type="{{inputType}}" [(ngModel)]="connectModel.password" required/>-->
+<!--          <clr-icon *ngIf="passwordShow" shape="eye" (click)="showOrHide();"></clr-icon>-->
+<!--          <clr-icon *ngIf="!passwordShow"shape="eye-hide" (click)="showOrHide();"></clr-icon>-->
+<!--        </div>-->
+<!--      </clr-input-container>-->
+      <clr-password-container class="dme_access">
         <label>{{'overview.password' | translate}}</label>
-        <input clrPassword formControlName="password" name="password" [(ngModel)]="connectModel.password" />
+        <input clrPassword formControlName="password" name="password" oncopy="return false" onpaste="return false" oncut="return false" [(ngModel)]="connectModel.password" />
       </clr-password-container>
     </form>
   </div>
@@ -235,5 +263,39 @@
   </div>
   <div class="modal-footer">
     <button type="button" class="btn btn-danger" (click)="connectAlertFail=false">{{'menu.ok'|translate}}</button>
+  </div>
+</clr-modal>
+<clr-modal [(clrModalOpen)]="disconnectFlag" [clrModalSize]="'sm'">
+  <h3 class="modal-title">{{'menu.tip'|translate}}</h3>
+  <div class="modal-body">
+    <div *ngIf="disconnectHandleLoading" class="loadingDiv">
+        <span>
+          {{'vmfs.dataHandleLoadingTips' | translate}}<img src="./assets/images/loading.gif"  width="20px" height="20px" style="margin-left: 20px;">
+        </span>
+    </div>
+    {{'tips.disconnected'|translate}}
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-primary" (click)="disconnectedDMEFunc();">{{'menu.ok'|translate}}</button>
+    <button type="button" class="btn btn-outline" (click)="disconnectFlag=false;">{{'menu.cancel'|translate}}</button>
+  </div>
+</clr-modal>
+<clr-modal [(clrModalOpen)]="disconnectResult" [clrModalSize]="'sm'">
+  <h3 class="modal-title">{{'menu.tip'|translate}}</h3>
+  <div class="modal-body">
+    <div *ngIf="disconnectSuccessFlag">
+        <span>
+          {{'tips.operationSuccessful' | translate}}
+        </span>
+    </div>
+    <div *ngIf="disconnectFailedFlag" class="errorTips">
+        <span>
+          <clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>
+          {{'tips.operationFailed' | translate}}
+        </span>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-primary" (click)="disconnectResult=false;disconnectSuccessFlag=false;disconnectFailedFlag=false;refresh();">{{'menu.ok'|translate}}</button>
   </div>
 </clr-modal>

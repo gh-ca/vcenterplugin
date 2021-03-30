@@ -238,3 +238,10 @@
   left: 50%;
   vertical-align: middle;
 }
+.over_flow{
+  text-overflow: ellipsis;
+  overflow: hidden;
+  word-break: break-all;
+  white-space: nowrap;
+}
+

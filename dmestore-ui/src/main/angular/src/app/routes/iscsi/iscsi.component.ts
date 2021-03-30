@@ -2,13 +2,14 @@ import {ChangeDetectorRef, Component, OnInit, AfterViewInit, ViewChild} from '@a
 import {HttpClient} from '@angular/common/http';
 import {CommonService} from '../common.service';
 import {GlobalsService} from '../../shared/globals.service';
-import {ClrForm} from "@clr/angular";
+import {ClrForm} from '@clr/angular';
+import {TranslatePipe} from "@ngx-translate/core";
 
 @Component({
   selector: 'app-iscsi',
   templateUrl: './iscsi.component.html',
   styleUrls: ['./iscsi.component.scss'],
-  providers: [CommonService]
+  providers: [CommonService, TranslatePipe]
 })
 export class IscsiComponent implements OnInit, AfterViewInit {
 
@@ -66,7 +67,7 @@ export class IscsiComponent implements OnInit, AfterViewInit {
   constructor(private cdr: ChangeDetectorRef,
               private http: HttpClient,
               private commonService: CommonService,
-              private gs: GlobalsService) { }
+              private gs: GlobalsService, private translatePipe:TranslatePipe) { }
 
   ngOnInit(): void {
   }
@@ -119,23 +120,69 @@ export class IscsiComponent implements OnInit, AfterViewInit {
     // 有存储 有ip才去load
     if (this.configModel.sn !== '' && this.configModel.vmKernel.device !== ''){
       this.portLoading = true;
-      this.portGetUrlParams.params.storageSn = this.configModel.sn;
-      this.http.get(this.portGetUrl, this.portGetUrlParams).subscribe((result: any) => {
-        this.portLoading = false;
-        if (result.code === '200'){
-          result.data.forEach((item) => {
-            item.connectStatus = '';
-          });
-          this.portList = result.data;
-          this.portTotal = result.data.length;
-          this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
-          // 连通状态
-          this.testPortConnected();
-        }
-      }, err => {
-        console.error('ERROR', err);
-        this.portLoading = false;
-      });
+      const isV6 = this.storageDevices.filter(item => item.sn == this.configModel.sn)[0].storageTypeShow.dorado;
+      // V5设备访问
+      if (!isV6) {
+        this.portGetUrlParams.params.storageSn = this.configModel.sn;
+        this.http.get(this.portGetUrl, this.portGetUrlParams).subscribe((result: any) => {
+          this.portLoading = false;
+          if (result.code === '200'){
+            // result.data.forEach((item) => {
+            //   item.connectStatus = '';
+            // });
+            // 端口列表中不展示名称为MGMT和MAINTENANCE的端口
+            this.portList = result.data.filter(item => item.portName.toLowerCase().indexOf( 'mgmt') < 0
+              && item.portName.toLowerCase().indexOf('maintenance') < 0  && item.mgmtIp);
+            this.portTotal = result.data.length;
+            // 连通状态
+            this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
+            this.testPortConnected();
+          }
+        }, err => {
+          console.error('ERROR', err);
+          this.portLoading = false;
+        });
+      } else {// V6设备访问
+        this.portLoading = true;
+        const storageId = this.storageDevices.filter(item => item.sn == this.configModel.sn)[0].id;
+        this.http.get('dmestorage/logicports?storageId=' + storageId + '&supportProtocol=iSCSI').subscribe((result: any) => {
+          this.portLoading = false;
+          if (result.code === '200'){
+            const logicDatas = [];
+            for (let i = 0;i < result.data.length; i++) {
+              let logicData = {
+                id:'',
+                location: '',
+                portName: '',
+                mgmtIp: '',
+                mgmtIpv6: '',
+                mac:'',
+                maxSpeed:null,
+                speed:null,
+                status:'',
+                connectStatusType:'',
+              };
+              logicData.location = result.data[i].currentPortName;
+              logicData.id = result.data[i].id;
+              logicData.portName = result.data[i].name;
+              logicData.mgmtIp = result.data[i].mgmtIp;
+              logicData.mgmtIpv6 = result.data[i].mgmtIpv6;
+
+              logicDatas.push(logicData);
+            }
+
+            // 端口列表中不展示名称为MGMT和MAINTENANCE的端口
+            this.portList = logicDatas.filter(item => item.portName.toLowerCase().indexOf( 'mgmt') < 0
+              && item.portName.toLowerCase().indexOf('maintenance') < 0  && item.mgmtIp);
+            // 连通状态
+            this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
+            this.testPortConnected();
+          }
+        }, err => {
+          console.error('ERROR', err);
+          this.portLoading = false;
+        });
+      }
     }
   }
 
@@ -143,9 +190,9 @@ export class IscsiComponent implements OnInit, AfterViewInit {
     const p = new testConnectParams();
     const testPortList = [];
     this.portList.forEach((item)=>{
-       if (item.mgmtIp && item.mgmtIp != ""){
+       // if (item.mgmtIp && item.mgmtIp != ""){
          testPortList.push(item);
-       }
+       // }
     });
     p.ethPorts = testPortList;
     p.hostObjectId = this.configModel.hostObjectId;
@@ -156,13 +203,14 @@ export class IscsiComponent implements OnInit, AfterViewInit {
             this.portList.forEach((j)=>{
                if(i.id == j.id){
                  j.connectStatus = i.connectStatus;
+                 j.connectStatusType = i.connectStatusType;
                }
             });
         });
-        this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
       } else{
         alert("测试连通性出错");
       }
+      this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
     }, err => {
       console.error('ERROR', err);
     });
@@ -196,6 +244,19 @@ export class IscsiComponent implements OnInit, AfterViewInit {
 
   closeWin(){
     this.gs.getClientSdk().modal.close();
+  }
+  footerTranslate() {
+    if (document.getElementsByClassName("switch-header")[0]) {
+      let transDom = document.getElementsByClassName("switch-header")[0] as HTMLElement;
+      // let transHtml = transDom.innerHTML.replace(/Show Columns/, "展示列");
+      transDom.innerText = this.translatePipe.transform('iscsi.showCol');
+      let selectDom = document.getElementsByClassName("btn btn-sm btn-link switch-button")[0] as HTMLElement;
+      // let selectHtml = selectDom.innerHTML.replace(/ Select All /, "全选");
+      selectDom.innerText = this.translatePipe.transform('iscsi.selectAll');
+    }
+  }
+  sortFunc(obj:any) {
+    return !obj;
   }
 }
 

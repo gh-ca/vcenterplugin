@@ -14,6 +14,7 @@
           </span>
         </div>
         <div *ngIf="isOperationErr" class="errorTips" readonly ><clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{'errorMsg.mountError' | translate}}</div>
+        <div *ngIf="isUnmountOperationErr" class="errorTips" readonly ><clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{'errorMsg.unMountError' | translate}}</div>
 
         <div *ngIf="notChooseMountDevice" class="errorTips" readonly ><clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{'vmfs.mount.notChooseDataStoreTips' | translate}}</div>
         <div *ngIf="notChooseUnmountDevice" class="errorTips" readonly ><clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{'vmfs.unmount.notChooseDataStoreTips' | translate}}</div>
@@ -22,22 +23,30 @@
           <clr-dg-column hidden>objectId</clr-dg-column>
           <clr-dg-column [clrDgField]="'name'">{{'vmfs.name' | translate}}</clr-dg-column>
           <clr-dg-column>{{'vmfs.type' | translate}}</clr-dg-column>
-          <clr-dg-column [clrDgField]="'capacity'">{{'vmfs.capacity' | translate}}</clr-dg-column>
-          <clr-dg-column [clrDgField]="'freeSpace'">{{'vmfs.freeSpace' | translate}}</clr-dg-column>
+          <clr-dg-column #capacity class="hideFilter" [clrDgField]="'capacity'" style="position: relative" (clrDgSortedChange)="sortFunc($event);">
+            {{'vmfs.capacity' | translate}}
+            <clr-icon *ngIf="sortFunc(capacity.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+          </clr-dg-column>
+          <clr-dg-column #freeSpace class="hideFilter" [clrDgField]="'freeSpace'" style="position: relative" (clrDgSortedChange)="sortFunc($event);">
+            {{'vmfs.freeSpace' | translate}}
+            <clr-icon *ngIf="sortFunc(freeSpace.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+          </clr-dg-column>
+          <clr-dg-placeholder>{{'vmfs.listNullTips' | translate}}</clr-dg-placeholder>
           <clr-dg-row *clrDgItems="let item of dataStores" [clrDgItem]="item">
             <clr-dg-cell hidden>{{item.id}}</clr-dg-cell>
             <clr-dg-cell hidden>{{item.objectId}}</clr-dg-cell>
-            <clr-dg-cell>{{item.name}}</clr-dg-cell>
-            <clr-dg-cell>{{item.type}}</clr-dg-cell>
-            <clr-dg-cell>{{formatCapacity(item.capacity, true)}}</clr-dg-cell>
-            <clr-dg-cell>{{formatCapacity(item.freeSpace, true)}}</clr-dg-cell>
+            <clr-dg-cell>{{item.name ? item.name:'--'}}</clr-dg-cell>
+            <clr-dg-cell>{{item.type ? item.type:'--'}}</clr-dg-cell>
+            <clr-dg-cell style="text-align: right">{{item.capacity ? formatCapacity(item.capacity, true):'--'}}</clr-dg-cell>
+            <clr-dg-cell style="text-align: right">{{item.freeSpace ? formatCapacity(item.freeSpace, true):'--'}}</clr-dg-cell>
           </clr-dg-row>
         </clr-datagrid>
       </form>
     </div>
     <div class="modal-footer">
       <button type="button" class="btn btn-outline" (click)="cancel();">{{'menu.cancel' | translate}}</button>
-      <button type="button" class="btn btn-primary" (click)="mountOrUnmountFunc();">{{'menu.ok' | translate}}</button>
+      <button type="button" class="btn btn-primary" *ngIf="operationType != 'unmount'" (click)="mountOrUnmountFunc();">{{'menu.ok' | translate}}</button>
+      <button type="button" class="btn btn-primary" *ngIf="operationType == 'unmount'" (click)="unmountTipsShow = true;">{{'menu.ok' | translate}}</button>
     </div>
   </clr-modal>
 
@@ -79,7 +88,7 @@
         <clr-combobox-container *ngIf="mountForm.mountType==='1'">
           <label style="color: #9F9F9F;">{{'vmfs.mount.host' | translate}}</label>
           <clr-combobox [(ngModel)]="chooseHost" name="chooseHost" required>
-            <clr-options *ngIf="mountHostData">
+            <clr-options style="max-height: 6.5rem;overflow: auto" *ngIf="mountHostData">
               <clr-option *clrOptionItems="let state of hostList; field:'hostName'" [clrValue]="state">
                 <clr-icon *ngIf="state.hostName !== ''" shape="host" role="img" aria-label="World is turning"></clr-icon>{{state.hostName}}
               </clr-option>
@@ -92,7 +101,7 @@
         <clr-combobox-container *ngIf="mountForm.mountType==='2'">
           <label style="color: #9F9F9F;">{{'vmfs.mount.cluster' | translate}}</label>
           <clr-combobox [(ngModel)]="chooseCluster" name="chooseCluster" required>
-            <clr-options *ngIf="mountClusterData">
+            <clr-options style="max-height: 6.5rem;overflow: auto" *ngIf="mountClusterData">
               <clr-option *clrOptionItems="let state of clusterList; field:'clusterName'" [clrValue]="state">
                 <clr-icon *ngIf="state.clusterName !== ''" shape="host-group" role="img" aria-label="World is turning"></clr-icon>{{state.clusterName}}
               </clr-option>
@@ -126,7 +135,7 @@
             {{'vmfs.dataHandleLoadingTips' | translate}}<img src="./assets/images/loading.gif"  width="20px" height="20px" style="margin-left: 20px;">
           </span>
         </div>
-        <div *ngIf="isOperationErr" class="errorTips" readonly ><clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{'errorMsg.mountError' | translate}}</div>
+        <div *ngIf="isUnmountOperationErr" class="errorTips" readonly ><clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{'errorMsg.unMountError' | translate}}</div>
 
         <div *ngIf="notChooseUnmountDevice" class="errorTips" readonly ><clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{'vmfs.unmount.notChooseDeviceTips' | translate}}</div>
         <clr-input-container>
@@ -170,10 +179,46 @@
     </div>
     <div class="modal-footer">
       <button type="button" class="btn btn-outline" (click)="cancel();">{{'menu.cancel' | translate}}</button>
-      <button type="submit" class="btn btn-primary" (click)="mountOrUnmountFunc();">{{'menu.ok' | translate}}</button>
+      <button type="submit" class="btn btn-primary" (click)="unmountTipsShow = true;">{{'menu.ok' | translate}}</button>
     </div>
   </clr-modal>
 </div>
+<!--主机连接失败提示窗口-->
+<clr-modal [(clrModalOpen)]="connectivityFailure" [clrModalClosable]="false">
+  <h3 class="modal-title modelTile">{{'tips.operationFailed' | translate}}</h3>
+  <div class="modal-body">
+    <p>{{'tips.mountVmfsConnFail' | translate}}
+      <button class="btn btn-link" (click)="showDetail = !showDetail;">
+        {{'tips.details' | translate}}
+        <clr-icon *ngIf="!showDetail" style="width: 0.6rem" shape="caret down"></clr-icon>
+        <clr-icon *ngIf="showDetail" style="width: 0.6rem" shape="caret up"></clr-icon>
+      </button>
+    </p>
+    <clr-datagrid *ngIf="showDetail">
+      <clr-dg-column>{{'nfs.hostName' | translate}}</clr-dg-column>
+      <clr-dg-column style="width: 14rem;">{{'table.description' | translate}}</clr-dg-column>
+      <clr-dg-placeholder>{{'tips.noData' | translate}}</clr-dg-placeholder>
+      <clr-dg-row [clrDgSelectable]="false" *clrDgItems="let item of connFailData" [clrDgItem]="item">
+        <clr-dg-cell title="{{item.hostName}}">{{item.hostName}}</clr-dg-cell>
+        <clr-dg-cell title="{{item.description}}" class="over_flow">{{item.description}}</clr-dg-cell>
+      </clr-dg-row>
+    </clr-datagrid>
+  </div>
+  <div class="modal-footer">
+    <button type="submit" class="btn btn-primary" (click)="connectivityFailure = false;">{{'menu.ok' | translate}}</button>
+  </div>
+</clr-modal>
+<!--卸载提示-->
+<clr-modal [(clrModalOpen)]="unmountTipsShow" [clrModalSize]="'sm'" [clrModalClosable]="false">
+  <h3 class="modal-title modelTile">{{'vmfs.reclaim.title' | translate}}</h3>
+  <div class="modal-body">
+    <p>{{'vmfs.unmount.tips' | translate}}</p>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline" (click)="unmountTipsShow = false;cancel();">{{'menu.cancel' | translate}}</button>
+    <button type="submit" class="btn btn-primary" (click)="unmountTipsShow = false;mountOrUnmountFunc()">{{'menu.ok' | translate}}</button>
+  </div>
+</clr-modal>
 <!--操作成功提示-->
 <clr-modal [(clrModalOpen)]="mountSuccessShow || unmountSuccessShow" [clrModalSize]="'sm'" [clrModalClosable]="false">
   <h3 class="modal-title modelTile">{{'vmfs.reclaim.title' | translate}}</h3>
