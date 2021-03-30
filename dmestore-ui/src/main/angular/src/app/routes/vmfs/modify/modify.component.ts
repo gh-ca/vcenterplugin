@@ -57,6 +57,9 @@ export class ModifyComponent implements OnInit{
   iopsMinErrTips = false;// IOPS下限错误提示
   latencyErrTips = false;// 时延错误提示
 
+  bandwidthLimitErr = false; // v6 设备 带宽 下限大于上限
+  iopsLimitErr = false; // v6 设备 IOPS 下限大于上限
+
   ngOnInit(): void {
     this.initData();
   }
@@ -249,6 +252,8 @@ export class ModifyComponent implements OnInit{
         break;
     }
     this.iopsErrTips(objVal, operationType);
+    // 下限大于上限 检测
+    this.qosV6Check('edit');
   }
 
   /**
@@ -267,7 +272,10 @@ export class ModifyComponent implements OnInit{
     this.matchErr = false;
 
     let reg5:RegExp = new RegExp('^[0-9a-zA-Z-\u4e00-\u9fa5a"_""."]*$');
-
+    if (this.bandWidthMaxErrTips || this.iopsMaxErrTips
+      || this.bandWidthMinErrTips || this.iopsMinErrTips || this.latencyErrTips || this.bandwidthLimitErr || this.iopsLimitErr) {
+      return;
+    }
     if (this.modifyForm.name) {
       if (reg5.test(this.modifyForm.name)) {
         // 校验VMFS名称重复
@@ -520,6 +528,16 @@ export class ModifyComponent implements OnInit{
         upperObj.checked = false;
       }
     }
+    if (form.control_policyUpper == undefined) {
+      form.maxbandwidthChoose = false;
+      form.maxiopsChoose = false;
+    }
+    if (form.control_policyLower == undefined) {
+      form.minbandwidthChoose = false;
+      form.miniopsChoose = false;
+      form.latencyChoose = false;
+    }
+    this.qosV6Check('edit');
   }
 
   /**
@@ -610,6 +628,48 @@ export class ModifyComponent implements OnInit{
           this.latencyErrTips = false;
         }
         break;
+    }
+  }
+  qosV6Check(type:string) {
+    if (type != 'add') {
+      if (this.storage) {
+        const qosTag = this.storage.storageTypeShow.qosTag
+        if (qosTag == 1) {
+          if (this.modifyForm.minbandwidthChoose && this.modifyForm.maxbandwidthChoose) {
+            // 带宽上限小于下限
+            if (this.modifyForm.min_bandwidth && this.modifyForm.max_bandwidth && Number(this.modifyForm.min_bandwidth) > Number(this.modifyForm.max_bandwidth)) {
+              this.bandwidthLimitErr = true;
+            } else {
+              this.bandwidthLimitErr = false;
+            }
+          } else {
+            this.bandwidthLimitErr = false;
+          }
+          if (this.modifyForm.miniopsChoose && this.modifyForm.maxiopsChoose) {
+            // iops上限小于下限
+            if (this.modifyForm.min_iops && this.modifyForm.max_iops && Number(this.modifyForm.min_iops) > Number(this.modifyForm.max_iops)) {
+              this.iopsLimitErr = true;
+            } else {
+              this.iopsLimitErr = false;
+            }
+          } else {
+            this.iopsLimitErr = false;
+          }
+        } else {
+          this.iopsLimitErr = false;
+          this.bandwidthLimitErr = false;
+        }
+        if (this.modifyForm.maxiopsChoose && this.modifyForm.max_iops && Number(this.modifyForm.max_iops) < 100) {
+          this.iopsLimitErr = true;
+        }
+        if (this.modifyForm.control_policyUpper == undefined) {
+          this.iopsLimitErr = false;
+          this.bandwidthLimitErr = false;
+        }
+        if (this.modifyForm.control_policyLower == undefined) {
+          this.bandwidthLimitErr = false;
+        }
+      }
     }
   }
 }

@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.ArrayList;
 import java.util.List;
 
-
 /**
  * BestPracticeController
  *
@@ -46,9 +45,24 @@ public class BestPracticeController extends BaseController {
      * @return ResponseBodyBean
      */
     @RequestMapping(value = "/check", method = RequestMethod.POST)
-    public ResponseBodyBean bestPractice() {
+    public ResponseBodyBean bestPractice(@RequestParam(required = false) String objectId) {
         try {
-            bestPracticeProcessService.check(null);
+            bestPracticeProcessService.check(objectId);
+            return success();
+        } catch (VcenterException ex) {
+            return failure(ex.getMessage());
+        }
+    }
+
+    /**
+     * bestPractice
+     *
+     * @return ResponseBodyBean
+     */
+    @RequestMapping(value = "/check/byCluster", method = RequestMethod.POST)
+    public ResponseBodyBean checkByCluster(@RequestParam String clusterObjId) {
+        try {
+            bestPracticeProcessService.checkByCluster(clusterObjId);
             return success();
         } catch (VcenterException ex) {
             return failure(ex.getMessage());
@@ -61,9 +75,10 @@ public class BestPracticeController extends BaseController {
      * @return ResponseBodyBean
      */
     @RequestMapping(value = "/records/all", method = RequestMethod.GET)
-    public ResponseBodyBean getBestPracticeRecords() {
+    public ResponseBodyBean getBestPracticeRecords(@RequestParam(required = false) String type,
+        @RequestParam(required = false) String objectId) {
         try {
-            return success(bestPracticeProcessService.getCheckRecord());
+            return success(bestPracticeProcessService.getCheckRecord(type, objectId));
         } catch (DmeSqlException ex) {
             return failure(ex.getMessage());
         } catch (DmeException e) {
@@ -75,13 +90,13 @@ public class BestPracticeController extends BaseController {
      * getBySettingAndPage
      *
      * @param hostSetting hostSetting
-     * @param pageNo      pageNo
-     * @param pageSize    pageSize
+     * @param pageNo pageNo
+     * @param pageSize pageSize
      * @return ResponseBodyBean
      */
     @RequestMapping(value = "/records/bypage", method = RequestMethod.GET)
     public ResponseBodyBean getBySettingAndPage(@RequestParam String hostSetting, @RequestParam int pageNo,
-                                                @RequestParam int pageSize) {
+        @RequestParam int pageSize) {
         try {
             return success(bestPracticeProcessService.getCheckRecordBy(hostSetting, pageNo, pageSize));
         } catch (DmeException ex) {

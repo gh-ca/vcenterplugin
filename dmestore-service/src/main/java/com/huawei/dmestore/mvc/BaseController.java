@@ -155,7 +155,7 @@ public class BaseController {
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.OK)
     protected Map<String, Object> handleException(final Exception exception, final HttpServletRequest request) {
-        LOGGER.error("System Exception!{}", new Gson().toJson(exception));
+        LOGGER.error("System Exception!{}", exception);
         return generateError(request, CODE_FAILURE, exception.getMessage(), null);
     }
 

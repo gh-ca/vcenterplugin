@@ -7,6 +7,8 @@ import com.huawei.dmestore.model.BestPracticeBean;
 import com.huawei.dmestore.model.BestPracticeCheckRecordBean;
 import com.huawei.dmestore.model.BestPracticeUpResultResponse;
 
+import org.springframework.web.bind.annotation.RequestParam;
+
 import java.util.List;
 
 /**
@@ -16,11 +18,13 @@ import java.util.List;
  * @since 2020-11-30
  **/
 public interface BestPracticeProcessService {
-    List<BestPracticeCheckRecordBean> getCheckRecord() throws DmeException;
+    List<BestPracticeCheckRecordBean> getCheckRecord(String type, String objectId) throws DmeException;
 
     List<BestPracticeBean> getCheckRecordBy(String hostSetting, int pageNo, int pageSize) throws DmeException;
 
     void check(String objectId) throws VcenterException;
+
+    void checkByCluster(String clusterObjectId) throws VcenterException;
 
     /**
      * 最佳实践实施

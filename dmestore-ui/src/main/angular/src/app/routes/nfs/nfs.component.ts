@@ -89,6 +89,7 @@ export class NfsComponent implements OnInit {
   @ViewChild('addPageTwo') addPageTwo: ClrWizardPage;
   addSuccessShow = false; // 添加成功提示
   modifySuccessShow = false; // 添加成功提示
+  syncSuccessTips = false; // 同步成功提
 
   logicPorts: LogicPort[] = [];
   oldNfsName:string;
@@ -121,6 +122,9 @@ export class NfsComponent implements OnInit {
   iopsMaxErrTips = false;// IOPS上限错误提示
   iopsMinErrTips = false;// IOPS下限错误提示
   latencyErrTips = false;// 时延错误提示
+
+  bandwidthLimitErr = false; // v6 设备 带宽 下限大于上限
+  iopsLimitErr = false; // v6 设备 IOPS 下限大于上限
 
   constructor(private addService: NfsAddService, private remoteSrv: NfsService, private cdr: ChangeDetectorRef, public gs: GlobalsService ,
               private storageService: StorageService,private vmfsListService: VmfsListService,private router:Router, private token: TokenService,
@@ -203,6 +207,9 @@ export class NfsComponent implements OnInit {
     this.storageList = null;
     this.storagePoolMap = [];
     this.shareNameContainsCN = false;
+    // qos错误提示初始化
+    this.iopsLimitErr = false;
+    this.bandwidthLimitErr = false;
     // 添加页面默认打开首页
     this.jumpTo(this.addPageOne);
 
@@ -280,7 +287,7 @@ export class NfsComponent implements OnInit {
 
   addNfs(){
     if (this.bandWidthMaxErrTips || this.iopsMaxErrTips
-      || this.bandWidthMinErrTips || this.iopsMinErrTips || this.latencyErrTips) {
+      || this.bandWidthMinErrTips || this.iopsMinErrTips || this.latencyErrTips  || this.bandwidthLimitErr || this.iopsLimitErr) {
       return;
     }
     //
@@ -542,8 +549,9 @@ export class NfsComponent implements OnInit {
     this.isLoading = true;
     this.vmfsListService.scanVMFS('nfs').subscribe((res: any) => {
       this.isLoading = false;
+      this.syncSuccessTips = true;
       if (res.code === '200') {
-        this.getNfsList();
+        // this.getNfsList();
         console.log('Scan success');
         this.router.navigate(['nfs'], {
           queryParams: {t: new Date().getTime()}
@@ -760,6 +768,9 @@ export class NfsComponent implements OnInit {
       }
     }
     this.iopsErrTips(objVal, operationType);
+
+    // 下限大于上限 检测
+    this.qosV6Check('add');
   }
 
   /**
@@ -967,6 +978,16 @@ export class NfsComponent implements OnInit {
       }
     }
     console.log("lowerChecked", form)
+    if (form.control_policyUpper == undefined) {
+      form.maxBandwidthChoose = false;
+      form.maxIopsChoose = false;
+    }
+    if (form.control_policyLower == undefined) {
+      form.minBandwidthChoose = false;
+      form.minIopsChoose = false;
+      form.latencyChoose = false;
+    }
+    this.qosV6Check('add');
   }
 
   /**
@@ -1049,5 +1070,51 @@ export class NfsComponent implements OnInit {
   }
   sortFunc(obj:any) {
     return !obj;
+  }
+  qosV6Check(type:string) {
+    if (type == 'add') {
+      if (this.addForm.storagId) {
+        const chooseStorage = this.storageList.filter(item => item.id == this.addForm.storagId)[0];
+        if (chooseStorage) {
+          const qosTag = chooseStorage.storageTypeShow.qosTag
+          if (qosTag == 1) {
+            if (this.addForm.minBandwidthChoose && this.addForm.maxBandwidthChoose) {
+              // 带宽上限小于下限
+              if (this.addForm.minBandwidth && this.addForm.maxBandwidth && Number(this.addForm.minBandwidth) > Number(this.addForm.maxBandwidth)) {
+                this.bandwidthLimitErr = true;
+              } else {
+                this.bandwidthLimitErr = false;
+              }
+            } else {
+              this.bandwidthLimitErr = false;
+            }
+            if (this.addForm.minIopsChoose && this.addForm.maxIopsChoose) {
+              // iops上限小于下限
+              if (this.addForm.minIops && this.addForm.maxIops && Number(this.addForm.minIops) > Number(this.addForm.maxIops)) {
+                this.iopsLimitErr = true;
+              } else {
+                this.iopsLimitErr = false;
+              }
+            } else {
+              this.iopsLimitErr = false;
+            }
+          } else {
+            this.iopsLimitErr = false;
+            this.bandwidthLimitErr = false;
+          }
+          if (this.addForm.maxIopsChoose && this.addForm.maxIops && Number(this.addForm.maxIops) < 100) {
+            this.iopsLimitErr = true;
+          }
+          if (this.addForm.control_policyUpper == undefined) {
+            this.iopsLimitErr = false;
+            this.bandwidthLimitErr = false;
+          }
+          if (this.addForm.control_policyLower == undefined) {
+            this.bandwidthLimitErr = false;
+          }
+        }
+
+      }
+    }
   }
 }

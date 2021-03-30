@@ -5,6 +5,7 @@ import com.huawei.dmestore.exception.DmeException;
 import com.huawei.dmestore.model.RelationInstance;
 import com.huawei.dmestore.utils.ToolUtils;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -304,7 +305,8 @@ public class DmeRelationInstanceServiceImpl implements DmeRelationInstanceServic
             ResponseEntity responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
             if (responseEntity != null && responseEntity.getStatusCodeValue() == HttpStatus.OK.value()) {
                 Object object = responseEntity.getBody();
-                jsonObject = new JsonParser().parse(object.toString()).getAsJsonObject();
+                Gson gson = new Gson();
+                jsonObject = new JsonParser().parse(ToolUtils.getStr(object)).getAsJsonObject();
             }
         } catch (DmeException e) {
             LOG.warn("List instance error by instanceName:{},{}", instanceName, e);

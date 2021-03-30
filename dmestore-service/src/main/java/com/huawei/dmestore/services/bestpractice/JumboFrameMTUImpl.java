@@ -16,6 +16,7 @@ import java.util.concurrent.Executors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 /**
  * JumboFrameMTUImpl
@@ -24,11 +25,20 @@ import org.slf4j.LoggerFactory;
  * @since 2020-11-30
  **/
 public class JumboFrameMTUImpl extends BaseBestPracticeService implements BestPracticeService {
+    private ThreadPoolTaskExecutor threadPoolExecutor;
     protected final Logger logger = LoggerFactory.getLogger(BaseBestPracticeService.class);
 
     private static final int RECOMMEND_VALUE = 9000;
 
     private static final String MTU_NULL = "--";
+
+    public ThreadPoolTaskExecutor getThreadPoolExecutor() {
+        return threadPoolExecutor;
+    }
+
+    public void setThreadPoolExecutor(ThreadPoolTaskExecutor threadPoolExecutor) {
+        this.threadPoolExecutor = threadPoolExecutor;
+    }
 
     @Override
     public String getHostSetting() {
@@ -116,13 +126,13 @@ public class JumboFrameMTUImpl extends BaseBestPracticeService implements BestPr
         HostNetworkSystemMo hostNetworkSystemMo = hostMo.getHostNetworkSystemMo();
         HostNetworkConfig networkConfig = hostNetworkSystemMo.getNetworkConfig();
         List<HostVirtualNicConfig> list = networkConfig.getVnic();
-        ExecutorService singleThreadExecutor = Executors.newFixedThreadPool(list.size());
+        //ExecutorService singleThreadExecutor = Executors.newFixedThreadPool(list.size());
         for (HostVirtualNicConfig config : list) {
             HostVirtualNicSpec spec = config.getSpec();
             String device = config.getDevice();
             Integer mtu = spec.getMtu();
             if (null == mtu || (mtu.intValue() != ((Integer) recommendValue).intValue())) {
-                singleThreadExecutor.execute(() -> {
+                threadPoolExecutor.execute(() -> {
                     spec.setMtu((Integer) recommendValue);
                     try {
                         hostNetworkSystemMo.updateVirtualNic(device, spec);
