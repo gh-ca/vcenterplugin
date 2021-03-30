@@ -32,6 +32,7 @@ public interface VmfsAccessService {
      */
     List<VmfsDataInfo> listVmfsPerformance(List<String> wwns) throws DmeException;
 
+
     /**
      * Create vmfs include:
      * ServiceVolumeBasicParams对象包含如下属性
@@ -68,54 +69,6 @@ public interface VmfsAccessService {
     List<Map<String, String>> createVmfs(Map<String, Object> params) throws DmeException;
 
     /**
-     * Create vmfs include:
-     * ServiceVolumeBasicParams对象包含如下属性
-     * param str name: 名称 必 vmfs stor的名称
-     * param str volumeName: 名称 必 卷的名称
-     * param int capacity: 容量，单位GB 必
-     * param int count: 数量 必
-     * param str service_level_id: 服务等级id 若未选择服务等级，可选择存储设备、存储池、设置QoS、Thin、Workload
-     * param str service_level_name; 服务等级名称
-     * param int version: 版本
-     * param int blockSize: 块大小，单位KB
-     * param int spaceReclamationGranularity   空间回收粒度 单位K
-     * param str spaceReclamationPriority: 空间回收优先权
-     * param str host: 主机  必  与cluster二选其一,不可同时存在
-     * param str hostId: 主机
-     * param str cluster: 集群 必 与host二选其一,不可同时存在
-     * param str clusterId: 集群
-     * param str storage_id 存储设备id
-     * param str pool_raw_id 卷所属存储池在存储设备上的id
-     * param integer workload_type_id 应用类型id
-     * param str alloctype 卷分配类型，取值范围 thin，thick
-     * 卷qos属性
-     * param str  control_policy 控制策略
-     * param integer  latency 时延，单位ms
-     * param integer  maxbandwidth 最大带宽
-     * param integer  maxiops 最大iops
-     * param integer  minbandwidth 最小带宽
-     * param integer  miniops 最小iops
-     * param str qosname Smart QoS名称
-     *
-     * @param params include Parameters above
-     * @throws DmeException when error
-     */
-    List<Map<String, String>> createVmfs2(Map<String, Object> params) throws DmeException;
-
-    /**
-     * Mount vmfs include
-     * param list dataStoreObjectIds: datastore object id列表 必
-     * param str host: 主机名称 必 （主机与集群二选一）
-     * param str hostId: 主机
-     * param str cluster: 集群名称 必（主机与集群二选一）
-     * param str clusterId: 集群
-     *
-     * @param params include dataStoreObjectIds,host,hostId,cluster,clusterId
-     * @throws DmeException when error
-     */
-    List<Map<String, String>> mountVmfs2(Map<String, Object> params) throws DmeException;
-
-    /**
      * Mount vmfs include
      * param list dataStoreObjectIds: datastore object id列表 必
      * param str host: 主机名称 必 （主机与集群二选一）
@@ -137,28 +90,12 @@ public interface VmfsAccessService {
     void unmountVmfs(Map<String, Object> params) throws DmeException;
 
     /**
-     * unmount Vmfs
-     *
-     * @param params include dataStoreObjectIds,host,hostId,cluster,clusterId
-     * @throws DmeException when error
-     */
-    void unmountVmfs2(Map<String, Object> params) throws DmeException;
-
-    /**
      * delete vmfs
      *
      * @param params include dataStoreObjectIds（list）
      * @throws DmeException when error
      */
     void deleteVmfs(Map<String, Object> params) throws DmeException;
-
-    /**
-     * delete vmfs
-     *
-     * @param params include dataStoreObjectIds（list）
-     * @throws DmeException when error
-     */
-    void deleteVmfs2(Map<String, Object> params) throws DmeException;
 
     /**
      * vCenter VMFS存储卷详细信息查询
