@@ -181,7 +181,7 @@ export class VmfsListComponent implements OnInit {
 
   ngOnInit() {
     // 列表数据
-    this.refresh();
+    this.refreshVmfs();
   }
   // 修改
   modifyBtnClick() {
@@ -354,7 +354,7 @@ export class VmfsListComponent implements OnInit {
     });
   }
   // table数据处理
-  refresh() {
+  refreshVmfs() {
     this.isLoading = true;
     // 进行数据加载
     this.remoteSrv.getData()
@@ -362,18 +362,27 @@ export class VmfsListComponent implements OnInit {
           if (result.code === '200' && null != result.data ) {
             this.list = result.data;
             if (null !== this.list) {
-              this.total = this.list.length;
-              // 获取chart 数据
-              const wwns = [];
-              this.list.forEach(item => {
-                item.usedCapacity = item.capacity - item.freeSpace;
-                item.capacityUsage = ((item.capacity - item.freeSpace)/item.capacity);
-                wwns.push(item.wwn);
-              });
-              // 设置卷ID集合
-              this.wwns = wwns;
-              if (this.radioCheck === 'chart') {
-                this.getPerformanceData();
+              if (this.list) {
+                this.total = this.list.length;
+                // 获取chart 数据
+                const wwns = [];
+                this.list.forEach(item => {
+                  if (item == null) {
+                    console.log(item)
+                  }
+                  if (item) {
+                    if (item.capacity && item.freeSpace) {
+                      item.usedCapacity = item.capacity - item.freeSpace;
+                      item.capacityUsage = ((item.capacity - item.freeSpace)/item.capacity);
+                    }
+                    wwns.push(item.wwn);
+                  }
+                });
+                // 设置卷ID集合
+                this.wwns = wwns;
+                if (this.radioCheck === 'chart') {
+                  this.getPerformanceData();
+                }
               }
             }
           } else {
@@ -1774,7 +1783,7 @@ export class VmfsListComponent implements OnInit {
     this.isFirstLoadChartData = true;
     // this.backToListPage();
     // 重新请求数据
-    this.refresh();
+    this.refreshVmfs();
   }
 
   /**

@@ -224,7 +224,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             if (!StringUtils.isEmpty(listStr)) {
                 JsonArray jsonArray = new JsonParser().parse(listStr).getAsJsonArray();
                 if (jsonArray != null && jsonArray.size() > 0) {
-                    relists = new ArrayList<>();
+                    relists = new CopyOnWriteArrayList<>();
                     for (int index = 0; index < jsonArray.size(); index++) {
                         JsonObject jo = jsonArray.get(index).getAsJsonObject();
 
@@ -347,7 +347,9 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                     vmfsDataInfo.setDevice(stoNameMap == null ? "" : stoNameMap.get(storageId));
 
                     parseTuning(vmfsDataInfo, jsonObject);
-                    relists.add(vmfsDataInfo);
+                    if (vmfsDataInfo != null) {
+                        relists.add(vmfsDataInfo);
+                    }
                     break;
                 }
             }
