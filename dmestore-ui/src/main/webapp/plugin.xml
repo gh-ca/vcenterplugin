@@ -541,6 +541,10 @@
                </com.vmware.actionsfw.ActionMenuItemSpec>
                <com.vmware.actionsfw.ActionMenuItemSpec>
                   <type>action</type>
+                  <uid>com.huawei.dmestore.datastore.vmfsmountaction</uid>
+               </com.vmware.actionsfw.ActionMenuItemSpec>
+               <com.vmware.actionsfw.ActionMenuItemSpec>
+                  <type>action</type>
                   <uid>com.huawei.dmestore.datastore.vmfsumountaction</uid>
                </com.vmware.actionsfw.ActionMenuItemSpec>
                <com.vmware.actionsfw.ActionMenuItemSpec>
