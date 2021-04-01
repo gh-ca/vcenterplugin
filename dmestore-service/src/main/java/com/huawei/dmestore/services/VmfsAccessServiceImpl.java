@@ -2046,7 +2046,8 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             for (String dsObj : dataStoreObjectIds) {
                 List<Map<String, Object>> hosts = getHostsByStorageId(dsObj);
                 if (hosts != null && hosts.size() == 1) {
-                    volumeDelete(params);
+                    // todo 此处注释代码暂时不要删除
+                    //volumeDelete(params);
                     isDeleteFalg = true;
                     break;
                 }
@@ -2056,7 +2057,8 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             for (String dsObjId : dataStoreObjectIds) {
                 List<Map<String, Object>> hostGroups = getHostGroupsByStorageId(dsObjId);
                 if (hostGroups != null && hostGroups.size() == 0) {
-                    volumeDelete(params);
+                    // todo 此处注释代码暂时不要删除
+                    //volumeDelete(params);
                     isDeleteFalg = true;
                     break;
                 }
@@ -2300,7 +2302,8 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         }
 
         // DME侧卸载卷
-        String taskId = volumeDeleteGetTaskId(params);
+        // todo 此处删除卷的功能暂时屏蔽 请不要删除
+        /*String taskId = volumeDeleteGetTaskId(params);
         if (!StringUtils.isEmpty(taskId)) {
             boolean isDmeDelete = taskService.checkTaskStatus(Arrays.asList(taskId));
             if (!isDmeDelete) {
@@ -2308,7 +2311,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             }
         } else {
             throw new DmeException("dme delete vmfs failed,task id is null!");
-        }
+        }*/
 
         // vcenter侧 扫描
         List<String> hostObjIds = (List<String>) params.get(HOST_OBJ_IDS);
