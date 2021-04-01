@@ -16,13 +16,7 @@
     </header>
     <div class="content-container">
       <clr-vertical-nav>
-        <a clrVerticalNavLink routerLink="./dashboard" routerLinkActive="active">Overview</a>
-        <a clrVerticalNavLink routerLink="./storage" routerLinkActive="active">Storage Device</a>
-        <a clrVerticalNavLink routerLink="./vmfs/list" routerLinkActive="active">VMFS Datastore</a>
-        <a clrVerticalNavLink routerLink="./raichu" routerLinkActive="active">NFS Datastore</a>
-        <a clrVerticalNavLink routerLink="./snorlax" routerLinkActive="active">Service Level</a>
-        <a clrVerticalNavLink routerLink="./credit" routerLinkActive="active">Best Practice</a>
-        <a clrVerticalNavLink routerLink="./nfs" routerLinkActive="active">NFS list</a>
+        <a clrVerticalNavLink [routerLink]="i.link" routerLinkActive="active" *ngFor="let i of linkInfo">{{i.label}}</a>
       </clr-vertical-nav>
       <div class="content-area loading-wrap">
         <router-outlet></router-outlet>

@@ -916,6 +916,8 @@
     "select": {
       "last5Minute": "最近5分钟",
       "last1Hour": "最近1小时",
+      "last4Hour": "最近4小时",
+      "last12Hour": "最近12小时",
       "last1Day": "最近1天",
       "last1Week": "最近1周",
       "last1Month": "最近1个月",

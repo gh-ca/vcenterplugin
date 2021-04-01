@@ -20,7 +20,7 @@ import { environment } from '@env/environment';
 
 import { SettingsService, AppSettings } from '@core';
 import { AppDirectionality } from '@shared';
-import { GlobalsService }     from "../../shared/globals.service";
+import { GlobalsService } from "../../shared/globals.service";
 
 const MOBILE_MEDIAQUERY = 'screen and (max-width: 599px)';
 const TABLET_MEDIAQUERY = 'screen and (min-width: 600px) and (max-width: 959px)';
@@ -38,6 +38,7 @@ export class AdminLayoutComponent implements OnInit, OnDestroy {
   env = environment
   options = this.settings.getOptions();
   loading = this.gs.loading
+  linkInfo
 
   private layoutChangesSubscription: Subscription;
 
@@ -76,7 +77,17 @@ export class AdminLayoutComponent implements OnInit, OnDestroy {
   ) {
     this.dir.value = this.options.dir;
     this.document.body.dir = this.dir.value;
-
+    this.linkInfo = [
+      { link: "./dashboard", label: 'Overview' },
+      { link: "./storage", label: 'Storage Device' },
+      { link: "./vmfs", label: 'vmfs' },
+      { link: "./vmfs/list", label: 'VMFS Datastore' },
+      { link: "./nfs", label: 'NFS Datastore' },
+      { link: "./nfs", label: 'NFS list' },
+      { link: "./servicelevel", label: 'Service Level' },
+      { link: "./bestpractice", label: 'Best Practice' },
+      { link: "./iscsi", label: 'iscsi list' }
+    ]
     this.layoutChangesSubscription = this.breakpointObserver
       .observe([MOBILE_MEDIAQUERY, TABLET_MEDIAQUERY, MONITOR_MEDIAQUERY])
       .subscribe(state => {
