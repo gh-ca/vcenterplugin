@@ -63,8 +63,8 @@
         {{'nfs.provisioningCapacity' | translate}}
         <clr-icon *ngIf="sortFunc(reserveCapacity.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
       </clr-dg-column>
-      <clr-dg-column #deviceFilter [hidden]="radioCheck!=='list'" >
-        {{'nfs.device' | translate}}
+      <clr-dg-column #deviceFilter [hidden]="radioCheck!=='list'" [clrDgField]="'device'">
+        {{'vmfs.device' | translate}}
         <clr-dg-filter [clrDgFilter]="deviceFilter">
           <device-filter #deviceFilter></device-filter>
         </clr-dg-filter>
