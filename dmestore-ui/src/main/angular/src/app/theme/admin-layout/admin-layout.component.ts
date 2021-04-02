@@ -80,11 +80,10 @@ export class AdminLayoutComponent implements OnInit, OnDestroy {
     this.linkInfo = [
       { link: "./dashboard", label: 'Overview' },
       { link: "./storage", label: 'Storage Device' },
-      { link: "./vmfs", label: 'vmfs' },
-      { link: "./vmfs/list", label: 'VMFS Datastore' },
+      { link: "./vmfs/list", label: './vmfs/list' },
       { link: "./nfs", label: 'NFS Datastore' },
-      { link: "./nfs", label: 'NFS list' },
-      { link: "./servicelevel", label: 'Service Level' },
+      { link: "./nfs/list", label: './nfs/list' },
+      { link: "./servicelevel", label: 'servicelevel DME存储策略' },
       { link: "./bestpractice", label: 'Best Practice' },
       { link: "./iscsi", label: 'iscsi list' }
     ]

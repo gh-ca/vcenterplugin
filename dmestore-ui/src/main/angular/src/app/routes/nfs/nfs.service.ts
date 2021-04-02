@@ -3,6 +3,13 @@ import { HttpClient } from '@angular/common/http';
 import { GlobalsService } from "@shared/globals.service";
 import { VolumeInfo } from "../vmfs/volume-attribute/attribute.service";
 
+
+
+export const URLS_NFS = {
+  ACCESSNFS_LISTNFS: 'accessnfs/listnfs'
+}
+
+
 @Injectable()
 export class NfsService {
 
@@ -49,7 +56,7 @@ export class NfsService {
   constructor(private http: HttpClient) { }
 
   getData() {
-    return this.http.get('accessnfs/listnfs',);
+    return this.http.get(URLS_NFS.ACCESSNFS_LISTNFS);
   }
   getChartData(fsIds: string[]) {
     return this.http.get('accessnfs/listnfsperformance', { params: { fsIds } });
