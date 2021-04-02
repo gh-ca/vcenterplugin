@@ -1147,6 +1147,8 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                     results.add(result);
                 }
             }
+        } else {
+            throw new DmeException("estimate connectivity of host or hostgroup error ,url:{}", url+":"+responseEntity.getStatusCodeValue());
         }
         return results;
     }
