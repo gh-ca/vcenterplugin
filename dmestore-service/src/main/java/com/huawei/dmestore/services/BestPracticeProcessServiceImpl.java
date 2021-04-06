@@ -175,7 +175,7 @@ public class BestPracticeProcessServiceImpl implements BestPracticeProcessServic
                         if (!isCheck) {
                             BestPracticeBean bean = new BestPracticeBean();
                             bean.setHostSetting(hostSetting);
-                            bean.setRecommendValue(String.valueOf(bestPracticeService.getRecommendValue()));
+                            bean.setRecommendValue(String.valueOf(bestPracticeService.getRecommendValue(vcsdkUtils, hostObjectId)));
                             bean.setLevel(bestPracticeService.getLevel());
                             bean.setNeedReboot(String.valueOf(bestPracticeService.needReboot()));
                             Object currentValue = bestPracticeService.getCurrentValue(vcsdkUtils, hostObjectId);
