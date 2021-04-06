@@ -33,6 +33,12 @@ public class VMFS3UseATSForHBOnVMFS5Impl extends BaseBestPracticeService impleme
     }
 
     @Override
+    public Object getRecommendValue(VCSDKUtils vcsdkUtils, String objectId) throws Exception {
+        String key = getRecommendValueKey(vcsdkUtils, objectId);
+        return recommendMap.get(key);
+    }
+
+    @Override
     public Object getCurrentValue(VCSDKUtils vcsdkUtils, String objectId) throws Exception {
         return super.getCurrentValue(vcsdkUtils, objectId, getHostSetting());
     }
@@ -65,15 +71,21 @@ public class VMFS3UseATSForHBOnVMFS5Impl extends BaseBestPracticeService impleme
     }
 
     private String getRecommendValueKey(VCSDKUtils vcsdkUtils, String objectId) throws Exception {
+        String recommendValueKey = "6.5low";
         ManagedObjectReference mor = vcsdkUtils.getVcConnectionHelper().objectId2Mor(objectId);
         VmwareContext context = vcsdkUtils.getVcConnectionHelper().getServerContext(objectId);
         HostMo hostMo = this.getHostMoFactory().build(context, mor);
         AboutInfo aboutInfo = hostMo.getHostAboutInfo();
-        String esxiApiVersion = aboutInfo.getApiVersion().substring(0, 3);
-        String recommendValueKey = "6.5low";
-        // ESXI6.5及以后版本，推荐开启，也就是如果是低于6.5的版本直接认为检测通过。
-        if (Float.valueOf(esxiApiVersion) > Float.valueOf("6.5")) {
-            recommendValueKey = "6.5up";
+        String apiVersion = aboutInfo.getApiVersion();
+        try {
+            String esxiApiVersion = apiVersion.substring(0, 3);
+            // ESXI6.5及以后版本，推荐开启，也就是如果是低于6.5的版本直接认为检测通过。
+            if (Float.valueOf(esxiApiVersion) >= Float.valueOf("6.5")) {
+                recommendValueKey = "6.5up";
+            }
+        } catch (Exception ex) {
+            logger.error("get host recommend value key error!host_ip={},apiVersion={}", hostMo.getName(), apiVersion);
+            throw ex;
         }
 
         return recommendValueKey;
