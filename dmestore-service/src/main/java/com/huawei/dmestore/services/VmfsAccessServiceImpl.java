@@ -425,7 +425,6 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         List<Map<String, Object>> volumelist = new ArrayList<>();
         List<String> volumeIds = new ArrayList<>();
         boolean isCreated = false;
-        boolean isMappling = false;
         try {
             // 创建Lun
             String taskId = createLun(params);
@@ -480,8 +479,8 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                     }
                     taskIds = new ArrayList<>();
                     taskIds.add(taskId);
-                    isMappling = taskService.checkTaskStatus(taskIds);
-                    if (isCreated && isMappling) {
+                    isCreated = taskService.checkTaskStatus(taskIds);
+                    if (isCreated) {
                         // 创建了几个卷，就创建几个VMFS，用卷的wwn去找到lun
                         if (volumelist != null && volumelist.size() > 0) {
                             createOnVmware(params, volumelist);
@@ -502,26 +501,26 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 }
             }
         } catch (DmeException e) {
-            rollBack(volumeIds, dmeHostId, demHostGroupId, isCreated, isMappling);
+            rollBack(volumeIds,dmeHostId,demHostGroupId,isCreated);
             throw new DmeException("create vmfs failed!",e.getMessage());
         }
 
         return new ArrayList<>();
     }
 
-    private void rollBack(List<String> volumeIds,String dmeHostId,String demHostGroupId,Boolean isCreated,Boolean isMapping) throws DmeException {
+    private void rollBack(List<String> volumeIds,String dmeHostId,String demHostGroupId,Boolean isCreated) throws DmeException {
         ResponseEntity responseEntity = null;
         String taskId = "";
         if (volumeIds.size() != 0) {
             Map<String, Object> requestParam = new HashMap<>();
-            //解除映射，删除已创建的卷
-            requestParam.put(VOLUMEIDS, volumeIds);
-            if (isCreated && isMapping) {
-                if (!StringUtils.isEmpty(dmeHostId) && isMapping) {
+            if (isCreated) {
+                //解除映射，删除已创建的卷
+                requestParam.put(VOLUMEIDS, volumeIds);
+                if (!StringUtils.isEmpty(dmeHostId)) {
                     requestParam.put(HOST_ID, dmeHostId);
                     responseEntity = hostUnmapping(requestParam);
                 }
-                if (!StringUtils.isEmpty(demHostGroupId) && isMapping) {
+                if (!StringUtils.isEmpty(demHostGroupId)) {
                     requestParam.put(HOST_GROUP_ID1, demHostGroupId);
                     responseEntity = hostGroupUnmapping(requestParam);
                 }
@@ -533,7 +532,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             }
             List<String> taskIds = new ArrayList<>();
             taskIds.add(taskId);
-            if (taskId.equals("") || taskService.checkTaskStatus(taskIds)) {
+            if (taskService.checkTaskStatus(taskIds)) {
                 volumeDelete(requestParam);
                 if (!StringUtils.isEmpty(demHostGroupId)) {
                     deleteHostgroup(demHostGroupId);
