@@ -155,7 +155,9 @@ export class NfsComponent implements OnInit {
   handleSortingFeild(){
     if(this.list!=null){
       this.list.forEach(n=>{
-        n.capacityUsage=(n.capacity - n.freeSpace)/n.capacity;
+        if (n.capacity && n.freeSpace) {
+          n.capacityUsage=(n.capacity - n.freeSpace)/n.capacity;
+        }
       });
     }
   }
