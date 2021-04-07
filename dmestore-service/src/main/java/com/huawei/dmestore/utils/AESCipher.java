@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 
+import java.lang.reflect.Field;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -64,6 +65,14 @@ public class AESCipher {
             byte[] rootkey = rootKeyGenerator.generateRootKey();
             String keyAlgorithm = cipherConfig.getAes().getKey().getAlgorithm();
             SecretKeySpec secretKeySpec = new SecretKeySpec(rootkey, keyAlgorithm);
+            // 修改加密非强制性配置
+            try {
+                Field field = Class.forName("javax.crypto.JceSecurity").getDeclaredField("isRestricted");
+                field.setAccessible(true);
+                field.set(null, java.lang.Boolean.FALSE);
+            } catch (Exception ex) {
+                throw new IllegalArgumentException("workkey illegal");
+            }
             String delimiter = cipherConfig.getDelimiter();
             String[] array = StringUtils.delimitedListToStringArray(workKey, delimiter);
             if (ARRAT_LENGTH_2 != array.length) {
