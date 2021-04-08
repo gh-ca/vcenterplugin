@@ -477,7 +477,7 @@ export class MountComponent implements OnInit{
     return new Promise((resolve, reject) => {
       // 获取集群 通过ObjectId过滤已挂载的集群
       this.remoteSrv.getClusterListByObjectId(this.objectId).subscribe((result: any) => {
-        if (result.code === '200'){
+        if (result.code === '200' && result.data !== null){
           result.data.forEach(item => {
             this.clusterList.push(item);
           });

@@ -13,7 +13,7 @@ import { CommonService } from './../../common.service';
   selector: 'app-nfsperformance',
   templateUrl: './performance.component.html',
   styleUrls: ['./performance.component.scss'],
-  providers: [PerformanceService, TranslatePipe, MakePerformance, NfsService, NgxEchartsModule, FileSystemService],
+  providers: [CommonService,PerformanceService, TranslatePipe, MakePerformance, NfsService, NgxEchartsModule, FileSystemService],
 })
 export class NfsPerformanceComponent implements OnInit, AfterViewInit {
   fsDetails: FsDetail[];
