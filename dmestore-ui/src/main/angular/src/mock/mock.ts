@@ -24,6 +24,6 @@ export const mockData = {
   DMESTORAGE_GETSTORAGEETHPORTS: DMESTORAGE_GETSTORAGEETHPORTS
 }
 
-export const isMockData = true;
+export const isMockData = false;
 
 // export const mockData = {};
