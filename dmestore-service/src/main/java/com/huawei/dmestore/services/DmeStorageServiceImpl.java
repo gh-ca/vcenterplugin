@@ -1383,21 +1383,13 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                         if (statisticObject != null) {
                             StoragePool sp = new StoragePool();
                             sp.setId(storagePoolId);
-                            if (ToolUtils.jsonToFloat(
-                                statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORAGEPOOL_THROUGHPUT)) != 0.0f) {
-                                sp.setMaxIops(ToolUtils.jsonToFloat(
+                            sp.setMaxIops(ToolUtils.jsonToFloat2(
                                     statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORAGEPOOL_THROUGHPUT)));
-                            }
-                            if (ToolUtils.jsonToFloat(
-                                statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORAGEPOOL_BANDWIDTH)) != 0.0f) {
-                                sp.setMaxBandwidth(ToolUtils.jsonToFloat(
+                            sp.setMaxBandwidth(ToolUtils.jsonToFloat2(
                                     statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORAGEPOOL_BANDWIDTH)));
-                            }
-                            if (ToolUtils.jsonToFloat(
-                                statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORAGEPOOL_RESPONSETIME)) != 0.0f) {
-                                sp.setMaxLatency(ToolUtils.jsonToFloat(
+                            sp.setMaxLatency(ToolUtils.jsonToFloat2(
                                     statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORAGEPOOL_RESPONSETIME)));
-                            }
+
                             relists.add(sp);
                         }
                     }
