@@ -309,9 +309,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
         long start = System.currentTimeMillis();
         for (int index = 0; index < jsonArray.size(); index++) {
             JsonObject nfsDatastore = jsonArray.get(index).getAsJsonObject();
-
                 ns.add(nfsDatastore);
-
         }
         List<Map<String, Object>> shareInfos=queryShareInfo();
         List<Map<String, Object>> fsInfos=queryFsInfo();
