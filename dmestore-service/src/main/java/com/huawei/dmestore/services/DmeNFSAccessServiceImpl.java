@@ -29,6 +29,8 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.util.StringUtils;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -303,8 +305,8 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
         }
         LOG.info("get dme storage success!storages size={}", storages.size());
         JsonArray jsonArray = new JsonParser().parse(listStr).getAsJsonArray();
-        List<DmeVmwareRelation> relationList = new ArrayList<>();
-        List<JsonObject> ns = new ArrayList<>();
+        List<DmeVmwareRelation> relationList = new CopyOnWriteArrayList<>();
+        List<JsonObject> ns = new CopyOnWriteArrayList<>();
         int k = 0;
         long start = System.currentTimeMillis();
         for (int index = 0; index < jsonArray.size(); index++) {
@@ -492,7 +494,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
     }
 
     private List<Map<String, Object>> queryShareInfo() throws DmeException {
-        List<Map<String, Object>> shareList = new ArrayList<>();
+        List<Map<String, Object>> shareList = new CopyOnWriteArrayList<>();
         int total=0;
         int pageno=1;
         int allpageno=1;
@@ -551,7 +553,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
     }
 
     private List<Map<String, Object>> queryFsInfo() throws DmeException {
-        List<Map<String, Object>> fsList = new ArrayList<>();
+        List<Map<String, Object>> fsList = new CopyOnWriteArrayList<>();
         int total=0;
         int pageno=1;
         int allpageno=1;
@@ -662,7 +664,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
     }
 
     private Map<String, Storage> converStorage(List<Storage> storages) {
-        Map<String, Storage> storageMap = new HashMap<>();
+        Map<String, Storage> storageMap = new ConcurrentHashMap<>();
         for (Storage storage : storages) {
             String ip = storage.getIp();
             storageMap.put(ip, storage);
@@ -688,7 +690,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
             throw new DmeException("list NFS from vcenter failed!");
         }
 
-        Map<String, NfsDataInfo> volIds = new HashMap<>();
+        Map<String, NfsDataInfo> volIds = new ConcurrentHashMap<>();
 
         JsonArray jsonArray = new JsonParser().parse(listStr).getAsJsonArray();
         for (int index = 0; index < jsonArray.size(); index++) {
@@ -725,18 +727,6 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
         int k = 0;
         Map<String, NfsDataInfo> tm = new HashMap<>();
         long start1 = System.currentTimeMillis();
-        /*while(iterator.hasNext()){
-            k++;
-            String key = iterator.next();
-            tm.put(key, volIds.get(key));
-            if (k % 20 == 0){
-                getNfsSync(tm);
-                tm = new HashMap<>();
-            }
-        }
-        if (k % 20 > 0){
-            getNfsSync(tm);
-        }*/
         getNfsSync(volIds);
         LOG.info("调用nfs存储接口时间：{}ms", System.currentTimeMillis() - start1);
 

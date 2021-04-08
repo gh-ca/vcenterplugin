@@ -115,11 +115,18 @@ export class IscsiComponent implements OnInit, AfterViewInit {
       console.error('ERROR', err);
     });
   }
-
+  resetListInfo() {
+    // 端口列表中不展示名称为MGMT和MAINTENANCE的端口
+    this.portList = []
+    this.portTotal = 0;
+    // 连通状态
+    this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
+  }
   loadPorts(){
     // 有存储 有ip才去load
     if (this.configModel.sn !== '' && this.configModel.vmKernel.device !== ''){
       this.portLoading = true;
+      this.resetListInfo();
       const isV6 = this.storageDevices.filter(item => item.sn == this.configModel.sn)[0].storageTypeShow.dorado;
       // V5设备访问
       if (!isV6) {

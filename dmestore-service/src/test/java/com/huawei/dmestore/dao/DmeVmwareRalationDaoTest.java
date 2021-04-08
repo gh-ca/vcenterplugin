@@ -179,4 +179,13 @@ public class DmeVmwareRalationDaoTest {
     public void getDataStoreByName() throws DmeSqlException {
         dmeVmwareRalationDao.getDataStoreByName("321");
     }
+
+    @Test
+    public void updateNfs() {
+        DmeVmwareRelation dmeVmwareRelation = new DmeVmwareRelation();
+        List<DmeVmwareRelation> list = new ArrayList<>();
+        list.add(dmeVmwareRelation);
+        dmeVmwareRalationDao.updateNfs(list);
+
+    }
 }

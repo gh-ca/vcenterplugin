@@ -46,6 +46,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
 import jdk.nashorn.internal.parser.Parser;
@@ -1776,9 +1777,9 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             return false;
         }
         JsonArray jsonArray = new JsonParser().parse(listStr).getAsJsonArray();
-        List<DmeVmwareRelation> relationList = new ArrayList<>();
+        List<DmeVmwareRelation> relationList = new CopyOnWriteArrayList<>();
         List<Ob> pa = new ArrayList<>();
-        Map<String, String> storageIds = new HashMap<>();
+        Map<String, String> storageIds = new ConcurrentHashMap<>();
         for (int index = 0; index < jsonArray.size(); index++) {
             JsonObject vmfsDatastore = jsonArray.get(index).getAsJsonObject();
             String vmfsDatastoreId = vmfsDatastore.get(OBJECTID).getAsString();
@@ -1805,20 +1806,6 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         int k = 0;
         List<Ob> ps = splitOb(pa);
         long start1 = System.currentTimeMillis();
-        /*for (Ob w : ps){
-            if(k + w.wwns.size() <= SIZE){
-                k = k + w.wwns.size();
-                tm.add(w);
-            } else{
-                getRelationSync(tm, k, storageIds, relationList);
-                tm = new ArrayList<>();
-                tm.add(w);
-                k = w.wwns.size();
-            }
-        }
-        if (tm.size() > 0){
-            getRelationSync(tm, k, storageIds, relationList);
-        }*/
         getRelationSync(ps, SIZE, storageIds, relationList);
         LOG.info("调用vmfs volume_wwn接口时间：{}ms", System.currentTimeMillis() - start1);
 
@@ -1831,7 +1818,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
 
 
     private List<Ob> splitOb(List<Ob> obs){
-        List<Ob> r = new ArrayList<>();
+        List<Ob> r = new CopyOnWriteArrayList<>();
         for (Ob ob : obs){
             if (ob.wwns.size() > SIZE){
                 List<String> wns = new ArrayList<>();
@@ -1870,8 +1857,6 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
     }
 
     public synchronized void getRelationSync(List<Ob> obs, int size, Map<String, String> storageIds, List<DmeVmwareRelation> relationList){
-        //ExecutorService executorService = Executors.newFixedThreadPool(size);
-        //CountDownLatch countDownLatch = new CountDownLatch(size);
         String volumeUrlByName = DmeConstants.DME_VOLUME_BASE_URL;
         try {
             ResponseEntity<String> responseEntity = dmeAccessService.access(volumeUrlByName, HttpMethod.GET, null);
