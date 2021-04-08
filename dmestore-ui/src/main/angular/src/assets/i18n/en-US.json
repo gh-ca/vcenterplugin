@@ -916,6 +916,8 @@
     "select": {
       "last5Minute": "Last 5 minutes",
       "last1Hour": "Last 1 hour",
+      "last4Hour": "Last 4 hour",
+      "last12Hour": "Last 12 hour",
       "last1Day": "Last day",
       "last1Week": "Last week",
       "last1Month": "Last month",
