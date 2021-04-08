@@ -15,93 +15,80 @@ public interface BestPracticeService {
     /**
      * 检查项名称
      *
-     * @return java.lang.String
      * @author wangxy
+     * @return java.lang.String
      */
     String getHostSetting();
 
     /**
      * 建议值
      *
-     * @return java.lang.Object
      * @author wangxy
+     * @return java.lang.Object
      */
     Object getRecommendValue();
 
     /**
-     * 获取每个主机的建议值。个性化需求
-     *
-     * @param vcsdkUtils vCenter工具类
-     * @param objectId 存储/主机ID
-     * @return java.lang.Object
-     * @author wangxy
-     */
-    default Object getRecommendValue(VCSDKUtils vcsdkUtils, String objectId) throws Exception {
-        // 默认返回配置的值。如果需要特殊需求，单独实现这个方法。
-        return getRecommendValue();
-    }
-
-    /**
      * 当前值
      *
+     * @author wangxy
      * @param vcsdkUtils vCenter工具类
      * @param objectId 存储/主机ID
      * @return Object
      * @throws DmeException 异常
-     * @author wangxy
      */
     Object getCurrentValue(VCSDKUtils vcsdkUtils, String objectId) throws Exception;
 
     /**
      * 提示级别
      *
-     * @return java.lang.String
      * @author wangxy
+     * @return java.lang.String
      */
     String getLevel();
 
     /**
      * 是否需要重启
      *
-     * @return boolean
      * @author wangxy
+     * @return boolean
      */
     boolean needReboot();
 
     /**
      * 是否可以自动恢复
      *
-     * @return boolean
      * @author wangxy
+     * @return boolean
      */
     boolean autoRepair();
 
     /**
      * 最佳实践检查接口
      *
+     * @author wangxy
      * @param vcsdkUtils vCenter工具类
      * @param objectId 存储/主机ID
      * @return boolean
      * @throws Exception 异常
-     * @author wangxy
      */
     boolean check(VCSDKUtils vcsdkUtils, String objectId) throws Exception;
 
     /**
      * 最佳实践实施
      *
+     * @author wangxy
      * @param vcsdkUtils vCenter工具类
      * @param objectId 存储/主机ID
      * @throws Exception 异常
-     * @author wangxy
      */
     void update(VCSDKUtils vcsdkUtils, String objectId) throws Exception;
 
     /**
      * HostMOFactory
      *
-     * @return HostMOFactory
      * @author wangxy
+     * @return HostMOFactory
      */
     default HostVmwareFactory getHostMoFactory() {
         return HostVmwareFactory.getInstance();
@@ -110,8 +97,8 @@ public interface BestPracticeService {
     /**
      * DatastoreMOFactory
      *
-     * @return DatastoreMOFactory
      * @author wangxy
+     * @return DatastoreMOFactory
      */
     default DatastoreVmwareMoFactory getDatastoreMoFactory() {
         return DatastoreVmwareMoFactory.getInstance();

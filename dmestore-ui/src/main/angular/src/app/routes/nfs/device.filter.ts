@@ -3,6 +3,8 @@ import {ClrDatagridFilterInterface} from "@clr/angular";
 import {Subject} from "rxjs";
 import {List} from "./nfs.service";
 import {StorageList, StorageService} from "../storage/storage.service";
+import { mockData } from './../../../mock/mock';
+import { URLS_STORAGE } from './../storage/storage.service';
 
 @Component({
   selector: "device-filter",
@@ -23,12 +25,15 @@ export class DeviceFilter implements ClrDatagridFilterInterface<List>,OnInit {
   constructor(private storageService: StorageService,private cdr: ChangeDetectorRef){}
 
   ngOnInit(): void {
-    this.storageService.getData().subscribe((s: any) => {
-      if (s.code === '200'){
+    const deviceFilterOptionsHandler = (s: any) => {
+      if (s.code === '200') {
         this.storageList = s.data;
-       this.cdr.detectChanges();
+        this.cdr.detectChanges();
       }
-    });
+    };
+    /* TODO: */
+    //deviceFilterOptionsHandler(mockData[URLS_STORAGE.DMESTORAGE_STORAGES]);
+    this.storageService.getData().subscribe(deviceFilterOptionsHandler);
   }
   changes = new Subject<any>();
   options;

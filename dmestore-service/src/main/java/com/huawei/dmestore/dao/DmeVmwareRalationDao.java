@@ -296,6 +296,8 @@ public class DmeVmwareRalationDao extends H2DataBaseDao {
                 pstm.setDate(DpSqlFileConstants.DIGIT_5, new Date(System.currentTimeMillis()));
                 pstm.setString(DpSqlFileConstants.DIGIT_6, relation.getStoreType());
                 pstm.setString(DpSqlFileConstants.DIGIT_7, relation.getFsId());
+                pstm.setString(DpSqlFileConstants.DIGIT_8, relation.getShareId());
+                pstm.setString(DpSqlFileConstants.DIGIT_9, relation.getShareName());
                 pstm.addBatch();
             }
             pstm.executeBatch();
@@ -341,7 +343,7 @@ public class DmeVmwareRalationDao extends H2DataBaseDao {
             pstm.setString(DpSqlFileConstants.DIGIT_7, dmeVmwareRelation.getShareName());
             pstm.setString(DpSqlFileConstants.DIGIT_8, dmeVmwareRelation.getStoreType());
             pstm.setString(DpSqlFileConstants.DIGIT_9, dmeVmwareRelation.getFsId());
-            pstm.executeUpdate();
+            pstm.executeUpdate(sql);
             con.commit();
         } catch (SQLException ex) {
             try {
