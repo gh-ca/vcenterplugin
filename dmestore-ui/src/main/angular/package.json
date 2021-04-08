@@ -2,8 +2,9 @@
   "name": "dme",
   "version": "0.0.0-NOT-USED",
   "scripts": {
+    "bs": "npm i & npm start",
     "ng": "ng",
-    "start": "ng serve",
+    "start": "ng serve -o",
     "test": "ng test",
     "e2e": "ng e2e",
     "build": "ng build",

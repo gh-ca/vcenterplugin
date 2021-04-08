@@ -1,9 +1,10 @@
-import {ChangeDetectorRef, Component, OnInit, AfterViewInit, ViewChild} from '@angular/core';
-import {HttpClient} from '@angular/common/http';
-import {CommonService} from '../common.service';
-import {GlobalsService} from '../../shared/globals.service';
-import {ClrForm} from '@clr/angular';
-import {TranslatePipe} from "@ngx-translate/core";
+import { ChangeDetectorRef, Component, OnInit, AfterViewInit, ViewChild } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { CommonService } from '../common.service';
+import { GlobalsService } from '../../shared/globals.service';
+import { ClrForm } from '@clr/angular';
+import { TranslatePipe } from "@ngx-translate/core";
+import { isMockData, mockData } from 'mock/mock';
 
 @Component({
   selector: 'app-iscsi',
@@ -13,8 +14,8 @@ import {TranslatePipe} from "@ngx-translate/core";
 })
 export class IscsiComponent implements OnInit, AfterViewInit {
 
-  @ViewChild(ClrForm, {static: true}) rdmFormGroup;
-  @ViewChild('myForm', {static: true}) myForm;
+  @ViewChild(ClrForm, { static: true }) rdmFormGroup;
+  @ViewChild('myForm', { static: true }) myForm;
   testPortConnectedUrl = "accesshost/testconnectivity";
   portGetUrl = 'dmestorage/getstorageethports';
   portGetUrlParams = {
@@ -64,20 +65,20 @@ export class IscsiComponent implements OnInit, AfterViewInit {
   ipLoading = false;
   dsDeviceLoading = false;
   submitLoading = false;
-  constructor(private cdr: ChangeDetectorRef,
-              private http: HttpClient,
-              private commonService: CommonService,
-              private gs: GlobalsService, private translatePipe:TranslatePipe) { }
+  constructor(
+    private cdr: ChangeDetectorRef,
+    private http: HttpClient,
+    private commonService: CommonService,
+    private gs: GlobalsService, private translatePipe: TranslatePipe) { }
 
-  ngOnInit(): void {
-  }
+  ngOnInit(): void { }
 
   ngAfterViewInit() {
     const ctx = this.gs.getClientSdk().app.getContextObjects();
     console.log(ctx);
-    if(ctx == null){
+    if (ctx == null) {
       this.hostObjectId = 'urn:vmomi:HostSystem:host-1034:674908e5-ab21-4079-9cb1-596358ee5dd1';
-    } else{
+    } else {
       this.hostObjectId = ctx[0].id;
     }
     this.ipsGetUrlParams.params.hostObjectId = this.hostObjectId;
@@ -86,35 +87,50 @@ export class IscsiComponent implements OnInit, AfterViewInit {
     this.loadStorageDevice();
   }
 
-  loadIps(){
+  loadIps() {
     this.ipLoading = true;
-    this.http.get(this.ipsGetUrl, this.ipsGetUrlParams).subscribe((result: any) => {
+    const successHandler = (result: any) => {
       this.ipLoading = false;
-      if (result.code === '200'){
+      if (result.code === '200') {
         this.ips = result.data;
         this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
       }
-    }, err => {
+    };
+    const errorHandler = err => {
       console.error('ERROR', err);
-    });
+    };
+    /* TODO: 2021年4月7日 切换不刷新 */
+    if (isMockData) {
+      successHandler(mockData.ACCESSVMWARE_GETVMKERNELIPBYHOSTOBJECTID)
+    } else {
+      this.http.get(this.ipsGetUrl, this.ipsGetUrlParams).subscribe(successHandler, errorHandler);
+    }
     this.cdr.detectChanges();
   }
 
-  loadStorageDevice(){
+  loadStorageDevice() {
     this.dsDeviceLoading = true;
-    this.http.get(this.storageGetUrl, {}).subscribe((result: any) => {
+    const successHandler = (result: any) => {
       this.dsDeviceLoading = false;
-      if (result.code === '200'){
+      if (result.code === '200') {
         this.storageDevices = result.data;
         setTimeout(() => {
           this.loadPorts();
         }, 1000);
         this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
       }
-    }, err => {
+    };
+    const errorHandler = err => {
       console.error('ERROR', err);
-    });
+    };
+    /* TODO: */
+    if (isMockData) {
+      successHandler(mockData.DMESTORAGE_STORAGES)
+    } else {
+      this.http.get(this.storageGetUrl, {}).subscribe(successHandler, errorHandler);
+    }
   }
+
   resetListInfo() {
     // 端口列表中不展示名称为MGMT和MAINTENANCE的端口
     this.portList = []
@@ -122,52 +138,68 @@ export class IscsiComponent implements OnInit, AfterViewInit {
     // 连通状态
     this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
   }
-  loadPorts(){
+
+
+  loadPorts() {
     // 有存储 有ip才去load
-    if (this.configModel.sn !== '' && this.configModel.vmKernel.device !== ''){
+    if (this.configModel.sn !== '' && this.configModel.vmKernel.device !== '') {
       this.portLoading = true;
+      /* FIX: */
       this.resetListInfo();
       const isV6 = this.storageDevices.filter(item => item.sn == this.configModel.sn)[0].storageTypeShow.dorado;
       // V5设备访问
       if (!isV6) {
         this.portGetUrlParams.params.storageSn = this.configModel.sn;
-        this.http.get(this.portGetUrl, this.portGetUrlParams).subscribe((result: any) => {
+        const successHandler = (result: any) => {
           this.portLoading = false;
-          if (result.code === '200'){
+          if (result.code === '200') {
             // result.data.forEach((item) => {
             //   item.connectStatus = '';
             // });
             // 端口列表中不展示名称为MGMT和MAINTENANCE的端口
-            this.portList = result.data.filter(item => item.portName.toLowerCase().indexOf( 'mgmt') < 0
-              && item.portName.toLowerCase().indexOf('maintenance') < 0  && item.mgmtIp);
+            this.portList = result.data.filter(item => item.portName.toLowerCase().indexOf('mgmt') < 0
+              && item.portName.toLowerCase().indexOf('maintenance') < 0 && item.mgmtIp);
             this.portTotal = result.data.length;
             // 连通状态
             this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
             this.testPortConnected();
           }
-        }, err => {
+        };
+
+        const errorHandler = err => {
           console.error('ERROR', err);
           this.portLoading = false;
-        });
+        };
+
+        /* TODO: */
+        if (isMockData) {
+          if (this.configModel.sn !== '2102351QLH9WK5800028_mock') {
+            successHandler(mockData.DMESTORAGE_GETSTORAGEETHPORTS);
+          } else {
+            this.portLoading = false;
+          }
+        } else {
+          this.http.get(this.portGetUrl, this.portGetUrlParams).subscribe(successHandler, errorHandler);
+        }
       } else {// V6设备访问
         this.portLoading = true;
         const storageId = this.storageDevices.filter(item => item.sn == this.configModel.sn)[0].id;
-        this.http.get('dmestorage/logicports?storageId=' + storageId + '&supportProtocol=iSCSI').subscribe((result: any) => {
+        const successHandler = (result: any) => {
           this.portLoading = false;
-          if (result.code === '200'){
+          if (result.code === '200') {
             const logicDatas = [];
-            for (let i = 0;i < result.data.length; i++) {
+            for (let i = 0; i < result.data.length; i++) {
               let logicData = {
-                id:'',
+                id: '',
                 location: '',
                 portName: '',
                 mgmtIp: '',
                 mgmtIpv6: '',
-                mac:'',
-                maxSpeed:null,
-                speed:null,
-                status:'',
-                connectStatusType:'',
+                mac: '',
+                maxSpeed: null,
+                speed: null,
+                status: '',
+                connectStatusType: '',
               };
               logicData.location = result.data[i].currentPortName;
               logicData.id = result.data[i].id;
@@ -179,42 +211,50 @@ export class IscsiComponent implements OnInit, AfterViewInit {
             }
 
             // 端口列表中不展示名称为MGMT和MAINTENANCE的端口
-            this.portList = logicDatas.filter(item => item.portName.toLowerCase().indexOf( 'mgmt') < 0
-              && item.portName.toLowerCase().indexOf('maintenance') < 0  && item.mgmtIp);
+            this.portList = logicDatas.filter(item => item.portName.toLowerCase().indexOf('mgmt') < 0
+              && item.portName.toLowerCase().indexOf('maintenance') < 0 && item.mgmtIp);
             // 连通状态
             this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
             this.testPortConnected();
           }
-        }, err => {
+        };
+
+        const errorHandler = err => {
           console.error('ERROR', err);
           this.portLoading = false;
-        });
+        }
+        /* TODO: */
+        if (isMockData) {
+          successHandler(mockData.DMESTORAGE_GETSTORAGEETHPORTS)
+        } else {
+          this.http.get('dmestorage/logicports?storageId=' + storageId + '&supportProtocol=iSCSI').subscribe(successHandler, errorHandler);
+        }
       }
     }
   }
 
-  testPortConnected(){
+  testPortConnected() {
     const p = new testConnectParams();
     const testPortList = [];
-    this.portList.forEach((item)=>{
-       // if (item.mgmtIp && item.mgmtIp != ""){
-         testPortList.push(item);
-       // }
+    this.portList.forEach((item) => {
+      // if (item.mgmtIp && item.mgmtIp != ""){
+      testPortList.push(item);
+      // }
     });
     p.ethPorts = testPortList;
     p.hostObjectId = this.configModel.hostObjectId;
     p.vmKernel = this.configModel.vmKernel;
     this.http.post(this.testPortConnectedUrl, p).subscribe((result: any) => {
-      if (result.code === '200' && result.data){
-        result.data.forEach((i)=>{
-            this.portList.forEach((j)=>{
-               if(i.id == j.id){
-                 j.connectStatus = i.connectStatus;
-                 j.connectStatusType = i.connectStatusType;
-               }
-            });
+      if (result.code === '200' && result.data) {
+        result.data.forEach((i) => {
+          this.portList.forEach((j) => {
+            if (i.id == j.id) {
+              j.connectStatus = i.connectStatus;
+              j.connectStatusType = i.connectStatusType;
+            }
+          });
         });
-      } else{
+      } else {
         alert("测试连通性出错");
       }
       this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
@@ -223,13 +263,13 @@ export class IscsiComponent implements OnInit, AfterViewInit {
     });
   }
 
-  submit(){
+  submit() {
     this.isSubmit = true;
     if (this.myForm.form.invalid) {
       this.rdmFormGroup.markAsTouched();
       return;
-    } else{
-      if(this.configModel.ethPorts.length == 0){
+    } else {
+      if (this.configModel.ethPorts.length == 0) {
         return;
       }
     }
@@ -237,9 +277,9 @@ export class IscsiComponent implements OnInit, AfterViewInit {
     this.submitLoading = true;
     this.http.post(this.configIscsiUrl, this.configModel).subscribe((result: any) => {
       this.submitLoading = false;
-      if(result.code == '200'){
+      if (result.code == '200') {
         this.tipModalSuccess = true;
-      } else{
+      } else {
         this.tipModalFail = true;
       }
       this.cdr.detectChanges();
@@ -249,7 +289,7 @@ export class IscsiComponent implements OnInit, AfterViewInit {
     this.cdr.detectChanges();
   }
 
-  closeWin(){
+  closeWin() {
     this.gs.getClientSdk().modal.close();
   }
   footerTranslate() {
@@ -262,13 +302,13 @@ export class IscsiComponent implements OnInit, AfterViewInit {
       selectDom.innerText = this.translatePipe.transform('iscsi.selectAll');
     }
   }
-  sortFunc(obj:any) {
+  sortFunc(obj: any) {
     return !obj;
   }
 }
 
 
-class testConnectParams{
+class testConnectParams {
   ethPorts: any[];
   hostObjectId: string;
   vmKernel: object;

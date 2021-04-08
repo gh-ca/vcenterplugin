@@ -13,11 +13,12 @@ import {
   ClusterList,
   ServiceLevelList, HostOrCluster, GetForm, Workload, StoragePoolMap, ConnFaildData,
 } from './list.service';
-import {ClrWizard, ClrWizardPage} from '@clr/angular';
-import {GlobalsService} from '../../../shared/globals.service';
-import {Router} from "@angular/router";
-import {DeviceFilter, ProtectionStatusFilter, ServiceLevelFilter, StatusFilter} from "./filter.component";
-import {FormControl, FormGroup, Validators} from "@angular/forms";
+import { ClrWizard, ClrWizardPage } from '@clr/angular';
+import { GlobalsService } from '../../../shared/globals.service';
+import { Router } from "@angular/router";
+import { DeviceFilter, ProtectionStatusFilter, ServiceLevelFilter, StatusFilter } from "./filter.component";
+import { FormControl, FormGroup, Validators } from "@angular/forms";
+import { isMockData, mockData } from 'mock/mock';
 
 
 @Component({
@@ -34,14 +35,14 @@ export class VmfsListComponent implements OnInit {
   }
 
   constructor(private remoteSrv: VmfsListService, private cdr: ChangeDetectorRef,
-              public gs: GlobalsService, private router:Router) {}
+    public gs: GlobalsService, private router: Router) { }
   // 添加页面窗口
   @ViewChild('wizard') wizard: ClrWizard;
   @ViewChild('addPageOne') addPageOne: ClrWizardPage;
   @ViewChild('addPageTwo') addPageTwo: ClrWizardPage;
 
-  @ViewChild('statusFilter') statusFilter:StatusFilter;
-  @ViewChild('deviceFilter') deviceFilter:DeviceFilter;
+  @ViewChild('statusFilter') statusFilter: StatusFilter;
+  @ViewChild('deviceFilter') deviceFilter: DeviceFilter;
   @ViewChild('serviceLevelFilter') serviceLevelFilter: ServiceLevelFilter;
   // @ViewChild('protectionStatusFilter') protectionStatusFilter:ProtectionStatusFilter;
 
@@ -67,7 +68,7 @@ export class VmfsListComponent implements OnInit {
   popListShow = false; // 添加弹出层显示
   addSuccessShow = false; // 添加成功弹窗
   connectivityFailure = false; // 主机联通性测试失败
-  connFailData:ConnFaildData[]; //  主机联通性测试失败数据
+  connFailData: ConnFaildData[]; //  主机联通性测试失败数据
   showDetail = false; // 展示主机联通异常数据
   isAddPage = false; // true 添加页面 false 挂载页面
   // 添加表单数据
@@ -78,7 +79,7 @@ export class VmfsListComponent implements OnInit {
     isSameName: new FormControl(true,
       Validators.required),
     volumeName: new FormControl('',
-      ),
+    ),
     version: new FormControl('5',
       Validators.required),
     capacity: new FormControl('',
@@ -105,10 +106,10 @@ export class VmfsListComponent implements OnInit {
   changeServiceLevelForm = new GetForm().getChangeLevelForm();
   storageList: StorageList[] = []; // 存储数据
   storagePoolList: StoragePoolList[] = []; // 存储池ID
-  storagePoolMap:StoragePoolMap[] = [];
-  storage:StorageList; // 存储详情（编辑页面使用参数）
+  storagePoolMap: StoragePoolMap[] = [];
+  storage: StorageList; // 存储详情（编辑页面使用参数）
 
-  workloads:Workload[] = []; // Workload
+  workloads: Workload[] = []; // Workload
   blockSizeOptions = []; // 块大小选择
   srgOptions = []; // 空间回收粒度初始化
   deviceList: HostOrCluster[] = []; // 主机AND集群
@@ -194,7 +195,7 @@ export class VmfsListComponent implements OnInit {
     // 初始化form
     this.modifyForm = new GetForm().getEditForm();
     this.initIopsErrTips(true, true);
-    console.log('this.rowSelected[0]', this.modifyForm );
+    console.log('this.rowSelected[0]', this.modifyForm);
     if (this.rowSelected.length === 1) {
       this.modalLoading = false;
       this.modalHandleLoading = false;
@@ -327,7 +328,7 @@ export class VmfsListComponent implements OnInit {
       console.log("this.modifyForm.control_policyUpper == '1'", this.modifyForm.control_policyUpper == '1');
       if (this.modifyForm.control_policyUpper == '1') { // 上限+全选（上下限）
         this.modifyForm.control_policy = '1';
-      } else if(this.modifyForm.control_policyLower == '0') {// 下限
+      } else if (this.modifyForm.control_policyLower == '0') {// 下限
         this.modifyForm.control_policy = '0';
       } else {
         this.modifyForm.control_policy = null;
@@ -357,39 +358,45 @@ export class VmfsListComponent implements OnInit {
   refreshVmfs() {
     this.isLoading = true;
     // 进行数据加载
-    this.remoteSrv.getData()
-        .subscribe((result: any) => {
-          if (result.code === '200' && null != result.data ) {
-            this.list = result.data;
-            if (null !== this.list) {
-              if (this.list) {
-                this.total = this.list.length;
-                // 获取chart 数据
-                const wwns = [];
-                this.list.forEach(item => {
-                  if (item == null) {
-                    console.log(item)
-                  }
-                  if (item) {
-                    if (item.capacity && item.freeSpace) {
-                      item.usedCapacity = item.capacity - item.freeSpace;
-                      item.capacityUsage = ((item.capacity - item.freeSpace)/item.capacity);
-                    }
-                    wwns.push(item.wwn);
-                  }
-                });
-                // 设置卷ID集合
-                this.wwns = wwns;
-                if (this.radioCheck === 'chart') {
-                  this.getPerformanceData();
-                }
+    const successHandler = (result: any) => {
+      if (result.code === '200' && null != result.data) {
+        this.list = result.data;
+        if (null !== this.list) {
+          if (this.list) {
+            this.total = this.list.length;
+            // 获取chart 数据
+            const wwns = [];
+            this.list.forEach(item => {
+              if (item == null) {
+                console.log(item)
               }
+              if (item) {
+                if (item.capacity && item.freeSpace) {
+                  item.usedCapacity = item.capacity - item.freeSpace;
+                  item.capacityUsage = ((item.capacity - item.freeSpace) / item.capacity);
+                }
+                wwns.push(item.wwn);
+              }
+            });
+            // 设置卷ID集合
+            this.wwns = wwns;
+            if (this.radioCheck === 'chart') {
+              this.getPerformanceData();
             }
-          } else {
           }
-          this.isLoading = false;
-          this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
-        });
+        }
+      } else {
+      }
+      this.isLoading = false;
+      this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
+    };
+
+    /* TODO: */
+    if (isMockData) {
+      successHandler(mockData.ACCESSVMFS_LISTVMFS)
+    } else {
+      this.remoteSrv.getData().subscribe(successHandler);
+    }
   }
   // 点刷新那个功能是分两步，一步是刷新，然后等我们这边的扫描任务，任务完成后返回你状态，任务成功后，你再刷新列表页面。
   scanDataStore() {
@@ -438,7 +445,7 @@ export class VmfsListComponent implements OnInit {
       this.isLoading = true;
       this.remoteSrv.getChartData(this.wwns).subscribe((chartResult: any) => {
         if (chartResult.code === '200' && chartResult.data != null) {
-          const chartList: VmfsInfo [] = chartResult.data;
+          const chartList: VmfsInfo[] = chartResult.data;
           this.list.forEach(item => {
             chartList.forEach(charItem => {
               // 若属同一个卷则将chartItem的带宽、iops、读写相应时间 值赋予列表
@@ -463,13 +470,13 @@ export class VmfsListComponent implements OnInit {
     this.remoteSrv.getStorages().subscribe((result: any) => {
       if (result.code === '200' && result.data !== null) {
         this.storageList = result.data;
-        const allPoolMap:StoragePoolMap[] = []
+        const allPoolMap: StoragePoolMap[] = []
 
-        result.data.forEach(item  => {
-          const poolMap:StoragePoolMap = {
-            storageId:item.id,
-            storagePoolList:null,
-            workloadList:null
+        result.data.forEach(item => {
+          const poolMap: StoragePoolMap = {
+            storageId: item.id,
+            storagePoolList: null,
+            workloadList: null
           }
           allPoolMap.push(poolMap);
         });
@@ -502,7 +509,7 @@ export class VmfsListComponent implements OnInit {
 
       const storagePoolList = storagePoolMap[0].storagePoolList;
       const workloads = storagePoolMap[0].workloadList;
-      const storages=this.storageList.filter(item=>item.id==this.form.storage_id)[0];
+      const storages = this.storageList.filter(item => item.id == this.form.storage_id)[0];
       const dorado = storages.storageTypeShow.dorado;
       let mediaType;
       if (dorado) { // v6设备
@@ -512,15 +519,15 @@ export class VmfsListComponent implements OnInit {
       }
       // 存储池
       // if (!storagePoolList) {
-        this.remoteSrv.getStoragePoolsByStorId(this.form.storage_id, mediaType).subscribe((result: any) => {
-          if (result.code === '200' && result.data !== null) {
-            this.storagePoolList = result.data;
+      this.remoteSrv.getStoragePoolsByStorId(this.form.storage_id, mediaType).subscribe((result: any) => {
+        if (result.code === '200' && result.data !== null) {
+          this.storagePoolList = result.data;
 
-            this.storagePoolMap.filter(item => item.storageId == this.form.storage_id)[0].storagePoolList = result.data;
+          this.storagePoolMap.filter(item => item.storageId == this.form.storage_id)[0].storagePoolList = result.data;
 
-            this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
-          }
-        });
+          this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
+        }
+      });
       // } else {
       //   this.storagePoolList = storagePoolList;
       // }
@@ -535,8 +542,8 @@ export class VmfsListComponent implements OnInit {
             this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
           }
         });
-      // } else {
-      //   this.workloads = workloads;
+        // } else {
+        //   this.workloads = workloads;
       }
     }
   }
@@ -546,12 +553,12 @@ export class VmfsListComponent implements OnInit {
     const options = [];
     const versionVal = this.form.version + '';
     if (versionVal === '6') {
-      const option1 = {key: 1024, value : '1MB'};
+      const option1 = { key: 1024, value: '1MB' };
       options.push(option1);
       // const option2 = {key: 64, value : '64KB'};
       // options.push(option2);
     } else if (versionVal === '5') {
-      const option1 = {key: 1024, value : '1MB'};
+      const option1 = { key: 1024, value: '1MB' };
       options.push(option1);
     }
     // 设置blockSize 可选值
@@ -567,17 +574,17 @@ export class VmfsListComponent implements OnInit {
     const blockValue = this.form.blockSize + '';
     const versionVal = this.form.version + '';
     if (blockValue === '1024') {
-      const option1 = {key: 1024, value : '1MB'};
+      const option1 = { key: 1024, value: '1MB' };
       options.push(option1);
-      if(versionVal === '5') {
-        const option2 = {key: 8, value : '8KB'};
+      if (versionVal === '5') {
+        const option2 = { key: 8, value: '8KB' };
         options.push(option2);
       }
     } else if (blockValue === '64') {
-      const option1 = {key: 64, value : '64KB'};
+      const option1 = { key: 64, value: '64KB' };
       options.push(option1);
       if (versionVal === '5') {
-        const option2 = {key: 8, value : '8KB'};
+        const option2 = { key: 8, value: '8KB' };
         options.push(option2);
       }
     }
@@ -639,7 +646,7 @@ export class VmfsListComponent implements OnInit {
   setClusterDatas() {
     return new Promise((resolve, reject) => {
       this.remoteSrv.getClusterList().subscribe((result: any) => {
-        let clusterList: ClusterList [] = []; // 集群列表
+        let clusterList: ClusterList[] = []; // 集群列表
         if (result.code === '200' && result.data !== null) {
           clusterList = result.data;
           clusterList.forEach(item => {
@@ -784,11 +791,11 @@ export class VmfsListComponent implements OnInit {
         addSubmitForm.service_level_name = null;
       }
       // 控制策略若未选清空数据
-      if( this.levelCheck == 'customer') {
+      if (this.levelCheck == 'customer') {
         this.qosFunc(addSubmitForm);
         if (addSubmitForm.control_policyUpper == '1') { // 上限+全选（上下限）
           addSubmitForm.control_policy = '1';
-        } else if(addSubmitForm.control_policyLower == '0') {// 下限
+        } else if (addSubmitForm.control_policyLower == '0') {// 下限
           addSubmitForm.control_policy = '0';
         } else {
           addSubmitForm.control_policy = null;
@@ -814,23 +821,23 @@ export class VmfsListComponent implements OnInit {
           // this.scanDataStore();
           // 打开成功提示窗口
           this.addSuccessShow = true;
-        } else if (result.code === '-60001'){
-            this.connectivityFailure = true;
-            this.showDetail = false;
-            this.isAddPage = true;
-            const connFailDatas:ConnFaildData[] = [];
-            if (result.data) {
-              result.data.forEach(item => {
-                for (let key in item) {
-                  const conFailData = {
-                    hostName: key,
-                    description: item[key]
-                  };
-                  connFailDatas.push(conFailData);
-                }
-              });
-              this.connFailData = connFailDatas;
-            }
+        } else if (result.code === '-60001') {
+          this.connectivityFailure = true;
+          this.showDetail = false;
+          this.isAddPage = true;
+          const connFailDatas: ConnFaildData[] = [];
+          if (result.data) {
+            result.data.forEach(item => {
+              for (let key in item) {
+                const conFailData = {
+                  hostName: key,
+                  description: item[key]
+                };
+                connFailDatas.push(conFailData);
+              }
+            });
+            this.connFailData = connFailDatas;
+          }
         } else {
           console.log('创建失败：' + result.description);
           // 失败信息
@@ -928,7 +935,7 @@ export class VmfsListComponent implements OnInit {
     this.setServiceLevelList();
   }
   // 页面跳转
-  navigateTo(objectid: string){
+  navigateTo(objectid: string) {
     console.log('页面跳转了');
     console.log(objectid);
     this.gs.getClientSdk().app.navigateTo({
@@ -948,7 +955,7 @@ export class VmfsListComponent implements OnInit {
     this.remoteSrv.delVmfs(delInfos).subscribe((result: any) => {
 
       this.modalHandleLoading = false;
-      if (result.code === '200'){
+      if (result.code === '200') {
         console.log('DEL success' + this.rowSelected[0].name + ' success');
         // 关闭删除页面
         this.delShow = false;
@@ -1015,11 +1022,11 @@ export class VmfsListComponent implements OnInit {
     });
   }
 
-  jumpPage(objectId:string,url:string){
+  jumpPage(objectId: string, url: string) {
     const resource = 'list';
-    this.router.navigate([url],{
-      queryParams:{
-        objectId,resource
+    this.router.navigate([url], {
+      queryParams: {
+        objectId, resource
       }
     });
   }
@@ -1028,7 +1035,7 @@ export class VmfsListComponent implements OnInit {
     return new Promise((resolve, reject) => {
       // 获取集群 通过ObjectId过滤已挂载的集群
       this.remoteSrv.getClusterListByObjectId(this.rowSelected[0].objectid).subscribe((result: any) => {
-        if (result.code === '200' && result.data !== null){
+        if (result.code === '200' && result.data !== null) {
           result.data.forEach(item => {
             this.clusterList.push(item);
           });
@@ -1045,7 +1052,7 @@ export class VmfsListComponent implements OnInit {
     return new Promise((resolve, reject) => {
       // 获取服务器 通过ObjectId过滤已挂载的服务器
       this.remoteSrv.getHostListByObjectId(this.rowSelected[0].objectid).subscribe((result: any) => {
-        if (result.code === '200' && result.data !== null){
+        if (result.code === '200' && result.data !== null) {
           result.data.forEach(item => {
             this.hostList.push(item);
           });
@@ -1057,16 +1064,16 @@ export class VmfsListComponent implements OnInit {
     });
   }
   // 挂载提交
-  mountSubmit(){
+  mountSubmit() {
 
     console.log('this.chooseHost', this.chooseHost);
     if (this.chooseHost || this.chooseCluster) {
       this.mountErr = false;
       // 数据封装
-      if (this.mountForm.mountType === '1'){ // 服务器
+      if (this.mountForm.mountType === '1') { // 服务器
         this.mountForm.hostId = this.chooseHost.hostId;
         this.mountForm.host = this.chooseHost.hostName;
-      }else if (this.mountForm.mountType === '2'){ // 集群
+      } else if (this.mountForm.mountType === '2') { // 集群
         this.mountForm.cluster = this.chooseCluster.clusterName;
         this.mountForm.clusterId = this.chooseCluster.clusterId;
       }
@@ -1074,7 +1081,7 @@ export class VmfsListComponent implements OnInit {
       this.modalHandleLoading = true;
       this.remoteSrv.mountVmfs(this.mountForm).subscribe((result: any) => {
         this.modalHandleLoading = false;
-        if (result.code  ===  '200'){
+        if (result.code === '200') {
           console.log('挂载成功');
           // 关闭挂载页面
           this.mountShow = false;
@@ -1082,11 +1089,11 @@ export class VmfsListComponent implements OnInit {
           // this.scanDataStore();
           // 打开成功提示窗口
           this.mountSuccessShow = true;
-        } else if(result.code === '-60001') {
+        } else if (result.code === '-60001') {
           this.connectivityFailure = true;
           this.showDetail = false;
           this.isAddPage = false;
-          const connFailDatas:ConnFaildData[] = [];
+          const connFailDatas: ConnFaildData[] = [];
           if (result.data) {
             result.data.forEach(item => {
               for (let key in item) {
@@ -1129,7 +1136,7 @@ export class VmfsListComponent implements OnInit {
         console.log(result);
         if (result.code === '200' && result.data !== null && result.data.length >= 1) {
           this.unmountForm.mountType = '1';
-          const mountHost: HostOrCluster [] = [];
+          const mountHost: HostOrCluster[] = [];
           result.data.forEach(item => {
             const hostInfo = {
               deviceId: item.hostId,
@@ -1146,7 +1153,7 @@ export class VmfsListComponent implements OnInit {
           console.log(result);
           if (result.code === '200' && result.data !== null && result.data.length >= 1) {
             this.unmountForm.mountType = '2';
-            const mountCluster: HostOrCluster [] = [];
+            const mountCluster: HostOrCluster[] = [];
             result.data.forEach(item => {
               const hostInfo = {
                 deviceId: item.hostGroupId,
@@ -1192,7 +1199,7 @@ export class VmfsListComponent implements OnInit {
       this.modalHandleLoading = true;
       this.remoteSrv.unmountVMFS(this.unmountForm).subscribe((result: any) => {
         this.modalHandleLoading = false;
-        if (result.code === '200'){
+        if (result.code === '200') {
           console.log('unmount ' + this.rowSelected[0].name + ' success');
           // 关闭卸载页面
           this.unmountShow = false;
@@ -1216,14 +1223,14 @@ export class VmfsListComponent implements OnInit {
     reclaimIds.push(vmfsObjectIds)
     this.remoteSrv.reclaimVmfs(reclaimIds).subscribe((result: any) => {
       this.modalHandleLoading = false;
-      if (result.code === '200'){
+      if (result.code === '200') {
         // 关闭回收空间页面
         this.reclaimShow = false;
         // 空间回收完成重新请求数据
         // this.scanDataStore();
         // 打开成功提示窗口
         this.reclaimSuccessShow = true;
-      }else {
+      } else {
         this.isOperationErr = true;
       }
       this.cdr.detectChanges();
@@ -1269,7 +1276,7 @@ export class VmfsListComponent implements OnInit {
       this.modalHandleLoading = true;
       this.remoteSrv.changeServiceLevel(this.changeServiceLevelForm).subscribe((result: any) => {
         this.modalHandleLoading = false;
-        if (result.code === '200'){
+        if (result.code === '200') {
           console.log('change service level success:' + name);
           // 关闭修改服务等级页面
           this.changeServiceLevelShow = false;
@@ -1278,7 +1285,7 @@ export class VmfsListComponent implements OnInit {
           // 打开成功提示窗口
           this.changeServiceLevelSuccessShow = true;
         } else {
-          console.log('change service level faild: ' + name  + ' Reason:' + result.description);
+          console.log('change service level faild: ' + name + ' Reason:' + result.description);
           this.isOperationErr = true;
         }
 
@@ -1329,7 +1336,7 @@ export class VmfsListComponent implements OnInit {
       // 参数封装
       this.remoteSrv.expandVMFS(expandSubmitForm).subscribe((result: any) => {
         this.modalHandleLoading = false;
-        if (result.code === '200'){
+        if (result.code === '200') {
           console.log('expand success:' + name);
           // 隐藏扩容页面
           this.expandShow = false;
@@ -1337,8 +1344,8 @@ export class VmfsListComponent implements OnInit {
           // this.scanDataStore();
           // 打开成功提示窗口
           this.expandSuccessShow = true;
-        }else {
-          console.log('expand: ' + name  + ' Reason:' + result.description);
+        } else {
+          console.log('expand: ' + name + ' Reason:' + result.description);
           // 错误信息 展示
           this.isOperationErr = true;
         }
@@ -1358,7 +1365,7 @@ export class VmfsListComponent implements OnInit {
       if (expand > 0) {
         switch (this.expandForm.capacityUnit) {
           case 'TB':
-            if ((expand*1024).toString().indexOf(".")!==-1) { // 小数
+            if ((expand * 1024).toString().indexOf(".") !== -1) { // 小数
               this.expandErr = true;
               expand = null;
             } else {
@@ -1366,7 +1373,7 @@ export class VmfsListComponent implements OnInit {
             }
             break;
           default: // 默认GB 不变
-            if (expand.toString().indexOf(".")!==-1) { // 小数
+            if (expand.toString().indexOf(".") !== -1) { // 小数
               this.expandErr = true;
               expand = null;
             } else {
@@ -1397,7 +1404,7 @@ export class VmfsListComponent implements OnInit {
       const vmfsObjectIds = this.rowSelected[0].objectid;
 
       this.modalHandleLoading = true;
-      this.remoteSrv.reclaimVmfsJudge(vmfsObjectIds).subscribe((result:any) => {
+      this.remoteSrv.reclaimVmfsJudge(vmfsObjectIds).subscribe((result: any) => {
         this.modalHandleLoading = false;
         if (result.code == '200') {
           if (!result.data) {
@@ -1425,14 +1432,14 @@ export class VmfsListComponent implements OnInit {
    * @param c 容量值
    * @param isGB true GB、false MB
    */
-  formatCapacity(c: number, isGB:boolean){
+  formatCapacity(c: number, isGB: boolean) {
     let cNum;
-    if (c < 1024){
-      cNum = isGB ? c.toFixed(3)+'GB':c.toFixed(3)+'MB';
-    }else if(c >= 1024 && c< 1048576){
-      cNum = isGB ? (c/1024).toFixed(3) + 'TB' : (c/1024).toFixed(3) + 'GB';
-    }else if(c>= 1048576){
-      cNum = isGB ? (c/1024/1024).toFixed(3) + 'PB':(c/1024/1024).toFixed(3) + 'TB';
+    if (c < 1024) {
+      cNum = isGB ? c.toFixed(3) + 'GB' : c.toFixed(3) + 'MB';
+    } else if (c >= 1024 && c < 1048576) {
+      cNum = isGB ? (c / 1024).toFixed(3) + 'TB' : (c / 1024).toFixed(3) + 'GB';
+    } else if (c >= 1048576) {
+      cNum = isGB ? (c / 1024 / 1024).toFixed(3) + 'PB' : (c / 1024 / 1024).toFixed(3) + 'TB';
     }
     return cNum;
   }
@@ -1454,22 +1461,22 @@ export class VmfsListComponent implements OnInit {
           case "TB":
             capacityG = capacity * 1024 + '';
             console.log('capacityG2', capacityG);
-            if (capacityG.indexOf(".")!==-1) { // 小数
+            if (capacityG.indexOf(".") !== -1) { // 小数
               this.capacityErr = true;
               capacity = '';
-            } else{ // 整数
+            } else { // 整数
               if (this.form.version === '5') {
-                if (capacity < 1/1024) {
+                if (capacity < 1 / 1024) {
                   capacity = '';
                   this.capacityErr = true;
                 } else {
                   this.capacityErr = false;
                 }
               } else {
-                if (capacity < 2/1024) {
+                if (capacity < 2 / 1024) {
                   capacity = '';
                   this.capacityErr = true;
-                }else {
+                } else {
                   this.capacityErr = false;
                 }
               }
@@ -1477,22 +1484,22 @@ export class VmfsListComponent implements OnInit {
             break;
           case "MB":
             capacityG = capacity / 1024 + '';
-            if (capacityG.indexOf(".")!==-1) { // 小数
+            if (capacityG.indexOf(".") !== -1) { // 小数
               this.capacityErr = true;
               capacity = '';
             } else { // 整数
               if (this.form.version === '5') {
-                if (capacity < 1*1024) {
+                if (capacity < 1 * 1024) {
                   capacity = '';
                   this.capacityErr = true;
-                }else {
+                } else {
                   this.capacityErr = false;
                 }
               } else {
-                if (capacity < 2*1024) {
+                if (capacity < 2 * 1024) {
                   capacity = '';
                   this.capacityErr = true;
-                }else {
+                } else {
                   this.capacityErr = false;
                 }
               }
@@ -1500,7 +1507,7 @@ export class VmfsListComponent implements OnInit {
             break;
           default:
             capacityG = capacity + '';
-            if (capacityG.indexOf(".")!==-1) { // 小数
+            if (capacityG.indexOf(".") !== -1) { // 小数
               capacity = '';
               this.capacityErr = true;
             } else {// 整数
@@ -1542,7 +1549,7 @@ export class VmfsListComponent implements OnInit {
   countBlur() {
     let count = this.form.count;
     if (count && count !== null && count !== '') {
-      if ((count+'').indexOf(".")!==-1) { // 小数
+      if ((count + '').indexOf(".") !== -1) { // 小数
         count = '';
         this.capacityErr = true;
       } else {
@@ -1551,7 +1558,7 @@ export class VmfsListComponent implements OnInit {
     } else {
       count = '';
     }
-    this.form.count =  count;
+    this.form.count = count;
   }
 
   /**
@@ -1569,7 +1576,7 @@ export class VmfsListComponent implements OnInit {
    * @param operationType add modify
    * @param valType
    */
-  qosBlur(type:string, operationType:string) {
+  qosBlur(type: string, operationType: string) {
 
     let objVal;
     if (type === 'add') {
@@ -1610,13 +1617,13 @@ export class VmfsListComponent implements OnInit {
       }
     }
     if (objVal && objVal !== '') {
-      if (objVal.toString().match( /^[1-9]\d*$/)) {
+      if (objVal.toString().match(/^[1-9]\d*$/)) {
         objVal = objVal.toString().match(/^[1-9]\d*$/)[0];
       } else {
         objVal = '';
       }
     }
-    if (objVal > 999999999){
+    if (objVal > 999999999) {
       objVal = '';
     } else if (objVal < 1) {
       objVal = '';
@@ -1671,42 +1678,42 @@ export class VmfsListComponent implements OnInit {
    * @param objVal
    * @param operationType
    */
-  iopsErrTips(objVal:string, operationType:string, type:string) {
+  iopsErrTips(objVal: string, operationType: string, type: string) {
     if (operationType) {
       if (type == 'add') {
         switch (operationType) {
           case 'maxbandwidth':
             if (objVal == '' && this.form.maxbandwidthChoose) {
               this.bandWidthMaxErrTips = true;
-            }else {
+            } else {
               this.bandWidthMaxErrTips = false;
             }
             break;
           case 'maxiops':
             if (objVal == '' && this.form.maxiopsChoose) {
               this.iopsMaxErrTips = true;
-            }else {
+            } else {
               this.iopsMaxErrTips = false;
             }
             break;
           case 'minbandwidth':
             if (objVal == '' && this.form.minbandwidthChoose) {
               this.bandWidthMinErrTips = true;
-            }else {
+            } else {
               this.bandWidthMinErrTips = false;
             }
             break;
           case 'miniops':
             if (objVal == '' && this.form.miniopsChoose) {
               this.iopsMinErrTips = true;
-            }else {
+            } else {
               this.iopsMinErrTips = false;
             }
             break;
           default:
             if (objVal == '' && this.form.latencyChoose) {
               this.latencyErrTips = true;
-            }else {
+            } else {
               this.latencyErrTips = false;
             }
             break;
@@ -1716,35 +1723,35 @@ export class VmfsListComponent implements OnInit {
           case 'max_bandwidth':
             if (objVal == '' && this.modifyForm.maxbandwidthChoose) {
               this.bandWidthMaxErrTips = true;
-            }else {
+            } else {
               this.bandWidthMaxErrTips = false;
             }
             break;
           case 'max_iops':
             if (objVal == '' && this.modifyForm.maxiopsChoose) {
               this.iopsMaxErrTips = true;
-            }else {
+            } else {
               this.iopsMaxErrTips = false;
             }
             break;
           case 'min_bandwidth':
             if (objVal == '' && this.modifyForm.minbandwidthChoose) {
               this.bandWidthMinErrTips = true;
-            }else {
+            } else {
               this.bandWidthMinErrTips = false;
             }
             break;
           case 'min_iops':
             if (objVal == '' && this.modifyForm.miniopsChoose) {
               this.iopsMinErrTips = true;
-            }else {
+            } else {
               this.iopsMinErrTips = false;
             }
             break;
           default:
             if (objVal == '' && this.modifyForm.latencyChoose) {
               this.latencyErrTips = true;
-            }else {
+            } else {
               this.latencyErrTips = false;
             }
             break;
@@ -1756,7 +1763,7 @@ export class VmfsListComponent implements OnInit {
   /**
    * 初始化IOPS错误提示
    */
-  initIopsErrTips(upper:boolean, lower:boolean){
+  initIopsErrTips(upper: boolean, lower: boolean) {
     if (upper) {
       this.bandWidthMaxErrTips = false;
       this.iopsMaxErrTips = false;
@@ -1796,7 +1803,7 @@ export class VmfsListComponent implements OnInit {
     this.volNameRepeatErr = false;
     this.matchErr = false;
 
-    let reg5:RegExp = new RegExp('^[0-9a-zA-Z-\u4e00-\u9fa5a"_""."]*$');
+    let reg5: RegExp = new RegExp('^[0-9a-zA-Z-\u4e00-\u9fa5a"_""."]*$');
     if (isVmfs) {
       if (this.form.name) {
         if (reg5.test(this.form.name)) {
@@ -1883,7 +1890,7 @@ export class VmfsListComponent implements OnInit {
     this.vmfsNameRepeatErr = false;
     this.volNameRepeatErr = false;
     this.matchErr = false;
-    let reg5:RegExp = new RegExp('^[0-9a-zA-Z-\u4e00-\u9fa5a"_""."]*$');
+    let reg5: RegExp = new RegExp('^[0-9a-zA-Z-\u4e00-\u9fa5a"_""."]*$');
     if (this.bandWidthMaxErrTips || this.iopsMaxErrTips
       || this.bandWidthMinErrTips || this.iopsMinErrTips || this.latencyErrTips || this.bandwidthLimitErr || this.iopsLimitErr) {
       return;
@@ -1953,7 +1960,7 @@ export class VmfsListComponent implements OnInit {
     if (!form.qosFlag) {// 关闭状态
       this.initAddMinInfo(form);
       this.initAddMaxInfo(form);
-    }else {
+    } else {
       if (form.control_policyUpper == '1') {
         if (!form.maxbandwidthChoose) {
           form.maxbandwidth = null;
@@ -1968,9 +1975,9 @@ export class VmfsListComponent implements OnInit {
         this.initAddMaxInfo(form);
       }
       if (form.control_policyLower == '0') {
-        if(qosTag == 2){
+        if (qosTag == 2) {
           this.initAddMaxInfo(form);
-        }else if (qosTag == 3) {
+        } else if (qosTag == 3) {
           this.initAddMinInfo(form);
         }
         if (!form.minbandwidthChoose) {
@@ -2013,8 +2020,8 @@ export class VmfsListComponent implements OnInit {
    * add qos开关
    * @param form
    */
-  qoSAddFlagChange(form){
-    if(form.qosFlag) {
+  qoSAddFlagChange(form) {
+    if (form.qosFlag) {
       form.control_policyUpper = undefined;
       form.maxbandwidthChoose = false;
       form.maxiopsChoose = false;
@@ -2031,7 +2038,7 @@ export class VmfsListComponent implements OnInit {
     if (!form.qosFlag) {// 关闭状态
       this.initEditMinInfo(form);
       this.initEditMaxInfo(form);
-    }else {
+    } else {
       if (form.control_policyUpper == '1') {
         if (!form.maxbandwidthChoose) {
           form.max_bandwidth = null;
@@ -2046,7 +2053,7 @@ export class VmfsListComponent implements OnInit {
         this.initEditMaxInfo(form);
       }
       if (form.control_policyLower == '0') {
-        if(qosTag == 2) {
+        if (qosTag == 2) {
           this.initEditMaxInfo(form);
         } else if (qosTag == 3) {
           this.initEditMinInfo(form);
@@ -2091,8 +2098,8 @@ export class VmfsListComponent implements OnInit {
    * edit qos开关
    * @param form
    */
-  qoSEditFlagChange(form){
-    if(form.qosFlag) {
+  qoSEditFlagChange(form) {
+    if (form.qosFlag) {
       form.control_policyUpper = undefined;
       form.maxbandwidthChoose = false;
       form.maxiopsChoose = false;
@@ -2153,7 +2160,7 @@ export class VmfsListComponent implements OnInit {
    * 获取选中的存储的 SmartTier
    * @param storageId
    */
-  getStroageSmartTierShow(storageId){
+  getStroageSmartTierShow(storageId) {
     const storageTypeShow = this.storageList.filter(item => item.id == storageId);
     // SmartTier策略 true 支持 false 不支持
     const smartTierShow = storageTypeShow[0].storageTypeShow.smartTierShow;
@@ -2238,8 +2245,8 @@ export class VmfsListComponent implements OnInit {
 
 
     let upperChecked;
-    if(upperObj) {
-      upperChecked =  upperObj.checked;
+    if (upperObj) {
+      upperChecked = upperObj.checked;
     }
     let lowerChecked;
     if (lowerObj) {
@@ -2247,20 +2254,20 @@ export class VmfsListComponent implements OnInit {
     }
     this.initIopsErrTips(upperChecked, lowerChecked);
     if (isUpper) {
-      if(upperChecked) {
+      if (upperChecked) {
         form.control_policyUpper = '1';
-      }else {
+      } else {
         form.control_policyUpper = undefined;
       }
-      if(qosTag == 2 && upperChecked) { // 单选
+      if (qosTag == 2 && upperChecked) { // 单选
         console.log("单选1", qosTag)
         form.control_policyLower = undefined;
         lowerObj.checked = false;
       }
     } else {
-      if(lowerChecked) {
-       form.control_policyLower = '0';
-      }else {
+      if (lowerChecked) {
+        form.control_policyLower = '0';
+      } else {
         form.control_policyLower = undefined;
       }
       if (lowerChecked && qosTag == 2) {
@@ -2284,7 +2291,7 @@ export class VmfsListComponent implements OnInit {
       form.latencyChoose = false;
     }
     console.log("lowerChecked", this.form)
-    const type = isEdit ? 'edit':'add';
+    const type = isEdit ? 'edit' : 'add';
     this.qosV6Check(type);
   }
 
@@ -2297,40 +2304,40 @@ export class VmfsListComponent implements OnInit {
       this.form.volumeName = this.form.name
     }
   }
-  resetQosFlag(objValue:boolean, operationType:string) {
+  resetQosFlag(objValue: boolean, operationType: string) {
     switch (operationType) {
       case 'maxbandwidth':
-        if(!objValue) {
+        if (!objValue) {
           this.bandWidthMaxErrTips = false;
         }
         break;
       case 'maxiops':
-        if(!objValue) {
+        if (!objValue) {
           this.iopsMaxErrTips = false;
         }
         break;
       case 'minbandwidth':
-        if(!objValue) {
+        if (!objValue) {
           this.bandWidthMinErrTips = false;
         }
         break;
       case 'miniops':
-        if(!objValue) {
+        if (!objValue) {
           this.iopsMinErrTips = false;
         }
         break;
       default:
-        if(!objValue) {
+        if (!objValue) {
           this.latencyErrTips = false;
         }
         break;
     }
   }
-  sortFunc(obj:any) {
+  sortFunc(obj: any) {
     return !obj;
   }
 
-  qosV6Check(type:string) {
+  qosV6Check(type: string) {
     if (type == 'add') {
       if (this.form.storage_id) {
         const chooseStorage = this.storageList.filter(item => item.id == this.form.storage_id)[0];

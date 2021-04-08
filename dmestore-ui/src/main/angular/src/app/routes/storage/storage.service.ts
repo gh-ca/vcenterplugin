@@ -1,55 +1,59 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import {StorageTypeShow} from "../vmfs/list/list.service";
-import {TranslatePipe} from "@ngx-translate/core";
+import { StorageTypeShow } from "../vmfs/list/list.service";
+import { TranslatePipe } from "@ngx-translate/core";
 
+
+export const URLS_STORAGE = {
+  DMESTORAGE_STORAGES: 'dmestorage/storages'
+}
 @Injectable()
 export class StorageService {
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
-  getData(){
-    return this.http.get('dmestorage/storages');
+  getData() {
+    return this.http.get(URLS_STORAGE.DMESTORAGE_STORAGES);
   }
-  getStoragePoolListByStorageId(mediaType:string,storageId:string){
-    return this.http.get('dmestorage/storagepools', {params: {storageId,mediaType}});
+  getStoragePoolListByStorageId(mediaType: string, storageId: string) {
+    return this.http.get('dmestorage/storagepools', { params: { storageId, mediaType } });
   }
-  getLogicPortListByStorageId(storageId: string){
-    return this.http.get('dmestorage/logicports', {params: {storageId}});
+  getLogicPortListByStorageId(storageId: string) {
+    return this.http.get('dmestorage/logicports', { params: { storageId } });
   }
-  listperformance(storageIds:string[]) {
-    return this.http.get('dmestorage/liststorageperformance', {params: {storageIds}});
+  listperformance(storageIds: string[]) {
+    return this.http.get('dmestorage/liststorageperformance', { params: { storageIds } });
   }
 }
 export interface StorageList {
-   id: string;
-   name: string;
-   ip: string;
-   status: string;
-   synStatus: string;
-   vendor: string;
-   model: string;
-   version: string;
-   productVersion: string;
-   usedCapacity: number;
-   totalCapacity: number;
-   freeCap: number;
-   totalEffectiveCapacity: number;
-   freeEffectiveCapacity: number;
-   maxCpuUtilization: number;
-   maxIops: number;
-   maxBandwidth: number;
-   maxLatency: number;
-   maxOps:number;
-   azIds: string[];
-   totalPoolCapacity: number;
-   subscriptionCapacity: number;
-   maintenanceStart: string;
-   maintenanceOvertime: string;
-   location: string;
-   patchVersion: string;
-   storageTypeShow:StorageTypeShow;
+  id: string;
+  name: string;
+  ip: string;
+  status: string;
+  synStatus: string;
+  vendor: string;
+  model: string;
+  version: string;
+  productVersion: string;
+  usedCapacity: number;
+  totalCapacity: number;
+  freeCap: number;
+  totalEffectiveCapacity: number;
+  freeEffectiveCapacity: number;
+  maxCpuUtilization: number;
+  maxIops: number;
+  maxBandwidth: number;
+  maxLatency: number;
+  maxOps: number;
+  azIds: string[];
+  totalPoolCapacity: number;
+  subscriptionCapacity: number;
+  maintenanceStart: string;
+  maintenanceOvertime: string;
+  location: string;
+  patchVersion: string;
+  storageTypeShow: StorageTypeShow;
 }
-export class LogicPort{
+export class LogicPort {
   id: string;
   name: string;
   runningStatus: string;
@@ -67,7 +71,7 @@ export class LogicPort{
   vstoreId: string;
   vstoreName: string;
 }
-export class StorageChart{
+export class StorageChart {
   id: string;
   name: string;
   ip: string;
@@ -81,12 +85,12 @@ export class StorageChart{
   iops: PerforChart;
   bandwidth: PerforChart;
 }
-export class CapacityChart{
+export class CapacityChart {
   tooltip: any;
   title: any;
-  series: CapacitySerie[] =[];
-  constructor(title: string){
-    this.tooltip = {trigger: 'item', formatter: ' {b}: {d}%'};
+  series: CapacitySerie[] = [];
+  constructor(title: string) {
+    this.tooltip = { trigger: 'item', formatter: ' {b}: {d}%' };
     this.title = {
       text: title,
       textAlign: 'center',
@@ -108,8 +112,8 @@ export class CapacityChart{
 
   }
 }
-export class CapacitySerie{
-  name:string;
+export class CapacitySerie {
+  name: string;
   type: string;
   radius: string[];
   center: any;
@@ -118,13 +122,13 @@ export class CapacitySerie{
   emphasis: any;
   labelLine: any;
   color: any;
-  data: D[]=[];
-  constructor(protection:number,fs:number,volume:number,free:number, blockFile:number,isDorado:boolean, translatePipe:TranslatePipe){
-    this.name= "";
-    this.type="pie";
-    this.radius=['60%', '70%'];
-    this.center=['50%', '50%'];
-    this.avoidLabelOverlap=false;
+  data: D[] = [];
+  constructor(protection: number, fs: number, volume: number, free: number, blockFile: number, isDorado: boolean, translatePipe: TranslatePipe) {
+    this.name = "";
+    this.type = "pie";
+    this.radius = ['60%', '70%'];
+    this.center = ['50%', '50%'];
+    this.avoidLabelOverlap = false;
     this.label = {
       show: false,
       position: 'center'
@@ -138,27 +142,27 @@ export class CapacitySerie{
     };
     // 保护
     const p = new D();
-    p.value=protection;
-    p.name=translatePipe.transform("storage.chart.protection");
+    p.value = protection;
+    p.name = translatePipe.transform("storage.chart.protection");
     this.data.push(p);
 
     if (isDorado) {
-      this.color=['hsl(164,58%, 52%)', 'hsl(48, 77%, 55%)', 'hsl(0, 0%, 90%)'];
+      this.color = ['hsl(164,58%, 52%)', 'hsl(48, 77%, 55%)', 'hsl(0, 0%, 90%)'];
       // 块/文件
       const bf = new D();
       bf.value = blockFile;
       bf.name = translatePipe.transform('storage.chart.blockFile');
       this.data.push(bf);
     } else {
-      this.color=['hsl(164,58%, 52%)', 'hsl(48, 77%, 55%)', 'hsl(224, 93%, 70%)', 'hsl(0, 0%, 90%)'];
+      this.color = ['hsl(164,58%, 52%)', 'hsl(48, 77%, 55%)', 'hsl(224, 93%, 70%)', 'hsl(0, 0%, 90%)'];
       // 文件系统
-      const f= new D();
-      f.value=fs;
+      const f = new D();
+      f.value = fs;
       f.name = translatePipe.transform('storage.chart.file');
       this.data.push(f);
       // LUN
-      const v= new D();
-      v.value=volume;
+      const v = new D();
+      v.value = volume;
       v.name = translatePipe.transform('storage.chart.volume');
       this.data.push(v);
     }
@@ -166,34 +170,34 @@ export class CapacitySerie{
       show: false
     };
     // 空闲
-    const fr= new D();
-    fr.value=free;
+    const fr = new D();
+    fr.value = free;
     fr.name = translatePipe.transform('storage.chart.free');
     this.data.push(fr);
 
   }
 }
-export class D{
+export class D {
   value: number;
   name: string;
 }
 
-export class PerforChart{
+export class PerforChart {
   xAxis: any;
   yAxis: any;
   series: any;
   color: any;
-  constructor(d: number[]){
-    this.xAxis={
+  constructor(d: number[]) {
+    this.xAxis = {
       show: true,
       type: 'category'
     };
-    this.yAxis={
+    this.yAxis = {
       show: false,
       type: 'value'
     };
-    this.color=['hsl(198, 100%, 32%)'];
-    this.series=[
+    this.color = ['hsl(198, 100%, 32%)'];
+    this.series = [
       {
         data: d,
         type: 'line',
