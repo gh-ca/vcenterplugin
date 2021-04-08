@@ -245,3 +245,8 @@
   white-space: nowrap;
 }
 
+clr-dg-cell.datagrid-cell{
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
