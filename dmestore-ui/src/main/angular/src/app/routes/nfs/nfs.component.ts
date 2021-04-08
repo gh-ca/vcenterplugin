@@ -140,10 +140,13 @@ export class NfsComponent implements OnInit {
     this.remoteSrv.getData().subscribe(nfsListResHandler);
   }
 
-  handleSortingFeild() {
-    if (this.list != null) {
-      this.list.forEach(n => {
-        n.capacityUsage = (n.capacity - n.freeSpace) / n.capacity;
+  handleSortingFeild(){
+    if(this.list!=null){
+      this.list.forEach(n=>{
+        if (n.capacity && n.freeSpace) {
+          n.capacityUsage=(n.capacity - n.freeSpace)/n.capacity;
+        }
+
       });
     }
   }
