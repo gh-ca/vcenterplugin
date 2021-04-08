@@ -11,7 +11,7 @@ import {
   StoragePoolList,
   HostList,
   ClusterList,
-  ServiceLevelList, HostOrCluster, GetForm, Workload, StoragePoolMap, ConnFaildData,
+  ServiceLevelList, HostOrCluster, GetForm, Workload, StoragePoolMap, ConnFaildData, URLS_LIST_SERVICE,
 } from './list.service';
 import { ClrWizard, ClrWizardPage } from '@clr/angular';
 import { GlobalsService } from '../../../shared/globals.service';
@@ -443,7 +443,7 @@ export class VmfsListComponent implements OnInit {
     this.wwns = wwns;
     if (this.wwns.length > 0) {
       this.isLoading = true;
-      this.remoteSrv.getChartData(this.wwns).subscribe((chartResult: any) => {
+      const chartDataResHandler = (chartResult: any) => {
         if (chartResult.code === '200' && chartResult.data != null) {
           const chartList: VmfsInfo[] = chartResult.data;
           this.list.forEach(item => {
@@ -457,12 +457,16 @@ export class VmfsListComponent implements OnInit {
               }
             });
           });
-        } else {
         }
+
         this.isLoading = false;
         this.isFirstLoadChartData = false; // 非第一次加载chartData 后续点击性能图标将不发送请求
         this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
-      });
+      }
+
+      /* TODO: 仅测试用  */
+      // chartDataResHandler(mockData[URLS_LIST_SERVICE.ACCESSVMFS_LISTVMFSPERFORMANCE]);
+      this.remoteSrv.getChartData(this.wwns).subscribe(chartDataResHandler);
     }
   }
   // 获取所有存储数据

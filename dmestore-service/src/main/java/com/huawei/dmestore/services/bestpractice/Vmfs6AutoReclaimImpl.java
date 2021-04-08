@@ -115,10 +115,7 @@ public class Vmfs6AutoReclaimImpl extends BaseBestPracticeService implements Bes
             ManagedObjectReference dsMor = pair.first();
             DatastoreMo datastoreMo = this.getDatastoreMoFactory().build(context, dsMor);
             DatastoreSummary summary = datastoreMo.getSummary();
-
-            // 连通性。false为不可访问的数据库存储，应该过滤不检查和更新。
-            boolean accessible = summary.isAccessible();
-            if (accessible && summary.getType().equalsIgnoreCase(DmeConstants.STORE_TYPE_VMFS)) {
+            if (summary.getType().equalsIgnoreCase(DmeConstants.STORE_TYPE_VMFS)) {
                 VmfsDatastoreInfo vmfsDatastoreInfo = datastoreMo.getVmfsDatastoreInfo();
                 HostVmfsVolume hostVmfsVolume = vmfsDatastoreInfo.getVmfs();
                 // 只对VMFS6进行处理

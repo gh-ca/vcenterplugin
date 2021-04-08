@@ -46,6 +46,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
 import jdk.nashorn.internal.parser.Parser;
@@ -425,7 +426,6 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         List<Map<String, Object>> volumelist = new ArrayList<>();
         List<String> volumeIds = new ArrayList<>();
         boolean isCreated = false;
-        boolean isMappling = false;
         try {
             // 创建Lun
             String taskId = createLun(params);
@@ -480,8 +480,8 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                     }
                     taskIds = new ArrayList<>();
                     taskIds.add(taskId);
-                    isMappling = taskService.checkTaskStatus(taskIds);
-                    if (isCreated && isMappling) {
+                    isCreated = taskService.checkTaskStatus(taskIds);
+                    if (isCreated) {
                         // 创建了几个卷，就创建几个VMFS，用卷的wwn去找到lun
                         if (volumelist != null && volumelist.size() > 0) {
                             createOnVmware(params, volumelist);
@@ -502,26 +502,26 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 }
             }
         } catch (DmeException e) {
-            rollBack(volumeIds, dmeHostId, demHostGroupId, isCreated, isMappling);
+            rollBack(volumeIds,dmeHostId,demHostGroupId,isCreated);
             throw new DmeException("create vmfs failed!",e.getMessage());
         }
 
         return new ArrayList<>();
     }
 
-    private void rollBack(List<String> volumeIds,String dmeHostId,String demHostGroupId,Boolean isCreated,Boolean isMapping) throws DmeException {
+    private void rollBack(List<String> volumeIds,String dmeHostId,String demHostGroupId,Boolean isCreated) throws DmeException {
         ResponseEntity responseEntity = null;
         String taskId = "";
         if (volumeIds.size() != 0) {
             Map<String, Object> requestParam = new HashMap<>();
-            //解除映射，删除已创建的卷
-            requestParam.put(VOLUMEIDS, volumeIds);
-            if (isCreated && isMapping) {
-                if (!StringUtils.isEmpty(dmeHostId) && isMapping) {
+            if (isCreated) {
+                //解除映射，删除已创建的卷
+                requestParam.put(VOLUMEIDS, volumeIds);
+                if (!StringUtils.isEmpty(dmeHostId)) {
                     requestParam.put(HOST_ID, dmeHostId);
                     responseEntity = hostUnmapping(requestParam);
                 }
-                if (!StringUtils.isEmpty(demHostGroupId) && isMapping) {
+                if (!StringUtils.isEmpty(demHostGroupId)) {
                     requestParam.put(HOST_GROUP_ID1, demHostGroupId);
                     responseEntity = hostGroupUnmapping(requestParam);
                 }
@@ -533,7 +533,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             }
             List<String> taskIds = new ArrayList<>();
             taskIds.add(taskId);
-            if (taskId.equals("") || taskService.checkTaskStatus(taskIds)) {
+            if (taskService.checkTaskStatus(taskIds)) {
                 volumeDelete(requestParam);
                 if (!StringUtils.isEmpty(demHostGroupId)) {
                     deleteHostgroup(demHostGroupId);
@@ -1777,9 +1777,9 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             return false;
         }
         JsonArray jsonArray = new JsonParser().parse(listStr).getAsJsonArray();
-        List<DmeVmwareRelation> relationList = new ArrayList<>();
+        List<DmeVmwareRelation> relationList = new CopyOnWriteArrayList<>();
         List<Ob> pa = new ArrayList<>();
-        Map<String, String> storageIds = new HashMap<>();
+        Map<String, String> storageIds = new ConcurrentHashMap<>();
         for (int index = 0; index < jsonArray.size(); index++) {
             JsonObject vmfsDatastore = jsonArray.get(index).getAsJsonObject();
             String vmfsDatastoreId = vmfsDatastore.get(OBJECTID).getAsString();
@@ -1806,20 +1806,6 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         int k = 0;
         List<Ob> ps = splitOb(pa);
         long start1 = System.currentTimeMillis();
-        /*for (Ob w : ps){
-            if(k + w.wwns.size() <= SIZE){
-                k = k + w.wwns.size();
-                tm.add(w);
-            } else{
-                getRelationSync(tm, k, storageIds, relationList);
-                tm = new ArrayList<>();
-                tm.add(w);
-                k = w.wwns.size();
-            }
-        }
-        if (tm.size() > 0){
-            getRelationSync(tm, k, storageIds, relationList);
-        }*/
         getRelationSync(ps, SIZE, storageIds, relationList);
         LOG.info("调用vmfs volume_wwn接口时间：{}ms", System.currentTimeMillis() - start1);
 
@@ -1832,7 +1818,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
 
 
     private List<Ob> splitOb(List<Ob> obs){
-        List<Ob> r = new ArrayList<>();
+        List<Ob> r = new CopyOnWriteArrayList<>();
         for (Ob ob : obs){
             if (ob.wwns.size() > SIZE){
                 List<String> wns = new ArrayList<>();
@@ -1871,8 +1857,6 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
     }
 
     public synchronized void getRelationSync(List<Ob> obs, int size, Map<String, String> storageIds, List<DmeVmwareRelation> relationList){
-        //ExecutorService executorService = Executors.newFixedThreadPool(size);
-        //CountDownLatch countDownLatch = new CountDownLatch(size);
         String volumeUrlByName = DmeConstants.DME_VOLUME_BASE_URL;
         try {
             ResponseEntity<String> responseEntity = dmeAccessService.access(volumeUrlByName, HttpMethod.GET, null);

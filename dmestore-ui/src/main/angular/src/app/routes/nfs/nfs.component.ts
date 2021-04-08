@@ -150,6 +150,7 @@ export class NfsComponent implements OnInit {
         if (n.capacity && n.freeSpace) {
           n.capacityUsage = (n.capacity - n.freeSpace) / n.capacity;
         }
+
       });
     }
   }

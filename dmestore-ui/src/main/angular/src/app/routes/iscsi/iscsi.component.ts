@@ -144,7 +144,7 @@ export class IscsiComponent implements OnInit, AfterViewInit {
     // 有存储 有ip才去load
     if (this.configModel.sn !== '' && this.configModel.vmKernel.device !== '') {
       this.portLoading = true;
-      /* FIX: */
+      /* FIX:切换选项不清空列表 */
       this.resetListInfo();
       const isV6 = this.storageDevices.filter(item => item.sn == this.configModel.sn)[0].storageTypeShow.dorado;
       // V5设备访问
