@@ -652,7 +652,7 @@
     "ipUnreachable": "IP无法到达",
     "connected": "已连接",
     "toBeConnected": "待连接",
-    "ports": "请选择存储设备的以太网端口",
+    "ports": "请选择存储设备的端口",
     "portNullMessage": "端口不能为空！",
     "establishConnect": "建立iSCSI连接",
     "showCol": "展示列",
