@@ -12,7 +12,7 @@ import { CommonService } from './../../common.service';
   selector: 'app-performance',
   templateUrl: './performance.component.html',
   styleUrls: ['./performance.component.scss'],
-  providers: [VmfsPerformanceService, MakePerformance, NfsService, TranslatePipe],
+  providers: [CommonService,VmfsPerformanceService, MakePerformance, NfsService, TranslatePipe],
 })
 export class PerformanceComponent implements OnInit {
 
