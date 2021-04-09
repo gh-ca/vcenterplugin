@@ -2439,7 +2439,7 @@ public class VCSDKUtils {
 
     public void createTag(String tagName, SessionHelper sessionHelper) {
         TaggingWorkflow taggingWorkflow = taggingWorkflowFactory.build(sessionHelper);
-        taggingWorkflow.createTag(tagName, "", getCategoryId(sessionHelper));
+        taggingWorkflow.createTag(tagName, "Huawei DME Service Level", getCategoryId(sessionHelper));
         //sessionHelper.logout();
     }
 

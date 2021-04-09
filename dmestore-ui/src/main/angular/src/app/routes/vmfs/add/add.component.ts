@@ -22,10 +22,22 @@ import {GlobalsService} from "../../../shared/globals.service";
 })
 export class AddComponent implements OnInit{
 
+  isShowInput: boolean;
+
   constructor(private remoteSrv: AddService, private route: ActivatedRoute, private cdr: ChangeDetectorRef,
               private router:Router, private globalsService: GlobalsService) {
+    this.form.version = '5'; // 版本
+    this.setFormValueWhenHiden(false);
 
   }
+
+  setFormValueWhenHiden(isShowInput) {
+    this.isShowInput = isShowInput;
+    this.form.blockSize = '1024'; // 块大小，单位KB
+    this.form.spaceReclamationGranularity = '1024'; // 空间回收粒度 单位K
+    this.form.spaceReclamationPriority = 'low';
+  }
+
   // 初始化表单
   form = new GetForm().getAddForm();
   // 块大小选择
@@ -158,11 +170,13 @@ export class AddComponent implements OnInit{
     console.log('versionVal' + versionVal);
     if (versionVal === '6') {
       const option1 = {key: 1024, value : '1MB'};
+      this.setFormValueWhenHiden(true);
       options.push(option1);
       // const option2 = {key: 64, value : '64KB'};
       // options.push(option2);
     } else if (versionVal === '5') {
       const option1 = {key: 1024, value : '1MB'};
+      this.setFormValueWhenHiden(false);
       options.push(option1);
     }
     // 设置blockSize 可选值
@@ -383,16 +397,16 @@ export class AddComponent implements OnInit{
       }
       // 获取存储池数据
       // if (!storagePoolList) {
-        this.remoteSrv.getStoragePoolsByStorId(this.form.storage_id, mediaType).subscribe((result: any) => {
-          console.log('storagePools', result);
-          console.log('result.code === \'200\' && result.data !== null', result.code === '200' && result.data !== null);
-          if (result.code === '200' && result.data !== null) {
-            this.storagePoolList = result.data;
-            this.storagePoolMap.filter(item => item.storageId == this.form.storage_id)[0].storagePoolList = result.data;
+      this.remoteSrv.getStoragePoolsByStorId(this.form.storage_id, mediaType).subscribe((result: any) => {
+        console.log('storagePools', result);
+        console.log('result.code === \'200\' && result.data !== null', result.code === '200' && result.data !== null);
+        if (result.code === '200' && result.data !== null) {
+          this.storagePoolList = result.data;
+          this.storagePoolMap.filter(item => item.storageId == this.form.storage_id)[0].storagePoolList = result.data;
 
-            this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
-          }
-        });
+          this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
+        }
+      });
       // } else {
       //   this.storagePoolList = storagePoolList;
       // }
@@ -407,8 +421,8 @@ export class AddComponent implements OnInit{
             this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
           }
         });
-      // } else {
-      //   this.workloads = workloads;
+        // } else {
+        //   this.workloads = workloads;
       }
     }
   }
@@ -730,23 +744,23 @@ export class AddComponent implements OnInit{
   qosBlur(type:String, operationType:string) {
 
     let objVal;
-      switch (operationType) {
-        case 'maxbandwidth':
-          objVal = this.form.maxbandwidth;
-          break;
-        case 'maxiops':
-          objVal = this.form.maxiops;
-          break;
-        case 'minbandwidth':
-          objVal = this.form.minbandwidth;
-          break;
-        case 'miniops':
-          objVal = this.form.miniops;
-          break;
-        default:
-          objVal = this.form.latency;
-          break;
-      }
+    switch (operationType) {
+      case 'maxbandwidth':
+        objVal = this.form.maxbandwidth;
+        break;
+      case 'maxiops':
+        objVal = this.form.maxiops;
+        break;
+      case 'minbandwidth':
+        objVal = this.form.minbandwidth;
+        break;
+      case 'miniops':
+        objVal = this.form.miniops;
+        break;
+      default:
+        objVal = this.form.latency;
+        break;
+    }
     if (objVal && objVal !== '') {
       if (objVal.toString().match(/\d+(\.\d{0,2})?/)) {
         objVal = objVal.toString().match(/\d+(\.\d{0,2})?/)[0];

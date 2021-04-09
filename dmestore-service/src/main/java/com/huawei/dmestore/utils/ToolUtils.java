@@ -451,4 +451,16 @@ public class ToolUtils {
         String subVmPathName = Arrays.stream(var.getVmPathName().split(" ")).findFirst().get();
         return subVmPathName.substring(1, subVmPathName.length() - 1);
     }
+    //修改从json转为浮点型的方法
+    public static Float jsonToFloat2(JsonElement obj) {
+        Float re = null;
+        try {
+            if (!StringUtils.isEmpty(obj) && !obj.isJsonNull()) {
+                re = obj.getAsFloat();
+            }
+        } catch (IllegalStateException e) {
+            LOG.error("jsonToFloat2 error:{}", e.toString());
+        }
+        return re;
+    }
 }

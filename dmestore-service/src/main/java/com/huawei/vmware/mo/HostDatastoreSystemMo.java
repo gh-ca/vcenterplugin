@@ -103,7 +103,9 @@ public class HostDatastoreSystemMo extends BaseMo {
 
         vmfsDatastoreCreateSpec.getVmfs().setVolumeName(datastoreName);
         vmfsDatastoreCreateSpec.getVmfs().setBlockSize(blockSize);
-        vmfsDatastoreCreateSpec.getVmfs().setUnmapGranularity(unmapGranularity);
+        if (unmapGranularity != 0) {
+            vmfsDatastoreCreateSpec.getVmfs().setUnmapGranularity(unmapGranularity);
+        }
         vmfsDatastoreCreateSpec.getVmfs().setUnmapPriority(unmapPriority);
         vmfsDatastoreCreateSpec.getPartition().setTotalSectors(totalSectors);
 

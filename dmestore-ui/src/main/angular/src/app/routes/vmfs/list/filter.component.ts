@@ -1,8 +1,9 @@
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit} from "@angular/core";
-import {ClrDatagridFilter, ClrDatagridFilterInterface, ClrDatagridStringFilterInterface} from "@clr/angular";
-import {ServiceLevelList, VmfsInfo, VmfsListService} from "./list.service";
-import {Subject} from "rxjs";
-import {StorageList, StorageService} from "../../storage/storage.service";
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from "@angular/core";
+import { ClrDatagridFilter, ClrDatagridFilterInterface, ClrDatagridStringFilterInterface } from "@clr/angular";
+import { ServiceLevelList, VmfsInfo, VmfsListService } from "./list.service";
+import { Subject } from "rxjs";
+import { StorageList, StorageService } from "../../storage/storage.service";
+import { isMockData, mockData } from 'mock/mock';
 
 @Component({
   selector: "vmfs-filter",
@@ -54,7 +55,7 @@ export class StatusFilter implements ClrDatagridFilterInterface<VmfsInfo> {
     if (!this.options) {
       return true;
     }
-    const  capital  = item.status;
+    const capital = item.status;
     console.log("capital", capital);
     if (this.options === '' || this.options === 'all') {
       return true;
@@ -93,11 +94,11 @@ export class StatusFilter implements ClrDatagridFilterInterface<VmfsInfo> {
   `,
   providers: [VmfsListService, StorageService],
 })
-export class DeviceFilter implements ClrDatagridFilterInterface<VmfsInfo>, OnInit{
-  constructor(private storageService: StorageService,private cdr: ChangeDetectorRef){}
+export class DeviceFilter implements ClrDatagridFilterInterface<VmfsInfo>, OnInit {
+  constructor(private storageService: StorageService, private cdr: ChangeDetectorRef) { }
   ngOnInit(): void {
-    this.storageService.getData().subscribe((s: any) => {
-      if (s.code === '200'){
+    const successHandler = (s: any) => {
+      if (s.code === '200') {
         this.storageList = s.data;
         this.storageList.forEach(item => {
           item.name = item.name + "(" + item.ip + ")";
@@ -105,7 +106,13 @@ export class DeviceFilter implements ClrDatagridFilterInterface<VmfsInfo>, OnIni
         })
       }
       this.cdr.detectChanges();
-    });
+    };
+    /* TODO: */
+    if (isMockData) {
+      successHandler(mockData.DMESTORAGE_STORAGES)
+    } else {
+      this.storageService.getData().subscribe(successHandler);
+    }
   }
   changes = new Subject<any>();
   device;
@@ -116,11 +123,11 @@ export class DeviceFilter implements ClrDatagridFilterInterface<VmfsInfo>, OnIni
     if (!this.device) {
       return true;
     }
-    const  capital  = item.device;
+    const capital = item.device;
     if (this.device === '') {
       return true;
     } else {
-      const  storageId = item.deviceId.replace(/-/g, '').toLowerCase();
+      const storageId = item.deviceId.replace(/-/g, '').toLowerCase();
       return this.device == storageId;
     }
   }
@@ -160,7 +167,7 @@ export class DeviceFilter implements ClrDatagridFilterInterface<VmfsInfo>, OnIni
   `,
   providers: [VmfsListService],
 })
-export class ServiceLevelFilter implements ClrDatagridFilterInterface<VmfsInfo>, OnInit{
+export class ServiceLevelFilter implements ClrDatagridFilterInterface<VmfsInfo>, OnInit {
 
 
   changes = new Subject<any>();
@@ -169,7 +176,7 @@ export class ServiceLevelFilter implements ClrDatagridFilterInterface<VmfsInfo>,
 
   readonly status: any;
 
-  constructor(private vmfsListService: VmfsListService,private cdr: ChangeDetectorRef){}
+  constructor(private vmfsListService: VmfsListService, private cdr: ChangeDetectorRef) { }
 
   ngOnInit(): void {
     this.vmfsListService.getServiceLevelList().subscribe((result: any) => {
@@ -186,7 +193,7 @@ export class ServiceLevelFilter implements ClrDatagridFilterInterface<VmfsInfo>,
     if (this.serviceLevel == undefined) {
       return true;
     }
-    const  capital  = item.serviceLevelName;
+    const capital = item.serviceLevelName;
     if (this.serviceLevel == 'all') {
       return true;
     } else {
@@ -239,7 +246,7 @@ export class ProtectionStatusFilter implements ClrDatagridFilterInterface<VmfsIn
     if (!this.protectionStatus) {
       return true;
     }
-    const  capital  = item.vmfsProtected.toString();
+    const capital = item.vmfsProtected.toString();
     console.log("capital", capital);
     if (this.protectionStatus === '' || this.protectionStatus === 'all') {
       return true;
