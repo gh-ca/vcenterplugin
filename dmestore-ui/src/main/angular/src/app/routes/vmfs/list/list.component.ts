@@ -34,7 +34,7 @@ export class VmfsListComponent implements OnInit {
     return p;
   }
 
-  private isShowInput: boolean;
+  isShowInput: boolean;
 
   constructor(private remoteSrv: VmfsListService, private cdr: ChangeDetectorRef,
     public gs: GlobalsService, private router: Router) {
