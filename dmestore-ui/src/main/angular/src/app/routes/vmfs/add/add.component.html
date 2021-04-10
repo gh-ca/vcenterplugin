@@ -2,10 +2,10 @@
 <clr-wizard class="add-wizard-wrap" #wizard [clrWizardOpen]="true" [clrWizardClosable]="false">
   <clr-wizard-title style="font-weight: bolder">{{'table.createDmeStorage' | translate}}</clr-wizard-title>
 
-<!--  <clr-wizard-button [type]="'cancel'" (click)="cancel();" >{{'menu.cancel' | translate}}</clr-wizard-button>-->
-<!--  <clr-wizard-button [type]="'previous'">{{'menu.previous' | translate}}</clr-wizard-button>-->
-<!--  <clr-wizard-button [type]="'next'">{{'menu.next' | translate}}</clr-wizard-button>-->
-<!--  <clr-wizard-button (click)="addVmfsHanlde();" [type]="'finish'">{{'menu.ok' | translate}}</clr-wizard-button>-->
+  <!--  <clr-wizard-button [type]="'cancel'" (click)="cancel();" >{{'menu.cancel' | translate}}</clr-wizard-button>-->
+  <!--  <clr-wizard-button [type]="'previous'">{{'menu.previous' | translate}}</clr-wizard-button>-->
+  <!--  <clr-wizard-button [type]="'next'">{{'menu.next' | translate}}</clr-wizard-button>-->
+  <!--  <clr-wizard-button (click)="addVmfsHanlde();" [type]="'finish'">{{'menu.ok' | translate}}</clr-wizard-button>-->
 
   <div *ngIf="modalLoading" class="loadingDiv">
       <span>
@@ -83,7 +83,7 @@
       </clr-select-container>
 
       <!-- 容量 -->
-      <clr-input-container>
+      <clr-input-container >
         <label style="color: #9F9F9F;">{{'vmfs.capacity' | translate}}</label>
         <div clrInput style="float: left;width: 54%;position: relative;">
           <!-- V5时最小值1.3G V6时最小值2G-->
@@ -106,7 +106,7 @@
       </clr-input-container>
 
       <!-- 块大小 -->
-      <clr-select-container class="selectClass">
+      <clr-select-container class="selectClass" *ngIf="isShowInput">
         <label style="color: #9F9F9F;">{{'vmfs.blockSize' | translate}}</label>
         <select  clrSelect [(ngModel)]="form.blockSize" name="blockSize" (change)="setSrgOptions();" required>
           <option *ngFor="let item of blockSizeOptions" value="{{item.key}}">{{item.value}}</option>
@@ -115,7 +115,7 @@
       </clr-select-container>
 
       <!-- 空间回收粒度 -->
-      <clr-select-container class="selectClass">
+      <clr-select-container class="selectClass" *ngIf="isShowInput">
         <label style="color: #9F9F9F;">{{'vmfs.spaceReclamationGranularity' | translate}}</label>
         <select  clrSelect (ngModelOptions)="srgOptions"  [(ngModel)]="form.spaceReclamationGranularity" name="spaceReclamationGranularity" required>
           <option *ngFor="let item of srgOptions" value="{{item.key}}">{{item.value}}</option>
@@ -124,7 +124,7 @@
       </clr-select-container>
 
       <!-- 空间回收优先级 -->
-      <clr-select-container class="selectClass">
+      <clr-select-container class="selectClass" *ngIf="isShowInput">
         <label style="color: #9F9F9F;">{{'vmfs.spaceReclamationPriority' | translate}}</label>
         <select  clrSelect [(ngModel)]="form.spaceReclamationPriority" name="spaceReclamationPriority" required>
           <option value="low">{{'vmfs.low' | translate}}</option>
@@ -155,7 +155,7 @@
     </ng-template>
   </clr-wizard-page>
   <!--Page2 储存库设置-->
-  <clr-wizard-page #addPageTwo [clrWizardPageNextDisabled]="number.pristine || !formPageTwo.valid">
+  <clr-wizard-page #addPageTwo [clrWizardPageNextDisabled]="number.pristine || !formPageTwo.valid" >
     <ng-template clrPageNavTitle>
       {{'vmfs.storageSetting' | translate}}
     </ng-template>

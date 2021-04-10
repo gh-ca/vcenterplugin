@@ -34,8 +34,21 @@ export class VmfsListComponent implements OnInit {
     return p;
   }
 
+  isShowInput: boolean;
+
   constructor(private remoteSrv: VmfsListService, private cdr: ChangeDetectorRef,
-    public gs: GlobalsService, private router: Router) { }
+    public gs: GlobalsService, private router: Router) {
+    this.form.version = '5'; // 版本
+    this.setFormValueWhenHiden(false);
+  }
+
+  setFormValueWhenHiden(isShowInput) {
+    this.isShowInput = isShowInput;
+    this.form.blockSize = '1024'; // 块大小，单位KB
+    this.form.spaceReclamationGranularity = '1024'; // 空间回收粒度 单位K
+    this.form.spaceReclamationPriority = 'low';
+  }
+
   // 添加页面窗口
   @ViewChild('wizard') wizard: ClrWizard;
   @ViewChild('addPageOne') addPageOne: ClrWizardPage;
@@ -184,6 +197,7 @@ export class VmfsListComponent implements OnInit {
     // 列表数据
     this.refreshVmfs();
   }
+
   // 修改
   modifyBtnClick() {
     console.log('this.rowSelected[0]', this.rowSelected[0]);
@@ -354,6 +368,7 @@ export class VmfsListComponent implements OnInit {
       this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
     });
   }
+
   // table数据处理
   refreshVmfs() {
     this.isLoading = true;
@@ -398,6 +413,7 @@ export class VmfsListComponent implements OnInit {
       this.remoteSrv.getData().subscribe(successHandler);
     }
   }
+
   // 点刷新那个功能是分两步，一步是刷新，然后等我们这边的扫描任务，任务完成后返回你状态，任务成功后，你再刷新列表页面。
   scanDataStore() {
     // 初始化筛选
@@ -465,6 +481,7 @@ export class VmfsListComponent implements OnInit {
       });
     }
   }
+
   // 获取所有存储数据
   getStorageList() {
     this.remoteSrv.getStorages().subscribe((result: any) => {
@@ -554,11 +571,13 @@ export class VmfsListComponent implements OnInit {
     const versionVal = this.form.version + '';
     if (versionVal === '6') {
       const option1 = { key: 1024, value: '1MB' };
+      this.setFormValueWhenHiden(true);
       options.push(option1);
       // const option2 = {key: 64, value : '64KB'};
       // options.push(option2);
     } else if (versionVal === '5') {
       const option1 = { key: 1024, value: '1MB' };
+      this.setFormValueWhenHiden(false);
       options.push(option1);
     }
     // 设置blockSize 可选值
@@ -568,6 +587,7 @@ export class VmfsListComponent implements OnInit {
     // 重置空间回收粒度
     this.setSrgOptions();
   }
+
   // 初始化空间回收粒度
   setSrgOptions() {
     const options = [];
@@ -642,6 +662,7 @@ export class VmfsListComponent implements OnInit {
       });
     });
   }
+
   // 设置集群数据
   setClusterDatas() {
     return new Promise((resolve, reject) => {
@@ -665,6 +686,9 @@ export class VmfsListComponent implements OnInit {
       });
     });
   }
+
+  /* 添加vmfs */
+
   // 点击addBtn触发事件
   addBtnClickFunc() {
     // 展示loading
@@ -721,6 +745,7 @@ export class VmfsListComponent implements OnInit {
     this.storagePoolMap = [];
 
   }
+
   // 页面跳转
   jumpTo(page: ClrWizardPage) {
     if (page && page.completed) {
@@ -730,6 +755,7 @@ export class VmfsListComponent implements OnInit {
     }
     this.wizard.open();
   }
+
   // 获取服务等级数据
   setServiceLevelList() {
     // 初始化服务等级选择参数
@@ -745,6 +771,7 @@ export class VmfsListComponent implements OnInit {
       this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
     });
   }
+
   // 添加vmfs 处理
   addVmfsHanlde() {
     if (this.bandWidthMaxErrTips || this.iopsMaxErrTips
@@ -925,6 +952,7 @@ export class VmfsListComponent implements OnInit {
 
     this.getStorageList();
   }
+
   // 选择服务等级时
   serviceLevelBtnFunc() {
     this.levelCheck = 'level';
@@ -934,6 +962,7 @@ export class VmfsListComponent implements OnInit {
 
     this.setServiceLevelList();
   }
+
   // 页面跳转
   navigateTo(objectid: string) {
     console.log('页面跳转了');
@@ -1030,6 +1059,7 @@ export class VmfsListComponent implements OnInit {
       }
     });
   }
+
   // 挂载  集群数据初始化
   initMountCluster() {
     return new Promise((resolve, reject) => {
@@ -1047,6 +1077,7 @@ export class VmfsListComponent implements OnInit {
       });
     });
   }
+
   // 挂载 主机数据初始化
   initMountHost() {
     return new Promise((resolve, reject) => {
@@ -1063,6 +1094,7 @@ export class VmfsListComponent implements OnInit {
       });
     });
   }
+
   // 挂载提交
   mountSubmit() {
 
@@ -1114,6 +1146,7 @@ export class VmfsListComponent implements OnInit {
       });
     }
   }
+
   // 卸载按钮点击事件
   unmountBtnFunc() {
     if (this.rowSelected.length === 1) {
@@ -1178,6 +1211,7 @@ export class VmfsListComponent implements OnInit {
   unMountConfirm() {
     this.unmountTipsShow = true;
   }
+
   // 卸载处理函数
   unmountHandleFunc() {
     this.unmountTipsShow = false;
@@ -1215,6 +1249,7 @@ export class VmfsListComponent implements OnInit {
       });
     }
   }
+
   // 回收空间 处理
   reclaimHandleFunc() {
     const vmfsObjectIds = this.rowSelected[0].objectid;
@@ -1237,6 +1272,7 @@ export class VmfsListComponent implements OnInit {
     });
 
   }
+
   // 变更服务等级 按钮点击事件
   changeServiceLevelBtnFunc() {
 
@@ -1258,6 +1294,7 @@ export class VmfsListComponent implements OnInit {
       this.setServiceLevelList();
     }
   }
+
   // 变更服务等级 服务等级点击事件
   changeSLDataClickFunc(serviceLevId: string, serviceLevName: string) {
     this.changeServiceLevelForm.service_level_id = serviceLevId;
@@ -1296,6 +1333,7 @@ export class VmfsListComponent implements OnInit {
       console.log('服务等级不能为空！');
     }
   }
+
   // 扩容按钮点击事件
   expandBtnFunc() {
     if (this.rowSelected.length === 1) {
@@ -1312,6 +1350,7 @@ export class VmfsListComponent implements OnInit {
       this.expandForm.obj_id = this.rowSelected[0].objectid;
     }
   }
+
   // 扩容处理
   expandHandleFunc() {
     const expandSubmitForm = new GetForm().getExpandForm();
@@ -1392,6 +1431,7 @@ export class VmfsListComponent implements OnInit {
     console.log('this.expandErr', this.expandErr);
     this.expandForm.vo_add_capacity = expand;
   }
+
   // 空间回收按钮点击事件
   reclaimBtnClick() {
     if (this.rowSelected.length >= 1) {
@@ -1999,6 +2039,7 @@ export class VmfsListComponent implements OnInit {
       }
     }
   }
+
   initAddMinInfo(form) {
     form.control_policyLower = undefined;
     form.minbandwidthChoose = false;
@@ -2008,6 +2049,7 @@ export class VmfsListComponent implements OnInit {
     form.latencyChoose = false;
     form.latency = null;
   }
+
   initAddMaxInfo(form) {
     form.control_policyUpper = undefined;
     form.maxbandwidthChoose = false;
@@ -2032,6 +2074,7 @@ export class VmfsListComponent implements OnInit {
       form.latencyChoose = false;
     }
   }
+
   qosEditFunc(form) {
     console.log("editform.qosFlag", form.qosFlag);
     const qosTag = this.storage.storageTypeShow.qosTag;
@@ -2077,6 +2120,7 @@ export class VmfsListComponent implements OnInit {
       }
     }
   }
+
   initEditMinInfo(form) {
     form.control_policyLower = undefined;
     form.minbandwidthChoose = false;
@@ -2086,6 +2130,7 @@ export class VmfsListComponent implements OnInit {
     form.latencyChoose = false;
     form.latency = null;
   }
+
   initEditMaxInfo(form) {
     form.control_policyUpper = undefined;
     form.maxiopsChoose = false;
@@ -2110,6 +2155,7 @@ export class VmfsListComponent implements OnInit {
       form.latencyChoose = false;
     }
   }
+
   /**
    * 编辑页面  名称变化Func
    */
@@ -2304,6 +2350,7 @@ export class VmfsListComponent implements OnInit {
       this.form.volumeName = this.form.name
     }
   }
+
   resetQosFlag(objValue: boolean, operationType: string) {
     switch (operationType) {
       case 'maxbandwidth':
@@ -2333,6 +2380,7 @@ export class VmfsListComponent implements OnInit {
         break;
     }
   }
+
   sortFunc(obj: any) {
     return !obj;
   }
