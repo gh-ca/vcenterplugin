@@ -170,7 +170,7 @@ public class VCSDKUtils {
 
     public static final String CATEGORY_NAME = "DME Service Level";
 
-    private static final int TEST_CONNECTIVITY_TIMEOUT = 3000;
+    private static final int TEST_CONNECTIVITY_TIMEOUT = 1500;
 
     private static final int THREAD_SLEEP_2_SECENDS = 2000;
 
