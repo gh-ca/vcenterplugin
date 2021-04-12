@@ -9,8 +9,9 @@ import {
   VmfsInfo,
   VmfsListService
 } from '../list/list.service';
-import {DataStore, MountService} from "./mount.service";
-import {GlobalsService} from "../../../shared/globals.service";
+import { DataStore, MountService } from "./mount.service";
+import { GlobalsService } from "../../../shared/globals.service";
+import { isMockData, mockData } from "../../../../mock/mock";
 
 @Component({
   selector: 'app-list',
@@ -116,8 +117,7 @@ export class MountComponent implements OnInit{
           if (this.resource === 'list') {// 以列表为入口
             this.objectId = queryParam.objectId;
           } else { // 以dataStore为入口
-            this.objectId = ctx[0].id;
-            // this.objectId = "urn:vmomi:Datastore:datastore-5036:674908e5-ab21-4079-9cb1-596358ee5dd1";
+            this.objectId = ctx ? ctx[0].id : "urn:vmfixomi:Datastore:datastore-5036:674908e5-ab21-4079-9cb1-596358ee5dd1";
           }
           if (this.operationType === 'mount') {
             this.mountShow = true;
@@ -160,9 +160,9 @@ export class MountComponent implements OnInit{
     // 初始化挂载form
     // 初始化dataStore
     this.dataStores = [];
-    console.log('this.dataType', this.dataType === 'host');
-    console.log('this.operationType', this.operationType === 'unmount');
-    console.log('this.resource', this.resource === 'others');
+    console.log(this.dataType, 'this.dataType', this.dataType === 'host');
+    console.log(this.operationType, 'this.operationType', this.operationType === 'unmount');
+    console.log(this.resource, 'this.resource', this.resource === 'others');
 
     // 初始化挂载/卸载 form
     if (this.operationType === 'mount') {
@@ -207,44 +207,70 @@ export class MountComponent implements OnInit{
         // 初始话已选择数据
         this.chooseUnmountCluster = null;
         this.chooseUnmountHost = null;
-        // 获取主机
-        this.remoteSrv.getMountHost(this.objectId).subscribe((result: any) => {
+
+
+        let isShowHostList = false;
+        /* 2：处理获取集群的数据 */
+        const handlerGetMountClusterSuccess = (result: any) => {
           console.log(result);
           if (result.code === '200' && result.data !== null && result.data.length >= 1) {
-            this.unmountForm.mountType = '1';
-            const mountHost: HostOrCluster [] = [];
+            this.unmountForm.mountType = isShowHostList ? '1' : '2';
+            const mountCluster: HostOrCluster[] = [];
             result.data.forEach(item => {
               const hostInfo = {
-                deviceId: item.hostId,
-                deviceName: item.hostName,
-                deviceType: 'host'
+                deviceId: item.hostGroupId,
+                deviceName: item.hostGroupName,
+                deviceType: 'cluster'
               };
-              mountHost.push(hostInfo);
+              mountCluster.push(hostInfo);
             });
-            this.mountedHost = mountHost;
+            this.mountedCluster = mountCluster;
           }
-          // 获取集群
-          this.remoteSrv.getMountCluster(this.objectId).subscribe((result: any) => {
-            console.log(result);
-            if (result.code === '200' && result.data !== null && result.data.length >= 1) {
-              this.unmountForm.mountType = '2';
-              const mountCluster: HostOrCluster [] = [];
+          this.modalLoading = false;
+          this.isLoading = false;
+          this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
+        };
+
+        /* 处理获取主机的数据 */
+        const handlerGetMountHost = (result: any) => {
+          console.log(result);
+          if (result.code === '200' && result.data !== null) {
+            if (result.data.length >= 1) {
+              /* FIX:20210412122706 如果主机有数据 则显示主机列表，如果没有，按原来的规则 */
+              /* 卸载时，如果主机有数据，显示主机列表 */
+              this.unmountForm.mountType = '1';
+              isShowHostList = true;
+              const mountHost: HostOrCluster[] = [];
               result.data.forEach(item => {
                 const hostInfo = {
-                  deviceId: item.hostGroupId,
-                  deviceName: item.hostGroupName,
-                  deviceType: 'cluster'
+                  deviceId: item.hostId,
+                  deviceName: item.hostName,
+                  deviceType: 'host'
                 };
-                mountCluster.push(hostInfo);
+                mountHost.push(hostInfo);
               });
-              this.mountedCluster = mountCluster;
+              this.mountedHost = mountHost;
             }
-            this.modalLoading = false;
-            this.isLoading = false;
-            this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
-          });
+          }
+
+          // 获取集群
+          if (isMockData) {
+            handlerGetMountClusterSuccess(mockData.ACCESSVMFS_GETHOSTGROUPSBYSTORAGEID);
+          } else {
+            this.remoteSrv.getMountCluster(this.objectId).subscribe(handlerGetMountClusterSuccess);
+          }
           this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
-        });
+        };
+
+        if (isMockData) {
+          handlerGetMountHost(mockData.ACCESSVMFS_GETHOSTSBYSTORAGEID);
+        } else {
+          // 获取主机
+          const lqHostgroupId = `urn:vmomi:Datastore:datastore-14029:674908e5-ab21-4079-9cb1-596358ee5dd1`;
+          /*TODO:*/
+          this.remoteSrv.getMountHost(lqHostgroupId).subscribe(handlerGetMountHost);
+          // this.remoteSrv.getMountHost(this.objectId).subscribe(handlerGetMountHost);
+        }
       }
     }
   }

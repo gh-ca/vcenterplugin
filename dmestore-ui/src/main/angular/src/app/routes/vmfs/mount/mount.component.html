@@ -74,6 +74,7 @@
           <input clrInput readonly [(ngModel)]="vmfsInfo.name" name="name" #name="ngModel" required/><br>
           <clr-control-error>{{'validations.required' | translate}}</clr-control-error>
         </clr-input-container>
+        <!-- 主机、集群列表切换 -->
         <clr-radio-container clrInline>
           <label class="floatleft" style="color: #9F9F9F;">{{'vmfs.hostOrCluster' | translate}}</label>
           <clr-radio-wrapper>
@@ -85,6 +86,7 @@
             <label>{{'vmfs.mount.cluster' | translate}}</label>
           </clr-radio-wrapper>
         </clr-radio-container>
+        <!-- 显示主机 -->
         <clr-combobox-container *ngIf="mountForm.mountType==='1'">
           <label style="color: #9F9F9F;">{{'vmfs.mount.host' | translate}}</label>
           <clr-combobox [(ngModel)]="chooseHost" name="chooseHost" required>
@@ -98,6 +100,7 @@
           <clr-control-error>{{'validations.required' | translate}}：{{'vmfs.mount.mountErr' | translate}}</clr-control-error>
         </clr-combobox-container>
 
+        <!-- 显示集群 -->
         <clr-combobox-container *ngIf="mountForm.mountType==='2'">
           <label style="color: #9F9F9F;">{{'vmfs.mount.cluster' | translate}}</label>
           <clr-combobox [(ngModel)]="chooseCluster" name="chooseCluster" required>
@@ -143,6 +146,7 @@
           <input clrInput readonly [(ngModel)]="vmfsInfo.name" name="name" #name="ngModel" required/><br>
           <clr-control-error>{{'validations.required' | translate}}</clr-control-error>
         </clr-input-container>
+        <!-- 主机、集群列表切换 -->
         <clr-radio-container clrInline>
           <label class="floatleft" style="color: #9F9F9F;">{{'vmfs.hostOrCluster' | translate}}</label>
           <clr-radio-wrapper>
@@ -155,7 +159,9 @@
           </clr-radio-wrapper>
         </clr-radio-container>
 
-        <clr-datagrid *ngIf="unmountForm.mountType === '1'" [(clrDgSingleSelected)]="chooseUnmountHost" [clrDgLoading]="isLoading">
+        <!-- 主机列表 -->
+        <clr-datagrid *ngIf="unmountForm.mountType === '1'"
+          [(clrDgSingleSelected)]="chooseUnmountHost" [clrDgLoading]="isLoading">
           <clr-dg-column hidden></clr-dg-column>
           <clr-dg-column [clrDgField]="'deviceName'">{{'vmfs.name' | translate}}</clr-dg-column>
           <clr-dg-column>{{'vmfs.type' | translate}}</clr-dg-column>
@@ -165,7 +171,9 @@
             <clr-dg-cell>{{'vmfs.host' | translate}}</clr-dg-cell>
           </clr-dg-row>
         </clr-datagrid>
-        <clr-datagrid *ngIf="unmountForm.mountType === '2'" [(clrDgSingleSelected)]="chooseUnmountCluster" [clrDgLoading]="isLoading">
+        <!-- 集群列表 -->
+        <clr-datagrid *ngIf="unmountForm.mountType === '2'"
+          [(clrDgSingleSelected)]="chooseUnmountCluster" [clrDgLoading]="isLoading">
           <clr-dg-column hidden></clr-dg-column>
           <clr-dg-column [clrDgField]="'deviceName'">{{'vmfs.name' | translate}}</clr-dg-column>
           <clr-dg-column>{{'vmfs.type' | translate}}</clr-dg-column>

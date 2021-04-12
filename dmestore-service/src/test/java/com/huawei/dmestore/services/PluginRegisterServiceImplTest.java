@@ -1,12 +1,16 @@
 package com.huawei.dmestore.services;
 
 import com.huawei.dmestore.exception.DmeException;
+import com.huawei.dmestore.utils.CipherUtils;
 import com.huawei.vmware.VcConnectionHelpers;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.when;
 
 /**
  * @author lianq
@@ -24,7 +28,8 @@ public class PluginRegisterServiceImplTest {
     private VCenterInfoService vCenterInfoService;
     @Mock
     private VcConnectionHelpers vcConnectionHelpers;
-
+    @Mock
+    private CipherUtils cipherUtils;
     @InjectMocks
     PluginRegisterService pluginRegisterService = new PluginRegisterServiceImpl();
 
@@ -35,6 +40,7 @@ public class PluginRegisterServiceImplTest {
 
     @Test
     public void installService() throws DmeException {
+        when(cipherUtils.encryptString(anyString())).thenReturn("13213");
         pluginRegisterService.installService("321","321","321","321","321","321","321","321");
     }
 

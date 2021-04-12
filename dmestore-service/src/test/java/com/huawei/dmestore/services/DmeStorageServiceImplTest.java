@@ -1,6 +1,7 @@
 package com.huawei.dmestore.services;
 
-import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.when;
 
 import com.huawei.dmestore.dao.DmeVmwareRalationDao;
@@ -14,7 +15,6 @@ import com.huawei.dmestore.model.NfsShares;
 import com.huawei.dmestore.model.Storage;
 import com.huawei.dmestore.model.StorageControllers;
 import com.huawei.dmestore.model.StorageDetail;
-import com.huawei.dmestore.model.VolumeListRestponse;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -63,7 +63,7 @@ public class DmeStorageServiceImplTest {
     }
 
     @Test
-    public void getStorages() throws DmeException {
+    public void testGetStorages() throws DmeException {
         url = "/rest/storagemgmt/v1/storages";
         List<JsonObject> reqList = new ArrayList<>();
         //更换设定返回的数据
@@ -110,13 +110,13 @@ public class DmeStorageServiceImplTest {
         Map<String, Object> reqMap = new HashMap<>();
         reqMap.put("datas", reqList);
         ResponseEntity<String> responseEntity = new ResponseEntity<>(gson.toJson(reqMap), null, HttpStatus.OK);
-        when(dmeAccessService.access(url, HttpMethod.GET, null)).thenReturn(responseEntity);
+        when(dmeAccessService.access(anyString(), any(), anyString())).thenReturn(responseEntity);
         List<Storage> storages = dmeStorageService.getStorages();
         System.out.println(storages);
     }
 
     @Test
-    public void getStorageDetail() throws DmeException {
+    public void testGetStorageDetail() throws DmeException {
         String storageId = "123";
         url = "/rest/storagemgmt/v1/storages/123/detail";
         //更换设定返回的数据
@@ -137,12 +137,14 @@ public class DmeStorageServiceImplTest {
             "  \"free_effective_capacity\" : 0.0,\n" +
             "  \"location\" : \"string\",\n" +
             "  \"az_ids\" : [ \"string\" ],\n" +
+            "  \"datas\" : [{\"bhkhihj\":\"dajdoj\"},{\"ljj\":\"dmkflkkm\"}],\n" +
+            "  \"objList\" : [{\"bhkhihj\":\"dajdoj\"},{\"ljj\":\"dmkflkkm\"}],\n" +
             "  \"maintenance_start\" : 1564211245111,\n" +
             "  \"maintenance_overtime\" : 1564211245111\n" +
             "}";
         JsonObject jsonObject = new JsonParser().parse(data).getAsJsonObject();
         ResponseEntity<String> responseEntity = new ResponseEntity<>(gson.toJson(jsonObject), null, HttpStatus.OK);
-        when(dmeAccessService.access(url, HttpMethod.GET, null)).thenReturn(responseEntity);
+        when(dmeAccessService.access(anyString(), any(), anyString())).thenReturn(responseEntity);
         List<JsonObject> reqPool = new ArrayList<>();
         String pool = "{\n" +
             " \"ownerType\": \"eSight_Storage\",\n" +
@@ -168,6 +170,7 @@ public class DmeStorageServiceImplTest {
             " \"poolId\": \"30\",\n" +
             " \"nativeId\": \"nedn=98bbdfb0-579e-11ea-a20d-005056adf850,id=19,objecttype=11\",\n" +
             " \"dataSource\": \"auto\",\n" +
+            " \"tier2RaidLv\":\"1\",\n" +
             " \"allocCapacity\": 1.19\n" +
             " }";
         JsonObject jsonPool = new JsonParser().parse(pool).getAsJsonObject();
@@ -193,7 +196,7 @@ public class DmeStorageServiceImplTest {
 
 
     @Test
-    public void getLogicPorts() throws DmeException {
+    public void testGetLogicPorts() throws DmeException {
         String storageId = "123";
         url = "/rest/storagemgmt/v1/storage-port/logic-ports?storage_id=" + storageId;
         String data = " {\n" +
@@ -223,14 +226,14 @@ public class DmeStorageServiceImplTest {
         Map<String, Object> map = new HashMap<>();
         map.put("logic_ports", list);
         ResponseEntity<String> responseEntity = new ResponseEntity<>(gson.toJson(map), null, HttpStatus.OK);
-        when(dmeAccessService.access(url, HttpMethod.GET, null)).thenReturn(responseEntity);
-        List<LogicPorts> logicPorts = dmeStorageService.getLogicPorts(storageId,null);
+        when(dmeAccessService.access(anyString(), any(), anyString())).thenReturn(responseEntity);
+        List<LogicPorts> logicPorts = dmeStorageService.getLogicPorts(storageId,"ihuiohjoh");
         System.out.println(logicPorts);
 
     }
 
     @Test
-    public void getVolumesByPage() throws DmeException {
+    public void testGetVolumesByPage() throws DmeException {
         String storageId = "123";
         String url = "/rest/blockservice/v1/volumes?storage_id=" + storageId + "&";
         String data = "{\n" +
@@ -313,7 +316,7 @@ public class DmeStorageServiceImplTest {
     }
 
     @Test
-    public void getFileSystems() throws DmeException {
+    public void testGetFileSystems() throws DmeException {
         String storageId = "123";
         url = "/rest/fileservice/v1/filesystems/query";
         String data = "{\n" +
@@ -351,7 +354,7 @@ public class DmeStorageServiceImplTest {
     }
 
     @Test
-    public void getDtrees() throws DmeException {
+    public void testGetDtrees() throws DmeException {
         String storageId = "123";
         url = "/rest/fileservice/v1/dtrees/summary";
         String data = "{\n" +
@@ -377,13 +380,13 @@ public class DmeStorageServiceImplTest {
         ResponseEntity<String> responseEntity = new ResponseEntity<>(gson.toJson(map), null, HttpStatus.OK);
         Map<String, Object> params = new HashMap<>();
         params.put("storage_id", storageId);
-        when(dmeAccessService.access(url, HttpMethod.POST, gson.toJson(params))).thenReturn(responseEntity);
+        when(dmeAccessService.access(anyString(), any(), anyString())).thenReturn(responseEntity);
         List<Dtrees> dtrees = dmeStorageService.getDtrees(storageId);
         System.out.println(dtrees);
     }
 
     @Test
-    public void getNfsShares() throws DmeException {
+    public void testGetNfsShares() throws DmeException {
         String storageId = "123";
         url = "/rest/fileservice/v1/nfs-shares/summary";
         String data = "{\n" +
@@ -413,13 +416,13 @@ public class DmeStorageServiceImplTest {
         ResponseEntity<String> responseEntity = new ResponseEntity<>(gson.toJson(map), null, HttpStatus.OK);
         Map<String, Object> params = new HashMap<>();
         params.put("storage_id", storageId);
-        when(dmeAccessService.access(url, HttpMethod.POST, gson.toJson(params))).thenReturn(responseEntity);
+        when(dmeAccessService.access(anyString(), any(), anyString())).thenReturn(responseEntity);
         List<NfsShares> nfsShares = dmeStorageService.getNfsShares(storageId);
         System.out.println(nfsShares);
     }
 
     @Test
-    public void getBandPorts() throws DmeException {
+    public void testGetBandPorts() throws DmeException {
         String storageId = "123";
         url = "/rest/storagemgmt/v1/storage-port/bond-ports?storage_id=" + storageId;
         String data = "{\n" +
@@ -435,13 +438,13 @@ public class DmeStorageServiceImplTest {
         Map<String, Object> map = new HashMap<>();
         map.put("bond_ports", list);
         ResponseEntity<String> responseEntity = new ResponseEntity<>(gson.toJson(map), null, HttpStatus.OK);
-        when(dmeAccessService.access(url, HttpMethod.GET, null)).thenReturn(responseEntity);
+        when(dmeAccessService.access(anyString(), any(), anyString())).thenReturn(responseEntity);
         List<BandPorts> bandPorts = dmeStorageService.getBandPorts(storageId);
         System.out.println(bandPorts);
     }
 
     @Test
-    public void getStorageControllers() throws DmeException {
+    public void testGetStorageControllers() throws DmeException {
         String storageDeviceId = "123";
         url = "/rest/resourcedb/v1/instances/SYS_Controller?condition={json}&&pageSize=1000";
         String pool = "{\n" +
@@ -499,7 +502,7 @@ public class DmeStorageServiceImplTest {
     }
 
     @Test
-    public void getStorageEthPorts() throws Exception {
+    public void testGetStorageEthPorts() throws Exception {
         String sn = "123";
         url = "/rest/resourcedb/v1/instances/SYS_StorDevice?condition={json}";
         String pool = "{\n" +
@@ -514,7 +517,7 @@ public class DmeStorageServiceImplTest {
         ResponseEntity<String> responseEntity = new ResponseEntity<>(gson.toJson(map), null, HttpStatus.OK);
         String params =
             "{\"constraint\":[{\"simple\":{\"name\":\"dataStatus\",\"operator\":\"equal\",\"value\":\"normal\"}},{\"simple\":{\"name\":\"sn\",\"operator\":\"equal\",\"value\":\"123\"},\"logOp\":\"and\"}]}";
-        when(dmeAccessService.accessByJson(url, HttpMethod.GET, params)).thenReturn(responseEntity);
+        when(dmeAccessService.accessByJson(anyString(), any(), anyString())).thenReturn(responseEntity);
         String param =
             "{\"constraint\":[{\"simple\":{\"name\":\"dataStatus\",\"operator\":\"equal\",\"value\":\"normal\"}},{\"simple\":{\"name\":\"portType\",\"operator\":\"equal\",\"value\":\"ETH\"},\"logOp\":\"and\"}," +
                 "{\"simple\":{\"name\":\"storageDeviceId\",\"operator\":\"equal\",\"value\":\"3F6CC81D8C4C358F8888303479544ACB\"},\"logOp\":\"and\"}]}";
@@ -551,13 +554,13 @@ public class DmeStorageServiceImplTest {
         Map<String, Object> map2 = new HashMap<>();
         map2.put("objList", list2);
         ResponseEntity<String> responseEntity2 = new ResponseEntity<>(gson.toJson(map2), null, HttpStatus.OK);
-        when(dmeAccessService.accessByJson(url2, HttpMethod.GET, param)).thenReturn(responseEntity2);
+        when(dmeAccessService.accessByJson(anyString(), any(), anyString())).thenReturn(responseEntity2);
         List<EthPortInfo> storageEthPorts = dmeStorageService.getStorageEthPorts(sn);
         System.out.println(storageEthPorts);
     }
 
     @Test
-    public void getVolume() throws DmeException {
+    public void testGetVolume() throws DmeException {
         String volumeId = "123";
         url = "/rest/blockservice/v1/volumes/" + volumeId;
         //更换设定返回的数据
@@ -599,7 +602,7 @@ public class DmeStorageServiceImplTest {
     }
 
     @Test
-    public void getStoragePort() throws DmeException {
+    public void testGetStoragePort() throws DmeException {
         String storageDeviceId = "123";
         url = "/rest/resourcedb/v1/instances/SYS_StoragePort?condition={json}&&pageSize=1000";
         String pool = "{\n" +
@@ -642,7 +645,7 @@ public class DmeStorageServiceImplTest {
     }
 
     @Test
-    public void getFailoverGroups() throws DmeException {
+    public void testGetFailoverGroups() throws DmeException {
         String storageId = "123";
         url = "/rest/storagemgmt/v1/storage-port/failover-groups?storage_id=" + storageId;
         String data = "{\n" +
@@ -656,12 +659,12 @@ public class DmeStorageServiceImplTest {
         Map<String, Object> map = new HashMap<>();
         map.put("failover_groups", list);
         ResponseEntity<String> responseEntity = new ResponseEntity<>(gson.toJson(map), null, HttpStatus.OK);
-        when(dmeAccessService.access(url, HttpMethod.GET, null)).thenReturn(responseEntity);
+        when(dmeAccessService.access(anyString(), any(), anyString())).thenReturn(responseEntity);
         System.out.println(dmeStorageService.getFailoverGroups(storageId));
     }
 
     @Test
-    public void getFileSystemDetail() throws DmeException {
+    public void testGetFileSystemDetail() throws DmeException {
         String fileSystemId = "123";
         url = "/rest/fileservice/v1/filesystems/" + fileSystemId;
         String data = "{\n" +
@@ -746,7 +749,7 @@ public class DmeStorageServiceImplTest {
     }
 
     @Test
-    public void listStoragePerformance() throws DmeException {
+    public void testListStoragePerformance() throws DmeException {
 
         String param1 = "SYS_StorDevice";
         String storageId = "123";
@@ -766,7 +769,7 @@ public class DmeStorageServiceImplTest {
     }
 
     @Test
-    public void listStoragePoolPerformance() throws DmeException {
+    public void testListStoragePoolPerformance() throws DmeException {
         String param1 = "SYS_StoragePool";
         String storageId = "123";
         List<String> list = new ArrayList<>();
@@ -785,7 +788,7 @@ public class DmeStorageServiceImplTest {
     }
 
     @Test
-    public void listStorageControllerPerformance() throws DmeException {
+    public void testListStorageControllerPerformance() throws DmeException {
         String param1 = "SYS_Controller";
         String storageId = "123";
         List<String> list = new ArrayList<>();
@@ -804,7 +807,7 @@ public class DmeStorageServiceImplTest {
     }
 
     @Test
-    public void listStorageDiskPerformance() throws DmeException {
+    public void testListStorageDiskPerformance() throws DmeException {
         String param1 = "SYS_StorageDisk";
         String storageId = "123";
         List<String> list = new ArrayList<>();
@@ -823,7 +826,7 @@ public class DmeStorageServiceImplTest {
     }
 
     @Test
-    public void listStoragePortPerformance() throws DmeException {
+    public void testListStoragePortPerformance() throws DmeException {
         String param1 = "SYS_StoragePort";
         String storageId = "123";
         List<String> list = new ArrayList<>();
@@ -842,7 +845,7 @@ public class DmeStorageServiceImplTest {
     }
 
     @Test
-    public void listVolumesPerformance() throws DmeException {
+    public void testListVolumesPerformance() throws DmeException {
         String param1 = "SYS_Lun";
         String storageId = "123";
         List<String> list = new ArrayList<>();
@@ -861,7 +864,7 @@ public class DmeStorageServiceImplTest {
     }
 
     @Test
-    public void queryVolumeByName() throws DmeException {
+    public void testQueryVolumeByName() throws DmeException {
         String name = "123";
         url = "/rest/blockservice/v1/volumes?name=" + name;
         JsonObject jsonObject = new JsonObject();
@@ -872,7 +875,7 @@ public class DmeStorageServiceImplTest {
     }
 
     @Test
-    public void queryFsByName() throws DmeException {
+    public void testQueryFsByName() throws DmeException {
         String storageId = "123";
         String name = "123";
         url = "/rest/fileservice/v1/filesystems/query";
@@ -894,7 +897,7 @@ public class DmeStorageServiceImplTest {
     }
 
     @Test
-    public void queryShareByName() throws DmeException {
+    public void testQueryShareByName() throws DmeException {
         String storageId = "123";
         String name = "123";
         url = "/rest/fileservice/v1/nfs-shares/summary";
@@ -911,12 +914,12 @@ public class DmeStorageServiceImplTest {
         Map<String, Object> map = new HashMap<>();
         map.put("nfs_share_info_list", list);
         ResponseEntity<String> responseEntity = new ResponseEntity(gson.toJson(map), null, HttpStatus.OK);
-        when(dmeAccessService.access(url, HttpMethod.POST, gson.toJson(jsonObject))).thenReturn(responseEntity);
+        when(dmeAccessService.access(anyString(), any(), anyString())).thenReturn(responseEntity);
         System.out.println(dmeStorageService.queryShareByName(name, storageId));
     }
 
     @Test
-    public void getStorageDisks() throws DmeException {
+    public void testGetStorageDisks() throws DmeException {
         String storageDeviceId = "123";
         String pool = "{\n" +
             " \"ownerType\": \"eSight_Storage\",\n" +
@@ -958,7 +961,7 @@ public class DmeStorageServiceImplTest {
         url = "/rest/resourcedb/v1/instances/SYS_DiskPool?condition={json}pageSize=1000";
         String params2 =
             "{\"constraint\":[{\"simple\":{\"name\":\"dataStatus\",\"operator\":\"equal\",\"value\":\"normal\"}},{\"simple\":{\"name\":\"poolId\",\"operator\":\"equal\",\"value\":\"30\"},\"logOp\":\"and\"}]}";
-        when(dmeAccessService.accessByJson(url, HttpMethod.GET, params2)).thenReturn(responseEntity2);
+        when(dmeAccessService.accessByJson(anyString(), any(), anyString())).thenReturn(responseEntity2);
         System.out.println(dmeStorageService.getStorageDisks(storageDeviceId));
 
     }

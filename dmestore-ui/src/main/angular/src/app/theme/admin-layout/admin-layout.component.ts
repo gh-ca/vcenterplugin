@@ -81,10 +81,15 @@ export class AdminLayoutComponent implements OnInit, OnDestroy {
       { link: "./dashboard", label: 'Overview' },
       { link: "./storage", label: 'Storage Device' },
       { link: "./vmfs/list", label: './vmfs/list' },
+      { link: "./vmfs/add", label: './vmfs/add' },
+      { link: "./vmfs/performance", label: './vmfs/performance' },
+      { link: "./vmfs/unmount", label: './vmfs/unmount' },
       { link: "./nfs", label: 'NFS Datastore' },
       { link: "./nfs/list", label: './nfs/list' },
       { link: "./servicelevel", label: 'servicelevel DME存储策略' },
       { link: "./bestpractice", label: 'Best Practice' },
+      { link: "./host/applybp", label: 'ApplybpComponent host' },
+      { link: "./cluster/applybp", label: 'ApplybpComponent cluster' },
       { link: "./iscsi", label: 'iscsi list' }
     ]
     this.layoutChangesSubscription = this.breakpointObserver
