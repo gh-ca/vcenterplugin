@@ -2030,7 +2030,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         boolean isDeleteFalg = false;
         if (params.get(HOSTID) != null) {
             for (String dsObj : dataStoreObjectIds) {
-                List<Map<String, Object>> hosts = getHostsByStorageId(dsObj);
+                List<Map<String, Object>> hosts = getHostsByStorageId2(dsObj);
                 if (hosts != null && hosts.size() == 1) {
                     // todo 此处注释代码暂时不要删除
                     //volumeDelete(params);
@@ -2041,7 +2041,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         }
         if (!isDeleteFalg && params.get(CLUSTER_ID) != null) {
             for (String dsObjId : dataStoreObjectIds) {
-                List<Map<String, Object>> hostGroups = getHostGroupsByStorageId(dsObjId);
+                List<Map<String, Object>> hostGroups = getHostGroupsByStorageId2(dsObjId);
                 if (hostGroups != null && hostGroups.size() == 0) {
                     // todo 此处注释代码暂时不要删除
                     //volumeDelete(params);
