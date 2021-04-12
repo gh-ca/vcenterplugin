@@ -597,6 +597,7 @@
     "disconnect": "断开连接"
   },
   "bestPractice": {
+    "deleteLUN":"请手动删除多余的LUN",
     "apply": "实施最佳实践",
     "check": "重新检查",
     "hostSetting": "主机配置",

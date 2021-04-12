@@ -597,6 +597,7 @@
     "disconnect": "Disconnect"
   },
   "bestPractice": {
+    "deleteLUN": "Please manually delete the excess LUN",
     "apply": "Apply Best Practice",
     "check": "Recheck",
     "hostSetting": "HostSetting",
