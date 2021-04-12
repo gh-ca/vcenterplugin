@@ -27,8 +27,11 @@
       <clr-dg-column style="width: 11rem;">{{'bestPractice.description.name'|translate}}</clr-dg-column>
       <clr-dg-column>{{'bestPractice.operation'|translate}}</clr-dg-column>
       <clr-dg-placeholder>{{'tips.noData' | translate}}</clr-dg-placeholder>
-      <clr-dg-row *clrDgItems="let item of list" [clrDgItem]="item">
-        <clr-dg-cell>{{item.hostSetting}}</clr-dg-cell>
+      <!--autorepare 实施最佳实践 -->
+      <clr-dg-row *clrDgItems="let item of list"
+                  [clrDgItem]="item"
+                  [clrDgSelectable]="item.hostList&&item.hostList.length>0&&item.hostList[0].autoRepair==='true'">
+      <clr-dg-cell>{{item.hostSetting}}</clr-dg-cell>
         <clr-dg-cell>{{item.recommendValue}}</clr-dg-cell>
         <clr-dg-cell>
         <span [hidden]="item.level != 'Critical'">
@@ -72,7 +75,9 @@
       <h3 class="modal-title">{{'bestPractice.non-compliant'|translate}}</h3>
       <div class="modal-body">
         <div>
-          <button class="btn btn-primary" [disabled]="hostSelected.length === 0" (click)="applyClick('2')">{{'bestPractice.apply'|translate}}</button>
+          <!--autorepare 实施最佳实践 -->
+          <button *ngIf="!isShowBPBtnTips" class="btn btn-primary" [disabled]="hostSelected.length === 0" (click)="applyClick('2')">{{'bestPractice.apply'|translate}}</button>
+          <span *ngIf="isShowBPBtnTips"><clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{'bestPractice.deleteLUN' | translate}}</span>
         </div>
         <!-- 列表页 -->
         <clr-datagrid [(clrDgSelected)]="hostSelected"  (clrDgRefresh)="hostRefresh()" [clrDgLoading]="hostIsLoading">

@@ -9,9 +9,9 @@ import {
   VmfsInfo,
   VmfsListService
 } from '../list/list.service';
-import { DataStore, MountService } from "./mount.service";
-import { GlobalsService } from "../../../shared/globals.service";
-import { isMockData, mockData } from "../../../../mock/mock";
+import {DataStore, MountService} from "./mount.service";
+import {GlobalsService} from "../../../shared/globals.service";
+import {isMockData, mockData} from "../../../../mock/mock";
 
 @Component({
   selector: 'app-list',
@@ -20,12 +20,13 @@ import { isMockData, mockData } from "../../../../mock/mock";
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [MountService],
 })
-export class MountComponent implements OnInit{
+export class MountComponent implements OnInit {
 
   constructor(private remoteSrv: MountService, private activatedRoute: ActivatedRoute, private cdr: ChangeDetectorRef,
-              private router:Router, private globalsService: GlobalsService) {
+              private router: Router, private globalsService: GlobalsService) {
 
   }
+
   // dataStore数据
   dataStores: DataStore[] = [];
   // 选择DataStore
@@ -86,7 +87,7 @@ export class MountComponent implements OnInit{
   isUnmountOperationErr = false; // 卸载错误信息
 
   connectivityFailure = false; // 主机联通性测试失败
-  connFailData:ConnFaildData[]; //  主机联通性测试失败数据
+  connFailData: ConnFaildData[]; //  主机联通性测试失败数据
   showDetail = false; // 展示主机联通异常数据
 
   ngOnInit(): void {
@@ -132,7 +133,7 @@ export class MountComponent implements OnInit{
               if (result.code === '200' && null != result.data) {
                 this.vmfsInfo = result.data.filter(item => item.objectid === this.objectId)[0];
               }
-              console.log('this.vmfsInfo ', this.vmfsInfo );
+              console.log('this.vmfsInfo ', this.vmfsInfo);
 
               this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
             });
@@ -153,6 +154,7 @@ export class MountComponent implements OnInit{
     // 数据初始化
     this.getDataStore();
   }
+
   /**
    * 挂载：初始化dataStore
    */
@@ -195,7 +197,7 @@ export class MountComponent implements OnInit{
         this.hostList = [];
 
         this.chooseCluster = undefined;
-        this.chooseHost =  undefined;
+        this.chooseHost = undefined;
         this.initMountHost();
 
       } else { // 卸载
@@ -210,21 +212,22 @@ export class MountComponent implements OnInit{
 
 
         let isShowHostList = false;
+        console.log("isShowHostList", isShowHostList);
         /* 2：处理获取集群的数据 */
         const handlerGetMountClusterSuccess = (result: any) => {
           console.log(result);
           if (result.code === '200' && result.data !== null && result.data.length >= 1) {
-            this.unmountForm.mountType = isShowHostList ? '1' : '2';
-            const mountCluster: HostOrCluster[] = [];
+            this.unmountForm.mountType = '1';
+            const mountHost: HostOrCluster [] = [];
             result.data.forEach(item => {
               const hostInfo = {
-                deviceId: item.hostGroupId,
-                deviceName: item.hostGroupName,
-                deviceType: 'cluster'
+                deviceId: item.hostId,
+                deviceName: item.hostName,
+                deviceType: 'host'
               };
-              mountCluster.push(hostInfo);
+              mountHost.push(hostInfo);
             });
-            this.mountedCluster = mountCluster;
+            this.mountedHost = mountHost;
           }
           this.modalLoading = false;
           this.isLoading = false;
@@ -235,22 +238,17 @@ export class MountComponent implements OnInit{
         const handlerGetMountHost = (result: any) => {
           console.log(result);
           if (result.code === '200' && result.data !== null) {
-            if (result.data.length >= 1) {
-              /* FIX:20210412122706 如果主机有数据 则显示主机列表，如果没有，按原来的规则 */
-              /* 卸载时，如果主机有数据，显示主机列表 */
-              this.unmountForm.mountType = '1';
-              isShowHostList = true;
-              const mountHost: HostOrCluster[] = [];
-              result.data.forEach(item => {
-                const hostInfo = {
-                  deviceId: item.hostId,
-                  deviceName: item.hostName,
-                  deviceType: 'host'
-                };
-                mountHost.push(hostInfo);
-              });
-              this.mountedHost = mountHost;
-            }
+            this.unmountForm.mountType = '2';
+            const mountCluster: HostOrCluster [] = [];
+            result.data.forEach(item => {
+              const hostInfo = {
+                deviceId: item.hostGroupId,
+                deviceName: item.hostGroupName,
+                deviceType: 'cluster'
+              };
+              mountCluster.push(hostInfo);
+            });
+            this.mountedCluster = mountCluster;
           }
 
           // 获取集群
@@ -266,10 +264,10 @@ export class MountComponent implements OnInit{
           handlerGetMountHost(mockData.ACCESSVMFS_GETHOSTSBYSTORAGEID);
         } else {
           // 获取主机
-          const lqHostgroupId = `urn:vmomi:Datastore:datastore-14029:674908e5-ab21-4079-9cb1-596358ee5dd1`;
           /*TODO:*/
-          this.remoteSrv.getMountHost(lqHostgroupId).subscribe(handlerGetMountHost);
-          // this.remoteSrv.getMountHost(this.objectId).subscribe(handlerGetMountHost);
+          // const lqHostgroupId = `urn:vmomi:Datastore:datastore-14029:674908e5-ab21-4079-9cb1-596358ee5dd1`;
+          // this.remoteSrv.getMountHost(lqHostgroupId).subscribe(handlerGetMountHost);
+          this.remoteSrv.getMountHost(this.objectId).subscribe(handlerGetMountHost);
         }
       }
     }
@@ -414,13 +412,13 @@ export class MountComponent implements OnInit{
       this.remoteSrv.mountVmfs(this.mountForm).subscribe((result: any) => {
         this.modalHandleLoading = false;
         console.log("result:", result)
-        if (result.code  ===  '200'){
+        if (result.code === '200') {
           console.log('挂载成功');
           this.mountSuccessShow = true;
-        } else if(result.code === '-60001') {
+        } else if (result.code === '-60001') {
           this.connectivityFailure = true;
           this.showDetail = false;
-          const connFailDatas:ConnFaildData[] = [];
+          const connFailDatas: ConnFaildData[] = [];
           if (result.data) {
             result.data.forEach(item => {
               for (let key in item) {
@@ -461,7 +459,7 @@ export class MountComponent implements OnInit{
       this.modalHandleLoading = true;
       this.remoteSrv.unmountVMFS(this.unmountForm).subscribe((result: any) => {
         this.modalHandleLoading = false;
-        if (result.code === '200'){
+        if (result.code === '200') {
           console.log('unmount  success');
           this.unmountSuccessShow = true;
         } else {
@@ -478,7 +476,7 @@ export class MountComponent implements OnInit{
     return new Promise((resolve, reject) => {
       // 获取服务器 通过ObjectId过滤已挂载的服务器
       this.remoteSrv.getHostListByObjectId(this.objectId).subscribe((result: any) => {
-        if (result.code === '200' && result.data !== null){
+        if (result.code === '200' && result.data !== null) {
           result.data.forEach(item => {
             this.hostList.push(item);
           });
@@ -498,12 +496,13 @@ export class MountComponent implements OnInit{
       });
     });
   }
+
   // 挂载  集群数据初始化
   initMountCluster() {
     return new Promise((resolve, reject) => {
       // 获取集群 通过ObjectId过滤已挂载的集群
       this.remoteSrv.getClusterListByObjectId(this.objectId).subscribe((result: any) => {
-        if (result.code === '200' && result.data !== null){
+        if (result.code === '200' && result.data !== null) {
           result.data.forEach(item => {
             this.clusterList.push(item);
           });
@@ -514,13 +513,14 @@ export class MountComponent implements OnInit{
       });
     });
   }
+
   // 挂载提交
-  mountSubmit(){
+  mountSubmit() {
     // 数据封装
-    if (this.mountForm.mountType === '1'){ // 服务器
+    if (this.mountForm.mountType === '1') { // 服务器
       this.mountForm.hostId = this.chooseHost.hostId;
       this.mountForm.host = this.chooseHost.hostName;
-    }else if (this.mountForm.mountType === '2'){ // 集群
+    } else if (this.mountForm.mountType === '2') { // 集群
       this.mountForm.cluster = this.chooseCluster.clusterName;
       this.mountForm.clusterId = this.chooseCluster.clusterId;
     }
@@ -531,13 +531,13 @@ export class MountComponent implements OnInit{
     this.modalHandleLoading = true;
     this.remoteSrv.mountVmfs(this.mountForm).subscribe((result: any) => {
       this.modalHandleLoading = false;
-      if (result.code  ===  '200'){
+      if (result.code === '200') {
         console.log('挂载成功');
         this.mountSuccessShow = true;
-      } else if(result.code === '-60001') {
+      } else if (result.code === '-60001') {
         this.connectivityFailure = true;
         this.showDetail = false;
-        const connFailDatas:ConnFaildData[] = [];
+        const connFailDatas: ConnFaildData[] = [];
         if (result.data) {
           result.data.forEach(item => {
             for (let key in item) {
@@ -578,7 +578,7 @@ export class MountComponent implements OnInit{
       this.modalHandleLoading = true;
       this.remoteSrv.unmountVMFS(this.unmountForm).subscribe((result: any) => {
         this.modalHandleLoading = false;
-        if (result.code === '200'){
+        if (result.code === '200') {
           console.log('unmount  success');
           this.unmountSuccessShow = true;
         } else {
@@ -589,20 +589,21 @@ export class MountComponent implements OnInit{
       });
     }
   }
+
   /**
    * 容量格式化
    * @param c 容量值
    * @param isGB true GB、false MB
    */
-  formatCapacity(c: number, isGB:boolean){
+  formatCapacity(c: number, isGB: boolean) {
     c = Number(c);
     let cNum;
-    if (c < 1024){
-      cNum = isGB ? c.toFixed(3)+'GB':c.toFixed(3)+'MB';
-    }else if(c >= 1024 && c< 1048576){
-      cNum = isGB ? (c/1024).toFixed(3) + 'TB' : (c/1024).toFixed(3) + 'GB';
-    }else if(c>= 1048576){
-      cNum = isGB ? (c/1024/1024).toFixed(3) + 'PB':(c/1024/1024).toFixed(3) + 'TB';
+    if (c < 1024) {
+      cNum = isGB ? c.toFixed(3) + 'GB' : c.toFixed(3) + 'MB';
+    } else if (c >= 1024 && c < 1048576) {
+      cNum = isGB ? (c / 1024).toFixed(3) + 'TB' : (c / 1024).toFixed(3) + 'GB';
+    } else if (c >= 1048576) {
+      cNum = isGB ? (c / 1024 / 1024).toFixed(3) + 'PB' : (c / 1024 / 1024).toFixed(3) + 'TB';
     }
     return cNum;
   }
@@ -613,7 +614,8 @@ export class MountComponent implements OnInit{
   confirmActResult() {
     this.cancel();
   }
-  sortFunc(obj:any) {
+
+  sortFunc(obj: any) {
     return !obj;
   }
 }

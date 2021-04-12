@@ -4,8 +4,8 @@ import {
   ChangeDetectionStrategy, ChangeDetectorRef,
 } from '@angular/core';
 import {HttpClient} from '@angular/common/http';
-import { CommonService } from '../common.service';
-import { GlobalsService }     from "../../shared/globals.service";
+import {CommonService} from '../common.service';
+import {GlobalsService} from "../../shared/globals.service";
 import {TranslatePipe} from "@ngx-translate/core";
 
 @Component({
@@ -29,6 +29,7 @@ export class BestpracticeComponent implements OnInit {
 
   // ================主机列表=============
   hostModalShow = false;
+  isShowBPBtnTips: boolean;
   hostSelected = []; // 主机选中列表
   hostIsLoading = false; // table数据loading
   hostList: Host[] = []; // 数据列表
@@ -53,7 +54,8 @@ export class BestpracticeComponent implements OnInit {
               public gs: GlobalsService,
               private http: HttpClient,
               private commonService: CommonService,
-              private translatePipe:TranslatePipe) { }
+              private translatePipe: TranslatePipe) {
+  }
 
   ngOnInit(): void {
     this.practiceRefresh();
@@ -67,12 +69,12 @@ export class BestpracticeComponent implements OnInit {
     const params = [];
     this.ips = '';
     this.rowSelected.forEach((item) => {
-      const i = {hostSetting:'', hostObjectIds: []};
+      const i = {hostSetting: '', hostObjectIds: []};
       i.hostSetting = item.hostSetting;
       item.hostList.forEach((s) => {
         i.hostObjectIds.push(s.hostObjectId);
-        if (s.needReboot == "true"){
-          this.ips += s.hostName+",";
+        if (s.needReboot == "true") {
+          this.ips += s.hostName + ",";
         }
       });
       params.push(i);
@@ -84,15 +86,15 @@ export class BestpracticeComponent implements OnInit {
    * 主机列表实时最佳实践 参数封装
    * @returns {any[]}
    */
-  packApplyPracticeParamsByHost(){
+  packApplyPracticeParamsByHost() {
     const params = [];
-    const i = {hostSetting:'', hostObjectIds: []};
+    const i = {hostSetting: '', hostObjectIds: []};
     i.hostSetting = this.currentBestpractice.hostSetting;
     let ips = '';
     this.hostSelected.forEach((s) => {
       i.hostObjectIds.push(s.hostObjectId);
-      if (s.needReboot == "true"){
-        ips += s.hostName+",";
+      if (s.needReboot == "true") {
+        ips += s.hostName + ",";
       }
     });
     params.push(i);
@@ -104,17 +106,17 @@ export class BestpracticeComponent implements OnInit {
    * 实时最佳实践
    * @param params
    */
-  applyPractice(params){
+  applyPractice(params) {
     this.applyLoading = true;
     this.http.post('v1/bestpractice/update/bylist', params).subscribe((result: any) => {
       this.applyLoading = false;
-      if (result.code == '200'){
+      if (result.code == '200') {
         this.tipModalSuccess = true;
-        if(this.applyType != '1'){
+        if (this.applyType != '1') {
           this.hostModalShow = false;
         }
         this.practiceRefresh();
-      } else{
+      } else {
         this.tipModalFail = true;
       }
       this.cdr.detectChanges();
@@ -123,15 +125,15 @@ export class BestpracticeComponent implements OnInit {
     });
   }
 
-  openTip(){
+  openTip() {
     this.tipModal = true;
   }
 
-  closeTip(){
+  closeTip() {
     this.tipModal = false;
   }
 
-  applyClick(type: string){
+  applyClick(type: string) {
     if (type == '1') {
       this.rowSelected.forEach((item) => {
         if (item.count == 0) {
@@ -145,22 +147,22 @@ export class BestpracticeComponent implements OnInit {
     }
     this.applyType = type;
     let params;
-    if(this.applyType == '1'){
+    if (this.applyType == '1') {
       params = this.packApplyPracticeParams();
     } else {
       params = this.packApplyPracticeParamsByHost();
     }
-    if(this.ips.length != 0){
+    if (this.ips.length != 0) {
       this.openTip();
-    } else{
+    } else {
       this.applyPractice(params);
     }
   }
 
-  tipOk(){
+  tipOk() {
     this.closeTip();
     let params;
-    if(this.applyType == '1'){
+    if (this.applyType == '1') {
       params = this.packApplyPracticeParams();
     } else {
       params = this.packApplyPracticeParamsByHost();
@@ -172,10 +174,10 @@ export class BestpracticeComponent implements OnInit {
     this.checkLoading = true;
     this.http.post('v1/bestpractice/check', {}).subscribe((result: any) => {
       this.checkLoading = false;
-      if (result.code == '200'){
+      if (result.code == '200') {
         this.tipModalSuccess = true;
         this.practiceRefresh();
-      } else{
+      } else {
         this.tipModalFail = true;
       }
       this.cdr.detectChanges();
@@ -184,110 +186,117 @@ export class BestpracticeComponent implements OnInit {
     });
   }
 
-  practiceRefresh(){
+  practiceRefresh() {
     this.isLoading = true;
     this.http.get('v1/bestpractice/records/all', {}).subscribe((result: any) => {
-          if (result.code === '200'){
-            this.list = result.data;
-            // bug修改：列表页面级别过滤 中英文问题
-            if (this.list) {
-              this.list.forEach(item => {
-                let levelDesc;
-                let levelNum;
-                switch (item.level) {
-                  case "Critical":
-                    levelNum = 4;
-                    levelDesc = this.translatePipe.transform("overview.critical");
-                    break;
-                  case "Major":
-                    levelNum = 3;
-                    levelDesc = this.translatePipe.transform("overview.major");
-                    break;
-                  case "Warning":
-                    levelNum = 2;
-                    levelDesc = this.translatePipe.transform("overview.warning");
-                    break;
-                  case "Info":
-                    levelNum = 1;
-                    levelDesc = this.translatePipe.transform("overview.info");
-                    break;
-                  default:
-                    levelNum = 0;
-                    levelDesc = "--";
-                    break;
-                }
-                item.levelDesc = levelDesc;
-                item.levelNum = levelNum;
-
-                // 设置描述信息
-                switch (item.hostSetting) {
-                  case 'VMFS3.UseATSForHBOnVMFS5':
-                    item.description = this.translatePipe.transform('bestPractice.description.vmfs5');
-                    break;
-                  case 'VMFS3.HardwareAcceleratedLocking':
-                    item.description = this.translatePipe.transform('bestPractice.description.locking');
-                    break;
-                  case 'DataMover.HardwareAcceleratedInit':
-                    item.description = this.translatePipe.transform('bestPractice.description.init');
-                    break;
-                  case 'DataMover.HardwareAcceleratedMove':
-                    item.description = this.translatePipe.transform('bestPractice.description.move');
-                    break;
-                  case 'VMFS3.EnableBlockDelete':
-                    item.description = this.translatePipe.transform('bestPractice.description.delete');
-                    break;
-                  case 'Disk.SchedQuantum':
-                    item.description = this.translatePipe.transform('bestPractice.description.quanTum');
-                    break;
-                  case 'Disk.DiskMaxIOSize':
-                    item.description = this.translatePipe.transform('bestPractice.description.diskMaxIOSize');
-                    break;
-                  case 'LUN Queue Depth for Qlogic':
-                    item.description = this.translatePipe.transform('bestPractice.description.depthForQlogic');
-                    break;
-                  case 'LUN Queue Depth for Emulex':
-                    item.description = this.translatePipe.transform('bestPractice.description.depthForEmulex');
-                    break;
-                  case 'NMP path switch policy':
-                    item.description = this.translatePipe.transform('bestPractice.description.pathSwitchPolicy');
-                    break;
-                  case 'Jumbo Frame (MTU)':
-                    item.description = this.translatePipe.transform('bestPractice.description.jumboFrame');
-                    break;
-                  case 'VMFS-6 Auto-Space Reclamation':
-                    item.description = this.translatePipe.transform('bestPractice.description.reclamation');
-                    break;
-                  case 'Number of volumes in Datastore':
-                    item.description = this.translatePipe.transform('bestPractice.description.numberOfVolInDatastore');
-                    break;
-                  default:
-                    item.description = '--';
-                }
-                // 违规主机实际值修改
-                item.hostList.forEach(hostInfo => {
-                  hostInfo.actualObjValue = this.getTypeOf(hostInfo.actualValue);
-                });
-              });
+      if (result.code === '200') {
+        this.list = result.data;
+        // bug修改：列表页面级别过滤 中英文问题
+        if (this.list) {
+          this.list.forEach(item => {
+            let levelDesc;
+            let levelNum;
+            switch (item.level) {
+              case "Critical":
+                levelNum = 4;
+                levelDesc = this.translatePipe.transform("overview.critical");
+                break;
+              case "Major":
+                levelNum = 3;
+                levelDesc = this.translatePipe.transform("overview.major");
+                break;
+              case "Warning":
+                levelNum = 2;
+                levelDesc = this.translatePipe.transform("overview.warning");
+                break;
+              case "Info":
+                levelNum = 1;
+                levelDesc = this.translatePipe.transform("overview.info");
+                break;
+              default:
+                levelNum = 0;
+                levelDesc = "--";
+                break;
             }
-            this.total = result.data.length;
-            this.isLoading = false;
-            this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
-          }
+            item.levelDesc = levelDesc;
+            item.levelNum = levelNum;
+
+            // 设置描述信息
+            switch (item.hostSetting) {
+              case 'VMFS3.UseATSForHBOnVMFS5':
+                item.description = this.translatePipe.transform('bestPractice.description.vmfs5');
+                break;
+              case 'VMFS3.HardwareAcceleratedLocking':
+                item.description = this.translatePipe.transform('bestPractice.description.locking');
+                break;
+              case 'DataMover.HardwareAcceleratedInit':
+                item.description = this.translatePipe.transform('bestPractice.description.init');
+                break;
+              case 'DataMover.HardwareAcceleratedMove':
+                item.description = this.translatePipe.transform('bestPractice.description.move');
+                break;
+              case 'VMFS3.EnableBlockDelete':
+                item.description = this.translatePipe.transform('bestPractice.description.delete');
+                break;
+              case 'Disk.SchedQuantum':
+                item.description = this.translatePipe.transform('bestPractice.description.quanTum');
+                break;
+              case 'Disk.DiskMaxIOSize':
+                item.description = this.translatePipe.transform('bestPractice.description.diskMaxIOSize');
+                break;
+              case 'LUN Queue Depth for Qlogic':
+                item.description = this.translatePipe.transform('bestPractice.description.depthForQlogic');
+                break;
+              case 'LUN Queue Depth for Emulex':
+                item.description = this.translatePipe.transform('bestPractice.description.depthForEmulex');
+                break;
+              case 'NMP path switch policy':
+                item.description = this.translatePipe.transform('bestPractice.description.pathSwitchPolicy');
+                break;
+              case 'Jumbo Frame (MTU)':
+                item.description = this.translatePipe.transform('bestPractice.description.jumboFrame');
+                break;
+              case 'VMFS-6 Auto-Space Reclamation':
+                item.description = this.translatePipe.transform('bestPractice.description.reclamation');
+                break;
+              case 'Number of volumes in Datastore':
+                item.description = this.translatePipe.transform('bestPractice.description.numberOfVolInDatastore');
+                break;
+              default:
+                item.description = '--';
+            }
+            // 违规主机实际值修改
+            item.hostList.forEach(hostInfo => {
+              hostInfo.actualObjValue = this.getTypeOf(hostInfo.actualValue);
+            });
+          });
+        }
+        this.total = result.data.length;
+        this.isLoading = false;
+        this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
+      }
     }, err => {
       console.error('ERROR', err);
     });
   }
 
-  openHostList(bestpractice: Bestpractice){
+  openHostList(bestpractice: Bestpractice) {
     this.hostModalShow = true;
     this.currentBestpractice = bestpractice;
     this.hostRefresh();
   }
 
-  hostRefresh(){
-    if (this.hostModalShow === true){
+  hostRefresh() {
+    if (this.hostModalShow === true) {
       this.hostIsLoading = true;
       this.hostList = this.currentBestpractice.hostList;
+      /*根据autoRepair 判断是否禁用执行最佳实践 */
+      /*显示tips就不显示按钮*/
+      if (this.hostList.length > 0) {
+        this.isShowBPBtnTips = this.hostList[0].autoRepair === 'false' ? true : false;
+      } else {
+        this.isShowBPBtnTips = false;
+      }
       this.hostTotal = this.currentBestpractice.hostList.length;
       this.hostIsLoading = false;
       this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
@@ -298,15 +307,15 @@ export class BestpracticeComponent implements OnInit {
    * 单行实施
    * @param item
    */
-  applyOperation(item:Bestpractice){
+  applyOperation(item: Bestpractice) {
     const params = [];
     this.ips = '';
-    const i = {hostSetting:'', hostObjectIds: []};
+    const i = {hostSetting: '', hostObjectIds: []};
     i.hostSetting = item.hostSetting;
     item.hostList.forEach((s) => {
       i.hostObjectIds.push(s.hostObjectId);
-      if (s.needReboot == "true"){
-        this.ips += s.hostName+",";
+      if (s.needReboot == "true") {
+        this.ips += s.hostName + ",";
       }
     });
     params.push(i);
@@ -318,7 +327,7 @@ export class BestpracticeComponent implements OnInit {
    * @param obj
    */
   getTypeOf(obj) {
-    let object:object;
+    let object: object;
     if (typeof obj == 'string' && obj.indexOf("[{") != -1) {
       object = JSON.parse(obj);
     } else {
@@ -347,7 +356,7 @@ export class BestpracticeComponent implements OnInit {
     return title;
   }
 
-  sortFunc(obj:any) {
+  sortFunc(obj: any) {
     // let object;
     // if (obj.target.type && obj.target.type == 'button') {
     //   object = obj.target;
@@ -367,7 +376,7 @@ export class BestpracticeComponent implements OnInit {
     // }
     return !obj;
   }
-} 
+}
 
 class Bestpractice {
   hostSetting: string;
@@ -376,7 +385,7 @@ class Bestpractice {
   levelNum: number;
   levelDesc: string;
   count: number;
-  description:string;
+  description: string;
   hostList: Host[];
 }
 
@@ -386,7 +395,7 @@ class Host {
   hostName: string;
   recommendValue: number;
   actualValue: number;
-  actualObjValue:any;
+  actualObjValue: any;
   hostObjectId: string;
   needReboot: string;
   hostId: string;
