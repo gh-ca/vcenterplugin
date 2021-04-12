@@ -30,6 +30,7 @@ import com.sun.org.apache.bcel.internal.generic.NEW;
 import com.vmware.vim.binding.vmodl.map;
 import com.vmware.vim.binding.vmodl.name;
 
+import com.vmware.vim25.SelectionSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpMethod;
@@ -463,9 +464,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                             for (Map<String, String> map : maps) {
                                 objHostId = map.get(CONNECTIVITY_NORMAL);
                                 if (StringUtils.isEmpty(objHostId)) {
-                                    List<String> deleteVolume = new ArrayList<>();
-                                    deleteVolume.add(volumeId);
-                                    rollBack(deleteVolume, dmeHostId, demHostGroupId, isCreated, isMappling);
+                                    rollBack(volumeIds, dmeHostId, demHostGroupId, isCreated, isMappling);
                                     return maps;
                                 } else {
                                     break;
@@ -981,15 +980,19 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         if (responseEntity.getStatusCodeValue() == HttpStatus.OK.value()) {
             String body = responseEntity.getBody();
             JsonObject jsonObject = new JsonParser().parse(body).getAsJsonObject();
-            JsonArray jsonArray = jsonObject.get("result_list").getAsJsonArray();
+            //JsonArray jsonArray = jsonObject.get("result_list").getAsJsonArray();
+            JsonArray jsonArray = jsonObject.get("resultList").getAsJsonArray();
             for (JsonElement jsonElement : jsonArray) {
                 JsonObject element = jsonElement.getAsJsonObject();
-                String id = ToolUtils.jsonToStr(element.get("host_id"));
+                //String id = ToolUtils.jsonToStr(element.get("host_id"));
+                //String status = ToolUtils.jsonToStr(element.get("status"));
+               // String resultMessage = ToolUtils.jsonToStr(element.get("result_message"));
+                String id = ToolUtils.jsonToStr(element.get("hostId"));
                 String status = ToolUtils.jsonToStr(element.get("status"));
-                String resultMessage = ToolUtils.jsonToStr(element.get("result_message"));
+                String resultMessage = ToolUtils.jsonToStr(element.get("resultMessage"));
                 // 连通性异常主机结果统计
                 Map<String, String> result = new HashMap<>();
-                if (status.equalsIgnoreCase("FAILED")) {
+                if (!status.equalsIgnoreCase("SUCCESS")) {
                     String hostName = getDmeHostNameById(id);
                     result.put(hostName, resultMessage);
                 }
