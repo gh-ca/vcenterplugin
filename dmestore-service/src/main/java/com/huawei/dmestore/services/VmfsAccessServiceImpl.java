@@ -994,6 +994,8 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                     results.add(result);
                 }
             }
+        } else {
+            throw new DmeException("check connectivity of host or horstgroup on dme failed!");
         }
         return results;
     }
