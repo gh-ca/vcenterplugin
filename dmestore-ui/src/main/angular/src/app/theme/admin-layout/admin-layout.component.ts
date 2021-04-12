@@ -88,6 +88,8 @@ export class AdminLayoutComponent implements OnInit, OnDestroy {
       { link: "./nfs/list", label: './nfs/list' },
       { link: "./servicelevel", label: 'servicelevel DME存储策略' },
       { link: "./bestpractice", label: 'Best Practice' },
+      { link: "./host/applybp", label: 'ApplybpComponent host' },
+      { link: "./cluster/applybp", label: 'ApplybpComponent cluster' },
       { link: "./iscsi", label: 'iscsi list' }
     ]
     this.layoutChangesSubscription = this.breakpointObserver

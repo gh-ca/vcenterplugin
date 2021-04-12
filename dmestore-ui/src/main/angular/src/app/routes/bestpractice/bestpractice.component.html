@@ -71,7 +71,10 @@
     <h3 class="modal-title">{{'bestPractice.non-compliant'|translate}}</h3>
     <div class="modal-body">
       <div>
-        <button class="btn btn-primary" [disabled]="hostSelected.length === 0" (click)="applyClick('2')">{{'bestPractice.apply'|translate}}</button>
+        <button class="btn btn-primary" [disabled]="true" (click)="applyClick('2')">{{'bestPractice.apply'|translate}}</button>
+        <!-- <button class="btn btn-primary" [disabled]="hostSelected.length === 0" (click)="applyClick('2')">{{'bestPractice.apply'|translate}}</button> -->
+        <clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>
+              {{'bestPractice.deleteLUN' | translate}}
       </div>
       <!-- 列表页 -->
       <clr-datagrid [(clrDgSelected)]="hostSelected"  (clrDgRefresh)="hostRefresh()" [clrDgLoading]="hostIsLoading">
