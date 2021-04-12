@@ -12,7 +12,7 @@ import org.junit.Test;
 public class DMEOpenApiServiceTest {
 
     @Test
-    public void isSuccessResponse() {
+    public void testIsSuccessResponse() {
         Object[] objects = {0, 0.0, "0"};
         for(Object object : objects){
             DMEOpenApiService.isSuccessResponse(object);
