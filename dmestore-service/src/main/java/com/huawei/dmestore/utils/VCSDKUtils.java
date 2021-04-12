@@ -170,7 +170,7 @@ public class VCSDKUtils {
 
     public static final String CATEGORY_NAME = "DME Service Level";
 
-    private static final int TEST_CONNECTIVITY_TIMEOUT = 1500;
+    private static final int TEST_CONNECTIVITY_TIMEOUT = 5000;
 
     private static final int THREAD_SLEEP_2_SECENDS = 2000;
 
@@ -3015,6 +3015,26 @@ public class VCSDKUtils {
                                                     + " xmlns=\"urn:vim25\">" + deviceFinal + "</interface>");
                                             soapArgumentList.add(soapArgument1);
                                         }
+
+                                        ManagedMethodExecuter.SoapArgument soapArgumentcount
+                                                = new ManagedMethodExecuter.SoapArgument();
+                                        soapArgumentcount.setName("count");
+                                        soapArgumentcount.setVal(
+                                                "<count xmlns:xsi=\"http:// www.w3.org/2001/XMLSchema-instance\" "
+                                                        + "xmlns:xsd=\"http:// www.w3.org/2001/XMLSchema\" "
+                                                        + "xmlns=\"urn:vim25\">" + 1 + "</count>");
+                                        soapArgumentList.add(soapArgumentcount);
+
+
+                                        ManagedMethodExecuter.SoapArgument soapArgumentwait
+                                                = new ManagedMethodExecuter.SoapArgument();
+                                        soapArgumentwait.setName("wait");
+                                        soapArgumentwait.setVal(
+                                                "<wait xmlns:xsi=\"http:// www.w3.org/2001/XMLSchema-instance\" "
+                                                        + "xmlns:xsd=\"http:// www.w3.org/2001/XMLSchema\" "
+                                                        + "xmlns=\"urn:vim25\">" + 1 + "</wait>");
+                                        soapArgumentList.add(soapArgumentwait);
+
 
                                         ManagedMethodExecuter.SoapResult soapResult = methodExecuter.executeSoap(moid,
                                             "urn:vim25/6.5", "vim.EsxCLI.network.diag.ping",
