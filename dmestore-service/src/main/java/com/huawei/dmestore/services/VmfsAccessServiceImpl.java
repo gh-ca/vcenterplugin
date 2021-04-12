@@ -463,7 +463,9 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                             for (Map<String, String> map : maps) {
                                 objHostId = map.get(CONNECTIVITY_NORMAL);
                                 if (StringUtils.isEmpty(objHostId)) {
-                                    rollBack(volumeIds, dmeHostId, demHostGroupId, isCreated, isMappling);
+                                    List<String> deleteVolume = new ArrayList<>();
+                                    deleteVolume.add(volumeId);
+                                    rollBack(deleteVolume, dmeHostId, demHostGroupId, isCreated, isMappling);
                                     return maps;
                                 } else {
                                     break;
