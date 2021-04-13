@@ -40,7 +40,7 @@ public class TaskServiceImplTest {
     }
 
     @Test
-    public void listTasks() throws DmeException {
+    public void testListTasks() throws DmeException {
         String resp = "{\n" +
                 "    \"id\": \"564537e8-295b-4cb6-8484-171ea552cb40\", \n" +
                 "    \"name_en\": \"Create volume\", \n" +
@@ -71,7 +71,7 @@ public class TaskServiceImplTest {
     }
 
     @Test
-    public void queryTaskById() throws DmeException {
+    public void testQueryTaskById() throws DmeException {
         String resp = "{\n" +
                 "    \"id\": \"564537e8-295b-4cb6-8484-171ea552cb40\", \n" +
                 "    \"name_en\": \"Create volume\", \n" +
@@ -107,7 +107,7 @@ public class TaskServiceImplTest {
     }
 
     @Test
-    public void queryTaskByIdUntilFinish() throws DmeException {
+    public void testQueryTaskByIdUntilFinish() throws DmeException {
         String resp = "{\n" +
                 "    \"id\": \"321\", \n" +
                 "    \"name_en\": \"Create volume\", \n" +
@@ -143,7 +143,7 @@ public class TaskServiceImplTest {
     }
 
     @Test
-    public void getTaskStatus() throws DmeException {
+    public void testGetTaskStatus() throws DmeException {
         List<String> list = new ArrayList<>();
         list.add("321");
         Map<String, Integer> map = new HashMap<>();
@@ -183,7 +183,7 @@ public class TaskServiceImplTest {
     }
 
     @Test
-    public void checkTaskStatus() throws DmeException {
+    public void testCheckTaskStatus() throws DmeException {
         List<String> list = new ArrayList<>();
         list.add("321");
         String resp = "{\n" +
