@@ -3271,8 +3271,9 @@ public class VCSDKUtils {
                     JsonObject jsonObject = new JsonObject();
                     jsonObject.addProperty("device", device);
                     jsonObject.addProperty("mtu", mtu);
-                    jsonObject.addProperty("ip", ip);
-                    jsonObject.addProperty("objId", hostObjectId);
+                    jsonObject.addProperty("nicIp", ip);
+                    jsonObject.addProperty("hostObjId", hostObjectId);
+                    jsonObject.addProperty("hostObjIp", hostIp);
                     jsonArray.add(jsonObject);
 
                 }
