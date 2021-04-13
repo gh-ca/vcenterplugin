@@ -103,6 +103,7 @@ export class ApplybpComponent implements OnInit {
 
   // ================主机列表=============
   hostModalShow = false;
+  isShowBPBtnTips: boolean;
   hostSelected = []; // 主机选中列表
   hostIsLoading = false; // table数据loading
   hostList: Host[] = []; // 数据列表
@@ -359,6 +360,13 @@ export class ApplybpComponent implements OnInit {
     if (this.hostModalShow === true){
       this.hostIsLoading = true;
       this.hostList = this.currentBestpractice.hostList;
+      /*根据autoRepair 判断是否禁用执行最佳实践 */
+      /*显示tips就不显示按钮*/
+      if (this.hostList.length > 0) {
+        this.isShowBPBtnTips = this.hostList[0].autoRepair === 'false' ? true : false;
+      } else {
+        this.isShowBPBtnTips = false;
+      }
       this.hostTotal = this.currentBestpractice.hostList.length;
       this.hostIsLoading = false;
       this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
