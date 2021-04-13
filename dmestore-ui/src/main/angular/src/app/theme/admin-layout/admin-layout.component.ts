@@ -9,18 +9,18 @@ import {
   Optional,
   ViewEncapsulation,
 } from '@angular/core';
-import { DOCUMENT } from '@angular/common';
-import { NavigationEnd, Router } from '@angular/router';
-import { Subscription } from 'rxjs';
-import { BreakpointObserver } from '@angular/cdk/layout';
-import { OverlayContainer } from '@angular/cdk/overlay';
-import { Directionality } from '@angular/cdk/bidi';
-import { MatSidenav, MatSidenavContent } from '@angular/material/sidenav';
-import { environment } from '@env/environment';
+import {DOCUMENT} from '@angular/common';
+import {NavigationEnd, Router} from '@angular/router';
+import {Subscription} from 'rxjs';
+import {BreakpointObserver} from '@angular/cdk/layout';
+import {OverlayContainer} from '@angular/cdk/overlay';
+import {Directionality} from '@angular/cdk/bidi';
+import {MatSidenav, MatSidenavContent} from '@angular/material/sidenav';
+import {environment} from '@env/environment';
 
-import { SettingsService, AppSettings } from '@core';
-import { AppDirectionality } from '@shared';
-import { GlobalsService } from "../../shared/globals.service";
+import {SettingsService, AppSettings} from '@core';
+import {AppDirectionality} from '@shared';
+import {GlobalsService} from "../../shared/globals.service";
 
 const MOBILE_MEDIAQUERY = 'screen and (max-width: 599px)';
 const TABLET_MEDIAQUERY = 'screen and (min-width: 600px) and (max-width: 959px)';
@@ -43,11 +43,13 @@ export class AdminLayoutComponent implements OnInit, OnDestroy {
   private layoutChangesSubscription: Subscription;
 
   private isMobileScreen = false;
+
   get isOver(): boolean {
     return this.isMobileScreen;
   }
 
   private contentWidthFix = true;
+
   @HostBinding('class.matero-content-width-fix') get isContentWidthFix() {
     return (
       this.contentWidthFix &&
@@ -58,6 +60,7 @@ export class AdminLayoutComponent implements OnInit, OnDestroy {
   }
 
   private collapsedWidthFix = true;
+
   @HostBinding('class.matero-sidenav-collapsed-fix') get isCollapsedWidthFix() {
     return (
       this.collapsedWidthFix &&
@@ -78,14 +81,49 @@ export class AdminLayoutComponent implements OnInit, OnDestroy {
     this.dir.value = this.options.dir;
     this.document.body.dir = this.dir.value;
     this.linkInfo = [
-      { link: "./dashboard", label: 'Overview' },
-      { link: "./storage", label: 'Storage Device' },
-      { link: "./vmfs/list", label: './vmfs/list' },
-      { link: "./nfs", label: 'NFS Datastore' },
-      { link: "./nfs/list", label: './nfs/list' },
-      { link: "./servicelevel", label: 'servicelevel DME存储策略' },
-      { link: "./bestpractice", label: 'Best Practice' },
-      { link: "./iscsi", label: 'iscsi list' }
+      {link: "./dashboard", label: 'Overview'},
+      {link: "./storage", label: 'Storage Device'},
+      {link: "./vmfs/list", label: './vmfs/list'},
+      {link: "./vmfs/add", label: './vmfs/add'},
+      {link: "./vmfs/performance", label: './vmfs/performance'},
+      {link: "./vmfs/unmount", label: './vmfs/unmount'},
+      {link: "./nfs", label: 'NFS Datastore'},
+      {link: "./nfs/list", label: './nfs/list'},
+      {link: "./servicelevel", label: 'servicelevel DME存储策略'},
+      {link: "./bestpractice", label: 'Best Practice'},
+      {link: "./host/applybp", label: 'ApplybpComponent host'},
+      {link: "./cluster/applybp", label: 'ApplybpComponent cluster'},
+      {link: "./iscsi", label: 'iscsi list'},
+      /**/
+      {link: './iscsi', label: './iscsi'},
+      {link: './best/host/applybp', label: './best/host/applybp'},
+      {link: './vmfs/delete', label: './vmfs/delete'},
+      {link: './nfs/delete', label: './nfs/delete'},
+      {link: './vmfs/expand?resource=dataStore', label: './vmfs/expand?resource=dataStore'},
+      {link: './vmfs/serviceLevel?resource=dataStore', label: './vmfs/serviceLevel?resource=dataStore'},
+      {link: './vmfs/modify?resource=dataStore', label: './vmfs/modify?resource=dataStore'},
+      {link: './vmfs/mount?resource=dataStore', label: './vmfs/mount?resource=dataStore'},
+      {link: './vmfs/unmount?resource=dataStore', label: './vmfs/unmount?resource=dataStore'},
+      {link: './vmfs/reclaim?resource=dataStore', label: './vmfs/reclaim?resource=dataStore'},
+      {link: './nfs/expand', label: './nfs/expand'},
+      {link: './nfs/reduce', label: './nfs/reduce'},
+      {link: './nfs/modify', label: './nfs/modify'},
+      {link: './nfs/dataStore/mount', label: './nfs/dataStore/mount'},
+      {link: './nfs/dataStore/unmount', label: './nfs/dataStore/unmount'},
+      {link: './vmfs/host/mount?resource=others', label: './vmfs/host/mount?resource=others'},
+      {link: './vmfs/host/unmount?resource=others', label: './vmfs/host/unmount?resource=others'},
+      {link: './nfs/host/mount', label: './nfs/host/mount'},
+      {link: './nfs/host/unmount', label: './nfs/host/unmount'},
+      {link: './nfs/add', label: './nfs/add'},
+      {link: './vmfs/add?resource=others', label: './vmfs/add?resource=others'},
+      {link: './vmfs/cluster/mount?resource=others', label: './vmfs/cluster/mount?resource=others'},
+      {link: './vmfs/cluster/unmount?resource=others', label: './vmfs/cluster/unmount?resource=others'},
+      {link: './nfs/cluster/mount', label: './nfs/cluster/mount'},
+      {link: './nfs/cluster/unmount', label: './nfs/cluster/unmount'},
+      {link: './best/cluster/applybp', label: './best/cluster/applybp'},
+      {link: './nfs/add', label: './nfs/add'},
+      {link: './vmfs/add?resource=others', label: './vmfs/add?resource=others'},
+      {link: './rdm', label: './rdm'},
     ]
     this.layoutChangesSubscription = this.breakpointObserver
       .observe([MOBILE_MEDIAQUERY, TABLET_MEDIAQUERY, MONITOR_MEDIAQUERY])

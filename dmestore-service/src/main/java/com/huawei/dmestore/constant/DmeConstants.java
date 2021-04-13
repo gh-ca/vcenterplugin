@@ -13,8 +13,11 @@ public class DmeConstants {
     /**
      *  POST
      *  estimate connectivity of host or hostgroup on dme
+     *  old
+     *  public static final String DME_ESTIMATE_CONNECTIVITY = "/rest/vmmgmt/v1/connectivity/host-storage";
      */
-    public static final String DME_ESTIMATE_CONNECTIVITY = "/rest/vmmgmt/v1/connectivity/host-storage";
+    //public static final String DME_ESTIMATE_CONNECTIVITY = "/rest/vmmgmt/v1/connectivity/host-storage";
+    public static final String DME_ESTIMATE_CONNECTIVITY = "/hostmgmt/v1/connectivity/host-and-storage";
     /**
      * nfs share detail
      **/

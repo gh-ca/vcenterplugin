@@ -117,7 +117,7 @@ public class DataStoreStatisticHistoryServiceImplTest {
     }
 
     @Test
-    public void queryVmfsStatistic() throws DmeException {
+    public void testQueryVmfsStatistic() throws DmeException {
 
         String param = "{\"obj_ids\":[\"321\"],\"indicator_ids\":[\"1125921381744648\",\"1125921381744649\",\"1125921381744646\",\"1125921381744647\"," +
             "\"1125921381744656\",\"1125921381744657\",\"1125921381744642\"],\"range\":\"[321]\",\"interval\":\"\",\"obj_type_id\":\"1125921381679104\"}";
@@ -139,7 +139,7 @@ public class DataStoreStatisticHistoryServiceImplTest {
     }
 
     @Test
-    public void queryVmfsStatisticCurrent() throws DmeException {
+    public void testQueryVmfsStatisticCurrent() throws DmeException {
 
         String param = "{\"obj_ids\":[\"321\"],\"indicator_ids\":[\"1125921381744641\",\"1125921381744643\",\"1125921381744656\"," +
             "\"1125921381744657\",\"1125921381744642\"],\"range\":\"[321]\",\"interval\":\"\",\"obj_type_id\":\"1125921381679104\"}";
@@ -162,7 +162,7 @@ public class DataStoreStatisticHistoryServiceImplTest {
     }
 
     @Test
-    public void queryNfsStatistic() throws DmeException {
+    public void testQueryNfsStatistic() throws DmeException {
 
         
         String param = "{\"obj_ids\":[\"321\"],\"indicator_ids\":[\"1126179079716867\",\"1126179079716870\",\"1126179079716868\"," +
@@ -185,7 +185,7 @@ public class DataStoreStatisticHistoryServiceImplTest {
     }
 
     @Test
-    public void queryNfsStatisticCurrent() throws DmeException {
+    public void testQueryNfsStatisticCurrent() throws DmeException {
         
         String param = "{\"obj_ids\":[\"321\"],\"indicator_ids\":[\"1126179079716865\",\"1126179079716878\",\"1126179079716869\"," +
             "\"1126179079716872\"],\"range\":\"[321]\",\"interval\":\"\",\"obj_type_id\":\"1126179079716864\"}";
@@ -207,7 +207,7 @@ public class DataStoreStatisticHistoryServiceImplTest {
     }
 
     @Test
-    public void queryVolumeStatistic() throws DmeException {
+    public void testQueryVolumeStatistic() throws DmeException {
 
         
         String param = "{\"obj_ids\":[\"321\"],\"indicator_ids\":[\"1125921381744648\",\"1125921381744649\",\"1125921381744646\",\"1125921381744647\"," +
@@ -230,7 +230,7 @@ public class DataStoreStatisticHistoryServiceImplTest {
     }
 
     @Test
-    public void queryControllerStatistic() throws DmeException {
+    public void testQueryControllerStatistic() throws DmeException {
 
         
         String param = "{\"obj_ids\":[\"321\"],\"indicator_ids\":[\"1125908496842758\",\"1125908496842759\",\"1125908496842756\"," +
@@ -253,7 +253,7 @@ public class DataStoreStatisticHistoryServiceImplTest {
     }
 
     @Test
-    public void queryStoragePortStatistic() throws DmeException {
+    public void testQueryStoragePortStatistic() throws DmeException {
 
         
         String param = "{\"obj_ids\":[\"321\"],\"indicator_ids\":[\"1125925676711943\",\"1125925676711944\",\"1125925676711939\"," +
@@ -276,7 +276,7 @@ public class DataStoreStatisticHistoryServiceImplTest {
     }
 
     @Test
-    public void queryStorageDiskStatistic() throws DmeException {
+    public void testQueryStorageDiskStatistic() throws DmeException {
 
         
         String param = "{\"obj_ids\":[\"321\"],\"indicator_ids\":[\"1125917086777347\",\"1125917086777348\",\"1125917086777346\"," +
@@ -299,7 +299,7 @@ public class DataStoreStatisticHistoryServiceImplTest {
     }
 
     @Test
-    public void queryFsStatistic() throws DmeException {
+    public void testQueryFsStatistic() throws DmeException {
 
         
         String param = "{\"obj_ids\":[\"321\"],\"indicator_ids\":[\"1126179079716867\",\"1126179079716870\",\"1126179079716868\"," +
@@ -322,7 +322,7 @@ public class DataStoreStatisticHistoryServiceImplTest {
     }
 
     @Test
-    public void queryServiceLevelStatistic() throws DmeException {
+    public void testQueryServiceLevelStatistic() throws DmeException {
 
         
         String param = "{\"obj_ids\":[\"321\"],\"indicator_ids\":[\"1126174784815111\",\"1126174784815118\",\"1126174784815117\"],\"range\":\"[321]\",\"interval\":\"\",\"obj_type_id\":\"1126174784749568\"}";
@@ -344,7 +344,7 @@ public class DataStoreStatisticHistoryServiceImplTest {
     }
 
     @Test
-    public void queryServiceLevelLunStatistic() throws DmeException {
+    public void testQueryServiceLevelLunStatistic() throws DmeException {
 
         
         String param = "{\"obj_ids\":[\"321\"],\"indicator_ids\":[\"1125921381744642\",\"1125921381744643\",\"1125921381744641\"]," +
@@ -367,7 +367,7 @@ public class DataStoreStatisticHistoryServiceImplTest {
     }
 
     @Test
-    public void queryServiceLevelStoragePoolStatistic() throws DmeException {
+    public void testQueryServiceLevelStoragePoolStatistic() throws DmeException {
 
         
         String param = "{\"obj_ids\":[\"321\"],\"indicator_ids\":[\"1125912791810049\",\"1125912791810051\"," +
@@ -390,7 +390,7 @@ public class DataStoreStatisticHistoryServiceImplTest {
     }
 
     @Test
-    public void queryStoragePoolStatistic() throws DmeException {
+    public void testQueryStoragePoolStatistic() throws DmeException {
 
         
         String param = "{\"obj_ids\":[\"321\"],\"indicator_ids\":[\"1125912791810049\",\"1125912791810050\",\"1125912791810051\"]," +
@@ -413,7 +413,7 @@ public class DataStoreStatisticHistoryServiceImplTest {
     }
 
     @Test
-    public void queryStorageDevcieStatistic() throws DmeException {
+    public void testQueryStorageDevcieStatistic() throws DmeException {
 
         
         String param = "{\"obj_ids\":[\"321\"],\"indicator_ids\":[\"1125904201875457\",\"1125904201875464\",\"1125904201875458\",\"1125904201875461\"," +
@@ -437,7 +437,7 @@ public class DataStoreStatisticHistoryServiceImplTest {
     }
 
     @Test
-    public void queryStorageDevcieCurrentStatistic() throws DmeException {
+    public void testQueryStorageDevcieCurrentStatistic() throws DmeException {
 
         
         String param = "{\"obj_ids\":[\"321\"],\"indicator_ids\":[\"1125904201875457\",\"1125904201875464\",\"1125904201875458\",\"1125904201875461\"," +
@@ -460,7 +460,7 @@ public class DataStoreStatisticHistoryServiceImplTest {
     }
 
     @Test
-    public void queryStoragePoolCurrentStatistic() throws DmeException {
+    public void testQueryStoragePoolCurrentStatistic() throws DmeException {
 
         
         String param = "{\"obj_ids\":[\"321\"],\"indicator_ids\":[\"1125912791810049\",\"1125912791810050\",\"1125912791810051\"]," +
@@ -483,7 +483,7 @@ public class DataStoreStatisticHistoryServiceImplTest {
     }
 
     @Test
-    public void queryControllerCurrentStatistic() throws DmeException {
+    public void testQueryControllerCurrentStatistic() throws DmeException {
 
         
         String param = "{\"obj_ids\":[\"321\"],\"indicator_ids\":[\"1125908496842763\",\"1125908496842755\",\"1125908496842753\"," +
@@ -506,7 +506,7 @@ public class DataStoreStatisticHistoryServiceImplTest {
     }
 
     @Test
-    public void queryStoragePortCurrentStatistic() throws DmeException {
+    public void testQueryStoragePortCurrentStatistic() throws DmeException {
 
         
         String param = "{\"obj_ids\":[\"321\"],\"indicator_ids\":[\"1125925676711946\",\"1125925676711938\",\"1125925676711951\"," +
@@ -529,7 +529,7 @@ public class DataStoreStatisticHistoryServiceImplTest {
     }
 
     @Test
-    public void queryStorageDiskCurrentStatistic() throws DmeException {
+    public void testQueryStorageDiskCurrentStatistic() throws DmeException {
 
         
         String param = "{\"obj_ids\":[\"321\"],\"indicator_ids\":[\"1125917086777347\",\"1125917086777346\",\"1125917086777345\"," +
@@ -552,7 +552,7 @@ public class DataStoreStatisticHistoryServiceImplTest {
     }
 
     @Test
-    public void queryHistoryStatistic() throws DmeException {
+    public void testQueryHistoryStatistic() throws DmeException {
 
         String relationOrInstance = "SYS_StoragePool";
         String param = "{\"obj_ids\":[\"321\"],\"indicator_ids\":[\"1125912791810049\",\"1125912791810050\",\"1125912791810051\"]," +
@@ -574,7 +574,7 @@ public class DataStoreStatisticHistoryServiceImplTest {
         }
     }
     @Test
-    public void queryHistoryStatistic2() throws DmeException {
+    public void testQueryHistoryStatistic2() throws DmeException {
 
         String relationOrInstance = "SYS_Lun";
         
@@ -597,7 +597,7 @@ public class DataStoreStatisticHistoryServiceImplTest {
         }
     }
     @Test
-    public void queryHistoryStatistic3() throws DmeException {
+    public void testQueryHistoryStatistic3() throws DmeException {
 
         String relationOrInstance = "SYS_DjTier";
         
@@ -620,7 +620,7 @@ public class DataStoreStatisticHistoryServiceImplTest {
         }
     }
     @Test
-    public void queryHistoryStatistic4() throws DmeException {
+    public void testQueryHistoryStatistic4() throws DmeException {
 
         String relationOrInstance = "SYS_StorageFileSystem";
         
@@ -643,7 +643,7 @@ public class DataStoreStatisticHistoryServiceImplTest {
         }
     }
     @Test
-    public void queryHistoryStatistic5() throws DmeException {
+    public void testQueryHistoryStatistic5() throws DmeException {
 
         String relationOrInstance = "SYS_Controller";
         
@@ -666,7 +666,7 @@ public class DataStoreStatisticHistoryServiceImplTest {
         }
     }
     @Test
-    public void queryHistoryStatistic6() throws DmeException {
+    public void testQueryHistoryStatistic6() throws DmeException {
 
         String relationOrInstance = "SYS_StoragePort";
         
@@ -689,7 +689,7 @@ public class DataStoreStatisticHistoryServiceImplTest {
         }
     }
     @Test
-    public void queryHistoryStatistic7() throws DmeException {
+    public void testQueryHistoryStatistic7() throws DmeException {
 
         String relationOrInstance = "SYS_StorDevice";
         
@@ -712,7 +712,7 @@ public class DataStoreStatisticHistoryServiceImplTest {
         }
     }
     @Test
-    public void queryHistoryStatistic8() throws DmeException {
+    public void testQueryHistoryStatistic8() throws DmeException {
 
         String relationOrInstance = "SYS_StorageDisk";
         
@@ -735,7 +735,7 @@ public class DataStoreStatisticHistoryServiceImplTest {
         }
     }
     @Test
-    public void queryHistoryStatistic9() throws DmeException {
+    public void testQueryHistoryStatistic9() throws DmeException {
 
         String relationOrInstance = "SYS";
         
@@ -758,7 +758,7 @@ public class DataStoreStatisticHistoryServiceImplTest {
     }
 
     @Test
-    public void queryCurrentStatistic() throws DmeException {
+    public void testQueryCurrentStatistic() throws DmeException {
 
         String[] relationOrInstances = {"SYS_StorageDisk","SYS_StoragePool","SYS_DjTier","SYS_Lun","SYS_StorageFileSystem","SYS_Controller","SYS_StoragePort","SYS_StorDevice"};
         for (int i = 0; i < 7; i++) {

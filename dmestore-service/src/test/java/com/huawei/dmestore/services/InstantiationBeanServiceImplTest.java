@@ -28,7 +28,7 @@ public class InstantiationBeanServiceImplTest {
     }
 
     @Test
-    public void init() {
+    public void testInit() {
         instantiationBeanService.init();
     }
 }

@@ -148,6 +148,7 @@ export class IscsiComponent implements OnInit, AfterViewInit {
       this.resetListInfo();
       const isV6 = this.storageDevices.filter(item => item.sn == this.configModel.sn)[0].storageTypeShow.dorado;
       // V5设备访问
+      /* TODO: */
       if (!isV6) {
         this.portGetUrlParams.params.storageSn = this.configModel.sn;
         const successHandler = (result: any) => {
@@ -199,8 +200,18 @@ export class IscsiComponent implements OnInit, AfterViewInit {
                 maxSpeed: null,
                 speed: null,
                 status: '',
+                connectStatus:'',
                 connectStatusType: '',
               };
+
+              logicData.connectStatus = (runningStatus => {
+                const STATUS_MAP = {
+                  "LINK_DOWN": 'disconnected',
+                  "LINK_UP":'connected',
+                }
+                return STATUS_MAP[runningStatus];
+              })(result.data[i].runningStatus);
+
               logicData.location = result.data[i].currentPortName;
               logicData.id = result.data[i].id;
               logicData.portName = result.data[i].name;
@@ -225,7 +236,7 @@ export class IscsiComponent implements OnInit, AfterViewInit {
         }
         /* TODO: */
         if (isMockData) {
-          successHandler(mockData.DMESTORAGE_GETSTORAGEETHPORTS)
+          successHandler(mockData.DMESTORAGE_LOGICPORTS)
         } else {
           this.http.get('dmestorage/logicports?storageId=' + storageId + '&supportProtocol=iSCSI').subscribe(successHandler, errorHandler);
         }
