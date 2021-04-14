@@ -597,7 +597,10 @@
     "disconnect": "断开连接"
   },
   "bestPractice": {
-    "deleteLUN":"请手动删除多余的LUN",
+    "adapter": "网络适配器",
+    "ipaddress":"IP地址",
+    "deleteLUN": "请手动删除多余的LUN",
+    "applyAdvice": "只建议对存储网络实施最佳实践",
     "apply": "实施最佳实践",
     "check": "重新检查",
     "hostSetting": "主机配置",

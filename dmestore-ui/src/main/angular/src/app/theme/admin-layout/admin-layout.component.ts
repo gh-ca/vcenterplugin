@@ -91,8 +91,8 @@ export class AdminLayoutComponent implements OnInit, OnDestroy {
       {link: "./nfs/list", label: './nfs/list'},
       {link: "./servicelevel", label: 'servicelevel DME存储策略'},
       {link: "./bestpractice", label: 'Best Practice'},
-      {link: "./host/applybp", label: 'ApplybpComponent host'},
-      {link: "./cluster/applybp", label: 'ApplybpComponent cluster'},
+      {link: "./host/applybp", label: 'host 实施最佳实践'},
+      {link: "./cluster/applybp", label: 'cluster 实施最佳实践'},
       {link: "./iscsi", label: 'iscsi list'},
       /**/
       {link: './iscsi', label: './iscsi'},

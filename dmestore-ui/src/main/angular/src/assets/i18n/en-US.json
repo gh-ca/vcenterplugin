@@ -597,7 +597,10 @@
     "disconnect": "Disconnect"
   },
   "bestPractice": {
+    "adapter": "adapter",
+    "ipaddress": "IP address",
     "deleteLUN": "Please manually delete the excess LUN",
+    "applyAdvice": "recommended apply best practice for storage networks only",
     "apply": "Apply Best Practice",
     "check": "Recheck",
     "hostSetting": "HostSetting",

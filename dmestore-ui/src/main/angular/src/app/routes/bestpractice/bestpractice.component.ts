@@ -3,10 +3,15 @@ import {
   OnInit,
   ChangeDetectionStrategy, ChangeDetectorRef,
 } from '@angular/core';
-import {HttpClient} from '@angular/common/http';
-import {CommonService} from '../common.service';
-import {GlobalsService} from "../../shared/globals.service";
-import {TranslatePipe} from "@ngx-translate/core";
+import { HttpClient } from '@angular/common/http';
+import { CommonService } from '../common.service';
+import { GlobalsService } from "../../shared/globals.service";
+import { TranslatePipe } from "@ngx-translate/core";
+import { isMockData, mockData } from 'mock/mock';
+import { handlerResponseErrorSimple } from 'app/app.helpers';
+
+const MTU = 'mtu';
+const MTU_TAG = 'Jumbo Frame (MTU)';
 
 @Component({
   selector: 'app-bestpractice',
@@ -35,6 +40,8 @@ export class BestpracticeComponent implements OnInit {
   hostList: Host[] = []; // 数据列表
   hostTotal = 0; // 总数据数量
   currentBestpractice: Bestpractice;
+  /* MTU的panel单独处理 */
+  currentPanel;
   // ================END====================
 
   tipModal = false;
@@ -188,101 +195,82 @@ export class BestpracticeComponent implements OnInit {
 
   practiceRefresh() {
     this.isLoading = true;
-    this.http.get('v1/bestpractice/records/all', {}).subscribe((result: any) => {
+    const handlerGetRecordsAllSuccess = (result: any) => {
+      /*TODO: 这个地方有问题：在中途切换语言的，翻译不会响应。不过不作妖应该还行。 */
+      /* 最简单方案，监听语言切换，再次调用 刷新*/
       if (result.code === '200') {
         this.list = result.data;
         // bug修改：列表页面级别过滤 中英文问题
-        if (this.list) {
-          this.list.forEach(item => {
-            let levelDesc;
-            let levelNum;
-            switch (item.level) {
-              case "Critical":
-                levelNum = 4;
-                levelDesc = this.translatePipe.transform("overview.critical");
-                break;
-              case "Major":
-                levelNum = 3;
-                levelDesc = this.translatePipe.transform("overview.major");
-                break;
-              case "Warning":
-                levelNum = 2;
-                levelDesc = this.translatePipe.transform("overview.warning");
-                break;
-              case "Info":
-                levelNum = 1;
-                levelDesc = this.translatePipe.transform("overview.info");
-                break;
-              default:
-                levelNum = 0;
-                levelDesc = "--";
-                break;
+        if (this.list && Array.isArray(this.list)) {
+          this.list = this.list.map(item => {
+            const _item = { ...item };
+            const LEVEL_MAP = {
+              "Critical": [4, "overview.critical"],
+              "Major": [3, "overview.major"],
+              "Warning": [2, "overview.warning"],
+              "Info": [1, "overview.info"],
+            };
+            let levelDesc = '--';
+            let levelNum = 0;
+            const mapLevel = LEVEL_MAP[String(item.hostSetting).trim()];
+
+            if (Array.isArray(mapLevel)) {
+              levelNum = mapLevel[0];
+              levelDesc = this.translatePipe.transform(mapLevel[1]) || '--';
             }
-            item.levelDesc = levelDesc;
-            item.levelNum = levelNum;
+            _item.levelDesc = levelDesc;
+            _item.levelNum = levelNum;
 
             // 设置描述信息
-            switch (item.hostSetting) {
-              case 'VMFS3.UseATSForHBOnVMFS5':
-                item.description = this.translatePipe.transform('bestPractice.description.vmfs5');
-                break;
-              case 'VMFS3.HardwareAcceleratedLocking':
-                item.description = this.translatePipe.transform('bestPractice.description.locking');
-                break;
-              case 'DataMover.HardwareAcceleratedInit':
-                item.description = this.translatePipe.transform('bestPractice.description.init');
-                break;
-              case 'DataMover.HardwareAcceleratedMove':
-                item.description = this.translatePipe.transform('bestPractice.description.move');
-                break;
-              case 'VMFS3.EnableBlockDelete':
-                item.description = this.translatePipe.transform('bestPractice.description.delete');
-                break;
-              case 'Disk.SchedQuantum':
-                item.description = this.translatePipe.transform('bestPractice.description.quanTum');
-                break;
-              case 'Disk.DiskMaxIOSize':
-                item.description = this.translatePipe.transform('bestPractice.description.diskMaxIOSize');
-                break;
-              case 'LUN Queue Depth for Qlogic':
-                item.description = this.translatePipe.transform('bestPractice.description.depthForQlogic');
-                break;
-              case 'LUN Queue Depth for Emulex':
-                item.description = this.translatePipe.transform('bestPractice.description.depthForEmulex');
-                break;
-              case 'NMP path switch policy':
-                item.description = this.translatePipe.transform('bestPractice.description.pathSwitchPolicy');
-                break;
-              case 'Jumbo Frame (MTU)':
-                item.description = this.translatePipe.transform('bestPractice.description.jumboFrame');
-                break;
-              case 'VMFS-6 Auto-Space Reclamation':
-                item.description = this.translatePipe.transform('bestPractice.description.reclamation');
-                break;
-              case 'Number of volumes in Datastore':
-                item.description = this.translatePipe.transform('bestPractice.description.numberOfVolInDatastore');
-                break;
-              default:
-                item.description = '--';
-            }
+            const DESCRIPTION_MAP = {
+              'VMFS3.UseATSForHBOnVMFS5': ('bestPractice.description.vmfs5'),
+              'VMFS3.HardwareAcceleratedLocking': ('bestPractice.description.locking'),
+              'DataMover.HardwareAcceleratedInit': ('bestPractice.description.init'),
+              'DataMover.HardwareAcceleratedMove': ('bestPractice.description.move'),
+              'VMFS3.EnableBlockDelete': ('bestPractice.description.delete'),
+              'Disk.SchedQuantum': ('bestPractice.description.quanTum'),
+              'Disk.DiskMaxIOSize': ('bestPractice.description.diskMaxIOSize'),
+              'LUN Queue Depth for Qlogic': ('bestPractice.description.depthForQlogic'),
+              'LUN Queue Depth for Emulex': ('bestPractice.description.depthForEmulex'),
+              'NMP path switch policy': ('bestPractice.description.pathSwitchPolicy'),
+              'Jumbo Frame (MTU)': ('bestPractice.description.jumboFrame'),
+              'VMFS-6 Auto-Space Reclamation': ('bestPractice.description.reclamation'),
+              'Number of volumes in Datastore': ('bestPractice.description.numberOfVolInDatastore'),
+            };
+            const mapDescription = DESCRIPTION_MAP[String(item.hostSetting).trim()];
+            let description = this.translatePipe.transform(mapDescription) || '--';
+            _item.description = description;
+
             // 违规主机实际值修改
-            item.hostList.forEach(hostInfo => {
-              hostInfo.actualObjValue = this.getTypeOf(hostInfo.actualValue);
-            });
+            _item.hostList = _item.hostList.map(hostInfo => ({
+              ...hostInfo,
+              actualObjValue: this.getTypeOf(hostInfo.actualValue)
+            }));
+            return _item;
           });
         }
         this.total = result.data.length;
         this.isLoading = false;
         this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
       }
-    }, err => {
-      console.error('ERROR', err);
-    });
+    };
+
+    if (isMockData) {
+      handlerGetRecordsAllSuccess(mockData.BESTPRACTICE_RECORDS_ALL);
+    } else {
+      this.http.get('v1/bestpractice/records/all', {}).subscribe(handlerGetRecordsAllSuccess, handlerResponseErrorSimple);
+    }
   }
 
+
+  checkBescpractice(bestpractice) {
+    this.currentBestpractice = bestpractice;
+    const { hostSetting } = bestpractice;
+    this.currentPanel = hostSetting === MTU_TAG ? MTU : '';
+  }
   openHostList(bestpractice: Bestpractice) {
     this.hostModalShow = true;
-    this.currentBestpractice = bestpractice;
+    this.checkBescpractice(bestpractice);
     this.hostRefresh();
   }
 
@@ -389,7 +377,7 @@ class Bestpractice {
   hostList: Host[];
 }
 
-class Host {
+export class Host {
   hostSetting: string;
   level: string;
   hostName: string;
