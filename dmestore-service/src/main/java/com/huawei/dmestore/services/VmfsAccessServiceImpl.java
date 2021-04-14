@@ -528,6 +528,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                     requestParam.put(HOST_GROUP_ID1, demHostGroupId);
                     responseEntity = hostGroupUnmapping(requestParam);
                 }
+                //todo 逻辑问题： 当解除映射失败，就直接删除lun信息和主机组信息，主机信息未删除
                 if (responseEntity.getStatusCodeValue() == HttpStatus.ACCEPTED.value()) {
                     taskId = ToolUtils.jsonToStr(
                         new JsonParser().parse(ToolUtils.getStr(responseEntity.getBody())).getAsJsonObject()
@@ -1488,6 +1489,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             // param str host: 主机  param str cluster: 集群  dataStoreObjectIds
             // 判断主机或主机组在DME中是否存在, 如果主机或主机不存在就创建并得到主机或主机组ID
             // 接入主机连通性检查
+            // todo 根据卷（lun）数据信息判断版本编号，如果版本为V6，需要根据lun获取对应的lun组进行连通性检测，进行联通性检测，然后挂载集群；
             Map<String, List<String>> storageIdMaps = (Map<String, List<String>>)params.get(STORAGEID_VOLUMEIDS);
             if (storageIdMaps != null && storageIdMaps.size() != 0) {
                 for (Map.Entry<String, List<String>> entry : storageIdMaps.entrySet()) {
@@ -1554,8 +1556,10 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         Map<String, List<String>> storageIds = new HashMap<>();
 
         for (String dsObjectId : dataStoreObjectIds) {
+            //通过存储的objectid查询存储对应的lun信息
             DmeVmwareRelation dvr = dmeVmwareRalationDao.getDmeVmwareRelationByDsId(dsObjectId);
             if (dvr != null) {
+                //循环往存储对象集合中添加存储编号（如果没有就添加，如果有就原来的基础上继续新增）
                 String storageDeviceId = dvr.getStorageDeviceId();
                 if (storageIds.get(storageDeviceId) != null) {
                     storageIds.get(storageDeviceId).add(dvr.getVolumeId());
@@ -1569,6 +1573,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             }
         }
         if (volumeIds.size() > 0) {
+            //如果存储编号集合不为空，返回存储编号集合，存储设备名称，存储设备对象
             params.put(VOLUMEIDS, volumeIds);
             params.put(DATASTORE_NAMES, dataStoreNames);
             params.put(STORAGEID_VOLUMEIDS, storageIds);
@@ -1731,7 +1736,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         return name;
     }
 
-
+    //用于根据storageid获取storagename
     private void parseStoragePool(String poolId, VmfsDatastoreVolumeDetail volumeDetail) throws DmeException {
         String poolName = "";
         try {
