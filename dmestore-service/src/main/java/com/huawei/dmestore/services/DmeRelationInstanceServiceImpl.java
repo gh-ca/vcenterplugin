@@ -298,9 +298,12 @@ public class DmeRelationInstanceServiceImpl implements DmeRelationInstanceServic
         listInstanceServiceLevel();
     }
 
-    private JsonObject listInstancdByInstanceName(String instanceName) {
+   /* private JsonObject listInstancdByInstanceName(String instanceName) {
+        int pageNo = 1;
+        int pageSize = 1000;
+        JsonArray jsonArrayList = new JsonArray();
         JsonObject jsonObject = null;
-        String url = DmeConstants.LIST_INSTANCE_URL.replace("{className}", instanceName);
+        String url = DmeConstants.LIST_INSTANCE_URL.replace("{className}", instanceName)+"pageSize="+pageSize+"&pageNo="+pageNo;
         try {
             ResponseEntity responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
             if (responseEntity != null && responseEntity.getStatusCodeValue() == HttpStatus.OK.value()) {
@@ -308,10 +311,49 @@ public class DmeRelationInstanceServiceImpl implements DmeRelationInstanceServic
                 Gson gson = new Gson();
                 jsonObject = new JsonParser().parse(ToolUtils.getStr(object)).getAsJsonObject();
             }
+            int totalPageNo = jsonObject.get("jsonObject").getAsInt();
+            if (totalPageNo > 1){
+
+            }
+            JsonArray jsonArray = jsonObject.get(OBJ_LIST).getAsJsonArray();
         } catch (DmeException e) {
             LOG.warn("List instance error by instanceName:{},{}", instanceName, e);
         }
         return jsonObject;
+    }*/
+    //由于接口吞吐量限制，需要递归调用
+    private JsonObject listInstancdByInstanceName(String instanceName) {
+        int pageNo = 1;
+        JsonArray jsonArrayList = new JsonArray();
+        JsonObject jsonObject = new JsonObject();
+        JsonObject jsonObjectResult = getLunInstance(instanceName,pageNo,jsonArrayList);
+        jsonObject.add(OBJ_LIST,jsonArrayList);
+        jsonObject.add("totalNum",jsonObjectResult.get("totalNum"));
+        jsonObject.add("pageSize",jsonObjectResult.get("pageSize"));
+        jsonObject.add("totalPageNo",jsonObjectResult.get("totalPageNo"));
+        return jsonObject;
+    }
+    private JsonObject getLunInstance(String instanceName,int pageNo,JsonArray jsonArrayList){
+        JsonObject jsonObjectTemp = new JsonObject();
+        String url = DmeConstants.LIST_INSTANCE_URL.replace("{className}", instanceName)+"&pageNo="+pageNo;
+        JsonObject jsonObject = null;
+        try {
+            ResponseEntity responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
+            if (responseEntity != null && responseEntity.getStatusCodeValue() == HttpStatus.OK.value()) {
+                Object object = responseEntity.getBody();
+                jsonObject = new JsonParser().parse(ToolUtils.getStr(object)).getAsJsonObject();
+                jsonObjectTemp = jsonObject;
+                jsonArrayList.addAll(jsonObject.get(OBJ_LIST).getAsJsonArray());
+                int totalPageNo = jsonObject.get("totalPageNo").getAsInt();
+                if(totalPageNo >pageNo){
+                    pageNo++;
+                    getLunInstance(instanceName,pageNo,jsonArrayList);
+                }
+            }
+        } catch (DmeException e) {
+            LOG.warn("List instance error by instanceName:{},{}", instanceName, e);
+        }
+        return jsonObjectTemp;
     }
 
     private List<RelationInstance> converRelations(Object object) {
