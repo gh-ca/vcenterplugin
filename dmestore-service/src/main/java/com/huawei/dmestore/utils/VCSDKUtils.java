@@ -1,19 +1,15 @@
 package com.huawei.dmestore.utils;
 
+import com.google.gson.JsonArray;
 import com.huawei.dmestore.constant.DmeConstants;
 import com.huawei.dmestore.entity.DmeVmwareRelation;
 import com.huawei.dmestore.entity.VCenterInfo;
 import com.huawei.dmestore.exception.VcenterException;
+import com.huawei.dmestore.model.UpHostVnicRequestBean;
 import com.huawei.vmware.VcConnectionHelpers;
 import com.huawei.vmware.autosdk.SessionHelper;
 import com.huawei.vmware.autosdk.TaggingWorkflow;
-import com.huawei.vmware.mo.ClusterMo;
-import com.huawei.vmware.mo.DatastoreMo;
-import com.huawei.vmware.mo.HostDatastoreSystemMo;
-import com.huawei.vmware.mo.HostMo;
-import com.huawei.vmware.mo.HostStorageSystemMo;
-import com.huawei.vmware.mo.RootFsMo;
-import com.huawei.vmware.mo.VirtualMachineMo;
+import com.huawei.vmware.mo.*;
 import com.huawei.vmware.util.ClusterVmwareMoFactory;
 import com.huawei.vmware.util.DatastoreVmwareMoFactory;
 import com.huawei.vmware.util.HostVmwareFactory;
@@ -62,31 +58,7 @@ import com.vmware.vim.vmomi.client.http.HttpConfiguration;
 import com.vmware.vim.vmomi.client.http.impl.AllowAllThumbprintVerifier;
 import com.vmware.vim.vmomi.client.http.impl.HttpConfigurationImpl;
 import com.vmware.vim.vmomi.core.types.VmodlContext;
-import com.vmware.vim25.DatastoreHostMount;
-import com.vmware.vim25.DatastoreSummary;
-import com.vmware.vim25.HostFibreChannelHba;
-import com.vmware.vim25.HostFileSystemMountInfo;
-import com.vmware.vim25.HostHostBusAdapter;
-import com.vmware.vim25.HostInternetScsiHba;
-import com.vmware.vim25.HostInternetScsiHbaSendTarget;
-import com.vmware.vim25.HostRuntimeInfo;
-import com.vmware.vim25.HostScsiDisk;
-import com.vmware.vim25.HostScsiDiskPartition;
-import com.vmware.vim25.HostSystemConnectionState;
-import com.vmware.vim25.HostVirtualNic;
-import com.vmware.vim25.HostVmfsVolume;
-import com.vmware.vim25.InvalidArgumentFaultMsg;
-import com.vmware.vim25.IscsiPortInfo;
-import com.vmware.vim25.ManagedObjectReference;
-import com.vmware.vim25.NasDatastoreInfo;
-import com.vmware.vim25.VirtualDiskMode;
-import com.vmware.vim25.VirtualDiskType;
-import com.vmware.vim25.VirtualHardwareOption;
-import com.vmware.vim25.VirtualMachineFileInfo;
-import com.vmware.vim25.VirtualNicManagerNetConfig;
-import com.vmware.vim25.VmfsDatastoreExpandSpec;
-import com.vmware.vim25.VmfsDatastoreInfo;
-import com.vmware.vim25.VmfsDatastoreOption;
+import com.vmware.vim25.*;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -3267,6 +3239,96 @@ public class VCSDKUtils {
                 e.getMessage());
         }
         return false;
+    }
+
+    /**
+     * 获取主机网卡信息
+     *
+     * @param hostObjectId 主机objectid
+     * @param recommendMtu MTU期望值
+     * @return String String
+     */
+    public String getVirtualNicList(List<String> hostObjectIds, int recommendMtu) {
+        String hostObjectId = null;
+        String reStr = null;
+        try {
+            JsonArray jsonArray = new JsonArray();
+            for (int index = 0; index < hostObjectIds.size(); index++) {
+                hostObjectId = hostObjectIds.get(index);
+                String serverguid = vcConnectionHelpers.objectId2Serverguid(hostObjectId);
+                VmwareContext context = vcConnectionHelpers.getServerContext(serverguid);
+                ManagedObjectReference objmor = vcConnectionHelpers.objectId2Mor(hostObjectId);
+                HostMo hostMo = hostVmwareFactory.build(context, objmor);
+                String hostIp = hostMo.getHostName();
+                HostNetworkSystemMo hostNetworkSystemMo = hostMo.getHostNetworkSystemMo();
+                HostNetworkConfig networkConfig = hostNetworkSystemMo.getNetworkConfig();
+                List<HostVirtualNicConfig> list = networkConfig.getVnic();
+                for (HostVirtualNicConfig config : list) {
+                    String device = config.getDevice();
+                    HostVirtualNicSpec spec = config.getSpec();
+                    String ip = spec.getIp().getIpAddress();
+                    int mtu = spec.getMtu();
+                    JsonObject jsonObject = new JsonObject();
+                    jsonObject.addProperty("device", device);
+                    jsonObject.addProperty("mtu", mtu);
+                    jsonObject.addProperty("nicIp", ip);
+                    jsonObject.addProperty("hostObjId", hostObjectId);
+                    jsonObject.addProperty("hostObjIp", hostIp);
+                    jsonArray.add(jsonObject);
+
+                }
+
+            }
+            reStr = jsonArray.toString();
+
+        } catch (Exception e) {
+            logger.error("query host virtual nic error!hostObjectId={}, error:{}", hostObjectId,
+                    e.getMessage());
+        }
+
+        return reStr;
+
+    }
+
+    /**
+     * 获取主机网卡信息
+     *
+     * @param hostObjectId 主机objectid
+     * @param recommendMtu MTU期望值
+     */
+    public void updateVirtualNicList(List<UpHostVnicRequestBean> beans, int recommendValue) {
+        JsonArray jsonArray = new JsonArray();
+        for (int index = 0; index < beans.size(); index++) {
+            UpHostVnicRequestBean bean = beans.get(index);
+            threadPoolExecutor.execute(() -> {
+                String hostName = null;
+                try {
+                    String hostObjectId = bean.getHostObjectId();
+                    String reDevice = bean.getDevice();
+                    String serverguid = vcConnectionHelpers.objectId2Serverguid(hostObjectId);
+                    VmwareContext context = vcConnectionHelpers.getServerContext(serverguid);
+                    ManagedObjectReference objmor = vcConnectionHelpers.objectId2Mor(hostObjectId);
+                    HostMo hostMo = hostVmwareFactory.build(context, objmor);
+                    hostName = hostMo.getHostName();
+                    HostNetworkSystemMo hostNetworkSystemMo = hostMo.getHostNetworkSystemMo();
+                    HostNetworkConfig networkConfig = hostNetworkSystemMo.getNetworkConfig();
+                    List<HostVirtualNicConfig> list = networkConfig.getVnic();
+                    for (HostVirtualNicConfig config : list) {
+                        String device = config.getDevice();
+                        HostVirtualNicSpec spec = config.getSpec();
+                        if (device.equals(reDevice) && spec.getMtu().intValue() != recommendValue) {
+                            spec.setMtu(recommendValue);
+                            hostNetworkSystemMo.updateVirtualNic(device, spec);
+                            break;
+                        }
+                    }
+                } catch (Exception e) {
+                    logger.error("update host virtual nic error!hostIp={}, device={}, error:{}", hostName, bean.getDevice(),
+                            e.getMessage());
+                }
+            });
+        }
+
     }
 
 }

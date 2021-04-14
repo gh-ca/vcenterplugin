@@ -28,7 +28,7 @@ public class JumboFrameMTUImpl extends BaseBestPracticeService implements BestPr
     private ThreadPoolTaskExecutor threadPoolExecutor;
     protected final Logger logger = LoggerFactory.getLogger(BaseBestPracticeService.class);
 
-    private static final int RECOMMEND_VALUE = 9000;
+    public static final int RECOMMEND_VALUE = 9000;
 
     private static final String MTU_NULL = "--";
 
