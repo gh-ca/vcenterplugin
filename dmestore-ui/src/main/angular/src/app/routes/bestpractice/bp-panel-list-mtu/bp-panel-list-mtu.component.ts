@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef, ChangeDetectionStrategy, Input, SimpleChange } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, ChangeDetectionStrategy, Input, SimpleChange, Output, EventEmitter } from '@angular/core';
 import { TranslatePipe } from '@ngx-translate/core';
 import { CommonService } from './../../common.service';
 import { Host } from '../bestpractice.component';
@@ -23,6 +23,7 @@ const URL_UPDATE_VIRTUAL_NIC_LIST = 'v1/bestpractice/virtual-nic/update';
 export class BpPanelListMtuComponent implements OnInit {
   @Input() hostList: Host[];
   @Input() currentItem;
+  @Output() onApply: EventEmitter<any>;
 
   /* 外部传入的hostList 请求之后获取的需要展示的list */
   dataTableList: Host[] = [];
@@ -37,7 +38,9 @@ export class BpPanelListMtuComponent implements OnInit {
     private $utils: CommonService,
     private translatePipe: TranslatePipe,
     private cdr: ChangeDetectorRef,
-  ) { }
+  ) {
+    this.onApply = new EventEmitter();
+  }
 
   ngOnInit(): void { }
 
@@ -123,8 +126,15 @@ export class BpPanelListMtuComponent implements OnInit {
       "device": i.device,
       "hostObjectId": i.hostObjId
     }))
-    const res = await this.applyBP(paramArray);
-    console.log("🚀 ~ file: bp-panel-list-mtu.component.ts ~ line 127 ~ BpPanelListMtuComponent ~ applyClick ~ res", res);
+    debugger;
+    try {
+      const res = await this.applyBP(paramArray);
+      this.onApply.emit(res);
+      console.log("🚀 ~ file: bp-panel-list-mtu.component.ts ~ line 132 ~ BpPanelListMtuComponent ~ applyClick ~ res", res);
+    } catch (error) {
+      this.onApply.emit(error);
+      console.log("🚀 ~ file: bp-panel-list-mtu.component.ts ~ line 134 ~ BpPanelListMtuComponent ~ applyClick ~ error", error);
+    }
   }
 
   sortFunc(obj: any) {

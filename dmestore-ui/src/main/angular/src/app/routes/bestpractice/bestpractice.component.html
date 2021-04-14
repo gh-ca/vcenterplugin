@@ -83,7 +83,7 @@
   <clr-modal [(clrModalOpen)]="hostModalShow" style="Width: 576px; height: 300px">
     <h3 class="modal-title">{{'bestPractice.non-compliant'|translate}}</h3>
     <div class="modal-body">
-      <app-bp-panel-list-mtu *ngIf="currentPanel==='mtu'" [hostList]="hostList" [currentItem]="currentBestpractice">
+      <app-bp-panel-list-mtu *ngIf="currentPanel==='mtu'" [hostList]="hostList" [currentItem]="currentBestpractice" (onApply)="afterApply($event)">
       </app-bp-panel-list-mtu>
       <div *ngIf="currentPanel!=='mtu'">
         <div>

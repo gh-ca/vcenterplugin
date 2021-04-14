@@ -10,8 +10,8 @@ import { TranslatePipe } from "@ngx-translate/core";
 import { isMockData, mockData } from 'mock/mock';
 import { handlerResponseErrorSimple } from 'app/app.helpers';
 
-const MTU = 'mtu';
-const MTU_TAG = 'Jumbo Frame (MTU)';
+export const MTU = 'mtu';
+export const MTU_TAG = 'Jumbo Frame (MTU)';
 
 @Component({
   selector: 'app-bestpractice',
@@ -117,7 +117,7 @@ export class BestpracticeComponent implements OnInit {
     this.applyLoading = true;
     this.http.post('v1/bestpractice/update/bylist', params).subscribe((result: any) => {
       this.applyLoading = false;
-      if (result.code == '200') {
+      if (result?.code == '200') {
         this.tipModalSuccess = true;
         if (this.applyType != '1') {
           this.hostModalShow = false;
@@ -363,6 +363,21 @@ export class BestpracticeComponent implements OnInit {
     //   object.children[0].hidden = false;
     // }
     return !obj;
+  }
+
+  afterApply(result) {
+    debugger;
+    this.applyLoading = false;
+    if (result?.code == '200') {
+      this.tipModalSuccess = true;
+      if (this.applyType != '1') {
+        this.hostModalShow = false;
+      }
+      this.practiceRefresh();
+    } else {
+      this.tipModalFail = true;
+    }
+    this.cdr.detectChanges();
   }
 }
 

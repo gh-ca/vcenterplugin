@@ -5,14 +5,13 @@ import { BestpracticeRoutingModule } from './bestpractice-routing.module';
 import { BestpracticeComponent } from './bestpractice.component';
 import { TranslateModule } from '@ngx-translate/core';
 import { ClrDatagridModule } from '@clr/angular';
-import { BpPanelListMtuComponent } from './bp-panel-list-mtu/bp-panel-list-mtu.component';
 
 const COMPONENTS = [BestpracticeComponent];
 const COMPONENTS_DYNAMIC = [];
-/* Ìí¼ÓÕë¶Ô MTU µÄµ¯´°×é¼ş  Ö÷»úÃû ÊÊÅäÆ÷ Êµ¼ÊÖµ  */
+/* æ·»åŠ é’ˆå¯¹ MTU çš„å¼¹çª—ç»„ä»¶  ä¸»æœºå é€‚é…å™¨ å®é™…å€¼  */
 @NgModule({
   imports: [SharedModule, BestpracticeRoutingModule, TranslateModule, ClrDatagridModule],
-  declarations: [...COMPONENTS, ...COMPONENTS_DYNAMIC, BpPanelListMtuComponent],
+  declarations: [...COMPONENTS, ...COMPONENTS_DYNAMIC],
   entryComponents: COMPONENTS_DYNAMIC,
 })
 export class BestpracticeModule { }

@@ -1,9 +1,12 @@
-import {ChangeDetectorRef, Component, OnInit, AfterViewInit} from '@angular/core';
-import {GlobalsService} from "../../shared/globals.service";
-import {HttpClient} from "@angular/common/http";
-import {ActivatedRoute} from "@angular/router";
-import {TranslatePipe} from "@ngx-translate/core";
-import {CommonService} from "../common.service";
+import { ChangeDetectorRef, Component, OnInit, AfterViewInit } from '@angular/core';
+import { GlobalsService } from "../../shared/globals.service";
+import { HttpClient } from "@angular/common/http";
+import { ActivatedRoute } from "@angular/router";
+import { TranslatePipe } from "@ngx-translate/core";
+import { CommonService } from "../common.service";
+import { handlerResponseErrorSimple } from 'app/app.helpers';
+import { isMockData, mockData } from 'mock/mock';
+import { MTU, MTU_TAG } from "../bestpractice/bestpractice.component"
 
 @Component({
   selector: 'app-applybp',
@@ -19,9 +22,9 @@ export class ApplybpComponent implements OnInit {
   status = 1;
 
   constructor(private cdr: ChangeDetectorRef,
-              private http: HttpClient,
-              private gs: GlobalsService, private activatedRoute: ActivatedRoute, private commonService: CommonService,
-              private translatePipe:TranslatePipe) { }
+    private http: HttpClient,
+    private gs: GlobalsService, private activatedRoute: ActivatedRoute, private commonService: CommonService,
+    private translatePipe: TranslatePipe) { }
 
   ngOnInit(): void {
     this.practiceRefresh();
@@ -109,6 +112,8 @@ export class ApplybpComponent implements OnInit {
   hostList: Host[] = []; // 数据列表
   hostTotal = 0; // 总数据数量
   currentBestpractice: Bestpractice;
+  /* MTU的panel单独处理 */
+  currentPanel;
   // ================END====================
 
   tipModal = false;
@@ -251,15 +256,14 @@ export class ApplybpComponent implements OnInit {
 
   practiceRefresh(){
     const ctx = this.gs.getClientSdk().app.getContextObjects();
-    const objectId = ctx[0].id;
-    // const objectId = 'urn:vmomi:ClusterComputeResource:domain-c2038:674908e5-ab21-4079-9cb1-596358ee5dd1';
+    const objectId = ctx ? ctx[0].id : 'urn:vmomi:ClusterComputeResource:domain-c2038:674908e5-ab21-4079-9cb1-596358ee5dd1';
     let type = '';
     this.activatedRoute.url.subscribe(url => {
       type = url[0].path;
     });
     this.isLoading = true;
-    this.http.get('v1/bestpractice/records/all?objectId='+objectId + '&type='+ type).subscribe((result: any) => {
-      if (result.code === '200'){
+    const handlerGetRecords = (result: any) => {
+      if (result.code === '200') {
         this.list = result.data;
         // bug修改：列表页面级别过滤 中英文问题
         if (this.list) {
@@ -345,19 +349,29 @@ export class ApplybpComponent implements OnInit {
         this.isLoading = false;
         this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
       }
-    }, err => {
-      console.error('ERROR', err);
-    });
+    };
+
+    if (isMockData) {
+      handlerGetRecords(mockData.BESTPRACTICE_RECORDS_ALL);
+    } else {
+      this.http.get('v1/bestpractice/records/all?objectId=' + objectId + '&type=' + type).subscribe(handlerGetRecords, handlerResponseErrorSimple);
+    }
   }
 
-  openHostList(bestpractice: Bestpractice){
-    this.hostModalShow = true;
+  checkBescpractice(bestpractice) {
     this.currentBestpractice = bestpractice;
+    const { hostSetting } = bestpractice;
+    this.currentPanel = hostSetting === MTU_TAG ? MTU : '';
+  }
+
+  openHostList(bestpractice: Bestpractice) {
+    this.hostModalShow = true;
+    this.checkBescpractice(bestpractice);
     this.hostRefresh();
   }
 
-  hostRefresh(){
-    if (this.hostModalShow === true){
+  hostRefresh() {
+    if (this.hostModalShow === true) {
       this.hostIsLoading = true;
       this.hostList = this.currentBestpractice.hostList;
       /*根据autoRepair 判断是否禁用执行最佳实践 */
@@ -446,6 +460,21 @@ export class ApplybpComponent implements OnInit {
     // }
     return !obj;
   }
+
+  afterApply(result) {
+    debugger;
+    this.applyLoading = false;
+    if (result?.code == '200') {
+      this.tipModalSuccess = true;
+      if (this.applyType != '1') {
+        this.hostModalShow = false;
+      }
+      this.practiceRefresh();
+    } else {
+      this.tipModalFail = true;
+    }
+    this.cdr.detectChanges();
+  }
 }
 
 class Bestpractice {
@@ -459,7 +488,7 @@ class Bestpractice {
   hostList: Host[];
 }
 
-class Host {
+export class Host {
   hostSetting: string;
   level: string;
   hostName: string;
