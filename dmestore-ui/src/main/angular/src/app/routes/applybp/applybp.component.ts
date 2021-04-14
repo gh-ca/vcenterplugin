@@ -94,7 +94,7 @@ export class ApplybpComponent implements OnInit {
   //   }
   // }
 
-// ================最佳实践列表=============
+  // ================最佳实践列表=============
   rowSelected = []; // 当前选中数据
   isLoading = true; // table数据loading
   list: Bestpractice[] = []; // 数据列表
@@ -137,12 +137,12 @@ export class ApplybpComponent implements OnInit {
     const params = [];
     this.ips = '';
     this.rowSelected.forEach((item) => {
-      const i = {hostSetting:'', hostObjectIds: []};
+      const i = { hostSetting: '', hostObjectIds: [] };
       i.hostSetting = item.hostSetting;
       item.hostList.forEach((s) => {
         i.hostObjectIds.push(s.hostObjectId);
-        if (s.needReboot == "true"){
-          this.ips += s.hostName+",";
+        if (s.needReboot == "true") {
+          this.ips += s.hostName + ",";
         }
       });
       params.push(i);
@@ -154,15 +154,15 @@ export class ApplybpComponent implements OnInit {
    * 主机列表实时最佳实践 参数封装
    * @returns {any[]}
    */
-  packApplyPracticeParamsByHost(){
+  packApplyPracticeParamsByHost() {
     const params = [];
-    const i = {hostSetting:'', hostObjectIds: []};
+    const i = { hostSetting: '', hostObjectIds: [] };
     i.hostSetting = this.currentBestpractice.hostSetting;
     let ips = '';
     this.hostSelected.forEach((s) => {
       i.hostObjectIds.push(s.hostObjectId);
-      if (s.needReboot == "true"){
-        ips += s.hostName+",";
+      if (s.needReboot == "true") {
+        ips += s.hostName + ",";
       }
     });
     params.push(i);
@@ -174,17 +174,17 @@ export class ApplybpComponent implements OnInit {
    * 实时最佳实践
    * @param params
    */
-  applyPractice(params){
+  applyPractice(params) {
     this.applyLoading = true;
     this.http.post('v1/bestpractice/update/bylist', params).subscribe((result: any) => {
       this.applyLoading = false;
-      if (result.code == '200'){
+      if (result.code == '200') {
         this.tipModalSuccess = true;
-        if(this.applyType != '1'){
+        if (this.applyType != '1') {
           this.hostModalShow = false;
         }
         this.practiceRefresh();
-      } else{
+      } else {
         this.tipModalFail = true;
       }
       this.cdr.detectChanges();
@@ -193,15 +193,15 @@ export class ApplybpComponent implements OnInit {
     });
   }
 
-  openTip(){
+  openTip() {
     this.tipModal = true;
   }
 
-  closeTip(){
+  closeTip() {
     this.tipModal = false;
   }
 
-  applyClick(type: string){
+  applyClick(type: string) {
     if (type == '1') {
       this.rowSelected.forEach((item) => {
         if (item.count == 0) {
@@ -215,22 +215,22 @@ export class ApplybpComponent implements OnInit {
     }
     this.applyType = type;
     let params;
-    if(this.applyType == '1'){
+    if (this.applyType == '1') {
       params = this.packApplyPracticeParams();
     } else {
       params = this.packApplyPracticeParamsByHost();
     }
-    if(this.ips.length != 0){
+    if (this.ips.length != 0) {
       this.openTip();
-    } else{
+    } else {
       this.applyPractice(params);
     }
   }
 
-  tipOk(){
+  tipOk() {
     this.closeTip();
     let params;
-    if(this.applyType == '1'){
+    if (this.applyType == '1') {
       params = this.packApplyPracticeParams();
     } else {
       params = this.packApplyPracticeParamsByHost();
@@ -242,10 +242,10 @@ export class ApplybpComponent implements OnInit {
     this.checkLoading = true;
     this.http.post('v1/bestpractice/check', {}).subscribe((result: any) => {
       this.checkLoading = false;
-      if (result.code == '200'){
+      if (result.code == '200') {
         this.tipModalSuccess = true;
         this.practiceRefresh();
-      } else{
+      } else {
         this.tipModalFail = true;
       }
       this.cdr.detectChanges();
@@ -254,7 +254,7 @@ export class ApplybpComponent implements OnInit {
     });
   }
 
-  practiceRefresh(){
+  practiceRefresh() {
     const ctx = this.gs.getClientSdk().app.getContextObjects();
     const objectId = ctx ? ctx[0].id : 'urn:vmomi:ClusterComputeResource:domain-c2038:674908e5-ab21-4079-9cb1-596358ee5dd1';
     let type = '';
@@ -391,15 +391,15 @@ export class ApplybpComponent implements OnInit {
    * 单行实施
    * @param item
    */
-  applyOperation(item:Bestpractice){
+  applyOperation(item: Bestpractice) {
     const params = [];
     this.ips = '';
-    const i = {hostSetting:'', hostObjectIds: []};
+    const i = { hostSetting: '', hostObjectIds: [] };
     i.hostSetting = item.hostSetting;
     item.hostList.forEach((s) => {
       i.hostObjectIds.push(s.hostObjectId);
-      if (s.needReboot == "true"){
-        this.ips += s.hostName+",";
+      if (s.needReboot == "true") {
+        this.ips += s.hostName + ",";
       }
     });
     params.push(i);
@@ -411,7 +411,7 @@ export class ApplybpComponent implements OnInit {
    * @param obj
    */
   getTypeOf(obj) {
-    let object:object;
+    let object: object;
     if (typeof obj == 'string' && obj.indexOf("[{") != -1) {
       object = JSON.parse(obj);
     } else {
@@ -440,7 +440,7 @@ export class ApplybpComponent implements OnInit {
     return title;
   }
 
-  sortFunc(obj:any) {
+  sortFunc(obj: any) {
     // let object;
     // if (obj.target.type && obj.target.type == 'button') {
     //   object = obj.target;
@@ -462,7 +462,6 @@ export class ApplybpComponent implements OnInit {
   }
 
   afterApply(result) {
-    debugger;
     this.applyLoading = false;
     if (result?.code == '200') {
       this.tipModalSuccess = true;
@@ -484,7 +483,7 @@ class Bestpractice {
   levelNum: number;
   levelDesc: string;
   count: number;
-  description:string;
+  description: string;
   hostList: Host[];
 }
 
@@ -494,7 +493,7 @@ export class Host {
   hostName: string;
   recommendValue: number;
   actualValue: number;
-  actualObjValue:any;
+  actualObjValue: any;
   hostObjectId: string;
   needReboot: string;
   hostId: string;

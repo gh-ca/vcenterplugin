@@ -58,10 +58,10 @@ export class BestpracticeComponent implements OnInit {
   applyTips = false;// 实施最佳实践提示（违规数为0时提示）
 
   constructor(private cdr: ChangeDetectorRef,
-              public gs: GlobalsService,
-              private http: HttpClient,
-              private commonService: CommonService,
-              private translatePipe: TranslatePipe) {
+    public gs: GlobalsService,
+    private http: HttpClient,
+    private commonService: CommonService,
+    private translatePipe: TranslatePipe) {
   }
 
   ngOnInit(): void {
@@ -76,7 +76,7 @@ export class BestpracticeComponent implements OnInit {
     const params = [];
     this.ips = '';
     this.rowSelected.forEach((item) => {
-      const i = {hostSetting: '', hostObjectIds: []};
+      const i = { hostSetting: '', hostObjectIds: [] };
       i.hostSetting = item.hostSetting;
       item.hostList.forEach((s) => {
         i.hostObjectIds.push(s.hostObjectId);
@@ -95,7 +95,7 @@ export class BestpracticeComponent implements OnInit {
    */
   packApplyPracticeParamsByHost() {
     const params = [];
-    const i = {hostSetting: '', hostObjectIds: []};
+    const i = { hostSetting: '', hostObjectIds: [] };
     i.hostSetting = this.currentBestpractice.hostSetting;
     let ips = '';
     this.hostSelected.forEach((s) => {
@@ -193,6 +193,7 @@ export class BestpracticeComponent implements OnInit {
     });
   }
 
+
   practiceRefresh() {
     this.isLoading = true;
     const handlerGetRecordsAllSuccess = (result: any) => {
@@ -212,8 +213,7 @@ export class BestpracticeComponent implements OnInit {
             };
             let levelDesc = '--';
             let levelNum = 0;
-            const mapLevel = LEVEL_MAP[String(item.hostSetting).trim()];
-
+            const mapLevel = LEVEL_MAP[String(item.level).trim()];
             if (Array.isArray(mapLevel)) {
               levelNum = mapLevel[0];
               levelDesc = this.translatePipe.transform(mapLevel[1]) || '--';
@@ -298,7 +298,7 @@ export class BestpracticeComponent implements OnInit {
   applyOperation(item: Bestpractice) {
     const params = [];
     this.ips = '';
-    const i = {hostSetting: '', hostObjectIds: []};
+    const i = { hostSetting: '', hostObjectIds: [] };
     i.hostSetting = item.hostSetting;
     item.hostList.forEach((s) => {
       i.hostObjectIds.push(s.hostObjectId);
@@ -366,7 +366,6 @@ export class BestpracticeComponent implements OnInit {
   }
 
   afterApply(result) {
-    debugger;
     this.applyLoading = false;
     if (result?.code == '200') {
       this.tipModalSuccess = true;

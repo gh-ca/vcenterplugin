@@ -31,6 +31,7 @@ export class BpPanelListMtuComponent implements OnInit {
   hostIsLoading = false;
   /* 主机选中列表 */
   hostSelected = [];
+  hostListChange;
 
 
   constructor(
@@ -66,13 +67,13 @@ export class BpPanelListMtuComponent implements OnInit {
 
   }
 
-  async handleHostListChange(isHostListChange, hostListChange) {
+  async handleHostListChange() {
+    const isHostListChange = this.hostListChange && Array.isArray(this.hostListChange.currentValue)
     if (isHostListChange) {
-      const _hostList = hostListChange.currentValue;
+      const _hostList = this.hostListChange.currentValue;
       this.resetVariables()
       if (_hostList.length > 0) {
-        console.log("🚀 ~ file: bp-panel-list-mtu.component.ts ~ line 37 ~ BpPanelListMtuComponent ~ ngOnChanges ~ _hostList", _hostList);
-        const targetObjectIds = hostListChange?.currentValue?.map(i => i.hostObjectId);
+        const targetObjectIds = this.hostListChange?.currentValue?.map(i => i.hostObjectId);
         let res;
         if (isMockData) {
           res = mockData.BESTPRACTICE_VIRTUAL_NIC
@@ -110,9 +111,9 @@ export class BpPanelListMtuComponent implements OnInit {
   }
 
   ngOnChanges(changes: { [propKey: string]: SimpleChange }) {
-    const hostListChange = changes['hostList'];
+    this.hostListChange = changes['hostList'];
     /* handle hostList changed */
-    this.handleHostListChange(hostListChange && Array.isArray(hostListChange.currentValue), hostListChange);
+    this.handleHostListChange();
   }
 
   $t(prop) {
