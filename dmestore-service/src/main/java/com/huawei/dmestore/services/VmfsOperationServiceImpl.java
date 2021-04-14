@@ -132,7 +132,6 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
             if (StringUtils.isEmpty(result) || "failed".equals(result)) {
                 throw new DmeException(CODE_503, "vmware update VmfsDatastore failed!");
             }
-
             ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.PUT, reqBody);
             int code = responseEntity.getStatusCodeValue();
             LOG.info("dme update vmfs,response:code={},response body={}", code, responseEntity.getBody());

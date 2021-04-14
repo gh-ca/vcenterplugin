@@ -869,7 +869,6 @@ public class DmeVmwareRalationDao extends H2DataBaseDao {
         if (dmeVmwareRelation == null) {
             return;
         }
-
         Connection con = null;
         PreparedStatement pstm = null;
         try {
