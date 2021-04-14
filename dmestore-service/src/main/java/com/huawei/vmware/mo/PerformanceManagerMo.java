@@ -25,4 +25,8 @@ public class PerformanceManagerMo extends BaseMo {
     public List<PerfCounterInfo> queryPerfCounter(List<Integer> list) throws Exception {
         return context.getService().queryPerfCounter(mor, list);
     }
+
+    public List<PerfCounterInfo> queryPerfCounterByLevel(int i) throws Exception {
+        return context.getService().queryPerfCounterByLevel(mor, i);
+    }
 }

@@ -47,31 +47,7 @@ import com.vmware.vim.vmomi.client.http.HttpConfiguration;
 import com.vmware.vim.vmomi.client.http.impl.AllowAllThumbprintVerifier;
 import com.vmware.vim.vmomi.client.http.impl.HttpConfigurationImpl;
 import com.vmware.vim.vmomi.core.types.VmodlContext;
-import com.vmware.vim25.DatastoreHostMount;
-import com.vmware.vim25.DatastoreSummary;
-import com.vmware.vim25.HostFibreChannelHba;
-import com.vmware.vim25.HostFileSystemMountInfo;
-import com.vmware.vim25.HostHostBusAdapter;
-import com.vmware.vim25.HostInternetScsiHba;
-import com.vmware.vim25.HostInternetScsiHbaSendTarget;
-import com.vmware.vim25.HostRuntimeInfo;
-import com.vmware.vim25.HostScsiDisk;
-import com.vmware.vim25.HostScsiDiskPartition;
-import com.vmware.vim25.HostSystemConnectionState;
-import com.vmware.vim25.HostVirtualNic;
-import com.vmware.vim25.HostVmfsVolume;
-import com.vmware.vim25.InvalidArgumentFaultMsg;
-import com.vmware.vim25.IscsiPortInfo;
-import com.vmware.vim25.ManagedObjectReference;
-import com.vmware.vim25.NasDatastoreInfo;
-import com.vmware.vim25.VirtualDiskMode;
-import com.vmware.vim25.VirtualDiskType;
-import com.vmware.vim25.VirtualHardwareOption;
-import com.vmware.vim25.VirtualMachineFileInfo;
-import com.vmware.vim25.VirtualNicManagerNetConfig;
-import com.vmware.vim25.VmfsDatastoreExpandSpec;
-import com.vmware.vim25.VmfsDatastoreInfo;
-import com.vmware.vim25.VmfsDatastoreOption;
+import com.vmware.vim25.*;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -3269,10 +3245,21 @@ public class VCSDKUtils {
         String listStr = "";
         try {
             String serverguid = vcConnectionHelpers.objectId2Serverguid(dataStoreObjectId);
+            ManagedObjectReference objmor=vcConnectionHelpers.objectId2Mor(dataStoreObjectId);
             VmwareContext vmwareContext = vcConnectionHelpers.getServerContext(serverguid);
             PerformanceManagerMo performanceManagerMo = performanceManagerMoFactory.build(vmwareContext, vmwareContext.getServiceContent().getPerfManager());
-            performanceManagerMo.queryPerf(null);
-
+            PerfQuerySpec qSpec = new PerfQuerySpec();
+            qSpec.setEntity(objmor);
+            qSpec.setMaxSample(new Integer(1));
+            qSpec.setFormat("csv");
+            qSpec.setIntervalId(new Integer(300));
+            PerfMetricId perfMetricId=new PerfMetricId();
+            perfMetricId.setCounterId(268);
+            qSpec.getMetricId().add(perfMetricId);
+            List<PerfQuerySpec> perfQuerySpecs=new ArrayList<>();
+            perfQuerySpecs.add(qSpec);
+            List<PerfEntityMetricBase> perfEntityMetricBases=performanceManagerMo.queryPerf(perfQuerySpecs);
+            System.out.println("ss");
             return "";
 
         } catch (Exception e) {
