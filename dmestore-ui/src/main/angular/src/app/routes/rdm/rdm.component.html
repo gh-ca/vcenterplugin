@@ -132,12 +132,12 @@
                   <th *ngIf="item.capabilities.qos != undefined
                                                 && item.capabilities.qos.enabled == true
                                                 && item.capabilities.qos.qosParam.minBandWidth != undefined">
-                    {{'tier.bandwidth'|translate}} >= {{item.capabilities.qos.qosParam.minBandWidth}} Mbps/s
+                    {{'tier.bandwidth'|translate}} >= {{item.capabilities.qos.qosParam.minBandWidth}} MBPS/TB
                   </th>
                   <th *ngIf="item.capabilities.qos != undefined
                                                 && item.capabilities.qos.enabled == true
                                                 && item.capabilities.qos.qosParam.maxBandWidth != undefined">
-                    {{'tier.bandwidth'|translate}} <= {{item.capabilities.qos.qosParam.maxBandWidth}} Mbps/s
+                    {{'tier.bandwidth'|translate}} <= {{item.capabilities.qos.qosParam.maxBandWidth}} MBPS/TB
                   </th>
                 </tr>
                 <tr>

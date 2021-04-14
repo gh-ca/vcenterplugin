@@ -3,11 +3,15 @@ package com.huawei.dmestore.utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
+import sun.misc.BASE64Decoder;
+import sun.misc.BASE64Encoder;
 
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.util.HashMap;
 
 import javax.crypto.BadPaddingException;
@@ -26,6 +30,7 @@ public class AESCipher {
     private static final Logger LOG = LoggerFactory.getLogger(AESCipher.class);
     private static final int ARRAT_LENGTH_2 = 2;
     private static final int ARRAT_LENGTH_3 = 3;
+    public static final int KEY_SIZE = 32;
     private CipherConfig cipherConfig;
 
     private RootKeyGenerator rootKeyGenerator;
@@ -46,7 +51,7 @@ public class AESCipher {
         this.rootKeyGenerator = rootKeyGenerator;
     }
 
-    private HashMap<Integer, String> init() {
+  /*  private HashMap<Integer, String> init() {
         HashMap<Integer, String> workkeys = new HashMap<>();
         String workkey = cipherConfig.getAes().getWorkKey();
         String[] array = StringUtils.delimitedListToStringArray(workkey, ",");
@@ -57,8 +62,28 @@ public class AESCipher {
             }
         }
         return workkeys;
-    }
+    }*/
 
+    public  String genencryptWorkKey() {
+        try {
+            byte[] rootkey = rootKeyGenerator.generateRootKey();
+            String keyAlgorithm = cipherConfig.getAes().getKey().getAlgorithm();
+            SecretKeySpec secretKeySpec = new SecretKeySpec(rootkey, keyAlgorithm);
+
+            byte[] iv = CipherUtil.initIV();
+            IvParameterSpec ivParameterSpec = new IvParameterSpec(iv);
+            String originworkkey=getSafeRandomToString(KEY_SIZE);
+            String algorthm = cipherConfig.getAes().getAlgorithm();
+            Cipher cipher = Cipher.getInstance(algorthm);
+            cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec, ivParameterSpec);
+            return new BASE64Encoder().encode(unitByteArray(iv,cipher.doFinal(CipherUtil.parseHexstr2Byte(originworkkey))));
+        } catch (NoSuchAlgorithmException | InvalidKeyException
+                | InvalidAlgorithmParameterException | NoSuchPaddingException
+                | BadPaddingException | IllegalBlockSizeException e) {
+            LOG.error("decrypt workkey failed");
+            return null;
+        }
+    }
 
     private byte[] decryptWorkKey(String workKey) {
         try {
@@ -73,22 +98,22 @@ public class AESCipher {
             } catch (Exception ex) {
                 throw new IllegalArgumentException("workkey illegal");
             }*/
-            String delimiter = cipherConfig.getDelimiter();
+            /*String delimiter = cipherConfig.getDelimiter();
             String[] array = StringUtils.delimitedListToStringArray(workKey, delimiter);
             if (ARRAT_LENGTH_2 != array.length) {
                 LOG.error("Delimiter workkey to string array,array length is not two");
                 throw new IllegalArgumentException("workkey illegal");
-            }
-            byte[] ivBytes = CipherUtil.parseHexstr2Byte(array[0]);
+            }*/
+            byte[] sSrcByte = new BASE64Decoder().decodeBuffer(workKey);// 先用base64解密
+            byte[] ivBytes = splitByteArray(sSrcByte, 0, 16);
+            byte[] encrypted = splitByteArray(sSrcByte, 16, sSrcByte.length - 16);
             IvParameterSpec ivParameterSpec = new IvParameterSpec(ivBytes);
-            byte[] encryptWorkKey = CipherUtil.parseHexstr2Byte(array[1]);
+
             String algorthm = cipherConfig.getAes().getAlgorithm();
             Cipher cipher = Cipher.getInstance(algorthm);
             cipher.init(Cipher.DECRYPT_MODE, secretKeySpec, ivParameterSpec);
-            return cipher.doFinal(encryptWorkKey);
-        } catch (NoSuchAlgorithmException | InvalidKeyException
-            | InvalidAlgorithmParameterException | NoSuchPaddingException
-            | BadPaddingException | IllegalBlockSizeException e) {
+            return cipher.doFinal(encrypted);
+        } catch (NoSuchAlgorithmException | InvalidKeyException | InvalidAlgorithmParameterException | NoSuchPaddingException | BadPaddingException | IllegalBlockSizeException | IOException e) {
             LOG.error("decrypt workkey failed");
             return null;
         }
@@ -104,12 +129,16 @@ public class AESCipher {
             return null;
         }
         try {
-            HashMap<Integer, String> workKeys = init();
+            /*HashMap<Integer, String> workKeys = init();
             if (workKeys.isEmpty() || StringUtils.isEmpty(workKeys.get(keyId))) {
                 LOG.error("work key used to encrypt is empty");
                 return null;
+            }*/
+            String workKey = FileUtils.getKey(FileUtils.WORK_FILE_NAME);
+            if (workKey == null) {
+                workKey=genencryptWorkKey();
+                FileUtils.saveKey(workKey,FileUtils.WORK_FILE_NAME);
             }
-            String workKey = workKeys.get(keyId);
             byte[] decryptWorkKey = decryptWorkKey(workKey);
             if (decryptWorkKey == null) {
                 throw new IllegalArgumentException("work key decrypt error");
@@ -145,13 +174,18 @@ public class AESCipher {
                 LOG.error("delimite rawdata length is not three");
                 throw new IllegalArgumentException("rawData illegal");
             }
-            HashMap<Integer, String> workKeys = init();
+            /*HashMap<Integer, String> workKeys = init();
             String workkey = workKeys.get(Integer.valueOf(array[0]));
             if (StringUtils.isEmpty(workkey)) {
                 LOG.error("work key used to decrypt is empty");
                 return null;
+            }*/
+            String workKey = FileUtils.getKey(FileUtils.WORK_FILE_NAME);
+            if (workKey == null) {
+                workKey=genencryptWorkKey();
+                FileUtils.saveKey(workKey,FileUtils.WORK_FILE_NAME);
             }
-            byte[] decryptworkkey = decryptWorkKey(workkey);
+            byte[] decryptworkkey = decryptWorkKey(workKey);
             if (decryptworkkey == null) {
                 throw new IllegalArgumentException("work key decrypt error");
             }
@@ -169,5 +203,51 @@ public class AESCipher {
             LOG.error("decrypt error");
             return null;
         }
+    }
+
+    public static String getSafeRandomToString(int num) throws NoSuchAlgorithmException {
+        return toHex(getSafeRandom(num));
+    }
+
+    /**
+     *
+     *
+     * @param array the byte array to convert
+     * @return a length*2 character string encoding the byte array
+     */
+    private static String toHex(byte[] array){
+        String TRANSFORMSTR = "0123456789abcdef";
+        StringBuilder stringBuilder = new StringBuilder();
+        for(byte bufferByte: array){
+            stringBuilder.append(TRANSFORMSTR.charAt((bufferByte&(0xf0))>>4));
+            stringBuilder.append(TRANSFORMSTR.charAt(bufferByte&(0x0f)));
+        }
+        return stringBuilder.toString();
+    }
+
+    private static byte[] getSafeRandom(int num) throws NoSuchAlgorithmException {
+        SecureRandom random = SecureRandom.getInstance("SHA1PRNG");
+        byte[] b = new byte[num];
+        random.nextBytes(b);
+        return b;
+    }
+
+    /**
+     * 合并byte数组
+     */
+    public static byte[] unitByteArray(byte[] byte1, byte[] byte2) {
+        byte[] unitByte = new byte[byte1.length + byte2.length];
+        System.arraycopy(byte1, 0, unitByte, 0, byte1.length);
+        System.arraycopy(byte2, 0, unitByte, byte1.length, byte2.length);
+        return unitByte;
+    }
+
+    /**
+     * 拆分byte数组
+     */
+    public static byte[] splitByteArray(byte[] byte1, int start, int end) {
+        byte[] splitByte = new byte[end];
+        System.arraycopy(byte1, start, splitByte, 0, end);
+        return splitByte;
     }
 }

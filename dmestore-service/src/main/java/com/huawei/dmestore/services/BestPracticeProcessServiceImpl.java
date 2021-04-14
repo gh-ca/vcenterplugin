@@ -5,11 +5,9 @@ import com.huawei.dmestore.dao.BestPracticeCheckDao;
 import com.huawei.dmestore.exception.DmeException;
 import com.huawei.dmestore.exception.DmeSqlException;
 import com.huawei.dmestore.exception.VcenterException;
-import com.huawei.dmestore.model.BestPracticeBean;
-import com.huawei.dmestore.model.BestPracticeCheckRecordBean;
-import com.huawei.dmestore.model.BestPracticeUpResultBase;
-import com.huawei.dmestore.model.BestPracticeUpResultResponse;
+import com.huawei.dmestore.model.*;
 import com.huawei.dmestore.services.bestpractice.BestPracticeService;
+import com.huawei.dmestore.services.bestpractice.JumboFrameMTUImpl;
 import com.huawei.dmestore.utils.StringUtil;
 import com.huawei.dmestore.utils.VCSDKUtils;
 
@@ -85,7 +83,8 @@ public class BestPracticeProcessServiceImpl implements BestPracticeProcessServic
                 String hostsOnCluster = vcsdkUtils.getHostsOnCluster(objectId);
                 if (StringUtil.isNotBlank(hostsOnCluster)) {
                     List<Map<String, String>> hostList = gson.fromJson(hostsOnCluster,
-                        new TypeToken<List<Map<String, String>>>() { }.getType());
+                            new TypeToken<List<Map<String, String>>>() {
+                            }.getType());
                     for (int index = 0; index < hostList.size(); index++) {
                         String tempHostObjectId = hostList.get(index).get("hostId");
                         //check(tempHostObjectId);
@@ -105,14 +104,14 @@ public class BestPracticeProcessServiceImpl implements BestPracticeProcessServic
                     List<BestPracticeBean> tempList = new ArrayList<>();
                     for (String id : objectIds) {
                         List<BestPracticeBean> hostBeanTemp = bestPracticeCheckDao.getRecordBeanByHostsetting(
-                            bestPracticeService.getHostSetting(), id);
+                                bestPracticeService.getHostSetting(), id);
                         tempList.addAll(hostBeanTemp);
                     }
                     bean.setHostList(tempList);
                     bean.setCount(tempList.size());
                 } else {
                     List<BestPracticeBean> hostBean = bestPracticeCheckDao.getRecordBeanByHostsetting(
-                        bestPracticeService.getHostSetting(), null);
+                            bestPracticeService.getHostSetting(), null);
                     bean.setHostList(hostBean);
                     bean.setCount(hostBean.size());
                 }
@@ -189,7 +188,7 @@ public class BestPracticeProcessServiceImpl implements BestPracticeProcessServic
                     } catch (Exception ex) {
                         // 报错，跳过当前项检查
                         log.error("{} check failed! hostSetting={}, errorMsg={}", hostName,
-                            bestPracticeService.getHostSetting(), ex.getMessage());
+                                bestPracticeService.getHostSetting(), ex.getMessage());
                     }
                 }
             }
@@ -210,7 +209,8 @@ public class BestPracticeProcessServiceImpl implements BestPracticeProcessServic
         String hostsOnCluster = vcsdkUtils.getHostsOnCluster(clusterObjectId);
         if (StringUtil.isNotBlank(hostsOnCluster)) {
             List<Map<String, String>> hostList = gson.fromJson(hostsOnCluster,
-                new TypeToken<List<Map<String, String>>>() { }.getType());
+                    new TypeToken<List<Map<String, String>>>() {
+                    }.getType());
             for (int index = 0; index < hostList.size(); index++) {
                 String tempHostObjectId = hostList.get(index).get("hostId");
                 check(tempHostObjectId);
@@ -266,7 +266,8 @@ public class BestPracticeProcessServiceImpl implements BestPracticeProcessServic
         String hostsOnCluster = vcsdkUtils.getHostsOnCluster(clusterObjectId);
         if (StringUtil.isNotBlank(hostsOnCluster)) {
             List<Map<String, String>> hostList = gson.fromJson(hostsOnCluster,
-                new TypeToken<List<Map<String, String>>>() { }.getType());
+                    new TypeToken<List<Map<String, String>>>() {
+                    }.getType());
             List<String> objectIds = new ArrayList<>();
             for (int index = 0; index < hostList.size(); index++) {
                 objectIds.add(hostList.get(index).get("hostId"));
@@ -277,13 +278,23 @@ public class BestPracticeProcessServiceImpl implements BestPracticeProcessServic
     }
 
     @Override
+    public String getVirtualNicList(List<String> hostObjIds) {
+        return vcsdkUtils.getVirtualNicList(hostObjIds, JumboFrameMTUImpl.RECOMMEND_VALUE);
+    }
+
+    @Override
+    public void upVirtualNicList(List<UpHostVnicRequestBean> beans) {
+        vcsdkUtils.updateVirtualNicList(beans, JumboFrameMTUImpl.RECOMMEND_VALUE);
+    }
+
+    @Override
     public List<BestPracticeUpResultResponse> update(List<String> objectIds) throws DmeSqlException {
         return update(objectIds, null);
     }
 
     @Override
     public List<BestPracticeUpResultResponse> update(List<String> objectIds, String hostSetting)
-        throws DmeSqlException {
+            throws DmeSqlException {
         // 获取对应的service
         List<BestPracticeService> services = new ArrayList<>();
         for (BestPracticeService bestPracticeService : bestPracticeServices) {
@@ -339,7 +350,7 @@ public class BestPracticeProcessServiceImpl implements BestPracticeProcessServic
                 } catch (Exception ex) {
                     base.setUpdateResult(false);
                     log.error("best practice update {} {} recommend value failed!errMsg:{}", objectId, hostSetting,
-                        ex.getMessage());
+                            ex.getMessage());
                 }
                 baseList.add(base);
             }

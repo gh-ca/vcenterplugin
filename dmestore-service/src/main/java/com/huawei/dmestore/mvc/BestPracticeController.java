@@ -6,6 +6,7 @@ import com.huawei.dmestore.exception.VcenterException;
 import com.huawei.dmestore.model.BestPracticeUpResultResponse;
 import com.huawei.dmestore.model.BestPracticeUpdateByTypeRequest;
 import com.huawei.dmestore.model.ResponseBodyBean;
+import com.huawei.dmestore.model.UpHostVnicRequestBean;
 import com.huawei.dmestore.services.BestPracticeProcessService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -76,7 +77,7 @@ public class BestPracticeController extends BaseController {
      */
     @RequestMapping(value = "/records/all", method = RequestMethod.GET)
     public ResponseBodyBean getBestPracticeRecords(@RequestParam(required = false) String type,
-        @RequestParam(required = false) String objectId) {
+                                                   @RequestParam(required = false) String objectId) {
         try {
             return success(bestPracticeProcessService.getCheckRecord(type, objectId));
         } catch (DmeSqlException ex) {
@@ -90,13 +91,13 @@ public class BestPracticeController extends BaseController {
      * getBySettingAndPage
      *
      * @param hostSetting hostSetting
-     * @param pageNo pageNo
-     * @param pageSize pageSize
+     * @param pageNo      pageNo
+     * @param pageSize    pageSize
      * @return ResponseBodyBean
      */
     @RequestMapping(value = "/records/bypage", method = RequestMethod.GET)
     public ResponseBodyBean getBySettingAndPage(@RequestParam String hostSetting, @RequestParam int pageNo,
-        @RequestParam int pageSize) {
+                                                @RequestParam int pageSize) {
         try {
             return success(bestPracticeProcessService.getCheckRecordBy(hostSetting, pageNo, pageSize));
         } catch (DmeException ex) {
@@ -117,7 +118,7 @@ public class BestPracticeController extends BaseController {
             for (int start = 0; start < list.size(); start++) {
                 BestPracticeUpdateByTypeRequest request = list.get(start);
                 List<BestPracticeUpResultResponse> listTemp = bestPracticeProcessService.update(
-                    request.getHostObjectIds(), request.getHostSetting());
+                        request.getHostObjectIds(), request.getHostSetting());
                 if (null != listTemp && listTemp.size() > 0) {
                     resultList.addAll(listTemp);
                 }
@@ -198,5 +199,28 @@ public class BestPracticeController extends BaseController {
         } catch (DmeException e) {
             return failure(e.getMessage());
         }
+    }
+
+    /**
+     * getVirtualNicList
+     *
+     * @param hostObjectIds hostObjectIds
+     * @return ResponseBodyBean
+     */
+    @RequestMapping(value = "/virtual-nic", method = RequestMethod.POST)
+    public ResponseBodyBean getVirtualNicList(@RequestBody List<String> hostObjectIds) {
+        return success(bestPracticeProcessService.getVirtualNicList(hostObjectIds));
+    }
+
+    /**
+     * getVirtualNicList
+     *
+     * @param beans beans
+     * @return ResponseBodyBean
+     */
+    @RequestMapping(value = "/virtual-nic/update", method = RequestMethod.POST)
+    public ResponseBodyBean updateVirtualNicList(@RequestBody List<UpHostVnicRequestBean> beans) {
+        bestPracticeProcessService.upVirtualNicList(beans);
+        return success();
     }
 }
