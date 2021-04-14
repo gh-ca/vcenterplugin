@@ -78,7 +78,11 @@ export class BpPanelListMtuComponent implements OnInit {
           res = mockData.BESTPRACTICE_VIRTUAL_NIC
         } else {
           this.hostIsLoading = true;
-          res = await this.getVirtualNicList(targetObjectIds);
+          try {
+            res = await this.getVirtualNicList(targetObjectIds);
+          } catch (error) {
+            console.log(error);
+          }
           this.hostIsLoading = false;
         }
         handleRes(res, {
@@ -126,7 +130,6 @@ export class BpPanelListMtuComponent implements OnInit {
       "device": i.device,
       "hostObjectId": i.hostObjId
     }))
-    debugger;
     try {
       const res = await this.applyBP(paramArray);
       this.onApply.emit(res);
@@ -138,7 +141,6 @@ export class BpPanelListMtuComponent implements OnInit {
   }
 
   sortFunc(obj: any) {
-    debugger;
     return !obj;
   }
 }
