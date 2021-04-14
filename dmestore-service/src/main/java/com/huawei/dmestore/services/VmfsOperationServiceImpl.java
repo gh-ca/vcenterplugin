@@ -1,6 +1,9 @@
 package com.huawei.dmestore.services;
 
 import com.huawei.dmestore.constant.DmeConstants;
+import com.huawei.dmestore.constant.DpSqlFileConstants;
+import com.huawei.dmestore.dao.DmeVmwareRalationDao;
+import com.huawei.dmestore.entity.DmeVmwareRelation;
 import com.huawei.dmestore.exception.DmeException;
 import com.huawei.dmestore.exception.VcenterException;
 import com.huawei.dmestore.model.CapabilitiesQos;
@@ -25,6 +28,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 
+import java.sql.Date;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -90,6 +94,7 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
     public void setVmfsAccessService(VmfsAccessServiceImpl vmfsAccessService) {
         this.vmfsAccessService = vmfsAccessService;
     }
+    private DmeVmwareRalationDao dmeVmwareRalationDao;
 
     @Override
     public void updateVmfs(String volumeId, Map<String, Object> params) throws DmeException {
@@ -143,6 +148,11 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
                 LOG.error("update vmfs datastore error");
                 throw new DmeException("400", "update vmfs datastore error");
             }
+            //刷新数据库存储数据信息
+            DmeVmwareRelation dmeVmwareRelation = new DmeVmwareRelation();
+            dmeVmwareRelation.setStoreId((String)params.get("dataStoreObjectId"));
+            dmeVmwareRelation.setStoreName((String) params.get("name"));
+            dmeVmwareRalationDao.updateVmfsByStoreId(dmeVmwareRelation);
         } catch (DmeException e) {
             LOG.error("update vmfsDatastore error", e);
             throw new DmeException(CODE_503, e.getMessage());
