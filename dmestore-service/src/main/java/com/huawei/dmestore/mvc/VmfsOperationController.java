@@ -40,7 +40,7 @@ public class VmfsOperationController extends BaseController {
 
     /**
      * vmfs update
-     * 编辑VMFS
+     *
      * @param volumeId required
      * @param params {control_policy,max_iops,max_bandwidth,newVoName,newDsName,
      * min_iops,min_bandwidth,String dataStoreObjectId,String service_level_name}
@@ -60,7 +60,7 @@ public class VmfsOperationController extends BaseController {
 
     /**
      * expand vmfs datastore
-     * vmfs扩容
+     *
      * @param volumes {int vo_add_capacity 扩容量,String hostObjectId 主机,String ds_name 存储名,String volume_id vmfs所在卷id}
      * @return ResponseBodyBean
      */
@@ -77,7 +77,7 @@ public class VmfsOperationController extends BaseController {
 
     /**
      * recycleVmfs
-     * vmfs页面回收空间
+     *
      * @param dsObjectIds dsObjectIds
      * @return ResponseBodyBean
      */
@@ -95,7 +95,7 @@ public class VmfsOperationController extends BaseController {
 
     /**
      * recycleVmfsByDatastoreIds
-     * 根据编号回收
+     *
      * @param datastoreIds datastoreIds
      * @return ResponseBodyBean
      */
