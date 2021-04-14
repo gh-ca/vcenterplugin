@@ -183,6 +183,7 @@
     }
   },
   "vmfs": {
+    "creatfailtips": "可能原因：指定的对象名称已存在或者该对象在回收站中。 请指定一个未被使用的名称或删除已存在对象后重试。",
     "controlPolicy": "控制策略",
     "controlPolicyDescOne": "控制策略",
     "controlPolicyDescZero": "控制策略",
@@ -598,7 +599,7 @@
   },
   "bestPractice": {
     "adapter": "网络适配器",
-    "ipaddress":"IP地址",
+    "ipaddress": "IP地址",
     "deleteLUN": "请手动删除多余的LUN",
     "applyAdvice": "只建议对存储网络实施最佳实践",
     "apply": "实施最佳实践",
@@ -693,36 +694,29 @@
     "dedupe": "重复数据删除",
     "compression": "数据压缩",
     "remove": "移除",
-
     "autoSelect": "自动选择",
     "hperformanceLevel": "高性能层",
     "performanceLevel": "性能层",
     "capacityLevel": "容量层",
-
     "notFetch": "不预取",
     "fixedFetch": "固定预取",
     "variableFetch": "可变预取",
     "smartFetch": "智能预取",
-
     "notMove": "不迁移",
     "autoMove": "自动迁移",
     "highPMove": "向高性能层迁移",
     "lowPMove": "向低性能层迁移",
-
     "default": "默认",
     "enable": "启用",
     "disable": "禁用",
     "host": "主机",
-
     "atOne": "请至少选择一项！",
     "bandNotNull": "带宽不能为空！",
     "IOPSNotNull": "IOPS不能为空！",
     "latencyNotNull": "时延不能为空！",
-
     "addTitle": "创建RDM",
     "basicSet": "卷设置",
     "storeSet": "存储设置",
-
     "createRdmError": "创建RDM出错!",
     "selectOneSer": "DME存储策略不能为空！",
     "rdmSuccessMsg": "创建RDM成功!",
@@ -757,43 +751,36 @@
     "alloctype": "资源分配类型",
     "dedupe": "重复数据删除",
     "compression": "数据压缩",
-
     "status": "状态",
     "diskType": "磁盘类型",
     "storage": "存储设备",
     "bandwidthm": "带宽(MB/s)",
     "latencyms": "时延(ms)",
     "appType": "应用类型",
-
     "general": "常规",
     "storagep": "存储池",
     "volume": "卷",
     "capacity": "容量",
     "performance": "性能",
     "project": "业务群组",
-
     "maxIOPS": "IOPS上限",
     "minIOPS": "IOPS下限",
     "maxBandWidth": "带宽上限",
     "minBandWidth": "带宽下限",
-
     "enable": "启用",
     "disable": "禁用",
     "notMove": "不迁移",
     "autoMove": "自动迁移",
     "highPMove": "向高性能层迁移",
     "lowPMove": "向低性能层迁移",
-
     "last1D": "最近1天",
     "last1W": "最近1周",
     "last1M": "最近1个月",
     "last1Y": "最近1年",
-
     "last1M": "最近1个月",
     "last3M": "最近3个月",
     "last6M": "最近6个月",
     "last1Y": "最近一年",
-
     "names": "按名称排序",
     "totals": "按总量排序",
     "latencys": "按时延排序",
@@ -801,7 +788,6 @@
     "minIOPSs": "按IOPS下限排序",
     "maxBandWidths": "按带宽上限排序",
     "minBandWidths": "按带宽下限排序",
-
     "offLine": "离线",
     "normal": "正常",
     "abnormal": "异常",
