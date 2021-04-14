@@ -108,4 +108,29 @@ public class DmeInfoDao extends H2DataBaseDao {
         checkUserName(dmeInfo.getUserName());
         checkPassword(dmeInfo.getPassword());
     }
+
+    public int updateDmeInfo(DmeInfo dmeInfo) throws DmeException {
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        try {
+            checkDmeInfo(dmeInfo);
+            con = getConnection();
+            ps = con.prepareStatement(
+                    "UPDATE " + DpSqlFileConstants.DP_DME_ACCESS_INFO +
+                            " SET hostIp=?,hostPort=?,username=?,password=?"
+                            + " WHERE ID=?");
+            ps.setString(DpSqlFileConstants.DIGIT_1, dmeInfo.getHostIp());
+            ps.setInt(DpSqlFileConstants.DIGIT_2, dmeInfo.getHostPort());
+            ps.setString(DpSqlFileConstants.DIGIT_3, dmeInfo.getUserName());
+            ps.setString(DpSqlFileConstants.DIGIT_4, dmeInfo.getPassword());
+            ps.setInt(DpSqlFileConstants.DIGIT_5, dmeInfo.getId());
+            return ps.executeUpdate();
+        } catch (SQLException e) {
+            LOGGER.error("Failed to update vCenter info: {}", e.toString());
+            throw new DmeException(e.getMessage());
+        } finally {
+            closeConnection(con, ps, rs);
+        }
+    }
 }

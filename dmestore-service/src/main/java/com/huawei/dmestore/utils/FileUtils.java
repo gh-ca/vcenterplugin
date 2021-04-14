@@ -3,8 +3,7 @@ package com.huawei.dmestore.utils;
 
 import com.huawei.dmestore.exception.VcenterRuntimeException;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.FileSystem;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -216,6 +215,110 @@ public class FileUtils {
 
     public static String getOldFolder() {
         return VMWARE_LINUX60_DIR;
+    }
+
+    public static String getKey(String fileName) {
+        File file = new File(getPath() + File.separator + fileName);
+        createFile(file);
+        String line = null;
+        StringBuffer result = new StringBuffer();
+        FileInputStream f = null;
+        InputStreamReader in = null;
+        BufferedReader br = null;
+        try {
+            f = new FileInputStream(file);
+            in = new InputStreamReader(f, "utf-8");
+            br = new BufferedReader(in);
+            while ((line = br.readLine()) != null) {
+                result.append(line);
+            }
+            if (result.length() < 1) {
+                return null;
+            }
+            return result.toString();
+        } catch (IOException e) {
+            LOGGER.error("Failed to get key: " + fileName);
+        } finally {
+            if (br != null) {
+                try {
+                    br.close();
+                } catch (IOException e) {
+                    LOGGER.error(e.getMessage());
+                }
+            }
+            if (in != null) {
+                try {
+                    in.close();
+                } catch (IOException e) {
+                    LOGGER.error(e.getMessage());
+                }
+            }
+            if (f != null) {
+                try {
+                    f.close();
+                } catch (IOException e) {
+                    LOGGER.error(e.getMessage());
+                }
+            }
+        }
+        return null;
+    }
+
+    public static void saveKey(String key, String fileName) {
+        File file = new File(getPath() + File.separator + fileName);
+        createFile(file);
+        FileOutputStream f = null;
+        OutputStreamWriter out = null;
+        BufferedWriter bw = null;
+        try {
+            f = new FileOutputStream(file, false);
+            out = new OutputStreamWriter(f, "utf-8");
+            bw = new BufferedWriter(out);
+            bw.write(key);
+        } catch (IOException e) {
+            LOGGER.error("Cannot save key: " + fileName);
+        } finally {
+            if (bw != null) {
+                try {
+                    bw.close();
+                } catch (IOException e) {
+                    LOGGER.error(e.getMessage());
+                }
+            }
+            if (out != null) {
+                try {
+                    out.close();
+                } catch (IOException e) {
+                    LOGGER.error(e.getMessage());
+                }
+            }
+            if (f != null) {
+                try {
+                    f.close();
+                } catch (IOException e) {
+                    LOGGER.error(e.getMessage());
+                }
+            }
+        }
+    }
+
+    private static void createFile(File file) {
+        // 判断文件是否存在
+        if (!file.exists()) {
+            LOGGER.info("key file not exists, create it ...");
+            try {
+                createDir(getPath());
+                boolean re = file.createNewFile();
+                if (re) {
+                    //设置权限
+                    setFilePermission(file);
+                } else {
+                    LOGGER.info("create file failed");
+                }
+            } catch (IOException e) {
+                LOGGER.error("Failed to create file " + file.getName());
+            }
+        }
     }
 
 }

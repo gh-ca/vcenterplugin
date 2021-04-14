@@ -21,8 +21,7 @@
         <property name="aes">
             <bean class="com.huawei.dmestore.utils.CipherConfig$Aes">
                 <property name="algorithm" value="${cipher.aes.algorithm}"/>
-                <property name="workKey" value="${cipher.aes.workKey}"/>
-                <property name="key">
+               <property name="key">
                     <bean class="com.huawei.dmestore.utils.CipherConfig$Aes$Key">
                         <property name="algorithm" value="${cipher.aes.key.algorithm}"/>
                     </bean>
@@ -34,7 +33,6 @@
                 <property name="algorithm" value="${cipher.rootkey.algorithm}"/>
                 <property name="iteration" value="${cipher.rootkey.iteration}"/>
                 <property name="salt" value="${cipher.rootkey.salt}"/>
-                <property name="key" value="${cipher.rootkey.key}"/>
             </bean>
         </property>
         <property name="pbkdf2">
@@ -62,8 +60,6 @@
 
     <bean name="dmeInfoDao" class="com.huawei.dmestore.dao.DmeInfoDao">
         <property name="url" value="${h2.url}"/>
-        <property name="user" value="${h2.user}"/>
-        <property name="password" value="${h2.pass}"/>
         <property name="cipherUtils" ref="cipherUtils"/>
     </bean>
 
@@ -79,26 +75,18 @@
 
     <bean name="h2DataBaseDao" class="com.huawei.dmestore.dao.H2DataBaseDao">
         <property name="url" value="${h2.url}"/>
-        <property name="user" value="${h2.user}"/>
-        <property name="password" value="${h2.pass}"/>
     </bean>
 
     <bean name="systemDao" class="com.huawei.dmestore.dao.SystemDao">
         <property name="url" value="${h2.url}"/>
-        <property name="user" value="${h2.user}"/>
-        <property name="password" value="${h2.pass}"/>
     </bean>
 
     <bean name="vcenterInfoDao" class="com.huawei.dmestore.dao.VCenterInfoDao">
         <property name="url" value="${h2.url}"/>
-        <property name="user" value="${h2.user}"/>
-        <property name="password" value="${h2.pass}"/>
     </bean>
 
     <bean name="scheduleDao" class="com.huawei.dmestore.dao.ScheduleDao">
         <property name="url" value="${h2.url}"/>
-        <property name="user" value="${h2.user}"/>
-        <property name="password" value="${h2.pass}"/>
     </bean>
 
     <bean name="InstantiationBeanServiceImpl"
@@ -113,6 +101,13 @@
     <bean name="VCenterInfoServiceImpl"
           class="com.huawei.dmestore.services.VCenterInfoServiceImpl">
         <property name="vcenterInfoDao" ref="vcenterInfoDao"/>
+    </bean>
+
+    <bean name="RefreshKeyServiceImpl"
+          class="com.huawei.dmestore.services.RefreshKeyServiceImpl">
+        <property name="dmeInfoDao" ref="dmeInfoDao"/>
+        <property name="vCenterInfoDao" ref="vcenterInfoDao"/>
+        <property name="cipherUtils" ref="cipherUtils"/>
     </bean>
 
     <bean name="ServiceLevelServiceImpl" class="com.huawei.dmestore.services.ServiceLevelServiceImpl">
@@ -136,8 +131,6 @@
     </bean>
     <bean name="dmeVmwareRalationDao" class="com.huawei.dmestore.dao.DmeVmwareRalationDao">
         <property name="url" value="${h2.url}"/>
-        <property name="user" value="${h2.user}"/>
-        <property name="password" value="${h2.pass}"/>
     </bean>
 
     <bean name="VmfsAccessServiceImpl" class="com.huawei.dmestore.services.VmfsAccessServiceImpl">
@@ -237,8 +230,6 @@
 
     <bean name="bestPracticeCheckDao" class="com.huawei.dmestore.dao.BestPracticeCheckDao">
         <property name="url" value="${h2.url}"/>
-        <property name="user" value="${h2.user}"/>
-        <property name="password" value="${h2.pass}"/>
     </bean>
 
     <bean name="vCSDKUtils" class="com.huawei.dmestore.utils.VCSDKUtils">

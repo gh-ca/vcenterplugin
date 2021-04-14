@@ -187,6 +187,14 @@ public final class DpSqlFileConstants {
             + "'0 */1 * * * ?', 'refreshResourceInstance', " + "'refreshResourceInstance');";
 
     /**
+     * DP_DME_TASK_REFRESHKEY_SQL.
+     */
+    public static final String DP_DME_TASK_DATA_REFRESHKEY_SQL =
+            "INSERT INTO DP_DME_TASK_INFO (ID, CLASS_NAME, CRON, JOB_NAME, METHOD) " + "VALUES (5, "
+                    + "'com.huawei.dmestore." + "task.RefreshKeyTask',"
+                    + "'0 0 0 1 * ?', 'refreshkey', " + "'refreshkey');";
+
+    /**
      * DP_DME_BEST_PRACTICE_CHECK.
      */
     public static final String DP_DME_BEST_PRACTICE_CHECK = "DP_DME_BEST_PRACTICE_CHECK";
