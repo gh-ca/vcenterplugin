@@ -43,26 +43,26 @@ public class VCenterInfoServiceImplTest {
     }
 
     @Test
-    public void addVcenterInfo() throws DmeSqlException {
+    public void testAddVcenterInfo() throws DmeSqlException {
         when(vCenterInfoDao.addVcenterInfo(vCenterInfo)).thenReturn(1);
         vCenterInfoService.addVcenterInfo(new VCenterInfo());
     }
 
     @Test
-    public void saveVcenterInfo() throws DmeSqlException {
+    public void testSaveVcenterInfo() throws DmeSqlException {
         when(vCenterInfoDao.getVcenterInfo()).thenReturn(vCenterInfo);
         when(vCenterInfoDao.updateVcenterInfo(vCenterInfo)).thenReturn(1);
         vCenterInfoService.saveVcenterInfo(vCenterInfo);
     }
 
     @Test
-    public void findVcenterInfo() throws DmeSqlException {
+    public void testFindVcenterInfo() throws DmeSqlException {
         when(vCenterInfoDao.getVcenterInfo()).thenReturn(vCenterInfo);
         vCenterInfoService.findVcenterInfo();
     }
 
     @Test
-    public void getVcenterInfo() throws DmeSqlException {
+    public void testGetVcenterInfo() throws DmeSqlException {
         when(vCenterInfoDao.getVcenterInfo()).thenReturn(vCenterInfo);
 
         vCenterInfoService.getVcenterInfo();
