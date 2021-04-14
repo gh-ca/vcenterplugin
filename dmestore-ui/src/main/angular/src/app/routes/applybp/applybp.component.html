@@ -81,7 +81,10 @@
           <div>
             <!--autorepare 实施最佳实践 -->
             <button *ngIf="!isShowBPBtnTips" class="btn btn-primary" [disabled]="hostSelected.length === 0" (click)="applyClick('2')">{{'bestPractice.apply'|translate}}</button>
-            <span *ngIf="isShowBPBtnTips"><clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{'bestPractice.deleteLUN' | translate}}</span>
+            <div *ngIf="isShowBPBtnTips"><clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{'bestPractice.deleteLUN' | translate}}</div>
+            <div>
+              <clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{currentBestpractice?.description}}
+            </div>
           </div>
           <!-- 列表页 -->
           <clr-datagrid [(clrDgSelected)]="hostSelected"  (clrDgRefresh)="hostRefresh()" [clrDgLoading]="hostIsLoading">
