@@ -32,3 +32,10 @@ export const valueOrDefault = (value, defaultValue = "--") => {
 
 /* 简单处理报错 */
 export const handlerResponseErrorSimple = err => console.error('ERROR', err);
+
+export async function getURL(vm){
+  return new Promise(resovle => vm.route.url.subscribe(resovle))
+}
+export async function getQueryParams(vm){
+  return new Promise(resovle => vm.route.queryParams.subscribe(resovle))
+}
