@@ -83,8 +83,9 @@ export class BpPanelListMtuComponent implements OnInit {
             res = await this.getVirtualNicList(targetObjectIds);
           } catch (error) {
             console.log(error);
+          } finally {
+            this.hostIsLoading = false;
           }
-          this.hostIsLoading = false;
         }
         handleRes(res, {
           fn: data => {
@@ -134,6 +135,8 @@ export class BpPanelListMtuComponent implements OnInit {
     try {
       const res = await this.applyBP(paramArray);
       this.onApply.emit(res);
+      /* refresh */
+      this.handleHostListChange();
       console.log("🚀 ~ file: bp-panel-list-mtu.component.ts ~ line 132 ~ BpPanelListMtuComponent ~ applyClick ~ res", res);
     } catch (error) {
       this.onApply.emit(error);
