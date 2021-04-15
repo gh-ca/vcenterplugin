@@ -2120,6 +2120,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                     String url = DmeConstants.PUT_REMOVE_HOST_FROM_HOSTGROUP.replace("{hostgroup_id}", hostgroupId);
                     hostIds.add(entry.getKey());
                     params.put("host_ids", hostIds);
+                    params.put("sync_to_storage", true);
                     ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.PUT, gson.toJson(params));
                     if (responseEntity.getStatusCodeValue()!=HttpStatus.OK.value()) {
                         throw new DmeException("remove host from hostgroup failed!{}",
