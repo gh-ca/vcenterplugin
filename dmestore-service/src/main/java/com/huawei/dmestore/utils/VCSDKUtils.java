@@ -2967,6 +2967,17 @@ public class VCSDKUtils {
                                 }
                                 if (!StringUtils.isEmpty(mgmtIp)) {
                                     try {
+                                        List<ManagedMethodExecuter.SoapArgument> soapArgumentList = new ArrayList<>();
+                                        ManagedMethodExecuter.SoapArgument soapArgumentcount
+                                                = new ManagedMethodExecuter.SoapArgument();
+                                        soapArgumentcount.setName("count");
+                                        soapArgumentcount.setVal(
+                                                "<count xmlns:xsi=\"http:// www.w3.org/2001/XMLSchema-instance\" "
+                                                        + "xmlns:xsd=\"http:// www.w3.org/2001/XMLSchema\" "
+                                                        + "xmlns=\"urn:vim25\">" + 1 + "</count>");
+                                        soapArgumentList.add(soapArgumentcount);
+
+
                                         ManagedMethodExecuter.SoapArgument soapArgument0
                                             = new ManagedMethodExecuter.SoapArgument();
                                         soapArgument0.setName(HOST_FIELD);
@@ -2974,7 +2985,6 @@ public class VCSDKUtils {
                                             "<host xmlns:xsi=\"http:// www.w3.org/2001/XMLSchema-instance\" "
                                                 + "xmlns:xsd=\"http:// www.w3.org/2001/XMLSchema\" "
                                                 + "xmlns=\"urn:vim25\">" + mgmtIp + "</host>");
-                                        List<ManagedMethodExecuter.SoapArgument> soapArgumentList = new ArrayList<>();
                                         soapArgumentList.add(soapArgument0);
 
                                         if (!StringUtils.isEmpty(deviceFinal)) {
@@ -2987,16 +2997,6 @@ public class VCSDKUtils {
                                                     + " xmlns=\"urn:vim25\">" + deviceFinal + "</interface>");
                                             soapArgumentList.add(soapArgument1);
                                         }
-
-                                        ManagedMethodExecuter.SoapArgument soapArgumentcount
-                                                = new ManagedMethodExecuter.SoapArgument();
-                                        soapArgumentcount.setName("count");
-                                        soapArgumentcount.setVal(
-                                                "<count xmlns:xsi=\"http:// www.w3.org/2001/XMLSchema-instance\" "
-                                                        + "xmlns:xsd=\"http:// www.w3.org/2001/XMLSchema\" "
-                                                        + "xmlns=\"urn:vim25\">" + 1 + "</count>");
-                                        soapArgumentList.add(soapArgumentcount);
-
 
                                         ManagedMethodExecuter.SoapArgument soapArgumentwait
                                                 = new ManagedMethodExecuter.SoapArgument();
