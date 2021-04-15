@@ -1,14 +1,15 @@
-import {ChangeDetectorRef, Component, OnInit, ViewChild} from '@angular/core';
-import {HttpClient} from '@angular/common/http';
-import {CommonService} from '../common.service';
-import {GlobalsService} from '../../shared/globals.service';
-import {ClrWizard, ClrWizardPage} from "@clr/angular";
+import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { CommonService } from '../common.service';
+import { GlobalsService } from '../../shared/globals.service';
+import { ClrWizard, ClrWizardPage } from "@clr/angular";
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-rdm',
   templateUrl: './rdm.component.html',
   styleUrls: ['./rdm.component.scss'],
-  providers: [CommonService]
+  providers: [CommonService, TranslatePipe]
 })
 export class RdmComponent implements OnInit {
 

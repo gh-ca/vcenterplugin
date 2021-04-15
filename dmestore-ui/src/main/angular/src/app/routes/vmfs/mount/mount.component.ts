@@ -1,5 +1,5 @@
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit} from '@angular/core';
-import {ActivatedRoute, Router} from '@angular/router';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import {
   ClusterList, ConnFaildData,
   GetForm,
@@ -9,9 +9,9 @@ import {
   VmfsInfo,
   VmfsListService
 } from '../list/list.service';
-import {DataStore, MountService} from "./mount.service";
-import {GlobalsService} from "../../../shared/globals.service";
-import {isMockData, mockData} from "../../../../mock/mock";
+import { DataStore, MountService } from "./mount.service";
+import { GlobalsService } from "../../../shared/globals.service";
+import { isMockData, mockData } from "../../../../mock/mock";
 
 @Component({
   selector: 'app-list',
@@ -23,7 +23,7 @@ import {isMockData, mockData} from "../../../../mock/mock";
 export class MountComponent implements OnInit {
 
   constructor(private remoteSrv: MountService, private activatedRoute: ActivatedRoute, private cdr: ChangeDetectorRef,
-              private router: Router, private globalsService: GlobalsService) {
+    private router: Router, private globalsService: GlobalsService) {
 
   }
 
@@ -118,7 +118,7 @@ export class MountComponent implements OnInit {
           if (this.resource === 'list') {// 以列表为入口
             this.objectId = queryParam.objectId;
           } else { // 以dataStore为入口
-            this.objectId = ctx ? ctx[0].id : "urn:vmfixomi:Datastore:datastore-5036:674908e5-ab21-4079-9cb1-596358ee5dd1";
+            this.objectId = ctx ? ctx[0].id : "urn:vmomi:Datastore:datastore-10058:674908e5-ab21-4079-9cb1-596358ee5dd1";
           }
           if (this.operationType === 'mount') {
             this.mountShow = true;
@@ -217,29 +217,8 @@ export class MountComponent implements OnInit {
         const handlerGetMountClusterSuccess = (result: any) => {
           console.log(result);
           if (result.code === '200' && result.data !== null && result.data.length >= 1) {
-            this.unmountForm.mountType = '1';
-            const mountHost: HostOrCluster [] = [];
-            result.data.forEach(item => {
-              const hostInfo = {
-                deviceId: item.hostId,
-                deviceName: item.hostName,
-                deviceType: 'host'
-              };
-              mountHost.push(hostInfo);
-            });
-            this.mountedHost = mountHost;
-          }
-          this.modalLoading = false;
-          this.isLoading = false;
-          this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
-        };
-
-        /* 处理获取主机的数据 */
-        const handlerGetMountHost = (result: any) => {
-          console.log(result);
-          if (result.code === '200' && result.data !== null) {
             this.unmountForm.mountType = '2';
-            const mountCluster: HostOrCluster [] = [];
+            const mountCluster: HostOrCluster[] = [];
             result.data.forEach(item => {
               const hostInfo = {
                 deviceId: item.hostGroupId,
@@ -250,7 +229,27 @@ export class MountComponent implements OnInit {
             });
             this.mountedCluster = mountCluster;
           }
+          this.modalLoading = false;
+          this.isLoading = false;
+          this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
+        };
 
+        /* 处理获取主机的数据 */
+        const handlerGetMountHost = (result: any) => {
+          console.log(result);
+          if (result.code === '200' && result.data !== null && result.data.length >= 1) {
+            this.unmountForm.mountType = '1';
+            const mountHost: HostOrCluster[] = [];
+            result.data.forEach(item => {
+              const hostInfo = {
+                deviceId: item.hostId,
+                deviceName: item.hostName,
+                deviceType: 'host'
+              };
+              mountHost.push(hostInfo);
+            });
+            this.mountedHost = mountHost;
+          }
           // 获取集群
           if (isMockData) {
             handlerGetMountClusterSuccess(mockData.ACCESSVMFS_GETHOSTGROUPSBYSTORAGEID);
