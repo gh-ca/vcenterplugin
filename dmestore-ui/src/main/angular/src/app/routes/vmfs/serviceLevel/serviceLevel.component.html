@@ -53,7 +53,7 @@
                         && item.capabilities.qos.qosParam.minBandWidth !== 0">{{'vmfs.bandwidth' | translate}} >= {{item.capabilities.qos.qosParam.minBandWidth}}MBPS/TB</th>
                   <th *ngIf="item.capabilities !== null && item.capabilities.qos !== null
                         && item.capabilities.qos.qosParam !== null
-                        && item.capabilities.qos.qosParam.maxIOPS !== 0">{{'vmfs.iops' | translate}} <= {{item.capabilities.qos.qosParam.minIOPS}}IOPS/TB</th>
+                        && item.capabilities.qos.qosParam.maxIOPS !== 0">{{'vmfs.iops' | translate}} <= {{item.capabilities.qos.qosParam.maxIOPS}}IOPS/TB</th>
                   <th *ngIf="item.capabilities !== null && item.capabilities.qos !== null
                         && item.capabilities.qos.qosParam !== null
                         && item.capabilities.qos.qosParam.minIOPS !== 0 ">{{'vmfs.iops' | translate}} >= {{item.capabilities.qos.qosParam.minIOPS}}IOPS/TB</th>

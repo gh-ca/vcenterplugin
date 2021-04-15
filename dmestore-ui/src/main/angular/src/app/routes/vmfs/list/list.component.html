@@ -53,13 +53,13 @@
           <clr-icon shape="list" size="20"></clr-icon>
         </label>
       </div>
-      <div class="radio btn" title="{{'menu.performance' | translate}}">
+<!--       <div class="radio btn" title="{{'menu.performance' | translate}}">
         <input (click)="radioCheck = 'chart';charBtnClickFunc();" type="radio" name="btn-group-demo-radios"
           id="btn-demo-radio-2">
         <label for="btn-demo-radio-2">
           <clr-icon shape="dashboard" size="20"></clr-icon>
         </label>
-      </div>
+      </div> -->
       <div class="radio btn merginLeft" title="{{'menu.refresh' | translate}}">
         <!--<input type="radio" name="btn-group-demo-radios" id="btn-demo-radio-3">-->
         <label>
@@ -482,9 +482,13 @@
           <clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>
           {{'vmfs.serviceLevelCantBeNull' | translate}}
         </div>
-        <div *ngIf="isOperationErr" class="errorTips" readonly>
+        <!-- <div *ngIf="isOperationErr" class="errorTips" readonly>
           <clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>
           {{'errorMsg.addError' | translate}}
+        </div> -->
+        <!-- TODO 创建失败提示 -->
+        <div *ngIf="isOperationErr" class="errorTips" readonly>
+          <app-vmfs-create-faild-tips></app-vmfs-create-faild-tips>
         </div>
         <!-- 1、选择 服务等级-->
         <ng-container *ngIf="levelCheck==='level'">
@@ -529,7 +533,7 @@
                       <th *ngIf="item.capabilities !== null && item.capabilities.qos !== null
                         && item.capabilities.qos.qosParam !== null
                         && item.capabilities.qos.qosParam.maxIOPS !== 0">{{'vmfs.iops' | translate}} <=
-                          {{item.capabilities.qos.qosParam.minIOPS}}IOPS/TB
+                          {{item.capabilities.qos.qosParam.maxIOPS}}IOPS/TB
                           </th>
                           <th *ngIf="item.capabilities !== null && item.capabilities.qos !== null
                         && item.capabilities.qos.qosParam !== null
@@ -1077,13 +1081,9 @@
               height="20px" style="margin-left: 20px;">
           </span>
         </div>
-        <!-- <div class="errorTips" readonly> -->
-        <!-- <clr-icon shape="exclamation-circle" class="is-solid"></clr-icon> {{'errorMsg.mountError' | translate}} -->
-        <!-- TODO 创建失败提示 -->
         <div *ngIf="isOperationErr" class="errorTips" readonly>
-          <app-vmfs-create-faild-tips></app-vmfs-create-faild-tips>
+          <clr-icon shape="exclamation-circle" class="is-solid"></clr-icon> {{'errorMsg.mountError' | translate}}
         </div>
-
         <clr-radio-container clrInline>
           <label class="floatleft" style="color: #9F9F9F;">{{'vmfs.hostOrCluster' | translate}}</label>
           <clr-radio-wrapper>
@@ -1356,7 +1356,7 @@
                       <th *ngIf="item.capabilities !== null && item.capabilities.qos !== null
                         && item.capabilities.qos.qosParam !== null
                         && item.capabilities.qos.qosParam.maxIOPS !== 0">{{'vmfs.iops' | translate}} <=
-                          {{item.capabilities.qos.qosParam.minIOPS}}IOPS/TB
+                          {{item.capabilities.qos.qosParam.maxIOPS}}IOPS/TB
                           </th>
                           <th *ngIf="item.capabilities !== null && item.capabilities.qos !== null
                         && item.capabilities.qos.qosParam !== null
