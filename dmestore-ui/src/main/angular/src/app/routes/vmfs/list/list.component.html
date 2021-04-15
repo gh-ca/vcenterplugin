@@ -79,10 +79,17 @@
     <clr-dg-column hidden>wwn</clr-dg-column>
     <clr-dg-column hidden>volumeName</clr-dg-column>
     <clr-dg-column hidden>objectid</clr-dg-column>
-    <clr-dg-column [hidden]="radioCheck!=='list'" [clrDgField]="'status'">
+    <!-- <clr-dg-column [hidden]="radioCheck!=='list'" [clrDgField]="'status'">
       {{'vmfs.status' | translate}}
       <clr-dg-filter [clrDgFilter]="statusFilter">
         <vmfs-filter #statusFilter></vmfs-filter>
+      </clr-dg-filter>
+    </clr-dg-column> -->
+    <clr-dg-column [hidden]="radioCheck!=='list'">
+      {{'nfs.status' | translate}}
+      <clr-dg-filter [clrDgFilter]="statusFilter">
+        <filter-alarm-state #statusFilter></filter-alarm-state>
+        <!-- <status-filter #statusFilter></status-filter> -->
       </clr-dg-filter>
     </clr-dg-column>
     <clr-dg-column #listCapacity [hidden]="radioCheck!=='list'" class="hideFilter" [clrDgField]="'capacity'"
@@ -180,7 +187,7 @@
       <clr-dg-cell hidden>{{item.wwn}}</clr-dg-cell>
       <clr-dg-cell hidden>{{item.volumeName}}</clr-dg-cell>
       <clr-dg-cell hidden>{{item.objectid}}</clr-dg-cell>
-      <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='list'">
+<!--       <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='list'">
         <span *ngIf="item.status == 'creating'">
           <span class="color-square"
             style="background-color: green; margin-right: 10px"></span>{{'enum.status.creating' | translate}}
@@ -212,6 +219,14 @@
         <span *ngIf="!item.status">
           --
         </span>
+      </clr-dg-cell> -->
+      <clr-dg-cell class="over_flow" style="width: 5%" [hidden]="radioCheck!=='list'">
+        <span *ngIf="item.alarmState">
+          <span class="color-square" [style.background-color]="getColor(item.alarmState)"
+            style="margin-right: 10px"></span>
+          <span>{{getLabelByValue(item.alarmState,'alarm_state_map') | translate}}</span>
+        </span>
+        <span *ngIf="!item.alarmState">--</span>
       </clr-dg-cell>
       <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='list'" style="text-align: right">
         {{item.capacity ? formatCapacity(item.capacity, true) : '--'}}
