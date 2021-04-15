@@ -95,6 +95,13 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
         this.vmfsAccessService = vmfsAccessService;
     }
     private DmeVmwareRalationDao dmeVmwareRalationDao;
+    public DmeVmwareRalationDao getDmeVmwareRalationDao() {
+        return dmeVmwareRalationDao;
+    }
+
+    public void setDmeVmwareRalationDao(DmeVmwareRalationDao dmeVmwareRalationDao) {
+        this.dmeVmwareRalationDao = dmeVmwareRalationDao;
+    }
 
     @Override
     public void updateVmfs(String volumeId, Map<String, Object> params) throws DmeException {
