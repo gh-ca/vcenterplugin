@@ -209,11 +209,22 @@ public class VCSDKUtils {
                     List<Map<String, Object>> lists = new ArrayList<>();
                     for (Pair<ManagedObjectReference, String> ds : dss) {
                         DatastoreMo ds1 = datastoreVmwareMoFactory.build(vmwareContext, ds.first());
+                        List<AlarmState> list = vmwareContext.getService().getAlarmState(vmwareContext.getServiceContent().getAlarmManager(),ds.first());
+                        int status = 1;
+                        for (AlarmState s: list){
+                            String va = s.getOverallStatus().value();
+                            if(va.equalsIgnoreCase("yellow") && status == 1){
+                                status = 2;
+                            } else if(va.equalsIgnoreCase("red")){
+                                status = 3;
+                            }
+                        }
                         Map<String, Object> dsmap = gson.fromJson(gson.toJson(ds1.getSummary()),
                             new TypeToken<Map<String, Object>>() { }.getType());
                         String objectid = vcConnectionHelpers.mor2ObjectId(ds1.getMor(),
                             vmwareContext.getServerAddress());
                         dsmap.put(OBJECT_ID, objectid);
+                        dsmap.put("alarmState", status);
                         if (storeType.equalsIgnoreCase(ToolUtils.STORE_TYPE_NFS) && (ds1.getSummary()
                             .getType()
                             .equalsIgnoreCase(ToolUtils.STORE_TYPE_NFS) || ds1.getSummary()
