@@ -1,9 +1,12 @@
-import {ChangeDetectorRef, Component, OnInit, AfterViewInit} from '@angular/core';
-import {GlobalsService} from "../../shared/globals.service";
-import {HttpClient} from "@angular/common/http";
-import {ActivatedRoute} from "@angular/router";
-import {TranslatePipe} from "@ngx-translate/core";
-import {CommonService} from "../common.service";
+import { ChangeDetectorRef, Component, OnInit, AfterViewInit } from '@angular/core';
+import { GlobalsService } from "../../shared/globals.service";
+import { HttpClient } from "@angular/common/http";
+import { ActivatedRoute } from "@angular/router";
+import { TranslatePipe } from "@ngx-translate/core";
+import { CommonService } from "../common.service";
+import { handlerResponseErrorSimple } from 'app/app.helpers';
+import { isMockData, mockData } from 'mock/mock';
+import { MTU, MTU_TAG } from "../bestpractice/bestpractice.component"
 
 @Component({
   selector: 'app-applybp',
@@ -19,9 +22,9 @@ export class ApplybpComponent implements OnInit {
   status = 1;
 
   constructor(private cdr: ChangeDetectorRef,
-              private http: HttpClient,
-              private gs: GlobalsService, private activatedRoute: ActivatedRoute, private commonService: CommonService,
-              private translatePipe:TranslatePipe) { }
+    private http: HttpClient,
+    private gs: GlobalsService, private activatedRoute: ActivatedRoute, private commonService: CommonService,
+    private translatePipe: TranslatePipe) { }
 
   ngOnInit(): void {
     this.practiceRefresh();
@@ -91,7 +94,7 @@ export class ApplybpComponent implements OnInit {
   //   }
   // }
 
-// ================最佳实践列表=============
+  // ================最佳实践列表=============
   rowSelected = []; // 当前选中数据
   isLoading = true; // table数据loading
   list: Bestpractice[] = []; // 数据列表
@@ -103,11 +106,14 @@ export class ApplybpComponent implements OnInit {
 
   // ================主机列表=============
   hostModalShow = false;
+  isShowBPBtnTips: boolean;
   hostSelected = []; // 主机选中列表
   hostIsLoading = false; // table数据loading
   hostList: Host[] = []; // 数据列表
   hostTotal = 0; // 总数据数量
   currentBestpractice: Bestpractice;
+  /* MTU的panel单独处理 */
+  currentPanel;
   // ================END====================
 
   tipModal = false;
@@ -131,12 +137,12 @@ export class ApplybpComponent implements OnInit {
     const params = [];
     this.ips = '';
     this.rowSelected.forEach((item) => {
-      const i = {hostSetting:'', hostObjectIds: []};
+      const i = { hostSetting: '', hostObjectIds: [] };
       i.hostSetting = item.hostSetting;
       item.hostList.forEach((s) => {
         i.hostObjectIds.push(s.hostObjectId);
-        if (s.needReboot == "true"){
-          this.ips += s.hostName+",";
+        if (s.needReboot == "true") {
+          this.ips += s.hostName + ",";
         }
       });
       params.push(i);
@@ -148,15 +154,15 @@ export class ApplybpComponent implements OnInit {
    * 主机列表实时最佳实践 参数封装
    * @returns {any[]}
    */
-  packApplyPracticeParamsByHost(){
+  packApplyPracticeParamsByHost() {
     const params = [];
-    const i = {hostSetting:'', hostObjectIds: []};
+    const i = { hostSetting: '', hostObjectIds: [] };
     i.hostSetting = this.currentBestpractice.hostSetting;
     let ips = '';
     this.hostSelected.forEach((s) => {
       i.hostObjectIds.push(s.hostObjectId);
-      if (s.needReboot == "true"){
-        ips += s.hostName+",";
+      if (s.needReboot == "true") {
+        ips += s.hostName + ",";
       }
     });
     params.push(i);
@@ -168,17 +174,17 @@ export class ApplybpComponent implements OnInit {
    * 实时最佳实践
    * @param params
    */
-  applyPractice(params){
+  applyPractice(params) {
     this.applyLoading = true;
     this.http.post('v1/bestpractice/update/bylist', params).subscribe((result: any) => {
       this.applyLoading = false;
-      if (result.code == '200'){
+      if (result.code == '200') {
         this.tipModalSuccess = true;
-        if(this.applyType != '1'){
+        if (this.applyType != '1') {
           this.hostModalShow = false;
         }
         this.practiceRefresh();
-      } else{
+      } else {
         this.tipModalFail = true;
       }
       this.cdr.detectChanges();
@@ -187,15 +193,15 @@ export class ApplybpComponent implements OnInit {
     });
   }
 
-  openTip(){
+  openTip() {
     this.tipModal = true;
   }
 
-  closeTip(){
+  closeTip() {
     this.tipModal = false;
   }
 
-  applyClick(type: string){
+  applyClick(type: string) {
     if (type == '1') {
       this.rowSelected.forEach((item) => {
         if (item.count == 0) {
@@ -209,22 +215,22 @@ export class ApplybpComponent implements OnInit {
     }
     this.applyType = type;
     let params;
-    if(this.applyType == '1'){
+    if (this.applyType == '1') {
       params = this.packApplyPracticeParams();
     } else {
       params = this.packApplyPracticeParamsByHost();
     }
-    if(this.ips.length != 0){
+    if (this.ips.length != 0) {
       this.openTip();
-    } else{
+    } else {
       this.applyPractice(params);
     }
   }
 
-  tipOk(){
+  tipOk() {
     this.closeTip();
     let params;
-    if(this.applyType == '1'){
+    if (this.applyType == '1') {
       params = this.packApplyPracticeParams();
     } else {
       params = this.packApplyPracticeParamsByHost();
@@ -236,10 +242,10 @@ export class ApplybpComponent implements OnInit {
     this.checkLoading = true;
     this.http.post('v1/bestpractice/check', {}).subscribe((result: any) => {
       this.checkLoading = false;
-      if (result.code == '200'){
+      if (result.code == '200') {
         this.tipModalSuccess = true;
         this.practiceRefresh();
-      } else{
+      } else {
         this.tipModalFail = true;
       }
       this.cdr.detectChanges();
@@ -248,17 +254,16 @@ export class ApplybpComponent implements OnInit {
     });
   }
 
-  practiceRefresh(){
+  practiceRefresh() {
     const ctx = this.gs.getClientSdk().app.getContextObjects();
-    const objectId = ctx[0].id;
-    // const objectId = 'urn:vmomi:ClusterComputeResource:domain-c2038:674908e5-ab21-4079-9cb1-596358ee5dd1';
+    const objectId = ctx ? ctx[0].id : 'urn:vmomi:ClusterComputeResource:domain-c2038:674908e5-ab21-4079-9cb1-596358ee5dd1';
     let type = '';
     this.activatedRoute.url.subscribe(url => {
       type = url[0].path;
     });
     this.isLoading = true;
-    this.http.get('v1/bestpractice/records/all?objectId='+objectId + '&type='+ type).subscribe((result: any) => {
-      if (result.code === '200'){
+    const handlerGetRecords = (result: any) => {
+      if (result.code === '200') {
         this.list = result.data;
         // bug修改：列表页面级别过滤 中英文问题
         if (this.list) {
@@ -344,21 +349,38 @@ export class ApplybpComponent implements OnInit {
         this.isLoading = false;
         this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
       }
-    }, err => {
-      console.error('ERROR', err);
-    });
+    };
+
+    if (isMockData) {
+      handlerGetRecords(mockData.BESTPRACTICE_RECORDS_ALL);
+    } else {
+      this.http.get('v1/bestpractice/records/all?objectId=' + objectId + '&type=' + type).subscribe(handlerGetRecords, handlerResponseErrorSimple);
+    }
   }
 
-  openHostList(bestpractice: Bestpractice){
-    this.hostModalShow = true;
+  checkBescpractice(bestpractice) {
     this.currentBestpractice = bestpractice;
+    const { hostSetting } = bestpractice;
+    this.currentPanel = hostSetting === MTU_TAG ? MTU : '';
+  }
+
+  openHostList(bestpractice: Bestpractice) {
+    this.hostModalShow = true;
+    this.checkBescpractice(bestpractice);
     this.hostRefresh();
   }
 
-  hostRefresh(){
-    if (this.hostModalShow === true){
+  hostRefresh() {
+    if (this.hostModalShow === true) {
       this.hostIsLoading = true;
       this.hostList = this.currentBestpractice.hostList;
+      /*根据autoRepair 判断是否禁用执行最佳实践 */
+      /*显示tips就不显示按钮*/
+      if (this.hostList.length > 0) {
+        this.isShowBPBtnTips = this.hostList[0].autoRepair === 'false' ? true : false;
+      } else {
+        this.isShowBPBtnTips = false;
+      }
       this.hostTotal = this.currentBestpractice.hostList.length;
       this.hostIsLoading = false;
       this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
@@ -369,15 +391,15 @@ export class ApplybpComponent implements OnInit {
    * 单行实施
    * @param item
    */
-  applyOperation(item:Bestpractice){
+  applyOperation(item: Bestpractice) {
     const params = [];
     this.ips = '';
-    const i = {hostSetting:'', hostObjectIds: []};
+    const i = { hostSetting: '', hostObjectIds: [] };
     i.hostSetting = item.hostSetting;
     item.hostList.forEach((s) => {
       i.hostObjectIds.push(s.hostObjectId);
-      if (s.needReboot == "true"){
-        this.ips += s.hostName+",";
+      if (s.needReboot == "true") {
+        this.ips += s.hostName + ",";
       }
     });
     params.push(i);
@@ -389,7 +411,7 @@ export class ApplybpComponent implements OnInit {
    * @param obj
    */
   getTypeOf(obj) {
-    let object:object;
+    let object: object;
     if (typeof obj == 'string' && obj.indexOf("[{") != -1) {
       object = JSON.parse(obj);
     } else {
@@ -418,7 +440,7 @@ export class ApplybpComponent implements OnInit {
     return title;
   }
 
-  sortFunc(obj:any) {
+  sortFunc(obj: any) {
     // let object;
     // if (obj.target.type && obj.target.type == 'button') {
     //   object = obj.target;
@@ -438,6 +460,20 @@ export class ApplybpComponent implements OnInit {
     // }
     return !obj;
   }
+
+  afterApply(result) {
+    this.applyLoading = false;
+    if (result?.code == '200') {
+      this.tipModalSuccess = true;
+      if (this.applyType != '1') {
+        this.hostModalShow = false;
+      }
+      this.practiceRefresh();
+    } else {
+      this.tipModalFail = true;
+    }
+    this.cdr.detectChanges();
+  }
 }
 
 class Bestpractice {
@@ -447,17 +483,17 @@ class Bestpractice {
   levelNum: number;
   levelDesc: string;
   count: number;
-  description:string;
+  description: string;
   hostList: Host[];
 }
 
-class Host {
+export class Host {
   hostSetting: string;
   level: string;
   hostName: string;
   recommendValue: number;
   actualValue: number;
-  actualObjValue:any;
+  actualObjValue: any;
   hostObjectId: string;
   needReboot: string;
   hostId: string;

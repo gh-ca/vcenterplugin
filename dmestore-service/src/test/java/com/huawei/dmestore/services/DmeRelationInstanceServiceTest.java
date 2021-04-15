@@ -34,7 +34,7 @@ public class DmeRelationInstanceServiceTest {
     }
 
     @Test
-    public void queryRelationByRelationName() throws Exception{
+    public void testQueryRelationByRelationName() throws Exception{
         String reName = "test";
         String url = "/rest/resourcedb/v1/relations/{relationName}/instances";
         url = url.replace("{relationName}", reName);
@@ -45,7 +45,7 @@ public class DmeRelationInstanceServiceTest {
     }
 
     @Test
-    public void queryRelationByRelationNameConditionSourceInstanceId() throws Exception{
+    public void testQueryRelationByRelationNameConditionSourceInstanceId() throws Exception{
         String relationName = "1232";
         String sourceInstanceId = "11";
         String url = "/rest/resourcedb/v1/relations/{relationName}/instances";
@@ -66,7 +66,7 @@ public class DmeRelationInstanceServiceTest {
     }
 
     @Test
-    public void queryRelationByRelationNameInstanceId() throws Exception{
+    public void testQueryRelationByRelationNameInstanceId() throws Exception{
         String relationName = "1232";
         String sourceInstanceId = "11";
         String url = "/rest/resourcedb/v1/relations/{relationName}/instances/{instanceId}";
@@ -87,7 +87,7 @@ public class DmeRelationInstanceServiceTest {
     }
 
     @Test
-    public void queryInstanceByInstanceNameId() throws Exception{
+    public void testQueryInstanceByInstanceNameId() throws Exception{
         String instanceName = "aa";
         String instanceId = "133";
         String url = "/rest/resourcedb/v1/instances/{className}/{instanceId}";
@@ -108,7 +108,7 @@ public class DmeRelationInstanceServiceTest {
     }
 
     @Test
-    public void getServiceLevelInstance() throws Exception{
+    public void testGetServiceLevelInstance() throws Exception{
         String instanceName = "SYS_DjTier";
         String url = "/rest/resourcedb/v1/instances/{className}?pageSize=1000";
         url = url.replace("{className}", instanceName);
@@ -119,7 +119,7 @@ public class DmeRelationInstanceServiceTest {
     }
 
     @Test
-    public void getLunInstance() throws Exception{
+    public void testGetLunInstance() throws Exception{
         String instanceName = "SYS_Lun";
         String url = "/rest/resourcedb/v1/instances/{className}?pageSize=1000";
         url = url.replace("{className}", instanceName);
@@ -130,7 +130,7 @@ public class DmeRelationInstanceServiceTest {
     }
 
     @Test
-    public void getStorageDeviceInstance() throws Exception {
+    public void testGetStorageDeviceInstance() throws Exception {
         String instanceName = "SYS_StorDevice";
         String url = "/rest/resourcedb/v1/instances/{className}?pageSize=1000";
         url = url.replace("{className}", instanceName);
@@ -141,7 +141,7 @@ public class DmeRelationInstanceServiceTest {
     }
 
     @Test
-    public void getStoragePoolInstance() throws Exception {
+    public void testGetStoragePoolInstance() throws Exception {
         String instanceName = "SYS_StoragePool";
         String url = "/rest/resourcedb/v1/instances/{className}?pageSize=1000";
         url = url.replace("{className}", instanceName);
@@ -152,7 +152,7 @@ public class DmeRelationInstanceServiceTest {
     }
 
     @Test
-    public void refreshResourceInstance() throws Exception {
+    public void testRefreshResourceInstance() throws Exception {
         dmeRelationInstanceService.refreshResourceInstance();
     }
 }

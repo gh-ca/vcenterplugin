@@ -17,8 +17,6 @@ import java.util.Map;
  * @since 2020-11-30
  **/
 public class DiskDiskMaxIOSizeImpl extends BaseBestPracticeService implements BestPracticeService {
-    private static final long RECOMMEND_VALUE = 1024L;
-
     private static final Map<String, Long> recommendMap = new HashMap() {{
         put("6.7up", 32767L);
         put("6.7low", 1024L);
@@ -31,7 +29,14 @@ public class DiskDiskMaxIOSizeImpl extends BaseBestPracticeService implements Be
 
     @Override
     public Object getRecommendValue() {
+        // ESXi6.7U1以前的版本默认值为1024，ESXi6.7U1以及之后的版本默认值为32767
         return "1024|32767";
+    }
+
+    @Override
+    public Object getRecommendValue(VCSDKUtils vcsdkUtils, String objectId) throws Exception {
+        String key = getRecommendValueKey(vcsdkUtils, objectId);
+        return recommendMap.get(key);
     }
 
     @Override

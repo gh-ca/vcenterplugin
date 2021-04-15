@@ -53,6 +53,8 @@ public class SystemServiceImpl implements SystemService {
 
             systemDao.initData(DpSqlFileConstants.DP_DME_TASK_DATA_REFRESHRESOURCEINSTANCE_SQL);
 
+            systemDao.initData(DpSqlFileConstants.DP_DME_TASK_DATA_REFRESHKEY_SQL);
+
             LOGGER.info("init data over...");
         } catch (SQLException e) {
             LOGGER.error("Failed to init DB: {}", e.getMessage());

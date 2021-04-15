@@ -5,7 +5,7 @@ language: java
 jdk:
   - openjdk8
 
-script: "mvn cobertura:cobertura"
+script: "mvn -q cobertura:cobertura"
 
 after_success:
   - bash <(curl -s https://codecov.io/bash) -t 2833d5f5-e465-4de6-9a3d-2fa3bf6066cf
