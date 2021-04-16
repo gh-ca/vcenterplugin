@@ -235,6 +235,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                             double uncommitted = ToolUtils.getDouble(jo.get("uncommitted")) / ToolUtils.GI;
 
                             vmfsDataInfo.setName(ToolUtils.jsonToStr(jo.get(NAME_FIELD)));
+                            vmfsDataInfo.setAlarmState(ToolUtils.jsonToStr(jo.get("alarmState")));
                             vmfsDataInfo.setCapacity(capacity);
                             vmfsDataInfo.setFreeSpace(freeSpace);
                             vmfsDataInfo.setReserveCapacity(capacity + uncommitted - freeSpace);
@@ -980,8 +981,8 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         if (responseEntity.getStatusCodeValue() == HttpStatus.OK.value()) {
             String body = responseEntity.getBody();
             JsonObject jsonObject = new JsonParser().parse(body).getAsJsonObject();
-            JsonArray jsonArray = jsonObject.get("result_list").getAsJsonArray();
-            //JsonArray jsonArray = jsonObject.get("results").getAsJsonArray();
+            //JsonArray jsonArray = jsonObject.get("result_list").getAsJsonArray();
+            JsonArray jsonArray = jsonObject.get("results").getAsJsonArray();
             for (JsonElement jsonElement : jsonArray) {
                 JsonObject element = jsonElement.getAsJsonObject();
                 String id = ToolUtils.jsonToStr(element.get("host_id"));
@@ -989,8 +990,8 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 //String resultMessage = ToolUtils.jsonToStr(element.get("result_message"));
                 // 连通性异常主机结果统计
                 Map<String, String> result = new HashMap<>();
-                //if (status.equalsIgnoreCase("NOT_CONNECT")) {
-                if (status.equalsIgnoreCase("FAILED")) {
+                if (status.equalsIgnoreCase("NOT_CONNECT")) {
+                //if (status.equalsIgnoreCase("FAILED")) {
                     String hostName = getDmeHostNameById(id);
                     // result.put(hostName, resultMessage);
                     result.put(hostName, "启动器处于离线状态！");

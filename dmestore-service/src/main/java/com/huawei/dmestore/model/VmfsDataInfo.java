@@ -21,6 +21,8 @@ public class VmfsDataInfo {
      * dme中状态.
      **/
     private String status;
+
+    private String alarmState;
     /**
      * vmware中总容量 单位GB.
      **/
@@ -124,6 +126,13 @@ public class VmfsDataInfo {
         return name;
     }
 
+    public String getAlarmState() {
+        return alarmState;
+    }
+
+    public void setAlarmState(String alarmState) {
+        this.alarmState = alarmState;
+    }
     /**
      * setName .
      *

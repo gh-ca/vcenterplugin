@@ -210,13 +210,13 @@ public class VCSDKUtils {
                     for (Pair<ManagedObjectReference, String> ds : dss) {
                         DatastoreMo ds1 = datastoreVmwareMoFactory.build(vmwareContext, ds.first());
                         List<AlarmState> list = vmwareContext.getService().getAlarmState(vmwareContext.getServiceContent().getAlarmManager(),ds.first());
-                        int status = 1;
+                        String status = "1";
                         for (AlarmState s: list){
                             String va = s.getOverallStatus().value();
-                            if(va.equalsIgnoreCase("yellow") && status == 1){
-                                status = 2;
+                            if(va.equalsIgnoreCase("yellow") && status.equals("1")){
+                                status = "2";
                             } else if(va.equalsIgnoreCase("red")){
-                                status = 3;
+                                status = "3";
                             }
                         }
                         Map<String, Object> dsmap = gson.fromJson(gson.toJson(ds1.getSummary()),
