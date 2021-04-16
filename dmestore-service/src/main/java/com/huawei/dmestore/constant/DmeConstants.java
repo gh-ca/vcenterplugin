@@ -199,6 +199,11 @@ public class DmeConstants {
     public static final String API_STORAGES = "/rest/storagemgmt/v1/storages?start=1&limit=1000";
 
     /**
+     * az list
+     */
+    public static final String GET_AZ_URL = "/rest/azmgmt/v1/availability-zones?start=1&limit=512";
+
+    /**
      * storage detail query
      **/
     public static final String DME_STORAGE_DETAIL_URL = "/rest/storagemgmt/v1/storages/{storage_id}/detail";
