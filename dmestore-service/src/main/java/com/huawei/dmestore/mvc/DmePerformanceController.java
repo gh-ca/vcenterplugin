@@ -6,10 +6,9 @@ import com.huawei.dmestore.services.DmePerformanceService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/dmeperformance")
@@ -29,5 +28,12 @@ public class DmePerformanceController  extends BaseController {
         }
     }
 
-
+    @RequestMapping(value = "/current", method = RequestMethod.POST)
+    public ResponseBodyBean getPerfCurrent(@RequestBody Map<String, Object> params) throws Exception {
+        try {
+            return success(dmePerformanceService.getPerformanceCurrent(params));
+        } catch (DmeException e) {
+            return failure(e.getMessage());
+        }
+    }
 }

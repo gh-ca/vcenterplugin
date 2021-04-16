@@ -1,6 +1,7 @@
 package com.huawei.vmware.mo;
 
 import com.huawei.vmware.util.VmwareContext;
+import com.vmware.vim.binding.vim.ManagedEntity;
 import com.vmware.vim25.*;
 
 import java.util.List;
@@ -21,12 +22,15 @@ public class PerformanceManagerMo extends BaseMo {
        return context.getService().queryPerf(mor, perfQuerySpecs);
     }
 
-
     public List<PerfCounterInfo> queryPerfCounter(List<Integer> list) throws Exception {
         return context.getService().queryPerfCounter(mor, list);
     }
 
     public List<PerfCounterInfo> queryPerfCounterByLevel(int i) throws Exception {
         return context.getService().queryPerfCounterByLevel(mor, i);
+    }
+
+    public List<PerfMetricId> queryAvailablePerfMetric(ManagedObjectReference entity, Integer refreshRate) throws Exception{
+        return context.getService().queryAvailablePerfMetric(mor, entity, null, null, refreshRate);
     }
 }

@@ -10,16 +10,7 @@ import com.huawei.vmware.VcConnectionHelpers;
 import com.huawei.vmware.autosdk.SessionHelper;
 import com.huawei.vmware.autosdk.TaggingWorkflow;
 import com.huawei.vmware.mo.*;
-import com.huawei.vmware.util.ClusterVmwareMoFactory;
-import com.huawei.vmware.util.DatastoreVmwareMoFactory;
-import com.huawei.vmware.util.HostVmwareFactory;
-import com.huawei.vmware.util.Pair;
-import com.huawei.vmware.util.PbmUtil;
-import com.huawei.vmware.util.RootVmwareMoFactory;
-import com.huawei.vmware.util.SessionHelperFactory;
-import com.huawei.vmware.util.TaggingWorkflowFactory;
-import com.huawei.vmware.util.VirtualMachineMoFactorys;
-import com.huawei.vmware.util.VmwareContext;
+import com.huawei.vmware.util.*;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -3330,13 +3321,13 @@ public class VCSDKUtils {
                 }
             });
         }
+    }
 
-         public String queryPerf(String dataStoreObjectId)
-            throws VcenterException {
+    public String queryPerf(String dataStoreObjectId) throws VcenterException {
         String listStr = "";
         try {
             String serverguid = vcConnectionHelpers.objectId2Serverguid(dataStoreObjectId);
-            ManagedObjectReference objmor=vcConnectionHelpers.objectId2Mor(dataStoreObjectId);
+            ManagedObjectReference objmor = vcConnectionHelpers.objectId2Mor(dataStoreObjectId);
             VmwareContext vmwareContext = vcConnectionHelpers.getServerContext(serverguid);
             PerformanceManagerMo performanceManagerMo = performanceManagerMoFactory.build(vmwareContext, vmwareContext.getServiceContent().getPerfManager());
             PerfQuerySpec qSpec = new PerfQuerySpec();
@@ -3344,21 +3335,44 @@ public class VCSDKUtils {
             qSpec.setMaxSample(new Integer(1));
             qSpec.setFormat("csv");
             qSpec.setIntervalId(new Integer(300));
-            PerfMetricId perfMetricId=new PerfMetricId();
+            PerfMetricId perfMetricId = new PerfMetricId();
             perfMetricId.setCounterId(268);
+            perfMetricId.setInstance("");
             qSpec.getMetricId().add(perfMetricId);
-            List<PerfQuerySpec> perfQuerySpecs=new ArrayList<>();
+            List<PerfQuerySpec> perfQuerySpecs = new ArrayList<>();
             perfQuerySpecs.add(qSpec);
-            List<PerfEntityMetricBase> perfEntityMetricBases=performanceManagerMo.queryPerf(perfQuerySpecs);
-            System.out.println("ss");
-            return "";
-
+            List<PerfEntityMetricBase> perfEntityMetricBases = performanceManagerMo.queryPerf(perfQuerySpecs);
+            listStr = gson.toJson(perfEntityMetricBases);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("objectId{}, queryPerf error", dataStoreObjectId);
         }
-        return "";
+        return listStr;
     }
 
+    public String queryPerfAllCount(String dataStoreObjectId) throws VcenterException {
+        String perResult = "";
+        Integer maxSample = 1;
+        Integer refreshRate = 300;
+        try {
+            String serverguid = vcConnectionHelpers.objectId2Serverguid(dataStoreObjectId);
+            ManagedObjectReference objmor = vcConnectionHelpers.objectId2Mor(dataStoreObjectId);
+            VmwareContext vmwareContext = vcConnectionHelpers.getServerContext(serverguid);
+            PerformanceManagerMo performanceManagerMo = performanceManagerMoFactory.build(vmwareContext, vmwareContext.getServiceContent().getPerfManager());
+            List<PerfMetricId> pmis = performanceManagerMo.queryAvailablePerfMetric(objmor, refreshRate);
+            PerfQuerySpec qSpec = new PerfQuerySpec();
+            qSpec.setEntity(objmor);
+            qSpec.setMaxSample(maxSample);
+            qSpec.setFormat("csv");
+            qSpec.setIntervalId(refreshRate);
+            qSpec.getMetricId().addAll(pmis);
+            List<PerfQuerySpec> perfQuerySpecs = new ArrayList<>();
+            perfQuerySpecs.add(qSpec);
+            List<PerfEntityMetricBase> perfEntityMetricBases = performanceManagerMo.queryPerf(perfQuerySpecs);
+            perResult = gson.toJson(perfEntityMetricBases);
+        } catch (Exception e) {
+            logger.error("queryPerfAllCount error");
+        }
+        return perResult;
     }
 
 }
