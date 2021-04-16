@@ -92,6 +92,7 @@ export class NfsService {
 export interface List {
   name: string;    // 名称
   status: string;  // 状态
+  alarmState: number;// 告警状态
   capacity: number;  // 总容量 单位GB
   freeSpace: number; // 空闲容量 单位GB
   reserveCapacity: number; // 置备容量  capacity+uncommitted-freeSpace 单位GB

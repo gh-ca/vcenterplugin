@@ -11,7 +11,7 @@ export default {
     "model": "5300 V5",
     "usedCapacity": 2163.604499816406,
     "totalCapacity": 6542.693389892578,
-    "totalEffectiveCapacity": 3236.0,
+    "totalEffectiveCapacity": 3236.0,/* MB */
     "freeEffectiveCapacity": 1064.0819999999999,
     "subscriptionCapacity": 3.3568379353E7,
     "protectionCapacity": 0.0,
