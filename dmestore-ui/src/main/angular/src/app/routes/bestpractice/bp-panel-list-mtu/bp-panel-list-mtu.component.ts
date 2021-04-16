@@ -137,10 +137,10 @@ export class BpPanelListMtuComponent implements OnInit {
       this.onApply.emit(res);
       /* refresh */
       this.handleHostListChange();
-      console.log("🚀 ~ file: bp-panel-list-mtu.component.ts ~ line 132 ~ BpPanelListMtuComponent ~ applyClick ~ res", res);
+      console.log("handleHostListChange", res);
     } catch (error) {
       this.onApply.emit(error);
-      console.log("🚀 ~ file: bp-panel-list-mtu.component.ts ~ line 134 ~ BpPanelListMtuComponent ~ applyClick ~ error", error);
+      console.log("实施失败", error);
     }
   }
 

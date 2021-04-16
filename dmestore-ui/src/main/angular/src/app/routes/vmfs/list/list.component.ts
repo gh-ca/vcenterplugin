@@ -19,6 +19,7 @@ import { Router } from "@angular/router";
 import { DeviceFilter, ProtectionStatusFilter, ServiceLevelFilter, StatusFilter } from "./filter.component";
 import { FormControl, FormGroup, Validators } from "@angular/forms";
 import { isMockData, mockData } from 'mock/mock';
+import { getColorByType, getLabelByValue } from 'app/app.helpers';
 
 
 @Component({
@@ -29,6 +30,11 @@ import { isMockData, mockData } from 'mock/mock';
   providers: [VmfsListService],
 })
 export class VmfsListComponent implements OnInit {
+  getColor;
+  getLabelByValue;
+
+
+
   get params() { // 对query进行处理
     const p = Object.assign({}, this.query);
     return p;
@@ -40,6 +46,9 @@ export class VmfsListComponent implements OnInit {
     public gs: GlobalsService, private router: Router) {
     this.form.version = '5'; // 版本
     this.setFormValueWhenHiden(false);
+
+    this.getColor = getColorByType;
+    this.getLabelByValue = getLabelByValue;
   }
 
   setFormValueWhenHiden(isShowInput) {

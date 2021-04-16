@@ -12,6 +12,7 @@ import { ErrorCodeComponent } from './components/error-code/error-code.component
 /*  */
 import { BpPanelListMtuComponent } from './../routes/bestpractice/bp-panel-list-mtu/bp-panel-list-mtu.component';
 import { VmfsCreateFaildTipsComponent } from './components/vmfs-create-faild-tips/vmfs-create-faild-tips.component';
+import { AlarmState } from 'app/routes/nfs/alarm-state.filter';
 
 const THIRD_MODULES = [
   MaterialModule,
@@ -21,12 +22,16 @@ const COMPONENTS = [BreadcrumbComponent, PageHeaderComponent, ErrorCodeComponent
 const COMPONENTS_DYNAMIC = [];
 const DIRECTIVES = [];
 const PIPES = [];
+const FILTER=[AlarmState]
+
+
 
 @NgModule({
-  declarations: [...COMPONENTS, ...COMPONENTS_DYNAMIC, ...DIRECTIVES, ...PIPES, BpPanelListMtuComponent],
+  declarations: [...COMPONENTS, ...COMPONENTS_DYNAMIC, ...DIRECTIVES, ...PIPES, BpPanelListMtuComponent,...FILTER],
   imports: [CommonModule, FormsModule, RouterModule, ReactiveFormsModule, ...THIRD_MODULES],
   exports: [
     BpPanelListMtuComponent,
+    ...FILTER,
     CommonModule,
     FormsModule,
     RouterModule,

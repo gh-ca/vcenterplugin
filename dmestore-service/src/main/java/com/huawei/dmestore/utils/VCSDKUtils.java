@@ -3342,4 +3342,191 @@ public class VCSDKUtils {
 
     }
 
+    public String xmlRulesFormat(String unformattedXml) {
+        try {
+            final Document document = parseXmlFile(unformattedXml);
+            NodeList sms = document.getElementsByTagName("obj");
+            for(int index = 0; index < sms.getLength(); index++){
+                Element sm = (Element) sms.item(index);
+
+            }
+        } catch (Exception e) {
+            logger.error("xmlFormat error:{}", e.toString());
+        }
+        return null;
+    }
+
+    public void satpRuleList(String hostObjectId, VCenterInfo vcenterinfo) {
+        String moid = "ha-cli-handler-storage-nmp-satp-rule";
+        String esxCLI = "vim.EsxCLI.storage.nmp.satp.rule.list";
+        ManagedMethodExecuter.SoapArgument pspQuery
+                = new ManagedMethodExecuter.SoapArgument();
+        pspQuery.setName("psp");
+        pspQuery.setVal("<psp>" + "VMW_PSP_RR" + "</psp>");
+        String ruleList = satpRuleProcess(hostObjectId, vcenterinfo, moid, esxCLI, new ManagedMethodExecuter.SoapArgument[]{pspQuery});
+        xmlRulesFormat(ruleList);
+
+    }
+
+
+    public void satpRuleAdd(String hostObjectId, VCenterInfo vcenterinfo) {
+        String moid = "ha-cli-handler-storage-nmp-satp-rule";
+        String esxCLI = "vim.EsxCLI.storage.nmp.satp.rule.add";
+        List<Map<String, String>> ruleList = new ArrayList<>();
+        Map<String, String> map1 = new HashMap();
+        map1.put("satp", "VMW_SATP_ALUA");
+        map1.put("psp", "VMW_PSP_RR");
+        map1.put("claimoption", "tpgs_on");
+        ruleList.add(map1);
+
+        Map<String, String> map2 = new HashMap();
+        map2.put("satp", "VMW_SATP_DEFAULT_AA");
+        map2.put("psp", "VMW_PSP_RR");
+        map2.put("claimoption", "tpgs_off");
+        ruleList.add(map2);
+
+
+        // 用于判断所有的线程是否结束
+        for (int index = 0; index < ruleList.size(); index++) {
+            Map<String, String> map = ruleList.get(index);
+            List<ManagedMethodExecuter.SoapArgument> soapArgumentList = new ArrayList<>();
+
+            ManagedMethodExecuter.SoapArgument vendor
+                    = new ManagedMethodExecuter.SoapArgument();
+            vendor.setName("vendor");
+            vendor.setVal("<vendor  xmlns:xsi=\"http:// www.w3.org/2001/XMLSchema-instance\" "
+                    + "xmlns:xsd=\"http:// www.w3.org/2001/XMLSchema\" "
+                    + "xmlns=\"urn:vim25\">" + "HUAWEI" + "</vendor>");
+
+            ManagedMethodExecuter.SoapArgument model
+                    = new ManagedMethodExecuter.SoapArgument();
+            model.setName("model");
+            model.setVal("<model  xmlns:xsi=\"http:// www.w3.org/2001/XMLSchema-instance\" "
+                    + "xmlns:xsd=\"http:// www.w3.org/2001/XMLSchema\" "
+                    + "xmlns=\"urn:vim25\">" + "XSG1" + "</model>");
+
+            ManagedMethodExecuter.SoapArgument satp
+                    = new ManagedMethodExecuter.SoapArgument();
+            satp.setName("satp");
+            satp.setVal("<satp  xmlns:xsi=\"http:// www.w3.org/2001/XMLSchema-instance\" "
+                    + "xmlns:xsd=\"http:// www.w3.org/2001/XMLSchema\" "
+                    + "xmlns=\"urn:vim25\">" + map.get("satp") + "</satp>");
+
+
+            ManagedMethodExecuter.SoapArgument psp
+                    = new ManagedMethodExecuter.SoapArgument();
+            psp.setName("psp");
+            psp.setVal("<psp  xmlns:xsi=\"http:// www.w3.org/2001/XMLSchema-instance\" "
+                    + "xmlns:xsd=\"http:// www.w3.org/2001/XMLSchema\" "
+                    + "xmlns=\"urn:vim25\">" + map.get("psp") + "</psp>");
+
+            ManagedMethodExecuter.SoapArgument claimoption
+                    = new ManagedMethodExecuter.SoapArgument();
+            claimoption.setName("claimoption");
+            claimoption.setVal(
+                    "<claimoption  xmlns:xsi=\"http:// www.w3.org/2001/XMLSchema-instance\" "
+                            + "xmlns:xsd=\"http:// www.w3.org/2001/XMLSchema\" "
+                            + "xmlns=\"urn:vim25\">" + map.get("claimoption") + "</claimoption>");
+
+            ManagedMethodExecuter.SoapArgument force
+                    = new ManagedMethodExecuter.SoapArgument();
+            force.setName("force");
+            force.setVal(
+                    "<force  xmlns:xsi=\"http:// www.w3.org/2001/XMLSchema-instance\" "
+                            + "xmlns:xsd=\"http:// www.w3.org/2001/XMLSchema\" "
+                            + "xmlns=\"urn:vim25\">" + "true" + "</force>");
+
+            soapArgumentList.add(claimoption);
+            soapArgumentList.add(force);
+            soapArgumentList.add(model);
+            soapArgumentList.add(psp);
+            soapArgumentList.add(satp);
+            soapArgumentList.add(vendor);
+
+            ManagedMethodExecuter.SoapArgument[] var4 = soapArgumentList.toArray(new ManagedMethodExecuter.SoapArgument[0]);
+            satpRuleProcess(hostObjectId, vcenterinfo, moid, esxCLI, var4);
+        }
+
+    }
+
+
+
+    public String satpRuleProcess(String hostObjectId, VCenterInfo vcenterinfo, String moid, String esxCLI, ManagedMethodExecuter.SoapArgument[] soapArguments) {
+        if (StringUtils.isEmpty(hostObjectId)) {
+            logger.error("host object id is null");
+        }
+
+        if (vcenterinfo == null || StringUtils.isEmpty(vcenterinfo.getHostIp())) {
+            logger.error("vCenter Info is null");
+        }
+        Client vmomiClient = null;
+        SessionManager sessionManager = null;
+        try {
+            HttpConfiguration httpConfig = new HttpConfigurationImpl();
+            httpConfig.setTimeoutMs(TEST_CONNECTIVITY_TIMEOUT);
+            httpConfig.setThumbprintVerifier(new AllowAllThumbprintVerifier());
+
+            HttpClientConfiguration clientConfig = HttpClientConfiguration.Factory.newInstance();
+            clientConfig.setHttpConfiguration(httpConfig);
+            try {
+                if (context == null) {
+                    context = VmodlContext.getContext();
+                    context.loadVmodlPackages(new String[] {"com.vmware.vim.binding.vmodl.reflect"});
+                }
+            } catch (Exception e) {
+                logger.error("context is not ready!{}", e.getMessage());
+            }
+            if (context == null) {
+                context = VmodlContext.initContext(
+                        new String[] {"com.vmware.vim.binding.vim", "com.vmware.vim.binding.vmodl.reflect"});
+            }
+
+            vmomiClient = Client.Factory.createClient(
+                    new URI("https://" + vcenterinfo.getHostIp() + ":" + vcenterinfo.getHostPort() + "/sdk"), VERSION,
+                    context, clientConfig);
+            com.vmware.vim.binding.vmodl.ManagedObjectReference svcRef
+                    = new com.vmware.vim.binding.vmodl.ManagedObjectReference();
+            svcRef.setType("ServiceInstance");
+            svcRef.setValue("ServiceInstance");
+            ServiceInstance instance = vmomiClient.createStub(ServiceInstance.class, svcRef);
+            ServiceInstanceContent serviceInstanceContent = instance.retrieveContent();
+
+            sessionManager = vmomiClient.createStub(SessionManager.class, serviceInstanceContent.getSessionManager());
+            sessionManager.login(vcenterinfo.getUserName(), cipherUtils.decryptString(vcenterinfo.getPassword()), "en");
+            ManagedObjectReference objmor = vcConnectionHelpers.objectId2Mor(hostObjectId);
+            com.vmware.vim.binding.vmodl.ManagedObjectReference hostmor
+                    = new com.vmware.vim.binding.vmodl.ManagedObjectReference();
+            hostmor.setType(objmor.getType());
+            hostmor.setValue(objmor.getValue());
+            HostSystem hostSystem = vmomiClient.createStub(HostSystem.class, hostmor);
+            com.vmware.vim.binding.vmodl.ManagedObjectReference methodexecutor
+                    = hostSystem.retrieveManagedMethodExecuter();
+
+            ManagedMethodExecuter methodExecuter = vmomiClient.createStub(ManagedMethodExecuter.class, methodexecutor);
+            ManagedMethodExecuter.SoapResult soapResult = methodExecuter.executeSoap(moid,"urn:vim25/6.5", esxCLI, soapArguments);
+            String re = null;
+            if(soapResult.response != null){
+                re = new String(soapResult.getResponse().getBytes("ISO-8859-1"), "UTF-8");
+
+            }
+            logger.info("satpRuleProcess,re={}", re);
+            return re;
+
+        } catch (Exception ex) {
+            logger.error("error:", ex);
+        } finally {
+            if (sessionManager != null) {
+                sessionManager.logout();
+            }
+            if (vmomiClient != null) {
+                vmomiClient.shutdown();
+            }
+        }
+
+        return null;
+
+    }
+
+
+
 }
