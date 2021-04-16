@@ -19,6 +19,7 @@ import { Router } from "@angular/router";
 import { DeviceFilter, ProtectionStatusFilter, ServiceLevelFilter, StatusFilter } from "./filter.component";
 import { FormControl, FormGroup, Validators } from "@angular/forms";
 import { isMockData, mockData } from 'mock/mock';
+import { getColorByType, getLabelByValue } from 'app/app.helpers';
 
 
 @Component({
@@ -29,6 +30,11 @@ import { isMockData, mockData } from 'mock/mock';
   providers: [VmfsListService],
 })
 export class VmfsListComponent implements OnInit {
+  getColor;
+  getLabelByValue;
+
+
+
   get params() { // 对query进行处理
     const p = Object.assign({}, this.query);
     return p;
@@ -40,6 +46,9 @@ export class VmfsListComponent implements OnInit {
     public gs: GlobalsService, private router: Router) {
     this.form.version = '5'; // 版本
     this.setFormValueWhenHiden(false);
+
+    this.getColor = getColorByType;
+    this.getLabelByValue = getLabelByValue;
   }
 
   setFormValueWhenHiden(isShowInput) {
@@ -1164,8 +1173,29 @@ export class VmfsListComponent implements OnInit {
       this.unmountForm.name = this.rowSelected[0].name;
       this.mountedHost = null;
       this.mountedCluster = null;
-      // 获取主机
-      this.remoteSrv.getMountHost(this.rowSelected[0].objectid).subscribe((result: any) => {
+      
+
+      /*2.*/
+      const handlerGetMountClusterSuccess = (result: any) => {
+        console.log(result);
+        if (result.code === '200' && result.data !== null && result.data.length >= 1) {
+          this.unmountForm.mountType = '2';
+          const mountCluster: HostOrCluster[] = [];
+          result.data.forEach(item => {
+            const hostInfo = {
+              deviceId: item.hostGroupId,
+              deviceName: item.hostGroupName,
+              deviceType: 'cluster'
+            };
+            mountCluster.push(hostInfo);
+          });
+          this.mountedCluster = mountCluster;
+        }
+        this.modalLoading = false;
+        this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
+      };
+      /*1.*/
+      const handlerGetMountHost = (result: any) => {
         console.log(result);
         if (result.code === '200' && result.data !== null && result.data.length >= 1) {
           this.unmountForm.mountType = '1';
@@ -1181,27 +1211,23 @@ export class VmfsListComponent implements OnInit {
           this.mountedHost = mountHost;
           console.log('this.serviceLevelList', this.serviceLevelList);
         }
+      
         // 获取集群
-        this.remoteSrv.getMountCluster(this.rowSelected[0].objectid).subscribe((result: any) => {
-          console.log(result);
-          if (result.code === '200' && result.data !== null && result.data.length >= 1) {
-            this.unmountForm.mountType = '2';
-            const mountCluster: HostOrCluster[] = [];
-            result.data.forEach(item => {
-              const hostInfo = {
-                deviceId: item.hostGroupId,
-                deviceName: item.hostGroupName,
-                deviceType: 'cluster'
-              };
-              mountCluster.push(hostInfo);
-            });
-            this.mountedCluster = mountCluster;
-          }
-          this.modalLoading = false;
-          this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
-        });
+        if (isMockData) {
+          handlerGetMountClusterSuccess(mockData.ACCESSVMFS_GETHOSTGROUPSBYSTORAGEID);
+        } else {
+          this.remoteSrv.getMountCluster(this.rowSelected[0].objectid).subscribe(handlerGetMountClusterSuccess);
+        }
+
         this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
-      });
+      };
+
+      // 获取主机
+      if (isMockData) {
+        handlerGetMountHost(mockData.ACCESSVMFS_GETHOSTSBYSTORAGEID);
+      } else {
+        this.remoteSrv.getMountHost(this.rowSelected[0].objectid).subscribe(handlerGetMountHost);
+      }
 
       this.unmountShow = true;
     }

@@ -149,6 +149,11 @@ public class DmeConstants {
     public static final String HOSTGROUP_UNMAPPING = "/rest/blockservice/v1/volumes/hostgroup-unmapping";
 
     /**
+     * hostgroup remove
+     **/
+    public static final String HOSTGROUP_REMOVE = "/rest/hostmgmt/v1/hostgroups/{hostgroup_id}";
+
+    /**
      * hostgroup mapping
      **/
     public static final String MOUNT_VOLUME_TO_HOSTGROUP_URL = "/rest/blockservice/v1/volumes/hostgroup-mapping";

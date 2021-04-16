@@ -1,6 +1,9 @@
 import { Injectable } from '@angular/core';
 import { ClrDatagridStateInterface } from '@clr/angular';
 import * as moment from 'moment';
+import { TranslatePipe } from '@ngx-translate/core';
+
+
 
 function getSelectedDateFn(label) {
   return (minuteName, exp) => {
@@ -16,6 +19,10 @@ function getSelectedDateFn(label) {
 
 @Injectable()
 export class CommonService {
+  constructor(
+    private translatePipe: TranslatePipe
+  ) {
+  }
 
   timeSelectorRanges_type1 = [
     { value: 'LAST_5_MINUTE', key: 'chart.select.last5Minute' },
@@ -47,6 +54,17 @@ zh:'一年' ,range:'LAST_1_YEAR',   interval:  "DAY"
     { value: 'LAST_1_YEAR', key: 'chart.select.last1Year' },
   ];
 
+
+  /**
+   * @Description 通用的同步翻译工具函数
+   * @date 2021-04-13
+   * @param {any} ...args
+   * @returns {any}
+   */
+  $t(prop) {
+    const res = this.translatePipe.transform(prop);
+    return res
+  }
 
   /**
    * @Description

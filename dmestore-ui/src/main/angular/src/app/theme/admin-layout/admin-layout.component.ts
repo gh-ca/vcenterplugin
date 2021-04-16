@@ -83,6 +83,7 @@ export class AdminLayoutComponent implements OnInit, OnDestroy {
     this.linkInfo = [
       {link: "./dashboard", label: 'Overview'},
       {link: "./storage", label: 'Storage Device'},
+      {link: "./storage/detail", label: 'Storage Device detail'},
       {link: "./vmfs/list", label: './vmfs/list'},
       {link: "./vmfs/add", label: './vmfs/add'},
       {link: "./vmfs/performance", label: './vmfs/performance'},
@@ -91,12 +92,11 @@ export class AdminLayoutComponent implements OnInit, OnDestroy {
       {link: "./nfs/list", label: './nfs/list'},
       {link: "./servicelevel", label: 'servicelevel DME存储策略'},
       {link: "./bestpractice", label: 'Best Practice'},
-      {link: "./host/applybp", label: 'ApplybpComponent host'},
-      {link: "./cluster/applybp", label: 'ApplybpComponent cluster'},
+      {link: './best/host/applybp', label: 'host 实施最佳实践'},
+      {link: './best/cluster/applybp', label: 'cluster 实施最佳实践'},
       {link: "./iscsi", label: 'iscsi list'},
       /**/
       {link: './iscsi', label: './iscsi'},
-      {link: './best/host/applybp', label: './best/host/applybp'},
       {link: './vmfs/delete', label: './vmfs/delete'},
       {link: './nfs/delete', label: './nfs/delete'},
       {link: './vmfs/expand?resource=dataStore', label: './vmfs/expand?resource=dataStore'},

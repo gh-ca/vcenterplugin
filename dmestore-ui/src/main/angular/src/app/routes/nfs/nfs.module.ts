@@ -18,6 +18,7 @@ import { NfsAddComponent } from "./subpages/add/nfs-add.component";
 import { NfsDeleteComponent } from "./subpages/delete/nfs-delete.component";
 import { NfsModifyComponent } from "./subpages/modify/nfs-modify.component";
 import { StatusFilter } from "./status.filter";
+// import { AlarmState } from "./alarm-state.filter";
 import { DeviceFilter } from "./device.filter";
 import { TranslateModule } from "@ngx-translate/core";
 
@@ -37,6 +38,7 @@ import { TranslateModule } from "@ngx-translate/core";
     NfsDeleteComponent,
     NfsModifyComponent,
     StatusFilter,
+    // AlarmState,
     DeviceFilter
   ],
   imports: [
