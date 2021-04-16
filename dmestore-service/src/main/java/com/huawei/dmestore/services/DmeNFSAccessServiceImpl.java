@@ -717,6 +717,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
                     nfsDataInfo.setShareId(dvr.getShareId());
                     nfsDataInfo.setFs(dvr.getFsName());
                     nfsDataInfo.setFsId(dvr.getFsId());
+                    nfsDataInfo.setAlarmState(ToolUtils.jsonToStr(jo.get("alarmState")));
                     nfsDataInfo.setObjectid(ToolUtils.jsonToStr(jo.get(OBJECTID)));
                     volIds.put(dvr.getFsId(), nfsDataInfo);
                     relists.add(nfsDataInfo);

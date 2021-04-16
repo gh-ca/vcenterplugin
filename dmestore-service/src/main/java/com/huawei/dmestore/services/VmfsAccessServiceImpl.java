@@ -235,6 +235,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                             double uncommitted = ToolUtils.getDouble(jo.get("uncommitted")) / ToolUtils.GI;
 
                             vmfsDataInfo.setName(ToolUtils.jsonToStr(jo.get(NAME_FIELD)));
+                            vmfsDataInfo.setAlarmState(ToolUtils.jsonToStr(jo.get("alarmState")));
                             vmfsDataInfo.setCapacity(capacity);
                             vmfsDataInfo.setFreeSpace(freeSpace);
                             vmfsDataInfo.setReserveCapacity(capacity + uncommitted - freeSpace);
@@ -981,20 +982,19 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             String body = responseEntity.getBody();
             JsonObject jsonObject = new JsonParser().parse(body).getAsJsonObject();
             //JsonArray jsonArray = jsonObject.get("result_list").getAsJsonArray();
-            JsonArray jsonArray = jsonObject.get("resultList").getAsJsonArray();
+            JsonArray jsonArray = jsonObject.get("results").getAsJsonArray();
             for (JsonElement jsonElement : jsonArray) {
                 JsonObject element = jsonElement.getAsJsonObject();
-                //String id = ToolUtils.jsonToStr(element.get("host_id"));
-                //String status = ToolUtils.jsonToStr(element.get("status"));
-               // String resultMessage = ToolUtils.jsonToStr(element.get("result_message"));
-                String id = ToolUtils.jsonToStr(element.get("hostId"));
+                String id = ToolUtils.jsonToStr(element.get("host_id"));
                 String status = ToolUtils.jsonToStr(element.get("status"));
-                String resultMessage = ToolUtils.jsonToStr(element.get("resultMessage"));
+                //String resultMessage = ToolUtils.jsonToStr(element.get("result_message"));
                 // 连通性异常主机结果统计
                 Map<String, String> result = new HashMap<>();
-                if (!status.equalsIgnoreCase("SUCCESS")) {
+                if (status.equalsIgnoreCase("NOT_CONNECT")) {
+                //if (status.equalsIgnoreCase("FAILED")) {
                     String hostName = getDmeHostNameById(id);
-                    result.put(hostName, resultMessage);
+                    // result.put(hostName, resultMessage);
+                    result.put(hostName, "启动器处于离线状态！");
                 }
                 if (result.size() != 0) {
                     results.add(result);
@@ -2024,6 +2024,15 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                         if (!StringUtils.isEmpty(taskId)) {
                             taskIds.add(taskId);
                         }
+                        boolean isUnmappingHostgroup = taskService.checkTaskStatus(taskIds);
+                        if (isUnmappingHostgroup) {
+                            taskId = removeHostgroupGetTaskId(params);
+                        }
+                        if (!StringUtils.isEmpty(taskId)) {
+                            taskIds.clear();
+                            taskIds.add(taskId);
+                        }
+
                     }
                 }
             }
@@ -2104,7 +2113,6 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         hostOfHostgroup.put(ToolUtils.getStr(hostMap.get(ID_FIELD)), hostgroupIds);
         if (hostgroupIds.size() != 0 && hostOfHostgroup.size() != 0) {
             flag = removeHostFromHostgroup(hostOfHostgroup);
-
         }
         return flag;
     }
@@ -2126,12 +2134,31 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                         throw new DmeException("remove host from hostgroup failed!{}",
                             entry.getKey() + " from " + hostgroupId);
                     }
-                    flag = true;
+                    flag = isRemoveHostOfHostgroup(hostgroupId);
                 }
             }
         }
         return flag;
     }
+
+    private Boolean isRemoveHostOfHostgroup(String hostgroupId) throws DmeException{
+        boolean flag = false;
+        Map<String, Object> dmeHostGroup = dmeAccessService.getDmeHostGroup(hostgroupId);
+        int hostCount = ToolUtils.getInt(dmeHostGroup.get("host_count"));
+        if (hostCount == 0) {
+            Map<String, Object> hostMap = new HashMap<>();
+            hostMap.put(HOST_GROUP_ID1, hostgroupId);
+            String taskId = removeHostgroupGetTaskId(hostMap);
+            List<String> list = new ArrayList<>();
+            list.add(taskId);
+            flag = taskService.checkTaskStatus(list);
+        }
+        if (hostCount != 0) {
+            flag = true;
+        }
+        return flag;
+    }
+
 
     private List<String> unmountVmfs(String dsObjId, Map<String, Object> params) throws DmeException {
         List<String> taskIds = new ArrayList<>();
@@ -2371,6 +2398,27 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             LOG.error(e.getMessage());
         }
         return taskId;
+    }
+
+    private String removeHostgroupGetTaskId(Map<String, Object> params) {
+        String taskId = "";
+        try {
+            ResponseEntity responseEntity = removeHostgroup(params);
+            taskId = getTaskId(responseEntity);
+        } catch (DmeException e) {
+            LOG.error(e.getMessage());
+        }
+        return taskId;
+    }
+
+    private ResponseEntity removeHostgroup(Map<String, Object> params) throws DmeException {
+        String hostGroupId = ToolUtils.getStr(params.get(HOST_GROUP_ID1));
+        Map<String, Object> requestbody = new HashMap<>();
+        String url = DmeConstants.HOSTGROUP_REMOVE.replace("{hostgroup_id}", hostGroupId);
+        requestbody.put("sync_to_storage", true);
+        ResponseEntity responseEntity = dmeAccessService.access(url, HttpMethod.DELETE,
+                null);
+        return responseEntity;
     }
 
     // DME侧删除磁盘 获取任务ID
