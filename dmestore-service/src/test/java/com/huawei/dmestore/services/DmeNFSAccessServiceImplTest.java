@@ -21,8 +21,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import java.util.*;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.when;
 
 /**
@@ -239,7 +238,7 @@ public class DmeNFSAccessServiceImplTest {
         StorageTypeShow storageTypeShow = new StorageTypeShow();
         storageTypeShow.setDorado(true);
         storageDetail.setStorageTypeShow(storageTypeShow);
-        when(dmeStorageService.getStorageDetail(anyString())).thenReturn(storageDetail);
+        when(dmeStorageService.getStorageDetail(anyString(),anyBoolean())).thenReturn(storageDetail);
         List<NfsDataStoreFsAttr> nfsDatastoreFsAttr = dmeNFSAccessService.getNfsDatastoreFsAttr("321");
         System.out.println(nfsDatastoreFsAttr);
 

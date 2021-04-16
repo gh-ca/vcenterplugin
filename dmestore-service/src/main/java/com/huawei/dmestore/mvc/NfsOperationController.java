@@ -231,7 +231,7 @@ public class NfsOperationController extends BaseController {
 
     public StorageTypeShow isDorado(String storageId) throws DmeException {
         StorageTypeShow storageTypeShow = new StorageTypeShow();
-        StorageDetail storageDetail = dmeStorageService.getStorageDetail(storageId);
+        StorageDetail storageDetail = dmeStorageService.getStorageDetail(storageId,false);
         if (storageDetail != null) {
             String storageType = storageDetail.getModel() +" "+ storageDetail.getProductVersion();
             storageTypeShow = ToolUtils.getStorageTypeShow(storageType);

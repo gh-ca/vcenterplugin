@@ -45,7 +45,7 @@ public interface DmeStorageService {
      * @return StorageDetail
      * @throws DmeException when error
      */
-    StorageDetail getStorageDetail(String storageId) throws DmeException;
+    StorageDetail getStorageDetail(String storageId,boolean flag) throws DmeException;
 
     /**
      * list storage pool

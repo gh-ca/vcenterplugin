@@ -190,7 +190,7 @@ public class DmeStorageServiceImplTest {
         when(dmeAccessService.accessByJson(url, HttpMethod.GET, params2)).thenReturn(responseEntity2);
         url = "/rest/resourcedb/v1/instances/SYS_StorageDisk?condition={json}&&pageSize=1000";
         when(dmeAccessService.accessByJson(url, HttpMethod.GET, params)).thenReturn(responseEntity2);
-        StorageDetail storageDetail = dmeStorageService.getStorageDetail(storageId);
+        StorageDetail storageDetail = dmeStorageService.getStorageDetail(storageId,false);
         System.out.println(storageDetail);
     }
 

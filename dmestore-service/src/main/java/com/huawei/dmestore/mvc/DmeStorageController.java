@@ -66,7 +66,7 @@ public class DmeStorageController extends BaseController {
     @GetMapping("/storage")
     public ResponseBodyBean getStorageDetail(@RequestParam(name = "storageId") String storageId) {
         try {
-            return success(dmeStorageService.getStorageDetail(storageId));
+            return success(dmeStorageService.getStorageDetail(storageId,true));
         } catch (DmeException e) {
             return failure(e.getMessage());
         }

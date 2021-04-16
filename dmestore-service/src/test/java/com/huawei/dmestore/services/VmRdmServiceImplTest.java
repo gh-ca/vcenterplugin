@@ -20,8 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.when;
 
 /**
@@ -224,7 +223,7 @@ public class VmRdmServiceImplTest {
         customizeVolumesRequest.setCustomizeVolumes(customizeVolumes);
         vmRdmCreateBean.setCustomizeVolumesRequest(customizeVolumesRequest);
         StorageDetail storageObj = new StorageDetail();
-        when(dmeStorageService.getStorageDetail(anyString())).thenReturn(storageObj);
+        when(dmeStorageService.getStorageDetail(anyString(),anyBoolean())).thenReturn(storageObj);
         String reqString =
             "{\"customize_volumes\":{\"initial_distribute_policy\":\"321\",\"tuning\":{\"workload_type_id\":12,\"dedupe_enabled\":false,\"compression_enabled\":true,\"smartqos\":{\"maxbandwidth\":21," +
                 "\"control_policy\":\"321\",\"maxiops\":1,\"latency\":1,\"miniops\":12,\"name\":\"321\",\"minbandwidth\":12},\"alloctype\":\"321\"},\"prefetch_policy\":\"321\",\"storage_id\":\"321\"," +

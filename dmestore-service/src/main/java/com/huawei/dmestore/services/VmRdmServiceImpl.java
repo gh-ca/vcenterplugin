@@ -472,7 +472,7 @@ public class VmRdmServiceImpl implements VmRdmService {
     }
 
     private String getStorageModel(String storageId) throws DmeException {
-        StorageDetail storageDetail = dmeStorageService.getStorageDetail(storageId);
+        StorageDetail storageDetail = dmeStorageService.getStorageDetail(storageId,false);
         return storageDetail.getModel() + " " + storageDetail.getProductVersion();
     }
 }

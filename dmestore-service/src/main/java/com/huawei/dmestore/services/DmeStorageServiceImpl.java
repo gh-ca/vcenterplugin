@@ -202,7 +202,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
     }
 
     @Override
-    public StorageDetail getStorageDetail(String storageId) throws DmeException {
+    public StorageDetail getStorageDetail(String storageId,boolean flag) throws DmeException {
         StorageDetail storageObj = new StorageDetail();
         try {
             Storage storage = getStorage(storageId);
@@ -219,12 +219,14 @@ public class DmeStorageServiceImpl implements DmeStorageService {
             /*增加查询指定lun方法，返回给前端页面，作为判断qos策略的依据
             * 1.首先根据前端页面的storageid获取volumeId
             * 2.根据volumeId查询对应卷的数据信息**/
-            DmeVmwareRelation vmRelations = dmeVmwareRalationDao.getDmeVmwareRelationByDsId(storageId);
-            Map<String, Object> map = getLunDetailByVolumeId(vmRelations.getVolumeId());
-            boolean qosFlag = (boolean) map.get("qosFlag");
-            SmartQos smartosQ = (SmartQos) map.get("smartosQ");
-            storageObj.setQosFlag(qosFlag);
-            storageObj.setSmartQos(smartosQ);
+            if(flag) {
+                DmeVmwareRelation vmRelations = dmeVmwareRalationDao.getDmeVmwareRelationByDsId(storageId);
+                Map<String, Object> map = getLunDetailByVolumeId(vmRelations.getVolumeId());
+                boolean qosFlag = (boolean) map.get("qosFlag");
+                SmartQos smartosQ = (SmartQos) map.get("smartosQ");
+                storageObj.setQosFlag(qosFlag);
+                storageObj.setSmartQos(smartosQ);
+            }
         } catch (DmeException e) {
             LOG.error("search oriented storage error!", e);
             throw new DmeException(CODE_503, e.getMessage());
