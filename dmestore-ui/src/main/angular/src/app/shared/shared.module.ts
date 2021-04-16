@@ -14,6 +14,8 @@ import { BpPanelListMtuComponent } from './../routes/bestpractice/bp-panel-list-
 import { VmfsCreateFaildTipsComponent } from './components/vmfs-create-faild-tips/vmfs-create-faild-tips.component';
 import { AlarmState } from 'app/routes/nfs/alarm-state.filter';
 import { BpCellMulRowComponent } from './bp-cell-mul-row/bp-cell-mul-row.component';
+import { StorageDjAzCellComponent } from './storage-dj-az-cell/storage-dj-az-cell.component';
+import { FormItemQosGroupComponent } from './form-item-qos-group/form-item-qos-group.component';
 
 const THIRD_MODULES = [MaterialModule, TranslateModule];
 const COMPONENTS = [
@@ -25,6 +27,10 @@ const COMPONENTS = [
   BpPanelListMtuComponent,
   /* 期望值多行 */
   BpCellMulRowComponent,
+  /* 存储列表可用分区 */
+  StorageDjAzCellComponent,
+  /* qos策略 */
+  FormItemQosGroupComponent,
 ];
 const COMPONENTS_DYNAMIC = [];
 const DIRECTIVES = [];

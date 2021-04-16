@@ -110,7 +110,7 @@ export class AdminLayoutComponent implements OnInit, OnDestroy {
       { link: './vmfs/delete', label: './vmfs/delete' },
       { link: './vmfs/expand?resource=dataStore', label: './vmfs/expand?resource=dataStore' },
       { link: './vmfs/serviceLevel?resource=dataStore', label: './vmfs/serviceLevel?resource=dataStore', },
-      { link: './vmfs/modify?resource=dataStore', label: './vmfs/modify?resource=dataStore' },
+      { link: './vmfs/modify', label: './vmfs/modify' },
       { link: './vmfs/mount?resource=dataStore', label: './vmfs/mount?resource=dataStore' },
       { link: './vmfs/unmount?resource=dataStore', label: './vmfs/unmount?resource=dataStore' },
       { link: './vmfs/reclaim?resource=dataStore', label: './vmfs/reclaim?resource=dataStore' },

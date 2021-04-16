@@ -19,6 +19,10 @@ export default {
       maxLatency: 3.86,
       maxOps: null,
       azIds: [],
+      djAzs: [
+        { id: 1, name: 'one' },
+        { id: 2, name: 'two' },
+      ],
       sn: '2102351QLH9WK5800028',
       version: 'V500R007C10',
       productVersion: null,
@@ -31,7 +35,8 @@ export default {
       maintenanceStart: null,
       maintenanceOvertime: null,
       storageTypeShow: {
-        qosTag: 2,
+        /* v6 */
+        qosTag: 1,
         workLoadShow: 2,
         ownershipController: true,
         allocationTypeShow: 1,
@@ -41,7 +46,7 @@ export default {
         smartTierShow: true,
         prefetchStrategyShow: true,
         storageDetailTag: 2,
-        dorado: false,
+        dorado: true,
       },
     },
     {
@@ -62,6 +67,10 @@ export default {
       maxLatency: 3.86,
       maxOps: null,
       azIds: [],
+      djAzs: [
+        { id: 1, name: 'one' },
+        { id: 2, name: 'two' },
+      ],
       sn: '2102351QLH9WK5800028_mock',
       version: 'V500R007C10',
       productVersion: null,

@@ -1,55 +1,85 @@
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, ViewChild} from "@angular/core";
-import {GlobalsService} from "../../../../shared/globals.service";
-import {ActivatedRoute, Router} from "@angular/router";
-import {AddNfs, Host, NfsAddService, Vmkernel} from "./nfs-add.service";
-import {ClrWizard, ClrWizardPage} from "@clr/angular";
-import {LogicPort, StorageList, StorageService} from "../../../storage/storage.service";
-import {StoragePool, StoragePoolMap} from "../../../storage/detail/detail.service";
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
+import { GlobalsService } from '../../../../shared/globals.service';
+import { ActivatedRoute, Router } from '@angular/router';
+import { AddNfs, Host, NfsAddService, Vmkernel } from './nfs-add.service';
+import { ClrWizard, ClrWizardPage } from '@clr/angular';
+import { LogicPort, StorageList, StorageService } from '../../../storage/storage.service';
+import { StoragePool, StoragePoolMap } from '../../../storage/detail/detail.service';
+import { isMockData, mockData } from 'mock/mock';
+import { handlerResponseErrorSimple } from 'app/app.helpers';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
+import debounce from 'just-debounce';
+
 @Component({
   selector: 'app-add',
   templateUrl: './nfs-add.component.html',
   styleUrls: ['./nfs-add.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [NfsAddService,StorageService]
+  providers: [NfsAddService, StorageService],
 })
-export class NfsAddComponent implements OnInit{
+export class NfsAddComponent implements OnInit {
+  isAddPageOneNextDisabled: boolean;
+
   viewPage: string;
   pluginFlag: string;
   addForm = new AddNfs();
+  addFormGroup = new FormGroup({
+    storagId: new FormControl('', Validators.required),
+    storagePoolId: new FormControl(true, Validators.required),
+    currentPortId: new FormControl('', Validators.required),
+    nfsName: new FormControl('', Validators.required),
+    size: new FormControl('', Validators.required),
+    hostObjectId: new FormControl('', Validators.required),
+    vkernelIp: new FormControl('', Validators.required),
+    accessMode: new FormControl('', Validators.required),
+    sameName: new FormControl(true, Validators.required),
+    fsName: new FormControl('', Validators.required),
+    shareName: new FormControl('', Validators.required),
+    type: new FormControl(''),
+    securityType: new FormControl(false),
+    unit: new FormControl('GB', Validators.required),
+    characterEncoding: new FormControl('utf-8', Validators.required),
+  });
+
   errorMsg: string;
   modalLoading = false; // 数据加载loading
   modalHandleLoading = false; // 数据处理loading
-  unit='GB';
-  checkedPool:any;
+  unit = 'GB';
+  checkedPool: any;
   storageList: StorageList[] = [];
   storagePools: StoragePool[] = [];
-  storagePoolMap:StoragePoolMap[] = [];
+  storagePoolMap: StoragePoolMap[] = [];
 
   logicPorts: LogicPort[] = [];
   hostList: Host[] = [];
-  vmkernelList: Vmkernel[]=[];
-  capacityErr=true;
+  vmkernelList: Vmkernel[] = [];
+  capacityErr = true;
 
-
-  maxbandwidthChoose=false; // 最大带宽 选中
-  maxiopsChoose=false; // 最大iops 选中
-  minbandwidthChoose=false; // 最小带宽 选中
-  miniopsChoose=false; // 最小iops 选中
-  latencyChoose=false; // 时延 选中
+  maxbandwidthChoose = false; // 最大带宽 选中
+  maxiopsChoose = false; // 最大iops 选中
+  minbandwidthChoose = false; // 最小带宽 选中
+  miniopsChoose = false; // 最小iops 选中
+  latencyChoose = false; // 时延 选中
   addSuccessShow = false; // 添加成功提示
 
   hiddenLowerFlag = false; // 不支持下限 true是 false否
   deduplicationShow = false; // 重复数据删除 true 支持 false 不支持
   compressionShow = false; // 数据压缩 true 支持 false 不支持
   latencyIsSelect = false; // 时延为下拉框
-  dorado= false;
+  dorado = false;
   shareNameContainsCN = false; // 共享名称包含中文
 
-  bandWidthMaxErrTips = false;// 带宽上限错误提示
-  bandWidthMinErrTips = false;// 带宽下限错误提示
-  iopsMaxErrTips = false;// IOPS上限错误提示
-  iopsMinErrTips = false;// IOPS下限错误提示
-  latencyErrTips = false;// 时延错误提示
+  bandWidthMaxErrTips = false; // 带宽上限错误提示
+  bandWidthMinErrTips = false; // 带宽下限错误提示
+  iopsMaxErrTips = false; // IOPS上限错误提示
+  iopsMinErrTips = false; // IOPS下限错误提示
+  latencyErrTips = false; // 时延错误提示
 
   bandwidthLimitErr = false; // v6 设备 带宽 下限大于上限
   iopsLimitErr = false; // v6 设备 IOPS 下限大于上限
@@ -59,70 +89,151 @@ export class NfsAddComponent implements OnInit{
   @ViewChild('addPageOne') addPageOne: ClrWizardPage;
   @ViewChild('addPageTwo') addPageTwo: ClrWizardPage;
 
-  constructor(private addService: NfsAddService, private cdr: ChangeDetectorRef,
-              private gs: GlobalsService,private storageService: StorageService,
-              private activatedRoute: ActivatedRoute,private router:Router){
+  constructor(
+    private addService: NfsAddService,
+    private cdr: ChangeDetectorRef,
+    private gs: GlobalsService,
+    private storageService: StorageService,
+    private activatedRoute: ActivatedRoute,
+    private router: Router
+  ) {
+    this.isAddPageOneNextDisabled = true;
+    this.checkAddForm = debounce(this.checkAddForm.bind(this), 300);
+  }
+
+  checkAddForm() {
+    const isStoragId = !!this.addForm.storagId;
+    const isStoragePoolId = !!this.addForm.storagePoolId;
+    const isCurrentPortId = !!this.addForm.currentPortId;
+    const isNfsName = !!this.addForm.nfsName;
+    const isSize = typeof this.addForm.size === 'number';
+    const isHostObjectId = !!this.addForm.hostObjectId;
+    const isVkernelIp = !!this.addForm.vkernelIp;
+    const isAccessMode = !!this.addForm.accessMode;
+    const isFsName = !!this.addForm.fsName;
+    const isShareName = !!this.addForm.shareName;
+
+    console.log(
+      isStoragId,
+      isStoragePoolId,
+      isCurrentPortId,
+      isNfsName,
+      isSize,
+      isHostObjectId,
+      isVkernelIp,
+      isAccessMode,
+      isFsName,
+      isShareName
+    );
+
+    this.isAddPageOneNextDisabled = !(
+      isStoragId &&
+      isStoragePoolId &&
+      isCurrentPortId &&
+      isNfsName &&
+      isSize &&
+      isHostObjectId &&
+      isVkernelIp &&
+      isAccessMode &&
+      isFsName &&
+      isShareName
+    );
+    this.cdr.detectChanges();
   }
 
   ngOnInit(): void {
-    this.modalLoading=true;
-    this.viewPage='add_plugin'
+    this.modalLoading = true;
+    this.viewPage = 'add_plugin';
     this.activatedRoute.queryParams.subscribe(queryParam => {
-      this.pluginFlag =queryParam.flag;
+      this.pluginFlag = queryParam.flag;
     });
-    if(this.pluginFlag==null){
+    if (this.pluginFlag == null) {
       //入口来至Vcenter
-      this.viewPage='delete_vcenter'
+      this.viewPage = 'delete_vcenter';
     }
 
     this.storagePoolMap = [];
 
     //入口是DataSource
-    this.viewPage='add_plugin'
+    this.viewPage = 'add_plugin';
     this.activatedRoute.queryParams.subscribe(queryParam => {
-      this.pluginFlag =queryParam.flag;
+      this.pluginFlag = queryParam.flag;
     });
-    if(this.pluginFlag==null){
+    if (this.pluginFlag == null) {
       //入口来至Vcenter
-      this.viewPage='add_vcenter'
+      this.viewPage = 'add_vcenter';
     }
-    this.storageService.getData().subscribe((s: any) => {
-      this.modalLoading=false;
-      if (s.code === '200'){
+
+    const successGetData = (s: any) => {
+      this.modalLoading = false;
+      if (s.code === '200') {
         this.storageList = s.data;
 
-        const allPoolMap:StoragePoolMap[] = []
+        const allPoolMap: StoragePoolMap[] = [];
 
-        s.data.forEach(item  => {
-          const poolMap:StoragePoolMap = {
-            storageId:item.id,
-            storagePoolList:null,
-            logicPort:null
-          }
+        s.data.forEach(item => {
+          const poolMap: StoragePoolMap = {
+            storageId: item.id,
+            storagePoolList: null,
+            logicPort: null,
+          };
           allPoolMap.push(poolMap);
         });
 
         this.storagePoolMap = allPoolMap;
 
-        this.modalLoading=false;
+        this.modalLoading = false;
       }
-    });
-    this.addService.getHostList().subscribe((r: any) => {
-      this.modalLoading=false;
-      if (r.code === '200'){
+    };
+
+    /* 1.获取存储设备 */
+    if (isMockData) {
+      successGetData(mockData.DMESTORAGE_STORAGES);
+    } else {
+      this.storageService.getData().subscribe(successGetData);
+    }
+
+    this.hostList = null;
+    const handlerGetHostListSuccess = (r: any) => {
+      this.modalLoading = false;
+      if (r.code === '200') {
         this.hostList = r.data;
         this.cdr.detectChanges();
       }
-    });
+    };
+
+    /* 2.获取挂载主机List */
+    if (isMockData) {
+      handlerGetHostListSuccess(mockData.NFS_ACCESSVMWARE_LISTHOST);
+    } else {
+      this.addService
+        .getHostList()
+        .subscribe(handlerGetHostListSuccess, handlerResponseErrorSimple);
+    }
+
     this.addForm = new AddNfs();
-    this.checkedPool= null;
-    this.errorMsg='';
+
+    /* 监听名字变化 根据是否一样给剩下两个赋值 */
+    this.addFormGroup.valueChanges.subscribe(addForm => {
+      if (addForm.sameName) {
+        const isSameShare = this.addForm.shareName === addForm.nfsName;
+        const isSameFs = (this.addForm.fsName = addForm.nfsName);
+        if (!(isSameShare && isSameFs)) {
+          this.addForm.fsName = this.addForm.shareName = addForm.nfsName;
+        }
+      }
+      this.checkAddForm();
+    });
+
+    this.checkedPool = null;
+    this.errorMsg = '';
     // 获取存储列表
     this.cdr.detectChanges();
   }
+
   jumpTo(page: ClrWizardPage, wizard: ClrWizard) {
-    console.log('wizard:')
-    console.log(this.wizard)
+    console.log('wizard:');
+    console.log(this.wizard);
     if (page && page.completed) {
       wizard.navService.currentPage = page;
     } else {
@@ -130,18 +241,26 @@ export class NfsAddComponent implements OnInit{
     }
     this.wizard.open();
   }
-  addNfs(){
-    if (this.bandWidthMaxErrTips || this.iopsMaxErrTips
-      || this.bandWidthMinErrTips || this.iopsMinErrTips || this.latencyErrTips  || this.bandwidthLimitErr || this.iopsLimitErr) {
+
+  addNfs() {
+    if (
+      this.bandWidthMaxErrTips ||
+      this.iopsMaxErrTips ||
+      this.bandWidthMinErrTips ||
+      this.iopsMinErrTips ||
+      this.latencyErrTips ||
+      this.bandwidthLimitErr ||
+      this.iopsLimitErr
+    ) {
       return;
     }
     //
-    this.modalHandleLoading=true;
+    this.modalHandleLoading = true;
 
     this.checkedPool = this.storagePools.filter(item => item.id === this.addForm.storagePoolId)[0];
 
-    this.addForm.poolRawId=this.checkedPool.poolId;
-    this.addForm.storagePoolId= this.checkedPool.id;
+    this.addForm.poolRawId = this.checkedPool.poolId;
+    this.addForm.storagePoolId = this.checkedPool.id;
     const addSubmitForm = new AddNfs();
     Object.assign(addSubmitForm, this.addForm);
     // 单位换算
@@ -155,7 +274,8 @@ export class NfsAddComponent implements OnInit{
       case 'KB':
         addSubmitForm.size = addSubmitForm.size / (1024 * 1024);
         break;
-      default: // 默认GB 不变
+      default:
+        // 默认GB 不变
         break;
     }
     this.qosFunc(addSubmitForm);
@@ -164,8 +284,12 @@ export class NfsAddComponent implements OnInit{
       addSubmitForm.deduplicationEnabled = null;
       addSubmitForm.compressionEnabled = null;
     } else {
-      if (addSubmitForm.deduplicationEnabled != null && addSubmitForm.deduplicationEnabled.toString()) {
-        addSubmitForm.deduplicationEnabled = addSubmitForm.deduplicationEnabled.toString() == 'true';
+      if (
+        addSubmitForm.deduplicationEnabled != null &&
+        addSubmitForm.deduplicationEnabled.toString()
+      ) {
+        addSubmitForm.deduplicationEnabled =
+          addSubmitForm.deduplicationEnabled.toString() == 'true';
       } else {
         addSubmitForm.deduplicationEnabled = null;
       }
@@ -176,99 +300,122 @@ export class NfsAddComponent implements OnInit{
       }
     }
     this.addService.addNfs(addSubmitForm).subscribe((result: any) => {
-      this.modalHandleLoading=false;
-      if (result.code === '200'){
+      this.modalHandleLoading = false;
+      if (result.code === '200') {
         // 打开成功提示窗口
         this.addSuccessShow = true;
-      }else{
+      } else {
         this.errorMsg = '1';
-        console.log("Delete failed:",result.description)
+        console.log('Delete failed:', result.description);
       }
       this.cdr.detectChanges();
     });
   }
-  selectStoragePool(){
-    this.modalLoading=true;
+  selectStoragePool() {
+    this.modalLoading = true;
     this.storagePools = [];
     this.addForm.storagePoolId = undefined;
     this.logicPorts = [];
     this.addForm.currentPortId = undefined;
     if (this.addForm.storagId) {
-
       this.addQosUpperAndLower();
       this.addCompressionShow();
       this.addDeduplicationShow();
       this.addLatencyChoose();
-      const storages=this.storageList.filter(item=>item.id==this.addForm.storagId);
-      this.dorado=storages[0].storageTypeShow.dorado;
+      const storages = this.storageList.filter(item => item.id == this.addForm.storagId);
+      this.dorado = storages[0].storageTypeShow.dorado;
       let mediaType;
-      if (this.dorado){
-        this.addForm.autoSizeEnable=undefined;
+      if (this.dorado) {
+        this.addForm.autoSizeEnable = undefined;
         mediaType = 'block-and-file';
       } else {
         mediaType = 'file';
       }
-      const storagePoolMap = this.storagePoolMap.filter(item => item.storageId == this.addForm.storagId);
+      const storagePoolMap = this.storagePoolMap.filter(
+        item => item.storageId == this.addForm.storagId
+      );
 
       const storagePoolList = storagePoolMap[0].storagePoolList;
       const logicPorts = storagePoolMap[0].logicPort;
 
       // 选择存储后获取存储池
       // if (!storagePoolList) {
-        this.storageService.getStoragePoolListByStorageId(mediaType,this.addForm.storagId)
-          .subscribe((r: any) => {
-            if (r.code === '200'){
-              this.storagePools = r.data;
-            }
-            this.cdr.detectChanges();
-          });
+
+      const handlerGetStoragePoolListByStorageIdSuccess = (r: any) => {
+        if (r.code === '200') {
+          this.storagePools = r.data;
+        }
+        this.cdr.detectChanges();
+      };
+
+      if (isMockData) {
+        handlerGetStoragePoolListByStorageIdSuccess(mockData.DMESTORAGE_STORAGES);
+      } else {
+        this.storageService
+          .getStoragePoolListByStorageId(mediaType, this.addForm.storagId)
+          .subscribe(handlerGetStoragePoolListByStorageIdSuccess);
+      }
       // } else {
       //   this.storagePools = storagePoolList;
       // }
       // if (!logicPorts) {
-        this.selectLogicPort();
+      this.selectLogicPort();
       // } else {
       //   this.logicPorts = logicPorts;
       //   this.modalLoading=false;
       // }
     }
   }
-  selectLogicPort(){
-    // 选择存储后逻辑端口
-    this.storageService.getLogicPortListByStorageId(this.addForm.storagId)
-      .subscribe((r: any) => {
-        this.modalLoading=false;
-        if (r.code === '200'){
-          this.logicPorts = r.data;
-          this.storagePoolMap.filter(item => item.storageId == this.addForm.storagId)[0].logicPort = r.data;
-        }
-        this.cdr.detectChanges();
-      });
+  selectLogicPort() {
+    const handlerGetLogicPortListByStorageIdSuccess = (r: any) => {
+      this.modalLoading = false;
+      if (r.code === '200') {
+        this.logicPorts = r.data;
+        this.storagePoolMap.filter(item => item.storageId == this.addForm.storagId)[0].logicPort =
+          r.data;
+      }
+      this.cdr.detectChanges();
+    };
+    if (isMockData) {
+      handlerGetLogicPortListByStorageIdSuccess(mockData.NFS_DMESTORAGE_LOGICPORTS);
+    } else {
+      // 选择存储后逻辑端口
+      this.storageService
+        .getLogicPortListByStorageId(this.addForm.storagId)
+        .subscribe(handlerGetLogicPortListByStorageIdSuccess);
+    }
   }
-  checkHost(){
-    this.modalLoading=true;
+  checkHost() {
+    this.modalLoading = true;
 
+    const handlerGetVmkernelListByObjectIdSuccess = (r: any) => {
+      this.modalLoading = false;
+      if (r.code === '200') {
+        this.vmkernelList = r.data;
+        this.addForm.vkernelIp = this.vmkernelList[0].ipAddress;
+      }
+      this.cdr.detectChanges();
+    };
     //选择主机后获取虚拟网卡
-    this.addService.getVmkernelListByObjectId(this.addForm.hostObjectId)
-      .subscribe((r: any) => {
-        this.modalLoading=false;
-        if (r.code === '200'){
-          this.vmkernelList = r.data;
-          this.addForm.vkernelIp=this.vmkernelList[0].ipAddress;
-        }
-        this.cdr.detectChanges();
-      });
+    if (isMockData) {
+      handlerGetVmkernelListByObjectIdSuccess(
+        mockData.NFS_ACCESSVMWARE_GETVMKERNELIPBYHOSTOBJECTID
+      );
+    } else {
+      this.addService
+        .getVmkernelListByObjectId(this.addForm.hostObjectId)
+        .subscribe(handlerGetVmkernelListByObjectIdSuccess);
+    }
   }
-  backToNfsList(){
-    this.modalLoading=false;
+  backToNfsList() {
+    this.modalLoading = false;
     this.router.navigate(['nfs']);
   }
-  closeModel(){
-    this.modalLoading=false;
+  closeModel() {
+    this.modalLoading = false;
     this.gs.getClientSdk().modal.close();
   }
-  qosBlur(type:String, operationType:string) {
-
+  qosBlur(type: String, operationType: string) {
     let objVal;
     if (type === 'add') {
       switch (operationType) {
@@ -296,7 +443,7 @@ export class NfsAddComponent implements OnInit{
         objVal = '';
       }
     }
-    if (objVal > 999999999){
+    if (objVal > 999999999) {
       objVal = '';
     } else if (objVal < 1) {
       objVal = '';
@@ -329,41 +476,41 @@ export class NfsAddComponent implements OnInit{
    * @param objVal
    * @param operationType
    */
-  iopsErrTips(objVal:string, operationType:string) {
+  iopsErrTips(objVal: string, operationType: string) {
     if (operationType) {
       switch (operationType) {
         case 'maxbandwidth':
           if (objVal == '' && this.addForm.maxBandwidthChoose) {
             this.bandWidthMaxErrTips = true;
-          }else {
+          } else {
             this.bandWidthMaxErrTips = false;
           }
           break;
         case 'maxiops':
           if (objVal == '' && this.addForm.maxIopsChoose) {
             this.iopsMaxErrTips = true;
-          }else {
+          } else {
             this.iopsMaxErrTips = false;
           }
           break;
         case 'minbandwidth':
           if (objVal == '' && this.addForm.minBandwidthChoose) {
             this.bandWidthMinErrTips = true;
-          }else {
+          } else {
             this.bandWidthMinErrTips = false;
           }
           break;
         case 'miniops':
           if (objVal == '' && this.addForm.minIopsChoose) {
             this.iopsMinErrTips = true;
-          }else {
+          } else {
             this.iopsMinErrTips = false;
           }
           break;
         default:
           if (objVal == '' && this.addForm.latencyChoose) {
             this.latencyErrTips = true;
-          }else {
+          } else {
             this.latencyErrTips = false;
           }
           break;
@@ -374,7 +521,7 @@ export class NfsAddComponent implements OnInit{
   /**
    * 初始化IOPS错误提示
    */
-  initIopsErrTips(upper:boolean, lower:boolean) {
+  initIopsErrTips(upper: boolean, lower: boolean) {
     if (upper) {
       this.bandWidthMaxErrTips = false;
       this.iopsMaxErrTips = false;
@@ -385,24 +532,24 @@ export class NfsAddComponent implements OnInit{
       this.latencyErrTips = false;
     }
   }
-  matchErr=false;
-  nfsNameRepeatErr=false;
-  shareNameRepeatErr=false;
-  fsNameRepeatErr=false;
-  oldNfsName:string;
-  oldShareName:string;
-  oldFsName:string;
-  checkNfsName(){
-    if(this.addForm.nfsName==null) return false;
-    if(this.oldNfsName==this.addForm.nfsName) return false;
-    this.oldNfsName=this.addForm.nfsName;
-    let reg5:RegExp = new RegExp('^[0-9a-zA-Z\u4e00-\u9fa5a"_"]*$');
-    if(reg5.test(this.addForm.nfsName)){
+  matchErr = false;
+  nfsNameRepeatErr = false;
+  shareNameRepeatErr = false;
+  fsNameRepeatErr = false;
+  oldNfsName: string;
+  oldShareName: string;
+  oldFsName: string;
+  checkNfsName() {
+    if (this.addForm.nfsName == null) return false;
+    if (this.oldNfsName == this.addForm.nfsName) return false;
+    this.oldNfsName = this.addForm.nfsName;
+    let reg5: RegExp = new RegExp('^[0-9a-zA-Z\u4e00-\u9fa5a"_"]*$');
+    if (reg5.test(this.addForm.nfsName)) {
       // 共享名称不能包含中文
-      let reg5Two:RegExp = new RegExp('[\u4e00-\u9fa5]');
+      let reg5Two: RegExp = new RegExp('[\u4e00-\u9fa5]');
       //验证重复
-      this.matchErr=false;
-      if (this.addForm.sameName){
+      this.matchErr = false;
+      if (this.addForm.sameName) {
         this.addForm.shareName = this.addForm.nfsName;
         this.addForm.fsName = this.addForm.nfsName;
         if (reg5Two.test(this.addForm.nfsName)) {
@@ -415,129 +562,131 @@ export class NfsAddComponent implements OnInit{
         }
         this.checkNfsNameExist(this.addForm.nfsName);
         this.checkFsNameExist(this.addForm.nfsName);
-      }else{
+      } else {
         this.checkNfsNameExist(this.addForm.nfsName);
       }
-    }else{
+    } else {
       //
-      this.matchErr=true;
+      this.matchErr = true;
       //不满足的时候置空
-      this.addForm.nfsName=null;
+      this.addForm.nfsName = null;
       console.log('验证不通过');
     }
   }
-  checkShareName(){
-    if(this.addForm.shareName==null) return false;
-    if(this.oldShareName==this.addForm.shareName) return false;
+  checkShareName() {
+    if (this.addForm.shareName == null) return false;
+    if (this.oldShareName == this.addForm.shareName) return false;
 
-    this.oldShareName=this.addForm.shareName;
-    let reg5:RegExp = new RegExp('^[0-9a-zA-Z\u4e00-\u9fa5a"_"]*$');
-    if(reg5.test(this.addForm.shareName)){
+    this.oldShareName = this.addForm.shareName;
+    let reg5: RegExp = new RegExp('^[0-9a-zA-Z\u4e00-\u9fa5a"_"]*$');
+    if (reg5.test(this.addForm.shareName)) {
       // 共享名称不能包含中文
-      let reg5Two:RegExp = new RegExp('[\u4e00-\u9fa5]');
+      let reg5Two: RegExp = new RegExp('[\u4e00-\u9fa5]');
       if (reg5Two.test(this.addForm.shareName)) {
         this.addForm.shareName = '';
         this.shareNameContainsCN = true;
       } else {
         this.shareNameContainsCN = false;
         //验证重复
-        this.matchErr=false;
+        this.matchErr = false;
         this.checkShareNameExist(this.addForm.shareName);
       }
-    }else{
-      this.matchErr=true;
-      this.addForm.shareName=null;
+    } else {
+      this.matchErr = true;
+      this.addForm.shareName = null;
     }
   }
   /**
    * 添加页面可点击 true 可点击 false 不可点击
    */
   isCheckSameName() {
-    let reg5:RegExp = new RegExp('[\u4e00-\u9fa5]');
-    if (reg5.test(this.addForm.nfsName)) { // 名称有中文
+    let reg5: RegExp = new RegExp('[\u4e00-\u9fa5]');
+    if (reg5.test(this.addForm.nfsName)) {
+      // 名称有中文
       return false;
-    } else { // 无中文
+    } else {
+      // 无中文
       return true;
     }
   }
-  setSameName(){
+  setSameName() {
     if (this.addForm.sameName) {
       this.addForm.shareName = this.addForm.nfsName;
       this.addForm.fsName = this.addForm.nfsName;
     }
   }
-  checkFsName(){
-    if(this.addForm.fsName==null) return false;
-    if(this.oldFsName==this.addForm.fsName) return false;
+  checkFsName() {
+    if (this.addForm.fsName == null) return false;
+    if (this.oldFsName == this.addForm.fsName) return false;
 
-    this.oldFsName=this.addForm.fsName;
-    let reg5:RegExp = new RegExp('^[0-9a-zA-Z\u4e00-\u9fa5a"_"]*$');
-    if(reg5.test(this.addForm.fsName)){
+    this.oldFsName = this.addForm.fsName;
+    let reg5: RegExp = new RegExp('^[0-9a-zA-Z\u4e00-\u9fa5a"_"]*$');
+    if (reg5.test(this.addForm.fsName)) {
       //验证重复
-      this.matchErr=false;
+      this.matchErr = false;
       this.checkShareNameExist(this.addForm.fsName);
-    }else{
-      this.matchErr=true;
-      this.addForm.fsName=null;
+    } else {
+      this.matchErr = true;
+      this.addForm.fsName = null;
     }
   }
-  checkNfsNameExist(name:string){
-    this.addService.checkNfsNameExist(name).subscribe((r:any)=>{
-        if (r.code=='200'){
-          if(r.data){
-            this.nfsNameRepeatErr=false;
-          }else{
-            this.nfsNameRepeatErr=true;
-            this.addForm.nfsName=null;
-          }
-        }
-    });
-  }
-  checkShareNameExist(name:string){
-    this.addService.checkShareNameExist(name).subscribe((r:any)=>{
-      if (r.code=='200'){
-        if(r.data){
-          this.shareNameRepeatErr=false;
-        }else{
-          this.shareNameRepeatErr=true;
-          this.addForm.nfsName=null;
+  checkNfsNameExist(name: string) {
+    this.addService.checkNfsNameExist(name).subscribe((r: any) => {
+      if (r.code == '200') {
+        if (r.data) {
+          this.nfsNameRepeatErr = false;
+        } else {
+          this.nfsNameRepeatErr = true;
+          this.addForm.nfsName = null;
         }
       }
     });
   }
-  checkFsNameExist(name:string){
-    this.addService.checkFsNameExist(name).subscribe((r:any)=>{
-      if (r.code=='200'){
-        if(r.data){
-          this.shareNameRepeatErr=false;
-        }else{
-          this.shareNameRepeatErr=true;
-          this.addForm.nfsName=null;
+  checkShareNameExist(name: string) {
+    this.addService.checkShareNameExist(name).subscribe((r: any) => {
+      if (r.code == '200') {
+        if (r.data) {
+          this.shareNameRepeatErr = false;
+        } else {
+          this.shareNameRepeatErr = true;
+          this.addForm.nfsName = null;
         }
       }
     });
   }
-
+  checkFsNameExist(name: string) {
+    this.addService.checkFsNameExist(name).subscribe((r: any) => {
+      if (r.code == '200') {
+        if (r.data) {
+          this.shareNameRepeatErr = false;
+        } else {
+          this.shareNameRepeatErr = true;
+          this.addForm.nfsName = null;
+        }
+      }
+    });
+  }
 
   /**
    * 确认关闭窗口
    */
   confirmActResult() {
-    this.wizard.close();// 关闭弹窗
-    if (this.pluginFlag=='plugin'){
+    this.wizard.close(); // 关闭弹窗
+    if (this.pluginFlag == 'plugin') {
       this.backToNfsList();
-    }else{
+    } else {
       this.closeModel();
     }
   }
   qosFunc(form) {
-    console.log("form.qosFlag", form.qosFlag);
+    console.log('form.qosFlag', form.qosFlag);
     const qosTag = this.getStorageQosTag(form.storagId);
-    if (!form.qosFlag) {// 关闭状态
+    if (!form.qosFlag) {
+      // 关闭状态
       form.contolPolicy = null;
       this.initAddMinInfo(form);
       this.initAddMaxInfo(form);
-    }else {
+    } else {
       if (form.control_policyUpper == '1') {
         if (!form.maxBandwidthChoose) {
           form.maxBandwidth = null;
@@ -550,9 +699,9 @@ export class NfsAddComponent implements OnInit{
         }
       }
       if (form.control_policyLower == '0') {
-        if(qosTag == 2){
+        if (qosTag == 2) {
           this.initAddMaxInfo(form);
-        }else if (qosTag == 3) {
+        } else if (qosTag == 3) {
           this.initAddMinInfo(form);
         }
         if (!form.minBandwidthChoose) {
@@ -577,7 +726,8 @@ export class NfsAddComponent implements OnInit{
       } else if (form.control_policyUpper != '1' && form.control_policyLower == '0') {
         this.initAddMaxInfo(form);
         form.contolPolicy = 'low';
-      } else { // all
+      } else {
+        // all
         form.contolPolicy = 'all';
       }
     }
@@ -591,7 +741,7 @@ export class NfsAddComponent implements OnInit{
     form.latencyChoose = false;
     form.latency = null;
   }
-  initAddMaxInfo(form){
+  initAddMaxInfo(form) {
     form.control_policyUpper = undefined;
     form.maxBandwidthChoose = false;
     form.maxBandwidth = null;
@@ -603,8 +753,8 @@ export class NfsAddComponent implements OnInit{
    * qos开关
    * @param form
    */
-  qoSFlagChange(form){
-    if(form.qosFlag) {
+  qoSFlagChange(form) {
+    if (form.qosFlag) {
       form.control_policyUpper = undefined;
       form.maxBandwidthChoose = false;
       form.maxIopsChoose = false;
@@ -633,10 +783,9 @@ export class NfsAddComponent implements OnInit{
       qosTag = this.getStorageQosTag(form.storagId);
     }
 
-
     let upperChecked;
-    if(upperObj) {
-      upperChecked =  upperObj.checked;
+    if (upperObj) {
+      upperChecked = upperObj.checked;
     }
     let lowerChecked;
     if (lowerObj) {
@@ -644,30 +793,31 @@ export class NfsAddComponent implements OnInit{
     }
     this.initIopsErrTips(upperChecked, lowerChecked);
     if (isUpper) {
-      if(upperChecked) {
+      if (upperChecked) {
         form.control_policyUpper = '1';
-      }else {
+      } else {
         form.control_policyUpper = undefined;
       }
-      if(qosTag == 2 && upperChecked) { // 单选
-        console.log("单选1", qosTag)
+      if (qosTag == 2 && upperChecked) {
+        // 单选
+        console.log('单选1', qosTag);
         form.control_policyLower = undefined;
         lowerObj.checked = false;
       }
     } else {
-      if(lowerChecked) {
+      if (lowerChecked) {
         form.control_policyLower = '0';
-      }else {
+      } else {
         form.control_policyLower = undefined;
       }
       if (lowerChecked && qosTag == 2) {
-        console.log("单选2", qosTag)
+        console.log('单选2', qosTag);
         form.control_policyUpper = undefined;
         upperObj.checked = false;
       }
     }
-    console.log("lowerChecked", form)
-    console.log("lowerChecked", form)
+    console.log('lowerChecked', form);
+    console.log('lowerChecked', form);
     if (form.control_policyUpper == undefined) {
       form.maxBandwidthChoose = false;
       form.maxIopsChoose = false;
@@ -698,8 +848,8 @@ export class NfsAddComponent implements OnInit{
     const qosTag = this.getStorageQosTag(this.addForm.storagId);
     this.addForm.control_policyLower = undefined;
     this.addForm.control_policyUpper = undefined;
-    const upperObj = document.getElementById("control_policyUpper") as HTMLInputElement;
-    const lowerObj = document.getElementById("control_policyLower") as HTMLInputElement;
+    const upperObj = document.getElementById('control_policyUpper') as HTMLInputElement;
+    const lowerObj = document.getElementById('control_policyLower') as HTMLInputElement;
     if (upperObj && upperObj.checked) {
       upperObj.checked = false;
     }
@@ -749,35 +899,35 @@ export class NfsAddComponent implements OnInit{
   /**
    * 添加页面 时延为下拉框
    */
-  addLatencyChoose(){
+  addLatencyChoose() {
     this.addForm.latency = null;
     const qosTag = this.getStorageQosTag(this.addForm.storagId);
     this.latencyIsSelect = qosTag == 1;
   }
-  resetQosFlag(objValue:boolean, operationType:string) {
+  resetQosFlag(objValue: boolean, operationType: string) {
     switch (operationType) {
       case 'maxbandwidth':
-        if(!objValue) {
+        if (!objValue) {
           this.bandWidthMaxErrTips = false;
         }
         break;
       case 'maxiops':
-        if(!objValue) {
+        if (!objValue) {
           this.iopsMaxErrTips = false;
         }
         break;
       case 'minbandwidth':
-        if(!objValue) {
+        if (!objValue) {
           this.bandWidthMinErrTips = false;
         }
         break;
       case 'miniops':
-        if(!objValue) {
+        if (!objValue) {
           this.iopsMinErrTips = false;
         }
         break;
       default:
-        if(!objValue) {
+        if (!objValue) {
           this.latencyErrTips = false;
         }
         break;
@@ -790,16 +940,20 @@ export class NfsAddComponent implements OnInit{
       this.addForm.securityType = '';
     }
   }
-  qosV6Check(type:string) {
+  qosV6Check(type: string) {
     if (type == 'add') {
       if (this.addForm.storagId) {
         const chooseStorage = this.storageList.filter(item => item.id == this.addForm.storagId)[0];
         if (chooseStorage) {
-          const qosTag = chooseStorage.storageTypeShow.qosTag
+          const qosTag = chooseStorage.storageTypeShow.qosTag;
           if (qosTag == 1) {
             if (this.addForm.minBandwidthChoose && this.addForm.maxBandwidthChoose) {
               // 带宽上限小于下限
-              if (this.addForm.minBandwidth && this.addForm.maxBandwidth && Number(this.addForm.minBandwidth) > Number(this.addForm.maxBandwidth)) {
+              if (
+                this.addForm.minBandwidth &&
+                this.addForm.maxBandwidth &&
+                Number(this.addForm.minBandwidth) > Number(this.addForm.maxBandwidth)
+              ) {
                 this.bandwidthLimitErr = true;
               } else {
                 this.bandwidthLimitErr = false;
@@ -809,7 +963,11 @@ export class NfsAddComponent implements OnInit{
             }
             if (this.addForm.minIopsChoose && this.addForm.maxIopsChoose) {
               // iops上限小于下限
-              if (this.addForm.minIops && this.addForm.maxIops && Number(this.addForm.minIops) > Number(this.addForm.maxIops)) {
+              if (
+                this.addForm.minIops &&
+                this.addForm.maxIops &&
+                Number(this.addForm.minIops) > Number(this.addForm.maxIops)
+              ) {
                 this.iopsLimitErr = true;
               } else {
                 this.iopsLimitErr = false;
@@ -821,7 +979,11 @@ export class NfsAddComponent implements OnInit{
             this.iopsLimitErr = false;
             this.bandwidthLimitErr = false;
           }
-          if (this.addForm.maxIopsChoose && this.addForm.maxIops && Number(this.addForm.maxIops) < 100) {
+          if (
+            this.addForm.maxIopsChoose &&
+            this.addForm.maxIops &&
+            Number(this.addForm.maxIops) < 100
+          ) {
             this.iopsLimitErr = true;
           }
           if (this.addForm.control_policyUpper == undefined) {
@@ -832,9 +994,7 @@ export class NfsAddComponent implements OnInit{
             this.bandwidthLimitErr = false;
           }
         }
-
       }
     }
   }
 }
-
