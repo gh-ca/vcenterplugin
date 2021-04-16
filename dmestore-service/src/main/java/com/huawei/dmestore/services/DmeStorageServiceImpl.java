@@ -220,7 +220,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
             * 1.首先根据前端页面的storageid获取volumeId
             * 2.根据volumeId查询对应卷的数据信息**/
             if(flag) {
-                DmeVmwareRelation vmRelations = dmeVmwareRalationDao.getDmeVmwareRelationByDsId(storageId);
+                DmeVmwareRelation vmRelations = dmeVmwareRalationDao.getDmeVmwareRelationByDeviceId(storageId);
                 Map<String, Object> map = getLunDetailByVolumeId(vmRelations.getVolumeId());
                 boolean qosFlag = (boolean) map.get("qosFlag");
                 SmartQos smartosQ = (SmartQos) map.get("smartosQ");
