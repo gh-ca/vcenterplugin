@@ -72,6 +72,7 @@ public class BestPracticeCheckDao extends H2DataBaseDao {
             pstm.executeBatch();
             con.commit();
         } catch (SQLException ex) {
+            LOGGER.error("save bestPracticeBean error!errMsg={}", ex.getMessage());
             try {
                 // 回滚
                 con.rollback();
