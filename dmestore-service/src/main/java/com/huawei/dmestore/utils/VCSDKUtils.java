@@ -2056,7 +2056,7 @@ public class VCSDKUtils {
      * @param mountType mountType
      * @throws VcenterException VcenterException
      **/
-    public void mountNfs(String datastoreobjectid, String hostobjectid, String logicPortIp, String mountType) {
+    public void mountNfs(String datastoreobjectid, String hostobjectid, String logicPortIp, String mountType, String shareName) {
         try {
             if (datastoreobjectid == null) {
                 logger.info("param datastore is null");
@@ -2083,7 +2083,7 @@ public class VCSDKUtils {
             // 挂载NFS
             NasDatastoreInfo nasdsinfo = (NasDatastoreInfo) datastoreMo.getInfo();
             hostMo.getHostDatastoreSystemMo()
-                .createNfsDatastore(nasdsinfo.getNas().getRemoteHost(), 0, nasdsinfo.getNas().getRemotePath(),
+                .createNfsDatastore(nasdsinfo.getNas().getRemoteHost(), 0, shareName,
                     datastoreMo.getName(), mountType, nasdsinfo.getNas().getType(),
                     nasdsinfo.getNas().getSecurityType());
             logger.info("mount nfs success:{}:", hostMo.getName(), datastoreMo.getName());
