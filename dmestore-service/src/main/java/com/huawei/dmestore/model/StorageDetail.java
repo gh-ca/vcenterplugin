@@ -162,6 +162,17 @@ public class StorageDetail {
      * 维保结束时间.
      **/
     private String maintenanceOvertime;
+
+    //增加qos前端页面判断逻辑标识
+
+    private boolean qosFlag;
+    public boolean getQosFlag() {
+        return qosFlag;
+    }
+    public void setQosFlag(final boolean param) {
+        this.qosFlag = param;
+    }
+
     /**
      * 存储类型不同导致页面及属性差异对象
      */
@@ -175,6 +186,14 @@ public class StorageDetail {
         this.storageTypeShow = storageTypeShow;
     }
 
+    private SmartQos smartQos;
+    public SmartQos getSmartQos() {
+        return smartQos;
+    }
+
+    public void setSmartQos(SmartQos smartQos) {
+        this.smartQos = smartQos;
+    }
     /**
      * getPatchVersion .
      *
