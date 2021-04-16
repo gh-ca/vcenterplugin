@@ -196,11 +196,13 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
                 map.put("latency", Integer.valueOf(latency.toString()));
             }
             map.put("enabled", true);
-            customizeVolumeTuning.put("smartqos", map);
         }
+        customizeVolumeTuning.put("smartqos", map);
         Boolean smartTierFlag = (Boolean) params.get("smartTierFlag");
         if (smartTierFlag) {
             customizeVolumeTuning.put("smarttier", ToolUtils.getStr(params.get("smartTier")));
+        }else {
+            customizeVolumeTuning.put("smarttier", null);
         }
         return customizeVolumeTuning;
     }
