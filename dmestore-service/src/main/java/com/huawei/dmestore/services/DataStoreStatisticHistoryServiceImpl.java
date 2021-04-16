@@ -127,6 +127,7 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
 
     @Override
     public Map<String, Object> queryVolumeStatistic(Map<String, Object> params) throws DmeException {
+        log.info("性能-queryVolumeStatistic：{}");
         Map<String, String> idInstancdIdMap = initParamVolume(params, false);
         return queryHistoryStatistic(VOLUME_INSTANCE, params, idInstancdIdMap);
     }
@@ -283,6 +284,7 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
     @Override
     public Map<String, Object> queryHistoryStatistic(String relationOrInstance, Map<String, Object> params)
         throws DmeException {
+        log.info("性能-queryHistoryStatistic：{}", relationOrInstance);
         Map<String, Object> resultMap = new HashMap<>(DmeConstants.COLLECTION_CAPACITY_16);
         if (!StringUtils.isEmpty(relationOrInstance)) {
             switch (relationOrInstance) {
@@ -410,7 +412,7 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
                     if (null != responseEntity
                         && DmeConstants.HTTPS_STATUS_SUCCESS_200 == responseEntity.getStatusCodeValue()) {
                         Object body = responseEntity.getBody();
-                        String bodyStr = body.toString();
+                        String bodyStr = ToolUtils.getStr(body);
                         bodyStr = replace(bodyStr, idInstanceIdMap);
                         JsonObject bodyJson = new JsonParser().parse(bodyStr).getAsJsonObject();
                         statisticElement = bodyJson.get("data");
@@ -449,10 +451,13 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
         Object indicatorIds = params.get(INDICATOR_IDS_FIELD);
         Map<String, Map<String, Object>> instanceMap = dmeRelationInstanceService.getStorageDeviceInstance();
         for (String id : ids) {
-            String instanceId = instanceMap.get(id).get(RESID_FIELD).toString();
-            if (!StringUtils.isEmpty(instanceId)) {
-                idInstancdIdMap.put(id, instanceId);
-                instanceIds.add(instanceId);
+            Map<String, Object> map = instanceMap.get(id);
+            if (map != null && map.size() != 0) {
+                String instanceId = map.get(RESID_FIELD).toString();
+                if (!StringUtils.isEmpty(instanceId)) {
+                    idInstancdIdMap.put(id, instanceId);
+                    instanceIds.add(instanceId);
+                }
             }
         }
         if (instanceIds.size() > 0) {
@@ -479,10 +484,13 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
         Object indicatorIds = params.get(INDICATOR_IDS_FIELD);
         Map<String, Map<String, Object>> sysLunMap = dmeRelationInstanceService.getStoragePoolInstance();
         for (String id : ids) {
-            String instanceId = sysLunMap.get(id).get(RESID_FIELD).toString();
-            if (!StringUtils.isEmpty(instanceId)) {
-                idInstancdIdMap.put(id, instanceId);
-                instanceIds.add(instanceId);
+            Map<String, Object> map = sysLunMap.get(id);
+            if (map != null && map.size() != 0) {
+                String instanceId = ToolUtils.getStr(map.get(RESID_FIELD));
+                if (!StringUtils.isEmpty(instanceId)) {
+                    idInstancdIdMap.put(id, instanceId);
+                    instanceIds.add(instanceId);
+                }
             }
         }
         if (instanceIds.size() > 0) {
@@ -506,29 +514,31 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
         }
         Map<String, String> idInstancdIdMap = new HashMap<>(DmeConstants.COLLECTION_CAPACITY_16);
         List<String> instanceIds = new ArrayList<>();
-        Object indicatorIds = params.get(INDICATOR_IDS_FIELD);
         Object objIds = params.get(OBJ_IDS_FIELD);
         List<String> ids = getObjIds(objIds);
+        Object indicatorIds = params.get(INDICATOR_IDS_FIELD);
         if (ids.size() > 0) {
             // ids若为wwn的集合则转换为对应的instanceId集合,也有可能ids直接就是volume的instanceId集合
             Map<String, Map<String, Object>> sysLunMap = dmeRelationInstanceService.getLunInstance();
-            for (String id : ids) {
-                if (sysLunMap.size() != 0) {
-                    String instanceId = ToolUtils.getStr(sysLunMap.get(id));
-                    if (!StringUtils.isEmpty(instanceId)) {
-                        idInstancdIdMap.put(id, instanceId);
-                        instanceIds.add(instanceId);
+            if (sysLunMap != null && sysLunMap.size() > 0) {
+                for (String id : ids) {
+                    Map<String, Object> map = sysLunMap.get(id);
+                    if (map != null && map.size() != 0) {
+                        String instanceId = ToolUtils.getStr(map.get(RESID_FIELD));
+                        if (!StringUtils.isEmpty(instanceId)) {
+                            idInstancdIdMap.put(id, instanceId);
+                            instanceIds.add(instanceId);
+                        }
                     }
                 }
-            }
-            if (instanceIds.size() > 0) {
-                params.put(OBJ_IDS_FIELD, instanceIds);
+                if (instanceIds.size() > 0) {
+                    params.put(OBJ_IDS_FIELD, instanceIds);
+                }
             }
         }
 
         // SYS_Lun
-        String objTypeId = SYS_LUN_OBJTYPEID;
-        params.put(OBJ_TYPE_ID_FIELD, objTypeId);
+        params.put(OBJ_TYPE_ID_FIELD, SYS_LUN_OBJTYPEID);
         if (null == indicatorIds) {
             indicatorIds = initVolumeIndicator(isCurrent);
             params.put(INDICATOR_IDS_FIELD, indicatorIds);
@@ -644,9 +654,9 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
     private List<String> getObjIds(Object objIds) {
         List<String> objectIds = new ArrayList<>();
         if (null != objIds) {
-            JsonArray objIdJsonArray = new JsonParser().parse(objIds.toString()).getAsJsonArray();
+            JsonArray objIdJsonArray = new JsonParser().parse(ToolUtils.getStr(objIds)).getAsJsonArray();
             for (JsonElement element : objIdJsonArray) {
-                String id = element.getAsString();
+                String id = ToolUtils.jsonToStr(element);
                 objectIds.add(id);
             }
         }
@@ -1026,6 +1036,7 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
     }
 
     private List<List<String>> groupObjIds(Map<String, Object> params) {
+        log.info("性能-groupObjIds:{}");
         int maxObjIndicator = MAX_OBJ_INDICATOR;
         List<List<String>> objGroup = new ArrayList<>();
         List<String> objIds = (List<String>) params.get(OBJ_IDS_FIELD);

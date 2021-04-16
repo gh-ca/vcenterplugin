@@ -2,30 +2,37 @@
   <table class="table table-noborder">
     <tr>
       <td class="left">{{'nfs.logic.name' | translate}}</td>
-      <td class="left">{{logicDetail.name}}</td>
+      <td class="left">{{logicDetail.name ? logicDetail.name:'--'}}</td>
 
       <td class="left">{{'nfs.logic.ip' | translate}}</td>
-      <td class="left">{{logicDetail.ip}}</td>
+      <td class="left">{{logicDetail.ip ? logicDetail.ip:'--'}}</td>
 
       <td class="left">{{'nfs.logic.healthStatus' | translate}}</td>
-      <td class="left">{{logicDetail.status}}</td>
+      <td class="left">{{logicDetail.status ? logicDetail.status:'--'}}</td>
     </tr>
     <tr>
       <td class="left">{{'nfs.logic.runningStatus' | translate}}</td>
-      <td class="left">{{logicDetail.runningStatus}}</td>
+      <td class="left">{{logicDetail.runningStatus ? logicDetail.runningStatus:'--'}}</td>
 
       <td class="left">{{'nfs.logic.activePort' | translate}}</td>
-      <td class="left">{{logicDetail.activePort}}</td>
+      <td class="left">{{logicDetail.activePort ? logicDetail.activePort:'--'}}</td>
 
       <td class="left">{{'nfs.logic.currentPort' | translate}}</td>
-      <td class="left">{{logicDetail.currentPort}}</td>
+      <td class="left">{{logicDetail.currentPort ? logicDetail.currentPort:'--'}}</td>
     </tr>
     <tr>
       <td class="left">{{'nfs.logic.failoverGroup' | translate}}</td>
-      <td class="left">{{logicDetail.failoverGroup}}</td>
+      <td class="left">{{logicDetail.failoverGroup ? logicDetail.failoverGroup:'--'}}</td>
     </tr>
   </table>
 </div>
-<div *ngIf="!logicDetail">
-  {{'tips.noData' | translate}}
+<div *ngIf="isLoading" class="loadingDiv">
+  <span>
+    {{'vmfs.loadingTips' | translate}}<img src="./assets/images/loading.gif"  width="20px" height="20px" style="margin-left: 20px;">
+  </span>
+</div>
+<div *ngIf="!logicDetail && !isLoading">
+  <span style="color: #b3b3b3;display: inline-block;width: 100%;text-align: center;font-size: 20px;font-weight: 600;">
+    <clr-icon shape="info-standard" class="is-warning" size="20"></clr-icon>&nbsp;{{'tips.noData' | translate}}
+  </span>
 </div>

@@ -444,7 +444,7 @@
                      <root>
                         <actionUrl>/ui/dmestore/index.html?view=best/host/applybp</actionUrl>
                         <dialogTitle>#{tip}</dialogTitle>
-                        <dialogSize>380,180</dialogSize>
+                        <dialogSize>900,600</dialogSize>
                      </root>
                   </object>
                </delegate>
@@ -538,6 +538,10 @@
                <com.vmware.actionsfw.ActionMenuItemSpec>
                   <type>action</type>
                   <uid>com.huawei.dmestore.datastore.vmfsservicelevelaction</uid>
+               </com.vmware.actionsfw.ActionMenuItemSpec>
+               <com.vmware.actionsfw.ActionMenuItemSpec>
+                  <type>action</type>
+                  <uid>com.huawei.dmestore.datastore.vmfsmountaction</uid>
                </com.vmware.actionsfw.ActionMenuItemSpec>
                <com.vmware.actionsfw.ActionMenuItemSpec>
                   <type>action</type>
@@ -1130,7 +1134,7 @@
                      <root>
                         <actionUrl>/ui/dmestore/index.html?view=best/cluster/applybp</actionUrl>
                         <dialogTitle>#{tip}</dialogTitle>
-                        <dialogSize>380,180</dialogSize>
+                        <dialogSize>900,600</dialogSize>
                      </root>
                   </object>
                </delegate>

@@ -44,6 +44,8 @@ export class NfsModifyComponent implements OnInit{
   iopsMaxErrTips = false;// IOPS上限错误提示
   iopsMinErrTips = false;// IOPS下限错误提示
   latencyErrTips = false;// 时延错误提示
+  bandwidthLimitErr = false; // v6 设备 带宽 下限大于上限
+  iopsLimitErr = false; // v6 设备 IOPS 下限大于上限
 
 
   constructor(private modifyService: NfsModifyService, private cdr: ChangeDetectorRef,
@@ -158,7 +160,7 @@ export class NfsModifyComponent implements OnInit{
 
   modifyCommit(){
     if (this.bandWidthMaxErrTips || this.iopsMaxErrTips
-      || this.bandWidthMinErrTips || this.iopsMinErrTips || this.latencyErrTips) {
+      || this.bandWidthMinErrTips || this.iopsMinErrTips || this.latencyErrTips || this.bandwidthLimitErr || this.iopsLimitErr) {
       return;
     }
     this.modalHandleLoading=true;
@@ -264,6 +266,8 @@ export class NfsModifyComponent implements OnInit{
       }
     }
     this.iopsErrTips(objVal, operationType);
+    // 下限大于上限 检测
+    this.qosV6Check('edit');
   }
   /**
    * iops错误提示
@@ -563,6 +567,16 @@ export class NfsModifyComponent implements OnInit{
       }
     }
     console.log("lowerChecked", form)
+    if (form.control_policyUpper == undefined) {
+      form.maxBandwidthChoose = false;
+      form.maxIopsChoose = false;
+    }
+    if (form.control_policyLower == undefined) {
+      form.minBandwidthChoose = false;
+      form.minIopsChoose = false;
+      form.latencyChoose = false;
+    }
+    this.qosV6Check('edit');
   }
   resetQosFlag(objValue:boolean, operationType:string) {
     switch (operationType) {
@@ -591,6 +605,48 @@ export class NfsModifyComponent implements OnInit{
           this.latencyErrTips = false;
         }
         break;
+    }
+  }
+  qosV6Check(type:string) {
+    if (type != 'add') {
+      if (this.storage) {
+        const qosTag = this.storage.storageTypeShow.qosTag
+        if (qosTag == 1) {
+          if (this.updateNfs.minBandwidthChoose && this.updateNfs.maxBandwidthChoose) {
+            // 带宽上限小于下限
+            if (this.updateNfs.minBandwidth && this.updateNfs.maxBandwidth && Number(this.updateNfs.minBandwidth) > Number(this.updateNfs.maxBandwidth)) {
+              this.bandwidthLimitErr = true;
+            } else {
+              this.bandwidthLimitErr = false;
+            }
+          } else {
+            this.bandwidthLimitErr = false;
+          }
+          if (this.updateNfs.minIopsChoose && this.updateNfs.maxIopsChoose) {
+            // iops上限小于下限
+            if (this.updateNfs.minIops && this.updateNfs.maxIops && Number(this.updateNfs.minIops) > Number(this.updateNfs.maxIops)) {
+              this.iopsLimitErr = true;
+            } else {
+              this.iopsLimitErr = false;
+            }
+          } else {
+            this.iopsLimitErr = false;
+          }
+        } else {
+          this.iopsLimitErr = false;
+          this.bandwidthLimitErr = false;
+        }
+        if (this.updateNfs.maxIopsChoose && this.updateNfs.maxIops && Number(this.updateNfs.maxIops) < 100) {
+          this.iopsLimitErr = true;
+        }
+        if (this.updateNfs.control_policyUpper == undefined) {
+          this.iopsLimitErr = false;
+          this.bandwidthLimitErr = false;
+        }
+        if (this.updateNfs.control_policyLower == undefined) {
+          this.bandwidthLimitErr = false;
+        }
+      }
     }
   }
 }

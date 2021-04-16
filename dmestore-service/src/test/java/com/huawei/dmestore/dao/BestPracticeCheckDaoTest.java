@@ -78,7 +78,7 @@ public class BestPracticeCheckDaoTest {
 
     @Test
     public void getRecordBeanByHostsetting() throws SQLException {
-        bestPracticeCheckDao.getRecordBeanByHostsetting("321");
+        bestPracticeCheckDao.getRecordBeanByHostsetting("321", null);
     }
 
     @Test

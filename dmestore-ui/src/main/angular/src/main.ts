@@ -24,3 +24,6 @@ if (environment.hmr) {
 } else {
   bootstrap().catch(err => console.log(err));
 }
+
+const version = 20210416021809;
+console.log(`current version: ${version}`);

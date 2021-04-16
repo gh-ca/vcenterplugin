@@ -91,6 +91,7 @@ export class StorageDetail{
   synStatus: string;
   totalCapacity: number;
   totalEffectiveCapacity: number; // Dorado设备当可得容量用、非Dorado设备当总容量用
+  blockFileCapacity:number; // 块/文件容量
   usedCapacity: number;
   vendor: string;
   volume: string;

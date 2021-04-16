@@ -66,7 +66,7 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   hostModel = { hostIp: '', hostPort: '', code: ''};
 
   bestShowLoading = false;
-  top5ShowLoading = false;
+  top5ShowLoading = true;
 
   disconnectFlag = false; // 断开连接提示框
   disconnectResult = false; // 断开连接结果：true 弹窗展示 false 隐藏
@@ -141,13 +141,16 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     this.http.get('overview/getdatastoretopn', { params: {type: type}}).subscribe((result: any) => {
       this.top5ShowLoading = false;
       if (result.code === '200'){
-        result.data.forEach((item) => {
-          item.totalCapacity = item.totalCapacity.toFixed(2);
-          item.usedCapacity = item.usedCapacity.toFixed(2);
-          item.freeCapacity = item.freeCapacity.toFixed(2);
-          item.utilization = item.utilization.toFixed(2);
-        });
+        if (result.data) {
+          result.data.forEach((item) => {
+            item.totalCapacity = item.totalCapacity.toFixed(2);
+            item.usedCapacity = item.usedCapacity.toFixed(2);
+            item.freeCapacity = item.freeCapacity.toFixed(2);
+            item.utilization = item.utilization.toFixed(2);
+          });
+        }
         this.storeageTopN = result.data;
+
       }
       this.cdr.detectChanges();
     }, err => {

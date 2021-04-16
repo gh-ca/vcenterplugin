@@ -79,7 +79,7 @@ public class RootFsMo extends BaseMo {
         if (objs != null && objs.size() > 0) {
             for (Pair<ManagedObjectReference, String> obj : objs) {
                 HostMo submo = new HostMo(context, obj.first());
-                if (id.equals(submo.getMor().getValue())) {
+                if (id.contains(submo.getMor().getValue())) {
                     objmo = submo;
                     break;
                 }

@@ -218,4 +218,7 @@ export class StorageComponent implements OnInit, AfterViewInit {
       return (c/1024/1024).toFixed(3)+" TB"
     }
   }
+  sortFunc(obj:any) {
+    return !obj;
+  }
 }

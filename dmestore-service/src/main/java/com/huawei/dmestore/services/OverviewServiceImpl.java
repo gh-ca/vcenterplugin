@@ -156,7 +156,7 @@ public class OverviewServiceImpl implements OverviewService {
             int major = 0;
             int warning = 0;
             int info = 0;
-            List<BestPracticeCheckRecordBean> rs = bestPracticeProcessService.getCheckRecord();
+            List<BestPracticeCheckRecordBean> rs = bestPracticeProcessService.getCheckRecord(null, null);
             for (BestPracticeCheckRecordBean recordBean : rs) {
                 int count = recordBean.getCount();
                 if(count == 0){
@@ -263,9 +263,13 @@ public class OverviewServiceImpl implements OverviewService {
                 object.put(TOTAL_CAPACITY, nfsDataInfo.getCapacity());
                 object.put(FREE_CAPACITY, nfsDataInfo.getFreeSpace());
                 object.put(USED_CAPACITY, usedCapacity);
-                object.put(UTILIZATION, usedCapacity / nfsDataInfo.getCapacity() * DOUBLE_100);
+                Double capacity = nfsDataInfo.getCapacity();
+                if (capacity != 0.0) {
+                    object.put(UTILIZATION, usedCapacity / nfsDataInfo.getCapacity() * DOUBLE_100);
+                } else {
+                    object.put(UTILIZATION, 0.0);
+                }
                 object.put(CAPACITY_UNIT, UNIT_GB);
-
                 returnMap.add(object);
             }
         }

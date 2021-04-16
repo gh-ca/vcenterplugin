@@ -13,8 +13,11 @@ public class DmeConstants {
     /**
      *  POST
      *  estimate connectivity of host or hostgroup on dme
+     *  old
+     *  public static final String DME_ESTIMATE_CONNECTIVITY = "/rest/vmmgmt/v1/connectivity/host-storage";
      */
-    public static final String DME_ESTIMATE_CONNECTIVITY = "/rest/vmmgmt/v1/connectivity/host-storage";
+    //public static final String DME_ESTIMATE_CONNECTIVITY = "/rest/vmmgmt/v1/connectivity/host-storage";
+    public static final String DME_ESTIMATE_CONNECTIVITY = "/hostmgmt/v1/connectivity/host-and-storage";
     /**
      * nfs share detail
      **/
@@ -144,6 +147,11 @@ public class DmeConstants {
      * hostgroup unmapping
      **/
     public static final String HOSTGROUP_UNMAPPING = "/rest/blockservice/v1/volumes/hostgroup-unmapping";
+
+    /**
+     * hostgroup remove
+     **/
+    public static final String HOSTGROUP_REMOVE = "/rest/hostmgmt/v1/hostgroups/{hostgroup_id}";
 
     /**
      * hostgroup mapping

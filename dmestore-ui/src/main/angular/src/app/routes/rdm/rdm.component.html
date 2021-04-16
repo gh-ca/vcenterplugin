@@ -6,6 +6,7 @@
     <ng-template clrPageTitle>{{'rdm.basicSet' | translate}}</ng-template> <!-- mandatory -->
 
     <form clrForm #formPageOne="ngForm">
+      <span style="color: red">{{'rdm.addTips' | translate}}</span>
       <!--名称 -->
       <clr-input-container>
         <label  style="color: #9F9F9F;">{{'rdm.name' | translate}}<span style="color: red">*</span></label>
@@ -49,7 +50,8 @@
       <clr-select-container class="selectClass">
         <label  style="color: #9F9F9F;">{{'rdm.dataStore' | translate}}<span style="color: red">*</span></label>
         <select clrSelect (ngModelOptions)="dataStores" required [(ngModel)]="dataStoreObjectId" name="dataStoreObjectId" class="clr-select">
-          <option *ngFor="let item of dataStores" value="{{item.objectId}}">{{item.name}}</option>
+          <option value="{{defaultStoreObjectId}}">{{defaultStoreObjectId ? ('rdm.defaultStorage' | translate):('tips.select' | translate)}}</option>
+          <option *ngFor="let item of dataStores" value="{{item.objectId}}" title="{{item.name}}">{{item.vmRootpath ? ('rdm.defaultStorage' | translate):item.shortName}}</option>
         </select>
         <clr-control-error>{{'validations.required' | translate}}</clr-control-error>
       </clr-select-container>
@@ -85,6 +87,7 @@
 
 
     <form clrForm #formPageTwo="ngForm">
+      <span style="color: red">{{'rdm.addTips' | translate}}</span>
       <!-- 1、选择 服务等级-->
       <div [hidden]="!serviceLevelIsNull" class="errorTips" readonly ><clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{'rdm.selectOneSer' | translate}}</div>
       <div [hidden]="!isOperationErr"  class="errorTips" readonly ><clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{'rdm.createRdmError' | translate}}</div>
@@ -110,7 +113,12 @@
                 </tr>
                 <tr>
                   <th hidden></th>
-                  <th><clr-progress-bar clrValue="{{item.usedRate}}" clrSuccess clrLabeled></clr-progress-bar></th>
+                  <th>
+                    <div class="progress-block">
+                      <clr-progress-bar clrValue="{{item.usedRate}}" clrSuccess></clr-progress-bar>
+                      <span>{{item.usedRate}}%</span>
+                    </div>
+                  </th>
                   <th *ngIf="item.capabilities.qos != undefined && item.capabilities.qos.qosParam.maxIOPS != undefined">
                     IOPS <= {{item.capabilities.qos.qosParam.maxIOPS}} IOPS/TB
                   </th>
@@ -124,12 +132,12 @@
                   <th *ngIf="item.capabilities.qos != undefined
                                                 && item.capabilities.qos.enabled == true
                                                 && item.capabilities.qos.qosParam.minBandWidth != undefined">
-                    {{'tier.bandwidth'|translate}} >= {{item.capabilities.qos.qosParam.minBandWidth}} Mbps/s
+                    {{'tier.bandwidth'|translate}} >= {{item.capabilities.qos.qosParam.minBandWidth}} MBPS/TB
                   </th>
                   <th *ngIf="item.capabilities.qos != undefined
                                                 && item.capabilities.qos.enabled == true
                                                 && item.capabilities.qos.qosParam.maxBandWidth != undefined">
-                    {{'tier.bandwidth'|translate}} <= {{item.capabilities.qos.qosParam.maxBandWidth}} Mbps/s
+                    {{'tier.bandwidth'|translate}} <= {{item.capabilities.qos.qosParam.maxBandWidth}} MBPS/TB
                   </th>
                 </tr>
                 <tr>
@@ -138,7 +146,7 @@
                   <th *ngIf="item.capabilities.qos != undefined
                                                 && item.capabilities.qos.enabled == true
                                                 && item.capabilities.qos.qosParam.latency != undefined">
-                    Latency= {{item.capabilities.qos.qosParam.latency}} {{item.capabilities.qos.qosParam.latencyUnit}}
+                    {{'rdm.latency' | translate}}= {{item.capabilities.qos.qosParam.latency}} {{item.capabilities.qos.qosParam.latencyUnit}}
                   </th>
                 </tr>
                 </tbody>
@@ -249,7 +257,7 @@
           <clr-checkbox-container *ngIf="configModel.flagInfo.control_policyUpper == '1'">
             <label style="color: #9F9F9F;">{{'rdm.trafficC' | translate}}</label>
             <clr-checkbox-wrapper>
-              <input type="checkbox" clrCheckbox name="c1" [(ngModel)]="configModel.flagInfo.maxBandwidthChoose" (ngModelChange)="resetQosFlag(configModel.flagInfo.maxBandwidthChoose, 'maxbandwidth')"/>
+              <input type="checkbox" clrCheckbox name="c1" [(ngModel)]="configModel.flagInfo.maxBandwidthChoose" (ngModelChange)="resetQosFlag(configModel.flagInfo.maxBandwidthChoose, 'maxbandwidth');qosV6Check('add');"/>
               <label style="color: #9F9F9F;" style="width: 190px">{{'rdm.bandwidth' | translate}} <=
                 <input type="number" min="0"  oninput="if (value.length > 11) {value=value.slice(0,11)}" class="inputOneLine" disabled="{{!configModel.flagInfo.maxBandwidthChoose}}" name="maxbandwidth" [(ngModel)]="configModel.tuning.smartqos.maxbandwidth"
                        (blur)="qosBlur('maxbandwidth');" [required]="configModel.flagInfo.maxBandwidthChoose"/> MB/s
@@ -262,7 +270,7 @@
           <clr-checkbox-container *ngIf="configModel.flagInfo.control_policyUpper == '1'">
             <label></label>
             <clr-checkbox-wrapper>
-              <input type="checkbox" clrCheckbox name="c2" [(ngModel)]="configModel.flagInfo.maxIopsChoose" (ngModelChange)="resetQosFlag(configModel.flagInfo.maxIopsChoose, 'maxiops')"/>
+              <input type="checkbox" clrCheckbox name="c2" [(ngModel)]="configModel.flagInfo.maxIopsChoose" (ngModelChange)="resetQosFlag(configModel.flagInfo.maxIopsChoose, 'maxiops');qosV6Check('add');"/>
               <label style="color: #9F9F9F;" style="width: 190px">IOPS <=
                 <input type="number" min="0"  oninput="if (value.length > 11) {value=value.slice(0,11)}" class="inputOneLine" disabled="{{!configModel.flagInfo.maxIopsChoose}}" name="maxiops" [(ngModel)]="configModel.tuning.smartqos.maxiops"
                        (blur)="qosBlur('maxiops');" [required]="configModel.flagInfo.maxIopsChoose"/>
@@ -278,7 +286,7 @@
               <label *ngIf="configModel.flagInfo.control_policyLower == '0' && configModel.flagInfo.control_policyUpper != '1'" style="color: #9F9F9F;">{{'vmfs.trafficControlObject' | translate}}</label>
               <label *ngIf="configModel.flagInfo.control_policyLower == '0' && configModel.flagInfo.control_policyUpper == '1'" style="color: #9F9F9F;"></label>
               <clr-checkbox-wrapper>
-                <input type="checkbox" clrCheckbox  name="c3"  [(ngModel)]="configModel.flagInfo.minBandwidthChoose" (ngModelChange)="resetQosFlag(configModel.flagInfo.minBandwidthChoose, 'minbandwidth')"/>
+                <input type="checkbox" clrCheckbox  name="c3"  [(ngModel)]="configModel.flagInfo.minBandwidthChoose" (ngModelChange)="resetQosFlag(configModel.flagInfo.minBandwidthChoose, 'minbandwidth');qosV6Check('add');"/>
                 <label style="color: #9F9F9F;" style="width: 190px">{{'rdm.bandwidth' | translate}} >=
                   <input type="number" min="0"  oninput="if (value.length > 11) {value=value.slice(0,11)}" class="inputOneLine" disabled="{{!configModel.flagInfo.minBandwidthChoose}}" name="minbandwidth" [(ngModel)]="configModel.tuning.smartqos.minbandwidth"
                          (blur)="qosBlur('minbandwidth');" [required]="configModel.flagInfo.minBandwidthChoose"/> MB/s
@@ -291,7 +299,7 @@
             <clr-checkbox-container *ngIf="configModel.flagInfo.control_policyLower == '0'">
               <label></label>
               <clr-checkbox-wrapper>
-                <input type="checkbox" clrCheckbox name="c4"  [(ngModel)]="configModel.flagInfo.minIopsChoose" (ngModelChange)="resetQosFlag(configModel.flagInfo.minIopsChoose, 'miniops')"/>
+                <input type="checkbox" clrCheckbox name="c4"  [(ngModel)]="configModel.flagInfo.minIopsChoose" (ngModelChange)="resetQosFlag(configModel.flagInfo.minIopsChoose, 'miniops');qosV6Check('add');"/>
                 <label style="color: #9F9F9F;" style="width: 190px">IOPS >=
                   <input type="number" min="0"  oninput="if (value.length > 11) {value=value.slice(0,11)}" class="inputOneLine" disabled="{{!configModel.flagInfo.minIopsChoose}}" name="miniops" [(ngModel)]="configModel.tuning.smartqos.miniops"
                          (blur)="qosBlur('miniops');" [required]="configModel.flagInfo.minIopsChoose"/>
@@ -323,6 +331,12 @@
               </clr-checkbox-wrapper>
               <clr-control-helper *ngIf="latencyErrTips" style="color: red"><clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{'errorMsg.iposMaxMinTips' | translate}}</clr-control-helper>
               <clr-control-helper *ngIf="!latencyErrTips && configModel.flagInfo.latencyChoose && !configModel.tuning.smartqos.latency">{{'errorMsg.require' | translate}}</clr-control-helper>
+            </clr-checkbox-container>
+            <clr-checkbox-container *ngIf="bandwidthLimitErr">
+              <clr-control-helper  style="color: red"><clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{'tips.bandwidthLimitErr' | translate}}</clr-control-helper>
+            </clr-checkbox-container>
+            <clr-checkbox-container *ngIf="iopsLimitErr">
+              <clr-control-helper style="color: red"><clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{'tips.iopsLimitErr' | translate}}</clr-control-helper>
             </clr-checkbox-container>
           </div>
         </div>

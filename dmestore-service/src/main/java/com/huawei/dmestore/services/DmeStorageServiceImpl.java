@@ -230,9 +230,11 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         Double protectionCapacity = 0.0;
         Double fileCapacity = 0.0;
         Double blockCapacity = 0.0;
+        Double blockFileCapacity = 0.0;
         Double dedupedCapacity = 0.0;
         Double compressedCapacity = 0.0;
         for (StoragePool storagePool : storagePools) {
+            // 块文件容量
             totalPoolCapicity += storagePool.getTotalCapacity();
             //subscriptionCapacity += storagePool.getSubscribedCapacity();
             protectionCapacity += storagePool.getProtectionCapacity();
@@ -242,17 +244,24 @@ public class DmeStorageServiceImpl implements DmeStorageService {
             if ("block".equalsIgnoreCase(storagePool.getMediaType())) {
                 blockCapacity += storagePool.getConsumedCapacity();
             }
+            if ("block-and-file".equalsIgnoreCase(storagePool.getMediaType())) {
+                blockFileCapacity += storagePool.getConsumedCapacity();
+            }
             dedupedCapacity += storagePool.getDedupedCapacity();
             compressedCapacity += storagePool.getCompressedCapacity();
         }
         if (isDorado) {
             storageObj.setFreeEffectiveCapacity(
-                storageObj.getTotalEffectiveCapacity() - fileCapacity - blockCapacity - protectionCapacity);
+                    totalPoolCapicity - blockFileCapacity- protectionCapacity);
         } else {
+            // (圈内)总容量
             storageObj.setTotalEffectiveCapacity(totalPoolCapicity);
             storageObj.setFreeEffectiveCapacity(totalPoolCapicity - fileCapacity - blockCapacity - protectionCapacity);
         }
         //storageObj.setSubscriptionCapacity(subscriptionCapacity);
+        //存储池的已用容量之和
+        storageObj.setBlockFileCapacity(blockFileCapacity);
+        // 保护容量
         storageObj.setProtectionCapacity(protectionCapacity);
         storageObj.setFileCapacity(fileCapacity);
         storageObj.setBlockCapacity(blockCapacity);
@@ -381,7 +390,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
     }
 
     private void parseStoragePoolCapacity(JsonObject element, StoragePool storagePool) {
-        storagePool.setConsumedCapacity(ToolUtils.jsonToDou(element.get(USED_CAPACITY), 0.0));
+
         Double totalCapacity = ToolUtils.jsonToDou(element.get("totalCapacity"), 0.0);
         storagePool.setTotalCapacity(totalCapacity);
         Double consumedCapacity = ToolUtils.jsonToDou(element.get(USED_CAPACITY), 0.0);
@@ -438,7 +447,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
     }
 
     @Override
-    public List<LogicPorts> getLogicPorts(String storageId) throws DmeException {
+    public List<LogicPorts> getLogicPorts(String storageId,String supportProtocol) throws DmeException {
         List<LogicPorts> resList = new ArrayList<>();
         String url = DmeConstants.API_LOGICPORTS_LIST;
         JsonObject param = null;
@@ -480,10 +489,16 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                     logicPorts.setCurrentPortName(ToolUtils.jsonToStr(element.get("current_port_name")));
                     logicPorts.setSupportProtocol(ToolUtils.jsonToStr(element.get("support_protocol")));
                     logicPorts.setManagementAccess(ToolUtils.jsonToStr(element.get("management_access")));
-                    logicPorts.setVstoreId(ToolUtils.jsonToStr(element.get("vstore_id")));
+                    logicPorts.setVstoreId(ToolUtils.jsonToStr(element.get("vstore_raw_id")));
                     logicPorts.setVstoreName(ToolUtils.jsonToStr(element.get("vstore_name")));
 
-                    resList.add(logicPorts);
+                    if (!StringUtils.isEmpty(supportProtocol) && supportProtocol.equalsIgnoreCase("iSCSI") &&
+                        supportProtocol.equalsIgnoreCase(logicPorts.getSupportProtocol())) {
+                        resList.add(logicPorts);
+                    } else if (supportProtocol.equalsIgnoreCase("all")) {
+                        resList.add(logicPorts);
+                    }
+
                 }
             }
         } catch (DmeException e) {
@@ -1369,19 +1384,13 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                         if (statisticObject != null) {
                             StoragePool sp = new StoragePool();
                             sp.setId(storagePoolId);
-                            if (statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORAGEPOOL_THROUGHPUT) != null) {
-                                sp.setMaxIops(ToolUtils.jsonToFloat(
+                            sp.setMaxIops(ToolUtils.jsonToFloat2(
                                     statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORAGEPOOL_THROUGHPUT)));
-                            }
-                            if (statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORAGEPOOL_BANDWIDTH) != null) {
-                                sp.setMaxBandwidth(ToolUtils.jsonToFloat(
+                            sp.setMaxBandwidth(ToolUtils.jsonToFloat2(
                                     statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORAGEPOOL_BANDWIDTH)));
-                            }
-                            if (statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORAGEPOOL_RESPONSETIME) !=
-                                null) {
-                                sp.setMaxLatency(ToolUtils.jsonToFloat(
+                            sp.setMaxLatency(ToolUtils.jsonToFloat2(
                                     statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORAGEPOOL_RESPONSETIME)));
-                            }
+
                             relists.add(sp);
                         }
                     }
@@ -1536,12 +1545,14 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                 Map<String, Object> params = new HashMap<>();
                 params.put(OBJ_IDS, volumeWwns);
                 Map<String, Object> remap = dataStoreStatisticHistoryService.queryCurrentStatistic(
-                    DmeIndicatorConstants.RESOURCE_TYPE_NAME_LUN, params);
+                DmeIndicatorConstants.RESOURCE_TYPE_NAME_LUN, params);
+                LOG.info("LUN_性能_DmeStorageServiceImpl_1557",gson.toJson(remap));
                 if (remap != null && remap.size() > 0) {
-                    JsonObject dataJson = new JsonParser().parse(remap.toString()).getAsJsonObject();
+                    JsonObject dataJson = new JsonParser().parse(gson.toJson(remap)).getAsJsonObject();
                     relists = new ArrayList<>();
                     for (String wwnid : volumeWwns) {
                         JsonObject statisticObject = dataJson.getAsJsonObject(wwnid);
+                        LOG.info("LUN_性能_DmeStorageServiceImpl_1557",gson.toJson(dataJson));
                         if (statisticObject != null) {
                             Volume sp = new Volume();
                             sp.setWwn(wwnid);

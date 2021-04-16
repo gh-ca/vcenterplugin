@@ -92,7 +92,7 @@ public class VmfsAccessController extends BaseController {
         LOG.info("accessvmfs/createvmfs=={}", gson.toJson(params));
         String failureStr = "";
         try {
-            List<Map<String, String>> vmfs = vmfsAccessService.createVmfs2(params);
+            List<Map<String, String>> vmfs = vmfsAccessService.createVmfs(params);
             if (vmfs.size() != 0) {
                 return failure(DmeConstants.CODE_CONNECTIVITY_FAILURE,
                     "create vmfs failure,connectivity of host or hostgroup on dme error!", vmfs);
@@ -140,7 +140,7 @@ public class VmfsAccessController extends BaseController {
         LOG.info("accessvmfs/unmountvmfs=={}", gson.toJson(params));
         String failureStr = "";
         try {
-            vmfsAccessService.unmountVmfs2(params);
+            vmfsAccessService.unmountVmfs(params);
             return success(null, "unmount vmfs success");
         } catch (DmeException e) {
             LOG.error("unmount vmfs failure:", e);
@@ -160,7 +160,7 @@ public class VmfsAccessController extends BaseController {
         LOG.info("accessvmfs/deletevmfs=={}", gson.toJson(params));
         String failureStr = "";
         try {
-            vmfsAccessService.deleteVmfs2(params);
+            vmfsAccessService.deleteVmfs(params);
             return success("delete vmfs success!");
         } catch (DmeException e) {
             failureStr = e.getMessage();

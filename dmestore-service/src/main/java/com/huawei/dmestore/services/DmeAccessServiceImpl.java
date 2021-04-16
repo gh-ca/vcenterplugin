@@ -132,7 +132,13 @@ public class DmeAccessServiceImpl implements DmeAccessService {
             if (responseEntity.getStatusCodeValue() == RestUtils.RES_STATE_I_200) {
                 // 连接成功后，数据入库
                 try {
-                    DmeInfo dmeInfo = new Gson().fromJson(params.toString(), DmeInfo.class);
+                    //DmeInfo dmeInfo = new Gson().fromJson(params.toString(), DmeInfo.class);
+                    DmeInfo dmeInfo = new DmeInfo();
+                    dmeInfo.setHostIp(ToolUtils.getStr(params.get("hostIp")));
+                    dmeInfo.setHostPort(ToolUtils.getInt(params.get("hostPort")));
+                    dmeInfo.setUserName(ToolUtils.getStr(params.get("userName")));
+                    dmeInfo.setPassword(ToolUtils.getStr(params.get("password")));
+
                     dmeInfoDao.addDmeInfo(dmeInfo);
                 } catch (DmeException ex) {
                     throw new DmeException(DmeConstants.ERROR_CODE_503, "连接信息保存失败:" + ex.getMessage());
@@ -368,6 +374,8 @@ public class DmeAccessServiceImpl implements DmeAccessService {
                                 relists.add(map);
                             }
                         }
+                    }else {
+                        LOG.error("getWorkLoads error url:{},error:{}", workloadsUrl,responseEntity.getStatusCodeValue());
                     }
                 } catch (DmeException e) {
                     LOG.error("getWorkLoads error url:{},error:{}", workloadsUrl, e.toString());

@@ -22,6 +22,7 @@ import java.util.concurrent.Executors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 /**
  * Vmfs6AutoReclaimImpl
@@ -31,10 +32,19 @@ import org.slf4j.LoggerFactory;
  **/
 public class Vmfs6AutoReclaimImpl extends BaseBestPracticeService implements BestPracticeService {
     protected final Logger logger = LoggerFactory.getLogger(BaseBestPracticeService.class);
+    private ThreadPoolTaskExecutor threadPoolExecutor;
+
+    public ThreadPoolTaskExecutor getThreadPoolExecutor() {
+        return threadPoolExecutor;
+    }
+
+    public void setThreadPoolExecutor(ThreadPoolTaskExecutor threadPoolExecutor) {
+        this.threadPoolExecutor = threadPoolExecutor;
+    }
 
     @Override
     public String getHostSetting() {
-        return "VMFS-6 Auto Reclaim";
+        return "VMFS-6 Auto-Space Reclamation";
     }
 
     @Override
@@ -50,7 +60,7 @@ public class Vmfs6AutoReclaimImpl extends BaseBestPracticeService implements Bes
             for (VmfsDatastoreInfo vmfsDatastoreInfo : list) {
                 HostVmfsVolume hostVmfsVolume = vmfsDatastoreInfo.getVmfs();
                 String unmapPriority = hostVmfsVolume.getUnmapPriority();
-                if (unmapPriority != null || !unmapPriority.equals(getRecommendValue())) {
+                if (unmapPriority != null && !unmapPriority.equals((String) getRecommendValue())) {
                     JsonObject object = new JsonObject();
                     object.addProperty("name", vmfsDatastoreInfo.getName());
                     object.addProperty("value", unmapPriority);
@@ -87,7 +97,7 @@ public class Vmfs6AutoReclaimImpl extends BaseBestPracticeService implements Bes
             for (VmfsDatastoreInfo vmfsDatastoreInfo : list) {
                 HostVmfsVolume hostVmfsVolume = vmfsDatastoreInfo.getVmfs();
                 String unmapPriority = hostVmfsVolume.getUnmapPriority();
-                if (null != unmapPriority && !unmapPriority.equals(getRecommendValue())) {
+                if (null != unmapPriority && !unmapPriority.equals((String) getRecommendValue())) {
                     return false;
                 }
             }
@@ -105,7 +115,10 @@ public class Vmfs6AutoReclaimImpl extends BaseBestPracticeService implements Bes
             ManagedObjectReference dsMor = pair.first();
             DatastoreMo datastoreMo = this.getDatastoreMoFactory().build(context, dsMor);
             DatastoreSummary summary = datastoreMo.getSummary();
-            if (summary.getType().equalsIgnoreCase(DmeConstants.STORE_TYPE_VMFS)) {
+
+            // 连通性。false为不可访问的数据库存储，应该过滤不检查和更新。
+            boolean accessible = summary.isAccessible();
+            if (accessible && summary.getType().equalsIgnoreCase(DmeConstants.STORE_TYPE_VMFS)) {
                 VmfsDatastoreInfo vmfsDatastoreInfo = datastoreMo.getVmfsDatastoreInfo();
                 HostVmfsVolume hostVmfsVolume = vmfsDatastoreInfo.getVmfs();
                 // 只对VMFS6进行处理
@@ -125,13 +138,13 @@ public class Vmfs6AutoReclaimImpl extends BaseBestPracticeService implements Bes
         HostMo hostMo = this.getHostMoFactory().build(context, mor);
         List<VmfsDatastoreInfo> list = getVmfs6DatastoreInfo(vcsdkUtils, objectId);
         if (list.size() > 0) {
-            ExecutorService executor = Executors.newFixedThreadPool(list.size());
+            //ExecutorService executor = Executors.newFixedThreadPool(list.size());
             for (VmfsDatastoreInfo vmfsDatastoreInfo : list) {
                 HostVmfsVolume hostVmfsVolume = vmfsDatastoreInfo.getVmfs();
                 String uuid = hostVmfsVolume.getUuid();
                 String unmapPriority = hostVmfsVolume.getUnmapPriority();
-                if (null != unmapPriority || !unmapPriority.equals(String.valueOf(getRecommendValue()))) {
-                    executor.execute(() -> {
+                if (null != unmapPriority && !unmapPriority.equals((String)getRecommendValue())) {
+                    threadPoolExecutor.execute(() -> {
                         try {
                             hostMo.getHostStorageSystemMo().updateVmfsUnmapPriority(uuid, (String) getRecommendValue());
                         } catch (Exception exception) {

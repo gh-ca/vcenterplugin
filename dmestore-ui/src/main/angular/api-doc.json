@@ -1,0 +1,4958 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "SpingCloud web接口列表",
+        "version": "1.0",
+        "title": "接口文档",
+        "contact": {},
+        "license": {}
+    },
+    "host": "localhost:8080",
+    "basePath": "/",
+    "tags": [{
+        "name": "best-practice-controller",
+        "description": "Best Practice Controller"
+    }, {
+        "name": "data-store-statistic-history-controller",
+        "description": "Data Store Statistic History Controller"
+    }, {
+        "name": "dme-access-controller",
+        "description": "Dme Access Controller"
+    }, {
+        "name": "dme-relation-instance-controller",
+        "description": "Dme Relation Instance Controller"
+    }, {
+        "name": "dme-storage-controller",
+        "description": "Dme Storage Controller"
+    }, {
+        "name": "host-access-controller",
+        "description": "Host Access Controller"
+    }, {
+        "name": "nfs-access-controller",
+        "description": "Nfs Access Controller"
+    }, {
+        "name": "nfs-data-store-controller",
+        "description": "Nfs Data Store Controller"
+    }, {
+        "name": "nfs-operation-controller",
+        "description": "Nfs Operation Controller"
+    }, {
+        "name": "overview-controller",
+        "description": "Overview Controller"
+    }, {
+        "name": "plugin-register-controller",
+        "description": "Plugin Register Controller"
+    }, {
+        "name": "service-level-controller",
+        "description": "Service Level Controller"
+    }, {
+        "name": "vm-rdm-controller",
+        "description": "Vm Rdm Controller"
+    }, {
+        "name": "vmfs-access-controller",
+        "description": "Vmfs Access Controller"
+    }, {
+        "name": "vmfs-operation-controller",
+        "description": "Vmfs Operation Controller"
+    }, {
+        "name": "vmware-access-controller",
+        "description": "Vmware Access Controller"
+    }],
+    "paths": {
+        "/accessdme/access": {
+            "post": {
+                "tags": ["dme-access-controller"],
+                "summary": "accessDme",
+                "operationId": "accessDmeUsingPOST",
+                "consumes": ["application/json"],
+                "produces": ["*/*"],
+                "parameters": [{
+                    "in": "body",
+                    "name": "params",
+                    "description": "params",
+                    "required": true,
+                    "schema": {
+                        "type": "object"
+                    }
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/accessdme/access/disconnect": {
+            "get": {
+                "tags": ["dme-access-controller"],
+                "summary": "disconnectDme",
+                "operationId": "disconnectDmeUsingGET",
+                "produces": ["*/*"],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/accessdme/configuretasktime": {
+            "get": {
+                "tags": ["dme-access-controller"],
+                "summary": "configureTaskTime",
+                "operationId": "configureTaskTimeUsingGET",
+                "produces": ["*/*"],
+                "parameters": [{
+                    "name": "taskCron",
+                    "in": "query",
+                    "description": "taskCron",
+                    "required": true,
+                    "type": "string"
+                }, {
+                    "name": "taskId",
+                    "in": "query",
+                    "description": "taskId",
+                    "required": true,
+                    "type": "integer",
+                    "format": "int32"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/accessdme/getworkloads": {
+            "get": {
+                "tags": ["dme-access-controller"],
+                "summary": "getWorkLoads",
+                "operationId": "getWorkLoadsUsingGET",
+                "produces": ["*/*"],
+                "parameters": [{
+                    "name": "storageId",
+                    "in": "query",
+                    "description": "storageId",
+                    "required": true,
+                    "type": "string"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/accessdme/refreshaccess": {
+            "get": {
+                "tags": ["dme-access-controller"],
+                "summary": "refreshDme",
+                "operationId": "refreshDmeUsingGET",
+                "produces": ["*/*"],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/accessdme/scandatastore": {
+            "get": {
+                "tags": ["dme-access-controller"],
+                "summary": "scanDatastore",
+                "operationId": "scanDatastoreUsingGET",
+                "produces": ["*/*"],
+                "parameters": [{
+                    "name": "storageType",
+                    "in": "query",
+                    "description": "storageType",
+                    "required": true,
+                    "type": "string"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/accesshost/configureiscsi": {
+            "post": {
+                "tags": ["host-access-controller"],
+                "summary": "configureIscsi",
+                "operationId": "configureIscsiUsingPOST",
+                "consumes": ["application/json"],
+                "produces": ["*/*"],
+                "parameters": [{
+                    "in": "body",
+                    "name": "params",
+                    "description": "params",
+                    "required": true,
+                    "schema": {
+                        "type": "object"
+                    }
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/accesshost/testconnectivity": {
+            "post": {
+                "tags": ["host-access-controller"],
+                "summary": "testConnectivity",
+                "operationId": "testConnectivityUsingPOST",
+                "consumes": ["application/json"],
+                "produces": ["*/*"],
+                "parameters": [{
+                    "in": "body",
+                    "name": "params",
+                    "description": "params",
+                    "required": true,
+                    "schema": {
+                        "type": "object"
+                    }
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/accessnfs/deletenfs": {
+            "post": {
+                "tags": ["nfs-access-controller"],
+                "summary": "deleteNfs",
+                "operationId": "deleteNfsUsingPOST",
+                "consumes": ["application/json"],
+                "produces": ["*/*"],
+                "parameters": [{
+                    "in": "body",
+                    "name": "params",
+                    "description": "params",
+                    "required": true,
+                    "schema": {
+                        "type": "object"
+                    }
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/accessnfs/fileservice/{storageObjectId}": {
+            "get": {
+                "tags": ["nfs-data-store-controller"],
+                "summary": "fsAttr",
+                "operationId": "fsAttrUsingGET",
+                "produces": ["*/*"],
+                "parameters": [{
+                    "name": "storageObjectId",
+                    "in": "path",
+                    "description": "storageObjectId",
+                    "required": true,
+                    "type": "string"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/accessnfs/gethostgroupsbystorageid/{storageId}": {
+            "get": {
+                "tags": ["nfs-access-controller"],
+                "summary": "getHostGroupsByStorageId",
+                "operationId": "getHostGroupsByStorageIdUsingGET",
+                "produces": ["*/*"],
+                "parameters": [{
+                    "name": "storageId",
+                    "in": "path",
+                    "description": "storageId",
+                    "required": true,
+                    "type": "string"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/accessnfs/gethostsbystorageid/{storageId}": {
+            "get": {
+                "tags": ["nfs-access-controller"],
+                "summary": "getHostsByStorageId",
+                "operationId": "getHostsByStorageIdUsingGET",
+                "produces": ["*/*"],
+                "parameters": [{
+                    "name": "storageId",
+                    "in": "path",
+                    "description": "storageId",
+                    "required": true,
+                    "type": "string"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/accessnfs/listnfs": {
+            "get": {
+                "tags": ["nfs-access-controller"],
+                "summary": "listNfs",
+                "operationId": "listNfsUsingGET",
+                "produces": ["*/*"],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/accessnfs/listnfsperformance": {
+            "get": {
+                "tags": ["nfs-access-controller"],
+                "summary": "listNfsPerformance",
+                "operationId": "listNfsPerformanceUsingGET",
+                "produces": ["*/*"],
+                "parameters": [{
+                    "name": "fsIds",
+                    "in": "query",
+                    "description": "fsIds",
+                    "required": true,
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "collectionFormat": "multi"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/accessnfs/logicport/{storageObjectId}": {
+            "get": {
+                "tags": ["nfs-data-store-controller"],
+                "summary": "portAttr",
+                "operationId": "portAttrUsingGET",
+                "produces": ["*/*"],
+                "parameters": [{
+                    "name": "storageObjectId",
+                    "in": "path",
+                    "description": "storageObjectId",
+                    "required": true,
+                    "type": "string"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/accessnfs/mountnfs": {
+            "post": {
+                "tags": ["nfs-access-controller"],
+                "summary": "mountNfs",
+                "operationId": "mountNfsUsingPOST",
+                "consumes": ["application/json"],
+                "produces": ["*/*"],
+                "parameters": [{
+                    "in": "body",
+                    "name": "params",
+                    "description": "params",
+                    "required": true,
+                    "schema": {
+                        "type": "object"
+                    }
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/accessnfs/scannfs": {
+            "get": {
+                "tags": ["nfs-data-store-controller"],
+                "summary": "scannfs",
+                "operationId": "scannfsUsingGET",
+                "produces": ["*/*"],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/accessnfs/share/{storageObjectId}": {
+            "get": {
+                "tags": ["nfs-data-store-controller"],
+                "summary": "shareAttr",
+                "operationId": "shareAttrUsingGET",
+                "produces": ["*/*"],
+                "parameters": [{
+                    "name": "storageObjectId",
+                    "in": "path",
+                    "description": "storageObjectId",
+                    "required": true,
+                    "type": "string"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/accessnfs/unmountnfs": {
+            "post": {
+                "tags": ["nfs-access-controller"],
+                "summary": "unmountNfs",
+                "operationId": "unmountNfsUsingPOST",
+                "consumes": ["application/json"],
+                "produces": ["*/*"],
+                "parameters": [{
+                    "in": "body",
+                    "name": "params",
+                    "description": "params",
+                    "required": true,
+                    "schema": {
+                        "type": "object"
+                    }
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/accessvmfs/createvmfs": {
+            "post": {
+                "tags": ["vmfs-access-controller"],
+                "summary": "createVmfs",
+                "operationId": "createVmfsUsingPOST",
+                "consumes": ["application/json"],
+                "produces": ["*/*"],
+                "parameters": [{
+                    "in": "body",
+                    "name": "params",
+                    "description": "params",
+                    "required": true,
+                    "schema": {
+                        "type": "object"
+                    }
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/accessvmfs/deletevmfs": {
+            "post": {
+                "tags": ["vmfs-access-controller"],
+                "summary": "deleteVmfs",
+                "operationId": "deleteVmfsUsingPOST",
+                "consumes": ["application/json"],
+                "produces": ["*/*"],
+                "parameters": [{
+                    "in": "body",
+                    "name": "params",
+                    "description": "params",
+                    "required": true,
+                    "schema": {
+                        "type": "object"
+                    }
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/accessvmfs/gethostgroupsbystorageid/{storageId}": {
+            "get": {
+                "tags": ["vmfs-access-controller"],
+                "summary": "getHostGroupsByStorageId",
+                "operationId": "getHostGroupsByStorageIdUsingGET_1",
+                "produces": ["*/*"],
+                "parameters": [{
+                    "name": "storageId",
+                    "in": "path",
+                    "description": "storageId",
+                    "required": true,
+                    "type": "string"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/accessvmfs/gethostsbystorageid/{storageId}": {
+            "get": {
+                "tags": ["vmfs-access-controller"],
+                "summary": "getHostsByStorageId",
+                "operationId": "getHostsByStorageIdUsingGET_1",
+                "produces": ["*/*"],
+                "parameters": [{
+                    "name": "storageId",
+                    "in": "path",
+                    "description": "storageId",
+                    "required": true,
+                    "type": "string"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/accessvmfs/listvmfs": {
+            "get": {
+                "tags": ["vmfs-access-controller"],
+                "summary": "listVmfs",
+                "operationId": "listVmfsUsingGET",
+                "produces": ["*/*"],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/accessvmfs/listvmfsperformance": {
+            "get": {
+                "tags": ["vmfs-access-controller"],
+                "summary": "listVmfsPerformance",
+                "operationId": "listVmfsPerformanceUsingGET",
+                "produces": ["*/*"],
+                "parameters": [{
+                    "name": "wwns",
+                    "in": "query",
+                    "description": "wwns",
+                    "required": true,
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "collectionFormat": "multi"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/accessvmfs/mountvmfs": {
+            "post": {
+                "tags": ["vmfs-access-controller"],
+                "summary": "mountVmfs",
+                "operationId": "mountVmfsUsingPOST",
+                "consumes": ["application/json"],
+                "produces": ["*/*"],
+                "parameters": [{
+                    "in": "body",
+                    "name": "params",
+                    "description": "params",
+                    "required": true,
+                    "schema": {
+                        "type": "object"
+                    }
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/accessvmfs/querydatastorebyname": {
+            "get": {
+                "tags": ["vmfs-access-controller"],
+                "summary": "queryDatastoreByName",
+                "operationId": "queryDatastoreByNameUsingGET",
+                "produces": ["*/*"],
+                "parameters": [{
+                    "name": "name",
+                    "in": "query",
+                    "description": "name",
+                    "required": true,
+                    "type": "string"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/accessvmfs/queryvmfs": {
+            "get": {
+                "tags": ["vmfs-access-controller"],
+                "summary": "queryVmfs",
+                "operationId": "queryVmfsUsingGET",
+                "produces": ["*/*"],
+                "parameters": [{
+                    "name": "dataStoreObjectId",
+                    "in": "query",
+                    "description": "dataStoreObjectId",
+                    "required": true,
+                    "type": "string"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/accessvmfs/scanvmfs": {
+            "get": {
+                "tags": ["vmfs-access-controller"],
+                "summary": "scanvmfs",
+                "operationId": "scanvmfsUsingGET",
+                "produces": ["*/*"],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/accessvmfs/ummountvmfs": {
+            "post": {
+                "tags": ["vmfs-access-controller"],
+                "summary": "unmountVmfs",
+                "operationId": "unmountVmfsUsingPOST",
+                "consumes": ["application/json"],
+                "produces": ["*/*"],
+                "parameters": [{
+                    "in": "body",
+                    "name": "params",
+                    "description": "params",
+                    "required": true,
+                    "schema": {
+                        "type": "object"
+                    }
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/accessvmfs/volume/{storageObjectId}": {
+            "get": {
+                "tags": ["vmfs-access-controller"],
+                "summary": "volumeDetail",
+                "operationId": "volumeDetailUsingGET",
+                "produces": ["*/*"],
+                "parameters": [{
+                    "name": "storageObjectId",
+                    "in": "path",
+                    "description": "storageObjectId",
+                    "required": true,
+                    "type": "string"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/accessvmware/getclustersbydsobjectid": {
+            "get": {
+                "tags": ["vmware-access-controller"],
+                "summary": "getClustersByDsObjectId",
+                "operationId": "getClustersByDsObjectIdUsingGET",
+                "produces": ["*/*"],
+                "parameters": [{
+                    "name": "dataStoreObjectId",
+                    "in": "query",
+                    "description": "dataStoreObjectId",
+                    "required": true,
+                    "type": "string"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/accessvmware/getdatastoresbyclusterobjectid": {
+            "get": {
+                "tags": ["vmware-access-controller"],
+                "summary": "getDataStoresByClusterObjectId",
+                "operationId": "getDataStoresByClusterObjectIdUsingGET",
+                "produces": ["*/*"],
+                "parameters": [{
+                    "name": "clusterObjectId",
+                    "in": "query",
+                    "description": "clusterObjectId",
+                    "required": true,
+                    "type": "string"
+                }, {
+                    "name": "dataStoreType",
+                    "in": "query",
+                    "description": "dataStoreType",
+                    "required": true,
+                    "type": "string"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/accessvmware/getdatastoresbyhostobjectid": {
+            "get": {
+                "tags": ["vmware-access-controller"],
+                "summary": "getDataStoresByHostObjectId",
+                "operationId": "getDataStoresByHostObjectIdUsingGET",
+                "produces": ["*/*"],
+                "parameters": [{
+                    "name": "dataStoreType",
+                    "in": "query",
+                    "description": "dataStoreType",
+                    "required": true,
+                    "type": "string"
+                }, {
+                    "name": "hostObjectId",
+                    "in": "query",
+                    "description": "hostObjectId",
+                    "required": true,
+                    "type": "string"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/accessvmware/gethostsbydsobjectid": {
+            "get": {
+                "tags": ["vmware-access-controller"],
+                "summary": "getHostsByDsObjectId",
+                "operationId": "getHostsByDsObjectIdUsingGET",
+                "produces": ["*/*"],
+                "parameters": [{
+                    "name": "dataStoreObjectId",
+                    "in": "query",
+                    "description": "dataStoreObjectId",
+                    "required": true,
+                    "type": "string"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/accessvmware/getmountdatastoresbyclusterobjectid": {
+            "get": {
+                "tags": ["vmware-access-controller"],
+                "summary": "getMountDataStoresByClusterObjectId",
+                "operationId": "getMountDataStoresByClusterObjectIdUsingGET",
+                "produces": ["*/*"],
+                "parameters": [{
+                    "name": "clusterObjectId",
+                    "in": "query",
+                    "description": "clusterObjectId",
+                    "required": true,
+                    "type": "string"
+                }, {
+                    "name": "dataStoreType",
+                    "in": "query",
+                    "description": "dataStoreType",
+                    "required": true,
+                    "type": "string"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/accessvmware/getmountdatastoresbyhostobjectid": {
+            "get": {
+                "tags": ["vmware-access-controller"],
+                "summary": "getMountDataStoresByHostObjectId",
+                "operationId": "getMountDataStoresByHostObjectIdUsingGET",
+                "produces": ["*/*"],
+                "parameters": [{
+                    "name": "dataStoreType",
+                    "in": "query",
+                    "description": "dataStoreType",
+                    "required": true,
+                    "type": "string"
+                }, {
+                    "name": "hostObjectId",
+                    "in": "query",
+                    "description": "hostObjectId",
+                    "required": true,
+                    "type": "string"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/accessvmware/getvmkernelipbyhostobjectid": {
+            "get": {
+                "tags": ["vmware-access-controller"],
+                "summary": "getVmKernelIpByHostObjectId",
+                "operationId": "getVmKernelIpByHostObjectIdUsingGET",
+                "produces": ["*/*"],
+                "parameters": [{
+                    "name": "hostObjectId",
+                    "in": "query",
+                    "description": "hostObjectId",
+                    "required": true,
+                    "type": "string"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/accessvmware/listcluster": {
+            "get": {
+                "tags": ["vmware-access-controller"],
+                "summary": "listClusters",
+                "operationId": "listClustersUsingGET",
+                "produces": ["*/*"],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/accessvmware/listhost": {
+            "get": {
+                "tags": ["vmware-access-controller"],
+                "summary": "listHosts",
+                "operationId": "listHostsUsingGET",
+                "produces": ["*/*"],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/accessvmware/relation": {
+            "get": {
+                "tags": ["vmware-access-controller"],
+                "summary": "getRelationByObjId",
+                "operationId": "getRelationByObjIdUsingGET",
+                "produces": ["*/*"],
+                "parameters": [{
+                    "name": "datastoreObjectId",
+                    "in": "query",
+                    "description": "datastoreObjectId",
+                    "required": true,
+                    "type": "string"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/datastorestatistichistrory/controller": {
+            "post": {
+                "tags": ["data-store-statistic-history-controller"],
+                "summary": "getControllerStatistic",
+                "operationId": "getControllerStatisticUsingPOST",
+                "consumes": ["application/json"],
+                "produces": ["*/*"],
+                "parameters": [{
+                    "in": "body",
+                    "name": "params",
+                    "description": "params",
+                    "required": true,
+                    "schema": {
+                        "type": "object"
+                    }
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/datastorestatistichistrory/controllerCurrent": {
+            "post": {
+                "tags": ["data-store-statistic-history-controller"],
+                "summary": "getControllerCurrenStatistic",
+                "operationId": "getControllerCurrenStatisticUsingPOST",
+                "consumes": ["application/json"],
+                "produces": ["*/*"],
+                "parameters": [{
+                    "in": "body",
+                    "name": "params",
+                    "description": "params",
+                    "required": true,
+                    "schema": {
+                        "type": "object"
+                    }
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/datastorestatistichistrory/fs": {
+            "post": {
+                "tags": ["data-store-statistic-history-controller"],
+                "summary": "getFsStatistic",
+                "operationId": "getFsStatisticUsingPOST",
+                "consumes": ["application/json"],
+                "produces": ["*/*"],
+                "parameters": [{
+                    "in": "body",
+                    "name": "params",
+                    "description": "params",
+                    "required": true,
+                    "schema": {
+                        "type": "object"
+                    }
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/datastorestatistichistrory/nfs": {
+            "post": {
+                "tags": ["data-store-statistic-history-controller"],
+                "summary": "getNfsVolumeStatistic",
+                "operationId": "getNfsVolumeStatisticUsingPOST",
+                "consumes": ["application/json"],
+                "produces": ["*/*"],
+                "parameters": [{
+                    "in": "body",
+                    "name": "params",
+                    "description": "params",
+                    "required": true,
+                    "schema": {
+                        "type": "object"
+                    }
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/datastorestatistichistrory/servicelevel": {
+            "post": {
+                "tags": ["data-store-statistic-history-controller"],
+                "summary": "getServiceLevelStatistic",
+                "operationId": "getServiceLevelStatisticUsingPOST",
+                "consumes": ["application/json"],
+                "produces": ["*/*"],
+                "parameters": [{
+                    "in": "body",
+                    "name": "params",
+                    "description": "params",
+                    "required": true,
+                    "schema": {
+                        "type": "object"
+                    }
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/datastorestatistichistrory/servicelevelLun": {
+            "post": {
+                "tags": ["data-store-statistic-history-controller"],
+                "summary": "getServiceLevelLunStatistic",
+                "operationId": "getServiceLevelLunStatisticUsingPOST",
+                "consumes": ["application/json"],
+                "produces": ["*/*"],
+                "parameters": [{
+                    "in": "body",
+                    "name": "params",
+                    "description": "params",
+                    "required": true,
+                    "schema": {
+                        "type": "object"
+                    }
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/datastorestatistichistrory/servicelevelStoragePool": {
+            "post": {
+                "tags": ["data-store-statistic-history-controller"],
+                "summary": "getServiceLevelStoragePoolStatistic",
+                "operationId": "getServiceLevelStoragePoolStatisticUsingPOST",
+                "consumes": ["application/json"],
+                "produces": ["*/*"],
+                "parameters": [{
+                    "in": "body",
+                    "name": "params",
+                    "description": "params",
+                    "required": true,
+                    "schema": {
+                        "type": "object"
+                    }
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/datastorestatistichistrory/storageDevice": {
+            "post": {
+                "tags": ["data-store-statistic-history-controller"],
+                "summary": "getStoragDeviceStatistic",
+                "operationId": "getStoragDeviceStatisticUsingPOST",
+                "consumes": ["application/json"],
+                "produces": ["*/*"],
+                "parameters": [{
+                    "in": "body",
+                    "name": "params",
+                    "description": "params",
+                    "required": true,
+                    "schema": {
+                        "type": "object"
+                    }
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/datastorestatistichistrory/storageDeviceCurrent": {
+            "post": {
+                "tags": ["data-store-statistic-history-controller"],
+                "summary": "getStoragDeviceCurrentStatistic",
+                "operationId": "getStoragDeviceCurrentStatisticUsingPOST",
+                "consumes": ["application/json"],
+                "produces": ["*/*"],
+                "parameters": [{
+                    "in": "body",
+                    "name": "params",
+                    "description": "params",
+                    "required": true,
+                    "schema": {
+                        "type": "object"
+                    }
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/datastorestatistichistrory/storageDisk": {
+            "post": {
+                "tags": ["data-store-statistic-history-controller"],
+                "summary": "getStoragDiskStatistic",
+                "operationId": "getStoragDiskStatisticUsingPOST",
+                "consumes": ["application/json"],
+                "produces": ["*/*"],
+                "parameters": [{
+                    "in": "body",
+                    "name": "params",
+                    "description": "params",
+                    "required": true,
+                    "schema": {
+                        "type": "object"
+                    }
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/datastorestatistichistrory/storageDiskCurrent": {
+            "post": {
+                "tags": ["data-store-statistic-history-controller"],
+                "summary": "getStoragDiskCurrentStatistic",
+                "operationId": "getStoragDiskCurrentStatisticUsingPOST",
+                "consumes": ["application/json"],
+                "produces": ["*/*"],
+                "parameters": [{
+                    "in": "body",
+                    "name": "params",
+                    "description": "params",
+                    "required": true,
+                    "schema": {
+                        "type": "object"
+                    }
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/datastorestatistichistrory/storagePool": {
+            "post": {
+                "tags": ["data-store-statistic-history-controller"],
+                "summary": "getStoragePoolStatistic",
+                "operationId": "getStoragePoolStatisticUsingPOST",
+                "consumes": ["application/json"],
+                "produces": ["*/*"],
+                "parameters": [{
+                    "in": "body",
+                    "name": "params",
+                    "description": "params",
+                    "required": true,
+                    "schema": {
+                        "type": "object"
+                    }
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/datastorestatistichistrory/storagePoolCurrent": {
+            "post": {
+                "tags": ["data-store-statistic-history-controller"],
+                "summary": "getStoragePoolCurrentStatistic",
+                "operationId": "getStoragePoolCurrentStatisticUsingPOST",
+                "consumes": ["application/json"],
+                "produces": ["*/*"],
+                "parameters": [{
+                    "in": "body",
+                    "name": "params",
+                    "description": "params",
+                    "required": true,
+                    "schema": {
+                        "type": "object"
+                    }
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/datastorestatistichistrory/storagePort": {
+            "post": {
+                "tags": ["data-store-statistic-history-controller"],
+                "summary": "getStoragPortStatistic",
+                "operationId": "getStoragPortStatisticUsingPOST",
+                "consumes": ["application/json"],
+                "produces": ["*/*"],
+                "parameters": [{
+                    "in": "body",
+                    "name": "params",
+                    "description": "params",
+                    "required": true,
+                    "schema": {
+                        "type": "object"
+                    }
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/datastorestatistichistrory/storagePortCurrent": {
+            "post": {
+                "tags": ["data-store-statistic-history-controller"],
+                "summary": "getStoragPortCurrentStatistic",
+                "operationId": "getStoragPortCurrentStatisticUsingPOST",
+                "consumes": ["application/json"],
+                "produces": ["*/*"],
+                "parameters": [{
+                    "in": "body",
+                    "name": "params",
+                    "description": "params",
+                    "required": true,
+                    "schema": {
+                        "type": "object"
+                    }
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/datastorestatistichistrory/vmfs": {
+            "post": {
+                "tags": ["data-store-statistic-history-controller"],
+                "summary": "getVmfsVolumeStatistic",
+                "operationId": "getVmfsVolumeStatisticUsingPOST",
+                "consumes": ["application/json"],
+                "produces": ["*/*"],
+                "parameters": [{
+                    "in": "body",
+                    "name": "params",
+                    "description": "params",
+                    "required": true,
+                    "schema": {
+                        "type": "object"
+                    }
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/datastorestatistichistrory/volume": {
+            "post": {
+                "tags": ["data-store-statistic-history-controller"],
+                "summary": "getVolumeStatistic",
+                "operationId": "getVolumeStatisticUsingPOST",
+                "consumes": ["application/json"],
+                "produces": ["*/*"],
+                "parameters": [{
+                    "in": "body",
+                    "name": "params",
+                    "description": "params",
+                    "required": true,
+                    "schema": {
+                        "type": "object"
+                    }
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/dmestorage/bandports": {
+            "get": {
+                "tags": ["dme-storage-controller"],
+                "summary": "getBandPorts",
+                "operationId": "getBandPortsUsingGET",
+                "produces": ["*/*"],
+                "parameters": [{
+                    "name": "storageId",
+                    "in": "query",
+                    "description": "storageId",
+                    "required": true,
+                    "type": "string"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/dmestorage/dtrees": {
+            "get": {
+                "tags": ["dme-storage-controller"],
+                "summary": "getDtrees",
+                "operationId": "getDtreesUsingGET",
+                "produces": ["*/*"],
+                "parameters": [{
+                    "name": "storageId",
+                    "in": "query",
+                    "description": "storageId",
+                    "required": true,
+                    "type": "string"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/dmestorage/failovergroups": {
+            "get": {
+                "tags": ["dme-storage-controller"],
+                "summary": "getFailoverGroups",
+                "operationId": "getFailoverGroupsUsingGET",
+                "produces": ["*/*"],
+                "parameters": [{
+                    "name": "storageId",
+                    "in": "query",
+                    "description": "storageId",
+                    "required": true,
+                    "type": "string"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/dmestorage/filesystems": {
+            "get": {
+                "tags": ["dme-storage-controller"],
+                "summary": "getFileSystems",
+                "operationId": "getFileSystemsUsingGET",
+                "produces": ["*/*"],
+                "parameters": [{
+                    "name": "pageNo",
+                    "in": "query",
+                    "description": "pageNo",
+                    "required": false,
+                    "type": "integer",
+                    "default": 1,
+                    "format": "int32"
+                }, {
+                    "name": "pageSize",
+                    "in": "query",
+                    "description": "pageSize",
+                    "required": false,
+                    "type": "integer",
+                    "default": 1000,
+                    "format": "int32"
+                }, {
+                    "name": "storageId",
+                    "in": "query",
+                    "description": "storageId",
+                    "required": true,
+                    "type": "string"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/dmestorage/getstorageethports": {
+            "get": {
+                "tags": ["dme-storage-controller"],
+                "summary": "getStorageEthPorts",
+                "operationId": "getStorageEthPortsUsingGET",
+                "produces": ["*/*"],
+                "parameters": [{
+                    "name": "storageSn",
+                    "in": "query",
+                    "description": "storageSn",
+                    "required": true,
+                    "type": "string"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/dmestorage/listStorageControllerPerformance": {
+            "get": {
+                "tags": ["dme-storage-controller"],
+                "summary": "listStorageControllerPerformance",
+                "operationId": "listStorageControllerPerformanceUsingGET",
+                "produces": ["*/*"],
+                "parameters": [{
+                    "name": "storageControllerIds",
+                    "in": "query",
+                    "description": "storageControllerIds",
+                    "required": true,
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "collectionFormat": "multi"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/dmestorage/listStorageDiskPerformance": {
+            "get": {
+                "tags": ["dme-storage-controller"],
+                "summary": "listStorageDiskPerformance",
+                "operationId": "listStorageDiskPerformanceUsingGET",
+                "produces": ["*/*"],
+                "parameters": [{
+                    "name": "storageDiskIds",
+                    "in": "query",
+                    "description": "storageDiskIds",
+                    "required": true,
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "collectionFormat": "multi"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/dmestorage/listStoragePortPerformance": {
+            "post": {
+                "tags": ["dme-storage-controller"],
+                "summary": "listStoragePortPerformance",
+                "operationId": "listStoragePortPerformanceUsingPOST",
+                "consumes": ["application/json"],
+                "produces": ["*/*"],
+                "parameters": [{
+                    "name": "storagePortIds",
+                    "in": "query",
+                    "description": "storagePortIds",
+                    "required": true,
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "collectionFormat": "multi"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/dmestorage/listVolumesPerformance": {
+            "get": {
+                "tags": ["dme-storage-controller"],
+                "summary": "listVolumesPerformance",
+                "operationId": "listVolumesPerformanceUsingGET",
+                "produces": ["*/*"],
+                "parameters": [{
+                    "name": "volumeId",
+                    "in": "query",
+                    "description": "volumeId",
+                    "required": true,
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "collectionFormat": "multi"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/dmestorage/liststorageperformance": {
+            "get": {
+                "tags": ["dme-storage-controller"],
+                "summary": "listStoragePerformance",
+                "operationId": "listStoragePerformanceUsingGET",
+                "produces": ["*/*"],
+                "parameters": [{
+                    "name": "storageIds",
+                    "in": "query",
+                    "description": "storageIds",
+                    "required": true,
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "collectionFormat": "multi"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/dmestorage/liststoragepoolperformance": {
+            "get": {
+                "tags": ["dme-storage-controller"],
+                "summary": "listStoragePoolPerformance",
+                "operationId": "listStoragePoolPerformanceUsingGET",
+                "produces": ["*/*"],
+                "parameters": [{
+                    "name": "storagePoolIds",
+                    "in": "query",
+                    "description": "storagePoolIds",
+                    "required": true,
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "collectionFormat": "multi"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/dmestorage/logicports": {
+            "get": {
+                "tags": ["dme-storage-controller"],
+                "summary": "getLogicPorts",
+                "operationId": "getLogicPortsUsingGET",
+                "produces": ["*/*"],
+                "parameters": [{
+                    "name": "storageId",
+                    "in": "query",
+                    "description": "storageId",
+                    "required": true,
+                    "type": "string"
+                }, {
+                    "name": "supportProtocol",
+                    "in": "query",
+                    "description": "supportProtocol",
+                    "required": false,
+                    "type": "string",
+                    "default": "all"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/dmestorage/nfsshares": {
+            "get": {
+                "tags": ["dme-storage-controller"],
+                "summary": "getNfsShares",
+                "operationId": "getNfsSharesUsingGET",
+                "produces": ["*/*"],
+                "parameters": [{
+                    "name": "storageId",
+                    "in": "query",
+                    "description": "storageId",
+                    "required": true,
+                    "type": "string"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/dmestorage/queryfsbyname": {
+            "get": {
+                "tags": ["dme-storage-controller"],
+                "summary": "queryFsByName",
+                "operationId": "queryFsByNameUsingGET",
+                "produces": ["*/*"],
+                "parameters": [{
+                    "name": "name",
+                    "in": "query",
+                    "description": "name",
+                    "required": true,
+                    "type": "string"
+                }, {
+                    "name": "storageId",
+                    "in": "query",
+                    "description": "storageId",
+                    "required": true,
+                    "type": "string"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/dmestorage/querysharebyname": {
+            "get": {
+                "tags": ["dme-storage-controller"],
+                "summary": "queryShareByName",
+                "operationId": "queryShareByNameUsingGET",
+                "produces": ["*/*"],
+                "parameters": [{
+                    "name": "name",
+                    "in": "query",
+                    "description": "name",
+                    "required": true,
+                    "type": "string"
+                }, {
+                    "name": "storageId",
+                    "in": "query",
+                    "description": "storageId",
+                    "required": true,
+                    "type": "string"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/dmestorage/queryvolumebyname": {
+            "get": {
+                "tags": ["dme-storage-controller"],
+                "summary": "queryVolumeByName",
+                "operationId": "queryVolumeByNameUsingGET",
+                "produces": ["*/*"],
+                "parameters": [{
+                    "name": "name",
+                    "in": "query",
+                    "description": "name",
+                    "required": true,
+                    "type": "string"
+                }, {
+                    "name": "serviceLevelId",
+                    "in": "query",
+                    "description": "serviceLevelId",
+                    "required": false,
+                    "type": "string"
+                }, {
+                    "name": "storageId",
+                    "in": "query",
+                    "description": "storageId",
+                    "required": false,
+                    "type": "string"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/dmestorage/storage": {
+            "get": {
+                "tags": ["dme-storage-controller"],
+                "summary": "getStorageDetail",
+                "operationId": "getStorageDetailUsingGET",
+                "produces": ["*/*"],
+                "parameters": [{
+                    "name": "storageId",
+                    "in": "query",
+                    "description": "storageId",
+                    "required": true,
+                    "type": "string"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/dmestorage/storagecontrollers": {
+            "get": {
+                "tags": ["dme-storage-controller"],
+                "summary": "getStorageControllers",
+                "operationId": "getStorageControllersUsingGET",
+                "produces": ["*/*"],
+                "parameters": [{
+                    "name": "storageDeviceId",
+                    "in": "query",
+                    "description": "storageDeviceId",
+                    "required": true,
+                    "type": "string"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/dmestorage/storagedisks": {
+            "get": {
+                "tags": ["dme-storage-controller"],
+                "summary": "getStorageDisks",
+                "operationId": "getStorageDisksUsingGET",
+                "produces": ["*/*"],
+                "parameters": [{
+                    "name": "storageDeviceId",
+                    "in": "query",
+                    "description": "storageDeviceId",
+                    "required": true,
+                    "type": "string"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/dmestorage/storagepools": {
+            "get": {
+                "tags": ["dme-storage-controller"],
+                "summary": "getStoragePools",
+                "operationId": "getStoragePoolsUsingGET",
+                "produces": ["*/*"],
+                "parameters": [{
+                    "name": "mediaType",
+                    "in": "query",
+                    "description": "mediaType",
+                    "required": false,
+                    "type": "string",
+                    "default": "all"
+                }, {
+                    "name": "storageId",
+                    "in": "query",
+                    "description": "storageId",
+                    "required": true,
+                    "type": "string"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/dmestorage/storageport": {
+            "get": {
+                "tags": ["dme-storage-controller"],
+                "summary": "getStoragePort",
+                "operationId": "getStoragePortUsingGET",
+                "produces": ["*/*"],
+                "parameters": [{
+                    "name": "portType",
+                    "in": "query",
+                    "description": "portType",
+                    "required": false,
+                    "type": "string",
+                    "default": "ALL"
+                }, {
+                    "name": "storageDeviceId",
+                    "in": "query",
+                    "description": "storageDeviceId",
+                    "required": true,
+                    "type": "string"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/dmestorage/storages": {
+            "get": {
+                "tags": ["dme-storage-controller"],
+                "summary": "getStorages",
+                "operationId": "getStoragesUsingGET",
+                "produces": ["*/*"],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/dmestorage/storages/serviceLevel/{serviceLevelId}": {
+            "get": {
+                "tags": ["dme-storage-controller"],
+                "summary": "getStorageByServiceLevelId",
+                "operationId": "getStorageByServiceLevelIdUsingGET",
+                "produces": ["*/*"],
+                "parameters": [{
+                    "name": "serviceLevelId",
+                    "in": "path",
+                    "description": "serviceLevelId",
+                    "required": true,
+                    "type": "string"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/dmestorage/volumes/byPage": {
+            "get": {
+                "tags": ["dme-storage-controller"],
+                "summary": "getVolumesByPage",
+                "operationId": "getVolumesByPageUsingGET",
+                "produces": ["*/*"],
+                "parameters": [{
+                    "name": "allocateType",
+                    "in": "query",
+                    "description": "allocateType",
+                    "required": false,
+                    "type": "string"
+                }, {
+                    "name": "attached",
+                    "in": "query",
+                    "description": "attached",
+                    "required": false,
+                    "type": "string"
+                }, {
+                    "name": "name",
+                    "in": "query",
+                    "description": "name",
+                    "required": false,
+                    "type": "string"
+                }, {
+                    "name": "pageNo",
+                    "in": "query",
+                    "description": "pageNo",
+                    "required": false,
+                    "type": "string",
+                    "default": "0"
+                }, {
+                    "name": "pageSize",
+                    "in": "query",
+                    "description": "pageSize",
+                    "required": false,
+                    "type": "string",
+                    "default": "20"
+                }, {
+                    "name": "servicelevelId",
+                    "in": "query",
+                    "description": "servicelevelId",
+                    "required": false,
+                    "type": "string"
+                }, {
+                    "name": "sortDir",
+                    "in": "query",
+                    "description": "sortDir",
+                    "required": false,
+                    "type": "string"
+                }, {
+                    "name": "sortKey",
+                    "in": "query",
+                    "description": "sortKey",
+                    "required": false,
+                    "type": "string"
+                }, {
+                    "name": "status",
+                    "in": "query",
+                    "description": "status",
+                    "required": false,
+                    "type": "string"
+                }, {
+                    "name": "storageId",
+                    "in": "query",
+                    "description": "storageId",
+                    "required": false,
+                    "type": "string"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/operatenfs/changenfsdatastore": {
+            "put": {
+                "tags": ["nfs-operation-controller"],
+                "summary": "changeNfsCapacity",
+                "operationId": "changeNfsCapacityUsingPUT",
+                "consumes": ["application/json"],
+                "produces": ["*/*"],
+                "parameters": [{
+                    "in": "body",
+                    "name": "params",
+                    "description": "params",
+                    "required": true,
+                    "schema": {
+                        "type": "object"
+                    }
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/operatenfs/createnfsdatastore": {
+            "post": {
+                "tags": ["nfs-operation-controller"],
+                "summary": "createNfsDatastore",
+                "operationId": "createNfsDatastoreUsingPOST",
+                "consumes": ["application/json"],
+                "produces": ["*/*"],
+                "parameters": [{
+                    "in": "body",
+                    "name": "requestParams",
+                    "description": "requestParams",
+                    "required": true,
+                    "schema": {
+                        "type": "object"
+                    }
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/operatenfs/editnfsstore": {
+            "get": {
+                "tags": ["nfs-operation-controller"],
+                "summary": "getEditNfsStore",
+                "operationId": "getEditNfsStoreUsingGET",
+                "produces": ["*/*"],
+                "parameters": [{
+                    "name": "storeObjectId",
+                    "in": "query",
+                    "description": "storeObjectId",
+                    "required": true,
+                    "type": "string"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/operatenfs/updatenfsdatastore": {
+            "post": {
+                "tags": ["nfs-operation-controller"],
+                "summary": "updateNfsDatastore",
+                "operationId": "updateNfsDatastoreUsingPOST",
+                "consumes": ["application/json"],
+                "produces": ["*/*"],
+                "parameters": [{
+                    "in": "body",
+                    "name": "params",
+                    "description": "params",
+                    "required": true,
+                    "schema": {
+                        "type": "object"
+                    }
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/operatevmfs/canrecyclevmfsbydatastoreid": {
+            "post": {
+                "tags": ["vmfs-operation-controller"],
+                "summary": "canRecycleVmfsbyDatastoreid",
+                "operationId": "canRecycleVmfsbyDatastoreidUsingPOST",
+                "consumes": ["application/json"],
+                "produces": ["*/*"],
+                "parameters": [{
+                    "in": "body",
+                    "name": "datastoreId",
+                    "description": "datastoreId",
+                    "required": true,
+                    "schema": {
+                        "type": "string"
+                    }
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/operatevmfs/expandvmfs": {
+            "post": {
+                "tags": ["vmfs-operation-controller"],
+                "summary": "expandVmfs",
+                "operationId": "expandVmfsUsingPOST",
+                "consumes": ["application/json"],
+                "produces": ["*/*"],
+                "parameters": [{
+                    "in": "body",
+                    "name": "volumes",
+                    "description": "volumes",
+                    "required": true,
+                    "schema": {
+                        "type": "object",
+                        "additionalProperties": {
+                            "type": "string"
+                        }
+                    }
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/operatevmfs/listvmfsservicelevel": {
+            "put": {
+                "tags": ["vmfs-operation-controller"],
+                "summary": "listServiceLevelVmfs",
+                "operationId": "listServiceLevelVmfsUsingPUT",
+                "consumes": ["application/json"],
+                "produces": ["*/*"],
+                "parameters": [{
+                    "in": "body",
+                    "name": "params",
+                    "description": "params",
+                    "required": false,
+                    "schema": {
+                        "type": "object"
+                    }
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/operatevmfs/recyclevmfs": {
+            "post": {
+                "tags": ["vmfs-operation-controller"],
+                "summary": "recycleVmfs",
+                "operationId": "recycleVmfsUsingPOST",
+                "consumes": ["application/json"],
+                "produces": ["*/*"],
+                "parameters": [{
+                    "in": "body",
+                    "name": "dsObjectIds",
+                    "description": "dsObjectIds",
+                    "required": true,
+                    "schema": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/operatevmfs/recyclevmfsbydatastoreids": {
+            "post": {
+                "tags": ["vmfs-operation-controller"],
+                "summary": "recycleVmfsByDatastoreIds",
+                "operationId": "recycleVmfsByDatastoreIdsUsingPOST",
+                "consumes": ["application/json"],
+                "produces": ["*/*"],
+                "parameters": [{
+                    "in": "body",
+                    "name": "datastoreIds",
+                    "description": "datastoreIds",
+                    "required": true,
+                    "schema": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/operatevmfs/updatevmfs": {
+            "put": {
+                "tags": ["vmfs-operation-controller"],
+                "summary": "updateVmfs",
+                "operationId": "updateVmfsUsingPUT",
+                "consumes": ["application/json"],
+                "produces": ["*/*"],
+                "parameters": [{
+                    "in": "body",
+                    "name": "params",
+                    "description": "params",
+                    "required": true,
+                    "schema": {
+                        "type": "object"
+                    }
+                }, {
+                    "name": "volumeId",
+                    "in": "query",
+                    "description": "volumeId",
+                    "required": true,
+                    "type": "string"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/operatevmfs/updatevmfsservicelevel": {
+            "post": {
+                "tags": ["vmfs-operation-controller"],
+                "summary": "updateServiceLevelVmfs",
+                "operationId": "updateServiceLevelVmfsUsingPOST",
+                "consumes": ["application/json"],
+                "produces": ["*/*"],
+                "parameters": [{
+                    "in": "body",
+                    "name": "params",
+                    "description": "params",
+                    "required": true,
+                    "schema": {
+                        "type": "object"
+                    }
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/overview/getbestpracticeviolations": {
+            "get": {
+                "tags": ["overview-controller"],
+                "summary": "getBestPracticeViolations",
+                "operationId": "getBestPracticeViolationsUsingGET",
+                "produces": ["*/*"],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/overview/getdatastoreoverview": {
+            "get": {
+                "tags": ["overview-controller"],
+                "summary": "getDataStoreOverview",
+                "operationId": "getDataStoreOverviewUsingGET",
+                "produces": ["*/*"],
+                "parameters": [{
+                    "name": "type",
+                    "in": "query",
+                    "description": "type",
+                    "required": true,
+                    "type": "string"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/overview/getdatastoretopn": {
+            "get": {
+                "tags": ["overview-controller"],
+                "summary": "getDataStoreTopN",
+                "operationId": "getDataStoreTopNUsingGET",
+                "produces": ["*/*"],
+                "parameters": [{
+                    "name": "desc",
+                    "in": "query",
+                    "description": "desc",
+                    "required": false,
+                    "type": "string",
+                    "default": "desc"
+                }, {
+                    "name": "orderBy",
+                    "in": "query",
+                    "description": "orderBy",
+                    "required": false,
+                    "type": "string",
+                    "default": "utilization"
+                }, {
+                    "name": "topn",
+                    "in": "query",
+                    "description": "topn",
+                    "required": false,
+                    "type": "integer",
+                    "format": "int32"
+                }, {
+                    "name": "type",
+                    "in": "query",
+                    "description": "type",
+                    "required": true,
+                    "type": "string"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/overview/getstoragenum": {
+            "get": {
+                "tags": ["overview-controller"],
+                "summary": "getStorageNum",
+                "operationId": "getStorageNumUsingGET",
+                "produces": ["*/*"],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/registerservice/pluginaction": {
+            "post": {
+                "tags": ["plugin-register-controller"],
+                "summary": "pluginaction",
+                "operationId": "pluginactionUsingPOST",
+                "consumes": ["application/json"],
+                "produces": ["*/*"],
+                "parameters": [{
+                    "name": "action",
+                    "in": "query",
+                    "description": "action",
+                    "required": false,
+                    "type": "string"
+                }, {
+                    "name": "dmeIp",
+                    "in": "query",
+                    "description": "dmeIp",
+                    "required": true,
+                    "type": "string"
+                }, {
+                    "name": "dmePassword",
+                    "in": "query",
+                    "description": "dmePassword",
+                    "required": true,
+                    "type": "string"
+                }, {
+                    "name": "dmePort",
+                    "in": "query",
+                    "description": "dmePort",
+                    "required": true,
+                    "type": "string"
+                }, {
+                    "name": "dmeUsername",
+                    "in": "query",
+                    "description": "dmeUsername",
+                    "required": true,
+                    "type": "string"
+                }, {
+                    "name": "removeData",
+                    "in": "query",
+                    "description": "removeData",
+                    "required": false,
+                    "type": "string"
+                }, {
+                    "name": "vcenterIP",
+                    "in": "query",
+                    "description": "vcenterIP",
+                    "required": true,
+                    "type": "string"
+                }, {
+                    "name": "vcenterPassword",
+                    "in": "query",
+                    "description": "vcenterPassword",
+                    "required": true,
+                    "type": "string"
+                }, {
+                    "name": "vcenterPort",
+                    "in": "query",
+                    "description": "vcenterPort",
+                    "required": true,
+                    "type": "string"
+                }, {
+                    "name": "vcenterUsername",
+                    "in": "query",
+                    "description": "vcenterUsername",
+                    "required": true,
+                    "type": "string"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/relationinstance/getbyrelationnameinstanceid": {
+            "get": {
+                "tags": ["dme-relation-instance-controller"],
+                "summary": "queryByRelationNameInstanceId",
+                "operationId": "queryByRelationNameInstanceIdUsingGET",
+                "produces": ["*/*"],
+                "parameters": [{
+                    "name": "instanceId",
+                    "in": "query",
+                    "description": "instanceId",
+                    "required": true,
+                    "type": "string"
+                }, {
+                    "name": "relationName",
+                    "in": "query",
+                    "description": "relationName",
+                    "required": true,
+                    "type": "string"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/relationinstance/getbyrelationnameinstanceidcondition": {
+            "get": {
+                "tags": ["dme-relation-instance-controller"],
+                "summary": "queryByRelationNameInstanceIdCondition",
+                "operationId": "queryByRelationNameInstanceIdConditionUsingGET",
+                "produces": ["*/*"],
+                "parameters": [{
+                    "name": "instanceId",
+                    "in": "query",
+                    "description": "instanceId",
+                    "required": true,
+                    "type": "string"
+                }, {
+                    "name": "relationName",
+                    "in": "query",
+                    "description": "relationName",
+                    "required": true,
+                    "type": "string"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/relationinstance/listbyrelationname": {
+            "get": {
+                "tags": ["dme-relation-instance-controller"],
+                "summary": "queryByRelationName",
+                "operationId": "queryByRelationNameUsingGET",
+                "produces": ["*/*"],
+                "parameters": [{
+                    "name": "relationName",
+                    "in": "query",
+                    "description": "relationName",
+                    "required": true,
+                    "type": "string"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/relationinstance/refreshresourceinstance": {
+            "get": {
+                "tags": ["dme-relation-instance-controller"],
+                "summary": "refreshResourceInstance",
+                "operationId": "refreshResourceInstanceUsingGET",
+                "produces": ["*/*"],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/servicelevel/capacity/stat-lun": {
+            "get": {
+                "tags": ["service-level-controller"],
+                "summary": "statLun",
+                "operationId": "statLunUsingGET",
+                "produces": ["*/*"],
+                "parameters": [{
+                    "name": "interval",
+                    "in": "query",
+                    "description": "interval",
+                    "required": true,
+                    "type": "string"
+                }, {
+                    "name": "serviceLevelId",
+                    "in": "query",
+                    "description": "serviceLevelId",
+                    "required": true,
+                    "type": "string"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/servicelevel/capacity/stat-storage-pool": {
+            "get": {
+                "tags": ["service-level-controller"],
+                "summary": "statStoragePool",
+                "operationId": "statStoragePoolUsingGET",
+                "produces": ["*/*"],
+                "parameters": [{
+                    "name": "interval",
+                    "in": "query",
+                    "description": "interval",
+                    "required": true,
+                    "type": "string"
+                }, {
+                    "name": "serviceLevelId",
+                    "in": "query",
+                    "description": "serviceLevelId",
+                    "required": true,
+                    "type": "string"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/servicelevel/listStoragePoolsByServiceLevelId": {
+            "post": {
+                "tags": ["service-level-controller"],
+                "summary": "listStoragePoolsByServiceLevelId",
+                "operationId": "listStoragePoolsByServiceLevelIdUsingPOST",
+                "consumes": ["application/json"],
+                "produces": ["*/*"],
+                "parameters": [{
+                    "in": "body",
+                    "name": "serviceLevelId",
+                    "description": "serviceLevelId",
+                    "required": true,
+                    "schema": {
+                        "type": "string"
+                    }
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/servicelevel/listVolumesByServiceLevelId": {
+            "post": {
+                "tags": ["service-level-controller"],
+                "summary": "listVolumesByServiceLevelId",
+                "operationId": "listVolumesByServiceLevelIdUsingPOST",
+                "consumes": ["application/json"],
+                "produces": ["*/*"],
+                "parameters": [{
+                    "in": "body",
+                    "name": "serviceLevelId",
+                    "description": "serviceLevelId",
+                    "required": true,
+                    "schema": {
+                        "type": "string"
+                    }
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/servicelevel/listservicelevel": {
+            "post": {
+                "tags": ["service-level-controller"],
+                "summary": "listServiceLevel",
+                "operationId": "listServiceLevelUsingPOST",
+                "consumes": ["application/json"],
+                "produces": ["*/*"],
+                "parameters": [{
+                    "in": "body",
+                    "name": "params",
+                    "description": "params",
+                    "required": true,
+                    "schema": {
+                        "type": "object"
+                    }
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/servicelevel/manualupdate": {
+            "post": {
+                "tags": ["service-level-controller"],
+                "summary": "manualupdate",
+                "operationId": "manualupdateUsingPOST",
+                "consumes": ["application/json"],
+                "produces": ["*/*"],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/servicelevel/performance/perf-stat-lun-details": {
+            "get": {
+                "tags": ["service-level-controller"],
+                "summary": "lunPerformanceDatasetsQuery",
+                "operationId": "lunPerformanceDatasetsQueryUsingGET",
+                "produces": ["*/*"],
+                "parameters": [{
+                    "name": "interval",
+                    "in": "query",
+                    "description": "interval",
+                    "required": true,
+                    "type": "string"
+                }, {
+                    "name": "serviceLevelId",
+                    "in": "query",
+                    "description": "serviceLevelId",
+                    "required": true,
+                    "type": "string"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/servicelevel/performance/perf-stat-storage-pool-details": {
+            "get": {
+                "tags": ["service-level-controller"],
+                "summary": "storagePoolPerformanceDatasetsQuery",
+                "operationId": "storagePoolPerformanceDatasetsQueryUsingGET",
+                "produces": ["*/*"],
+                "parameters": [{
+                    "name": "interval",
+                    "in": "query",
+                    "description": "interval",
+                    "required": true,
+                    "type": "string"
+                }, {
+                    "name": "serviceLevelId",
+                    "in": "query",
+                    "description": "serviceLevelId",
+                    "required": true,
+                    "type": "string"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/v1/bestpractice/check": {
+            "post": {
+                "tags": ["best-practice-controller"],
+                "summary": "bestPractice",
+                "operationId": "bestPracticeUsingPOST",
+                "consumes": ["application/json"],
+                "produces": ["*/*"],
+                "parameters": [{
+                    "name": "objectId",
+                    "in": "query",
+                    "description": "objectId",
+                    "required": false,
+                    "type": "string"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/v1/bestpractice/check/byCluster": {
+            "post": {
+                "tags": ["best-practice-controller"],
+                "summary": "checkByCluster",
+                "operationId": "checkByClusterUsingPOST",
+                "consumes": ["application/json"],
+                "produces": ["*/*"],
+                "parameters": [{
+                    "name": "clusterObjId",
+                    "in": "query",
+                    "description": "clusterObjId",
+                    "required": true,
+                    "type": "string"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/v1/bestpractice/records/all": {
+            "get": {
+                "tags": ["best-practice-controller"],
+                "summary": "getBestPracticeRecords",
+                "operationId": "getBestPracticeRecordsUsingGET",
+                "produces": ["*/*"],
+                "parameters": [{
+                    "name": "objectId",
+                    "in": "query",
+                    "description": "objectId",
+                    "required": false,
+                    "type": "string"
+                }, {
+                    "name": "type",
+                    "in": "query",
+                    "description": "type",
+                    "required": false,
+                    "type": "string"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/v1/bestpractice/records/bypage": {
+            "get": {
+                "tags": ["best-practice-controller"],
+                "summary": "getBySettingAndPage",
+                "operationId": "getBySettingAndPageUsingGET",
+                "produces": ["*/*"],
+                "parameters": [{
+                    "name": "hostSetting",
+                    "in": "query",
+                    "description": "hostSetting",
+                    "required": true,
+                    "type": "string"
+                }, {
+                    "name": "pageNo",
+                    "in": "query",
+                    "description": "pageNo",
+                    "required": true,
+                    "type": "integer",
+                    "format": "int32"
+                }, {
+                    "name": "pageSize",
+                    "in": "query",
+                    "description": "pageSize",
+                    "required": true,
+                    "type": "integer",
+                    "format": "int32"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/v1/bestpractice/update/all": {
+            "post": {
+                "tags": ["best-practice-controller"],
+                "summary": "upAll",
+                "operationId": "upAllUsingPOST",
+                "consumes": ["application/json"],
+                "produces": ["*/*"],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/v1/bestpractice/update/byCluster": {
+            "post": {
+                "tags": ["best-practice-controller"],
+                "summary": "upByCluster",
+                "operationId": "upByClusterUsingPOST",
+                "consumes": ["application/json"],
+                "produces": ["*/*"],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/v1/bestpractice/update/byCluster/{clusterObjectId}": {
+            "post": {
+                "tags": ["best-practice-controller"],
+                "summary": "upByClusterId",
+                "operationId": "upByClusterIdUsingPOST",
+                "consumes": ["application/json"],
+                "produces": ["*/*"],
+                "parameters": [{
+                    "name": "clusterObjectId",
+                    "in": "path",
+                    "description": "clusterObjectId",
+                    "required": true,
+                    "type": "string"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/v1/bestpractice/update/byhosts": {
+            "post": {
+                "tags": ["best-practice-controller"],
+                "summary": "upByHosts",
+                "operationId": "upByHostsUsingPOST",
+                "consumes": ["application/json"],
+                "produces": ["*/*"],
+                "parameters": [{
+                    "in": "body",
+                    "name": "hostObjectIds",
+                    "description": "hostObjectIds",
+                    "required": true,
+                    "schema": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/v1/bestpractice/update/bylist": {
+            "post": {
+                "tags": ["best-practice-controller"],
+                "summary": "bylist",
+                "operationId": "bylistUsingPOST",
+                "consumes": ["application/json"],
+                "produces": ["*/*"],
+                "parameters": [{
+                    "in": "body",
+                    "name": "list",
+                    "description": "list",
+                    "required": true,
+                    "schema": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/definitions/BestPracticeUpdateByTypeRequest"
+                        }
+                    }
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/v1/bestpractice/update/bytype": {
+            "post": {
+                "tags": ["best-practice-controller"],
+                "summary": "upByHostSetting",
+                "operationId": "upByHostSettingUsingPOST",
+                "consumes": ["application/json"],
+                "produces": ["*/*"],
+                "parameters": [{
+                    "in": "body",
+                    "name": "request",
+                    "description": "request",
+                    "required": true,
+                    "schema": {
+                        "$ref": "#/definitions/BestPracticeUpdateByTypeRequest"
+                    }
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/v1/bestpractice/virtual-nic": {
+            "post": {
+                "tags": ["best-practice-controller"],
+                "summary": "getVirtualNicList",
+                "operationId": "getVirtualNicListUsingPOST",
+                "consumes": ["application/json"],
+                "produces": ["*/*"],
+                "parameters": [{
+                    "in": "body",
+                    "name": "hostObjectIds",
+                    "description": "hostObjectIds",
+                    "required": true,
+                    "schema": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/v1/bestpractice/virtual-nic/update": {
+            "post": {
+                "tags": ["best-practice-controller"],
+                "summary": "updateVirtualNicList",
+                "operationId": "updateVirtualNicListUsingPOST",
+                "consumes": ["application/json"],
+                "produces": ["*/*"],
+                "parameters": [{
+                    "in": "body",
+                    "name": "beans",
+                    "description": "beans",
+                    "required": true,
+                    "schema": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/definitions/UpHostVnicRequestBean"
+                        }
+                    }
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/v1/vmrdm/createRdm": {
+            "post": {
+                "tags": ["vm-rdm-controller"],
+                "summary": "createRdm",
+                "operationId": "createRdmUsingPOST",
+                "consumes": ["application/json"],
+                "produces": ["*/*"],
+                "parameters": [{
+                    "in": "body",
+                    "name": "createBean",
+                    "description": "createBean",
+                    "required": true,
+                    "schema": {
+                        "$ref": "#/definitions/VmRdmCreateBean"
+                    }
+                }, {
+                    "name": "dataStoreObjectId",
+                    "in": "query",
+                    "description": "dataStoreObjectId",
+                    "required": true,
+                    "type": "string"
+                }, {
+                    "name": "vmObjectId",
+                    "in": "query",
+                    "description": "vmObjectId",
+                    "required": true,
+                    "type": "string"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/v1/vmrdm/dmeHosts": {
+            "get": {
+                "tags": ["vm-rdm-controller"],
+                "summary": "dmeHosts",
+                "operationId": "dmeHostsUsingGET",
+                "produces": ["*/*"],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/v1/vmrdm/vCenter/datastoreOnHost": {
+            "get": {
+                "tags": ["vm-rdm-controller"],
+                "summary": "getDatastoreMountsOnHost",
+                "operationId": "getDatastoreMountsOnHostUsingGET",
+                "produces": ["*/*"],
+                "parameters": [{
+                    "name": "vmObjectId",
+                    "in": "query",
+                    "description": "vmObjectId",
+                    "required": true,
+                    "type": "string"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ResponseBodyBean"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        }
+    },
+    "definitions": {
+        "BestPracticeUpdateByTypeRequest": {
+            "type": "object",
+            "properties": {
+                "hostObjectIds": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "hostSetting": {
+                    "type": "string"
+                }
+            },
+            "title": "BestPracticeUpdateByTypeRequest"
+        },
+        "CreateVolumesRequest": {
+            "type": "object",
+            "properties": {
+                "mapping": {
+                    "$ref": "#/definitions/ServiceVolumeMapping"
+                },
+                "serviceLevelId": {
+                    "type": "string"
+                },
+                "volumes": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/ServiceVolumeBasicParams"
+                    }
+                }
+            },
+            "title": "CreateVolumesRequest"
+        },
+        "CustomizeVolumeTuningForCreate": {
+            "type": "object",
+            "properties": {
+                "alloctype": {
+                    "type": "string"
+                },
+                "compressionEnabled": {
+                    "type": "boolean"
+                },
+                "dedupeEnabled": {
+                    "type": "boolean"
+                },
+                "smartqos": {
+                    "$ref": "#/definitions/SmartQosForRdmCreate"
+                },
+                "smarttier": {
+                    "type": "string"
+                },
+                "workloadTypeId": {
+                    "type": "integer",
+                    "format": "int32"
+                }
+            },
+            "title": "CustomizeVolumeTuningForCreate"
+        },
+        "CustomizeVolumes": {
+            "type": "object",
+            "properties": {
+                "availabilityZone": {
+                    "type": "string"
+                },
+                "initialDistributePolicy": {
+                    "type": "string"
+                },
+                "ownerController": {
+                    "type": "string"
+                },
+                "poolRawId": {
+                    "type": "string"
+                },
+                "prefetchPolicy": {
+                    "type": "string"
+                },
+                "prefetchValue": {
+                    "type": "string"
+                },
+                "storageId": {
+                    "type": "string"
+                },
+                "tuning": {
+                    "$ref": "#/definitions/CustomizeVolumeTuningForCreate"
+                },
+                "volumeSpecs": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/ServiceVolumeBasicParams"
+                    }
+                }
+            },
+            "title": "CustomizeVolumes"
+        },
+        "CustomizeVolumesRequest": {
+            "type": "object",
+            "properties": {
+                "customizeVolumes": {
+                    "$ref": "#/definitions/CustomizeVolumes"
+                },
+                "mapping": {
+                    "$ref": "#/definitions/ServiceVolumeMapping"
+                }
+            },
+            "title": "CustomizeVolumesRequest"
+        },
+        "ResponseBodyBean": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "string"
+                },
+                "data": {
+                    "type": "object"
+                },
+                "description": {
+                    "type": "string"
+                }
+            },
+            "title": "ResponseBodyBean"
+        },
+        "ServiceVolumeBasicParams": {
+            "type": "object",
+            "properties": {
+                "capacity": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "count": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "startSuffix": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "unit": {
+                    "type": "string"
+                }
+            },
+            "title": "ServiceVolumeBasicParams"
+        },
+        "ServiceVolumeMapping": {
+            "type": "object",
+            "properties": {
+                "hostId": {
+                    "type": "string"
+                },
+                "hostgroupId": {
+                    "type": "string"
+                }
+            },
+            "title": "ServiceVolumeMapping"
+        },
+        "SmartQosForRdmCreate": {
+            "type": "object",
+            "properties": {
+                "controlPolicy": {
+                    "type": "string"
+                },
+                "enabled": {
+                    "type": "boolean"
+                },
+                "latency": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "latencyUnit": {
+                    "type": "string"
+                },
+                "maxbandwidth": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "maxiops": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "minbandwidth": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "miniops": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "name": {
+                    "type": "string"
+                }
+            },
+            "title": "SmartQosForRdmCreate"
+        },
+        "UpHostVnicRequestBean": {
+            "type": "object",
+            "properties": {
+                "device": {
+                    "type": "string"
+                },
+                "hostObjectId": {
+                    "type": "string"
+                }
+            },
+            "title": "UpHostVnicRequestBean"
+        },
+        "VmRdmCreateBean": {
+            "type": "object",
+            "properties": {
+                "compatibilityMode": {
+                    "type": "string"
+                },
+                "createVolumesRequest": {
+                    "$ref": "#/definitions/CreateVolumesRequest"
+                },
+                "customizeVolumesRequest": {
+                    "$ref": "#/definitions/CustomizeVolumesRequest"
+                }
+            },
+            "title": "VmRdmCreateBean"
+        }
+    }
+}
