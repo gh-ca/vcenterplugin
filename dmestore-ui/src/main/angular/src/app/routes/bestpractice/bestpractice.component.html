@@ -41,7 +41,10 @@
       [clrDgSelectable]="item.hostSetting!=='Jumbo Frame (MTU)'&&item.hostList&&item.hostList.length>0&&item.hostList[0].autoRepair==='true'">
       <!-- MTU 单独处理 -->
       <clr-dg-cell>{{item.hostSetting}}</clr-dg-cell>
-      <clr-dg-cell>{{item.recommendValue}}</clr-dg-cell>
+      <clr-dg-cell>
+        <!-- {{item.recommendValue}} -->
+        <app-bp-cell-mul-row [items]="item.recommendValue"></app-bp-cell-mul-row>
+      </clr-dg-cell>
       <clr-dg-cell>
         <span [hidden]="item.level != 'Critical'">
           <span class="color-square" style="background-color: #CA2200; margin-right: 10px"></span>{{item.levelDesc}}
@@ -124,9 +127,10 @@
               <span *ngIf="!item.actualObjValue">--</span>
 
             </clr-dg-cell>
-            <clr-dg-cell class="over_flow"
-              title="{{item.recommendValue ? item.recommendValue:'--'}}">
-              {{item.recommendValue ? item.recommendValue : '--'}}</clr-dg-cell>
+            <clr-dg-cell class="over_flow" title="{{item.recommendValue ? item.recommendValue:'--'}}">
+              <!-- {{item.recommendValue ? item.recommendValue : '--'}} -->
+              <app-bp-cell-mul-row [items]="item.recommendValue"></app-bp-cell-mul-row>
+            </clr-dg-cell>
           </clr-dg-row>
 
           <clr-dg-footer>
