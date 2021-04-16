@@ -805,6 +805,8 @@
   },
   "enum": {
     "status": {
+      "warning": "警告",
+      "alert": "警示",
       "disconnected": "未连接",
       "connected": "已连接",
       "creating": "创建中",

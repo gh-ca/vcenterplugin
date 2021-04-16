@@ -19,6 +19,7 @@ import { FormControl, FormGroup, Validators } from "@angular/forms";
 import { TokenService } from "@core";
 import { DOCUMENT } from "@angular/common";
 import { isMockData, mockData } from './../../../mock/mock';
+import { getColorByType, getLabelByValue } from './../../app.helpers';
 
 @Component({
   selector: 'app-nfs',
@@ -28,6 +29,12 @@ import { isMockData, mockData } from './../../../mock/mock';
   providers: [NfsService, StorageService, VmfsListService, NfsAddService],
 })
 export class NfsComponent implements OnInit {
+
+
+  getColor;
+  getLabelByValue;
+
+
   descSort = ClrDatagridSortOrder.DESC;
   list: List[] = []; // 数据列表
   radioCheck = 'list'; // 切换列表页显示
@@ -111,9 +118,21 @@ export class NfsComponent implements OnInit {
   bandwidthLimitErr = false; // v6 设备 带宽 下限大于上限
   iopsLimitErr = false; // v6 设备 IOPS 下限大于上限
 
-  constructor(private addService: NfsAddService, private remoteSrv: NfsService, private cdr: ChangeDetectorRef, public gs: GlobalsService,
-    private storageService: StorageService, private vmfsListService: VmfsListService, private router: Router, private token: TokenService,
-    @Optional() @Inject(DOCUMENT) private document: any) { }
+  constructor(private addService: NfsAddService,
+    private remoteSrv: NfsService, 
+    private cdr: ChangeDetectorRef,
+    public gs: GlobalsService,
+    private storageService: StorageService, 
+    private vmfsListService: VmfsListService, 
+    private router: Router, 
+    private token: TokenService,
+    @Optional() @Inject(DOCUMENT) 
+    private document: any
+  ) {
+    this.getColor = getColorByType;
+    this.getLabelByValue = getLabelByValue;
+  }
+  
   ngOnInit(): void {
     this.process();
     this.getNfsList();

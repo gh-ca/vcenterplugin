@@ -183,7 +183,7 @@
     }
   },
   "vmfs": {
-    "creatfailtips":"It is possible the specified object name already exists or the object is in the Recycle Bin.Specify an unused name or delete the existing object and try again.",
+    "creatfailtips": "It is possible the specified object name already exists or the object is in the Recycle Bin.Specify an unused name or delete the existing object and try again.",
     "controlPolicy": "Control Policy",
     "controlPolicyDescOne": "Control Policy",
     "controlPolicyDescZero": "Control Policy",
@@ -805,6 +805,8 @@
   },
   "enum": {
     "status": {
+      "warning": "Warning",
+      "alert": "Alert",
       "disconnected": "Disconnected",
       "connected": "Connected",
       "creating": "Creating",

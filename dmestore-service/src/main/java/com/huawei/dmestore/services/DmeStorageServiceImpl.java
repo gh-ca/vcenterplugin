@@ -251,16 +251,17 @@ public class DmeStorageServiceImpl implements DmeStorageService {
             compressedCapacity += storagePool.getCompressedCapacity();
         }
         if (isDorado) {
-            Double totalEffectiveCapacity = storageObj.getTotalEffectiveCapacity();
             storageObj.setFreeEffectiveCapacity(
-                storageObj.getTotalEffectiveCapacity() - blockFileCapacity- protectionCapacity);
+                    totalPoolCapicity - blockFileCapacity- protectionCapacity);
         } else {
-            // 总容量
+            // (圈内)总容量
             storageObj.setTotalEffectiveCapacity(totalPoolCapicity);
             storageObj.setFreeEffectiveCapacity(totalPoolCapicity - fileCapacity - blockCapacity - protectionCapacity);
         }
         //storageObj.setSubscriptionCapacity(subscriptionCapacity);
+        //存储池的已用容量之和
         storageObj.setBlockFileCapacity(blockFileCapacity);
+        // 保护容量
         storageObj.setProtectionCapacity(protectionCapacity);
         storageObj.setFileCapacity(fileCapacity);
         storageObj.setBlockCapacity(blockCapacity);
