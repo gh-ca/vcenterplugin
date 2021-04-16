@@ -1,6 +1,36 @@
 export default {
   "code": "200",
   "data": [{
+    "capabilities": null,
+    "id": "c9c48c60-1528-4514-baf4-af6b1e091045",
+    "name": "yctest",
+    "description": "block service-level for dj",
+    "type": "BLOCK",
+    "protocol": null,
+    "totalCapacity": 2234368.0,
+    "freeCapacity": 278336.0,
+    "usedCapacity": 1956032.0
+  }, {
+    "capabilities": {
+      "resourceType": "thin",
+      "compression": false,
+      "deduplication": null,
+      "smarttier": null,
+      "iopriority": {
+        "enabled": true,
+        "policy": 2
+      },
+      "qos": null
+    },
+    "id": "c5445eae-1ecf-4439-b345-592526c16594",
+    "name": "lq_server_level",
+    "description": "block service-level for dj",
+    "type": "BLOCK",
+    "protocol": null,
+    "totalCapacity": 10240.0,
+    "freeCapacity": 6592.0,
+    "usedCapacity": 3648.0
+  }, {
     "capabilities": {
       "resourceType": "thin",
       "compression": false,
@@ -15,8 +45,8 @@ export default {
           "latencyUnit": "ms",
           "minBandWidth": 0,
           "minIOPS": 0,
-          "maxBandWidth": 100,
-          "maxIOPS": 100,
+          "maxBandWidth": 175,
+          "maxIOPS": 145,
           "smartQos": null
         },
         "enabled": true
@@ -28,8 +58,8 @@ export default {
     "type": "BLOCK",
     "protocol": null,
     "totalCapacity": 2244608.0,
-    "freeCapacity": 344128.0,
-    "usedCapacity": 1900480.0
+    "freeCapacity": 292224.0,
+    "usedCapacity": 1952384.0
   }],
   "description": null
 }

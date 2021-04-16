@@ -83,6 +83,7 @@ export class AdminLayoutComponent implements OnInit, OnDestroy {
     this.linkInfo = [
       {link: "./dashboard", label: 'Overview'},
       {link: "./storage", label: 'Storage Device'},
+      {link: "./storage/detail", label: 'Storage Device detail'},
       {link: "./vmfs/list", label: './vmfs/list'},
       {link: "./vmfs/add", label: './vmfs/add'},
       {link: "./vmfs/performance", label: './vmfs/performance'},

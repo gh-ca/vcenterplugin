@@ -21,6 +21,8 @@ import { DeviceFilter } from '../../vmfs/list/filter.component';
 import { DtreeQuotaFilter, DtreeSecModFilter, FsStatusFilter, FsTypeFilter, MapStatusFilter, ProTypeFilter, StoragePoolStatusFilter, StoragePoolTypeFilter, VolProtectionStatusFilter, VolServiceLevelFilter, VolStatusFilter, VolStoragePoolFilter, } from '../filter.component';
 import { ServiceLevelList, VmfsListService } from '../../vmfs/list/list.service';
 import { CommonService } from './../../common.service';
+import { isMockData, mockData } from 'mock/mock';
+import { handlerResponseErrorSimple } from 'app/app.helpers';
 
 @Component({
   selector: 'app-detail',
@@ -193,7 +195,8 @@ export class DetailComponent implements OnInit, AfterViewInit {
 
   detailLoading = false;
 
-  constructor(private nfsService: NfsService,
+  constructor(
+    private nfsService: NfsService,
     private makePerformance: MakePerformance,
     private detailService: DetailService,
     private cdr: ChangeDetectorRef,
@@ -310,43 +313,52 @@ export class DetailComponent implements OnInit, AfterViewInit {
     if (fresh) {
       // this.gs.loading=true;
       this.detailLoading = true;
-      this.detailService.getStorageDetail(this.storageId).subscribe((r: any) => {
+      const handlerGetStorageDetailSuccess = (r: any) => {
         // this.gs.loading = false; = false;
         this.detailLoading = false;
         if (r.code === '200') {
           this.detail = r.data;
-
           this.detail.location = this.HTMLDecode(this.detail.location);
           // 如果是V6设备可得容量单位为M，此处修改为G
-          if (this.detail.storageTypeShow.dorado) {
+          /* if (this.detail.storageTypeShow.dorado) {
             this.detail.totalEffectiveCapacity = this.detail.totalEffectiveCapacity / 1024;
-          }
+          } */
           this.storageDetailTag = this.detail.storageTypeShow.storageDetailTag;
-        } else {
         }
         this.getStoragePoolList(true);
         this.cdr.detectChanges();
-      });
+      };
+      if (isMockData) {
+        handlerGetStorageDetailSuccess(mockData.DMESTORAGE_STORAGE);
+      } else {
+        this.detailService.getStorageDetail(this.storageId).subscribe(handlerGetStorageDetailSuccess,handlerResponseErrorSimple);
+      }
     } else {
       // 此处防止重复切换tab每次都去后台请求数据
       if (this.detail === null) {
         // this.gs.loading = false;=true;
         this.detailLoading = true;
-        this.detailService.getStorageDetail(this.storageId).subscribe((r: any) => {
+        const handlerGetStorageDetailSuccess2 = (r: any) => {
           // this.gs.loading = false;
           this.detailLoading = false;
           if (r.code === '200') {
             this.detail = r.data;
             this.detail.location = this.HTMLDecode(this.detail.location);
             // 如果是V6设备可得容量单位为M，此处修改为G
-            if (this.detail.storageTypeShow.dorado) {
+            /* if (this.detail.storageTypeShow.dorado) {
               this.detail.totalEffectiveCapacity = this.detail.totalEffectiveCapacity / 1024;
-            }
+            } */
             this.storageDetailTag = this.detail.storageTypeShow.storageDetailTag;
             this.getStoragePoolList(true);
           }
           this.cdr.detectChanges();
-        });
+        };
+
+        if (isMockData) {
+          handlerGetStorageDetailSuccess2(mockData.DMESTORAGE_STORAGE);
+        } else {
+          this.detailService.getStorageDetail(this.storageId).subscribe(handlerGetStorageDetailSuccess2,handlerResponseErrorSimple);
+        }
       }
     }
   }
@@ -907,6 +919,41 @@ export class DetailComponent implements OnInit, AfterViewInit {
     }
   }
 
+  /**
+   * @Description v6 （单位 mb : 小于1换KB 大于1024换Gb大于1024GB换Tb）
+   * @date 2021-04-16
+   * @param {any} c:number
+   * @returns {any}
+   */  
+  formatCapacityV6(c: number) {
+    const p = pow => Math.pow(1024, pow);
+
+    const u = p(1);
+    const uu = p(2);
+    const uuu = p(3);
+
+    if (c<1) {
+      return c * u + ' KB';
+    }
+
+    if (c >= 1 && c < u) {
+      return (c).toFixed(3) + ' MB';
+    }
+
+    if (c >= u && c < uu) {
+      return (c / u).toFixed(3) + ' GB';
+    }
+    
+    if (c >= uu && c < uuu) {
+      return (c / uu).toFixed(3) + ' TB';
+    }
+
+    if (c >= uuu ) {
+      return (c / uuu).toFixed(3) + ' PB';
+    }
+
+  }
+
   initCapacity() {
     this.initCapacityDistribution();
     this.buildCapacitySavings();
@@ -946,28 +993,49 @@ export class DetailComponent implements OnInit, AfterViewInit {
     this.cd = new CapacityDistribution();
     const p = 0;
     this.detail.protectionCapacity;
+    /* 保护容量 */
     this.cd.protection = this.formatCapacity(this.detail.protectionCapacity);
     let storagePoolAllUsedCap;
     let freeCapacity;
-    if (this.detail.storageTypeShow.dorado) { // dorado v6.1版本及高版本
+    let title;
+
+
+    // dorado v6.1版本及高版本
+    const handleDoradoV6 = () => {
       // storagePoolAllUsedCap = this.storagePool.map(item => item.consumedCapacity).reduce(this.getSum, 0).toFixed(3);
       storagePoolAllUsedCap = this.formatCapacity(this.detail.blockFileCapacity);
       this.cd.blockFile = storagePoolAllUsedCap;
-      freeCapacity = (this.detail.totalEffectiveCapacity - this.detail.protectionCapacity - this.detail.blockFileCapacity).toFixed(3);
-    } else { // dorado v 6.0版本及更低版本
+      /* 总容量-保护容量-块/文件容量 */
+      // freeCapacity = (this.detail.totalEffectiveCapacity - this.detail.protectionCapacity - this.detail.blockFileCapacity).toFixed(3);
+      /* FIX: v6直接使用提供的字段 */
+      freeCapacity = this.detail.freeEffectiveCapacity;
+      /*  */
+      this.cd.freeCapacity = this.formatCapacityV6(freeCapacity);
+      title = this.formatCapacityV6(this.detail.totalEffectiveCapacity) + '\n' + this.translatePipe.transform('storage.chart.total');
+    };
+
+    // dorado v 6.0版本及更低版本
+    const handleOtherVersion = () => {
       this.cd.fileSystem = this.formatCapacity(this.detail.fileCapacity);
       this.cd.volume = this.formatCapacity(this.detail.blockCapacity);
       freeCapacity = (this.detail.totalEffectiveCapacity - this.detail.usedCapacity).toFixed(3);
-    }
-    this.cd.freeCapacity = this.formatCapacity(freeCapacity);
+      /*  */
+      this.cd.freeCapacity = this.formatCapacity(freeCapacity);
+      title = this.formatCapacity(this.detail.totalEffectiveCapacity) + '\n' + this.translatePipe.transform('storage.chart.total');
+    };
 
-    const title = this.formatCapacity(this.detail.totalEffectiveCapacity) + '\n' + this.translatePipe.transform('storage.chart.total');
+    if (this.detail.storageTypeShow.dorado) {
+      handleDoradoV6();
+    } else {
+      handleOtherVersion();
+    }
+
     const cc = new CapacityChart(title);
-    let cs = new CapacitySerie(this.detail.protectionCapacity
-      , this.detail.fileCapacity, this.detail.blockCapacity,
-      Number(freeCapacity), Number(this.detail.blockFileCapacity), this.detail.storageTypeShow.dorado, this.translatePipe);
+    console.log(this.detail.protectionCapacity , this.detail.fileCapacity, this.detail.blockCapacity, Number(freeCapacity), Number(this.detail.blockFileCapacity), this.detail.storageTypeShow.dorado, this.translatePipe);
+    let cs = new CapacitySerie(this.detail.protectionCapacity , this.detail.fileCapacity, this.detail.blockCapacity, Number(freeCapacity), Number(this.detail.blockFileCapacity), this.detail.storageTypeShow.dorado, this.translatePipe);
     cc.series.push(cs);
     this.cd.chart = cc;
+
   }
 
   getSum(total, num) {

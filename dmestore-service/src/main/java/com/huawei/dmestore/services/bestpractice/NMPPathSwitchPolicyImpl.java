@@ -1,12 +1,12 @@
 package com.huawei.dmestore.services.bestpractice;
 
-import com.google.common.util.concurrent.Futures;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.huawei.dmestore.constant.DmeConstants;
 import com.huawei.dmestore.exception.DmeException;
 import com.huawei.dmestore.services.DmeAccessService;
+import com.huawei.dmestore.services.VCenterInfoService;
 import com.huawei.dmestore.utils.VCSDKUtils;
 import com.huawei.vmware.mo.HostMo;
 import com.huawei.vmware.mo.HostStorageSystemMo;
@@ -19,8 +19,6 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 /**
@@ -45,6 +43,12 @@ public class NMPPathSwitchPolicyImpl extends BaseBestPracticeService implements 
 
     public void setThreadPoolExecutor(ThreadPoolTaskExecutor threadPoolExecutor) {
         this.threadPoolExecutor = threadPoolExecutor;
+    }
+
+    private VCenterInfoService vcenterinfoservice;
+
+    public void setvCenterInfoService(VCenterInfoService vcenterService) {
+        this.vcenterinfoservice = vcenterService;
     }
 
     @Override
@@ -108,32 +112,7 @@ public class NMPPathSwitchPolicyImpl extends BaseBestPracticeService implements 
 
     @Override
     public void update(VCSDKUtils vcsdkUtils, String objectId) throws Exception {
-        if (check(vcsdkUtils, objectId)) {
-            return;
-        }
-        ManagedObjectReference mor = vcsdkUtils.getVcConnectionHelper().objectId2Mor(objectId);
-        VmwareContext context = vcsdkUtils.getVcConnectionHelper().getServerContext(objectId);
-        HostMo hostMo = this.getHostMoFactory().build(context, mor);
-        HostStorageSystemMo hostStorageSystemMo = hostMo.getHostStorageSystemMo();
-        List<HostMultipathInfoLogicalUnit> lunList = getLuns(vcsdkUtils, objectId);
-        if (lunList != null && lunList.size() > 0) {
-            //ExecutorService executor = Executors.newFixedThreadPool(lunList.size());
-            for (HostMultipathInfoLogicalUnit lun : lunList) {
-                threadPoolExecutor.execute(() -> {
-                    HostMultipathInfoLogicalUnitPolicy policy = lun.getPolicy();
-                    String pspPolicy = policy.getPolicy();
-                    // 多路径选路策略，集中式存储选择VMW_SATP_ALUA, VMW_PSP_RR
-                    if (!pspPolicy.equals(getRecommendValue())) {
-                        policy.setPolicy((String) getRecommendValue());
-                        try {
-                            hostStorageSystemMo.setMultipathLunPolicy(lun.getId(), policy);
-                        } catch (Exception exception) {
-                            logger.error("setMultipathLunPolicy error!lun_id={}", lun.getId());
-                        }
-                    }
-                });
-            }
-        }
+        vcsdkUtils.satpRuleAdd(objectId, vcenterinfoservice.getVcenterInfo());
     }
 
     private List<HostMultipathInfoLogicalUnit> getLuns(VCSDKUtils vcsdkUtils, String objectId) throws Exception {
@@ -149,8 +128,6 @@ public class NMPPathSwitchPolicyImpl extends BaseBestPracticeService implements 
 
     private List<HostMultipathInfoLogicalUnit> pickupDmeLun(List<HostMultipathInfoLogicalUnit> lunList) {
         List<HostMultipathInfoLogicalUnit> targetList = new ArrayList<>();
-        //ExecutorService executorService = Executors.newFixedThreadPool(SIZE);
-
         List<Future> futures=new ArrayList<>();
         for (int index = 0; index < lunList.size(); index++) {
             int finalIndex = index;
