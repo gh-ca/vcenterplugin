@@ -283,6 +283,9 @@ public class NfsOperationController extends BaseController {
                 }
                 param.put("qos_policy", qosPolicy);
             }
+        }else {
+            param.put("qos_policy", null);
+
         }
     }
 
