@@ -16,7 +16,7 @@ export class AddService {
 
   // 创建vmfs
   createVmfs(params = {}) {
-    return  this.http.post('accessvmfs/createvmfs', params);
+    return this.http.post('accessvmfs/createvmfs', params);
   }
   // 获取存储
   getStorages() {
@@ -37,7 +37,7 @@ export class AddService {
 
   // 获取WorkLoads
   getWorkLoads(storageId: string) {
-    return  this.http.get('accessdme/getworkloads', {params: {storageId}});
+    return this.http.get('accessdme/getworkloads', { params: { storageId } });
   }
 
   /**
@@ -45,7 +45,7 @@ export class AddService {
    * @param name
    */
   checkVmfsName(name: string) {
-    return this.http.get('accessvmfs/querydatastorebyname', {params: {name}});
+    return this.http.get('accessvmfs/querydatastorebyname', { params: { name } });
   }
 
   /**
@@ -53,7 +53,6 @@ export class AddService {
    * @param volName
    */
   checkVolName(volName: string) {
-    return this.http.get('dmestorage/queryvolumebyname', {params: {name:volName}});
+    return this.http.get('dmestorage/queryvolumebyname', { params: { name: volName } });
   }
 }
-

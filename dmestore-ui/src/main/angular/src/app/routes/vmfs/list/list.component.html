@@ -53,7 +53,7 @@
           <clr-icon shape="list" size="20"></clr-icon>
         </label>
       </div>
-<!--       <div class="radio btn" title="{{'menu.performance' | translate}}">
+      <!--       <div class="radio btn" title="{{'menu.performance' | translate}}">
         <input (click)="radioCheck = 'chart';charBtnClickFunc();" type="radio" name="btn-group-demo-radios"
           id="btn-demo-radio-2">
         <label for="btn-demo-radio-2">
@@ -187,7 +187,7 @@
       <clr-dg-cell hidden>{{item.wwn}}</clr-dg-cell>
       <clr-dg-cell hidden>{{item.volumeName}}</clr-dg-cell>
       <clr-dg-cell hidden>{{item.objectid}}</clr-dg-cell>
-<!--       <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='list'">
+      <!--       <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='list'">
         <span *ngIf="item.status == 'creating'">
           <span class="color-square"
             style="background-color: green; margin-right: 10px"></span>{{'enum.status.creating' | translate}}
@@ -828,6 +828,7 @@
       </ng-template>
     </clr-wizard-page>
   </clr-wizard>
+
   <!-- 编辑页面 -->
   <clr-modal [(clrModalOpen)]="modifyShow" [clrModalClosable]="false">
     <h3 class="modal-title modelTile">{{'menu.edit' | translate}}</h3>
@@ -901,10 +902,13 @@
             </clr-select-container>
           </div>
 
+          <!--  <pre>
+            {{print(modifyForm)}}
+          </pre> -->
           <!--b.QoS 设置 -->
           <clr-toggle-wrapper style="margin-top: 1.2rem;width: 6rem;" class="selectClass">
             <label>{{'nfs.qosPolicy' | translate}}</label>
-            <input type="checkbox" clrToggle name="qosFlag" (change)="qoSEditFlagChange(modifyForm);"
+            <input type="checkbox" clrToggle name="qosFlag" (change)="qoSEditFlagChangeModify()"
               [(ngModel)]="modifyForm.qosFlag" />
           </clr-toggle-wrapper>
           <div *ngIf="modifyForm.qosFlag">
@@ -913,14 +917,12 @@
               <label style="color: #9F9F9F;">{{'vmfs.controlPolicy' | translate}}</label>
               <!--上限-->
               <clr-checkbox-wrapper>
-                <input type="checkbox" id="editControl_policyUpper" clrCheckbox
-                  (change)="controlPolicyChangeFunc('editControl_policyUpper', 'editControl_policyLower', true, modifyForm, true);" />
+                <input type="checkbox" id="editControl_policyUpper" clrCheckbox [(ngModel)]="modifyForm.isCheckedUpper" name="isCheckedUpper" (change)="handleModifyControlPolicyChange(true, modifyForm, true);" />
                 <label>{{'vmfs.upperLimitControl' | translate}}</label>
               </clr-checkbox-wrapper>
               <!--下限-->
               <clr-checkbox-wrapper *ngIf="!showLowerFlag">
-                <input type="checkbox" id="editControl_policyLower" clrCheckbox
-                  (change)="controlPolicyChangeFunc('editControl_policyUpper', 'editControl_policyLower', true, modifyForm, false);" />
+                <input type="checkbox" id="editControl_policyLower" clrCheckbox [(ngModel)]="modifyForm.isCheckedlower" name="isCheckedlower" (change)="handleModifyControlPolicyChange(true, modifyForm, false);" />
                 <label>{{'vmfs.lowerLimitControl' | translate}}</label>
               </clr-checkbox-wrapper>
             </clr-checkbox-container>
