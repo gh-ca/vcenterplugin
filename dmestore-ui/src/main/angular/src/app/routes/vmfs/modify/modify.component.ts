@@ -18,16 +18,18 @@ import { getVmfsDmestorageStorageByTag } from 'mock/VMFS_DMESTORAGE_STORAGE';
   templateUrl: './modify.component.html',
   styleUrls: ['./modify.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [ModifyService],
+  providers: [ModifyService, VmfsListService],
 })
 export class ModifyComponent implements OnInit {
   constructor(
+    private vmfsListServece: VmfsListService,
     private remoteSrv: ModifyService,
     private route: ActivatedRoute,
     private cdr: ChangeDetectorRef,
     private router: Router,
-    private globalsService: GlobalsService
-  ) {}
+    private globalsService: GlobalsService,
+  ) {
+  }
 
   // 编辑form提交数据
   modifyForm = new GetForm().getEditForm();
@@ -134,7 +136,7 @@ export class ModifyComponent implements OnInit {
           ) {
             this.modifyForm.qosFlag = true;
           }
-          this.modifyGetStorage(this.vmfsInfo.deviceId);
+          this.modifyGetStorage(this.objectId);
 
           this.remoteSrv.getChartData(wwns).subscribe((chartResult: any) => {
             console.log('chartResult', chartResult);
@@ -173,6 +175,7 @@ export class ModifyComponent implements OnInit {
       this.globalsService.getClientSdk().modal.close();
     }
   }
+
   /**
    * 修改
    */
@@ -223,6 +226,7 @@ export class ModifyComponent implements OnInit {
         this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
       });
   }
+
   /**
    * 带宽 blur
    * @param type
@@ -369,9 +373,10 @@ export class ModifyComponent implements OnInit {
     console.log(
       'this.vmfsNameRepeatErr, this.volNameRepeatErr',
       this.vmfsNameRepeatErr,
-      this.volNameRepeatErr
+      this.volNameRepeatErr,
     );
   }
+
   /**
    * 编辑页面  名称变化Func
    */
@@ -384,6 +389,7 @@ export class ModifyComponent implements OnInit {
     }
     console.log('this.modifyForm.name', this.modifyForm.name);
   }
+
   qosEditFunc(form) {
     console.log('editform.qosFlag', form.qosFlag);
     const qosTag = this.storage.storageTypeShow.qosTag;
@@ -430,6 +436,7 @@ export class ModifyComponent implements OnInit {
       }
     }
   }
+
   initEditMinInfo(form) {
     form.control_policyLower = undefined;
     form.minbandwidthChoose = false;
@@ -439,6 +446,7 @@ export class ModifyComponent implements OnInit {
     form.latencyChoose = false;
     form.latency = null;
   }
+
   initEditMaxInfo(form) {
     form.control_policyUpper = undefined;
     form.maxiopsChoose = false;
@@ -446,6 +454,7 @@ export class ModifyComponent implements OnInit {
     form.maxbandwidthChoose = false;
     form.max_bandwidth = null;
   }
+
   /**
    * edit qos开关
    * @param form
@@ -462,13 +471,14 @@ export class ModifyComponent implements OnInit {
       form.latencyChoose = false;
     }
   }
+
   /**
    * 修改页面获取存储数据
    * @param objectId
    */
-  modifyGetStorage(storageId) {
+  async modifyGetStorage(objectId) {
     this.modalHandleLoading = true;
-    if (storageId) {
+    if (objectId) {
       const handlerGetStorageDetailSuccess = (result: any) => {
         this.modalHandleLoading = false;
         if (result.code == '200') {
@@ -551,6 +561,7 @@ export class ModifyComponent implements OnInit {
       };
 
       if (isMockData) {
+        /* 每次动态切换 qoSFlag qosTag  */
         const a: any = this.modifyGetStorage;
         a.count = a.count || 1;
         const count = a.count++ % 4;
@@ -558,12 +569,16 @@ export class ModifyComponent implements OnInit {
         console.log(res);
         handlerGetStorageDetailSuccess(res);
       } else {
-        this.remoteSrv
-          .getStorageDetail(storageId)
-          .subscribe(handlerGetStorageDetailSuccess, handlerResponseErrorSimple);
+        try {
+          const res = await this.vmfsListServece.asyncGetStoragesVmfsInfo(objectId);
+          handlerGetStorageDetailSuccess(res);
+        } catch (error) {
+          handlerResponseErrorSimple(error);
+        }
       }
     }
   }
+
   /**
    * 控制策略变更
    * @param upperObj
@@ -733,6 +748,7 @@ export class ModifyComponent implements OnInit {
       this.latencyErrTips = false;
     }
   }
+
   resetQosFlag(objValue: boolean, operationType: string) {
     switch (operationType) {
       case 'maxbandwidth':
@@ -762,6 +778,7 @@ export class ModifyComponent implements OnInit {
         break;
     }
   }
+
   qosV6Check(type: string) {
     if (type != 'add') {
       if (this.storage) {

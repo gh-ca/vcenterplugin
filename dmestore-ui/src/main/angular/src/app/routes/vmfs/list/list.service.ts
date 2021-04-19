@@ -23,6 +23,15 @@ export class VmfsListService {
   getStorages() {
     return this.http.get('dmestorage/storages');
   }
+  /* list 编辑 根据objectid获取信息   */
+  // 获取存储 20210419114306
+  asyncGetStoragesVmfsInfo(objectid: string) {
+    /* objectid */
+    /* https://10.143.132.249:20443/ui/dmestore/rest/operatevmfs/vmfsInfo?storeId=urn:vmomi:Datastore:datastore-12014:674908e5-ab21-4079-9cb1-596358ee5dd1 */
+    return new Promise((resolve, reject) => {
+      this.http.get(`operatevmfs/vmfsInfo?storeId=${objectid}`).subscribe(resolve, reject);
+    });
+  }
 
   getStorageDetail(storageId: string) {
     return this.http.get('dmestorage/storage', { params: { storageId } });

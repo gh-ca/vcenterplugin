@@ -58,7 +58,7 @@ export class VmfsListComponent implements OnInit {
     private remoteSrv: VmfsListService,
     private cdr: ChangeDetectorRef,
     public gs: GlobalsService,
-    private router: Router
+    private router: Router,
   ) {
     this.form.version = '5'; // 版本
     this.setFormValueWhenHiden(false);
@@ -67,6 +67,7 @@ export class VmfsListComponent implements OnInit {
     this.getLabelByValue = getLabelByValue;
     this.print = print;
   }
+
   getColor;
   getLabelByValue;
   print;
@@ -263,6 +264,7 @@ export class VmfsListComponent implements OnInit {
         this.modifyForm.min_iops = this.rowSelected[0].minIops;
         this.modifyForm.min_bandwidth = this.rowSelected[0].minBandwidth;
         this.modifyForm.latency = this.rowSelected[0].latency;
+
         if (
           this.modifyForm.latency ||
           this.modifyForm.min_bandwidth ||
@@ -272,6 +274,7 @@ export class VmfsListComponent implements OnInit {
         ) {
           this.modifyForm.qosFlag = true;
         }
+
         // 默认隐藏smartTier
         this.showSmartTierFlag = false;
         // 默认隐藏下限
@@ -280,9 +283,36 @@ export class VmfsListComponent implements OnInit {
         this.latencyIsSelect = false;
 
         // 获取存储数据
-        this.modifyGetStorage(this.rowSelected[0].deviceId);
+        /* dmestore/rest/accessvmfs/listvmfs 返回的信息 */
+        /*
+        alarmState: "1"
+bandwidth: null
+capacity: 0
+device: "Huawei.Storage"
+deviceId: "4e3109c2-91fa-11eb-bb86-7e7d8e1bd299"
+freeSpace: 0
+iops: null
+latency: null
+maxBandwidth: null
+maxIops: null
+minBandwidth: null
+minIops: null
+name: "lq_hostgroup_remove_003"
+objectid: "urn:vmomi:Datastore:datastore-14106:674908e5-ab21-4079-9cb1-596358ee5dd1"
+readResponseTime: null
+reserveCapacity: 0
+serviceLevelName: ""
+status: "normal"
+vmfsProtected: false
+volumeId: "f3c9cee5-24ad-492b-90e1-520d5f04fe51"
+volumeName: "lq_hostgroup_remove_003"
+writeResponseTime: null
+wwn: "67c1cf110058934511ba6e5a00000344"
+ */
+        this.modifyGetStorageByObjectId(this.rowSelected[0].objectid);
       }
       console.log('this.modifyForm.control_policy', this.modifyForm.control_policy);
+      /* 弹出编辑窗口 */
       this.modifyShow = true;
       this.cdr.detectChanges();
     }
@@ -292,106 +322,115 @@ export class VmfsListComponent implements OnInit {
    * 修改页面获取存储数据
    * @param objectId
    */
-  modifyGetStorage(storageId) {
+  async modifyGetStorageByObjectId(objectid) {
+    /*  */
+    let handlerGetStorageDetailSuccess;
+
     this.modalHandleLoading = true;
-    if (storageId) {
-      const handlergetStorageDetailSuccess = (result: any) => {
-        this.modalHandleLoading = false;
-        if (result.code == '200') {
-          this.storage = result.data;
-          const storageTypeShow = this.storage.storageTypeShow;
-          /* 是否打开qos switch qosFlog */
-          this.modifyForm.qosFlag = this.storage.qosFlag;
-          if (storageTypeShow) {
-            // smartTier 展示与隐藏
-            const smartTierShow = storageTypeShow.smartTierShow;
-            this.showSmartTierFlag = smartTierShow;
-            // qos策略 1 支持复选(上限、下限) 2支持单选（上限或下限） 3只支持上限
-            const qosTag = storageTypeShow.qosTag;
-
-            if (qosTag == 3) {
-              this.showLowerFlag = true;
-            } else {
-              this.showLowerFlag = false;
-            }
-
-            this.modifyForm.isCheckedUpper = false;
-            this.modifyForm.isCheckedlower = false;
-            const upperObj = document.getElementById('editControl_policyUpper') as HTMLInputElement;
-            const lowerObj = document.getElementById('editControl_policyLower') as HTMLInputElement;
-
-            /* 根据返回的数据判断是否需要展示 */
-            const {
-              smartQos: { latency, maxbandwidth, maxiops, minbandwidth, miniops },
-            } = this.storage;
-
-            this.modifyForm.max_iops = maxiops;
-            this.modifyForm.max_bandwidth = maxbandwidth;
-            this.modifyForm.min_iops = miniops;
-            this.modifyForm.min_bandwidth = minbandwidth;
-            this.modifyForm.latency = latency;
-
-            if (this.modifyForm.max_iops || this.modifyForm.max_bandwidth) {
-              if (this.modifyForm.max_iops) {
-                this.modifyForm.maxiopsChoose = true;
-              }
-              if (this.modifyForm.max_bandwidth) {
-                this.modifyForm.maxbandwidthChoose = true;
-              }
-
-              this.modifyForm.isCheckedUpper = true;
-              if (upperObj) {
-                upperObj.checked = true;
-              }
-              this.handleModifyControlPolicyChange(true, this.modifyForm, true);
-            }
-
-            if (
-              this.modifyForm.min_iops ||
-              this.modifyForm.min_bandwidth ||
-              this.modifyForm.latency
-            ) {
-              if (this.modifyForm.min_iops) {
-                this.modifyForm.miniopsChoose = true;
-              }
-              if (this.modifyForm.min_bandwidth) {
-                this.modifyForm.minbandwidthChoose = true;
-              }
-              if (this.modifyForm.latency) {
-                this.modifyForm.latencyChoose = true;
-              }
-
-              this.modifyForm.isCheckedlower = true;
-              if (lowerObj) {
-                lowerObj.checked = true;
-              }
-
-              this.handleModifyControlPolicyChange(true, this.modifyForm, false);
-            }
-            if (smartTierShow) {
-              if (this.rowSelected[0].smartTier) {
-                this.modifyForm.smartTierFlag = true;
-                this.modifyForm.smartTier = this.rowSelected[0].smartTier;
-              }
-            }
-            this.latencyIsSelect = qosTag == 1;
-          }
-        }
-        this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
-      };
+    if (objectid) {
       if (isMockData) {
-        const a: any = this.modifyGetStorage;
+        const a: any = this.modifyGetStorageByObjectId;
         a.count = a.count || 1;
         const count = a.count++ % 4;
         const res = getVmfsDmestorageStorageByTag(count);
         console.log(res);
-        handlergetStorageDetailSuccess(res);
+        handlerGetStorageDetailSuccess(res);
       } else {
-        this.remoteSrv
-          .getStorageDetail(storageId)
-          .subscribe(handlergetStorageDetailSuccess, handlerResponseErrorSimple);
+        // this.remoteSrv.getStorageDetail(storageId).subscribe(handlerGetStorageDetailSuccess, handlerResponseErrorSimple);
+        /* 20210419134040  */
+        try {
+          const res = await this.remoteSrv.asyncGetStoragesVmfsInfo(objectid);
+          handlerGetStorageDetailSuccess(res);
+        } catch (error) {
+          handlerResponseErrorSimple(error);
+        }
       }
     }
+
+    handlerGetStorageDetailSuccess = (result: any) => {
+      this.modalHandleLoading = false;
+      if (result.code == '200') {
+        this.storage = result.data;
+        const storageTypeShow = this.storage.storageTypeShow;
+        /* 是否打开qos switch qosFlog */
+        this.modifyForm.qosFlag = this.storage.qosFlag;
+        if (storageTypeShow) {
+          // smartTier 展示与隐藏
+          const smartTierShow = storageTypeShow.smartTierShow;
+          this.showSmartTierFlag = smartTierShow;
+          // qos策略 1 支持复选(上限、下限) 2支持单选（上限或下限） 3只支持上限
+          const qosTag = storageTypeShow.qosTag;
+
+          if (qosTag == 3) {
+            this.showLowerFlag = true;
+          } else {
+            this.showLowerFlag = false;
+          }
+
+          this.modifyForm.isCheckedUpper = false;
+          this.modifyForm.isCheckedlower = false;
+          const upperObj = document.getElementById('editControl_policyUpper') as HTMLInputElement;
+          const lowerObj = document.getElementById('editControl_policyLower') as HTMLInputElement;
+
+          /* 根据返回的数据判断是否需要展示 */
+          const {
+            smartQos: { latency, maxbandwidth, maxiops, minbandwidth, miniops },
+          } = this.storage;
+
+          this.modifyForm.max_iops = maxiops;
+          this.modifyForm.max_bandwidth = maxbandwidth;
+          this.modifyForm.min_iops = miniops;
+          this.modifyForm.min_bandwidth = minbandwidth;
+          this.modifyForm.latency = latency;
+
+          if (this.modifyForm.max_iops || this.modifyForm.max_bandwidth) {
+            if (this.modifyForm.max_iops) {
+              this.modifyForm.maxiopsChoose = true;
+            }
+            if (this.modifyForm.max_bandwidth) {
+              this.modifyForm.maxbandwidthChoose = true;
+            }
+
+            this.modifyForm.isCheckedUpper = true;
+            if (upperObj) {
+              upperObj.checked = true;
+            }
+            this.handleModifyControlPolicyChange(true, this.modifyForm, true);
+          }
+
+          if (
+            this.modifyForm.min_iops ||
+            this.modifyForm.min_bandwidth ||
+            this.modifyForm.latency
+          ) {
+            if (this.modifyForm.min_iops) {
+              this.modifyForm.miniopsChoose = true;
+            }
+            if (this.modifyForm.min_bandwidth) {
+              this.modifyForm.minbandwidthChoose = true;
+            }
+            if (this.modifyForm.latency) {
+              this.modifyForm.latencyChoose = true;
+            }
+
+            this.modifyForm.isCheckedlower = true;
+            if (lowerObj) {
+              lowerObj.checked = true;
+            }
+
+            this.handleModifyControlPolicyChange(true, this.modifyForm, false);
+          }
+          if (smartTierShow) {
+            if (this.rowSelected[0].smartTier) {
+              this.modifyForm.smartTierFlag = true;
+              this.modifyForm.smartTier = this.rowSelected[0].smartTier;
+            }
+          }
+          this.latencyIsSelect = qosTag == 1;
+        }
+      }
+      this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
+    };
   }
 
   // 修改 处理
@@ -416,8 +455,8 @@ export class VmfsListComponent implements OnInit {
       // 控制策略若未选清空数据
       this.qosEditFunc(this.modifyForm);
       console.log(
-        "this.modifyForm.control_policyUpper == '1'",
-        this.modifyForm.control_policyUpper == '1'
+        'this.modifyForm.control_policyUpper == \'1\'',
+        this.modifyForm.control_policyUpper == '1',
       );
       if (this.modifyForm.control_policyUpper == '1') {
         // 上限+全选（上下限）
@@ -609,7 +648,7 @@ export class VmfsListComponent implements OnInit {
       this.addLatencyChoose();
 
       const storagePoolMap = this.storagePoolMap.filter(
-        item => item.storageId == this.form.storage_id
+        item => item.storageId == this.form.storage_id,
       );
 
       const storagePoolList = storagePoolMap[0].storagePoolList;
@@ -633,7 +672,7 @@ export class VmfsListComponent implements OnInit {
             this.storagePoolList = result.data;
 
             this.storagePoolMap.filter(
-              item => item.storageId == this.form.storage_id
+              item => item.storageId == this.form.storage_id,
             )[0].storagePoolList = result.data;
 
             this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
@@ -649,7 +688,7 @@ export class VmfsListComponent implements OnInit {
             this.workloads = result.data;
 
             this.storagePoolMap.filter(
-              item => item.storageId == this.form.storage_id
+              item => item.storageId == this.form.storage_id,
             )[0].workloadList = result.data;
 
             this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
@@ -1354,7 +1393,7 @@ export class VmfsListComponent implements OnInit {
     console.log(
       'this.flag',
       (!this.chooseUnmountHost && this.unmountForm.mountType === '1') ||
-        (!this.chooseUnmountCluster && this.unmountForm.mountType === '2')
+      (!this.chooseUnmountCluster && this.unmountForm.mountType === '2'),
     );
     if (
       (!this.chooseUnmountHost && this.unmountForm.mountType === '1') ||
@@ -2315,6 +2354,7 @@ export class VmfsListComponent implements OnInit {
       this.modifyForm = new GetForm().getEditForm();
     }
   }
+
   qoSEditFlagChange(form) {
     if (form.qosFlag) {
       form.control_policyUpper = undefined;
