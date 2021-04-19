@@ -238,7 +238,7 @@ public class DmeNFSAccessServiceImplTest {
         StorageTypeShow storageTypeShow = new StorageTypeShow();
         storageTypeShow.setDorado(true);
         storageDetail.setStorageTypeShow(storageTypeShow);
-        when(dmeStorageService.getStorageDetail(anyString(),anyBoolean())).thenReturn(storageDetail);
+        when(dmeStorageService.getStorageDetail(anyString())).thenReturn(storageDetail);
         List<NfsDataStoreFsAttr> nfsDatastoreFsAttr = dmeNFSAccessService.getNfsDatastoreFsAttr("321");
         System.out.println(nfsDatastoreFsAttr);
 

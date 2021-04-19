@@ -164,56 +164,6 @@ public class DmeVmwareRalationDao extends H2DataBaseDao {
         }
         return dvr;
     }
-
-    public DmeVmwareRelation getDmeVmwareRelationByDeviceId(String storageDeviceId) throws DmeSqlException {
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-        DmeVmwareRelation dvr = null;
-        try {
-            con = getConnection();
-            String sql = "SELECT ID,STORE_ID,STORE_NAME,VOLUME_ID,VOLUME_NAME,VOLUME_WWN,VOLUME_SHARE,VOLUME_FS,"
-                    + "SHARE_ID,SHARE_NAME,FS_ID,FS_NAME,LOGICPORT_ID,LOGICPORT_NAME,STORE_TYPE,CREATETIME,UPDATETIME,"
-                    + "STATE,STORAGE_TYPE,STORAGE_DEVICE_ID FROM DP_DME_VMWARE_RELATION WHERE state = 1";
-            if (!StringUtils.isEmpty(storageDeviceId)) {
-                sql = sql + " and STORAGE_DEVICE_ID=?";
-                ps = con.prepareStatement(sql);
-                ps.setString(1, storageDeviceId);
-            } else {
-                ps = con.prepareStatement(sql);
-            }
-            rs = ps.executeQuery();
-            while (rs.next()) {
-                dvr = new DmeVmwareRelation();
-                dvr.setId(rs.getInt(ID));
-                dvr.setStoreId(rs.getString(STORE_ID));
-                dvr.setStoreName(rs.getString(STORE_NAME));
-                dvr.setVolumeId(rs.getString(VOLUME_ID));
-                dvr.setVolumeName(rs.getString(VOLUME_NAME));
-                dvr.setVolumeWwn(rs.getString(VOLUME_WWN));
-                dvr.setVolumeShare(rs.getString(VOLUME_SHARE));
-                dvr.setVolumeFs(rs.getString(VOLUME_FS));
-                dvr.setShareId(rs.getString(SHARE_ID));
-                dvr.setShareName(rs.getString(SHARE_NAME));
-                dvr.setFsId(rs.getString(FS_ID));
-                dvr.setFsName(rs.getString(FS_NAME));
-                dvr.setLogicPortId(rs.getString(LOGICPORT_ID));
-                dvr.setLogicPortName(rs.getString(LOGICPORT_NAME));
-                dvr.setStoreType(rs.getString(STORE_TYPE));
-                dvr.setCreateTime(rs.getTimestamp(CREATETIME));
-                dvr.setUpdateTime(rs.getTimestamp(UPDATETIME));
-                dvr.setState(rs.getInt(STATE));
-                dvr.setStorageType(rs.getString(STORAGE_TYPE));
-                dvr.setStorageDeviceId(rs.getString(STORAGE_DEVICE_ID));
-            }
-        } catch (DataBaseException | SQLException e) {
-            LOGGER.error("Failed to get Dme Vmware Relation: {}", e.getMessage());
-            throw new DmeSqlException(e.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
-        }
-        return dvr;
-    }
     public List<String> getAllWwnByType(String storeType) throws DmeSqlException {
         List<String> lists = new ArrayList<>();
         Connection con = null;
@@ -414,7 +364,7 @@ public class DmeVmwareRalationDao extends H2DataBaseDao {
         try {
             con = getConnection();
             String sql = "UPDATE " + DpSqlFileConstants.DP_DME_VMWARE_RELATION
-                + " SET STORE_ID=?,VOLUME_ID=?,STORE_NAME=?,VOLUME_NAME=?,UPDATETIME=? where VOLUME_WWN=?";
+                    + " SET STORE_ID=?,VOLUME_ID=?,STORE_NAME=?,VOLUME_NAME=?,UPDATETIME=?,STORAGE_DEVICE_ID =? where VOLUME_WWN=?";
             pstm = con.prepareStatement(sql);
             LOGGER.info("updateVmfs!sql={}, connection is not null:{}", sql, con == null ? false : true);
             con.setAutoCommit(false);
@@ -426,6 +376,7 @@ public class DmeVmwareRalationDao extends H2DataBaseDao {
                 pstm.setDate(DpSqlFileConstants.DIGIT_5, new Date(System.currentTimeMillis()));
                 pstm.setString(DpSqlFileConstants.DIGIT_6, relation.getVolumeWwn());
                 pstm.setString(DpSqlFileConstants.DIGIT_7, relation.getStorageType());
+                pstm.setString(DpSqlFileConstants.DIGIT_8, relation.getStorageDeviceId());
                 pstm.addBatch();
             }
             pstm.executeBatch();

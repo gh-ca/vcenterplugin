@@ -202,7 +202,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
     }
 
     @Override
-    public StorageDetail getStorageDetail(String storageId,boolean flag) throws DmeException {
+    public StorageDetail getStorageDetail(String storageId) throws DmeException {
         StorageDetail storageObj = new StorageDetail();
         try {
             Storage storage = getStorage(storageId);
@@ -216,85 +216,11 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                 storageObj.setStorageTypeShow(storageTypeShow);
             }
             parseStoragePoolDetail(storageId, storageObj, storageTypeShow.getDorado());
-            /*增加查询指定lun方法，返回给前端页面，作为判断qos策略的依据
-            * 1.首先根据前端页面的storageid获取volumeId
-            * 2.根据volumeId查询对应卷的数据信息**/
-            if(flag) {
-                DmeVmwareRelation vmRelations = dmeVmwareRalationDao.getDmeVmwareRelationByDeviceId(storageId);
-                Map<String, Object> map = getLunDetailByVolumeId(vmRelations.getVolumeId());
-                boolean qosFlag = (boolean) map.get("qosFlag");
-                SmartQos smartosQ = (SmartQos) map.get("smartosQ");
-                storageObj.setQosFlag(qosFlag);
-                storageObj.setSmartQos(smartosQ);
-            }
         } catch (DmeException e) {
             LOG.error("search oriented storage error!", e);
             throw new DmeException(CODE_503, e.getMessage());
         }
         return storageObj;
-    }
-    /**
-      * @Description: 查询知道lun信息
-      * @Param String volumeId
-      * @return boolean
-      * @throws DmeException
-      * @author yc
-      * @Date 2021/4/16 15:39
-     */
-    private Map<String,Object> getLunDetailByVolumeId(String volumeId) throws DmeException{
-        boolean flag = false;
-        Map<String,Object> map  = new HashMap<>();
-        if (!StringUtils.isEmpty(volumeId)){
-            String url = DmeConstants.DME_VOLUME_BASE_URL + "/" + volumeId;
-            try {
-                ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET,
-                        null);
-                int code = responseEntity.getStatusCodeValue();
-                if (code != HttpStatus.OK.value()) {
-                    throw new DmeException(CODE_503, "get volume error !");
-                }
-                Object object = responseEntity.getBody();
-                if (object != null) {
-                    JsonObject jsonObject = new JsonParser().parse(object.toString()).getAsJsonObject();
-                    JsonElement volume = jsonObject.get("volume");
-                    JsonObject volumeJson = new JsonParser().parse(volume.toString()).getAsJsonObject();
-                    JsonElement smartqos = volumeJson.get("smartqos");
-                    JsonObject smartqosJson = new JsonParser().parse(smartqos.toString()).getAsJsonObject();
-                    flag = ckeckSmartQosIsEmpty(smartqosJson);
-                    map.put("qosFlag",flag);
-                    SmartQos smartosQ = null;
-                    if (flag){
-                        smartosQ = new Gson().fromJson(new JsonParser().parse(smartqos.toString()).getAsJsonObject(),SmartQos.class);
-                        map.put("smartosQ",smartosQ);
-                    }
-
-                }
-            }catch (DmeException e){
-                LOG.error("get volume's info  error", e);
-                throw new DmeException(CODE_503, e.getMessage());
-            }
-        }
-        return map;
-    }
-    /**
-      * @Description: 检验对象是否为空
-      * @Param JsonObject smartqosJson
-      * @return boolean
-      * @author yc
-      * @Date 2021/4/16 15:38
-     */
-    private boolean ckeckSmartQosIsEmpty(JsonObject smartqosJson) {
-        if (StringUtils.isEmpty(smartqosJson.get("maxiops"))||
-                (StringUtils.isEmpty(smartqosJson.get("smartqosJson")) &&
-                StringUtils.isEmpty(smartqosJson.get("maxiops")) &&
-                StringUtils.isEmpty(smartqosJson.get("minbandwidth")) &&
-                StringUtils.isEmpty(smartqosJson.get("miniops")) &&
-                StringUtils.isEmpty(smartqosJson.get("maxiops")) &&
-                StringUtils.isEmpty(smartqosJson.get("latency")))){
-            return false;
-        }else {
-            return true;
-        }
     }
 
     private void parseStoragePoolDetail(String storageId, StorageDetail storageObj, boolean isDorado)

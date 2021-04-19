@@ -1892,7 +1892,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                                         storageModel = storageIds.get(storageId);
                                     }
                                     DmeVmwareRelation relation = getDmeVmwareRelation(ob.storeType, ob.vmfsDatastoreId, ob.vmfsDatastoreName,
-                                            volumeObject, storageModel);
+                                            volumeObject, storageModel,storageId);
                                     relationList.add(relation);
                                 }
                             }
@@ -1907,7 +1907,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
     }
 
     private DmeVmwareRelation getDmeVmwareRelation(String storeType, String vmfsDatastoreId, String vmfsDatastoreName,
-        JsonObject volumeObject, String storageModel) {
+        JsonObject volumeObject, String storageModel,String deviceId) {
         String volumeId = ToolUtils.jsonToOriginalStr(volumeObject.get(ID_FIELD));
         String volumeName = ToolUtils.jsonToOriginalStr(volumeObject.get(NAME_FIELD));
         String volumeWwn = ToolUtils.jsonToOriginalStr(volumeObject.get(VOLUME_WWN));
@@ -1920,6 +1920,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         relation.setVolumeWwn(volumeWwn);
         relation.setStoreType(storeType);
         relation.setStorageType(storageModel);
+        relation.setStorageDeviceId(deviceId);
         relation.setState(1);
         return relation;
     }
@@ -2919,7 +2920,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
     }
 
     private String getStorageModel(String storageId) throws DmeException {
-        StorageDetail storageDetail = dmeStorageService.getStorageDetail(storageId,false);
+        StorageDetail storageDetail = dmeStorageService.getStorageDetail(storageId);
         return storageDetail.getModel() + " " + storageDetail.getProductVersion();
     }
 

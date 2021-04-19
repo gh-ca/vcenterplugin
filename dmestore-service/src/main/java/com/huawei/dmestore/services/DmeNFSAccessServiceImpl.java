@@ -263,7 +263,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
                 fsAttr.setProvisionType(ToolUtils.jsonToStr(fsDetail.get("alloc_type")));
                 fsAttr.setStorageId(ToolUtils.jsonToStr(fsDetail.get("storage_id")));
                 //获取指定存储设备详情
-                StorageDetail storageDetail = dmeStorageService.getStorageDetail(fsAttr.getStorageId(),false);
+                StorageDetail storageDetail = dmeStorageService.getStorageDetail(fsAttr.getStorageId());
                 Boolean dorado = storageDetail.getStorageTypeShow().getDorado();
                 fsAttr.setDorado(dorado);
                 fsAttr.setDevice(ToolUtils.jsonToStr(fsDetail.get(STORAGE_NAME)));
@@ -1170,7 +1170,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
     }
 
     private String getStorageModel(String storageId) throws DmeException {
-        StorageDetail storageDetail = dmeStorageService.getStorageDetail(storageId,false);
+        StorageDetail storageDetail = dmeStorageService.getStorageDetail(storageId);
         return storageDetail.getModel() +" "+ storageDetail.getProductVersion();
     }
 }

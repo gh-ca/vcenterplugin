@@ -231,7 +231,7 @@ public class NfsOperationController extends BaseController {
 
     public StorageTypeShow isDorado(String storageId) throws DmeException {
         StorageTypeShow storageTypeShow = new StorageTypeShow();
-        StorageDetail storageDetail = dmeStorageService.getStorageDetail(storageId,false);
+        StorageDetail storageDetail = dmeStorageService.getStorageDetail(storageId);
         if (storageDetail != null) {
             String storageType = storageDetail.getModel() +" "+ storageDetail.getProductVersion();
             storageTypeShow = ToolUtils.getStorageTypeShow(storageType);
@@ -284,8 +284,9 @@ public class NfsOperationController extends BaseController {
                 param.put("qos_policy", qosPolicy);
             }
         }else {
-            param.put("qos_policy", null);
-
+            Map<String, Object> enableMap = new HashMap<>(DmeConstants.COLLECTION_CAPACITY_16);
+            enableMap.put("enabled", false);
+            param.put("qos_policy", enableMap);
         }
     }
 
