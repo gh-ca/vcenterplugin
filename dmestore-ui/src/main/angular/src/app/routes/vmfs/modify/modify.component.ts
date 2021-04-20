@@ -503,9 +503,8 @@ export class ModifyComponent implements OnInit {
             const upperObj = document.getElementById('editControl_policyUpper') as HTMLInputElement;
             const lowerObj = document.getElementById('editControl_policyLower') as HTMLInputElement;
             /* 根据返回的数据判断是否需要展示 */
-            const {
-              smartQos: { latency, maxbandwidth, maxiops, minbandwidth, miniops },
-            } = this.storage;
+            const smartQos = this.storage || {};
+            const { latency, maxbandwidth, maxiops, minbandwidth, miniops } = smartQos as any;
 
             this.modifyForm.max_iops = maxiops;
             this.modifyForm.max_bandwidth = maxbandwidth;
@@ -681,11 +680,6 @@ export class ModifyComponent implements OnInit {
     this.qosV6Check('edit');
   }
 
-  qoSEditFlagChangeModify() {
-    if (!this.modifyForm.qosFlag) {
-      this.modifyForm = new GetForm().getEditForm();
-    }
-  }
 
   /**
    * iops错误提示

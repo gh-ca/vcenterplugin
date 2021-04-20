@@ -908,8 +908,7 @@
           <!--b.QoS 设置 -->
           <clr-toggle-wrapper style="margin-top: 1.2rem;width: 6rem;" class="selectClass">
             <label>{{'nfs.qosPolicy' | translate}}</label>
-            <input type="checkbox" clrToggle name="qosFlag" (change)="qoSEditFlagChangeModify()"
-              [(ngModel)]="modifyForm.qosFlag" />
+            <input type="checkbox" clrToggle name="qosFlag" (change)="qoSEditFlagChange(modifyForm)" [(ngModel)]="modifyForm.qosFlag" />
           </clr-toggle-wrapper>
           <div *ngIf="modifyForm.qosFlag">
             <!-- 控制策略 -->

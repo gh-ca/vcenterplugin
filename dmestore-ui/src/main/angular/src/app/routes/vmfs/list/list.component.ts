@@ -324,30 +324,7 @@ wwn: "67c1cf110058934511ba6e5a00000344"
    */
   async modifyGetStorageByObjectId(objectid) {
     /*  */
-    let handlerGetStorageDetailSuccess;
-
-    this.modalHandleLoading = true;
-    if (objectid) {
-      if (isMockData) {
-        const a: any = this.modifyGetStorageByObjectId;
-        a.count = a.count || 1;
-        const count = a.count++ % 4;
-        const res = getVmfsDmestorageStorageByTag(count);
-        console.log(res);
-        handlerGetStorageDetailSuccess(res);
-      } else {
-        // this.remoteSrv.getStorageDetail(storageId).subscribe(handlerGetStorageDetailSuccess, handlerResponseErrorSimple);
-        /* 20210419134040  */
-        try {
-          const res = await this.remoteSrv.asyncGetStoragesVmfsInfo(objectid);
-          handlerGetStorageDetailSuccess(res);
-        } catch (error) {
-          handlerResponseErrorSimple(error);
-        }
-      }
-    }
-
-    handlerGetStorageDetailSuccess = (result: any) => {
+    const handlerGetStorageDetailSuccess = (result: any) => {
       this.modalHandleLoading = false;
       if (result.code == '200') {
         this.storage = result.data;
@@ -373,9 +350,8 @@ wwn: "67c1cf110058934511ba6e5a00000344"
           const lowerObj = document.getElementById('editControl_policyLower') as HTMLInputElement;
 
           /* 根据返回的数据判断是否需要展示 */
-          const {
-            smartQos: { latency, maxbandwidth, maxiops, minbandwidth, miniops },
-          } = this.storage;
+          const smartQos = this.storage || {};
+          const { latency, maxbandwidth, maxiops, minbandwidth, miniops } = smartQos as any;
 
           this.modifyForm.max_iops = maxiops;
           this.modifyForm.max_bandwidth = maxbandwidth;
@@ -431,6 +407,28 @@ wwn: "67c1cf110058934511ba6e5a00000344"
       }
       this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
     };
+
+    this.modalHandleLoading = true;
+    if (objectid) {
+      if (isMockData) {
+        const a: any = this.modifyGetStorageByObjectId;
+        a.count = a.count || 1;
+        const count = a.count++ % 4;
+        const res = getVmfsDmestorageStorageByTag(count);
+        console.log(res);
+        handlerGetStorageDetailSuccess(res);
+      } else {
+        // this.remoteSrv.getStorageDetail(storageId).subscribe(handlerGetStorageDetailSuccess, handlerResponseErrorSimple);
+        /* 20210419134040  */
+        try {
+          const res = await this.remoteSrv.asyncGetStoragesVmfsInfo(objectid);
+          handlerGetStorageDetailSuccess(res);
+        } catch (error) {
+          handlerResponseErrorSimple(error);
+        }
+      }
+    }
+
   }
 
   // 修改 处理
@@ -2349,12 +2347,6 @@ wwn: "67c1cf110058934511ba6e5a00000344"
    * edit qos开关
    * @param form
    */
-  qoSEditFlagChangeModify() {
-    if (!this.modifyForm.qosFlag) {
-      this.modifyForm = new GetForm().getEditForm();
-    }
-  }
-
   qoSEditFlagChange(form) {
     if (form.qosFlag) {
       form.control_policyUpper = undefined;
@@ -2507,8 +2499,8 @@ wwn: "67c1cf110058934511ba6e5a00000344"
       qosTag = this.getStorageQosTag(this.form.storage_id);
     }
 
-    let upperChecked = this.modifyForm.isCheckedUpper;
-    let lowerChecked = this.modifyForm.isCheckedlower;
+    const upperChecked = this.modifyForm.isCheckedUpper;
+    const lowerChecked = this.modifyForm.isCheckedlower;
 
     this.initIopsErrTips(upperChecked, lowerChecked);
     if (isUpper) {
