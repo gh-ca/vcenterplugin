@@ -192,10 +192,10 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         List<Storage> storageList = new ArrayList<>();
         for (Storage storage:list) {
             if(!StringUtils.isEmpty(storage)) {
-                if (ModelVersionConstants.DORADOV3List.contains(storage.getModel())
-                        || ModelVersionConstants.DORADOV6List.contains(storage.getModel())
-                        || ModelVersionConstants.HuaWeiV3List.contains(storage.getModel())
-                        || ModelVersionConstants.HuaWeiV5List.contains(storage.getModel())) {
+                if (ModelVersionConstants.DORADOV3List.contains(StringUtils.trimAllWhitespace(storage.getModel()))
+                        || ModelVersionConstants.DORADOV6List.contains(StringUtils.trimAllWhitespace(storage.getModel()))
+                        || ModelVersionConstants.HuaWeiV3List.contains(StringUtils.trimAllWhitespace(storage.getModel()))
+                        || ModelVersionConstants.HuaWeiV5List.contains(StringUtils.trimAllWhitespace(storage.getModel()))) {
                     storageList.add(storage);
                 }
             }
