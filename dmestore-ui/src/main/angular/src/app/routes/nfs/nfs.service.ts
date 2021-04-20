@@ -56,7 +56,7 @@ export class NfsService {
   constructor(private http: HttpClient) { }
 
   getData() {
-    return this.http.get(URLS_NFS.ACCESSNFS_LISTNFS);
+    return this.http.get('accessnfs/listnfs');
   }
   getChartData(fsIds: string[]) {
     return this.http.get('accessnfs/listnfsperformance', { params: { fsIds } });
