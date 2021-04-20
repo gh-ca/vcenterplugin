@@ -3,13 +3,19 @@ import {
   OnInit,
   AfterViewInit,
   ChangeDetectionStrategy,
-  ChangeDetectorRef, NgZone, ViewChild, Optional, Inject
+  ChangeDetectorRef,
+  NgZone,
+  ViewChild,
+  Optional,
+  Inject,
 } from '@angular/core';
-import {StorageService, StorageList} from './storage.service';
-import { Router} from "@angular/router";
-import { StorageStatusFilter} from "./filter.component";
-import {TokenService} from "@core";
-import {DOCUMENT} from "@angular/common";
+import { StorageService, StorageList } from './storage.service';
+import { Router } from '@angular/router';
+import { StorageStatusFilter } from './filter.component';
+import { TokenService } from '@core';
+import { DOCUMENT } from '@angular/common';
+import { handlerResponseErrorSimple } from 'app/app.helpers';
+import { isMockData, mockData } from 'mock/mock';
 @Component({
   selector: 'app-storage',
   templateUrl: './storage.component.html',
@@ -18,53 +24,58 @@ import {DOCUMENT} from "@angular/common";
   providers: [StorageService],
 })
 export class StorageComponent implements OnInit, AfterViewInit {
-
   list: StorageList[] = []; // 数据列表
   total = 0; // 总数据数量
   isLoading = true; // table数据loading
   rowSelected = []; // 当前选中数据
   radioCheck = 'table1'; // 切换列表页显示
-  buttonTrigger ='list'; // 切换列表页显示
-  obj_ids=[];
-  @ViewChild('storageStatusFilter') storageStatusFilter:StorageStatusFilter;
-  constructor(private remoteSrv: StorageService, private cdr: ChangeDetectorRef, private ngZone: NgZone,private router:Router, private token: TokenService,
-              @Optional() @Inject(DOCUMENT) private document: any) {}
+  buttonTrigger = 'list'; // 切换列表页显示
+  obj_ids = [];
+  @ViewChild('storageStatusFilter') storageStatusFilter: StorageStatusFilter;
+  constructor(
+    private remoteSrv: StorageService,
+    private cdr: ChangeDetectorRef,
+    private ngZone: NgZone,
+    private router: Router,
+    private token: TokenService,
+    @Optional() @Inject(DOCUMENT) private document: any
+  ) {}
   // 生命周期： 初始化数据
   ngOnInit() {
     this.process();
     this.refresh();
   }
 
-  ngAfterViewInit() {
-
-  }
+  ngAfterViewInit() {}
 
   scanData() {
-    console.log("this.storageStatusFilter", this.storageStatusFilter);
+    console.log('this.storageStatusFilter', this.storageStatusFilter);
     this.storageStatusFilter.initStatus();
     this.refresh();
   }
   // table数据处理
   refresh() {
     this.isLoading = true;
-
-    this.remoteSrv.getData()
-        .subscribe((result: any) => {
-          this.isLoading = false;
-          if (result.code == '200') {
-
-            this.list = result.data;
-            // 对存储的location做特殊处理
-            this.list.forEach(item => {
-              item.location = this.HTMLDecode(item.location);
-              item.freeCap = item.totalPoolCapacity-item.usedCapacity;
-            })
-            this.total = result.total_count;
-          }
-          this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
-          //this.getStrageCharts();
-          this.listperformance();
+    const handlerGetDataSuccess = (result: any) => {
+      this.isLoading = false;
+      if (result.code == '200') {
+        this.list = result.data;
+        // 对存储的location做特殊处理
+        this.list.forEach(item => {
+          item.location = this.HTMLDecode(item.location);
+          item.freeCap = item.totalPoolCapacity - item.usedCapacity;
         });
+        this.total = result.total_count;
+      }
+      this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
+      //this.getStrageCharts();
+      this.listperformance();
+    };
+    if (isMockData) {
+      handlerGetDataSuccess(mockData.DMESTORAGE_STORAGES);
+    } else {
+      this.remoteSrv.getData().subscribe(handlerGetDataSuccess, handlerResponseErrorSimple);
+    }
   }
 
   /**
@@ -87,22 +98,24 @@ export class StorageComponent implements OnInit, AfterViewInit {
       div.innerHTML = str;
       str = div.innerText;
     }
-    return  str;
+    return str;
   }
   // 性能视图列表
-  listperformance(){
-    if (this.list === null || this.list.length <= 0){ return; }
+  listperformance() {
+    if (this.list === null || this.list.length <= 0) {
+      return;
+    }
     this.list.forEach(item => {
       this.obj_ids.push(item.id);
     });
     this.remoteSrv.listperformance(this.obj_ids).subscribe((result: any) => {
-      if (result.code === '200'){
-        const chartList: StorageList [] = result.data;
-        if ( chartList !== null && chartList.length > 0){
+      if (result.code === '200') {
+        const chartList: StorageList[] = result.data;
+        if (chartList !== null && chartList.length > 0) {
           this.list.forEach(item => {
             chartList.forEach(charItem => {
-              if (item.id === charItem.id){
-                item.maxOps=charItem.maxOps;
+              if (item.id === charItem.id) {
+                item.maxOps = charItem.maxOps;
               }
             });
           });
@@ -111,26 +124,28 @@ export class StorageComponent implements OnInit, AfterViewInit {
       }
     });
   }
-  check(param){
+  check(param) {
     console.log(param);
     this.radioCheck = param;
     this.cdr.detectChanges();
   }
   //跳转详情页面的方法
-  toDetailView(id,name){
-    this.router.navigate(['storage/detail'],{
-      queryParams:{
-        id,name
-      }
+  toDetailView(id, name) {
+    this.router.navigate(['storage/detail'], {
+      queryParams: {
+        id,
+        name,
+      },
     });
   }
   private process(): boolean {
-    const tourl = this.getQueryString('view')
+    const tourl = this.getQueryString('view');
     let res = this.checkJWT(this.token.get<any>(), 1000);
-    res = true
-    if (tourl) { // 如果带有?view=storage则跳转到当前页面
-      var newURL = location.href.split("?")[0];
-      console.log("newURL=", newURL);
+    res = true;
+    if (tourl) {
+      // 如果带有?view=storage则跳转到当前页面
+      var newURL = location.href.split('?')[0];
+      console.log('newURL=', newURL);
       window.history.pushState('object', document.title, newURL); // 去除多余参数  避免二次内部跳转失败
       this.gotoUrl('/' + tourl);
     }
@@ -208,17 +223,17 @@ export class StorageComponent implements OnInit, AfterViewInit {
   //   return s;
   // }
   // 容量单位转换
-  formatCapacity(c: number){
-    if(c==null) return '--';
-    if (c < 1024){
-      return c.toFixed(3)+" MB";
-    }else if(c >= 1024 && c< 1048576){
-      return (c/1024).toFixed(3) +" GB";
-    }else if(c>= 1048576){
-      return (c/1024/1024).toFixed(3)+" TB"
+  formatCapacity(c: number) {
+    if (c == null) return '--';
+    if (c < 1024) {
+      return c.toFixed(3) + ' MB';
+    } else if (c >= 1024 && c < 1048576) {
+      return (c / 1024).toFixed(3) + ' GB';
+    } else if (c >= 1048576) {
+      return (c / 1024 / 1024).toFixed(3) + ' TB';
     }
   }
-  sortFunc(obj:any) {
+  sortFunc(obj: any) {
     return !obj;
   }
 }

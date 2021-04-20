@@ -2,6 +2,7 @@ package com.huawei.dmestore.services;
 
 import com.huawei.dmestore.exception.DmeException;
 import com.huawei.dmestore.model.SimpleServiceLevel;
+import com.huawei.dmestore.model.StorageDetail;
 
 import java.util.List;
 import java.util.Map;
@@ -72,4 +73,14 @@ public interface VmfsOperationService {
      * @throws DmeException DmeException
      */
     List<SimpleServiceLevel> listServiceLevelVmfs(Map<String, Object> params) throws DmeException;
+    /**
+      * @Description: vmfs编辑页面展示vmfs信息
+      * @Param @param null
+      * @return @return
+      * @throws
+      * @author yc
+      * @Date 2021/4/19 10:16
+     */
+    StorageDetail getVmfsDetail(String storeId) throws DmeException;
+
 }

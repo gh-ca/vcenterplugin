@@ -6,12 +6,7 @@ import com.huawei.dmestore.dao.DmeVmwareRalationDao;
 import com.huawei.dmestore.entity.DmeVmwareRelation;
 import com.huawei.dmestore.exception.DmeException;
 import com.huawei.dmestore.exception.VcenterException;
-import com.huawei.dmestore.model.CapabilitiesQos;
-import com.huawei.dmestore.model.CapabilitiesSmarttier;
-import com.huawei.dmestore.model.SimpleCapabilities;
-import com.huawei.dmestore.model.SimpleServiceLevel;
-import com.huawei.dmestore.model.SmartQos;
-import com.huawei.dmestore.model.VmfsDatastoreVolumeDetail;
+import com.huawei.dmestore.model.*;
 import com.huawei.dmestore.utils.ToolUtils;
 import com.huawei.dmestore.utils.VCSDKUtils;
 
@@ -23,6 +18,7 @@ import com.google.gson.JsonParser;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -54,6 +50,8 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
     private static final String TASK_ID = "task_id";
 
     private DmeAccessService dmeAccessService;
+    @Autowired
+    private DmeStorageService dmeStorageService;
 
     private VmfsAccessServiceImpl vmfsAccessService;
 
@@ -196,6 +194,8 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
                 map.put("latency", Integer.valueOf(latency.toString()));
             }
             map.put("enabled", true);
+        }else {
+            map.put("enabled",false);
         }
         customizeVolumeTuning.put("smartqos", map);
         Boolean smartTierFlag = (Boolean) params.get("smartTierFlag");
@@ -415,5 +415,101 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
         simpleServiceLevel.setTotalCapacity(ToolUtils.jsonToDou(element.get("total_capacity"), 0.0));
         simpleServiceLevel.setFreeCapacity(ToolUtils.jsonToDou(element.get("free_capacity"), 0.0));
         simpleServiceLevel.setUsedCapacity(ToolUtils.jsonToDou(element.get("used_capacity"), 0.0));
+    }
+
+    @Override
+    public StorageDetail getVmfsDetail(String storeId) throws DmeException {
+        //首先根据storeId查询数据库，获取对应的关系信息数据
+        DmeVmwareRelation vmRelations = dmeVmwareRalationDao.getDmeVmwareRelationByDsId(storeId);
+        //获取对应的storageId
+        if (StringUtils.isEmpty(vmRelations)){
+            throw new DmeException("500", "get dmevmware relation by storeid error ");
+        }
+        if(StringUtils.isEmpty(vmRelations.getStorageDeviceId())){
+            throw new DmeException("500", "get dmevmware relation by storeid error ");
+        }
+        if(StringUtils.isEmpty(vmRelations.getVolumeId())){
+            throw new DmeException("500", "get dmevmware relation by storeid error ");
+        }
+        String storageId = vmRelations.getStorageDeviceId();
+        StorageDetail storageObj = dmeStorageService.getStorageDetail(storageId);
+        /*增加查询指定lun方法，返回给前端页面，作为判断qos策略的依据
+         * 1.首先根据前端页面的storageid获取volumeId
+         * 2.根据volumeId查询对应卷的数据信息**/
+         Map<String, Object> map = getLunDetailByVolumeId(vmRelations.getVolumeId());
+            boolean qosFlag = (boolean) map.get("qosFlag");
+            SmartQos smartosQ = (SmartQos) map.get("smartosQ");
+            storageObj.setQosFlag(qosFlag);
+            storageObj.setSmartQos(smartosQ);
+        return storageObj;
+    }
+    /**
+     * @Description: 查询知道lun信息
+     * @Param String volumeId
+     * @return boolean
+     * @throws DmeException
+     * @author yc
+     * @Date 2021/4/16 15:39
+     */
+    private Map<String,Object> getLunDetailByVolumeId(String volumeId) throws DmeException{
+        boolean flag = false;
+        Map<String,Object> map  = new HashMap<>();
+        if (!StringUtils.isEmpty(volumeId)){
+            String url = DmeConstants.DME_VOLUME_BASE_URL + "/" + volumeId;
+            try {
+                ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET,
+                        null);
+                int code = responseEntity.getStatusCodeValue();
+                if (code != HttpStatus.OK.value()) {
+                    throw new DmeException(CODE_503, "get volume error !");
+                }
+                Object object = responseEntity.getBody();
+                if (object != null) {
+                    JsonObject jsonObject = new JsonParser().parse(object.toString()).getAsJsonObject();
+                    JsonElement volume = jsonObject.get("volume");
+                    JsonObject volumeJson = new JsonParser().parse(volume.toString()).getAsJsonObject();
+                    JsonElement tuning = volumeJson.get("tuning");
+                    JsonObject tuningJson = new JsonParser().parse(tuning.toString()).getAsJsonObject();
+                    JsonElement smartqos = tuningJson.get("smartqos");
+                    if(!smartqos.isJsonNull()) {
+                        JsonObject smartqosJson = new JsonParser().parse(smartqos.toString()).getAsJsonObject();
+                        flag = ckeckSmartQosIsEmpty(smartqosJson);
+                        map.put("qosFlag", flag);
+                    }else {
+                        map.put("qosFlag", false);
+                    }
+                    SmartQos smartosQ = null;
+                    if (flag){
+                        smartosQ = new Gson().fromJson(new JsonParser().parse(smartqos.toString()).getAsJsonObject(),SmartQos.class);
+                        map.put("smartosQ",smartosQ);
+                    }
+
+                }
+            }catch (DmeException e){
+                LOG.error("get volume's info  error", e);
+                throw new DmeException(CODE_503, e.getMessage());
+            }
+        }
+        return map;
+    }
+    /**
+     * @Description: 检验对象是否为空
+     * @Param JsonObject smartqosJson
+     * @return boolean
+     * @author yc
+     * @Date 2021/4/16 15:38
+     */
+    private boolean ckeckSmartQosIsEmpty(JsonObject smartqosJson) {
+        if (StringUtils.isEmpty(smartqosJson)||
+                (StringUtils.isEmpty(smartqosJson.get("smartqosJson")) &&
+                        StringUtils.isEmpty(smartqosJson.get("maxiops")) &&
+                        StringUtils.isEmpty(smartqosJson.get("minbandwidth")) &&
+                        StringUtils.isEmpty(smartqosJson.get("miniops")) &&
+                        StringUtils.isEmpty(smartqosJson.get("maxiops")) &&
+                        StringUtils.isEmpty(smartqosJson.get("latency")))){
+            return false;
+        }else {
+            return true;
+        }
     }
 }

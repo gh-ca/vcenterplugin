@@ -43,6 +43,7 @@ export class ModifyService {
   checkVolName(volName: string) {
     return this.http.get('dmestorage/queryvolumebyname', { params: { name: volName } });
   }
+  
   getStorageDetail(storageId: string) {
     return this.http.get('dmestorage/storage', { params: { storageId } });
   }

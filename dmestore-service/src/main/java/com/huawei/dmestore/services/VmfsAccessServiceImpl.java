@@ -987,13 +987,13 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 JsonObject element = jsonElement.getAsJsonObject();
                 String id = ToolUtils.jsonToStr(element.get("host_id"));
                 String status = ToolUtils.jsonToStr(element.get("status"));
-                //String resultMessage = ToolUtils.jsonToStr(element.get("result_message"));
+                String resultMessage = ToolUtils.jsonToStr(element.get("result_message"));
                 // 连通性异常主机结果统计
                 Map<String, String> result = new HashMap<>();
                 if (status.equalsIgnoreCase("NOT_CONNECT")) {
                 //if (status.equalsIgnoreCase("FAILED")) {
                     String hostName = getDmeHostNameById(id);
-                    // result.put(hostName, resultMessage);
+                    //result.put(hostName, resultMessage);
                     result.put(hostName, "启动器处于离线状态！");
                 }
                 if (result.size() != 0) {
@@ -1892,7 +1892,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                                         storageModel = storageIds.get(storageId);
                                     }
                                     DmeVmwareRelation relation = getDmeVmwareRelation(ob.storeType, ob.vmfsDatastoreId, ob.vmfsDatastoreName,
-                                            volumeObject, storageModel);
+                                            volumeObject, storageModel,storageId);
                                     relationList.add(relation);
                                 }
                             }
@@ -1907,7 +1907,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
     }
 
     private DmeVmwareRelation getDmeVmwareRelation(String storeType, String vmfsDatastoreId, String vmfsDatastoreName,
-        JsonObject volumeObject, String storageModel) {
+        JsonObject volumeObject, String storageModel,String deviceId) {
         String volumeId = ToolUtils.jsonToOriginalStr(volumeObject.get(ID_FIELD));
         String volumeName = ToolUtils.jsonToOriginalStr(volumeObject.get(NAME_FIELD));
         String volumeWwn = ToolUtils.jsonToOriginalStr(volumeObject.get(VOLUME_WWN));
@@ -1920,6 +1920,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         relation.setVolumeWwn(volumeWwn);
         relation.setStoreType(storeType);
         relation.setStorageType(storageModel);
+        relation.setStorageDeviceId(deviceId);
         relation.setState(1);
         return relation;
     }

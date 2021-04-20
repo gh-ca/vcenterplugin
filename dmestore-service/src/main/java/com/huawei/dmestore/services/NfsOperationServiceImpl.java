@@ -908,12 +908,12 @@ public class NfsOperationServiceImpl implements NfsOperationService {
      */
     private boolean getAutoSizeEnableStatus (JsonObject json) {
         boolean status;
-       String  capacitySelfAdjustingMode = json.get("apacity_self_adjusting_mode").getAsString();
-       if ("grow_off".equalsIgnoreCase(capacitySelfAdjustingMode)|| StringUtils.isEmpty(capacitySelfAdjustingMode)){
-           status = false;
-       }else {
-           status = true;
-       }
+        String capacitySelfAdjustingMode = ToolUtils.jsonToStr(json.get("apacity_self_adjusting_mode"));
+        if ("grow_off".equalsIgnoreCase(capacitySelfAdjustingMode) || StringUtils.isEmpty(capacitySelfAdjustingMode)) {
+            status = false;
+        } else {
+            status = true;
+        }
        return status;
     }
 }
