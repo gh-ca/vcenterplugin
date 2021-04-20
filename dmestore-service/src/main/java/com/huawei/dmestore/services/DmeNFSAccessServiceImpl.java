@@ -888,8 +888,9 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
                     hostObjectId = ToolUtils.getStr(params.get("hostObjectId"));
                     logicPortIp = ToolUtils.getStr(params.get(HOSTVKERNELIP));
                 }
+                NfsDataStoreShareAttr shareAttr = this.getNfsDatastoreShareAttr(dataStoreObjectId);
                 vcsdkUtils.mountNfs(dataStoreObjectId, hostObjectId, logicPortIp,
-                    ToolUtils.getStr(params.get("mountType")));
+                    ToolUtils.getStr(params.get("mountType")), shareAttr.getName());
             } else {
                 TaskDetailInfo taskDetailInfo = taskService.queryTaskById(taskId);
                 LOG.error("mountnfs error!{}", taskDetailInfo.getDetail());

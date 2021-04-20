@@ -210,8 +210,8 @@ public class NfsOperationServiceImpl implements NfsOperationService {
                         shareClientName = (String) shareClientHostMap.get(NAME_FIELD);
                         reqNfsShareClientArrayAddition.put("permission", params.get("accessModeDme"));
                         reqNfsShareClientArrayAddition.put("write_mode", "synchronization");
-                        reqNfsShareClientArrayAddition.put("permission_constraint", "all_squash");
-                        reqNfsShareClientArrayAddition.put("root_permission_constraint", "root_squash");
+                        reqNfsShareClientArrayAddition.put("permission_constraint", "no_all_squash");
+                        reqNfsShareClientArrayAddition.put("root_permission_constraint", "no_root_squash");
                         reqNfsShareClientArrayAddition.put("source_port_verification", "insecure");
                         mount.put((String) shareClientHostMap.get("objectId"),
                             (String) shareClientHostMap.get(NAME_FIELD));

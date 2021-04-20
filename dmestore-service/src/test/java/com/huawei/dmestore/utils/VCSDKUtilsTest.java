@@ -912,7 +912,7 @@ public class VCSDKUtilsTest {
         when(hostMO.getHostDatastoreSystemMo()).thenReturn(hostDatastoreSystemMO);
         when(hostMO.getName()).thenReturn("321");
         when(datastoreMO.getName()).thenReturn("321");
-        vcsdkUtils.mountNfs("321", "321", "321", "321");
+        vcsdkUtils.mountNfs("321", "321", "321", "321", "321");
     }
 
     @Test
