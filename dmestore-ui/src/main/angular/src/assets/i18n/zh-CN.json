@@ -590,6 +590,7 @@
     "totalCapacity": "总量",
     "used": "已用",
     "free": "可用",
+    "capacity": "存储容量分配",
     "top5T": "存储容量利用率Top5",
     "connectT": "DME连接",
     "connectFail": "连接失败！",

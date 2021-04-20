@@ -590,6 +590,7 @@
     "totalCapacity": "Total",
     "used": "Used",
     "free": "Free",
+    "capacity": "Capacity Distribution",
     "top5T": "Top 5 storage capacity utilization",
     "connectT": "DME Connect",
     "connectFail": "Connect Failed!",
