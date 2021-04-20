@@ -18,6 +18,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
@@ -58,7 +59,7 @@ public class NMPPathSwitchPolicyImpl extends BaseBestPracticeService implements 
 
     @Override
     public Object getRecommendValue() {
-        return "VMW_PSP_RR";
+        return new StringBuilder("VMW_SATP_ALUA/VMW_PSP_RR").append("$$").append("VMW_SATP_DEFAULT_AA/VMW_PSP_RR").toString();
     }
 
     @Override
@@ -68,7 +69,7 @@ public class NMPPathSwitchPolicyImpl extends BaseBestPracticeService implements 
         for (HostMultipathInfoLogicalUnit lun : lunList) {
             HostMultipathInfoLogicalUnitPolicy policy = lun.getPolicy();
             String policyStr = policy.getPolicy();
-            if (!policyStr.equals(getRecommendValue())) {
+            if (!policyStr.equals("VMW_PSP_RR")) {
                 JsonObject object = new JsonObject();
                 object.addProperty("name", "naa." + lun.getId().substring(10, 42));
                 object.addProperty("value", policyStr);
@@ -96,17 +97,10 @@ public class NMPPathSwitchPolicyImpl extends BaseBestPracticeService implements 
 
     @Override
     public boolean check(VCSDKUtils vcsdkUtils, String objectId) throws Exception {
-        List<HostMultipathInfoLogicalUnit> lunList = getLuns(vcsdkUtils, objectId);
-        for (HostMultipathInfoLogicalUnit lun : lunList) {
-            HostMultipathInfoLogicalUnitPolicy psp = lun.getPolicy();
-            String pspPolicy = psp.getPolicy();
-
-            // 多路径选路策略，集中式存储选择VMW_SATP_ALUA, VMW_PSP_RR
-            if (!pspPolicy.equals(getRecommendValue())) {
-                return false;
-            }
+        Map<String, Map<String, String>> satpRules = vcsdkUtils.satpRuleList(objectId, vcenterinfoservice.getVcenterInfo());
+        if (satpRules.size() != 2) {
+            return false;
         }
-
         return true;
     }
 

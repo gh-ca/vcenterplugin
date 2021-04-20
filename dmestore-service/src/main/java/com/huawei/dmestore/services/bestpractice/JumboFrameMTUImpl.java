@@ -119,9 +119,9 @@ public class JumboFrameMTUImpl extends BaseBestPracticeService implements BestPr
     private void update(VCSDKUtils vcsdkUtils, String objectId, Object recommendValue) throws Exception {
         ManagedObjectReference mor = vcsdkUtils.getVcConnectionHelper().objectId2Mor(objectId);
         VmwareContext context = vcsdkUtils.getVcConnectionHelper().getServerContext(objectId);
-        if (check(vcsdkUtils, objectId, recommendValue)) {
+        /*if (check(vcsdkUtils, objectId, recommendValue)) {
             return;
-        }
+        }*/
         HostMo hostMo = this.getHostMoFactory().build(context, mor);
         HostNetworkSystemMo hostNetworkSystemMo = hostMo.getHostNetworkSystemMo();
         HostNetworkConfig networkConfig = hostNetworkSystemMo.getNetworkConfig();

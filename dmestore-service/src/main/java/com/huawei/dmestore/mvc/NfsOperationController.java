@@ -284,8 +284,9 @@ public class NfsOperationController extends BaseController {
                 param.put("qos_policy", qosPolicy);
             }
         }else {
-            param.put("qos_policy", null);
-
+            Map<String, Object> enableMap = new HashMap<>(DmeConstants.COLLECTION_CAPACITY_16);
+            enableMap.put("enabled", false);
+            param.put("qos_policy", enableMap);
         }
     }
 

@@ -69,7 +69,6 @@ public class SystemDao extends H2DataBaseDao {
             ps.executeUpdate();
         } catch (SQLException ex) {
             LOGGER.error("Failed to initData: {}", ex.getMessage());
-            throw ex;
         } finally {
             closeConnection(con, ps, rs);
         }

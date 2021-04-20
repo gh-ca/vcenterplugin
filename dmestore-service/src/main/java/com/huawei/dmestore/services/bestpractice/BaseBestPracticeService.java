@@ -57,9 +57,9 @@ public class BaseBestPracticeService {
         final Object recommendValue) throws Exception {
         ManagedObjectReference mor = vcsdkUtils.getVcConnectionHelper().objectId2Mor(objectId);
         VmwareContext context = vcsdkUtils.getVcConnectionHelper().getServerContext(objectId);
-        if (check(vcsdkUtils, objectId, hostSetting, recommendValue)) {
+        /*if (check(vcsdkUtils, objectId, hostSetting, recommendValue)) {
             return;
-        }
+        }*/
         HostMo hostMo = this.getHostMoFactory().build(context, mor);
         List<OptionValue> values = hostMo.getHostAdvanceOptionMo().queryOptions(hostSetting);
         for (OptionValue value : values) {
@@ -142,9 +142,9 @@ public class BaseBestPracticeService {
      */
     protected void updateModuleOption(final VCSDKUtils vcsdkUtils, final String objectId, final String moduleName,
         final String optionName, final Object recommendValue) throws Exception {
-        if (checkModuleOption(vcsdkUtils, objectId, moduleName, recommendValue)) {
+        /*if (checkModuleOption(vcsdkUtils, objectId, moduleName, recommendValue)) {
             return;
-        }
+        }*/
         ManagedObjectReference mor = vcsdkUtils.getVcConnectionHelper().objectId2Mor(objectId);
         VmwareContext context = vcsdkUtils.getVcConnectionHelper().getServerContext(objectId);
         HostMo hostMo = this.getHostMoFactory().build(context, mor);

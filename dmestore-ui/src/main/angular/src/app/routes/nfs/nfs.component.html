@@ -2,6 +2,8 @@
   <!-- 头部按钮组 -->
   <div class="gh-btngroup-header">
     <div class="gh-btngroup-left">
+      <!-- NFS  创建DME数据存储 -->
+      <!-- 添加 -->
       <button class="btn btn-primary" (click)="addView()">{{'menu.add' | translate}}</button>
       <button class="btn btn-primary" [disabled]="rowSelected.length !== 1"
         (click)="modifyData()">{{'menu.modify' | translate}}</button>
@@ -192,9 +194,11 @@
     </clr-datagrid>
   </div>
   <!--添加弹框-->
+  <!-- addView() -->
+  <!-- 创建DME数据存储-1-数据存储设置 -->
   <clr-wizard #wizard [clrWizardOpen]="addModelShow" [clrWizardClosable]="false">
     <clr-wizard-title>{{'table.createDmeStorage' | translate}}</clr-wizard-title>
-    <p *ngIf="errorMsg" style="color: red">{{'errorMsg.addError' | translate}}</p>
+    <p *ngIf="errorMsg" class="clr-error clr-subtext">{{'errorMsg.addError' | translate}}</p>
     <div *ngIf="modalLoading" class="loadingDiv">
       <span>
         {{'vmfs.loadingTips' | translate}}<img src="./assets/images/loading.gif" width="20px" height="20px"
@@ -207,7 +211,8 @@
           style="margin-left: 20px;">
       </span>
     </div>
-    <clr-wizard-page #addPageOne [clrWizardPageNextDisabled]="!formPageOne.valid">
+    <!--   <pre> {{print(addForm)}} </pre> -->
+    <clr-wizard-page #addPageOne [clrWizardPageNextDisabled]="isAddPageOneNextDisabled">
       <ng-template clrPageTitle>{{'nfs.datastoreSetting' | translate}}</ng-template> <!-- mandatory -->
       <form clrForm [formGroup]="addFormGroup" #formPageOne="ngForm">
         <!--存储设备-->
@@ -220,6 +225,7 @@
           </select>
           <clr-control-error>{{'errorMsg.require' | translate}}</clr-control-error>
         </clr-select-container>
+        <!-- 存储池 -->
         <clr-select-container class="selectClass">
           <label>{{'nfs.storagePool' | translate}}</label>
           <select class="inputWidth100Percent" clrSelect (ngModelOptions)="storagePools"
@@ -229,6 +235,8 @@
           </select>
           <clr-control-error>{{'errorMsg.require' | translate}}</clr-control-error>
         </clr-select-container>
+
+
         <!--        <clr-combobox-container>-->
         <!--          <label>{{'nfs.storagePool' | translate}}</label>-->
         <!--          <clr-combobox  [(ngModel)]="checkedPool" name="checkedPool" required>-->
@@ -239,6 +247,8 @@
         <!--            </clr-options>-->
         <!--          </clr-combobox>-->
         <!--        </clr-combobox-container>-->
+
+
         <!--逻辑端口-->
         <clr-select-container class="selectClass">
           <label>{{'nfs.logicPort' | translate}}</label>
@@ -255,13 +265,14 @@
           <input clrInput class="inputWidth100Percent" [(ngModel)]="addForm.nfsName" maxlength="256" name="nfsName"
             (blur)="checkNfsName();" formControlName="nfsName" required />
           <clr-control-error>
-            <p *ngIf="!oldNfsName" style="color: red">{{'errorMsg.require' | translate}}</p>
-            <p *ngIf="matchErr" style="color: red">{{'validations.nameRequiredTwo' | translate}}</p>
-            <p *ngIf="nfsNameRepeatErr" style="color: red">{{'errorMsg.fsrepeat' | translate}}</p>
-            <p *ngIf="fsNameRepeatErr" style="color: red">{{'errorMsg.fsrepeat' | translate}}</p>
-            <p *ngIf="shareNameRepeatErr" style="color: red">{{'errorMsg.sharerepeat' | translate}}</p>
+            <p *ngIf="!oldNfsName" class="clr-error clr-subtext">{{'errorMsg.require' | translate}}</p>
+            <p *ngIf="matchErr" class="clr-error clr-subtext">{{'validations.nameRequiredTwo' | translate}}</p>
+            <p *ngIf="nfsNameRepeatErr" class="clr-error clr-subtext">{{'errorMsg.fsrepeat' | translate}}</p>
+            <p *ngIf="fsNameRepeatErr" class="clr-error clr-subtext">{{'errorMsg.fsrepeat' | translate}}</p>
+            <p *ngIf="shareNameRepeatErr" class="clr-error clr-subtext">{{'errorMsg.sharerepeat' | translate}}</p>
           </clr-control-error>
         </clr-input-container>
+        <!-- 名称是否可以不一样 -->
         <clr-checkbox-container>
           <label></label>
           <clr-checkbox-wrapper>
@@ -272,30 +283,33 @@
             <label style="width: 280px;">{{'nfs.sameName' | translate}}</label>
           </clr-checkbox-wrapper>
         </clr-checkbox-container>
+        <!-- 如果名字可以不一样 -->
         <clr-input-container *ngIf="!addForm.sameName">
+          <!-- 文件系统名称 -->
           <label>{{'nfs.fsName' | translate}}</label>
           <input class="inputWidth100Percent" maxlength="256" clrInput [(ngModel)]="addForm.fsName" name="fsName"
             formControlName="fsName" (blur)="checkFsName();" />
           <clr-control-helper *ngIf="matchErr">
-            <p style="color: red">{{'validations.nameRequiredTwo' | translate}}</p>
+            <p class="clr-error clr-subtext">{{'validations.nameRequiredTwo' | translate}}</p>
           </clr-control-helper>
           <clr-control-error>
-            <p *ngIf="!oldFsName" style="color: red">{{'errorMsg.require' | translate}}</p>
-            <p *ngIf="matchErr" style="color: red">{{'errorMsg.numberAndLetter' | translate}}</p>
-            <p *ngIf="fsNameRepeatErr" style="color: red">{{'errorMsg.fsrepeat' | translate}}</p>
+            <p *ngIf="!oldFsName" class="clr-error clr-subtext">{{'errorMsg.require' | translate}}</p>
+            <p *ngIf="matchErr" class="clr-error clr-subtext">{{'errorMsg.numberAndLetter' | translate}}</p>
+            <p *ngIf="fsNameRepeatErr" class="clr-error clr-subtext">{{'errorMsg.fsrepeat' | translate}}</p>
           </clr-control-error>
         </clr-input-container>
+        <!-- 共享名称 -->
         <clr-input-container *ngIf="!addForm.sameName">
           <label>{{'nfs.shareName' | translate}}</label>
           <input class="inputWidth100Percent" maxlength="256" clrInput [(ngModel)]="addForm.shareName" name="shareName"
             formControlName="shareName" (blur)="checkShareName();" />
           <clr-control-helper *ngIf="shareNameContainsCN">
-            <p style="color: red">{{'validations.shareNameRequired' | translate}}</p>
+            <p class="clr-error clr-subtext">{{'validations.shareNameRequired' | translate}}</p>
           </clr-control-helper>
           <clr-control-error>
-            <p *ngIf="!oldShareName" style="color: red">{{'errorMsg.require' | translate}}</p>
-            <p *ngIf="matchErr" style="color: red">{{'errorMsg.numberAndLetter' | translate}}</p>
-            <p *ngIf="shareNameRepeatErr" style="color: red">{{'errorMsg.sharerepeat' | translate}}</p>
+            <p *ngIf="!oldShareName" class="clr-error clr-subtext">{{'errorMsg.require' | translate}}</p>
+            <p *ngIf="matchErr" class="clr-error clr-subtext">{{'errorMsg.numberAndLetter' | translate}}</p>
+            <p *ngIf="shareNameRepeatErr" class="clr-error clr-subtext">{{'errorMsg.sharerepeat' | translate}}</p>
           </clr-control-error>
         </clr-input-container>
         <!--大小-->
@@ -307,6 +321,7 @@
             <option value="TB">TB</option>
             <option value="GB">GB</option>
           </select>
+          <clr-control-error>{{'errorMsg.require' | translate}}</clr-control-error>
         </clr-input-container>
         <!--字符编码-->
         <clr-select-container class="selectClass">
@@ -390,6 +405,8 @@
         <clr-wizard-button [type]="'next'">{{'nfs.button_next' | translate}}</clr-wizard-button>
       </ng-template>
     </clr-wizard-page>
+
+    <!-- 创建DME数据存储-2-存储设置 -->
     <clr-wizard-page #addPageTwo [clrWizardPageNextDisabled]="!formPageTwo.valid">
       <ng-template clrPageTitle>{{'nfs.storageSetting' | translate}}</ng-template> <!-- mandatory -->
       <ng-template clrPageNavTitle>{{'nfs.storageSetting' | translate}}</ng-template> <!-- optional -->
@@ -443,7 +460,7 @@
                     {{'vmfs.unitM' | translate}}
                   </label>
                 </clr-checkbox-wrapper>
-                <clr-control-helper *ngIf="bandWidthMaxErrTips" style="color: red">
+                <clr-control-helper *ngIf="bandWidthMaxErrTips" class="clr-error clr-subtext">
                   <clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>
                   {{'errorMsg.iposMaxMinTips' | translate}}
                 </clr-control-helper>
@@ -465,7 +482,7 @@
                       [required]="addForm.maxIopsChoose" />
                   </label>
                 </clr-checkbox-wrapper>
-                <clr-control-helper *ngIf="iopsMaxErrTips" style="color: red">
+                <clr-control-helper *ngIf="iopsMaxErrTips" class="clr-error clr-subtext">
                   <clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>
                   {{'errorMsg.iposMaxMinTips' | translate}}
                 </clr-control-helper>
@@ -493,7 +510,7 @@
                       {{'vmfs.unitM' | translate}}
                     </label>
                   </clr-checkbox-wrapper>
-                  <clr-control-helper *ngIf="bandWidthMinErrTips" style="color: red">
+                  <clr-control-helper *ngIf="bandWidthMinErrTips" class="clr-error clr-subtext">
                     <clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>
                     {{'errorMsg.iposMaxMinTips' | translate}}
                   </clr-control-helper>
@@ -516,7 +533,7 @@
                         [required]="addForm.minIopsChoose" />
                     </label>
                   </clr-checkbox-wrapper>
-                  <clr-control-helper *ngIf="iopsMinErrTips" style="color: red">
+                  <clr-control-helper *ngIf="iopsMinErrTips" class="clr-error clr-subtext">
                     <clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>
                     {{'errorMsg.iposMaxMinTips' | translate}}
                   </clr-control-helper>
@@ -550,7 +567,7 @@
                       {{'vmfs.latencyUnitUs' | translate}}
                     </label>
                   </clr-checkbox-wrapper>
-                  <clr-control-helper *ngIf="latencyErrTips" style="color: red">
+                  <clr-control-helper *ngIf="latencyErrTips" class="clr-error clr-subtext">
                     <clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>
                     {{'errorMsg.iposMaxMinTips' | translate}}
                   </clr-control-helper>
@@ -558,41 +575,43 @@
                     {{'errorMsg.require' | translate}}</clr-control-helper>
                 </clr-checkbox-container>
                 <clr-checkbox-container *ngIf="bandwidthLimitErr">
-                  <clr-control-helper style="color: red">
+                  <clr-control-helper class="clr-error clr-subtext">
                     <clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>
                     {{'tips.bandwidthLimitErr' | translate}}
                   </clr-control-helper>
                 </clr-checkbox-container>
                 <clr-checkbox-container *ngIf="iopsLimitErr">
-                  <clr-control-helper style="color: red">
+                  <clr-control-helper class="clr-error clr-subtext">
                     <clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{'tips.iopsLimitErr' | translate}}
                   </clr-control-helper>
                 </clr-checkbox-container>
               </div>
             </div>
           </div>
-          <clr-toggle-wrapper>
-            <label style="width: 100px;"> {{'nfs.thin' | translate}}</label>
-            <input type="checkbox" name="thin" clrToggle [(ngModel)]="addForm.thin" />
-          </clr-toggle-wrapper>
-          <!--重删-->
-          <clr-select-container class="selectClass" *ngIf="deduplicationShow && addForm.thin">
-            <label style="width: 100px;">{{'nfs.dataDedu' | translate}}</label>
-            <select clrSelect [(ngModel)]="addForm.deduplicationEnabled" name="deduplicationEnabled">
-              <option value="">{{'rdm.default' | translate}}</option>
-              <option value="false">{{'nfs.disable' | translate}}</option>
-              <option value="true">{{'nfs.enable' | translate}}</option>
-            </select>
-          </clr-select-container>
-          <!--压缩-->
-          <clr-select-container class="selectClass" *ngIf="compressionShow && addForm.thin">
-            <label style="width: 100px;">{{'nfs.dataCompre' | translate}}</label>
-            <select clrSelect [(ngModel)]="addForm.compressionEnabled" name="compressionEnabled">
-              <option value="">{{'rdm.default' | translate}}</option>
-              <option value="false">{{'nfs.disable' | translate}}</option>
-              <option value="true">{{'nfs.enable' | translate}}</option>
-            </select>
-          </clr-select-container>
+          <div *ngIf="!dorado">
+            <clr-toggle-wrapper>
+              <label style="width: 100px;"> {{'nfs.thin' | translate}}</label>
+              <input type="checkbox" name="thin" clrToggle [(ngModel)]="addForm.thin" />
+            </clr-toggle-wrapper>
+            <!--重删-->
+            <clr-select-container class="selectClass" *ngIf="deduplicationShow && addForm.thin">
+              <label style="width: 100px;">{{'nfs.dataDedu' | translate}}</label>
+              <select clrSelect [(ngModel)]="addForm.deduplicationEnabled" name="deduplicationEnabled">
+                <option value="">{{'rdm.default' | translate}}</option>
+                <option value="false">{{'nfs.disable' | translate}}</option>
+                <option value="true">{{'nfs.enable' | translate}}</option>
+              </select>
+            </clr-select-container>
+            <!--压缩-->
+            <clr-select-container class="selectClass" *ngIf="compressionShow && addForm.thin">
+              <label style="width: 100px;">{{'nfs.dataCompre' | translate}}</label>
+              <select clrSelect [(ngModel)]="addForm.compressionEnabled" name="compressionEnabled">
+                <option value="">{{'rdm.default' | translate}}</option>
+                <option value="false">{{'nfs.disable' | translate}}</option>
+                <option value="true">{{'nfs.enable' | translate}}</option>
+              </select>
+            </clr-select-container>
+          </div>
           <clr-toggle-wrapper *ngIf="!dorado">
             <label style="width: 100px;">{{'nfs.capAuto' | translate}}</label>
             <input type="checkbox" clrToggle [(ngModel)]="addForm.autoSizeEnable" name="autoSizeEnable" />
@@ -688,28 +707,30 @@
             </clr-radio-container>
           </div>
         </div>
-        <!--thin-->
-        <clr-toggle-wrapper>
-          <label> {{'nfs.thin' | translate}}</label>
-          <input type="checkbox" name="thin" clrToggle [(ngModel)]="updateNfs.thin" />
-        </clr-toggle-wrapper>
-        <!--重删-->
-        <clr-select-container>
-          <label>{{'nfs.dataDedu' | translate}}</label>
-          <select clrSelect [(ngModel)]="updateNfs.deduplicationEnabled" name="deduplicationEnabled">
-            <option value="false">{{'nfs.disable' | translate}}</option>
-            <option value="true">{{'nfs.enable' | translate}}</option>
-          </select>
-        </clr-select-container>
-        <!--压缩-->
-        <clr-select-container>
-          <label>{{'nfs.dataCompre' | translate}}</label>
-          <select clrSelect [(ngModel)]="updateNfs.compressionEnabled" name="compressionEnabled">
-            <option value="false">{{'nfs.disable' | translate}}</option>
-            <option value="true">{{'nfs.enable' | translate}}</option>
-          </select>
-        </clr-select-container>
-        <clr-toggle-wrapper>
+        <div *ngIf="!dorado">
+          <!--thin-->
+          <clr-toggle-wrapper>
+            <label> {{'nfs.thin' | translate}}</label>
+            <input type="checkbox" name="thin" clrToggle [(ngModel)]="updateNfs.thin" />
+          </clr-toggle-wrapper>
+          <!--重删-->
+          <clr-select-container>
+            <label>{{'nfs.dataDedu' | translate}}</label>
+            <select clrSelect [(ngModel)]="updateNfs.deduplicationEnabled" name="deduplicationEnabled">
+              <option value="false">{{'nfs.disable' | translate}}</option>
+              <option value="true">{{'nfs.enable' | translate}}</option>
+            </select>
+          </clr-select-container>
+          <!--压缩-->
+          <clr-select-container>
+            <label>{{'nfs.dataCompre' | translate}}</label>
+            <select clrSelect [(ngModel)]="updateNfs.compressionEnabled" name="compressionEnabled">
+              <option value="false">{{'nfs.disable' | translate}}</option>
+              <option value="true">{{'nfs.enable' | translate}}</option>
+            </select>
+          </clr-select-container>
+        </div>
+        <clr-toggle-wrapper *ngIf="!dorado">
           <label>{{'nfs.capAuto' | translate}}</label>
           <input type="checkbox" clrToggle [(ngModel)]="updateNfs.autoSizeEnable" name="autoSizeEnable" />
         </clr-toggle-wrapper>

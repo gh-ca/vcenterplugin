@@ -10,16 +10,7 @@ import com.huawei.vmware.VcConnectionHelpers;
 import com.huawei.vmware.autosdk.SessionHelper;
 import com.huawei.vmware.autosdk.TaggingWorkflow;
 import com.huawei.vmware.mo.*;
-import com.huawei.vmware.util.ClusterVmwareMoFactory;
-import com.huawei.vmware.util.DatastoreVmwareMoFactory;
-import com.huawei.vmware.util.HostVmwareFactory;
-import com.huawei.vmware.util.Pair;
-import com.huawei.vmware.util.PbmUtil;
-import com.huawei.vmware.util.RootVmwareMoFactory;
-import com.huawei.vmware.util.SessionHelperFactory;
-import com.huawei.vmware.util.TaggingWorkflowFactory;
-import com.huawei.vmware.util.VirtualMachineMoFactorys;
-import com.huawei.vmware.util.VmwareContext;
+import com.huawei.vmware.util.*;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -66,6 +57,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.util.StringUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -159,6 +151,8 @@ public class VCSDKUtils {
     private VcConnectionHelpers vcConnectionHelpers;
 
     private RootVmwareMoFactory rootVmwareMoFactory = RootVmwareMoFactory.getInstance();
+
+    private PerformanceManagerMoFactory performanceManagerMoFactory = PerformanceManagerMoFactory.getInstance();
 
     private DatastoreVmwareMoFactory datastoreVmwareMoFactory = DatastoreVmwareMoFactory.getInstance();
 
@@ -3339,100 +3333,188 @@ public class VCSDKUtils {
                 }
             });
         }
-
     }
 
-    public String xmlRulesFormat(String unformattedXml) {
+    public String queryPerf(String dataStoreObjectId) throws VcenterException {
+        String listStr = "";
+        try {
+            String serverguid = vcConnectionHelpers.objectId2Serverguid(dataStoreObjectId);
+            ManagedObjectReference objmor = vcConnectionHelpers.objectId2Mor(dataStoreObjectId);
+            VmwareContext vmwareContext = vcConnectionHelpers.getServerContext(serverguid);
+            PerformanceManagerMo performanceManagerMo = performanceManagerMoFactory.build(vmwareContext, vmwareContext.getServiceContent().getPerfManager());
+            PerfQuerySpec qSpec = new PerfQuerySpec();
+            qSpec.setEntity(objmor);
+            qSpec.setMaxSample(new Integer(1));
+            qSpec.setFormat("csv");
+            qSpec.setIntervalId(new Integer(300));
+            PerfMetricId perfMetricId = new PerfMetricId();
+            perfMetricId.setCounterId(268);
+            perfMetricId.setInstance("");
+            qSpec.getMetricId().add(perfMetricId);
+            List<PerfQuerySpec> perfQuerySpecs = new ArrayList<>();
+            perfQuerySpecs.add(qSpec);
+            List<PerfEntityMetricBase> perfEntityMetricBases = performanceManagerMo.queryPerf(perfQuerySpecs);
+            listStr = gson.toJson(perfEntityMetricBases);
+        } catch (Exception e) {
+            logger.error("objectId{}, queryPerf error", dataStoreObjectId);
+        }
+        return listStr;
+    }
+
+    public String queryPerfAllCount(String dataStoreObjectId) throws VcenterException {
+        String perResult = "";
+        Integer maxSample = 1;
+        Integer refreshRate = 300;
+        try {
+            String serverguid = vcConnectionHelpers.objectId2Serverguid(dataStoreObjectId);
+            ManagedObjectReference objmor = vcConnectionHelpers.objectId2Mor(dataStoreObjectId);
+            VmwareContext vmwareContext = vcConnectionHelpers.getServerContext(serverguid);
+            PerformanceManagerMo performanceManagerMo = performanceManagerMoFactory.build(vmwareContext, vmwareContext.getServiceContent().getPerfManager());
+            List<PerfMetricId> pmis = performanceManagerMo.queryAvailablePerfMetric(objmor, refreshRate);
+            PerfQuerySpec qSpec = new PerfQuerySpec();
+            qSpec.setEntity(objmor);
+            qSpec.setMaxSample(maxSample);
+            qSpec.setFormat("csv");
+            qSpec.setIntervalId(refreshRate);
+            qSpec.getMetricId().addAll(pmis);
+            List<PerfQuerySpec> perfQuerySpecs = new ArrayList<>();
+            perfQuerySpecs.add(qSpec);
+            List<PerfEntityMetricBase> perfEntityMetricBases = performanceManagerMo.queryPerf(perfQuerySpecs);
+            perResult = gson.toJson(perfEntityMetricBases);
+        } catch (Exception e) {
+            logger.error("queryPerfAllCount error");
+        }
+        return perResult;
+    }
+
+    public Map<String, Map<String, String>> xmlRulesFormat(String unformattedXml) {
+        Map<String, Map<String, String>> map = new HashMap<>();
         try {
             final Document document = parseXmlFile(unformattedXml);
-            NodeList sms = document.getElementsByTagName("obj");
-            for(int index = 0; index < sms.getLength(); index++){
+            NodeList sms = document.getElementsByTagName("DataObject");
+            for (int index = 0; index < sms.getLength(); index++) {
                 Element sm = (Element) sms.item(index);
-
+                NodeList vendor = sm.getElementsByTagName("Vendor");
+                Node vendorNode = vendor.item(0).getFirstChild();
+                String vendorValue = vendorNode == null? null : vendorNode.getNodeValue();
+                if(StringUtil.isNotBlank(vendorValue) && vendorValue.equals("HUAWEI")){
+                    Map<String, String> satpMap = new HashMap<>();
+                    String pspValue = sm.getElementsByTagName("DefaultPSP").item(0).getFirstChild().getNodeValue();
+                    String satpValue = sm.getElementsByTagName("Name").item(0).getFirstChild().getNodeValue();
+                    String claimOptionValue = sm.getElementsByTagName("ClaimOptions").item(0).getFirstChild().getNodeValue();
+                    String modelValue =  sm.getElementsByTagName("Model").item(0).getFirstChild().getNodeValue();
+                    satpMap.put("vendor", vendorValue);
+                    satpMap.put("model", modelValue);
+                    satpMap.put("satp", satpValue);
+                    satpMap.put("psp", pspValue);
+                    satpMap.put("claimOption", claimOptionValue);
+                    String key = getSatpKey(satpMap);
+                    map.put(key, satpMap);
+                }
             }
         } catch (Exception e) {
-            logger.error("xmlFormat error:{}", e.toString());
+            logger.error("xmlRulesFormat error:{}", e.toString());
         }
-        return null;
+        return map;
     }
 
-    public void satpRuleList(String hostObjectId, VCenterInfo vcenterinfo) {
+    private String getSatpKey(Map<String, String> satpMap){
+         String key = new StringBuilder(satpMap.get("vendor"))
+                 .append(satpMap.get("model"))
+                 .append(satpMap.get("satp"))
+                 .append(satpMap.get("psp"))
+                 .append(satpMap.get("claimOption"))
+                 .toString();
+         return key;
+    }
+
+    public Map<String, Map<String, String>> satpRuleList(String hostObjectId, VCenterInfo vcenterinfo) {
         String moid = "ha-cli-handler-storage-nmp-satp-rule";
         String esxCLI = "vim.EsxCLI.storage.nmp.satp.rule.list";
-        ManagedMethodExecuter.SoapArgument pspQuery
-                = new ManagedMethodExecuter.SoapArgument();
-        pspQuery.setName("psp");
-        pspQuery.setVal("<psp>" + "VMW_PSP_RR" + "</psp>");
-        String ruleList = satpRuleProcess(hostObjectId, vcenterinfo, moid, esxCLI, new ManagedMethodExecuter.SoapArgument[]{pspQuery});
-        xmlRulesFormat(ruleList);
+        String[] satps = new String[]{"VMW_SATP_DEFAULT_AA", "VMW_SATP_ALUA"};
+        Map<String, Map<String, String>> satpRuleMap = new HashMap();
+        for(String stap : satps){
+            ManagedMethodExecuter.SoapArgument satpArgument0 = new ManagedMethodExecuter.SoapArgument();
+            satpArgument0.setName("satp");
+            satpArgument0.setVal("<satp>" + stap + "</satp>");
+            ManagedMethodExecuter.SoapArgument[] soapArguments = new ManagedMethodExecuter.SoapArgument[]{satpArgument0};
+            String ruleList = satpRuleProcess(hostObjectId, vcenterinfo, moid, esxCLI, soapArguments);
+            satpRuleMap.putAll(xmlRulesFormat(ruleList));
+        }
 
+        return satpRuleMap;
     }
 
 
     public void satpRuleAdd(String hostObjectId, VCenterInfo vcenterinfo) {
+        // 获取主机上配置的satp规则信息
+        Map<String, Map<String, String>> satpRuleMap = satpRuleList(hostObjectId, vcenterinfo);
+
         String moid = "ha-cli-handler-storage-nmp-satp-rule";
         String esxCLI = "vim.EsxCLI.storage.nmp.satp.rule.add";
+        String modelValue = "XSG1";
+        String vendorValue = "HUAWEI";
         List<Map<String, String>> ruleList = new ArrayList<>();
         Map<String, String> map1 = new HashMap();
         map1.put("satp", "VMW_SATP_ALUA");
         map1.put("psp", "VMW_PSP_RR");
-        map1.put("claimoption", "tpgs_on");
-        ruleList.add(map1);
+        map1.put("claimOption", "tpgs_on");
+        map1.put("model", modelValue);
+        map1.put("vendor", modelValue);
+        String satpKey1 = getSatpKey(map1);
+        if(!satpRuleMap.containsKey(satpKey1)){
+            ruleList.add(map1);
+        }
 
         Map<String, String> map2 = new HashMap();
         map2.put("satp", "VMW_SATP_DEFAULT_AA");
         map2.put("psp", "VMW_PSP_RR");
-        map2.put("claimoption", "tpgs_off");
-        ruleList.add(map2);
+        map2.put("claimOption", "tpgs_off");
+        map1.put("model", modelValue);
+        map1.put("vendor", modelValue);
+        String satpKey2 = getSatpKey(map2);
+        if(!satpRuleMap.containsKey(satpKey2)){
+            ruleList.add(map2);
+        }
 
-
-        // 用于判断所有的线程是否结束
         for (int index = 0; index < ruleList.size(); index++) {
             Map<String, String> map = ruleList.get(index);
             List<ManagedMethodExecuter.SoapArgument> soapArgumentList = new ArrayList<>();
 
-            ManagedMethodExecuter.SoapArgument vendor
-                    = new ManagedMethodExecuter.SoapArgument();
+            ManagedMethodExecuter.SoapArgument vendor = new ManagedMethodExecuter.SoapArgument();
             vendor.setName("vendor");
             vendor.setVal("<vendor  xmlns:xsi=\"http:// www.w3.org/2001/XMLSchema-instance\" "
                     + "xmlns:xsd=\"http:// www.w3.org/2001/XMLSchema\" "
-                    + "xmlns=\"urn:vim25\">" + "HUAWEI" + "</vendor>");
+                    + "xmlns=\"urn:vim25\">" + vendorValue + "</vendor>");
 
-            ManagedMethodExecuter.SoapArgument model
-                    = new ManagedMethodExecuter.SoapArgument();
+            ManagedMethodExecuter.SoapArgument model = new ManagedMethodExecuter.SoapArgument();
             model.setName("model");
             model.setVal("<model  xmlns:xsi=\"http:// www.w3.org/2001/XMLSchema-instance\" "
                     + "xmlns:xsd=\"http:// www.w3.org/2001/XMLSchema\" "
-                    + "xmlns=\"urn:vim25\">" + "XSG1" + "</model>");
+                    + "xmlns=\"urn:vim25\">" + modelValue + "</model>");
 
-            ManagedMethodExecuter.SoapArgument satp
-                    = new ManagedMethodExecuter.SoapArgument();
+            ManagedMethodExecuter.SoapArgument satp = new ManagedMethodExecuter.SoapArgument();
             satp.setName("satp");
             satp.setVal("<satp  xmlns:xsi=\"http:// www.w3.org/2001/XMLSchema-instance\" "
                     + "xmlns:xsd=\"http:// www.w3.org/2001/XMLSchema\" "
                     + "xmlns=\"urn:vim25\">" + map.get("satp") + "</satp>");
 
 
-            ManagedMethodExecuter.SoapArgument psp
-                    = new ManagedMethodExecuter.SoapArgument();
+            ManagedMethodExecuter.SoapArgument psp = new ManagedMethodExecuter.SoapArgument();
             psp.setName("psp");
             psp.setVal("<psp  xmlns:xsi=\"http:// www.w3.org/2001/XMLSchema-instance\" "
                     + "xmlns:xsd=\"http:// www.w3.org/2001/XMLSchema\" "
                     + "xmlns=\"urn:vim25\">" + map.get("psp") + "</psp>");
 
-            ManagedMethodExecuter.SoapArgument claimoption
-                    = new ManagedMethodExecuter.SoapArgument();
+            ManagedMethodExecuter.SoapArgument claimoption = new ManagedMethodExecuter.SoapArgument();
             claimoption.setName("claimoption");
-            claimoption.setVal(
-                    "<claimoption  xmlns:xsi=\"http:// www.w3.org/2001/XMLSchema-instance\" "
+            claimoption.setVal("<claimoption  xmlns:xsi=\"http:// www.w3.org/2001/XMLSchema-instance\" "
                             + "xmlns:xsd=\"http:// www.w3.org/2001/XMLSchema\" "
-                            + "xmlns=\"urn:vim25\">" + map.get("claimoption") + "</claimoption>");
+                            + "xmlns=\"urn:vim25\">" + map.get("claimOption") + "</claimoption>");
 
-            ManagedMethodExecuter.SoapArgument force
-                    = new ManagedMethodExecuter.SoapArgument();
+            ManagedMethodExecuter.SoapArgument force = new ManagedMethodExecuter.SoapArgument();
             force.setName("force");
-            force.setVal(
-                    "<force  xmlns:xsi=\"http:// www.w3.org/2001/XMLSchema-instance\" "
+            force.setVal("<force  xmlns:xsi=\"http:// www.w3.org/2001/XMLSchema-instance\" "
                             + "xmlns:xsd=\"http:// www.w3.org/2001/XMLSchema\" "
                             + "xmlns=\"urn:vim25\">" + "true" + "</force>");
 
@@ -3505,11 +3587,11 @@ public class VCSDKUtils {
             ManagedMethodExecuter methodExecuter = vmomiClient.createStub(ManagedMethodExecuter.class, methodexecutor);
             ManagedMethodExecuter.SoapResult soapResult = methodExecuter.executeSoap(moid,"urn:vim25/6.5", esxCLI, soapArguments);
             String re = null;
-            if(soapResult.response != null){
+            if (soapResult.response != null) {
                 re = new String(soapResult.getResponse().getBytes("ISO-8859-1"), "UTF-8");
-
+            } else {
+                logger.error("satpRuleProcess failed!errMsg={}", soapResult.getFault().faultDetail);
             }
-            logger.info("satpRuleProcess,re={}", re);
             return re;
 
         } catch (Exception ex) {

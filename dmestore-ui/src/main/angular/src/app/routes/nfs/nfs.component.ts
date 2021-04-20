@@ -5,21 +5,24 @@ import {
   Inject,
   OnInit,
   Optional,
-  ViewChild
+  ViewChild,
 } from '@angular/core';
 import { Host, List, NfsService, UpdateNfs, URLS_NFS } from './nfs.service';
 import { GlobalsService } from '../../shared/globals.service';
 import { LogicPort, StorageList, StorageService } from '../storage/storage.service';
-import { StoragePool, StoragePoolMap } from "../storage/detail/detail.service";
-import { ClrDatagridSortOrder, ClrWizard, ClrWizardPage } from "@clr/angular";
-import { VmfsListService } from "../vmfs/list/list.service";
-import { Router } from "@angular/router";
-import { AddNfs, NfsAddService, Vmkernel } from "./subpages/add/nfs-add.service";
-import { FormControl, FormGroup, Validators } from "@angular/forms";
-import { TokenService } from "@core";
-import { DOCUMENT } from "@angular/common";
+import { StoragePool, StoragePoolMap } from '../storage/detail/detail.service';
+import { ClrDatagridSortOrder, ClrWizard, ClrWizardPage } from '@clr/angular';
+import { VmfsListService } from '../vmfs/list/list.service';
+import { Router } from '@angular/router';
+import { AddNfs, NfsAddService, Vmkernel } from './subpages/add/nfs-add.service';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { TokenService } from '@core';
+import { DOCUMENT } from '@angular/common';
 import { isMockData, mockData } from './../../../mock/mock';
 import { getColorByType, getLabelByValue } from './../../app.helpers';
+import { handlerResponseErrorSimple } from 'app/app.helpers';
+import { SimpleChange } from '@angular/core';
+import debounce from 'just-debounce';
 
 @Component({
   selector: 'app-nfs',
@@ -29,11 +32,10 @@ import { getColorByType, getLabelByValue } from './../../app.helpers';
   providers: [NfsService, StorageService, VmfsListService, NfsAddService],
 })
 export class NfsComponent implements OnInit {
-
-
   getColor;
   getLabelByValue;
-
+  isAddPageOneNextDisabled: boolean;
+  /*  */
 
   descSort = ClrDatagridSortOrder.DESC;
   list: List[] = []; // 数据列表
@@ -59,13 +61,14 @@ export class NfsComponent implements OnInit {
     vkernelIp: new FormControl('', Validators.required),
     accessMode: new FormControl('', Validators.required),
     sameName: new FormControl(true, Validators.required),
-    fsName: new FormControl('',),
-    shareName: new FormControl('',),
-    type: new FormControl('',),
-    securityType: new FormControl(false,),
+    fsName: new FormControl('', Validators.required),
+    shareName: new FormControl('', Validators.required),
+    type: new FormControl(''),
+    securityType: new FormControl(false),
     unit: new FormControl('GB', Validators.required),
     characterEncoding: new FormControl('utf-8', Validators.required),
-  }); storageList: StorageList[] = [];
+  });
+  storageList: StorageList[] = [];
   storagePools: StoragePool[] = [];
   storagePoolMap: StoragePoolMap[] = [];
 
@@ -104,35 +107,39 @@ export class NfsComponent implements OnInit {
   deduplicationShow = false; // 重复数据删除 true 支持 false 不支持
   compressionShow = false; // 数据压缩 true 支持 false 不支持
   latencyIsSelect = false; // 时延为下拉框
-  dorado = false;//是否是V6设备
+  dorado = false; //是否是V6设备
   shareNameContainsCN = false; // 共享名称包含中文
 
   errMessage = '';
 
-  bandWidthMaxErrTips = false;// 带宽上限错误提示
-  bandWidthMinErrTips = false;// 带宽下限错误提示
-  iopsMaxErrTips = false;// IOPS上限错误提示
-  iopsMinErrTips = false;// IOPS下限错误提示
-  latencyErrTips = false;// 时延错误提示
+  bandWidthMaxErrTips = false; // 带宽上限错误提示
+  bandWidthMinErrTips = false; // 带宽下限错误提示
+  iopsMaxErrTips = false; // IOPS上限错误提示
+  iopsMinErrTips = false; // IOPS下限错误提示
+  latencyErrTips = false; // 时延错误提示
 
   bandwidthLimitErr = false; // v6 设备 带宽 下限大于上限
   iopsLimitErr = false; // v6 设备 IOPS 下限大于上限
 
-  constructor(private addService: NfsAddService,
-    private remoteSrv: NfsService, 
+  constructor(
+    private addService: NfsAddService,
+    private remoteSrv: NfsService,
     private cdr: ChangeDetectorRef,
     public gs: GlobalsService,
-    private storageService: StorageService, 
-    private vmfsListService: VmfsListService, 
-    private router: Router, 
+    private storageService: StorageService,
+    private vmfsListService: VmfsListService,
+    private router: Router,
     private token: TokenService,
-    @Optional() @Inject(DOCUMENT) 
+    @Optional()
+    @Inject(DOCUMENT)
     private document: any
   ) {
     this.getColor = getColorByType;
     this.getLabelByValue = getLabelByValue;
+    this.isAddPageOneNextDisabled = true;
+    this.checkAddForm = debounce(this.checkAddForm.bind(this), 300);
   }
-  
+
   ngOnInit(): void {
     this.process();
     this.getNfsList();
@@ -162,7 +169,6 @@ export class NfsComponent implements OnInit {
     }
   }
 
-
   handleSortingFeild() {
     if (this.list != null) {
       this.list.forEach(n => {
@@ -174,7 +180,9 @@ export class NfsComponent implements OnInit {
   }
   // 性能视图列表
   listnfsperformance() {
-    if (this.list === null || this.list.length <= 0) { return; }
+    if (this.list === null || this.list.length <= 0) {
+      return;
+    }
     const fsIds = [];
     this.list.forEach(item => {
       fsIds.push(item.fsId);
@@ -209,6 +217,38 @@ export class NfsComponent implements OnInit {
     }
     this.wizard.open();
   }
+
+  print(val) {
+    return JSON.stringify(val, null, 2);
+  }
+
+  checkAddForm() {
+    const isStoragId = !!this.addForm.storagId;
+    const isStoragePoolId = !!this.addForm.storagePoolId;
+    const isCurrentPortId = !!this.addForm.currentPortId;
+    const isNfsName = !!this.addForm.nfsName;
+    const isSize = typeof this.addForm.size === 'number';
+    const isHostObjectId = !!this.addForm.hostObjectId;
+    const isVkernelIp = !!this.addForm.vkernelIp;
+    const isAccessMode = !!this.addForm.accessMode;
+    const isFsName = !!this.addForm.fsName;
+    const isShareName = !!this.addForm.shareName;
+
+    this.isAddPageOneNextDisabled = !(
+      isStoragId &&
+      isStoragePoolId &&
+      isCurrentPortId &&
+      isNfsName &&
+      isSize &&
+      isHostObjectId &&
+      isVkernelIp &&
+      isAccessMode &&
+      isFsName &&
+      isShareName
+    );
+    this.cdr.detectChanges();
+  }
+
   addView() {
     // const flag = 'plugin';
     // this.router.navigate(['nfs/add'],{
@@ -216,6 +256,7 @@ export class NfsComponent implements OnInit {
     //     flag
     //   }
     // });
+    /* 打开添加弹窗 */
     this.addModelShow = true;
     this.storageList = null;
     this.storagePoolMap = [];
@@ -231,35 +272,56 @@ export class NfsComponent implements OnInit {
       if (s.code === '200') {
         this.storageList = s.data;
         this.modalLoading = false;
-
-        const allPoolMap: StoragePoolMap[] = []
-
+        const allPoolMap: StoragePoolMap[] = [];
         s.data.forEach(item => {
           const poolMap: StoragePoolMap = {
             storageId: item.id,
             storagePoolList: null,
-            logicPort: null
-          }
+            logicPort: null,
+          };
           allPoolMap.push(poolMap);
         });
 
         this.storagePoolMap = allPoolMap;
       }
     };
+    /* 1.获取存储设备 */
     if (isMockData) {
       successGetData(mockData.DMESTORAGE_STORAGES);
     } else {
       this.storageService.getData().subscribe(successGetData);
     }
+
     this.hostList = null;
-    this.addService.getHostList().subscribe((r: any) => {
+    const handlerGetHostListSuccess = (r: any) => {
       this.modalLoading = false;
       if (r.code === '200') {
         this.hostList = r.data;
         this.cdr.detectChanges();
       }
-    });
+    };
+    /* 2.获取挂载主机List */
+    if (isMockData) {
+      handlerGetHostListSuccess(mockData.NFS_ACCESSVMWARE_LISTHOST);
+    } else {
+      this.addService
+        .getHostList()
+        .subscribe(handlerGetHostListSuccess, handlerResponseErrorSimple);
+    }
+
     this.addForm = new AddNfs();
+    /* 监听名字变化 根据是否一样给剩下两个赋值 */
+    this.addFormGroup.valueChanges.subscribe(addForm => {
+      if (addForm.sameName) {
+        const isSameShare = this.addForm.shareName === addForm.nfsName;
+        const isSameFs = (this.addForm.fsName = addForm.nfsName);
+        if (!(isSameShare && isSameFs)) {
+          this.addForm.fsName = this.addForm.shareName = addForm.nfsName;
+        }
+      }
+      this.checkAddForm();
+    });
+
     // 初始化form
     this.addFormGroup.reset(this.addForm);
     this.checkedPool = null;
@@ -272,15 +334,18 @@ export class NfsComponent implements OnInit {
     // 获取存储列表
     this.cdr.detectChanges();
   }
+
   modifyData() {
-    const flag = "plugin";
+    const flag = 'plugin';
     const objectid = this.rowSelected[0].objectid;
     this.router.navigate(['nfs/modify'], {
       queryParams: {
-        objectid, flag
-      }
+        objectid,
+        flag,
+      },
     });
   }
+
   modifyCommit() {
     this.updateNfs.name = this.updateNfs.nfsName;
     this.remoteSrv.updateNfs(this.updateNfs).subscribe((result: any) => {
@@ -298,14 +363,23 @@ export class NfsComponent implements OnInit {
     const objectId = this.rowSelected[0].objectid;
     this.router.navigate(['nfs/expand'], {
       queryParams: {
-        objectId, fsId, flag
-      }
+        objectId,
+        fsId,
+        flag,
+      },
     });
   }
 
   addNfs() {
-    if (this.bandWidthMaxErrTips || this.iopsMaxErrTips
-      || this.bandWidthMinErrTips || this.iopsMinErrTips || this.latencyErrTips || this.bandwidthLimitErr || this.iopsLimitErr) {
+    if (
+      this.bandWidthMaxErrTips ||
+      this.iopsMaxErrTips ||
+      this.bandWidthMinErrTips ||
+      this.iopsMinErrTips ||
+      this.latencyErrTips ||
+      this.bandwidthLimitErr ||
+      this.iopsLimitErr
+    ) {
       return;
     }
     //
@@ -328,7 +402,8 @@ export class NfsComponent implements OnInit {
       case 'KB':
         addSubmitForm.size = addSubmitForm.size / (1024 * 1024);
         break;
-      default: // 默认GB 不变
+      default:
+        // 默认GB 不变
         break;
     }
     //  控制策略若未选清空数据
@@ -338,8 +413,12 @@ export class NfsComponent implements OnInit {
       addSubmitForm.deduplicationEnabled = null;
       addSubmitForm.compressionEnabled = null;
     } else {
-      if (addSubmitForm.deduplicationEnabled != null && addSubmitForm.deduplicationEnabled.toString()) {
-        addSubmitForm.deduplicationEnabled = addSubmitForm.deduplicationEnabled.toString() == 'true';
+      if (
+        addSubmitForm.deduplicationEnabled != null &&
+        addSubmitForm.deduplicationEnabled.toString()
+      ) {
+        addSubmitForm.deduplicationEnabled =
+          addSubmitForm.deduplicationEnabled.toString() == 'true';
       } else {
         addSubmitForm.deduplicationEnabled = null;
       }
@@ -358,17 +437,20 @@ export class NfsComponent implements OnInit {
         this.getNfsList();
       } else {
         this.errorMsg = '1';
-        console.log("Delete failed:", result.description)
+        console.log('Delete failed:', result.description);
       }
       this.cdr.detectChanges();
     });
   }
+
+  /* 存储设备change */
   selectStoragePool() {
     this.modalLoading = true;
     this.storagePools = [];
     this.addForm.storagePoolId = undefined;
     this.logicPorts = [];
     this.addForm.currentPortId = undefined;
+    /*  */
     if (this.addForm.storagId) {
       this.addQosUpperAndLower();
       this.addCompressionShow();
@@ -391,16 +473,25 @@ export class NfsComponent implements OnInit {
       } else {
         mediaType = 'file';
       }
-      this.storageService.getStoragePoolListByStorageId(mediaType, this.addForm.storagId)
-        .subscribe((r: any) => {
-          this.modalLoading = false;
-          if (r.code === '200') {
-            this.storagePools = r.data;
+      const handlerGetStoragePoolListByStorageIdSuccess = (r: any) => {
+        this.modalLoading = false;
+        if (r.code === '200') {
+          this.storagePools = r.data;
+          this.storagePoolMap.filter(
+            item => item.storageId == this.addForm.storagId
+          )[0].storagePoolList = r.data;
+        }
+        this.cdr.detectChanges();
+      };
+      /*  */
+      if (isMockData) {
+        handlerGetStoragePoolListByStorageIdSuccess(mockData.DMESTORAGE_STORAGES);
+      } else {
+        this.storageService
+          .getStoragePoolListByStorageId(mediaType, this.addForm.storagId)
+          .subscribe(handlerGetStoragePoolListByStorageIdSuccess, handlerResponseErrorSimple);
+      }
 
-            this.storagePoolMap.filter(item => item.storageId == this.addForm.storagId)[0].storagePoolList = r.data;
-          }
-          this.cdr.detectChanges();
-        });
       // } else {
       //   console.log("storagePoolList exists")
       //   this.storagePools = storagePoolList;
@@ -412,7 +503,6 @@ export class NfsComponent implements OnInit {
       //   this.logicPorts = logicPorts;
       //   this.modalLoading=false;
       // }
-
     }
   }
 
@@ -425,8 +515,8 @@ export class NfsComponent implements OnInit {
     const qosTag = this.getStorageQosTag(this.addForm.storagId);
     this.addForm.control_policyLower = undefined;
     this.addForm.control_policyUpper = undefined;
-    const upperObj = document.getElementById("control_policyUpper") as HTMLInputElement;
-    const lowerObj = document.getElementById("control_policyLower") as HTMLInputElement;
+    const upperObj = document.getElementById('control_policyUpper') as HTMLInputElement;
+    const lowerObj = document.getElementById('control_policyLower') as HTMLInputElement;
     if (upperObj && upperObj.checked) {
       upperObj.checked = false;
     }
@@ -482,19 +572,27 @@ export class NfsComponent implements OnInit {
     const compressionshow = this.storageList.filter(item => item.id == storageId);
     return compressionshow[0].storageTypeShow.compressionShow;
   }
+  // 选择存储后逻辑端口
   selectLogicPort() {
-    // 选择存储后逻辑端口
     this.modalLoading = true;
-    this.storageService.getLogicPortListByStorageId(this.addForm.storagId)
-      .subscribe((r: any) => {
-        this.modalLoading = false;
-        if (r.code === '200') {
-          this.logicPorts = r.data;
+    /*  */
+    const handlerGetLogicPortListByStorageIdSuccess = (r: any) => {
+      this.modalLoading = false;
+      if (r.code === '200') {
+        this.logicPorts = r.data;
+        this.storagePoolMap.filter(item => item.storageId == this.addForm.storagId)[0].logicPort =
+          r.data;
+      }
+      this.cdr.detectChanges();
+    };
 
-          this.storagePoolMap.filter(item => item.storageId == this.addForm.storagId)[0].logicPort = r.data;
-        }
-        this.cdr.detectChanges();
-      });
+    if (isMockData) {
+      handlerGetLogicPortListByStorageIdSuccess(mockData.NFS_DMESTORAGE_LOGICPORTS);
+    } else {
+      this.storageService
+        .getLogicPortListByStorageId(this.addForm.storagId)
+        .subscribe(handlerGetLogicPortListByStorageIdSuccess);
+    }
   }
 
   // 弹出缩容页面
@@ -504,8 +602,10 @@ export class NfsComponent implements OnInit {
     const objectId = this.rowSelected[0].objectid;
     this.router.navigate(['nfs/reduce'], {
       queryParams: {
-        objectId, fsId, flag
-      }
+        objectId,
+        fsId,
+        flag,
+      },
     });
   }
   // 挂载
@@ -514,24 +614,27 @@ export class NfsComponent implements OnInit {
     const flag = 'plugin';
     const objectId = this.rowSelected[0].objectid;
     const dsName = this.rowSelected[0].name;
-    this.router.navigate(["nfs/dataStore/mount"], {
+    this.router.navigate(['nfs/dataStore/mount'], {
       queryParams: {
-        objectId, flag, dsName
-      }
+        objectId,
+        flag,
+        dsName,
+      },
     });
   }
   jumpPage(objectId: string, url: string) {
     const flag = 'plugin';
     this.router.navigate([url], {
       queryParams: {
-        objectId, flag
-      }
+        objectId,
+        flag,
+      },
     });
   }
   // 卸载按钮点击事件
   unmountBtnFunc() {
     if (this.rowSelected != null && this.rowSelected.length == 1) {
-      this.jumpPage(this.rowSelected[0].objectid, "nfs/dataStore/unmount");
+      this.jumpPage(this.rowSelected[0].objectid, 'nfs/dataStore/unmount');
     }
   }
   // 删除按钮点击事件
@@ -540,26 +643,27 @@ export class NfsComponent implements OnInit {
     const objectid = this.rowSelected.map(item => item.objectid);
     this.router.navigate(['nfs/delete'], {
       queryParams: {
-        objectid, flag
-      }
-    })
+        objectid,
+        flag,
+      },
+    });
   }
   navigateTo(objectid) {
     console.log('页面跳转了');
     console.log(objectid);
     this.gs.getClientSdk().app.navigateTo({
       targetViewId: 'vsphere.core.datastore.summary',
-      objectId: objectid
+      objectId: objectid,
     });
   }
 
   formatCapacity(c: number) {
     if (c < 1024) {
-      return c.toFixed(3) + " GB";
+      return c.toFixed(3) + ' GB';
     } else if (c >= 1024 && c < 1048576) {
-      return (c / 1024).toFixed(3) + " TB";
+      return (c / 1024).toFixed(3) + ' TB';
     } else if (c >= 1048576) {
-      return (c / 1024 / 1024).toFixed(3) + " PB"
+      return (c / 1024 / 1024).toFixed(3) + ' PB';
     }
   }
   // 点刷新那个功能是分两步，一步是刷新，然后等我们这边的扫描任务，任务完成后返回你状态，任务成功后，你再刷新列表页面。
@@ -572,12 +676,12 @@ export class NfsComponent implements OnInit {
         // this.getNfsList();
         console.log('Scan success');
         this.router.navigate(['nfs'], {
-          queryParams: { t: new Date().getTime() }
+          queryParams: { t: new Date().getTime() },
         });
       } else {
         console.log('Scan faild');
         this.router.navigate(['nfs'], {
-          queryParams: { t: new Date().getTime() }
+          queryParams: { t: new Date().getTime() },
         });
       }
       this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
@@ -647,9 +751,11 @@ export class NfsComponent implements OnInit {
    */
   isCheckSameName() {
     let reg5: RegExp = new RegExp('[\u4e00-\u9fa5]');
-    if (reg5.test(this.addForm.nfsName)) { // 名称有中文
+    if (reg5.test(this.addForm.nfsName)) {
+      // 名称有中文
       return false;
-    } else { // 无中文
+    } else {
+      // 无中文
       return true;
     }
   }
@@ -716,24 +822,32 @@ export class NfsComponent implements OnInit {
     this.modalLoading = false;
     this.confirmActResult();
   }
+
   checkHost() {
     this.modalLoading = true;
     this.addForm.vkernelIp = undefined;
     //选择主机后获取虚拟网卡
-    this.addService.getVmkernelListByObjectId(this.addForm.hostObjectId)
-      .subscribe((r: any) => {
-        this.modalLoading = false;
-        if (r.code === '200') {
-          this.vmkernelList = r.data;
-          if (this.vmkernelList && this.vmkernelList.length > 0) {
-            this.addForm.vkernelIp = this.vmkernelList[0].ipAddress;
-          }
+    const handlerGetVmkernelListByObjectIdSuccess = (r: any) => {
+      this.modalLoading = false;
+      if (r.code === '200') {
+        this.vmkernelList = r.data;
+        if (this.vmkernelList && this.vmkernelList.length > 0) {
+          this.addForm.vkernelIp = this.vmkernelList[0].ipAddress;
         }
-        this.cdr.detectChanges();
-      });
+      }
+      this.cdr.detectChanges();
+    };
+    if (isMockData) {
+      handlerGetVmkernelListByObjectIdSuccess(
+        mockData.NFS_ACCESSVMWARE_GETVMKERNELIPBYHOSTOBJECTID
+      );
+    } else {
+      this.addService
+        .getVmkernelListByObjectId(this.addForm.hostObjectId)
+        .subscribe(handlerGetVmkernelListByObjectIdSuccess, handlerResponseErrorSimple);
+    }
   }
   qosBlur(type: String, operationType: string) {
-
     let objVal;
     if (type === 'add') {
       switch (operationType) {
@@ -861,9 +975,10 @@ export class NfsComponent implements OnInit {
   }
 
   qosFunc(form) {
-    console.log("form.qosFlag", form.qosFlag);
+    console.log('form.qosFlag', form.qosFlag);
     const qosTag = this.getStorageQosTag(form.storagId);
-    if (!form.qosFlag) {// 关闭状态
+    if (!form.qosFlag) {
+      // 关闭状态
       form.contolPolicy = null;
       this.initAddMinInfo(form);
       this.initAddMaxInfo(form);
@@ -894,7 +1009,6 @@ export class NfsComponent implements OnInit {
         if (!form.latencyChoose) {
           form.latency = null;
         }
-
       } else {
         this.initAddMinInfo(form);
       }
@@ -908,7 +1022,8 @@ export class NfsComponent implements OnInit {
       } else if (form.control_policyUpper != '1' && form.control_policyLower == '0') {
         this.initAddMaxInfo(form);
         form.contolPolicy = 'low';
-      } else { // all
+      } else {
+        // all
         form.contolPolicy = 'all';
       }
     }
@@ -929,6 +1044,12 @@ export class NfsComponent implements OnInit {
     form.maxIopsChoose = false;
     form.maxIops = null;
   }
+
+  ngOnChanges(changes: { [propKey: string]: SimpleChange }) {
+    debugger;
+    console.log(changes);
+  }
+
   /**
    * qos开关
    * @param form
@@ -962,7 +1083,6 @@ export class NfsComponent implements OnInit {
       qosTag = this.getStorageQosTag(form.storagId);
     }
 
-
     let upperChecked;
     if (upperObj) {
       upperChecked = upperObj.checked;
@@ -978,8 +1098,9 @@ export class NfsComponent implements OnInit {
       } else {
         form.control_policyUpper = undefined;
       }
-      if (qosTag == 2 && upperChecked) { // 单选
-        console.log("单选1", qosTag)
+      if (qosTag == 2 && upperChecked) {
+        // 单选
+        console.log('单选1', qosTag);
         form.control_policyLower = undefined;
         lowerObj.checked = false;
       }
@@ -990,12 +1111,12 @@ export class NfsComponent implements OnInit {
         form.control_policyLower = undefined;
       }
       if (lowerChecked && qosTag == 2) {
-        console.log("单选2", qosTag)
+        console.log('单选2', qosTag);
         form.control_policyUpper = undefined;
         upperObj.checked = false;
       }
     }
-    console.log("lowerChecked", form)
+    console.log('lowerChecked', form);
     if (form.control_policyUpper == undefined) {
       form.maxBandwidthChoose = false;
       form.maxIopsChoose = false;
@@ -1018,12 +1139,13 @@ export class NfsComponent implements OnInit {
     return qosTag;
   }
   private process(): boolean {
-    const tourl = this.getQueryString('view')
+    const tourl = this.getQueryString('view');
     let res = this.checkJWT(this.token.get<any>(), 1000);
-    res = true
-    if (tourl) { // 如果带有?view=storage则跳转到当前页面
-      var newURL = location.href.split("?")[0];
-      console.log("newURL=", newURL);
+    res = true;
+    if (tourl) {
+      // 如果带有?view=storage则跳转到当前页面
+      var newURL = location.href.split('?')[0];
+      console.log('newURL=', newURL);
       window.history.pushState('object', document.title, newURL); // 去除多余参数  避免二次内部跳转失败
       this.gotoUrl('/' + tourl);
     }
@@ -1089,16 +1211,21 @@ export class NfsComponent implements OnInit {
   sortFunc(obj: any) {
     return !obj;
   }
+
   qosV6Check(type: string) {
     if (type == 'add') {
       if (this.addForm.storagId) {
         const chooseStorage = this.storageList.filter(item => item.id == this.addForm.storagId)[0];
         if (chooseStorage) {
-          const qosTag = chooseStorage.storageTypeShow.qosTag
+          const qosTag = chooseStorage.storageTypeShow.qosTag;
           if (qosTag == 1) {
             if (this.addForm.minBandwidthChoose && this.addForm.maxBandwidthChoose) {
               // 带宽上限小于下限
-              if (this.addForm.minBandwidth && this.addForm.maxBandwidth && Number(this.addForm.minBandwidth) > Number(this.addForm.maxBandwidth)) {
+              if (
+                this.addForm.minBandwidth &&
+                this.addForm.maxBandwidth &&
+                Number(this.addForm.minBandwidth) > Number(this.addForm.maxBandwidth)
+              ) {
                 this.bandwidthLimitErr = true;
               } else {
                 this.bandwidthLimitErr = false;
@@ -1108,7 +1235,11 @@ export class NfsComponent implements OnInit {
             }
             if (this.addForm.minIopsChoose && this.addForm.maxIopsChoose) {
               // iops上限小于下限
-              if (this.addForm.minIops && this.addForm.maxIops && Number(this.addForm.minIops) > Number(this.addForm.maxIops)) {
+              if (
+                this.addForm.minIops &&
+                this.addForm.maxIops &&
+                Number(this.addForm.minIops) > Number(this.addForm.maxIops)
+              ) {
                 this.iopsLimitErr = true;
               } else {
                 this.iopsLimitErr = false;
@@ -1120,7 +1251,11 @@ export class NfsComponent implements OnInit {
             this.iopsLimitErr = false;
             this.bandwidthLimitErr = false;
           }
-          if (this.addForm.maxIopsChoose && this.addForm.maxIops && Number(this.addForm.maxIops) < 100) {
+          if (
+            this.addForm.maxIopsChoose &&
+            this.addForm.maxIops &&
+            Number(this.addForm.maxIops) < 100
+          ) {
             this.iopsLimitErr = true;
           }
           if (this.addForm.control_policyUpper == undefined) {
@@ -1131,7 +1266,6 @@ export class NfsComponent implements OnInit {
             this.bandwidthLimitErr = false;
           }
         }
-
       }
     }
   }
