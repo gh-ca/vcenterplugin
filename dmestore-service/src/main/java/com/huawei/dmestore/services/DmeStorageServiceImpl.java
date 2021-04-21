@@ -1528,21 +1528,21 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                         if (statisticObject != null) {
                             StorageDisk sp = new StorageDisk();
                             sp.setId(storageDiskId);
-                            if (statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORAGEPORT_THROUGHPUT) != null) {
+                            if (statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORAGEDISK_THROUGHPUT) != null) {
                                 sp.setIops(ToolUtils.jsonToFloat(
-                                    statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORAGEPORT_THROUGHPUT)));
+                                    statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORAGEDISK_THROUGHPUT)));
                             }
-                            if (statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORAGEPORT_BANDWIDTH) != null) {
+                            if (statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORAGEDISK_BANDWIDTH) != null) {
                                 sp.setBandwith(ToolUtils.jsonToFloat(
-                                    statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORAGEPORT_BANDWIDTH)));
+                                    statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORAGEDISK_BANDWIDTH)));
                             }
-                            if (statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORAGEPORT_RESPONSETIME) != null) {
+                            if (statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORAGEDISK_RESPONSETIME) != null) {
                                 sp.setLantency(ToolUtils.jsonToFloat(
-                                    statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORAGEPORT_RESPONSETIME)));
+                                    statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORAGEDISK_RESPONSETIME)));
                             }
-                            if (statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORAGEPORT_UTILITY) != null) {
+                            if (statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORAGEDISK_UTILITY) != null) {
                                 sp.setUseage(ToolUtils.jsonToFloat(
-                                    statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORAGEPORT_UTILITY)));
+                                    statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORAGEDISK_UTILITY)));
                             }
                             relists.add(sp);
                         }
