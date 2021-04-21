@@ -337,6 +337,11 @@ public class DmeIndicatorConstants {
     public static final String COUNTER_ID_STORAGEDISK_WRITETHROUGHPUT = "1125917086777348";
 
     /**
+     * IOPS
+     */
+    public static final String COUNTER_ID_STORAGEDISK_THROUGHPUT = "1125917086777352";
+
+    /**
      * 平均IO响应时间
      */
     public static final String COUNTER_ID_STORAGEDISK_RESPONSETIME = "1125917086777351";
