@@ -1,3 +1,7 @@
 @import './custom/mixins';
 @import './custom/material';
 @import './custom/table';
+
+.filter-alarm-state.clr-form-control{
+    margin-top:0;
+}

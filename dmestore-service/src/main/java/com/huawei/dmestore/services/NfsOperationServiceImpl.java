@@ -210,8 +210,8 @@ public class NfsOperationServiceImpl implements NfsOperationService {
                         shareClientName = (String) shareClientHostMap.get(NAME_FIELD);
                         reqNfsShareClientArrayAddition.put("permission", params.get("accessModeDme"));
                         reqNfsShareClientArrayAddition.put("write_mode", "synchronization");
-                        reqNfsShareClientArrayAddition.put("permission_constraint", "all_squash");
-                        reqNfsShareClientArrayAddition.put("root_permission_constraint", "root_squash");
+                        reqNfsShareClientArrayAddition.put("permission_constraint", "no_all_squash");
+                        reqNfsShareClientArrayAddition.put("root_permission_constraint", "no_root_squash");
                         reqNfsShareClientArrayAddition.put("source_port_verification", "insecure");
                         mount.put((String) shareClientHostMap.get("objectId"),
                             (String) shareClientHostMap.get(NAME_FIELD));
@@ -779,7 +779,7 @@ public class NfsOperationServiceImpl implements NfsOperationService {
         fsname = ToolUtils.jsonToStr(object.get(NAME_FIELD));
         resultMap.put("fileSystemId", fileSystemId);
         JsonObject json = object.get("capacity_auto_negotiation").getAsJsonObject();
-        resultMap.put("autoSizeEnable", ToolUtils.jsonToBoo(json.get("auto_size_enable")));
+        resultMap.put("autoSizeEnable", getAutoSizeEnableStatus(json));
         boolean isThin = (THIN_FIELD.equalsIgnoreCase(ToolUtils.jsonToStr(object.get("alloc_type")))) ? true : false;
         resultMap.put(THIN_FIELD, isThin);
         resultMap.put("capacity",ToolUtils.jsonToDou(object.get("capacity")));
@@ -897,5 +897,23 @@ public class NfsOperationServiceImpl implements NfsOperationService {
             }
             LOG.info("delete file system success!");
         }
+    }
+    /**
+      * @Description:  根据查询结果的自动扩容策略来展示自动扩容策略
+      * @Param @param null
+      * @return @return
+      * @throws
+      * @author yc
+      * @Date 2021/4/15 18:13
+     */
+    private boolean getAutoSizeEnableStatus (JsonObject json) {
+        boolean status;
+        String capacitySelfAdjustingMode = ToolUtils.jsonToStr(json.get("apacity_self_adjusting_mode"));
+        if ("grow_off".equalsIgnoreCase(capacitySelfAdjustingMode) || StringUtils.isEmpty(capacitySelfAdjustingMode)) {
+            status = false;
+        } else {
+            status = true;
+        }
+       return status;
     }
 }

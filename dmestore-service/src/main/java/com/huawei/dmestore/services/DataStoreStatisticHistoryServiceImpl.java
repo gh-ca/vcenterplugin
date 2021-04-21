@@ -888,6 +888,7 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
             indicators.add(DmeIndicatorConstants.COUNTER_ID_STORAGEDISK_READTHROUGHPUT);
             indicators.add(DmeIndicatorConstants.COUNTER_ID_STORAGEDISK_BANDWIDTH);
             indicators.add(DmeIndicatorConstants.COUNTER_ID_STORAGEDISK_UTILITY);
+            indicators.add(DmeIndicatorConstants.COUNTER_ID_STORAGEDISK_THROUGHPUT);
         } else {
             indicators.add(DmeIndicatorConstants.COUNTER_ID_STORAGEDISK_READTHROUGHPUT);
             indicators.add(DmeIndicatorConstants.COUNTER_ID_STORAGEDISK_WRITETHROUGHPUT);

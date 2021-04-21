@@ -332,6 +332,7 @@
         </dependency>
     </dependencies>
     <build>
+        <defaultGoal>compile</defaultGoal>
         <finalName>dmestore-service</finalName>
         <resources>
             <resource>

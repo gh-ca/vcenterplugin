@@ -987,13 +987,13 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 JsonObject element = jsonElement.getAsJsonObject();
                 String id = ToolUtils.jsonToStr(element.get("host_id"));
                 String status = ToolUtils.jsonToStr(element.get("status"));
-                //String resultMessage = ToolUtils.jsonToStr(element.get("result_message"));
+                String resultMessage = ToolUtils.jsonToStr(element.get("result_message"));
                 // 连通性异常主机结果统计
                 Map<String, String> result = new HashMap<>();
                 if (status.equalsIgnoreCase("NOT_CONNECT")) {
                 //if (status.equalsIgnoreCase("FAILED")) {
                     String hostName = getDmeHostNameById(id);
-                    // result.put(hostName, resultMessage);
+                    //result.put(hostName, resultMessage);
                     result.put(hostName, "启动器处于离线状态！");
                 }
                 if (result.size() != 0) {
@@ -1703,9 +1703,28 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             }
             list.add(volumeDetail);
         }
-
+        replaceSpecChar(list);
         return list;
     }
+    /**
+      * @Description: 替换卷页面展示的&问题
+      * @Param @param null
+      * @return @return 
+      * @throws 
+      * @author yc
+      * @Date 2021/4/20 18:29
+     */
+    private void replaceSpecChar(List<VmfsDatastoreVolumeDetail> list) {
+
+        for (VmfsDatastoreVolumeDetail volumeDetail:list) {
+            if(null != volumeDetail){
+                if(!StringUtils.isEmpty(volumeDetail.getApplicationType())){
+                    volumeDetail.setApplicationType(volumeDetail.getApplicationType().replace("&amp;","&"));
+                }
+            }
+        }
+    }
+
     private String getWorkLoadNameById(String storageId,String workLoadType) throws DmeException {
         String name = "";
         if (!StringUtils.isEmpty(storageId) && !StringUtils.isEmpty(workLoadType)) {
@@ -1866,6 +1885,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
     }
 
     public synchronized void getRelationSync(List<Ob> obs, int size, Map<String, String> storageIds, List<DmeVmwareRelation> relationList){
+
         String volumeUrlByName = DmeConstants.DME_VOLUME_BASE_URL;
         try {
             ResponseEntity<String> responseEntity = dmeAccessService.access(volumeUrlByName, HttpMethod.GET, null);
@@ -1892,7 +1912,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                                         storageModel = storageIds.get(storageId);
                                     }
                                     DmeVmwareRelation relation = getDmeVmwareRelation(ob.storeType, ob.vmfsDatastoreId, ob.vmfsDatastoreName,
-                                            volumeObject, storageModel);
+                                            volumeObject, storageModel,storageId);
                                     relationList.add(relation);
                                 }
                             }
@@ -1907,7 +1927,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
     }
 
     private DmeVmwareRelation getDmeVmwareRelation(String storeType, String vmfsDatastoreId, String vmfsDatastoreName,
-        JsonObject volumeObject, String storageModel) {
+        JsonObject volumeObject, String storageModel,String deviceId) {
         String volumeId = ToolUtils.jsonToOriginalStr(volumeObject.get(ID_FIELD));
         String volumeName = ToolUtils.jsonToOriginalStr(volumeObject.get(NAME_FIELD));
         String volumeWwn = ToolUtils.jsonToOriginalStr(volumeObject.get(VOLUME_WWN));
@@ -1920,6 +1940,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         relation.setVolumeWwn(volumeWwn);
         relation.setStoreType(storeType);
         relation.setStorageType(storageModel);
+        relation.setStorageDeviceId(deviceId);
         relation.setState(1);
         return relation;
     }
@@ -2577,10 +2598,9 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         String listStr = vcsdkUtils.getHostsByDsObjectId(storeId, true);
 
         // 获取已挂载的集群，找到对应的主机，用于排除主机
-        // 1.0.0.B03版本需求变更 取消排除集群中主机
-        // List<Map<String, Object>> clustermaps = getHostGroupsByStorageId2(storeId);
-        // Map<String, String> excludehostmap = new HashMap<>();
-        /*for (Map<String, Object> clustermap : clustermaps) {
+        List<Map<String, Object>> clustermaps = getHostGroupsByStorageId2(storeId);
+        Map<String, String> excludehostmap = new HashMap<>();
+        for (Map<String, Object> clustermap : clustermaps) {
             String clusterid = String.valueOf(clustermap.get(HOST_GROUP_ID));
             String vmwarehosts = vcsdkUtils.getHostsOnCluster(clusterid);
             if (!StringUtils.isEmpty(vmwarehosts)) {
@@ -2591,7 +2611,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                     excludehostmap.put(vmwarehostmap.get(HOSTID), "true");
                 }
             }
-        }*/
+        }
         if (!StringUtils.isEmpty(listStr)) {
             List<Map<String, String>> hosts = gson.fromJson(listStr,
                 new TypeToken<List<Map<String, String>>>() { }.getType());
@@ -2601,16 +2621,16 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 String hostId = ToolUtils.getStr(host.get(HOSTID));
 
                 // 排除已挂载在集群中的主机
-                //if (excludehostmap.get(hostId) == null) {
-                String hostNmme = ToolUtils.getStr(host.get(HOST_NAME));
-                String initiatorId = checkToHost(hostId);
-                if (!StringUtils.isEmpty(initiatorId)) {
-                    Map<String, Object> tempMap = new HashMap<>();
-                    tempMap.put(HOSTID, hostId);
-                    tempMap.put(HOST_NAME, hostNmme);
-                    hostMapList.add(tempMap);
+                if (excludehostmap.get(hostId) == null) {
+                    String hostNmme = ToolUtils.getStr(host.get(HOST_NAME));
+                    String initiatorId = checkToHost(hostId);
+                    if (!StringUtils.isEmpty(initiatorId)) {
+                        Map<String, Object> tempMap = new HashMap<>();
+                        tempMap.put(HOSTID, hostId);
+                        tempMap.put(HOST_NAME, hostNmme);
+                        hostMapList.add(tempMap);
                     }
-                //}
+                }
             }
         }
         return hostMapList;

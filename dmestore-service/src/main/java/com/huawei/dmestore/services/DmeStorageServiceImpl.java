@@ -1,6 +1,8 @@
 package com.huawei.dmestore.services;
 
 import com.google.gson.*;
+import com.huawei.dmestore.constant.ModelVersionConstants;
+import com.huawei.dmestore.entity.DmeVmwareRelation;
 import com.vmware.vim.binding.vmodl.name;
 
 import com.huawei.dmestore.constant.DmeConstants;
@@ -143,6 +145,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
             if (object != null) {
                 JsonObject jsonObject = new JsonParser().parse(object.toString()).getAsJsonObject();
                 JsonArray storage = jsonObject.get("datas").getAsJsonArray();
+                Map<String, DjAz> djAzMap = getDjAzs();
                 for (JsonElement jsonElement : storage) {
                     JsonObject jsonObj = new JsonParser().parse(jsonElement.toString()).getAsJsonObject();
                     Storage storageObj = new Storage();
@@ -164,7 +167,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                     storageObj.setMaxBandwidth(ToolUtils.jsonToDou(jsonObj.get("max_bandwidth"), 0.0));
                     storageObj.setMaxLatency(ToolUtils.jsonToDou(jsonObj.get("max_latency"), 0.0));
                     storageObj.setTotalPoolCapacity(ToolUtils.jsonToDou(jsonObj.get("total_pool_capacity"), 0.0));
-                    JsonElement jsonAzIds = jsonObj.get("az_ids");
+                    /*JsonElement jsonAzIds = jsonObj.get("az_ids");
                     if (!ToolUtils.jsonIsNull(jsonAzIds)) {
                         String azIds = ToolUtils.jsonToStr(jsonAzIds);
                         String[] azIdsArr = {azIds};
@@ -172,7 +175,18 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                     } else {
                         String[] azIdsArr = {};
                         storageObj.setAzIds(azIdsArr);
+                    }*/
+                    JsonArray jsonAzIds = jsonObj.get("az_ids").getAsJsonArray();
+                    List<String> azIds = new ArrayList<>();
+                    List<DjAz> djAzs = new ArrayList<>();
+                    for (JsonElement az : jsonAzIds){
+                        azIds.add(az.getAsString());
+                        if (djAzMap.containsKey(az.getAsString())){
+                            djAzs.add(djAzMap.get(az.getAsString()));
+                        }
                     }
+                    storageObj.setAzIds(azIds.toArray(new String[azIds.size()]));
+                    storageObj.setDjAzs(djAzs);
                     list.add(storageObj);
                 }
             }
@@ -181,7 +195,55 @@ public class DmeStorageServiceImpl implements DmeStorageService {
             String message = e.getMessage();
             throw new DmeException(CODE_503, message);
         }
-        return list;
+        //剔除版本不支持设备
+      List<Storage> storages = excludedNotSupportDevice(list);
+        return storages;
+    }
+
+    private List<Storage> excludedNotSupportDevice(List<Storage> list) {
+        List<Storage> storageList = new ArrayList<>();
+        for (Storage storage:list) {
+            if(!StringUtils.isEmpty(storage)) {
+                if (ModelVersionConstants.DORADOV3List.contains(StringUtils.trimAllWhitespace(storage.getModel()))
+                        || ModelVersionConstants.DORADOV6List.contains(StringUtils.trimAllWhitespace(storage.getModel()))
+                        || ModelVersionConstants.HuaWeiV3List.contains(StringUtils.trimAllWhitespace(storage.getModel()))
+                        || ModelVersionConstants.HuaWeiV5List.contains(StringUtils.trimAllWhitespace(storage.getModel()))) {
+                    storageList.add(storage);
+                }
+            }
+        }
+        return storageList;
+    }
+
+
+    /**
+     * get az map
+     * @return
+     * @throws DmeException
+     */
+    private Map<String, DjAz> getDjAzs() throws DmeException {
+        Map<String, DjAz> r = new HashMap<>();
+        ResponseEntity<String> dd = dmeAccessService.access(DmeConstants.GET_AZ_URL, HttpMethod.GET,null);
+        if (dd.getStatusCodeValue() != HttpStatus.OK.value()) {
+            throw new DmeException(CODE_503, "list storage error !");
+        }
+        Object body = dd.getBody();
+        if (body != null){
+            JsonObject jsonObject = new JsonParser().parse(body.toString()).getAsJsonObject();
+            JsonArray azList = jsonObject.get("az_list").getAsJsonArray();
+            for (JsonElement jsonElement : azList){
+                JsonObject jsonObj = new JsonParser().parse(jsonElement.toString()).getAsJsonObject();
+                String id = ToolUtils.jsonToStr(jsonObj.get("id"));
+                String name = ToolUtils.jsonToStr(jsonObj.get("name"));
+                if (!StringUtils.isEmpty(id)){
+                    DjAz az = new DjAz();
+                    az.setId(id);
+                    az.setName(name);
+                    r.put(id, az);
+                }
+            }
+        }
+        return r;
     }
 
     private void parseStorageBaseInfo(JsonObject jsonObj, Storage storageObj) {
@@ -1466,21 +1528,21 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                         if (statisticObject != null) {
                             StorageDisk sp = new StorageDisk();
                             sp.setId(storageDiskId);
-                            if (statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORAGEPORT_THROUGHPUT) != null) {
+                            if (statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORAGEDISK_THROUGHPUT) != null) {
                                 sp.setIops(ToolUtils.jsonToFloat(
-                                    statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORAGEPORT_THROUGHPUT)));
+                                    statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORAGEDISK_THROUGHPUT)));
                             }
-                            if (statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORAGEPORT_BANDWIDTH) != null) {
+                            if (statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORAGEDISK_BANDWIDTH) != null) {
                                 sp.setBandwith(ToolUtils.jsonToFloat(
-                                    statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORAGEPORT_BANDWIDTH)));
+                                    statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORAGEDISK_BANDWIDTH)));
                             }
-                            if (statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORAGEPORT_RESPONSETIME) != null) {
+                            if (statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORAGEDISK_RESPONSETIME) != null) {
                                 sp.setLantency(ToolUtils.jsonToFloat(
-                                    statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORAGEPORT_RESPONSETIME)));
+                                    statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORAGEDISK_RESPONSETIME)));
                             }
-                            if (statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORAGEPORT_UTILITY) != null) {
+                            if (statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORAGEDISK_UTILITY) != null) {
                                 sp.setUseage(ToolUtils.jsonToFloat(
-                                    statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORAGEPORT_UTILITY)));
+                                    statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORAGEDISK_UTILITY)));
                             }
                             relists.add(sp);
                         }
