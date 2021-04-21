@@ -1,6 +1,7 @@
 package com.huawei.dmestore.services;
 
 import com.google.gson.*;
+import com.huawei.dmestore.constant.ModelVersionConstants;
 import com.huawei.dmestore.entity.DmeVmwareRelation;
 import com.vmware.vim.binding.vmodl.name;
 
@@ -194,7 +195,24 @@ public class DmeStorageServiceImpl implements DmeStorageService {
             String message = e.getMessage();
             throw new DmeException(CODE_503, message);
         }
-        return list;
+        //剔除版本不支持设备
+      List<Storage> storages = excludedNotSupportDevice(list);
+        return storages;
+    }
+
+    private List<Storage> excludedNotSupportDevice(List<Storage> list) {
+        List<Storage> storageList = new ArrayList<>();
+        for (Storage storage:list) {
+            if(!StringUtils.isEmpty(storage)) {
+                if (ModelVersionConstants.DORADOV3List.contains(StringUtils.trimAllWhitespace(storage.getModel()))
+                        || ModelVersionConstants.DORADOV6List.contains(StringUtils.trimAllWhitespace(storage.getModel()))
+                        || ModelVersionConstants.HuaWeiV3List.contains(StringUtils.trimAllWhitespace(storage.getModel()))
+                        || ModelVersionConstants.HuaWeiV5List.contains(StringUtils.trimAllWhitespace(storage.getModel()))) {
+                    storageList.add(storage);
+                }
+            }
+        }
+        return storageList;
     }
 
 
