@@ -1703,9 +1703,28 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             }
             list.add(volumeDetail);
         }
-
+        replaceSpecChar(list);
         return list;
     }
+    /**
+      * @Description: 替换卷页面展示的&问题
+      * @Param @param null
+      * @return @return 
+      * @throws 
+      * @author yc
+      * @Date 2021/4/20 18:29
+     */
+    private void replaceSpecChar(List<VmfsDatastoreVolumeDetail> list) {
+
+        for (VmfsDatastoreVolumeDetail volumeDetail:list) {
+            if(null != volumeDetail){
+                if(!StringUtils.isEmpty(volumeDetail.getApplicationType())){
+                    volumeDetail.setApplicationType(volumeDetail.getApplicationType().replace("&amp;","&"));
+                }
+            }
+        }
+    }
+
     private String getWorkLoadNameById(String storageId,String workLoadType) throws DmeException {
         String name = "";
         if (!StringUtils.isEmpty(storageId) && !StringUtils.isEmpty(workLoadType)) {

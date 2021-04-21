@@ -25,6 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClientException;
@@ -387,7 +388,8 @@ public class DmeAccessServiceImpl implements DmeAccessService {
             LOG.error("get WorkLoads error:", e);
             throw new DmeException(DmeConstants.ERROR_CODE_503, "get WorkLoads error:" + e.getMessage());
         }
-        return relists;
+        List<Map<String, Object>> newList = replaceSpecialChar(relists);
+        return newList;
     }
 
     @Override
@@ -863,5 +865,34 @@ public class DmeAccessServiceImpl implements DmeAccessService {
             LOG.error("host mapping failed!task status={}", task.get(STATUS).getAsInt());
             throw new DmeException(task.get(TASK_DETAIL_CN).getAsString());
         }
+    }
+
+    /**
+     * @return @return
+     * @throws
+     * @Description: /
+     * @Param @param null
+     * @author yc
+     * @Date 2021/4/20 16:20
+     */
+    private   List<Map<String, Object>> replaceSpecialChar(List<Map<String, Object>> list) {
+        List<Map<String, Object>> objList = new ArrayList<>();
+        Map<String, Object> objMap = new HashMap<>();
+        if (!CollectionUtils.isEmpty(list)) {
+            for (Map<String, Object> map : list) {
+                Iterator<Map.Entry<String, Object>> it = map.entrySet().iterator();
+                while (it.hasNext()) {
+                    Map.Entry entry =(Map.Entry) it.next();
+                               Object key = entry.getKey();
+                              Object value = entry.getValue();
+                              if(ToolUtils.getStr(value).contains("&amp;")){
+                                  value = ToolUtils.getStr(value).replace("&amp;","&");
+                              }
+                    objMap.put(ToolUtils.getStr(key),ToolUtils.getStr(value));
+                }
+            }
+            objList.add(objMap);
+        }
+        return objList;
     }
 }
