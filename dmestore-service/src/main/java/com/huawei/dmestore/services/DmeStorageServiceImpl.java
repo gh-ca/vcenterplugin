@@ -176,13 +176,16 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                         String[] azIdsArr = {};
                         storageObj.setAzIds(azIdsArr);
                     }*/
-                    JsonArray jsonAzIds = jsonObj.get("az_ids").getAsJsonArray();
+                    JsonElement jsonAzIds = jsonObj.get("az_ids");
                     List<String> azIds = new ArrayList<>();
                     List<DjAz> djAzs = new ArrayList<>();
-                    for (JsonElement az : jsonAzIds){
-                        azIds.add(az.getAsString());
-                        if (djAzMap.containsKey(az.getAsString())){
-                            djAzs.add(djAzMap.get(az.getAsString()));
+                    if (!jsonAzIds.isJsonNull()){
+                        JsonArray jaz = jsonAzIds.getAsJsonArray();
+                        for (JsonElement az : jaz){
+                            azIds.add(az.getAsString());
+                            if (djAzMap.containsKey(az.getAsString())){
+                                djAzs.add(djAzMap.get(az.getAsString()));
+                            }
                         }
                     }
                     storageObj.setAzIds(azIds.toArray(new String[azIds.size()]));
