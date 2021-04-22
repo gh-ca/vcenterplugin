@@ -128,7 +128,8 @@
             <clr-dg-cell>{{item.ip}}</clr-dg-cell>
 
             <clr-dg-cell [hidden]="radioCheck!=='table1'">
-
+              <app-storage-status-cell [item]="item"></app-storage-status-cell>
+              <!-- 
               <span *ngIf="item.status == 0">
                 <span class="color-square" style="background-color: #A9A9A9; margin-right: 10px"></span>
                 <span>{{'storage.list.offLine' | translate}}</span>
@@ -165,7 +166,7 @@
               <span *ngIf="!item.synStatus">
                 <span class="color-square" style="background-color: #A9A9A9; margin-right: 10px"></span>
                 <span>--</span>
-              </span>
+              </span> -->
             </clr-dg-cell>
 
             <clr-dg-cell [hidden]="radioCheck!=='table1'">{{item.vendor ? item.vendor:'--'}}</clr-dg-cell>

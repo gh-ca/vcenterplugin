@@ -799,7 +799,7 @@
               <clr-checkbox-container *ngIf="iopsLimitErr">
                 <clr-control-helper style="color: red">
                   <clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>
-                  {{'tips.iopsLimitErr' | translate}}
+                  {{dorado?'tips.iopsLimitErr':'tips.iopsLimitErrNotV6' | translate}}
                 </clr-control-helper>
               </clr-checkbox-container>
             </div>
@@ -908,8 +908,7 @@
           <!--b.QoS 设置 -->
           <clr-toggle-wrapper style="margin-top: 1.2rem;width: 6rem;" class="selectClass">
             <label>{{'nfs.qosPolicy' | translate}}</label>
-            <input type="checkbox" clrToggle name="qosFlag" (change)="qoSEditFlagChangeModify()"
-              [(ngModel)]="modifyForm.qosFlag" />
+            <input type="checkbox" clrToggle name="qosFlag" (change)="qoSEditFlagChange(modifyForm)" [(ngModel)]="modifyForm.qosFlag" />
           </clr-toggle-wrapper>
           <div *ngIf="modifyForm.qosFlag">
             <!-- 控制策略 -->
@@ -1068,7 +1067,7 @@
             <clr-checkbox-container *ngIf="iopsLimitErr">
               <clr-control-helper style="color: red">
                 <clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>
-                {{'tips.iopsLimitErr' | translate}}
+                {{dorado?'tips.iopsLimitErr':'tips.iopsLimitErrNotV6' | translate}}
               </clr-control-helper>
             </clr-checkbox-container>
           </div>

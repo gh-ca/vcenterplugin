@@ -4,15 +4,12 @@ import { StorageTypeShow } from "../vmfs/list/list.service";
 import { TranslatePipe } from "@ngx-translate/core";
 
 
-export const URLS_STORAGE = {
-  DMESTORAGE_STORAGES: 'dmestorage/storages'
-}
 @Injectable()
 export class StorageService {
   constructor(private http: HttpClient) { }
 
   getData() {
-    return this.http.get(URLS_STORAGE.DMESTORAGE_STORAGES);
+    return this.http.get('dmestorage/storages');
   }
   getStoragePoolListByStorageId(mediaType: string, storageId: string) {
     return this.http.get('dmestorage/storagepools', { params: { storageId, mediaType } });

@@ -76,7 +76,7 @@ export class AdminLayoutComponent implements OnInit, OnDestroy {
     private settings: SettingsService,
     @Optional() @Inject(DOCUMENT) private document: Document,
     @Inject(Directionality) public dir: AppDirectionality,
-    public gs: GlobalsService
+    public gs: GlobalsService,
   ) {
     this.dir.value = this.options.dir;
     this.document.body.dir = this.dir.value;
@@ -87,6 +87,7 @@ export class AdminLayoutComponent implements OnInit, OnDestroy {
       { link: './vmfs/list', label: './vmfs/list' },
       { link: './vmfs/add', label: './vmfs/add' },
       { link: './vmfs/performance', label: './vmfs/performance' },
+      { link: './vmfs/attribute', label: './vmfs/attribute' },
       { link: './vmfs/unmount', label: './vmfs/unmount' },
       { link: './nfs', label: 'NFS Datastore' },
       { link: './nfs/add', label: './nfs/add' },
@@ -109,7 +110,7 @@ export class AdminLayoutComponent implements OnInit, OnDestroy {
       { link: './iscsi', label: './iscsi' },
       { link: './vmfs/delete', label: './vmfs/delete' },
       { link: './vmfs/expand?resource=dataStore', label: './vmfs/expand?resource=dataStore' },
-      { link: './vmfs/serviceLevel?resource=dataStore', label: './vmfs/serviceLevel?resource=dataStore', },
+      { link: './vmfs/serviceLevel?resource=dataStore', label: './vmfs/serviceLevel?resource=dataStore' },
       { link: './vmfs/modify', label: './vmfs/modify' },
       { link: './vmfs/mount?resource=dataStore', label: './vmfs/mount?resource=dataStore' },
       { link: './vmfs/unmount?resource=dataStore', label: './vmfs/unmount?resource=dataStore' },
@@ -117,8 +118,8 @@ export class AdminLayoutComponent implements OnInit, OnDestroy {
       { link: './vmfs/host/mount?resource=others', label: './vmfs/host/mount?resource=others' },
       { link: './vmfs/host/unmount?resource=others', label: './vmfs/host/unmount?resource=others' },
       { link: './vmfs/add?resource=others', label: './vmfs/add?resource=others' },
-      { link: './vmfs/cluster/mount?resource=others', label: './vmfs/cluster/mount?resource=others', },
-      { link: './vmfs/cluster/unmount?resource=others', label: './vmfs/cluster/unmount?resource=others', },
+      { link: './vmfs/cluster/mount?resource=others', label: './vmfs/cluster/mount?resource=others' },
+      { link: './vmfs/cluster/unmount?resource=others', label: './vmfs/cluster/unmount?resource=others' },
       { link: './best/cluster/applybp', label: './best/cluster/applybp' },
       { link: './vmfs/add?resource=others', label: './vmfs/add?resource=others' },
       { link: './rdm', label: './rdm' },
