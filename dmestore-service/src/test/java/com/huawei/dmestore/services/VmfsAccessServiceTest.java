@@ -83,7 +83,7 @@ public class VmfsAccessServiceTest {
         Storage storageObj = new Storage();
         storageObj.setName("Huawei.Storage");
         list.add(storageObj);
-        when(dmeStorageService.getStorages()).thenReturn(list);
+        when(dmeStorageService.getStorages(anyString())).thenReturn(list);
         List<Map<String, Object>> lists = new ArrayList<>();
         Map<String, Object> dsmap = new HashMap<>();
         dsmap.put("objectid", storeObjectId);
@@ -718,7 +718,7 @@ public class VmfsAccessServiceTest {
         storage.setId("112");
         storage.setName("tasts");
         storagemap.add(storage);
-        when(dmeStorageService.getStorages()).thenReturn(storagemap);
+        when(dmeStorageService.getStorages(anyString())).thenReturn(storagemap);
         String listStr
             = "[{\"objectid\": \"11\",\"capacity\": 123123141415,\"freeSpace\": 123123141415,\"uncommitted\": 123123141415,\"name\": \"11\"}]";
         when(vcsdkUtils.getAllVmfsDataStoreInfos(DmeConstants.STORE_TYPE_VMFS)).thenReturn(listStr);
