@@ -799,7 +799,7 @@
               <clr-checkbox-container *ngIf="iopsLimitErr">
                 <clr-control-helper style="color: red">
                   <clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>
-                  {{'tips.iopsLimitErr' | translate}}
+                  {{dorado?'tips.iopsLimitErr':'tips.iopsLimitErrNotV6' | translate}}
                 </clr-control-helper>
               </clr-checkbox-container>
             </div>
@@ -1067,7 +1067,7 @@
             <clr-checkbox-container *ngIf="iopsLimitErr">
               <clr-control-helper style="color: red">
                 <clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>
-                {{'tips.iopsLimitErr' | translate}}
+                {{dorado?'tips.iopsLimitErr':'tips.iopsLimitErrNotV6' | translate}}
               </clr-control-helper>
             </clr-checkbox-container>
           </div>

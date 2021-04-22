@@ -120,6 +120,7 @@
                       <clr-dg-column>
                         {{'storage.detail.storagePool.status' | translate}}
                         <clr-dg-filter [clrDgFilter]="storagePoolStatusFilter">
+                          <!-- 20210421162921 -->
                           <storage-pool-status-filter #storagePoolStatusFilter></storage-pool-status-filter>
                         </clr-dg-filter>
                       </clr-dg-column>
@@ -200,6 +201,7 @@
                       <clr-dg-row *clrDgItems="let item of storagePool" [clrDgItem]="item">
                         <clr-dg-cell class="over_flow">{{item.name ? item.name:'--'}}</clr-dg-cell>
                         <clr-dg-cell class="over_flow">
+                          <!-- print{{print(item)}} -->
                           <span *ngIf="item.healthStatus == 'normal'">
                             <span class="color-square" style="background-color: #7CDFA0; margin-right: 10px"></span>
                             {{'storage.detail.storagePool.normal' | translate}}
@@ -785,6 +787,7 @@
           </clr-tab-content>
         </clr-tab>
         <clr-tab>
+          <!-- 容量 -->
           <button clrTabLink (click)="changeTab('capacity')">{{'storage.detail.cap.capacity' | translate}}</button>
           <clr-tab-content>
             <div class="detail-margin-top">
@@ -982,6 +985,7 @@
           </clr-tab-content>
         </clr-tab>
         <clr-tab>
+          <!-- 性能 -->
           <button clrTabLink>{{'storage.detail.performance.performance' | translate}}</button>
           <clr-tab-content clrTabLinkInOverflow="true">
             <div style="margin-bottom: 1%;font-size: 5px">{{'storage.detail.performance.ptc' | translate}}</div>
@@ -1023,12 +1027,14 @@
           </clr-tab-content>
         </clr-tab>
         <clr-tab>
+          <!-- 硬件 -->
           <button clrTabLink
             (click)="changeTab('hardware')">{{'storage.detail.hardware.hardware' | translate }}</button>
           <clr-tab-content>
             <div class="detail-margin-top">
               <clr-tabs>
                 <clr-tab>
+                  <!-- 控制器 -->
                   <button clrTabLink
                     (click)="changeTab('controller')">{{'storage.detail.hardware.controllers.controllers' | translate}}</button>
                   <clr-tab-content>
@@ -1125,6 +1131,7 @@
                   </clr-tab-content>
                 </clr-tab>
                 <clr-tab>
+                  <!-- 硬盘 -->
                   <button clrTabLink
                     (click)="changeTab('disk')">{{'storage.detail.hardware.disks.disks' | translate}}</button>
                   <clr-tab-content>
@@ -1185,6 +1192,7 @@
                             style="position: absolute;right: 1.1rem;"></clr-icon>
                         </clr-dg-column>
                         <clr-dg-placeholder>{{'tips.noData' | translate}}</clr-dg-placeholder>
+                        <!-- 20210421162737 -->
                         <clr-dg-row *clrDgItems="let item of disks" [clrDgItem]="item">
                           <clr-dg-cell class="over_flow">{{item.name ? item.name:'--'}}</clr-dg-cell>
                           <clr-dg-cell class="over_flow">
@@ -1247,6 +1255,7 @@
                     <div class="detail-margin-top">
                       <clr-accordion>
                         <clr-accordion-panel>
+                          <!-- FC -->
                           <clr-accordion-title>
                             {{'storage.detail.hardware.ports.fc' | translate}}({{fcs==null?0:fcs.length}})
                           </clr-accordion-title>
@@ -1310,7 +1319,7 @@
                                 </clr-dg-cell>
                                 <clr-dg-cell class="over_flow">{{item.wwn ? item.wwn:'--'}}</clr-dg-cell>
                                 <clr-dg-cell class="over_flow" style="text-align: right;min-width: 7rem;">
-                                  {{item.speed!=null?item.iops.toFixed(2):'--'}}</clr-dg-cell>
+                                  {{item.speed!=null?item.speed.toFixed(2):'--'}}</clr-dg-cell>
                                 <clr-dg-cell class="over_flow" style="text-align: right;">
                                   {{item.iops!=null?item.iops.toFixed(2):'--'}}</clr-dg-cell>
                                 <clr-dg-cell class="over_flow" style="text-align: right;min-width: 9rem;">
@@ -1332,6 +1341,7 @@
                           </clr-accordion-content>
                         </clr-accordion-panel>
                         <clr-accordion-panel>
+                          <!-- 以太 -->
                           <clr-accordion-title>
                             {{'storage.detail.hardware.ports.eth' | translate}}({{eths==null?0:eths.length}})
                           </clr-accordion-title>
@@ -1424,6 +1434,7 @@
                           </clr-accordion-content>
                         </clr-accordion-panel>
                         <clr-accordion-panel>
+                          <!-- FCoE -->
                           <clr-accordion-title>
                             {{'storage.detail.hardware.ports.fcoe' | translate}}({{fcoes==null?0:fcoes.length}})
                           </clr-accordion-title>
@@ -1510,6 +1521,7 @@
                           </clr-accordion-content>
                         </clr-accordion-panel>
                         <clr-accordion-panel>
+                          <!-- 绑定 -->
                           <clr-accordion-title>
                             {{'storage.detail.hardware.ports.bond' | translate}}({{bonds==null?0:bonds.length}})
                           </clr-accordion-title>
@@ -1609,6 +1621,7 @@
                           </clr-accordion-content>
                         </clr-accordion-panel>
                         <clr-accordion-panel>
+                          <!-- 逻辑 -->
                           <clr-accordion-title>
                             {{'storage.detail.hardware.ports.logic' | translate}}({{logicports==null?0:logicports.length}})
                           </clr-accordion-title>
@@ -1712,6 +1725,7 @@
                           </clr-accordion-content>
                         </clr-accordion-panel>
                         <clr-accordion-panel>
+                          <!-- 漂移 -->
                           <clr-accordion-title>
                             {{'storage.detail.hardware.ports.fail' | translate}}({{fgs==null?0:fgs.length}})
                           </clr-accordion-title>

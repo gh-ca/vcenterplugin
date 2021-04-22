@@ -1,3 +1,5 @@
+import { STATUS_ARRAY, SYN_STATUS_ARRAY } from './../../app/routes/storage/filter.component';
+
 const data = [
   {
     id: '4e3109c2-91fa-11eb-bb86-7e7d8e1bd299',
@@ -98,13 +100,44 @@ const data = [
 export const getList = count => {
   return {
     code: '200',
-    data: [...data, ...[...new Array(count)].map((i, ii) => {
-      return {
-        ...data[0],
-        id: data[0].id + ii,
-        name: data[0].name + ii,
-      };
-    })],
+    data: [
+      ...data,
+      ...[...new Array(count)].map((i, ii) => {
+        return {
+          ...data[0],
+          id: data[0].id + ii,
+          name: data[0].name + ii,
+        };
+      }),
+    ],
+    description: null,
+  };
+};
+
+const statusArray = STATUS_ARRAY.map(i => i.value);
+const statusLength = statusArray.length;
+const synStatusArray = SYN_STATUS_ARRAY.map(i => i.value);
+const synStatusLength = synStatusArray.length;
+
+export const getDmestorageStoragesManystate = count => {
+  return {
+    code: '200',
+    data: [
+      ...data,
+      ...[...new Array(count)].map((i, ii) => {
+        const status = statusArray[ii % statusLength];
+        const synStatus = synStatusArray[ii % synStatusLength];
+
+        console.log(status, synStatus);
+        return {
+          ...data[0],
+          status,
+          synStatus,
+          id: data[0].id + ii,
+          name: data[0].name + ii,
+        };
+      }),
+    ],
     description: null,
   };
 };

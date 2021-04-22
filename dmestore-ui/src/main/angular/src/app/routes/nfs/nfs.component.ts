@@ -19,7 +19,7 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { TokenService } from '@core';
 import { DOCUMENT } from '@angular/common';
 import { isMockData, mockData } from './../../../mock/mock';
-import { getColorByType, getLabelByValue } from './../../app.helpers';
+import { getColorByType, getLabelByValue, getQosCheckTipsTagInfo } from './../../app.helpers';
 import { handlerResponseErrorSimple } from 'app/app.helpers';
 import { SimpleChange } from '@angular/core';
 import debounce from 'just-debounce';
@@ -284,18 +284,7 @@ export class NfsComponent extends NfsComponentCommon implements OnInit {
         .subscribe(handlerGetHostListSuccess, handlerResponseErrorSimple);
     }
 
-    this.addForm = new AddNfs();
-    /* 监听名字变化 根据是否一样给剩下两个赋值 */
-    this.addFormGroup.valueChanges.subscribe(addForm => {
-      if (addForm.sameName) {
-        const isSameShare = this.addForm.shareName === addForm.nfsName;
-        const isSameFs = (this.addForm.fsName = addForm.nfsName);
-        if (!(isSameShare && isSameFs)) {
-          this.addForm.fsName = this.addForm.shareName = addForm.nfsName;
-        }
-      }
-      this.checkAddForm();
-    });
+    this.createAddFormAndWatchFormChange();
 
     // 初始化form
     this.addFormGroup.reset(this.addForm);
@@ -1193,6 +1182,26 @@ export class NfsComponent extends NfsComponentCommon implements OnInit {
         const chooseStorage = this.storageList.filter(item => item.id == this.addForm.storagId)[0];
         if (chooseStorage) {
           const qosTag = chooseStorage.storageTypeShow.qosTag;
+          const { bandwidthLimitErr, iopsLimitErr } = getQosCheckTipsTagInfo({
+            qosTag,
+            minBandwidthChoose: this.addForm.minBandwidthChoose,
+            minBandwidth: this.addForm.minBandwidth,
+            maxBandwidthChoose: this.addForm.maxBandwidthChoose,
+            maxBandwidth: this.addForm.maxBandwidth,
+            minIopsChoose: this.addForm.minIopsChoose,
+            minIops: this.addForm.minIops,
+            maxIopsChoose: this.addForm.maxIopsChoose,
+            maxIops: this.addForm.maxIops,
+            control_policyUpper: this.addForm.control_policyUpper,
+            control_policyLower: this.addForm.control_policyLower,
+          });
+          this.bandwidthLimitErr = bandwidthLimitErr;
+          this.iopsLimitErr = iopsLimitErr;
+
+          /* 
+          
+          
+          const qosTag = chooseStorage.storageTypeShow.qosTag;
           if (qosTag == 1) {
             if (this.addForm.minBandwidthChoose && this.addForm.maxBandwidthChoose) {
               // 带宽上限小于下限
@@ -1240,6 +1249,8 @@ export class NfsComponent extends NfsComponentCommon implements OnInit {
           if (this.addForm.control_policyLower == undefined) {
             this.bandwidthLimitErr = false;
           }
+        
+          */
         }
       }
     }

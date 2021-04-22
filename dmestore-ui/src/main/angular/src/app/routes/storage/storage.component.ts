@@ -16,6 +16,7 @@ import { TokenService } from '@core';
 import { DOCUMENT } from '@angular/common';
 import { handlerResponseErrorSimple } from 'app/app.helpers';
 import { isMockData, mockData } from 'mock/mock';
+import { getDmestorageStoragesManystate } from 'mock/URLS_STORAGE/DMESTORAGE_STORAGES';
 @Component({
   selector: 'app-storage',
   templateUrl: './storage.component.html',
@@ -72,7 +73,8 @@ export class StorageComponent implements OnInit, AfterViewInit {
       this.listperformance();
     };
     if (isMockData) {
-      handlerGetDataSuccess(mockData.DMESTORAGE_STORAGES);
+      handlerGetDataSuccess(getDmestorageStoragesManystate(100));
+      // handlerGetDataSuccess(mockData.DMESTORAGE_STORAGES);
     } else {
       this.remoteSrv.getData().subscribe(handlerGetDataSuccess, handlerResponseErrorSimple);
     }

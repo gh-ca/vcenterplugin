@@ -361,15 +361,19 @@
       "iops": "IOPS",
       "ops": "OPS",
       "bandwidth": "Bandwith(MB/s)",
-      "offLine": "Off Line",
+      "Offline": "Offline",
       "normal": "Normal",
-      "fault": "fault",
-      "notMgr": "Not Manage",
-      "notSync": "Not Sync",
-      "inSync": "in Sync",
+      "Abnormal": "Abnormal",
+      "degraded": "Degraded",
+      "Unmanaged": "Unmanaged",
+      "unsync": "Unsync",
+      "Sync": "Sync",
       "synced": "Synchronized",
+      "syncNormal": "normal",
+      "syncFailed": "Failed",
       "status": "Running Status",
-      "synStatus": "Synchronized State"
+      "synStatus": "Synchronized State",
+      "Unknown": "Unknow"
     },
     "chart": {
       "total": " Total",
@@ -903,6 +907,7 @@
     "details": "Details",
     "bandwidthLimitErr": "The lower limit of bandwidth cannot be greater than the upper limit!",
     "iopsLimitErr": "The upper limit of IOPS is at least 100, and the lower limit cannot be greater than the upper limit!",
+    "iopsLimitErrNotV6": "The lower limit cannot be greater than the upper limit!",
     "syncSuccess": "Data synchronization is successful!"
   },
   "chart": {

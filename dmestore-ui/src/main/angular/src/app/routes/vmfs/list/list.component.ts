@@ -34,6 +34,7 @@ import { isMockData, mockData } from 'mock/mock';
 import {
   getColorByType,
   getLabelByValue,
+  getQosCheckTipsTagInfo,
   handlerResponseErrorSimple,
   print,
 } from 'app/app.helpers';
@@ -58,7 +59,7 @@ export class VmfsListComponent implements OnInit {
     private remoteSrv: VmfsListService,
     private cdr: ChangeDetectorRef,
     public gs: GlobalsService,
-    private router: Router,
+    private router: Router
   ) {
     this.form.version = '5'; // 版本
     this.setFormValueWhenHiden(false);
@@ -67,6 +68,8 @@ export class VmfsListComponent implements OnInit {
     this.getLabelByValue = getLabelByValue;
     this.print = print;
   }
+
+  dorado = false; //是否是V6设备
 
   getColor;
   getLabelByValue;
@@ -428,7 +431,6 @@ wwn: "67c1cf110058934511ba6e5a00000344"
         }
       }
     }
-
   }
 
   // 修改 处理
@@ -453,8 +455,8 @@ wwn: "67c1cf110058934511ba6e5a00000344"
       // 控制策略若未选清空数据
       this.qosEditFunc(this.modifyForm);
       console.log(
-        'this.modifyForm.control_policyUpper == \'1\'',
-        this.modifyForm.control_policyUpper == '1',
+        "this.modifyForm.control_policyUpper == '1'",
+        this.modifyForm.control_policyUpper == '1'
       );
       if (this.modifyForm.control_policyUpper == '1') {
         // 上限+全选（上下限）
@@ -646,7 +648,7 @@ wwn: "67c1cf110058934511ba6e5a00000344"
       this.addLatencyChoose();
 
       const storagePoolMap = this.storagePoolMap.filter(
-        item => item.storageId == this.form.storage_id,
+        item => item.storageId == this.form.storage_id
       );
 
       const storagePoolList = storagePoolMap[0].storagePoolList;
@@ -670,7 +672,7 @@ wwn: "67c1cf110058934511ba6e5a00000344"
             this.storagePoolList = result.data;
 
             this.storagePoolMap.filter(
-              item => item.storageId == this.form.storage_id,
+              item => item.storageId == this.form.storage_id
             )[0].storagePoolList = result.data;
 
             this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
@@ -686,7 +688,7 @@ wwn: "67c1cf110058934511ba6e5a00000344"
             this.workloads = result.data;
 
             this.storagePoolMap.filter(
-              item => item.storageId == this.form.storage_id,
+              item => item.storageId == this.form.storage_id
             )[0].workloadList = result.data;
 
             this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
@@ -1391,7 +1393,7 @@ wwn: "67c1cf110058934511ba6e5a00000344"
     console.log(
       'this.flag',
       (!this.chooseUnmountHost && this.unmountForm.mountType === '1') ||
-      (!this.chooseUnmountCluster && this.unmountForm.mountType === '2'),
+        (!this.chooseUnmountCluster && this.unmountForm.mountType === '2')
     );
     if (
       (!this.chooseUnmountHost && this.unmountForm.mountType === '1') ||
@@ -2598,6 +2600,27 @@ wwn: "67c1cf110058934511ba6e5a00000344"
         const chooseStorage = this.storageList.filter(item => item.id == this.form.storage_id)[0];
         if (chooseStorage) {
           const qosTag = chooseStorage.storageTypeShow.qosTag;
+          this.dorado = String(qosTag) === '1';
+          const { bandwidthLimitErr, iopsLimitErr } = getQosCheckTipsTagInfo({
+            qosTag,
+            minBandwidthChoose: this.form.minbandwidthChoose,
+            minBandwidth: this.form.minbandwidth,
+            maxBandwidthChoose: this.form.maxbandwidthChoose,
+            maxBandwidth: this.form.maxbandwidth,
+            minIopsChoose: this.form.miniopsChoose,
+            minIops: this.form.miniops,
+            maxIopsChoose: this.form.maxiopsChoose,
+            maxIops: this.form.maxiops,
+            control_policyUpper: this.form.control_policyUpper,
+            control_policyLower: this.form.control_policyLower,
+          });
+          this.bandwidthLimitErr = bandwidthLimitErr;
+          this.iopsLimitErr = iopsLimitErr;
+
+          /* 
+          
+          
+          const qosTag = chooseStorage.storageTypeShow.qosTag;
           if (qosTag == 1) {
             if (this.form.minbandwidthChoose && this.form.maxbandwidthChoose) {
               // 带宽上限小于下限
@@ -2641,6 +2664,8 @@ wwn: "67c1cf110058934511ba6e5a00000344"
           if (this.form.control_policyLower == undefined) {
             this.bandwidthLimitErr = false;
           }
+        
+          */
         }
       }
     } else {
@@ -2679,6 +2704,7 @@ wwn: "67c1cf110058934511ba6e5a00000344"
           this.iopsLimitErr = false;
           this.bandwidthLimitErr = false;
         }
+
         if (
           this.modifyForm.maxiopsChoose &&
           this.modifyForm.max_iops &&
@@ -2686,6 +2712,7 @@ wwn: "67c1cf110058934511ba6e5a00000344"
         ) {
           this.iopsLimitErr = true;
         }
+
         if (this.modifyForm.control_policyUpper == undefined) {
           this.iopsLimitErr = false;
           this.bandwidthLimitErr = false;
