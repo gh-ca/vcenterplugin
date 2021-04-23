@@ -23,7 +23,7 @@ export const stringParseObj = (stringData, defaultValue) => {
     console.log(
       '🚀 ~ file: app.helpers.ts ~ line 12 ~ string ~ stringData,defaultValue',
       stringData,
-      defaultValue
+      defaultValue,
     );
     console.error(error);
   }
@@ -40,6 +40,7 @@ export const handlerResponseErrorSimple = err => console.error('ERROR', err);
 export async function getURL(vm) {
   return new Promise(resovle => vm.route.url.subscribe(resovle));
 }
+
 export async function getQueryParams(vm) {
   return new Promise(resovle => vm.route.queryParams.subscribe(resovle));
 }
@@ -75,3 +76,64 @@ export const getLabelByValue = (value, type, defaultValue = '') => {
 export const print = val => {
   return JSON.stringify(val, null, 2);
 };
+
+export function getQosCheckTipsTagInfo({
+                                         /*  */
+                                         qosTag,
+                                         minBandwidthChoose,
+                                         minBandwidth,
+                                         maxBandwidthChoose,
+                                         maxBandwidth,
+                                         minIopsChoose,
+                                         minIops,
+                                         maxIopsChoose,
+                                         maxIops,
+                                         control_policyUpper,
+                                         control_policyLower,
+                                       }) {
+  const result = {
+    bandwidthLimitErr: false,
+    iopsLimitErr: false,
+  };
+
+  if (qosTag == 1) {
+    if (minBandwidthChoose && maxBandwidthChoose) {
+      // 带宽上限小于下限
+      if (minBandwidth && maxBandwidth && Number(minBandwidth) > Number(maxBandwidth)) {
+        result.bandwidthLimitErr = true;
+      } else {
+        result.bandwidthLimitErr = false;
+      }
+    } else {
+      result.bandwidthLimitErr = false;
+    }
+    if (minIopsChoose && maxIopsChoose) {
+      // iops上限小于下限
+      if (minIops && maxIops && Number(minIops) > Number(maxIops)) {
+        result.iopsLimitErr = true;
+      } else {
+        result.iopsLimitErr = false;
+      }
+    } else {
+      result.iopsLimitErr = false;
+    }
+
+    /*v6 限制 v5 不限制*/
+    if (maxIopsChoose && maxIops && Number(maxIops) < 100) {
+      result.iopsLimitErr = true;
+    }
+  } else {
+    result.iopsLimitErr = false;
+    result.bandwidthLimitErr = false;
+  }
+
+
+  if (control_policyUpper == undefined) {
+    result.iopsLimitErr = false;
+    result.bandwidthLimitErr = false;
+  }
+  if (control_policyLower == undefined) {
+    result.bandwidthLimitErr = false;
+  }
+  return result;
+}

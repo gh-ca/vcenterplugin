@@ -365,8 +365,8 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
                 SimpleCapabilities capability = new SimpleCapabilities();
                 JsonObject capabilities = element.get("capabilities").getAsJsonObject();
                 capability.setResourceType(ToolUtils.jsonToStr(capabilities.get("resource_type")));
-                capability.setCompression(ToolUtils.jsonToBoo(capabilities.get("compression")));
-                capability.setDeduplication(ToolUtils.jsonToBoo(capabilities.get("deduplication")));
+                capability.setCompression(ToolUtils.jsonToStr(capabilities.get("compression")));
+                capability.setDeduplication(ToolUtils.jsonToStr(capabilities.get("deduplication")));
                 CapabilitiesSmarttier smarttier = new CapabilitiesSmarttier();
                 if (!"".equals(ToolUtils.jsonToStr(capabilities.get("smarttier")))) {
                     JsonObject smarttiers = capabilities.get("smarttier").getAsJsonObject();

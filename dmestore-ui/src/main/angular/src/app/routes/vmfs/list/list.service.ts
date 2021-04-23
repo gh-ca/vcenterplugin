@@ -2,10 +2,6 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import construct = Reflect.construct;
 
-export const URLS_LIST_SERVICE = {
-  ACCESSVMFS_LISTVMFS: 'accessvmfs/listvmfs',
-  ACCESSVMFS_LISTVMFSPERFORMANCE: 'accessvmfs/listvmfsperformance',
-};
 
 @Injectable()
 export class VmfsListService {
@@ -13,11 +9,11 @@ export class VmfsListService {
 
   // 主列表数据
   getData() {
-    return this.http.get(URLS_LIST_SERVICE.ACCESSVMFS_LISTVMFS);
+    return this.http.get('accessvmfs/listvmfs');
   }
   // 附列表数据
   getChartData(wwns: string[]) {
-    return this.http.get(URLS_LIST_SERVICE.ACCESSVMFS_LISTVMFSPERFORMANCE, { params: { wwns } });
+    return this.http.get('accessvmfs/listvmfsperformance', { params: { wwns } });
   }
   // 获取存储
   getStorages() {

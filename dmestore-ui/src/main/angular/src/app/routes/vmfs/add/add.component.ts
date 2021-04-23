@@ -21,6 +21,7 @@ import {
 } from '../list/list.service';
 import { ClrWizard, ClrWizardPage } from '@clr/angular';
 import { GlobalsService } from '../../../shared/globals.service';
+import { getQosCheckTipsTagInfo } from 'app/app.helpers';
 
 @Component({
   selector: 'app-list',
@@ -30,18 +31,20 @@ import { GlobalsService } from '../../../shared/globals.service';
   providers: [AddService],
 })
 export class AddComponent implements OnInit {
-
   constructor(
     private remoteSrv: AddService,
     private route: ActivatedRoute,
     private cdr: ChangeDetectorRef,
     private router: Router,
-    private globalsService: GlobalsService,
+    private globalsService: GlobalsService
   ) {
     this.form.version = '5'; // 版本
     this.setFormValueWhenHiden(false);
   }
 
+  dorado = false; //是否是V6设备
+
+  
   isShowInput: boolean;
 
   // 初始化表单
@@ -357,7 +360,8 @@ export class AddComponent implements OnInit {
   }
 
   // 获取所有存储数据
-  getStorageList() { /*  */
+  getStorageList() {
+    /*  */
 
     const handlerGetStorageListSuccess = (result: any) => {
       console.log(result);
@@ -382,8 +386,7 @@ export class AddComponent implements OnInit {
       this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
     };
 
-    this.remoteSrv.getStorages()
-      .subscribe(handlerGetStorageListSuccess);
+    this.remoteSrv.getStorages().subscribe(handlerGetStorageListSuccess);
   }
 
   // 获取存储池数据
@@ -402,7 +405,7 @@ export class AddComponent implements OnInit {
       this.addLatencyChoose();
 
       const storagePoolMap = this.storagePoolMap.filter(
-        item => item.storageId == this.form.storage_id,
+        item => item.storageId == this.form.storage_id
       );
 
       const storagePoolList = storagePoolMap[0].storagePoolList;
@@ -424,13 +427,13 @@ export class AddComponent implements OnInit {
         .subscribe((result: any) => {
           console.log('storagePools', result);
           console.log(
-            'result.code === \'200\' && result.data !== null',
-            result.code === '200' && result.data !== null,
+            "result.code === '200' && result.data !== null",
+            result.code === '200' && result.data !== null
           );
           if (result.code === '200' && result.data !== null) {
             this.storagePoolList = result.data;
             this.storagePoolMap.filter(
-              item => item.storageId == this.form.storage_id,
+              item => item.storageId == this.form.storage_id
             )[0].storagePoolList = result.data;
 
             this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
@@ -446,7 +449,7 @@ export class AddComponent implements OnInit {
           if (result.code === '200' && result.data !== null) {
             this.workloads = result.data;
             this.storagePoolMap.filter(
-              item => item.storageId == this.form.storage_id,
+              item => item.storageId == this.form.storage_id
             )[0].workloadList = result.data;
 
             this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
@@ -575,7 +578,7 @@ export class AddComponent implements OnInit {
           this.showDetail = false;
           const connFailDatas: ConnFaildData[] = [];
           if (result.data) {
-            result.data.forEach((item) => {
+            result.data.forEach(item => {
               for (const key in item) {
                 const conFailData = {
                   hostName: key,
@@ -1309,6 +1312,28 @@ export class AddComponent implements OnInit {
         const chooseStorage = this.storageList.filter(item => item.id == this.form.storage_id)[0];
         if (chooseStorage) {
           const qosTag = chooseStorage.storageTypeShow.qosTag;
+          this.dorado = String(qosTag) === '1';
+          const { bandwidthLimitErr, iopsLimitErr } = getQosCheckTipsTagInfo({
+            qosTag,
+            minBandwidthChoose: this.form.minbandwidthChoose,
+            minBandwidth: this.form.minbandwidth,
+            maxBandwidthChoose: this.form.maxbandwidthChoose,
+            maxBandwidth: this.form.maxbandwidth,
+            minIopsChoose: this.form.miniopsChoose,
+            minIops: this.form.miniops,
+            maxIopsChoose: this.form.maxiopsChoose,
+            maxIops: this.form.maxiops,
+            control_policyUpper: this.form.control_policyUpper,
+            control_policyLower: this.form.control_policyLower,
+          });
+          this.bandwidthLimitErr = bandwidthLimitErr;
+          this.iopsLimitErr = iopsLimitErr;
+
+          /* 
+          
+          
+          
+          const qosTag = chooseStorage.storageTypeShow.qosTag;
           if (qosTag == 1) {
             if (this.form.minbandwidthChoose && this.form.maxbandwidthChoose) {
               // 带宽上限小于下限
@@ -1352,6 +1377,8 @@ export class AddComponent implements OnInit {
           if (this.form.control_policyLower == undefined) {
             this.bandwidthLimitErr = false;
           }
+        
+          */
         }
       }
     }

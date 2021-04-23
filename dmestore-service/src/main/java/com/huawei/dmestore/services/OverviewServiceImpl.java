@@ -63,7 +63,7 @@ public class OverviewServiceImpl implements OverviewService {
         int normal = 0;
         int abnormal = 0;
         int total;
-        List<Storage> storages = dmeStorageService.getStorages();
+        List<Storage> storages = dmeStorageService.getStorages(null);
         total = storages.size();
         for (Storage storage : storages) {
             // 运行状态 0-离线 1-正常 2-故障 9-未管理。
