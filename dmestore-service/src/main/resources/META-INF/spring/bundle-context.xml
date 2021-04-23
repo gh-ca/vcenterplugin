@@ -32,7 +32,7 @@
             <bean class="com.huawei.dmestore.utils.CipherConfig$RootKey">
                 <property name="algorithm" value="${cipher.rootkey.algorithm}"/>
                 <property name="iteration" value="${cipher.rootkey.iteration}"/>
-                <property name="salt" value="${cipher.rootkey.salt}"/>
+             <!--   <property name="salt" value="${cipher.rootkey.salt}"/>-->
             </bean>
         </property>
         <property name="pbkdf2">

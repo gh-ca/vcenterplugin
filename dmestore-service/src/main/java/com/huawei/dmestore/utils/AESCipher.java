@@ -80,6 +80,7 @@ public class AESCipher {
         } catch (NoSuchAlgorithmException | InvalidKeyException
                 | InvalidAlgorithmParameterException | NoSuchPaddingException
                 | BadPaddingException | IllegalBlockSizeException e) {
+            e.printStackTrace();
             LOG.error("decrypt workkey failed");
             return null;
         }
