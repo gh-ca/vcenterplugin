@@ -44,7 +44,8 @@ public class KeytookUtil {
         BufferedReader input = null;
         InputStreamReader inr = null;
         try {
-            String cmd = "keytool -list -keypass changeit -storepass changeit -keystore ./tomcat.keystore";
+            String randompass=FileUtil.getKey(FileUtil.KEYSTORE_PASS_NAME);
+            String cmd = "keytool -list -keypass "+randompass+" -storepass "+randompass+" -keystore ./tomcat.keystore";
             Process process = Runtime.getRuntime().exec(cmd);
             inr = new InputStreamReader(process.getInputStream(), "utf-8");
             input = new BufferedReader(inr);
