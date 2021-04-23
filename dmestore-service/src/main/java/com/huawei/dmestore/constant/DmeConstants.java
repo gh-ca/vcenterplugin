@@ -17,7 +17,7 @@ public class DmeConstants {
      *  public static final String DME_ESTIMATE_CONNECTIVITY = "/rest/vmmgmt/v1/connectivity/host-storage";
      */
     //public static final String DME_ESTIMATE_CONNECTIVITY = "/rest/vmmgmt/v1/connectivity/host-storage";
-    public static final String DME_ESTIMATE_CONNECTIVITY = "/hostmgmt/v1/connectivity/host-and-storage";
+    public static final String DME_ESTIMATE_CONNECTIVITY = "/rest/hostmgmt/v1/connectivity/host-and-storage";
     /**
      * nfs share detail
      **/
