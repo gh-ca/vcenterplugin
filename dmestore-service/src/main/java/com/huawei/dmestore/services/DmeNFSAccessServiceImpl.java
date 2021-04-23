@@ -947,6 +947,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
     public void unmountNfs(Map<String, Object> params) throws DmeException {
         String dataStoreObjectId = ToolUtils.getStr(params.get(DATASTOREOBJECTID));
         String hostObjId = ToolUtils.getStr(params.get("hostId"));
+        String name = vcsdkUtils.findHostById(hostObjId);
         DmeVmwareRelation dvr = dmeVmwareRalationDao.getDmeVmwareRelationByDsId(dataStoreObjectId);
         if (dvr == null) {
             LOG.error("unmountNfs get relation error!dataStoreObjectId={}", dataStoreObjectId);
@@ -963,7 +964,10 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
                 String authId = authClient.getId();
                 String ip = authClient.getName();
                 if (!StringUtils.isEmpty(ip) && !StringUtils.isEmpty(authId)) {
-                    authIdIpMap.put(authClient.getClientIdInStorage(), ip);
+                    if ( ToolUtils.jsonToStr(new JsonParser().parse(name).getAsJsonArray().get(0).getAsJsonObject()
+                            .get("hostName")).equalsIgnoreCase(authClient.getName())) {
+                        authIdIpMap.put(authClient.getClientIdInStorage(), ip);
+                    }
                 }
             }
             String taskId = deleteAuthClient(shareId, authIdIpMap);
