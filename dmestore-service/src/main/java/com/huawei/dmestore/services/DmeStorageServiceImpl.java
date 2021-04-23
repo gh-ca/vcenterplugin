@@ -1467,8 +1467,12 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                                     statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORDEVICE_RESPONSETIME)));
                             }
                             if (statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORDEVICE_THROUGHPUT) != null) {
+                                storage.setMaxIops(ToolUtils.jsonToDou(
+                                        statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORDEVICE_THROUGHPUT)));
+                            }
+                            if (statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORDEVICE_OPS) != null) {
                                 storage.setMaxOps(ToolUtils.jsonToDou(
-                                    statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORDEVICE_THROUGHPUT)));
+                                        statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORDEVICE_OPS)));
                             }
                             relists.add(storage);
                         }
