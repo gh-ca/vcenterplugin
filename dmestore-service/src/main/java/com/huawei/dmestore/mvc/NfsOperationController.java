@@ -294,29 +294,32 @@ public class NfsOperationController extends BaseController {
         throws DmeException {
         Map<String, Object> filesystemDetail = getFilesystemDetail((String) params.get("fileSystemId"));
         Map<String, Object> capacityAutonegotiationMap =
-            (Map<String, Object>) filesystemDetail.get("capacity_auto_negotiation");
+                (Map<String, Object>) filesystemDetail.get("capacity_auto_negotiation");
         Map<String, Object> capacityAutonegotiation = new HashMap<>(DmeConstants.COLLECTION_CAPACITY_16);
+        boolean autoSizeEnableFlag = false;
+        String capacitymode = null;
         if (autoSizeEnable != null) {
-            String capacitymode = (Boolean) autoSizeEnable
-                ? CapacityAutonegotiation.CAPACITY_MODE_AUTO
-                : CapacityAutonegotiation.CAPACITY_MODE_OFF;
-            if (!"grow-off".equalsIgnoreCase(capacitymode)) {
-                capacityAutonegotiation.put(AUTO_SIZE_ENABLE_FIELD, params.get(AUTO_SIZE_ENABLE_REQUEST_FIELD));
-                capacityAutonegotiation
-                    .put("capacity_recycle_mode", capacityAutonegotiationMap.get("capacity_recycle_mode"));
-                capacityAutonegotiation
-                    .put("auto_grow_threshold_percent", capacityAutonegotiationMap.get("auto_grow_threshold_percent"));
-                capacityAutonegotiation.put("auto_shrink_threshold_percent",
-                    capacityAutonegotiationMap.get("auto_shrink_threshold_percent"));
-                capacityAutonegotiation.put("max_auto_size", capacityAutonegotiationMap.get("max_auto_size"));
-                capacityAutonegotiation.put("min_auto_size", capacityAutonegotiationMap.get("min_auto_size"));
-                capacityAutonegotiation
-                    .put("auto_size_increment", capacityAutonegotiationMap.get("auto_size_increment"));
-            }
-            capacityAutonegotiation.put(ADJUSTING_MODE_FIELD, capacitymode);
-            param.put("capacity", filesystemDetail.get("capacity"));
-            param.put("capacity_autonegotiation", capacityAutonegotiation);
+            autoSizeEnableFlag = (Boolean) autoSizeEnable;
+            capacitymode = autoSizeEnableFlag
+                    ? CapacityAutonegotiation.CAPACITY_MODE_AUTO
+                    : CapacityAutonegotiation.CAPACITY_MODE_OFF;
         }
+        capacityAutonegotiation.put(AUTO_SIZE_ENABLE_FIELD, autoSizeEnableFlag);
+        capacityAutonegotiation
+                .put("capacity_recycle_mode", capacityAutonegotiationMap.get("capacity_recycle_mode"));
+        capacityAutonegotiation
+                .put("auto_grow_threshold_percent", capacityAutonegotiationMap.get("auto_grow_threshold_percent"));
+        capacityAutonegotiation.put("auto_shrink_threshold_percent",
+                capacityAutonegotiationMap.get("auto_shrink_threshold_percent"));
+        capacityAutonegotiation.put("max_auto_size", capacityAutonegotiationMap.get("max_auto_size"));
+        capacityAutonegotiation.put("min_auto_size", capacityAutonegotiationMap.get("min_auto_size"));
+        capacityAutonegotiation
+                .put("auto_size_increment", capacityAutonegotiationMap.get("auto_size_increment"));
+
+        capacityAutonegotiation.put(ADJUSTING_MODE_FIELD, capacitymode);
+        param.put("capacity", filesystemDetail.get("capacity"));
+        param.put("capacity_autonegotiation", capacityAutonegotiation);
+
     }
 
     private void parseCreateNfsParams(Map<String, Object> requestParams,Map<String, Object> targetParams)

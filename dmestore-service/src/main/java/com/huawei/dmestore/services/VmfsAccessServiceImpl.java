@@ -449,7 +449,6 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 isCreated = taskService.checkTaskStatus(taskIds);
                 // 查询看创建任务是否完成。
                 if (isCreated) {
-
                     if (volumelist.size() == 0) {
                         volumelist = getVolumeByName(ToolUtils.getStr(params.get(VOLUMENAME)),
                             null, null, ToolUtils.getStr(params.get(SERVICE_LEVEL_ID)),
@@ -457,6 +456,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                     }
 
                     volumeIds = getVolumeId(volumelist);
+                    taskIds = new ArrayList<>();
                     for (String volumeId : volumeIds) {
                         if (!StringUtils.isEmpty(volumeId)) {
                             params.put("volume_id", volumeId);
@@ -473,18 +473,18 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                                 }
                             }
                         }
+                        // 映射主机或者主机组
+                        if (params.get(DmeConstants.HOST) != null) {
+                            dmeHostId = objHostId;
+                            taskId = lunMappingToHostOrHostgroup(volumeIds, dmeHostId, null);
+                        } else if (params.get(DmeConstants.CLUSTER) != null) {
+                            List<String> lunids = new ArrayList<>();
+                            lunids.add(volumeId);
+                            demHostGroupId = objHostId;
+                            taskId = lunMappingToHostOrHostgroup(lunids, null, demHostGroupId);
+                        }
+                        taskIds.add(taskId);
                     }
-
-                    // 映射主机或者主机组
-                    if (params.get(DmeConstants.HOST) != null) {
-                        dmeHostId = objHostId;
-                        taskId = lunMappingToHostOrHostgroup(volumeIds, dmeHostId, null);
-                    } else if (params.get(DmeConstants.CLUSTER) != null) {
-                        demHostGroupId = objHostId;
-                        taskId = lunMappingToHostOrHostgroup(volumeIds, null, demHostGroupId);
-                    }
-                    taskIds = new ArrayList<>();
-                    taskIds.add(taskId);
                     isMappling = taskService.checkTaskStatus(taskIds);
                     if (isCreated && isMappling) {
                         // 创建了几个卷，就创建几个VMFS，用卷的wwn去找到lun
@@ -495,9 +495,9 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                         TaskDetailInfo taskinfo = taskService.queryTaskById(taskId);
                         if (taskinfo != null) {
                             throw new DmeException(
-                                "DME create vmfs volume error(task status info:" + "name:" + taskinfo.getTaskName() + ";status:"
-                                    + taskinfo.getStatus() + ";" + "progress:" + taskinfo.getProgress() + ";detail:"
-                                    + taskinfo.getDetail() + ")!");
+                                    "DME create vmfs volume error(task status info:" + "name:" + taskinfo.getTaskName() + ";status:"
+                                            + taskinfo.getStatus() + ";" + "progress:" + taskinfo.getProgress() + ";detail:"
+                                            + taskinfo.getDetail() + ")!");
                         } else {
                             throw new DmeException("DME create vmfs volume error(task status is failure)!");
                         }

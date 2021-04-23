@@ -1841,7 +1841,10 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         String url = String.format(DmeConstants.DME_RESOURCE_INSTANCE_LIST, className) + CONDITION;
         Map<String,String> map = new HashMap<>();
         map.put(POOL_ID, poolRawId);
-        map.put(STORAGE_DEVICE_ID,storageId);
+        //处理中划线并且大写
+        if(!StringUtils.isEmpty(storageId)){
+            map.put(STORAGE_DEVICE_ID, StringUtils.replace(storageId,"-","").toUpperCase());
+        }
         String params = ToolUtils.getRequsetParams(map,true,true);
         ResponseEntity<String> responseEntity = dmeAccessService.accessByJson(url, HttpMethod.GET, params);
         if (responseEntity.getStatusCodeValue() == HttpStatus.OK.value()) {
