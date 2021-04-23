@@ -6,6 +6,7 @@ import { UpdateNfs } from '../../nfs.service';
 import { StorageList } from '../../../storage/storage.service';
 import { VmfsListService } from '../../../vmfs/list/list.service';
 import { isMockData, mockData } from 'mock/mock';
+import { getQosCheckTipsTagInfo } from 'app/app.helpers';
 
 @Component({
   selector: 'app-add',
@@ -56,6 +57,7 @@ export class NfsModifyComponent implements OnInit {
     private router: Router,
     private vmfsListService: VmfsListService
   ) {}
+
   ngOnInit(): void {
     this.modalLoading = true;
     this.activatedRoute.queryParams.subscribe(queryParam => {
@@ -68,7 +70,6 @@ export class NfsModifyComponent implements OnInit {
       this.objectId = ctx[0].id;
       // this.objectId="urn:vmomi:Datastore:datastore-10020:674908e5-ab21-4079-9cb1-596358ee5dd1";
     }
-
 
     const handlerGetNfsDetailById = (result: any) => {
       if (this.pluginFlag) {
@@ -252,14 +253,17 @@ export class NfsModifyComponent implements OnInit {
       this.cdr.detectChanges();
     });
   }
+
   backToNfsList() {
     this.modalLoading = false;
     this.router.navigate(['nfs']);
   }
+
   closeModel() {
     this.modalLoading = false;
     this.gs.getClientSdk().modal.close();
   }
+
   qosBlur(type: String, operationType: string) {
     let objVal;
     if (type === 'add') {
@@ -316,6 +320,7 @@ export class NfsModifyComponent implements OnInit {
     // 下限大于上限 检测
     this.qosV6Check('edit');
   }
+
   /**
    * iops错误提示
    * @param objVal
@@ -377,6 +382,7 @@ export class NfsModifyComponent implements OnInit {
       this.latencyErrTips = false;
     }
   }
+
   matchErr = false;
   nfsNameRepeatErr = false;
   shareNameRepeatErr = false;
@@ -384,9 +390,14 @@ export class NfsModifyComponent implements OnInit {
   oldNfsName: string;
   oldShareName: string;
   oldFsName: string;
+
   checkNfsName() {
-    if (this.updateNfs.nfsName == null) return false;
-    if (this.oldNfsName == this.updateNfs.nfsName) return false;
+    if (this.updateNfs.nfsName == null) {
+      return false;
+    }
+    if (this.oldNfsName == this.updateNfs.nfsName) {
+      return false;
+    }
     this.oldNfsName = this.updateNfs.nfsName;
     let reg5: RegExp = new RegExp('^[0-9a-zA-Z\u4e00-\u9fa5a"_"]*$');
     if (reg5.test(this.updateNfs.nfsName)) {
@@ -407,9 +418,14 @@ export class NfsModifyComponent implements OnInit {
       console.log('验证不通过');
     }
   }
+
   checkShareName() {
-    if (this.updateNfs.shareName == null) return false;
-    if (this.oldShareName == this.updateNfs.shareName) return false;
+    if (this.updateNfs.shareName == null) {
+      return false;
+    }
+    if (this.oldShareName == this.updateNfs.shareName) {
+      return false;
+    }
 
     this.oldShareName = this.updateNfs.shareName;
     let reg5: RegExp = new RegExp('^[0-9a-zA-Z\u4e00-\u9fa5a"_"]*$');
@@ -422,9 +438,14 @@ export class NfsModifyComponent implements OnInit {
       this.updateNfs.shareName = null;
     }
   }
+
   checkFsName() {
-    if (this.updateNfs.fsName == null) return false;
-    if (this.oldFsName == this.updateNfs.fsName) return false;
+    if (this.updateNfs.fsName == null) {
+      return false;
+    }
+    if (this.oldFsName == this.updateNfs.fsName) {
+      return false;
+    }
 
     this.oldFsName = this.updateNfs.fsName;
     let reg5: RegExp = new RegExp('^[0-9a-zA-Z\u4e00-\u9fa5a"_"]*$');
@@ -437,6 +458,7 @@ export class NfsModifyComponent implements OnInit {
       this.updateNfs.fsName = null;
     }
   }
+
   checkNfsNameExist(name: string) {
     this.modifyService.checkNfsNameExist(name).subscribe((r: any) => {
       if (r.code == '200') {
@@ -449,6 +471,7 @@ export class NfsModifyComponent implements OnInit {
       }
     });
   }
+
   checkShareNameExist(name: string) {
     this.modifyService.checkShareNameExist(name).subscribe((r: any) => {
       if (r.code == '200') {
@@ -461,6 +484,7 @@ export class NfsModifyComponent implements OnInit {
       }
     });
   }
+
   checkFsNameExist(name: string) {
     this.modifyService.checkFsNameExist(name).subscribe((r: any) => {
       if (r.code == '200') {
@@ -537,6 +561,7 @@ export class NfsModifyComponent implements OnInit {
       }
     }
   }
+
   initMaxInfo(form) {
     form.control_policyUpper = undefined;
     form.maxBandwidthChoose = false;
@@ -544,6 +569,7 @@ export class NfsModifyComponent implements OnInit {
     form.maxIopsChoose = false;
     form.maxIops = null;
   }
+
   initMinInfo(form) {
     form.control_policyLower = undefined;
     form.minBandwidthChoose = false;
@@ -570,6 +596,7 @@ export class NfsModifyComponent implements OnInit {
       form.latencyChoose = false;
     }
   }
+
   /**
    * 控制策略变更
    * @param upperObj
@@ -627,6 +654,7 @@ export class NfsModifyComponent implements OnInit {
     }
     this.qosV6Check('edit');
   }
+
   resetQosFlag(objValue: boolean, operationType: string) {
     switch (operationType) {
       case 'maxbandwidth':
@@ -656,9 +684,29 @@ export class NfsModifyComponent implements OnInit {
         break;
     }
   }
+
   qosV6Check(type: string) {
     if (type != 'add') {
       if (this.storage) {
+        const qosTag = this.storage.storageTypeShow.qosTag;
+        const { bandwidthLimitErr, iopsLimitErr } = getQosCheckTipsTagInfo({
+          qosTag,
+          minBandwidthChoose: this.updateNfs.minBandwidthChoose,
+          minBandwidth: this.updateNfs.minBandwidth,
+          maxBandwidthChoose: this.updateNfs.maxBandwidthChoose,
+          maxBandwidth: this.updateNfs.maxBandwidth,
+          minIopsChoose: this.updateNfs.minIopsChoose,
+          minIops: this.updateNfs.minIops,
+          maxIopsChoose: this.updateNfs.maxIopsChoose,
+          maxIops: this.updateNfs.maxIops,
+          control_policyUpper: this.updateNfs.control_policyUpper,
+          control_policyLower: this.updateNfs.control_policyLower,
+        });
+        this.bandwidthLimitErr = bandwidthLimitErr;
+        this.iopsLimitErr = iopsLimitErr;
+      }
+
+      /*       if (this.storage) {
         const qosTag = this.storage.storageTypeShow.qosTag;
         if (qosTag == 1) {
           if (this.updateNfs.minBandwidthChoose && this.updateNfs.maxBandwidthChoose) {
@@ -708,6 +756,7 @@ export class NfsModifyComponent implements OnInit {
           this.bandwidthLimitErr = false;
         }
       }
+ */
     }
   }
 }

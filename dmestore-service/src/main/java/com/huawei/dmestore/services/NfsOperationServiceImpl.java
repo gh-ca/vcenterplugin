@@ -657,7 +657,7 @@ public class NfsOperationServiceImpl implements NfsOperationService {
         Map<String, String> respMap = new HashMap<>();
         String mgmt = "";
         String logicName = "";
-        List<LogicPorts> logicPorts = dmeStorageService.getLogicPorts(storageId,"all");
+        List<LogicPorts> logicPorts = dmeStorageService.getLogicPorts(storageId,"all",null);
         if (logicPorts != null) {
             for (LogicPorts logicPort : logicPorts) {
                 if (logicPort != null && !StringUtils.isEmpty(currentPortId) &&

@@ -297,7 +297,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
         LOG.info("vmware list nfs success!");
 
         // 将DME的存储设备集合转换为map key:ip value:Storage
-        List<Storage> storages = dmeStorageService.getStorages();
+        List<Storage> storages = dmeStorageService.getStorages(null);
         Map<String, Storage> storageMap = converStorage(storages);
         if (storageMap == null || storageMap.size() == 0) {
             LOG.error("get dme storage failed!storages is null!");
@@ -947,6 +947,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
     public void unmountNfs(Map<String, Object> params) throws DmeException {
         String dataStoreObjectId = ToolUtils.getStr(params.get(DATASTOREOBJECTID));
         String hostObjId = ToolUtils.getStr(params.get("hostId"));
+        String name = vcsdkUtils.findHostById(hostObjId);
         DmeVmwareRelation dvr = dmeVmwareRalationDao.getDmeVmwareRelationByDsId(dataStoreObjectId);
         if (dvr == null) {
             LOG.error("unmountNfs get relation error!dataStoreObjectId={}", dataStoreObjectId);
@@ -963,7 +964,10 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
                 String authId = authClient.getId();
                 String ip = authClient.getName();
                 if (!StringUtils.isEmpty(ip) && !StringUtils.isEmpty(authId)) {
-                    authIdIpMap.put(authClient.getClientIdInStorage(), ip);
+                    if ( ToolUtils.jsonToStr(new JsonParser().parse(name).getAsJsonArray().get(0).getAsJsonObject()
+                            .get("hostName")).equalsIgnoreCase(authClient.getName())) {
+                        authIdIpMap.put(authClient.getClientIdInStorage(), ip);
+                    }
                 }
             }
             String taskId = deleteAuthClient(shareId, authIdIpMap);
@@ -1052,7 +1056,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
         LOG.info("dme delete nfs end!");
     }
 
-    private void unmountNfsFromHost(String dataStoreObjectId, String hostId) throws VcenterException {
+    private void unmountNfsFromHost(String dataStoreObjectId, String hostId) throws DmeException {
         vcsdkUtils.unmountNfsOnHost(dataStoreObjectId, hostId);
     }
 
