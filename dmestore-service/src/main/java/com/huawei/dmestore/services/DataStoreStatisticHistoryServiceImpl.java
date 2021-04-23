@@ -840,6 +840,7 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
         indicators.add(DmeIndicatorConstants.COUNTER_ID_STORDEVICE_READBANDWIDTH);
         indicators.add(DmeIndicatorConstants.COUNTER_ID_STORDEVICE_WRITEBANDWIDTH);
         indicators.add(DmeIndicatorConstants.COUNTER_ID_STORDEVICE_THROUGHPUT);
+        indicators.add(DmeIndicatorConstants.COUNTER_ID_STORDEVICE_OPS);
         return indicators;
     }
 
