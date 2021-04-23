@@ -297,7 +297,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
         LOG.info("vmware list nfs success!");
 
         // 将DME的存储设备集合转换为map key:ip value:Storage
-        List<Storage> storages = dmeStorageService.getStorages();
+        List<Storage> storages = dmeStorageService.getStorages(null);
         Map<String, Storage> storageMap = converStorage(storages);
         if (storageMap == null || storageMap.size() == 0) {
             LOG.error("get dme storage failed!storages is null!");
@@ -1052,7 +1052,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
         LOG.info("dme delete nfs end!");
     }
 
-    private void unmountNfsFromHost(String dataStoreObjectId, String hostId) throws VcenterException {
+    private void unmountNfsFromHost(String dataStoreObjectId, String hostId) throws DmeException {
         vcsdkUtils.unmountNfsOnHost(dataStoreObjectId, hostId);
     }
 
