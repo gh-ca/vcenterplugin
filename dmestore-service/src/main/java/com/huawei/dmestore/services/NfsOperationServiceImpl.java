@@ -910,7 +910,7 @@ public class NfsOperationServiceImpl implements NfsOperationService {
      */
     private boolean getAutoSizeEnableStatus(JsonObject json) {
         boolean status = false;
-        String capacitySelfAdjustingMode = ToolUtils.jsonToStr(json.get("apacity_self_adjusting_mode"));
+        String capacitySelfAdjustingMode = ToolUtils.jsonToStr(json.get("capacity_self_adjusting_mode"));
         String autoSizeEnable = ToolUtils.jsonToStr(json.get("auto_size_enable"));
         if (Boolean.valueOf(autoSizeEnable)) {
             if (!"grow_shrink".equalsIgnoreCase(capacitySelfAdjustingMode)) {
