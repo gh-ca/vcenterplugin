@@ -184,6 +184,7 @@ public class NfsOperationServiceImpl implements NfsOperationService {
                 Object qoPolicy = params.get(QOS_POLICY);
                 JsonObject qosPolicy = gson.fromJson(gson.toJson(qoPolicy), JsonObject.class);
                 if (qoPolicy != null &&  Boolean.valueOf(String.valueOf(qosPolicy.get("auto_size_enable")))) {
+
                     tuningMap.put(QOS_POLICY, qoPolicy);
                 }
                 fsMap.put(TUNING, tuningMap);
