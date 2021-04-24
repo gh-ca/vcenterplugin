@@ -182,8 +182,7 @@ public class NfsOperationServiceImpl implements NfsOperationService {
             if (!StringUtils.isEmpty(tuning)) {
                 Map<String, Object> tuningMap = gson.fromJson(tuning.toString(), Map.class);
                 Object qoPolicy = params.get(QOS_POLICY);
-                JsonObject qosPolicy = gson.fromJson(gson.toJson(qoPolicy), JsonObject.class);
-                if (qoPolicy != null &&  Boolean.valueOf(String.valueOf(qosPolicy.get("auto_size_enable")))) {
+                if (qoPolicy != null &&  Boolean.valueOf(String.valueOf(gson.fromJson(gson.toJson(qoPolicy), JsonObject.class).get("auto_size_enable")))) {
 
                     tuningMap.put(QOS_POLICY, qoPolicy);
                 }
@@ -911,7 +910,7 @@ public class NfsOperationServiceImpl implements NfsOperationService {
      */
     private boolean getAutoSizeEnableStatus(JsonObject json) {
         boolean status = false;
-        String capacitySelfAdjustingMode = ToolUtils.jsonToStr(json.get("capacity_self_adjusting_mode"));
+        String capacitySelfAdjustingMode = ToolUtils.jsonToStr(json.get("apacity_self_adjusting_mode"));
         String autoSizeEnable = ToolUtils.jsonToStr(json.get("auto_size_enable"));
         if (Boolean.valueOf(autoSizeEnable)) {
             if (!"grow_shrink".equalsIgnoreCase(capacitySelfAdjustingMode)) {
