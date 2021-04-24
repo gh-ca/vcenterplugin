@@ -457,6 +457,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
 
                     volumeIds = getVolumeId(volumelist);
                     taskIds = new ArrayList<>();
+                    List<String> lunids = new ArrayList<>();
                     for (String volumeId : volumeIds) {
                         if (!StringUtils.isEmpty(volumeId)) {
                             params.put("volume_id", volumeId);
@@ -474,11 +475,12 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                             }
                         }
                         // 映射主机或者主机组
-                        if (params.get(DmeConstants.HOST) != null) {
+                        lunids.add(volumeId);
+                        if (params.get(DmeConstants.HOST) != null && lunids.size()==volumeIds.size()) {
                             dmeHostId = objHostId;
-                            taskId = lunMappingToHostOrHostgroup(volumeIds, dmeHostId, null);
+                            taskId = lunMappingToHostOrHostgroup(lunids, dmeHostId, null);
                         } else if (params.get(DmeConstants.CLUSTER) != null) {
-                            List<String> lunids = new ArrayList<>();
+                            lunids.clear();
                             lunids.add(volumeId);
                             demHostGroupId = objHostId;
                             taskId = lunMappingToHostOrHostgroup(lunids, null, demHostGroupId);
