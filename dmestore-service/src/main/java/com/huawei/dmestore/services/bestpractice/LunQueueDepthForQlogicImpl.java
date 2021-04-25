@@ -53,7 +53,7 @@ public class LunQueueDepthForQlogicImpl extends BaseBestPracticeService implemen
         String apiVersion = aboutInfo.getApiVersion();
         try {
             String esxiApiVersion = apiVersion.substring(0, 3);
-            if (Float.valueOf(esxiApiVersion) != Float.valueOf("6.7")) {
+            if (Float.parseFloat(esxiApiVersion) != Float.parseFloat("6.7")) {
                 return true;
             }
         } catch (Exception ex) {
