@@ -1,0 +1,33 @@
+export default {
+  code: '200',
+  data: [
+    {
+      name: 'Dvmfs156_170000',
+      wwn: '67c1cf110058934532cd9c0e0000029a',
+      smartTier: '0',
+      evolutionaryInfo: null,
+      device: null,
+      storagePool: 'StoragePool001',
+      serviceLevel: null,
+      storage: 'Huawei.Storage',
+      dudeplication: false,
+      provisionType: 'thin',
+      compression: false,
+      applicationType: 'ORACL_OLAP&OLTP',
+      controlPolicy: '1',
+      trafficControl: null,
+      smartQos: {
+        name: null,
+        latency: 0,
+        maxbandwidth: 1000,
+        maxiops: 100,
+        minbandwidth: 0,
+        miniops: 0,
+        enabled: null,
+        controlPolicy: '1',
+        latencyUnit: null,
+      },
+    },
+  ],
+  description: null,
+};

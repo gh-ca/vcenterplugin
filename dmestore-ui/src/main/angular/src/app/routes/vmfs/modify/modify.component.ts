@@ -9,7 +9,12 @@ import {
   VmfsListService,
 } from '../list/list.service';
 import { GlobalsService } from '../../../shared/globals.service';
-import { getQueryParams, getURL, handlerResponseErrorSimple } from 'app/app.helpers';
+import {
+  getQosCheckTipsTagInfo,
+  getQueryParams,
+  getURL,
+  handlerResponseErrorSimple,
+} from 'app/app.helpers';
 import { isMockData, mockData } from 'mock/mock';
 import { getVmfsDmestorageStorageByTag } from 'mock/VMFS_DMESTORAGE_STORAGE';
 
@@ -27,9 +32,10 @@ export class ModifyComponent implements OnInit {
     private route: ActivatedRoute,
     private cdr: ChangeDetectorRef,
     private router: Router,
-    private globalsService: GlobalsService,
-  ) {
-  }
+    private globalsService: GlobalsService
+  ) {}
+
+  dorado = false; //是否是V6设备
 
   // 编辑form提交数据
   modifyForm = new GetForm().getEditForm();
@@ -373,7 +379,7 @@ export class ModifyComponent implements OnInit {
     console.log(
       'this.vmfsNameRepeatErr, this.volNameRepeatErr',
       this.vmfsNameRepeatErr,
-      this.volNameRepeatErr,
+      this.volNameRepeatErr
     );
   }
 
@@ -503,9 +509,8 @@ export class ModifyComponent implements OnInit {
             const upperObj = document.getElementById('editControl_policyUpper') as HTMLInputElement;
             const lowerObj = document.getElementById('editControl_policyLower') as HTMLInputElement;
             /* 根据返回的数据判断是否需要展示 */
-            const {
-              smartQos: { latency, maxbandwidth, maxiops, minbandwidth, miniops },
-            } = this.storage;
+            const smartQos = this.storage || {};
+            const { latency, maxbandwidth, maxiops, minbandwidth, miniops } = smartQos as any;
 
             this.modifyForm.max_iops = maxiops;
             this.modifyForm.max_bandwidth = maxbandwidth;
@@ -681,12 +686,6 @@ export class ModifyComponent implements OnInit {
     this.qosV6Check('edit');
   }
 
-  qoSEditFlagChangeModify() {
-    if (!this.modifyForm.qosFlag) {
-      this.modifyForm = new GetForm().getEditForm();
-    }
-  }
-
   /**
    * iops错误提示
    * @param objVal
@@ -783,6 +782,28 @@ export class ModifyComponent implements OnInit {
     if (type != 'add') {
       if (this.storage) {
         const qosTag = this.storage.storageTypeShow.qosTag;
+        this.dorado = String(qosTag) === '1';
+        const { bandwidthLimitErr, iopsLimitErr } = getQosCheckTipsTagInfo({
+          qosTag,
+          minBandwidthChoose: this.modifyForm.minbandwidthChoose,
+          minBandwidth: this.modifyForm.min_bandwidth,
+          maxBandwidthChoose: this.modifyForm.maxbandwidthChoose,
+          maxBandwidth: this.modifyForm.max_bandwidth,
+          minIopsChoose: this.modifyForm.miniopsChoose,
+          minIops: this.modifyForm.min_iops,
+          maxIopsChoose: this.modifyForm.maxiopsChoose,
+          maxIops: this.modifyForm.max_iops,
+          control_policyUpper: this.modifyForm.control_policyUpper,
+          control_policyLower: this.modifyForm.control_policyLower,
+        });
+        this.bandwidthLimitErr = bandwidthLimitErr;
+        this.iopsLimitErr = iopsLimitErr;
+
+        /* 
+        
+        
+        
+        const qosTag = this.storage.storageTypeShow.qosTag;
         if (qosTag == 1) {
           if (this.modifyForm.minbandwidthChoose && this.modifyForm.maxbandwidthChoose) {
             // 带宽上限小于下限
@@ -830,6 +851,10 @@ export class ModifyComponent implements OnInit {
         if (this.modifyForm.control_policyLower == undefined) {
           this.bandwidthLimitErr = false;
         }
+      
+      
+      
+        */
       }
     }
   }

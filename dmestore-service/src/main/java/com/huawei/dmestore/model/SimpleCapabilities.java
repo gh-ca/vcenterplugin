@@ -16,11 +16,11 @@ public class SimpleCapabilities {
     /**
      * compression.
      */
-    private Boolean compression;
+    private String compression;
     /**
      * deduplication.
      */
-    private Boolean deduplication;
+    private String deduplication;
     /**
      * smarttier.
      */
@@ -93,7 +93,7 @@ public class SimpleCapabilities {
      *
      * @return Boolean .
      */
-    public Boolean getCompression() {
+    public String getCompression() {
         return compression;
     }
 
@@ -102,7 +102,7 @@ public class SimpleCapabilities {
      *
      * @param param .
      */
-    public void setCompression(final Boolean param) {
+    public void setCompression(final String param) {
         this.compression = param;
     }
 
@@ -111,7 +111,7 @@ public class SimpleCapabilities {
      *
      * @return Boolean .
      */
-    public Boolean getDeduplication() {
+    public String getDeduplication() {
         return deduplication;
     }
 
@@ -120,7 +120,7 @@ public class SimpleCapabilities {
      *
      * @param param .
      */
-    public void setDeduplication(final Boolean param) {
+    public void setDeduplication(final String param) {
         this.deduplication = param;
     }
 

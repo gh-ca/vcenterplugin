@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { URLS_LIST_SERVICE } from './../list/list.service';
 
 @Injectable()
 export class ModifyService {
@@ -25,7 +24,7 @@ export class ModifyService {
 
   // 附列表数据
   getChartData(volumeIds: string[]) {
-    return this.http.get(URLS_LIST_SERVICE.ACCESSVMFS_LISTVMFSPERFORMANCE, { params: { volumeIds } });
+    return this.http.get('accessvmfs/listvmfsperformance', { params: { volumeIds } });
   }
 
   /**

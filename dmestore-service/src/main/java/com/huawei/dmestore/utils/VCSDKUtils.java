@@ -4,6 +4,7 @@ import com.google.gson.JsonArray;
 import com.huawei.dmestore.constant.DmeConstants;
 import com.huawei.dmestore.entity.DmeVmwareRelation;
 import com.huawei.dmestore.entity.VCenterInfo;
+import com.huawei.dmestore.exception.DmeException;
 import com.huawei.dmestore.exception.VcenterException;
 import com.huawei.dmestore.model.UpHostVnicRequestBean;
 import com.huawei.vmware.VcConnectionHelpers;
@@ -2050,7 +2051,7 @@ public class VCSDKUtils {
      * @param mountType mountType
      * @throws VcenterException VcenterException
      **/
-    public void mountNfs(String datastoreobjectid, String hostobjectid, String logicPortIp, String mountType) {
+    public void mountNfs(String datastoreobjectid, String hostobjectid, String logicPortIp, String mountType, String shareName) throws DmeException {
         try {
             if (datastoreobjectid == null) {
                 logger.info("param datastore is null");
@@ -2077,7 +2078,7 @@ public class VCSDKUtils {
             // 挂载NFS
             NasDatastoreInfo nasdsinfo = (NasDatastoreInfo) datastoreMo.getInfo();
             hostMo.getHostDatastoreSystemMo()
-                .createNfsDatastore(nasdsinfo.getNas().getRemoteHost(), 0, nasdsinfo.getNas().getRemotePath(),
+                .createNfsDatastore(nasdsinfo.getNas().getRemoteHost(), 0, shareName,
                     datastoreMo.getName(), mountType, nasdsinfo.getNas().getType(),
                     nasdsinfo.getNas().getSecurityType());
             logger.info("mount nfs success:{}:", hostMo.getName(), datastoreMo.getName());
@@ -2087,6 +2088,7 @@ public class VCSDKUtils {
             logger.info("Rescan datastore after mounting");
         } catch (Exception e) {
             logger.error("vmware mount nfs error:{}", e.getMessage());
+            throw new DmeException(e.getMessage());
         }
     }
 
@@ -2097,7 +2099,7 @@ public class VCSDKUtils {
      * @param hostMo hostMo
      * @param datastoreobjectid datastoreobjectid
      */
-    public void unmountNfsOnHost(DatastoreMo dsmo, HostMo hostMo, String datastoreobjectid) {
+    public void unmountNfsOnHost(DatastoreMo dsmo, HostMo hostMo, String datastoreobjectid) throws Exception {
         try {
             if (dsmo == null) {
                 logger.info("datastore is null");
@@ -2120,10 +2122,12 @@ public class VCSDKUtils {
             logger.info("Rescan datastore after unmounting");
         } catch (Exception e) {
             logger.error("unmount nfs error:{}", e.getMessage());
+            throw new Exception(e.getMessage());
+
         }
     }
 
-    public void unmountNfsOnHost(String dataStoreObjectId, String hostObjId) throws VcenterException {
+    public void unmountNfsOnHost(String dataStoreObjectId, String hostObjId) throws DmeException {
         try {
             if (StringUtils.isEmpty(dataStoreObjectId)) {
                 logger.info("param dataStoreObjectId is null");
@@ -2144,7 +2148,7 @@ public class VCSDKUtils {
             unmountNfsOnHost(dsmo, hostmo, dataStoreObjectId);
         } catch (Exception e) {
             logger.error("unmount nfs On host error:{}", e.getMessage());
-            throw new VcenterException(e.getMessage());
+            throw new DmeException(e.getMessage());
         }
     }
 
@@ -3249,7 +3253,7 @@ public class VCSDKUtils {
     /**
      * 获取主机网卡信息
      *
-     * @param hostObjectId 主机objectid
+     * @param hostObjectIds 主机objectid
      * @param recommendMtu MTU期望值
      * @return String String
      */
@@ -3298,8 +3302,8 @@ public class VCSDKUtils {
     /**
      * 获取主机网卡信息
      *
-     * @param hostObjectId 主机objectid
-     * @param recommendMtu MTU期望值
+     * @param beans 主机objectid
+     * @param recommendValue MTU期望值
      */
     public void updateVirtualNicList(List<UpHostVnicRequestBean> beans, int recommendValue) {
         JsonArray jsonArray = new JsonArray();

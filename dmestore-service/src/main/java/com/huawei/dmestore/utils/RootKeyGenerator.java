@@ -55,7 +55,13 @@ public class RootKeyGenerator {
         if("PBKDF2".equalsIgnoreCase(rootAlgorithm)){
             String key=CipherUtil.parseByte2Hexstr(modResult);
             //byte[] rootsalt=CipherUtil.parseHexstr2Byte(System.getProperty("cipher.rootKey.salt"));
-            byte[] rootsalt=CipherUtil.parseHexstr2Byte(cipherConfig.getRootKey().getSalt());
+            //String randomsalt= getSafeRandomToString(KEY_SIZE);
+            String saltKey = FileUtils.getKey(FileUtils.SALT_FILE_NAME);
+            if (saltKey == null) {
+                saltKey= getSafeRandomToString(KEY_SIZE);
+                FileUtils.saveKey(saltKey,FileUtils.SALT_FILE_NAME);
+            }
+            byte[] rootsalt=CipherUtil.parseHexstr2Byte(saltKey);
             //Integer rootIteration=Integer.valueOf(System.getProperty("cipher.rootKey.iteration"));
             Integer rootIteration=Integer.valueOf(cipherConfig.getRootKey().getIteration());
             return encryptRootKey(key,rootsalt,rootIteration);

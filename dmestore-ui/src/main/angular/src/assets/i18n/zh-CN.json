@@ -361,15 +361,19 @@
       "iops": "IOPS",
       "ops": "OPS",
       "bandwidth": "带宽(MB/s)",
-      "offLine": "离线",
+      "Offline": "离线",
       "normal": "正常",
-      "fault": "故障",
-      "notMgr": "未管理",
-      "notSync": "未同步",
-      "inSync": "同步中",
+      "Abnormal": "故障",
+      "degraded": "降级",
+      "Unmanaged": "未管理",
+      "unsync": "未同步",
+      "Sync": "同步中",
       "synced": "已同步",
+      "syncNormal": "同步完成",
+      "syncFailed": "同步失败",
       "status": "运行状态",
-      "synStatus": "同步状态"
+      "synStatus": "同步状态",
+      "Unknown": "未知"
     },
     "chart": {
       "total": " 总计",
@@ -590,6 +594,7 @@
     "totalCapacity": "总量",
     "used": "已用",
     "free": "可用",
+    "capacity": "存储容量分配",
     "top5T": "存储容量利用率Top5",
     "connectT": "DME连接",
     "connectFail": "连接失败！",
@@ -902,6 +907,7 @@
     "details": "详情",
     "bandwidthLimitErr": "带宽下限不能大于上限！",
     "iopsLimitErr": "IOPS上限值最小为100,且下限不能大于上限！",
+    "iopsLimitErrNotV6": "IOPS下限不能大于上限！",
     "syncSuccess": "数据同步成功!"
   },
   "chart": {

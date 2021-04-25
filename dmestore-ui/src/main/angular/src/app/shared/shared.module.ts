@@ -16,6 +16,7 @@ import { AlarmState } from 'app/routes/nfs/alarm-state.filter';
 import { BpCellMulRowComponent } from './bp-cell-mul-row/bp-cell-mul-row.component';
 import { StorageDjAzCellComponent } from './storage-dj-az-cell/storage-dj-az-cell.component';
 import { FormItemQosGroupComponent } from './form-item-qos-group/form-item-qos-group.component';
+import { StorageStatusCellComponent } from './storage-status-cell/storage-status-cell.component';
 
 const THIRD_MODULES = [MaterialModule, TranslateModule];
 const COMPONENTS = [
@@ -29,6 +30,8 @@ const COMPONENTS = [
   BpCellMulRowComponent,
   /* 存储列表可用分区 */
   StorageDjAzCellComponent,
+  /* 状态 运行状态 */
+  StorageStatusCellComponent,
   /* qos策略 */
   FormItemQosGroupComponent,
 ];

@@ -19,10 +19,11 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { TokenService } from '@core';
 import { DOCUMENT } from '@angular/common';
 import { isMockData, mockData } from './../../../mock/mock';
-import { getColorByType, getLabelByValue } from './../../app.helpers';
+import { getColorByType, getLabelByValue, getQosCheckTipsTagInfo } from './../../app.helpers';
 import { handlerResponseErrorSimple } from 'app/app.helpers';
 import { SimpleChange } from '@angular/core';
 import debounce from 'just-debounce';
+import { NfsComponentCommon } from './NfsComponentCommon';
 
 @Component({
   selector: 'app-nfs',
@@ -31,7 +32,7 @@ import debounce from 'just-debounce';
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [NfsService, StorageService, VmfsListService, NfsAddService],
 })
-export class NfsComponent implements OnInit {
+export class NfsComponent extends NfsComponentCommon implements OnInit {
   getColor;
   getLabelByValue;
   isAddPageOneNextDisabled: boolean;
@@ -124,7 +125,7 @@ export class NfsComponent implements OnInit {
   constructor(
     private addService: NfsAddService,
     private remoteSrv: NfsService,
-    private cdr: ChangeDetectorRef,
+    public cdr: ChangeDetectorRef,
     public gs: GlobalsService,
     private storageService: StorageService,
     private vmfsListService: VmfsListService,
@@ -134,6 +135,7 @@ export class NfsComponent implements OnInit {
     @Inject(DOCUMENT)
     private document: any
   ) {
+    super();
     this.getColor = getColorByType;
     this.getLabelByValue = getLabelByValue;
     this.isAddPageOneNextDisabled = true;
@@ -163,7 +165,7 @@ export class NfsComponent implements OnInit {
 
     /* TODO: */
     if (isMockData) {
-      nfsListResHandler(mockData[URLS_NFS.ACCESSNFS_LISTNFS]);
+      nfsListResHandler(mockData.ACCESSNFS_LISTNFS);
     } else {
       this.remoteSrv.getData().subscribe(nfsListResHandler);
     }
@@ -220,33 +222,6 @@ export class NfsComponent implements OnInit {
 
   print(val) {
     return JSON.stringify(val, null, 2);
-  }
-
-  checkAddForm() {
-    const isStoragId = !!this.addForm.storagId;
-    const isStoragePoolId = !!this.addForm.storagePoolId;
-    const isCurrentPortId = !!this.addForm.currentPortId;
-    const isNfsName = !!this.addForm.nfsName;
-    const isSize = typeof this.addForm.size === 'number';
-    const isHostObjectId = !!this.addForm.hostObjectId;
-    const isVkernelIp = !!this.addForm.vkernelIp;
-    const isAccessMode = !!this.addForm.accessMode;
-    const isFsName = !!this.addForm.fsName;
-    const isShareName = !!this.addForm.shareName;
-
-    this.isAddPageOneNextDisabled = !(
-      isStoragId &&
-      isStoragePoolId &&
-      isCurrentPortId &&
-      isNfsName &&
-      isSize &&
-      isHostObjectId &&
-      isVkernelIp &&
-      isAccessMode &&
-      isFsName &&
-      isShareName
-    );
-    this.cdr.detectChanges();
   }
 
   addView() {
@@ -309,18 +284,7 @@ export class NfsComponent implements OnInit {
         .subscribe(handlerGetHostListSuccess, handlerResponseErrorSimple);
     }
 
-    this.addForm = new AddNfs();
-    /* 监听名字变化 根据是否一样给剩下两个赋值 */
-    this.addFormGroup.valueChanges.subscribe(addForm => {
-      if (addForm.sameName) {
-        const isSameShare = this.addForm.shareName === addForm.nfsName;
-        const isSameFs = (this.addForm.fsName = addForm.nfsName);
-        if (!(isSameShare && isSameFs)) {
-          this.addForm.fsName = this.addForm.shareName = addForm.nfsName;
-        }
-      }
-      this.checkAddForm();
-    });
+    this.createAddFormAndWatchFormChange();
 
     // 初始化form
     this.addFormGroup.reset(this.addForm);
@@ -1218,6 +1182,26 @@ export class NfsComponent implements OnInit {
         const chooseStorage = this.storageList.filter(item => item.id == this.addForm.storagId)[0];
         if (chooseStorage) {
           const qosTag = chooseStorage.storageTypeShow.qosTag;
+          const { bandwidthLimitErr, iopsLimitErr } = getQosCheckTipsTagInfo({
+            qosTag,
+            minBandwidthChoose: this.addForm.minBandwidthChoose,
+            minBandwidth: this.addForm.minBandwidth,
+            maxBandwidthChoose: this.addForm.maxBandwidthChoose,
+            maxBandwidth: this.addForm.maxBandwidth,
+            minIopsChoose: this.addForm.minIopsChoose,
+            minIops: this.addForm.minIops,
+            maxIopsChoose: this.addForm.maxIopsChoose,
+            maxIops: this.addForm.maxIops,
+            control_policyUpper: this.addForm.control_policyUpper,
+            control_policyLower: this.addForm.control_policyLower,
+          });
+          this.bandwidthLimitErr = bandwidthLimitErr;
+          this.iopsLimitErr = iopsLimitErr;
+
+          /* 
+          
+          
+          const qosTag = chooseStorage.storageTypeShow.qosTag;
           if (qosTag == 1) {
             if (this.addForm.minBandwidthChoose && this.addForm.maxBandwidthChoose) {
               // 带宽上限小于下限
@@ -1265,6 +1249,8 @@ export class NfsComponent implements OnInit {
           if (this.addForm.control_policyLower == undefined) {
             this.bandwidthLimitErr = false;
           }
+        
+          */
         }
       }
     }

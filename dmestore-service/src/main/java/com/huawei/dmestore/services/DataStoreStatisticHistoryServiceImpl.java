@@ -840,6 +840,7 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
         indicators.add(DmeIndicatorConstants.COUNTER_ID_STORDEVICE_READBANDWIDTH);
         indicators.add(DmeIndicatorConstants.COUNTER_ID_STORDEVICE_WRITEBANDWIDTH);
         indicators.add(DmeIndicatorConstants.COUNTER_ID_STORDEVICE_THROUGHPUT);
+        indicators.add(DmeIndicatorConstants.COUNTER_ID_STORDEVICE_OPS);
         return indicators;
     }
 
@@ -888,6 +889,7 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
             indicators.add(DmeIndicatorConstants.COUNTER_ID_STORAGEDISK_READTHROUGHPUT);
             indicators.add(DmeIndicatorConstants.COUNTER_ID_STORAGEDISK_BANDWIDTH);
             indicators.add(DmeIndicatorConstants.COUNTER_ID_STORAGEDISK_UTILITY);
+            indicators.add(DmeIndicatorConstants.COUNTER_ID_STORAGEDISK_THROUGHPUT);
         } else {
             indicators.add(DmeIndicatorConstants.COUNTER_ID_STORAGEDISK_READTHROUGHPUT);
             indicators.add(DmeIndicatorConstants.COUNTER_ID_STORAGEDISK_WRITETHROUGHPUT);

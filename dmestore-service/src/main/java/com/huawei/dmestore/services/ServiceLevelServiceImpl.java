@@ -236,10 +236,11 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
                 SimpleCapabilities scb = new SimpleCapabilities();
                 JsonObject capJsonObj = capObj.getAsJsonObject();
                 String resourceType = ToolUtils.jsonToOriginalStr(capJsonObj.get("resource_type"));
-                boolean compression = ToolUtils.jsonToBoo(capJsonObj.get("compression"));
+                String compression = ToolUtils.jsonToOriginalStr(capJsonObj.get("compression"));
+                String deduplication = ToolUtils.jsonToOriginalStr(capJsonObj.get("deduplication"));
                 scb.setResourceType(resourceType);
                 scb.setCompression(compression);
-
+                scb.setDeduplication(deduplication);
                 CapabilitiesIopriority ci = new CapabilitiesIopriority();
                 JsonElement element = capJsonObj.get("iopriority");
                 if (!ToolUtils.jsonIsNull(element)) {
