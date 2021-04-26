@@ -880,15 +880,17 @@ public class DmeAccessServiceImpl implements DmeAccessService {
         Map<String, Object> objMap = new HashMap<>();
         if (!CollectionUtils.isEmpty(list)) {
             for (Map<String, Object> map : list) {
+                if (!CollectionUtils.isEmpty(map)){
                 Iterator<Map.Entry<String, Object>> it = map.entrySet().iterator();
                 while (it.hasNext()) {
-                    Map.Entry entry =(Map.Entry) it.next();
-                               Object key = entry.getKey();
-                              Object value = entry.getValue();
-                              if(ToolUtils.getStr(value).contains("&amp;")){
-                                  value = ToolUtils.getStr(value).replace("&amp;","&");
-                              }
-                    objMap.put(ToolUtils.getStr(key),ToolUtils.getStr(value));
+                    Map.Entry entry = (Map.Entry) it.next();
+                    Object key = entry.getKey();
+                    Object value = entry.getValue();
+                    if ((!StringUtils.isEmpty(value)) && ToolUtils.getStr(value).contains("&amp;")) {
+                        value = ToolUtils.getStr(value).replace("&amp;", "&");
+                    }
+                    objMap.put(ToolUtils.getStr(key), ToolUtils.getStr(value));
+                }
                 }
             }
             objList.add(objMap);
