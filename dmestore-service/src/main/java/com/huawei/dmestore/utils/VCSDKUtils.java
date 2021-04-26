@@ -3600,7 +3600,7 @@ public class VCSDKUtils {
             return re;
 
         } catch (Exception ex) {
-            logger.error("error:", ex);
+            logger.error("satpRuleProcess error!hostObjectId={},esxCLI={},{}", hostObjectId, esxCLI, ex);
         } finally {
             if (sessionManager != null) {
                 sessionManager.logout();
@@ -3613,12 +3613,5 @@ public class VCSDKUtils {
         return null;
 
     }
-
-
-    public static void main(String[] args) {
-
-    }
-
-
 
 }
