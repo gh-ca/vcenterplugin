@@ -885,7 +885,7 @@ public class DmeAccessServiceImpl implements DmeAccessService {
                     Map.Entry entry =(Map.Entry) it.next();
                                Object key = entry.getKey();
                               Object value = entry.getValue();
-                              if(ToolUtils.getStr(value).contains("&amp;")){
+                              if(!StringUtils.isEmpty(value) && ToolUtils.getStr(value).contains("&amp;")){
                                   value = ToolUtils.getStr(value).replace("&amp;","&");
                               }
                     objMap.put(ToolUtils.getStr(key),ToolUtils.getStr(value));
