@@ -3385,8 +3385,8 @@ public class VCSDKUtils {
             perfQuerySpecs.add(qSpec);
             List<PerfEntityMetricBase> perfEntityMetricBases = performanceManagerMo.queryPerf(perfQuerySpecs);
             perResult = gson.toJson(perfEntityMetricBases);
-        } catch (Exception e) {
-            logger.error("queryPerfAllCount error");
+        } catch (Exception ex) {
+            logger.error("queryPerfAllCount error!", ex);
         }
         return perResult;
     }
@@ -3416,8 +3416,8 @@ public class VCSDKUtils {
                     map.put(key, satpMap);
                 }
             }
-        } catch (Exception e) {
-            logger.error("xmlRulesFormat error:{}", e.toString());
+        } catch (Exception ex) {
+            logger.error("xmlRulesFormat error!", ex);
         }
         return map;
     }
@@ -3464,7 +3464,7 @@ public class VCSDKUtils {
         map1.put("psp", "VMW_PSP_RR");
         map1.put("claimOption", "tpgs_on");
         map1.put("model", modelValue);
-        map1.put("vendor", modelValue);
+        map1.put("vendor", vendorValue);
         String satpKey1 = getSatpKey(map1);
         if(!satpRuleMap.containsKey(satpKey1)){
             ruleList.add(map1);
@@ -3474,8 +3474,8 @@ public class VCSDKUtils {
         map2.put("satp", "VMW_SATP_DEFAULT_AA");
         map2.put("psp", "VMW_PSP_RR");
         map2.put("claimOption", "tpgs_off");
-        map1.put("model", modelValue);
-        map1.put("vendor", modelValue);
+        map2.put("model", modelValue);
+        map2.put("vendor", vendorValue);
         String satpKey2 = getSatpKey(map2);
         if(!satpRuleMap.containsKey(satpKey2)){
             ruleList.add(map2);
@@ -3530,7 +3530,8 @@ public class VCSDKUtils {
             soapArgumentList.add(vendor);
 
             ManagedMethodExecuter.SoapArgument[] var4 = soapArgumentList.toArray(new ManagedMethodExecuter.SoapArgument[0]);
-            satpRuleProcess(hostObjectId, vcenterinfo, moid, esxCLI, var4);
+            String processStr = satpRuleProcess(hostObjectId, vcenterinfo, moid, esxCLI, var4);
+            logger.info("add SATP rule {}, {}, hostObjectId={}", map.get("satp"), StringUtils.isEmpty(processStr) ? "failed" : "success", hostObjectId);
         }
 
     }
@@ -3610,6 +3611,11 @@ public class VCSDKUtils {
         }
 
         return null;
+
+    }
+
+
+    public static void main(String[] args) {
 
     }
 

@@ -64,8 +64,12 @@ public class NMPPathSwitchPolicyImpl extends BaseBestPracticeService implements 
 
     @Override
     public Object getCurrentValue(VCSDKUtils vcsdkUtils, String objectId) throws Exception {
-        List<HostMultipathInfoLogicalUnit> lunList = getLuns(vcsdkUtils, objectId);
         JsonArray array = new JsonArray();
+        List<HostMultipathInfoLogicalUnit> lunList = getLuns(vcsdkUtils, objectId);
+        if(lunList.size() == 0){
+            logger.info("host {} has not DME LUN!", objectId);
+            return array.toString();
+        }
         for (HostMultipathInfoLogicalUnit lun : lunList) {
             HostMultipathInfoLogicalUnitPolicy policy = lun.getPolicy();
             String policyStr = policy.getPolicy();
@@ -75,6 +79,10 @@ public class NMPPathSwitchPolicyImpl extends BaseBestPracticeService implements 
                 object.addProperty("value", policyStr);
                 array.add(object);
             }
+        }
+
+        if(array.size() == 0){
+            logger.info("host {} has not fond any lun which psp is VMW_PSP_RR!", objectId);
         }
 
         return array.toString();
