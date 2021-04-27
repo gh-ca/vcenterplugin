@@ -209,9 +209,9 @@ public class NfsOperationController extends BaseController {
                     capacityAutonegotiation.put("max_auto_size", 16777216);
                     capacityAutonegotiation.put("min_auto_size", 16777216);
                     capacityAutonegotiation.put("auto_size_increment", 1024);
-                    capacityAutonegotiation.put(AUTO_SIZE_ENABLE_FIELD, requestParams.get(AUTO_SIZE_ENABLE_REQUEST_FIELD));
+                    capacityAutonegotiation.put(AUTO_SIZE_ENABLE_FIELD, true);
+                    capacityAutonegotiation.put(ADJUSTING_MODE_FIELD, capacitymode);
                 }
-                capacityAutonegotiation.put(ADJUSTING_MODE_FIELD, capacitymode);
             }
         } else {
             tuning.put(ALLOCATION_TYPE_FIELD, THIN_FIELD);
@@ -279,14 +279,15 @@ public class NfsOperationController extends BaseController {
             }
             if (qosPolicy != null && qosPolicy.size() != 0) {
                 if (enabled) {
-                    qosPolicy.put("enabled", enabled);
+                    qosPolicy.put("enabled", qosFlag);
                 }
                 param.put("qos_policy", qosPolicy);
             }
         }else {
             Map<String, Object> enableMap = new HashMap<>(DmeConstants.COLLECTION_CAPACITY_16);
-            enableMap.put("enabled", false);
-            param.put("qos_policy", enableMap);
+            if (enabled) {
+                enableMap.put("enabled", qosFlag);
+                param.put("qos_policy", enableMap);            }
         }
     }
 
@@ -296,15 +297,13 @@ public class NfsOperationController extends BaseController {
         Map<String, Object> capacityAutonegotiationMap =
                 (Map<String, Object>) filesystemDetail.get("capacity_auto_negotiation");
         Map<String, Object> capacityAutonegotiation = new HashMap<>(DmeConstants.COLLECTION_CAPACITY_16);
-        boolean autoSizeEnableFlag = false;
         String capacitymode = null;
         if (autoSizeEnable != null) {
-            autoSizeEnableFlag = (Boolean) autoSizeEnable;
-            capacitymode = autoSizeEnableFlag
+            capacitymode = (Boolean) autoSizeEnable
                     ? CapacityAutonegotiation.CAPACITY_MODE_AUTO
                     : CapacityAutonegotiation.CAPACITY_MODE_OFF;
         }
-        capacityAutonegotiation.put(AUTO_SIZE_ENABLE_FIELD, autoSizeEnableFlag);
+        capacityAutonegotiation.put(AUTO_SIZE_ENABLE_FIELD, true);
         capacityAutonegotiation
                 .put("capacity_recycle_mode", capacityAutonegotiationMap.get("capacity_recycle_mode"));
         capacityAutonegotiation
