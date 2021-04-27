@@ -31,6 +31,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
+import sun.rmi.runtime.Log;
 
 /**
  * NfsOperationServiceImpl
@@ -182,13 +183,11 @@ public class NfsOperationServiceImpl implements NfsOperationService {
             if (!StringUtils.isEmpty(tuning)) {
                 Map<String, Object> tuningMap = gson.fromJson(tuning.toString(), Map.class);
                 Object qoPolicy = params.get(QOS_POLICY);
-                if (qoPolicy != null &&  Boolean.valueOf(String.valueOf(gson.fromJson(gson.toJson(qoPolicy), JsonObject.class).get("auto_size_enable")))) {
-
+                if (qoPolicy != null ) {
                     tuningMap.put(QOS_POLICY, qoPolicy);
                 }
                 fsMap.put(TUNING, tuningMap);
             }
-
             Object capacityAutonegotiation = params.get(CAPACITY_AUTONEGOTIATION);
             if (!StringUtils.isEmpty(capacityAutonegotiation)) {
                 fsMap.put(CAPACITY_AUTONEGOTIATION, capacityAutonegotiation);
@@ -492,7 +491,7 @@ public class NfsOperationServiceImpl implements NfsOperationService {
             filesystemSpecsLists.add(filesystemSpecsMap);
         }
         params.put(FILESYSTEM_SPECS, filesystemSpecsLists);
-
+        String ss = gson.toJson(params);
         LOG.info("DME 创建NFS报文：{}", gson.toJson(params));
         String url = DmeConstants.API_FS_CREATE;
         ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.POST, gson.toJson(params));
@@ -741,6 +740,7 @@ public class NfsOperationServiceImpl implements NfsOperationService {
             }
             String url = DmeConstants.DME_NFS_FILESERVICE_DETAIL_URL.replace(FILE_SYSTEM_ID, fileSystemId);
             ResponseEntity<String> responseTuning = dmeAccessService.access(url, HttpMethod.GET, null);
+            LOG.info(responseTuning.toString());
             if (responseTuning.getStatusCodeValue() / DIGIT_100 == DIGIT_2) {
                 fsname = fsDetailPrase(resultMap, fileSystemId, responseTuning);
             }
