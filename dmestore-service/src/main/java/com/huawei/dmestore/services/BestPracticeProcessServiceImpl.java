@@ -338,6 +338,7 @@ public class BestPracticeProcessServiceImpl implements BestPracticeProcessServic
                 base.setNeedReboot(service.needReboot());
                 try {
                     boolean checkFlag = service.check(vcsdkUtils, objectId);
+                    log.info("check! before best practice update! checkFlag={}, objectId={}, hostSetting={}", checkFlag, objectId, hostSetting);
                     if (!checkFlag) {
                         service.update(vcsdkUtils, objectId);
                         // 更新成功后，只要有一项是需要重启的则该主机需要重启后生效
@@ -349,8 +350,7 @@ public class BestPracticeProcessServiceImpl implements BestPracticeProcessServic
                     successList.add(objectId);
                 } catch (Exception ex) {
                     base.setUpdateResult(false);
-                    log.error("best practice update {} {} recommend value failed!errMsg:{}", objectId, hostSetting,
-                            ex.getMessage());
+                    log.error("best practice update {} {} recommend value failed!errMsg:{}", objectId, hostSetting, ex);
                 }
                 baseList.add(base);
             }
