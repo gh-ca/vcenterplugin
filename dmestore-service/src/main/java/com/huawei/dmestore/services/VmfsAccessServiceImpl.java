@@ -960,8 +960,8 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
     @Override
     public List<Map<String, String>> estimateConnectivityOfHostOrHostgroup(String storageId, String hostId,
         String hostgroupId) throws DmeException {
-
         Map<String, String> requestBody = new HashMap<>();
+        //Map<String, Object> requestBody = new HashMap<>();
         if (StringUtils.isEmpty(storageId)) {
             LOG.error("estimate connectivity of host or hostgroup storageid param error!", storageId);
             throw new DmeException("estimate connectivity of host or hostgroup , storageid param error!");
@@ -969,6 +969,9 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         requestBody.put("storage_id", storageId);
         if (!StringUtils.isEmpty(hostId)) {
             //检查主机连通性参数
+            //List<String> ids = new ArrayList<>();
+            //ids.add(hostId);
+            //requestBody.put("host_ids", ids);
             requestBody.put("host_id", hostId);
         }
         if (!StringUtils.isEmpty(hostgroupId)) {

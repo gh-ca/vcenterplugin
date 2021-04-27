@@ -48,7 +48,8 @@ public class RestUtils {
                 .build();
             HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory();
             requestFactory.setHttpClient(httpClient);
-            requestFactory.setReadTimeout(10000);
+            // 批量创建vmfs200个 readtimeout超时问题。
+            requestFactory.setReadTimeout(10000*10);
             requestFactory.setConnectTimeout(3000);
             restTemplate = new RestTemplate(requestFactory);
             restTemplate.setErrorHandler(new ResponseErrorHandler() {
