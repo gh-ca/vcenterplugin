@@ -1,23 +1,16 @@
 import { SimpleChange } from '@angular/core';
 import { Component, OnInit, Input } from '@angular/core';
-import { STATUS_ARRAY, SYN_STATUS_ARRAY } from './../../routes/storage/filter.component';
+import { STATUS_ARRAY, SYN_STATUS_ARRAY } from 'mock/URLS_STORAGE/DMESTORAGE_STORAGES';
 
 const STATUS_MAP = STATUS_ARRAY.slice(1).reduce((target, i) => {
   target[i.value] = i;
   return target;
 }, {});
-console.log(
-  '🚀 ~ file: storage-status-cell.component.ts ~ line 6 ~ constSTATUS_MAP=STATUS_ARRAY.slice ~ STATUS_MAP',
-  STATUS_MAP
-);
+
 const SYN_STATUS_MAP = SYN_STATUS_ARRAY.slice(1).reduce((target, i) => {
   target[i.value] = i;
   return target;
 }, {});
-console.log(
-  '🚀 ~ file: storage-status-cell.component.ts ~ line 11 ~ constSYN_STATUS_MAP=SYN_STATUS_ARRAY.slice ~ SYN_STATUS_MAP',
-  SYN_STATUS_MAP
-);
 
 @Component({
   selector: 'app-storage-status-cell',

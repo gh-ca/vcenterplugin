@@ -7,7 +7,7 @@ const data = [
     runningStatus: 'normal',
     healthStatus: 'normal',
     totalCapacity: 2157.0,
-    consumedCapacity: 1816.938,
+    consumedCapacity: 0,
     consumedCapacityPercentage: '.84',
     storagePoolId: '9E1A6FFAA27811EB994B16EEA383CC74',
     storageInstanceId: '06CAC89FF7433CFE9D0BE14663F7B80B',
@@ -19,14 +19,14 @@ const data = [
     tier2RaidLv: '0',
     storageId: '9E1A6FFAA27811EB994B16EEA383CC74',
     dataSpace: null,
-    subscribedCapacity: 1999.0,
+    subscribedCapacity: 0.0,
     dedupedCapacity: 0.0,
     compressedCapacity: 0.0,
     protectionCapacity: 0.0,
     physicalType: 'SAS',
     diskPoolId: '1',
     poolId: '0',
-    serviceLevelName: null,
+    serviceLevelName: "D存储策略2",
     maxIops: null,
     maxBandwidth: null,
     maxLatency: null,
@@ -59,7 +59,7 @@ const data = [
     physicalType: 'SAS',
     diskPoolId: '1',
     poolId: '3',
-    serviceLevelName: null,
+    serviceLevelName: "t_service_level",
     maxIops: null,
     maxBandwidth: null,
     maxLatency: null,
@@ -208,13 +208,17 @@ const TYPE_ARRAY = ['normal', 'fault', 'degraded', 'degraded'];
 export const getDmestorageStoragepools = count => {
   return {
     code: '200',
-    data: [...new Array(count)].map((i, ii) => {
-      return {
-        ...data[0],
-        name: 'CTE0.2' + ii,
-        healthStatus: TYPE_ARRAY[ii % 5],
-      };
-    }),
+    data: [...new Array(count)]
+      .map((i, ii) => {
+        return {
+          ...data[0],
+          name: 'CTE0.2' + ii,
+          healthStatus: TYPE_ARRAY[ii % 5],
+          consumedCapacity: Math.random() * 1816.938 + 1,
+          subscribedCapacity: Math.random() * 3277958.0 + 1,
+        };
+      })
+      .concat(data),
     description: null,
   };
 };

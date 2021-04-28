@@ -36,10 +36,14 @@ import {
   getLabelByValue,
   getQosCheckTipsTagInfo,
   handlerResponseErrorSimple,
+  isStringLengthByteOutRange,
   print,
+  regExpCollection,
 } from 'app/app.helpers';
 import { getVmfsDmestorageStorageByTag } from './../../../../mock/VMFS_DMESTORAGE_STORAGE';
 import { SimpleChange } from '@angular/core';
+import { handleRes } from './../../../app.helpers';
+import { VmfsCommon } from './VmfsCommon';
 
 @Component({
   selector: 'app-list',
@@ -48,7 +52,7 @@ import { SimpleChange } from '@angular/core';
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [VmfsListService],
 })
-export class VmfsListComponent implements OnInit {
+export class VmfsListComponent extends VmfsCommon implements OnInit {
   get params() {
     // 对query进行处理
     const p = Object.assign({}, this.query);
@@ -57,13 +61,13 @@ export class VmfsListComponent implements OnInit {
 
   constructor(
     private remoteSrv: VmfsListService,
-    private cdr: ChangeDetectorRef,
+    public cdr: ChangeDetectorRef,
     public gs: GlobalsService,
     private router: Router
   ) {
+    super();
     this.form.version = '5'; // 版本
     this.setFormValueWhenHiden(false);
-
     this.getColor = getColorByType;
     this.getLabelByValue = getLabelByValue;
     this.print = print;
@@ -74,6 +78,38 @@ export class VmfsListComponent implements OnInit {
   getColor;
   getLabelByValue;
   print;
+
+  item_test = {
+    capabilities: {
+      resourceType: 'thin',
+      compression: false,
+      deduplication: 'enabled',
+      smarttier: null,
+      iopriority: null,
+      qos: {
+        smartQos: null,
+        qosParam: {
+          enabled: null,
+          latency: 0,
+          latencyUnit: 'ms',
+          minBandWidth: 0,
+          minIOPS: 0,
+          maxBandWidth: 175,
+          maxIOPS: 145,
+          smartQos: null,
+        },
+        enabled: true,
+      },
+    },
+    id: '2784cf0f-9821-4f59-963b-836dbecbd271',
+    name: 'D这是存储DME',
+    description: 'block service-level for dj',
+    type: 'BLOCK',
+    protocol: null,
+    totalCapacity: 2244608.0,
+    freeCapacity: 292224.0,
+    usedCapacity: 1952384.0,
+  };
 
   isShowInput: boolean;
 
@@ -115,19 +151,7 @@ export class VmfsListComponent implements OnInit {
   isAddPage = false; // true 添加页面 false 挂载页面
   // 添加表单数据
   form = new GetForm().getAddForm();
-  addForm = new FormGroup({
-    name: new FormControl('', Validators.required),
-    isSameName: new FormControl(true, Validators.required),
-    volumeName: new FormControl(''),
-    version: new FormControl('5', Validators.required),
-    capacity: new FormControl('', Validators.required),
-    capacityUnit: new FormControl('GB', Validators.required),
-    count: new FormControl('', Validators.required),
-    blockSize: new FormControl('', Validators.required),
-    spaceReclamationGranularity: new FormControl('', Validators.required),
-    spaceReclamationPriority: new FormControl('', Validators.required),
-    chooseDevice: new FormControl('', Validators.required),
-  });
+  addForm;
   // 编辑form提交数据
   modifyForm = new GetForm().getEditForm();
   modifyNameChanged = false;
@@ -353,7 +377,7 @@ wwn: "67c1cf110058934511ba6e5a00000344"
           const lowerObj = document.getElementById('editControl_policyLower') as HTMLInputElement;
 
           /* 根据返回的数据判断是否需要展示 */
-          const smartQos = this.storage || {};
+          const smartQos = this.storage.smartQos || {};
           const { latency, maxbandwidth, maxiops, minbandwidth, miniops } = smartQos as any;
 
           this.modifyForm.max_iops = maxiops;
@@ -525,14 +549,14 @@ wwn: "67c1cf110058934511ba6e5a00000344"
             }
           }
         }
-      } else {
-      }
+      } 
       this.isLoading = false;
       this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
     };
 
     /* TODO: */
     if (isMockData) {
+      mockData.ACCESSVMFS_LISTVMFS.data.shift();
       successHandler(mockData.ACCESSVMFS_LISTVMFS);
     } else {
       this.remoteSrv.getData().subscribe(successHandler);
@@ -609,7 +633,7 @@ wwn: "67c1cf110058934511ba6e5a00000344"
 
   // 获取所有存储数据
   getStorageList() {
-    this.remoteSrv.getStorages().subscribe((result: any) => {
+    const handlerGetstoragesSuccess = (result: any) => {
       if (result.code === '200' && result.data !== null) {
         this.storageList = result.data;
         const allPoolMap: StoragePoolMap[] = [];
@@ -629,7 +653,13 @@ wwn: "67c1cf110058934511ba6e5a00000344"
       }
       this.modalLoading = false;
       this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
-    });
+    };
+
+    if (isMockData) {
+      handlerGetstoragesSuccess(mockData.DMESTORAGE_STORAGESV6);
+    } else {
+      this.remoteSrv.getStorages().subscribe(handlerGetstoragesSuccess, handlerResponseErrorSimple);
+    }
   }
 
   // 获取存储池数据
@@ -777,7 +807,7 @@ wwn: "67c1cf110058934511ba6e5a00000344"
   // 设置主机数据
   setHostDatas() {
     return new Promise((resolve, reject) => {
-      this.remoteSrv.getHostList().subscribe((result: any) => {
+      const handlerGetHostListSuccess = (result: any) => {
         let hostList: HostList[] = []; // 主机列表
         if (result.code === '200' && result.data !== null) {
           hostList = result.data;
@@ -793,7 +823,14 @@ wwn: "67c1cf110058934511ba6e5a00000344"
         this.form.hostDataloadSuccess = true;
         resolve(this.deviceList);
         this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
-      });
+      };
+      if (isMockData) {
+        handlerGetHostListSuccess(mockData.ACCESSVMWARE_LISTHOST);
+      } else {
+        this.remoteSrv
+          .getHostList()
+          .subscribe(handlerGetHostListSuccess, handlerResponseErrorSimple);
+      }
     });
   }
 
@@ -853,6 +890,16 @@ wwn: "67c1cf110058934511ba6e5a00000344"
     this.form = new GetForm().getAddForm();
     // 初始化form
     this.addForm.reset(this.form);
+    /* 监听名字变化 根据是否一样给剩下两个赋值 */
+    this.addForm.valueChanges.subscribe(this.handlerValueChanges.bind(this));
+
+    this.modifyFormGroup = new FormGroup({
+      name: new FormControl('', [Validators.required]),
+    });
+    this.modifyFormGroup = new FormGroup({
+      name: new FormControl('', [Validators.required]),
+    });
+
     // this.addForm.markAsTouched();
     // 添加页面显示
     this.popListShow = true;
@@ -893,7 +940,7 @@ wwn: "67c1cf110058934511ba6e5a00000344"
     // 初始化服务等级选择参数
     this.serviceLevelIsNull = false;
     // 获取服务等级数据
-    this.remoteSrv.getServiceLevelList().subscribe((result: any) => {
+    const HandlerGetServiceLeveListSuccess = (result: any) => {
       if (result.code === '200' && result.data !== null) {
         this.serviceLevelList = result.data.filter(item => item.totalCapacity !== 0);
       }
@@ -901,7 +948,14 @@ wwn: "67c1cf110058934511ba6e5a00000344"
       this.modalLoading = false;
       // this.gs.loading = false;
       this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
-    });
+    };
+    if (isMockData) {
+      HandlerGetServiceLeveListSuccess(mockData.SERVICELEVEL_LISTSERVICELEVEL);
+    } else {
+      this.remoteSrv
+        .getServiceLevelList()
+        .subscribe(HandlerGetServiceLeveListSuccess, handlerResponseErrorSimple);
+    }
   }
 
   // 添加vmfs 处理
@@ -1316,7 +1370,12 @@ wwn: "67c1cf110058934511ba6e5a00000344"
       this.chooseUnmountHost = null;
       // 获取已挂载的集群 主机数据
       this.unmountForm = new GetForm().getUnmountForm();
-      this.unmountForm.name = this.rowSelected[0].name;
+      if (isMockData) {
+        /* 检测名字过长问题  */
+        this.unmountForm.name = 'name_20210426095614_20210426095619_20210426095621';
+      } else {
+        this.unmountForm.name = this.rowSelected[0].name;
+      }
       this.mountedHost = null;
       this.mountedCluster = null;
 
@@ -2032,11 +2091,11 @@ wwn: "67c1cf110058934511ba6e5a00000344"
     this.vmfsNameRepeatErr = false;
     this.volNameRepeatErr = false;
     this.matchErr = false;
-
-    const reg5: RegExp = new RegExp('^[0-9a-zA-Z-\u4e00-\u9fa5a"_""."]*$');
     if (isVmfs) {
       if (this.form.name) {
-        if (reg5.test(this.form.name)) {
+        /* 20210426163328 */
+        const inLimit = !isStringLengthByteOutRange(this.form.name, 27);
+        if (regExpCollection.vmfsName().test(this.form.name) && inLimit) {
           // 校验VMFS名称重复
           this.checkVmfsName(this.form.name);
           if (this.form.isSameName) {
@@ -2047,13 +2106,21 @@ wwn: "67c1cf110058934511ba6e5a00000344"
           this.form.name = null;
         }
       } else {
-        this.matchErr = true;
+        this.form.name = null;
       }
     } else {
       if (this.form.volumeName) {
-        if (reg5.test(this.form.volumeName)) {
+        console.log(
+          '🚀 ~ file: list.component.ts ~ line 2109 ~ VmfsListComponent ~ nameCheck ~ this.form.volumeName',
+          this.form.volumeName
+        );
+        if (
+          regExpCollection.vmfsName().test(this.form.volumeName) &&
+          !isStringLengthByteOutRange(this.form.volumeName, 27)
+        ) {
           // 校验Vol名称重复
           this.checkVolName(this.form.volumeName);
+          console.log(this.checkVolName(this.form.volumeName));
         } else {
           this.matchErr = true;
           this.form.volumeName = null;
@@ -2123,7 +2190,8 @@ wwn: "67c1cf110058934511ba6e5a00000344"
     this.vmfsNameRepeatErr = false;
     this.volNameRepeatErr = false;
     this.matchErr = false;
-    const reg5: RegExp = new RegExp('^[0-9a-zA-Z-\u4e00-\u9fa5a"_""."]*$');
+    const reg5: RegExp = regExpCollection.vmfsName();
+    // const reg5: RegExp = new RegExp('^[0-9a-zA-Z-\u4e00-\u9fa5a"_""."]*$');
     if (
       this.bandWidthMaxErrTips ||
       this.iopsMaxErrTips ||
@@ -2135,9 +2203,10 @@ wwn: "67c1cf110058934511ba6e5a00000344"
     ) {
       return;
     }
+    const inLimit = !isStringLengthByteOutRange(this.modifyForm.name, 27);
 
     if (this.modifyForm.name) {
-      if (reg5.test(this.modifyForm.name)) {
+      if (reg5.test(this.modifyForm.name) && inLimit) {
         // 校验VMFS名称重复
         // this.modalHandleLoading = true;
         if (this.modifyNameChanged) {
@@ -2190,10 +2259,11 @@ wwn: "67c1cf110058934511ba6e5a00000344"
           this.modifyHandleFunc();
         }
       } else {
-        this.matchErr = true;
         this.modifyForm.name = null;
+        this.matchErr = true;
       }
     } else {
+      this.modifyForm.name = null;
       this.matchErr = true;
     }
   }
@@ -2366,6 +2436,11 @@ wwn: "67c1cf110058934511ba6e5a00000344"
    * 编辑页面  名称变化Func
    */
   modifyNameChange() {
+    const inLimit = !isStringLengthByteOutRange(this.modifyForm.name, 27);
+    if (!(regExpCollection.vmfsName().test(this.modifyForm.name) && inLimit)) {
+      this.matchErr = true;
+      this.modifyForm.name = null;
+    }
     const oldName = this.rowSelected[0].volumeName;
     if (oldName !== this.modifyForm.name) {
       this.modifyNameChanged = true;
@@ -2492,7 +2567,10 @@ wwn: "67c1cf110058934511ba6e5a00000344"
    * @param lowerObj
    * @param isUpper true:upper、false:lower
    */
-  handleModifyControlPolicyChange(isEdit, form, isUpper) {
+
+  controlPolicyChangeFunc(upperId, lowerId, isEdit, form, isUpper) {
+    const upperObj = document.getElementById(upperId) as HTMLInputElement;
+    const lowerObj = document.getElementById(lowerId) as HTMLInputElement;
     // qos策略 1 支持复选(上限、下限) 2支持单选（上限或下限） 3只支持上限
     let qosTag;
     if (isEdit) {
@@ -2501,6 +2579,66 @@ wwn: "67c1cf110058934511ba6e5a00000344"
       qosTag = this.getStorageQosTag(this.form.storage_id);
     }
 
+    let upperChecked;
+    if (upperObj) {
+      upperChecked = upperObj.checked;
+    }
+    let lowerChecked;
+    if (lowerObj) {
+      lowerChecked = lowerObj.checked;
+    }
+    this.initIopsErrTips(upperChecked, lowerChecked);
+    if (isUpper) {
+      if (upperChecked) {
+        form.control_policyUpper = '1';
+      } else {
+        form.control_policyUpper = undefined;
+      }
+      if (qosTag == 2 && upperChecked) {
+        // 单选
+        console.log('单选1', qosTag);
+        form.control_policyLower = undefined;
+        lowerObj.checked = false;
+      }
+    } else {
+      if (lowerChecked) {
+        form.control_policyLower = '0';
+      } else {
+        form.control_policyLower = undefined;
+      }
+      if (lowerChecked && qosTag == 2) {
+        console.log('单选2', qosTag);
+        form.control_policyUpper = undefined;
+        upperObj.checked = false;
+      }
+    }
+    if (isEdit) {
+      this.modifyForm = form;
+    } else {
+      this.form = form;
+    }
+    if (form.control_policyUpper == undefined) {
+      form.maxbandwidthChoose = false;
+      form.maxiopsChoose = false;
+    }
+    if (form.control_policyLower == undefined) {
+      form.minbandwidthChoose = false;
+      form.miniopsChoose = false;
+      form.latencyChoose = false;
+    }
+    console.log('lowerChecked', this.form);
+    const type = isEdit ? 'edit' : 'add';
+    this.qosV6Check(type);
+  }
+
+  handleModifyControlPolicyChange(isEdit, form, isUpper) {
+    // qos策略 1 支持复选(上限、下限) 2支持单选（上限或下限） 3只支持上限
+    let qosTag;
+    if (isEdit) {
+      qosTag = this.storage.storageTypeShow.qosTag;
+    } else {
+      qosTag = this.getStorageQosTag(this.form.storage_id);
+    }
     const upperChecked = this.modifyForm.isCheckedUpper;
     const lowerChecked = this.modifyForm.isCheckedlower;
 
@@ -2548,16 +2686,6 @@ wwn: "67c1cf110058934511ba6e5a00000344"
     console.log('lowerChecked', this.form);
     const type = isEdit ? 'edit' : 'add';
     this.qosV6Check(type);
-  }
-
-  /**
-   *
-   * 添加页面名称相同按钮点击事件
-   */
-  addSameBtnChangeFunc(obj) {
-    if (this.form.isSameName) {
-      this.form.volumeName = this.form.name;
-    }
   }
 
   resetQosFlag(objValue: boolean, operationType: string) {
@@ -2617,9 +2745,9 @@ wwn: "67c1cf110058934511ba6e5a00000344"
           this.bandwidthLimitErr = bandwidthLimitErr;
           this.iopsLimitErr = iopsLimitErr;
 
-          /* 
-          
-          
+          /*
+
+
           const qosTag = chooseStorage.storageTypeShow.qosTag;
           if (qosTag == 1) {
             if (this.form.minbandwidthChoose && this.form.maxbandwidthChoose) {
@@ -2664,7 +2792,7 @@ wwn: "67c1cf110058934511ba6e5a00000344"
           if (this.form.control_policyLower == undefined) {
             this.bandwidthLimitErr = false;
           }
-        
+
           */
         }
       }

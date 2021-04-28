@@ -195,10 +195,12 @@
   </div>
   <!--添加弹框-->
   <!-- addView() -->
+  <!-- page1 -->
   <!-- 创建DME数据存储-1-数据存储设置 -->
   <clr-wizard #wizard [clrWizardOpen]="addModelShow" [clrWizardClosable]="false">
     <clr-wizard-title>{{'table.createDmeStorage' | translate}}</clr-wizard-title>
-    <p *ngIf="errorMsg" class="clr-error clr-subtext">{{'errorMsg.addError' | translate}}</p>
+    <p *ngIf="errorMsg" class="clr-error"><span class="clr-subtext"> {{'errorMsg.addError' | translate}} </span></p>
+    <!-- <p *ngIf="errorMsg" class="clr-error clr-subtext">{{'errorMsg.addError' | translate}}</p> -->
     <div *ngIf="modalLoading" class="loadingDiv">
       <span>
         {{'vmfs.loadingTips' | translate}}<img src="./assets/images/loading.gif" width="20px" height="20px"
@@ -211,9 +213,11 @@
           style="margin-left: 20px;">
       </span>
     </div>
-    <!--   <pre> {{print(addForm)}} </pre> -->
-    <clr-wizard-page #addPageOne [clrWizardPageNextDisabled]="isAddPageOneNextDisabled">
+    <clr-wizard-page #addPageOne [clrWizardPageNextDisabled]="checkAddForm('addPageOne')&&isAddPageOneNextDisabled">
+      <!-- <clr-wizard-page #addPageOne [clrWizardPageNextDisabled]="isAddPageOneNextDisabled"> -->
       <ng-template clrPageTitle>{{'nfs.datastoreSetting' | translate}}</ng-template> <!-- mandatory -->
+      <!-- <pre> {{print(addForm)}} </pre> -->
+      <!-- {{checkAddForm('addPageOne')}}isAddPageOneNextDisabled:{{isAddPageOneNextDisabled}} -->
       <form clrForm [formGroup]="addFormGroup" #formPageOne="ngForm">
         <!--存储设备-->
         <clr-select-container class="selectClass">
@@ -259,14 +263,21 @@
           </select>
           <clr-control-error>{{'errorMsg.require' | translate}}</clr-control-error>
         </clr-select-container>
-        <!--名称-->
+        <!--数据存储名称-->
         <clr-input-container>
           <label>{{'nfs.datastoreName' | translate}}</label>
-          <input clrInput class="inputWidth100Percent" [(ngModel)]="addForm.nfsName" maxlength="256" name="nfsName"
-            (blur)="checkNfsName();" formControlName="nfsName" required />
+          <input
+            clrInput
+            class="inputWidth100Percent"
+            [(ngModel)]="addForm.nfsName"
+            maxlength="256" name="nfsName"
+            formControlName="nfsName"
+            (blur)="checkNfsName();"
+            (change)="checkNfsName();"
+            required />
           <clr-control-error>
-            <p *ngIf="!oldNfsName" class="clr-error clr-subtext">{{'errorMsg.require' | translate}}</p>
-            <p *ngIf="matchErr" class="clr-error clr-subtext">{{'validations.nameRequiredTwo' | translate}}</p>
+            <p *ngIf="!oldNfsName || matchErr" class="clr-error clr-subtext">{{'errorMsg.require' | translate}}</p>
+            <p class="clr-error clr-subtext"> {{'validations.required_nfs_name' | translate:'{length:42}'}}</p>
             <p *ngIf="nfsNameRepeatErr" class="clr-error clr-subtext">{{'errorMsg.fsrepeat' | translate}}</p>
             <p *ngIf="fsNameRepeatErr" class="clr-error clr-subtext">{{'errorMsg.fsrepeat' | translate}}</p>
             <p *ngIf="shareNameRepeatErr" class="clr-error clr-subtext">{{'errorMsg.sharerepeat' | translate}}</p>
@@ -278,6 +289,7 @@
           <clr-checkbox-wrapper>
             <input type="checkbox" clrCheckbox *ngIf="isCheckSameName();" [(ngModel)]="addForm.sameName"
               (change)="setSameName();" name="sameName" formControlName="sameName" />
+            <!-- disabled checkbox samename -->
             <input type="checkbox" clrCheckbox *ngIf="!isCheckSameName();" [(ngModel)]="addForm.sameName"
               name="sameName" formControlName="sameName" disabled />
             <label style="width: 280px;">{{'nfs.sameName' | translate}}</label>
@@ -287,28 +299,45 @@
         <clr-input-container *ngIf="!addForm.sameName">
           <!-- 文件系统名称 -->
           <label>{{'nfs.fsName' | translate}}</label>
-          <input class="inputWidth100Percent" maxlength="256" clrInput [(ngModel)]="addForm.fsName" name="fsName"
-            formControlName="fsName" (blur)="checkFsName();" />
-          <clr-control-helper *ngIf="matchErr">
+          <!-- 中文名 -->
+          <input class="inputWidth100Percent"
+            maxlength="256"
+            clrInput
+            [(ngModel)]="addForm.fsName"
+            name="fsName"
+            required
+            formControlName="fsName"
+            (change)="checkFsName();"
+            (blur)="checkFsName();" />
+          <!--   <clr-control-helper *ngIf="matchErr">
             <p class="clr-error clr-subtext">{{'validations.nameRequiredTwo' | translate}}</p>
-          </clr-control-helper>
+          </clr-control-helper> -->
           <clr-control-error>
             <p *ngIf="!oldFsName" class="clr-error clr-subtext">{{'errorMsg.require' | translate}}</p>
-            <p *ngIf="matchErr" class="clr-error clr-subtext">{{'errorMsg.numberAndLetter' | translate}}</p>
+            <!-- <p *ngIf="matchErr" class="clr-error clr-subtext">{{'errorMsg.numberAndLetter' | translate}}</p> -->
+            <p class="clr-error clr-subtext"> {{'validations.required_nfs_name' | translate:'{length:42}'}}</p>
             <p *ngIf="fsNameRepeatErr" class="clr-error clr-subtext">{{'errorMsg.fsrepeat' | translate}}</p>
           </clr-control-error>
         </clr-input-container>
+        <!-- <p class="clr-error clr-subtext">{{'validations.required_share_name' | translate:'{length:254}'}}</p> -->
         <!-- 共享名称 -->
         <clr-input-container *ngIf="!addForm.sameName">
           <label>{{'nfs.shareName' | translate}}</label>
-          <input class="inputWidth100Percent" maxlength="256" clrInput [(ngModel)]="addForm.shareName" name="shareName"
-            formControlName="shareName" (blur)="checkShareName();" />
-          <clr-control-helper *ngIf="shareNameContainsCN">
+          <input class="inputWidth100Percent"
+            clrInput
+            maxlength="256"
+            name="shareName"
+            [(ngModel)]="addForm.shareName"
+            formControlName="shareName"
+            (blur)="checkShareName();"
+            (change)="checkShareName();" />
+          <!-- <clr-control-helper *ngIf="shareNameContainsCN">
             <p class="clr-error clr-subtext">{{'validations.shareNameRequired' | translate}}</p>
-          </clr-control-helper>
+          </clr-control-helper> -->
           <clr-control-error>
             <p *ngIf="!oldShareName" class="clr-error clr-subtext">{{'errorMsg.require' | translate}}</p>
-            <p *ngIf="matchErr" class="clr-error clr-subtext">{{'errorMsg.numberAndLetter' | translate}}</p>
+            <!-- <p *ngIf="matchErr" class="clr-error clr-subtext">{{'errorMsg.numberAndLetter' | translate}}</p> -->
+            <p class="clr-error clr-subtext">{{'validations.required_share_name' | translate:'{length:254}'}}</p>
             <p *ngIf="shareNameRepeatErr" class="clr-error clr-subtext">{{'errorMsg.sharerepeat' | translate}}</p>
           </clr-control-error>
         </clr-input-container>
@@ -406,10 +435,15 @@
       </ng-template>
     </clr-wizard-page>
 
+    <!-- page2 -->
     <!-- 创建DME数据存储-2-存储设置 -->
-    <clr-wizard-page #addPageTwo [clrWizardPageNextDisabled]="!formPageTwo.valid">
+    <clr-wizard-page #addPageTwo [clrWizardPageNextDisabled]="isDisableFormPageTwo(formPageTwo)">
+      <!-- <clr-wizard-page #addPageTwo [clrWizardPageNextDisabled]="!formPageTwo.valid"> -->
       <ng-template clrPageTitle>{{'nfs.storageSetting' | translate}}</ng-template> <!-- mandatory -->
       <ng-template clrPageNavTitle>{{'nfs.storageSetting' | translate}}</ng-template> <!-- optional -->
+      <!-- <pre>
+        addForm{{print(addForm)}}
+      </pre> -->
       <form clrForm #formPageTwo="ngForm">
         <clr-toggle-wrapper>
           <label style="width: 100px;">{{'nfs.add_advance' | translate}}</label>
@@ -582,7 +616,8 @@
                 </clr-checkbox-container>
                 <clr-checkbox-container *ngIf="iopsLimitErr">
                   <clr-control-helper class="clr-error clr-subtext">
-                    <clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{dorado?'tips.iopsLimitErr':'tips.iopsLimitErrNotV6' | translate}}
+                    <clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>
+                    {{(dorado?'tips.iopsLimitErr':'tips.iopsLimitErrNotV6') | translate}}
                   </clr-control-helper>
                 </clr-checkbox-container>
               </div>

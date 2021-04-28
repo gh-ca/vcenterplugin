@@ -31,6 +31,9 @@
   },
   "validations": {
     "required": "该字段必填!",
+    "required_vmfs_name": "只能包含半角字母、半角数字、“_”、“-”、“.”和中文字符。长度不超过{{length}}个字节，一个中文字符占三个字节",
+    "required_nfs_name": "只能包含半角字母、半角数字、“_”、“-”、“.”和中文字符。长度不超过{{length}}个字符",
+    "required_share_name": "取值范围为1到254个字符，只能由字母、数字、字符!\\\"#&%$'()*+-·.;<=>?@[]^_`{|}~,:和空格组成。",
     "nameRequired": "该字段必填！且只能包含半角字母、半角数字、“_”、“-”、“.”和中文字符。",
     "nameRequiredTwo": "该字段必填！且只能包含半角字母、半角数字、“_”和中文字符。",
     "shareNameRequired": "该字段必填！且只能包含半角字母、半角数字、“_”",
@@ -144,6 +147,7 @@
       "storagePool": "存储池",
       "controller": "控制器",
       "provisionType": "供应类型",
+      "provisionType2": "资源分配类型",
       "appSce": "应用场景",
       "dataDed": "重删",
       "dataCom": "压缩",
@@ -373,7 +377,8 @@
       "syncFailed": "同步失败",
       "status": "运行状态",
       "synStatus": "同步状态",
-      "Unknown": "未知"
+      "Unknown": "未知",
+      "Other": "其它"
     },
     "chart": {
       "total": " 总计",
@@ -773,7 +778,9 @@
     "maxBandWidth": "带宽上限",
     "minBandWidth": "带宽下限",
     "enable": "启用",
+    "enabled": "已启用",
     "disable": "禁用",
+    "disabled": "已禁用",
     "notMove": "不迁移",
     "autoMove": "自动迁移",
     "highPMove": "向高性能层迁移",
@@ -794,7 +801,7 @@
     "maxBandWidths": "按带宽上限排序",
     "minBandWidths": "按带宽下限排序",
     "offLine": "离线",
-    "normal": "正常",
+    "normal": "在线",
     "abnormal": "异常",
     "unknown": "未知",
     "faulty": "故障",

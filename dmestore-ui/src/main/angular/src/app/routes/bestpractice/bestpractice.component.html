@@ -118,6 +118,7 @@
             </clr-dg-cell>
             <clr-dg-cell class="over_flow" *ngIf="isObjectValue(item.actualObjValue) == true">
               <div [title]="getObjectTitle(item.actualObjValue)" *ngIf="item.actualObjValue">
+                <div *ngIf="item?.actualObjValue?.length===0">--</div>
                 <div *ngFor="let actValue of item.actualObjValue">
                   <span style="max-width: 4rem;display: inline-block;" class="over_flow">{{actValue.name}}</span>
                   |

@@ -1,7 +1,8 @@
 <clr-wizard #wizard [clrWizardOpen]="viewPage=='add_plugin'" [clrWizardClosable]="false">
-  <clr-wizard-title>{{'table.createDmeStorage' | translate}}</clr-wizard-title>
-  <p *ngIf="errorMsg" class="clr-error clr-subtext">{{'errorMsg.addError' | translate}}</p>
-
+  <clr-wizard-title>{{'table.createDmeStorage' | translate}}
+  </clr-wizard-title>
+  <!-- <p *ngIf="errorMsg" class="clr-error clr-subtext">{{'errorMsg.addError' | translate}}</p> -->
+  <p *ngIf="errorMsg" class="clr-error"><span class="clr-subtext"> {{'errorMsg.addError' | translate}} </span></p>
   <div *ngIf="modalLoading" class="loadingDiv">
     <span>
       {{'vmfs.loadingTips' | translate}}<img src="./assets/images/loading.gif" width="20px" height="20px"
@@ -14,12 +15,12 @@
         style="margin-left: 20px;">
     </span>
   </div>
-  <clr-wizard-page #addPageOne [clrWizardPageNextDisabled]="isAddPageOneNextDisabled">
+  <clr-wizard-page #addPageOne [clrWizardPageNextDisabled]="checkAddForm('nfs add page one')&&isAddPageOneNextDisabled">
     <ng-template clrPageTitle>{{'nfs.datastoreSetting' | translate}}</ng-template> <!-- mandatory -->
     <form clrForm #formPageOne="ngForm" [formGroup]="addFormGroup">
       <!--存储设备-->
       <clr-select-container class="selectClass">
-        <label>{{'nfs.storeageDevice' | translate}}</label>
+        <label>{{'nfs.storeageDevice' | translate}}asdfasdf</label>
         <select class="inputWidth100Percent" clrSelect (ngModelOptions)="storageList" [(ngModel)]="addForm.storagId"
           name="storagId" class="clr-select" (change)="selectStoragePool();qosV6Check('add')"
           formControlName="storagId" required>
@@ -63,8 +64,8 @@
         <input clrInput class="inputWidth100Percent" [(ngModel)]="addForm.nfsName" maxlength="256" name="nfsName"
           (blur)="checkNfsName();" formControlName="nfsName" required />
         <clr-control-error>
-          <p *ngIf="!oldNfsName" class="clr-error clr-subtext">{{'errorMsg.require' | translate}}</p>
-          <p *ngIf="matchErr" class="clr-error clr-subtext">{{'validations.nameRequiredTwo' | translate}}</p>
+          <p *ngIf="!oldNfsName || matchErr" class="clr-error clr-subtext">{{'errorMsg.require' | translate}}</p>
+          <p class="clr-error clr-subtext"> {{'validations.required_nfs_name' | translate:'{length:42}'}}</p>
           <p *ngIf="nfsNameRepeatErr" class="clr-error clr-subtext">{{'errorMsg.fsrepeat' | translate}}</p>
           <p *ngIf="fsNameRepeatErr" class="clr-error clr-subtext">{{'errorMsg.fsrepeat' | translate}}</p>
           <p *ngIf="shareNameRepeatErr" class="clr-error clr-subtext">{{'errorMsg.sharerepeat' | translate}}</p>
@@ -93,7 +94,7 @@
         </clr-control-helper>
         <clr-control-error>
           <p *ngIf="!oldNfsName" class="clr-error clr-subtext">{{'errorMsg.require' | translate}}</p>
-          <p *ngIf="matchErr" class="clr-error clr-subtext">{{'errorMsg.numberAndLetter' | translate}}</p>
+          <p class="clr-error clr-subtext"> {{'validations.required_nfs_name' | translate:'{length:42}'}}</p>
           <p *ngIf="fsNameRepeatErr" class="clr-error clr-subtext">{{'errorMsg.fsrepeat' | translate}}</p>
         </clr-control-error>
       </clr-input-container>
@@ -108,6 +109,7 @@
         </clr-control-helper>
         <clr-control-error>
           <p *ngIf="!oldShareName" class="clr-error clr-subtext">{{'errorMsg.require' | translate}}</p>
+          <p class="clr-error clr-subtext">{{'validations.required_share_name' | translate:'{length:254}'}}</p>
           <p *ngIf="matchErr" class="clr-error clr-subtext">{{'errorMsg.numberAndLetter' | translate}}</p>
           <p *ngIf="shareNameRepeatErr" class="clr-error clr-subtext">{{'errorMsg.sharerepeat' | translate}}</p>
         </clr-control-error>
@@ -210,7 +212,8 @@
   </clr-wizard-page>
 
 
-  <clr-wizard-page [clrWizardPageNextDisabled]="!formPageTwo.valid">
+  <!-- <clr-wizard-page [clrWizardPageNextDisabled]="!formPageTwo.valid"> -->
+  <clr-wizard-page [clrWizardPageNextDisabled]="isDisableFormPageTwo(formPageTwo)">
     <ng-template clrPageTitle>{{'nfs.storageSetting' | translate}}</ng-template> <!-- mandatory -->
     <ng-template clrPageNavTitle>{{'nfs.storageSetting' | translate}}</ng-template> <!-- optional -->
     <form clrForm #formPageTwo="ngForm">
@@ -383,7 +386,8 @@
               </clr-checkbox-container>
               <clr-checkbox-container *ngIf="iopsLimitErr">
                 <clr-control-helper class="clr-error clr-subtext">
-                  <clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{dorado?'tips.iopsLimitErr':'tips.iopsLimitErrNotV6' | translate}}
+                  <clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>
+                  {{(dorado?'tips.iopsLimitErr':'tips.iopsLimitErrNotV6') | translate}}
                 </clr-control-helper>
               </clr-checkbox-container>
             </div>
@@ -429,7 +433,8 @@
 </clr-wizard>
 <clr-wizard class="add-wizard-wrap" #wizard [clrWizardOpen]="viewPage=='add_vcenter'" [clrWizardClosable]="false">
   <clr-wizard-title>{{'table.createDmeStorage' | translate}}</clr-wizard-title>
-  <p *ngIf="errorMsg" class="clr-error clr-subtext">{{'errorMsg.addError' | translate}}</p>
+  <!-- <p *ngIf="errorMsg" class="clr-error clr-subtext">{{'errorMsg.addError' | translate}}</p> -->
+  <p *ngIf="errorMsg" class="clr-error"><span class="clr-subtext"> {{'errorMsg.addError' | translate}} </span></p>
   <div *ngIf="modalLoading" class="loadingDiv">
     <span>
       {{'vmfs.loadingTips' | translate}}<img src="./assets/images/loading.gif" width="20px" height="20px"
@@ -443,8 +448,9 @@
     </span>
   </div>
   <!--  -->
-  <clr-wizard-page #addPageOne [clrWizardPageNextDisabled]="isAddPageOneNextDisabled">
+  <clr-wizard-page #addPageOne [clrWizardPageNextDisabled]="checkAddForm('nfs add page one')&&isAddPageOneNextDisabled">
     <ng-template clrPageTitle>{{'nfs.datastoreSetting' | translate}}</ng-template> <!-- mandatory -->
+    <!-- {{isDisableFormPageTwo(formPageTwo)}} checkAddForm: {{checkAddForm()}}-----isAddPageOneNextDisabled: {{isAddPageOneNextDisabled}} -->
     <form clrForm #formPageOne="ngForm" [formGroup]="addFormGroup">
       <!--存储设备-->
       <clr-select-container class="selectClass">
@@ -492,9 +498,8 @@
         <input clrInput class="inputWidth100Percent" [(ngModel)]="addForm.nfsName" maxlength="256" name="nfsName"
           (blur)="checkNfsName();" formControlName="nfsName" required />
         <clr-control-error>
-          <p *ngIf="!oldNfsName" class="clr-error clr-subtext">{{'errorMsg.require' | translate}}</p>
-          <p *ngIf="matchErr" class="clr-error clr-subtext">{{'validations.nameRequiredTwo' | translate}}</p>
-
+          <p *ngIf="!oldNfsName || matchErr" class="clr-error clr-subtext">{{'errorMsg.require' | translate}}</p>
+          <p class="clr-error clr-subtext"> {{'validations.required_nfs_name' | translate:'{length:42}'}}</p>
           <p *ngIf="fsNameRepeatErr" class="clr-error clr-subtext">{{'errorMsg.fsrepeat' | translate}}</p>
           <p *ngIf="shareNameRepeatErr" class="clr-error clr-subtext">{{'errorMsg.sharerepeat' | translate}}</p>
         </clr-control-error>
@@ -522,7 +527,8 @@
         </clr-control-helper>
         <clr-control-error>
           <p *ngIf="!oldNfsName" class="clr-error clr-subtext">{{'errorMsg.require' | translate}}</p>
-          <p *ngIf="matchErr" class="clr-error clr-subtext">{{'errorMsg.numberAndLetter' | translate}}</p>
+          <p class="clr-error clr-subtext"> {{'validations.required_nfs_name' | translate:'{length:42}'}}</p>
+          <p *ngIf="fsNameRepeatErr" class="clr-error clr-subtext">{{'errorMsg.fsrepeat' | translate}}</p>
         </clr-control-error>
       </clr-input-container>
       <!-- 共享名称 -->
@@ -535,6 +541,7 @@
         </clr-control-helper>
         <clr-control-error>
           <p *ngIf="!oldNfsName" class="clr-error clr-subtext">{{'errorMsg.require' | translate}}</p>
+          <p class="clr-error clr-subtext">{{'validations.required_share_name' | translate:'{length:254}'}}</p>
           <p *ngIf="matchErr" class="clr-error clr-subtext">{{'errorMsg.numberAndLetter' | translate}}</p>
         </clr-control-error>
       </clr-input-container>
@@ -635,7 +642,8 @@
   </clr-wizard-page>
 
   <!--  -->
-  <clr-wizard-page [clrWizardPageNextDisabled]="!formPageTwo.valid">
+  <clr-wizard-page [clrWizardPageNextDisabled]="isDisableFormPageTwo(formPageTwo)">
+    <!-- <clr-wizard-page [clrWizardPageNextDisabled]="!formPageTwo.valid"> -->
     <ng-template clrPageTitle>{{'nfs.storageSetting' | translate}}</ng-template> <!-- mandatory -->
     <ng-template clrPageNavTitle>{{'nfs.storageSetting' | translate}}</ng-template> <!-- optional -->
     <form clrForm #formPageTwo="ngForm">
@@ -807,7 +815,8 @@
               </clr-checkbox-container>
               <clr-checkbox-container *ngIf="iopsLimitErr">
                 <clr-control-helper class="clr-error clr-subtext">
-                  <clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{dorado?'tips.iopsLimitErr':'tips.iopsLimitErrNotV6' | translate}}
+                  <clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>
+                  {{(dorado?'tips.iopsLimitErr':'tips.iopsLimitErrNotV6') | translate}}
                 </clr-control-helper>
               </clr-checkbox-container>
             </div>
