@@ -1,4 +1,21 @@
-import { STATUS_ARRAY, SYN_STATUS_ARRAY } from './../../app/routes/storage/filter.component';
+export const STATUS_ARRAY = [
+  { value: '', label: 'vmfs.filter.all', color: '#A9A9A9' },
+  { value: 1, label: 'storage.list.normal', color: '#7CDFA0' },
+  { value: 0, label: 'storage.list.Offline', color: '#A9A9A9' },
+  { value: 2, label: 'storage.list.Abnormal', color: 'red' },
+  { value: 9, label: 'storage.list.Unmanaged', color: 'yellow' },
+  { value: -1, label: 'storage.list.Unknown', color: '#A9A9A9' },
+  { value: 5, label: 'storage.list.degraded', color: '#A9A9A9' },
+];
+
+export const SYN_STATUS_ARRAY = [
+  { value: '', label: 'vmfs.filter.all', color: '#A9A9A9' },
+  { value: 0, label: 'storage.list.unsync', color: '#A9A9A9' },
+  { value: 1, label: 'storage.list.Sync', color: '#00BFFF' },
+  { value: 2, label: 'storage.list.synced', color: '#7CDFA0' },
+  { value: 3, label: 'storage.list.syncFailed', color: 'red' },
+  { value: -1, label: 'storage.list.Unknown', color: '#A9A9A9' },
+];
 
 const data = [
   {
@@ -9,7 +26,7 @@ const data = [
     synStatus: '2',
     vendor: 'Huawei',
     model: '5300 V5',
-    usedCapacity: 2135851.007812,
+    usedCapacity: 0,
     totalCapacity: 6699718.03125,
     totalEffectiveCapacity: 0.0,
     freeEffectiveCapacity: 0.0,
@@ -107,6 +124,7 @@ export const getList = count => {
           ...data[0],
           id: data[0].id + ii,
           name: data[0].name + ii,
+          usedCapacity: Math.random() * 2135851.007812 + 1,
         };
       }),
     ],
@@ -135,6 +153,7 @@ export const getDmestorageStoragesManystate = count => {
           synStatus,
           id: data[0].id + ii,
           name: data[0].name + ii,
+          usedCapacity: Math.random() * 2135851.007812 + 1,
         };
       }),
     ],

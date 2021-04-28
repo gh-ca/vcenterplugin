@@ -19,18 +19,25 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { TokenService } from '@core';
 import { DOCUMENT } from '@angular/common';
 import { isMockData, mockData } from './../../../mock/mock';
-import { getColorByType, getLabelByValue, getQosCheckTipsTagInfo } from './../../app.helpers';
+import {
+  getColorByType,
+  getLabelByValue,
+  getQosCheckTipsTagInfo,
+  isStringLengthByteOutRange,
+  regExpCollection,
+} from './../../app.helpers';
 import { handlerResponseErrorSimple } from 'app/app.helpers';
 import { SimpleChange } from '@angular/core';
 import debounce from 'just-debounce';
 import { NfsComponentCommon } from './NfsComponentCommon';
+import { NfsMountService } from './subpages/mount/nfs-mount.service';
 
 @Component({
   selector: 'app-nfs',
   templateUrl: './nfs.component.html',
   styleUrls: ['./nfs.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [NfsService, StorageService, VmfsListService, NfsAddService],
+  providers: [NfsService, StorageService, VmfsListService, NfsAddService, NfsMountService],
 })
 export class NfsComponent extends NfsComponentCommon implements OnInit {
   getColor;
@@ -95,7 +102,6 @@ export class NfsComponent extends NfsComponentCommon implements OnInit {
   nfsNameRepeatErr = false;
   shareNameRepeatErr = false;
   fsNameRepeatErr = false;
-
   vmkernelList: Vmkernel[] = [];
 
   maxbandwidthChoose = false; // 最大带宽 选中
@@ -123,6 +129,7 @@ export class NfsComponent extends NfsComponentCommon implements OnInit {
   iopsLimitErr = false; // v6 设备 IOPS 下限大于上限
 
   constructor(
+    private mountService: NfsMountService,
     private addService: NfsAddService,
     private remoteSrv: NfsService,
     public cdr: ChangeDetectorRef,
@@ -139,7 +146,7 @@ export class NfsComponent extends NfsComponentCommon implements OnInit {
     this.getColor = getColorByType;
     this.getLabelByValue = getLabelByValue;
     this.isAddPageOneNextDisabled = true;
-    this.checkAddForm = debounce(this.checkAddForm.bind(this), 300);
+    (this.checkAddForm as any) = debounce(this.checkAddForm.bind(this), 600);
   }
 
   ngOnInit(): void {
@@ -264,7 +271,7 @@ export class NfsComponent extends NfsComponentCommon implements OnInit {
     if (isMockData) {
       successGetData(mockData.DMESTORAGE_STORAGES);
     } else {
-      this.storageService.getData().subscribe(successGetData);
+      this.storageService.getData(1).subscribe(successGetData);
     }
 
     this.hostList = null;
@@ -498,7 +505,7 @@ export class NfsComponent extends NfsComponentCommon implements OnInit {
    * 添加页面 重复数据删除
    */
   addDeduplicationShow() {
-    this.addForm.deduplicationEnabled = null;
+    this.addForm.deduplicationEnabled = '';
     this.deduplicationShow = this.getDeduplicationShow(this.addForm.storagId);
   }
 
@@ -515,7 +522,7 @@ export class NfsComponent extends NfsComponentCommon implements OnInit {
    * 添加页面数据压缩
    */
   addCompressionShow() {
-    this.addForm.compressionEnabled = null;
+    this.addForm.compressionEnabled = '';
     this.compressionShow = this.getCompressionShow(this.addForm.storagId);
   }
 
@@ -553,8 +560,8 @@ export class NfsComponent extends NfsComponentCommon implements OnInit {
     if (isMockData) {
       handlerGetLogicPortListByStorageIdSuccess(mockData.NFS_DMESTORAGE_LOGICPORTS);
     } else {
-      this.storageService
-        .getLogicPortListByStorageId(this.addForm.storagId)
+      this.mountService
+        .getLogicPortListByStorageId(this.addForm.storagId, 1)
         .subscribe(handlerGetLogicPortListByStorageIdSuccess);
     }
   }
@@ -652,47 +659,87 @@ export class NfsComponent extends NfsComponentCommon implements OnInit {
     });
   }
 
+  whenChoseSameName() {
+    this.addForm.shareName = this.addForm.nfsName;
+    this.addForm.fsName = this.addForm.nfsName;
+    // 共享名称不能包含中文
+    /* 取值范围为1到254个字符，只能由字母、数字、字符!\"#&%$'()*+-·.;<=>?@[]^_`{|}~,:和空格组成。 */
+    /* 如果有中文，不可以相同，清空并打开 */
+    if (!regExpCollection.shareFsName().test(this.addForm.nfsName)) {
+      this.addForm.sameName = false;
+      this.addForm.shareName = '';
+      this.shareNameContainsCN = true;
+    } else {
+      this.shareNameContainsCN = false;
+      this.checkShareNameExist(this.addForm.nfsName);
+    }
+    this.checkNfsNameExist(this.addForm.nfsName);
+    this.checkFsNameExist(this.addForm.nfsName);
+  }
+
   checkNfsName() {
     if (this.addForm.nfsName == null) return false;
-    if (this.oldNfsName == this.addForm.nfsName) return false;
+    // if (this.oldNfsName == this.addForm.nfsName) return false;
     this.oldNfsName = this.addForm.nfsName;
-    let reg5: RegExp = new RegExp('^[0-9a-zA-Z\u4e00-\u9fa5a"_"]*$');
-    if (reg5.test(this.addForm.nfsName)) {
-      // 共享名称不能包含中文
-      let reg5Two: RegExp = new RegExp('[\u4e00-\u9fa5]');
+
+    // let reg5: RegExp = new RegExp('^[0-9a-zA-Z\u4e00-\u9fa5a"_"]*$');
+    const inLimit = !isStringLengthByteOutRange(this.addForm.nfsName, 42, 'letters');
+
+    if (regExpCollection.nfsName().test(this.addForm.nfsName) && inLimit) {
       //验证重复
       this.matchErr = false;
+      /* 如果选择名字相同 */
       if (this.addForm.sameName) {
-        this.addForm.shareName = this.addForm.nfsName;
-        this.addForm.fsName = this.addForm.nfsName;
-        if (reg5Two.test(this.addForm.nfsName)) {
-          this.addForm.sameName = false;
-          this.addForm.shareName = '';
-          this.shareNameContainsCN = true;
-        } else {
-          this.shareNameContainsCN = false;
-          this.checkShareNameExist(this.addForm.nfsName);
-        }
-        this.checkNfsNameExist(this.addForm.nfsName);
-        this.checkFsNameExist(this.addForm.nfsName);
+        this.whenChoseSameName();
       } else {
         this.checkNfsNameExist(this.addForm.nfsName);
       }
     } else {
-      //
-      this.matchErr = true;
-      //不满足的时候置空
+      //不满足的时候置空，触发错误提示
       this.addForm.nfsName = null;
+      this.matchErr = true;
       console.log('验证不通过');
+    }
+  }
+
+  /* 检测文件系统名称 */
+  checkFsName() {
+    if (this.addForm.fsName == null) return false;
+    // if (this.oldFsName == this.addForm.fsName) return false;
+    this.oldFsName = this.addForm.fsName;
+    // let reg5: RegExp = new RegExp('^[0-9a-zA-Z\u4e00-\u9fa5a"_"]*$');
+    const inLimit = !isStringLengthByteOutRange(this.addForm.fsName, 42, 'letters');
+    /*  */
+    if (regExpCollection.nfsName().test(this.addForm.fsName) && inLimit) {
+      //验证重复
+      this.matchErr = false;
+      this.checkShareNameExist(this.addForm.fsName);
+    } else {
+      this.matchErr = true;
+      this.addForm.fsName = null;
     }
   }
 
   checkShareName() {
     if (this.addForm.shareName == null) return false;
-    if (this.oldShareName == this.addForm.shareName) return false;
+    // if (this.oldShareName == this.addForm.shareName) return false;
     this.oldShareName = this.addForm.shareName;
-    let reg5: RegExp = new RegExp('^[0-9a-zA-Z\u4e00-\u9fa5a"_"]*$');
-    if (reg5.test(this.addForm.shareName)) {
+
+    // let reg5: RegExp = new RegExp('^[0-9a-zA-Z\u4e00-\u9fa5a"_"]*$');
+    // 共享名称不能包含中文
+    // let reg5Two: RegExp = new RegExp('[\u4e00-\u9fa5]');
+    const inLimit = !isStringLengthByteOutRange(this.addForm.shareName, 254, 'letters');
+    if (regExpCollection.shareFsName().test(this.addForm.shareName) && inLimit) {
+      this.shareNameContainsCN = false;
+      this.matchErr = false;
+      //验证重复
+      this.checkShareNameExist(this.addForm.shareName);
+    } else {
+      this.matchErr = true;
+      this.addForm.shareName = null;
+    }
+
+    /*     if (reg5.test(this.addForm.shareName)) {
       // 共享名称不能包含中文
       let reg5Two: RegExp = new RegExp('[\u4e00-\u9fa5]');
       if (reg5Two.test(this.addForm.shareName)) {
@@ -708,14 +755,19 @@ export class NfsComponent extends NfsComponentCommon implements OnInit {
       this.matchErr = true;
       this.addForm.shareName = null;
     }
+ */
   }
 
   /**
    * 添加页面可点击 true 可点击 false 不可点击
    */
+  /* 是否可以点击使用相同名字  */
   isCheckSameName() {
-    let reg5: RegExp = new RegExp('[\u4e00-\u9fa5]');
-    if (reg5.test(this.addForm.nfsName)) {
+    // let reg5: RegExp = new RegExp('[\u4e00-\u9fa5]');
+    if (this.addForm.nfsName === '') return true;
+    let reg5: RegExp = regExpCollection.shareFsName();
+    // console.log(reg5.test(this.addForm.nfsName));
+    if (!reg5.test(this.addForm.nfsName)) {
       // 名称有中文
       return false;
     } else {
@@ -723,6 +775,7 @@ export class NfsComponent extends NfsComponentCommon implements OnInit {
       return true;
     }
   }
+
   setSameName() {
     if (this.addForm.sameName) {
       this.addForm.shareName = this.addForm.nfsName;
@@ -730,21 +783,6 @@ export class NfsComponent extends NfsComponentCommon implements OnInit {
     }
   }
 
-  checkFsName() {
-    if (this.addForm.fsName == null) return false;
-    if (this.oldFsName == this.addForm.fsName) return false;
-
-    this.oldFsName = this.addForm.fsName;
-    let reg5: RegExp = new RegExp('^[0-9a-zA-Z\u4e00-\u9fa5a"_"]*$');
-    if (reg5.test(this.addForm.fsName)) {
-      //验证重复
-      this.matchErr = false;
-      this.checkShareNameExist(this.addForm.fsName);
-    } else {
-      this.matchErr = true;
-      this.addForm.fsName = null;
-    }
-  }
   checkNfsNameExist(name: string) {
     this.addService.checkNfsNameExist(name).subscribe((r: any) => {
       if (r.code == '200') {
@@ -1007,11 +1045,6 @@ export class NfsComponent extends NfsComponentCommon implements OnInit {
     form.maxBandwidth = null;
     form.maxIopsChoose = false;
     form.maxIops = null;
-  }
-
-  ngOnChanges(changes: { [propKey: string]: SimpleChange }) {
-    debugger;
-    console.log(changes);
   }
 
   /**

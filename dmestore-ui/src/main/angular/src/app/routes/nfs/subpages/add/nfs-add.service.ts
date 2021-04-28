@@ -57,8 +57,8 @@ export class AddNfs {
   latency: number; //
   latencyChoose: false; //
   thin: boolean; // true  代表thin false代表thick
-  deduplicationEnabled: boolean; // 重删 true false
-  compressionEnabled: boolean; // 压缩 true false
+  deduplicationEnabled: boolean | string; // 重删 true false
+  compressionEnabled: boolean | string; // 压缩 true false
   autoSizeEnable: boolean; // 自动扩容 true false
   vkernelIp: string; //  虚拟网卡ip
   hostObjectId: string; //  挂载主机的Objectid
