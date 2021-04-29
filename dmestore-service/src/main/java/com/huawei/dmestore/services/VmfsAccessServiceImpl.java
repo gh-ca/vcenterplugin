@@ -2010,6 +2010,11 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             if (dataStoreObjectIds.size() > 0) {
                 List<String> dataStoreNames = new ArrayList<>();
                 for (String dsObjectId : dataStoreObjectIds) {
+                    boolean isFoundVm = vcsdkUtils.hasVmOnDatastore(dsObjectId);
+                    if (isFoundVm) {
+                        LOG.info("vmfs unmount,the vmfs:{} contain vm,can not unmount!!!", dsObjectId);
+                        continue;
+                    }
                     DmeVmwareRelation dvr = dmeVmwareRalationDao.getDmeVmwareRelationByDsId(dsObjectId);
                     if (dvr == null) {
                         scanVmfs();
