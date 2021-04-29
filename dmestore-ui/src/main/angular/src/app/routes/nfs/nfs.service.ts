@@ -803,7 +803,7 @@ export class MakePerformance {
     // 设置下限、均值 折线图数据 lower write
 
     const target_upper = res[objId].upper;
-    if (is.string(target_upper)) {
+    if (is.string(target_upper) && target_upper.length > 0) {
       legendData.push(this.setLengdData('Upper Limit', 'line'));
       const series_upper = this.setSerieData(
         'Upper Limit',
@@ -821,7 +821,7 @@ export class MakePerformance {
     }
 
     const target_lower = res[objId].lower;
-    if (is.string(target_lower)) {
+    if (is.string(target_lower) && target_lower.length > 0) {
       legendData.push(this.setLengdData('Lower Limit', 'line'));
       const series_lower = this.setSerieData(
         'Lower Limit',
