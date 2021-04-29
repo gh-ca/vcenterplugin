@@ -533,7 +533,8 @@ export class MakePerformance {
             subtext,
             resData,
             uppers,
-            lower
+            lower,
+            objIds[0]
           );
 
           // 设置标题
@@ -735,7 +736,15 @@ export class MakePerformance {
     return chart;
   }
 
-  getNewChartWithResponse(height: number, title: string, subtext: string, res, uppers, lower) {
+  getNewChartWithResponse(
+    height: number,
+    title: string,
+    subtext: string,
+    res,
+    uppers,
+    lower,
+    objId
+  ) {
     const chart: ChartOptions = new ChartOptions();
     // 高度
     chart.height = height;
@@ -793,7 +802,8 @@ export class MakePerformance {
     // 设置上限、均值 折线图数据 upper read
     // 设置下限、均值 折线图数据 lower write
 
-    if (is.string(res.upper)) {
+    const target_upper = res[objId].upper;
+    if (is.string(target_upper)) {
       legendData.push(this.setLengdData('Upper Limit', 'line'));
       const series_upper = this.setSerieData(
         'Upper Limit',
@@ -804,13 +814,14 @@ export class MakePerformance {
         null
       );
       series_upper.data = uppers.map(i => ({
-        value: Number(Number(res.upper).toFixed(4)),
+        value: Number(Number(target_upper).toFixed(4)),
         symbol: 'none',
       }));
       series.push(series_upper);
     }
 
-    if (is.string(res.lower)) {
+    const target_lower = res[objId].lower;
+    if (is.string(target_lower)) {
       legendData.push(this.setLengdData('Lower Limit', 'line'));
       const series_lower = this.setSerieData(
         'Lower Limit',
@@ -821,7 +832,7 @@ export class MakePerformance {
         null
       );
       series_lower.data = lower.map(i => ({
-        value: Number(Number(res.lower).toFixed(4)),
+        value: Number(Number(target_lower).toFixed(4)),
         symbol: 'none',
       }));
       series.push(series_lower);
