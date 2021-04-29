@@ -37,6 +37,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.io.IOException;
@@ -961,7 +962,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
     public List<Map<String, String>> estimateConnectivityOfHostOrHostgroup(String storageId, String hostId,
         String hostgroupId) throws DmeException {
 
-        Map<String, String> requestBody = new HashMap<>();
+        Map<String, Object> requestBody = new HashMap<>();
         if (StringUtils.isEmpty(storageId)) {
             LOG.error("estimate connectivity of host or hostgroup storageid param error!", storageId);
             throw new DmeException("estimate connectivity of host or hostgroup , storageid param error!");
@@ -969,7 +970,9 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         requestBody.put("storage_id", storageId);
         if (!StringUtils.isEmpty(hostId)) {
             //检查主机连通性参数
-            requestBody.put("host_id", hostId);
+            ArrayList<String> hostIds = new ArrayList<>();
+            hostIds.add(hostId);
+            requestBody.put("host_ids", hostIds);
         }
         if (!StringUtils.isEmpty(hostgroupId)) {
             //检查主机组连通性参数
