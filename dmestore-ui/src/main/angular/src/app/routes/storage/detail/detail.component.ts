@@ -483,8 +483,8 @@ export class DetailComponent implements OnInit, AfterViewInit {
           this.storagePool = r.data;
           // 设置容量个利用率
           this.storagePool.forEach(item => {
-            item.capUsage = (item.consumedCapacity / item.totalCapacity) * 100;
-            item.supRate = (item.subscribedCapacity / item.totalCapacity) * 100;
+            item.capUsage = (item?.consumedCapacity / item?.totalCapacity) * 100 || 0;
+            item.supRate = (item?.subscribedCapacity / item?.totalCapacity) * 100 || 0;
           });
           // 如果是v6设备存储池的类型为Block/File
           if (this.detail.storageTypeShow.dorado) {
@@ -503,7 +503,7 @@ export class DetailComponent implements OnInit, AfterViewInit {
       };
 
       if (isMockData) {
-        handlerGetStoragePoolListSuccess(getDmestorageStoragepools(100));
+        handlerGetStoragePoolListSuccess(getDmestorageStoragepools(20));
       } else {
         this.detailService
           .getStoragePoolList(this.storageId)
@@ -663,6 +663,24 @@ export class DetailComponent implements OnInit, AfterViewInit {
   }
 
   getStorageVolumeList(fresh: boolean) {
+    const handlerGetVolumeListListByPageSuccess = (r: any) => {
+      this.volIsLoading = false;
+      if (r.code === '200') {
+        this.volumes = r.data.volumeList;
+        this.volumeTotal = r.data.count;
+        this.volumes.forEach(vol => {
+          vol.capacityUsageNum = vol.capacityUsage ? Number.parseFloat(vol.capacityUsage) : 0;
+        });
+        // 设置总页数、footer
+        this.setVolumeTotalAndFooter();
+
+        // this.totalPageNum = '/' + ' ' + Math.ceil(this.volumeTotal/(query ? query.pageSize:10));
+        if (this.volumeRadio === 'table2') {
+          this.listVolumesperformance();
+        }
+      }
+      this.cdr.detectChanges();
+    };
     let reqParams;
     if (this.volReqParam != null) {
       reqParams = this.volReqParam;
@@ -677,46 +695,24 @@ export class DetailComponent implements OnInit, AfterViewInit {
     }
     if (fresh) {
       this.volIsLoading = true;
-      this.detailService.getVolumeListListByPage(reqParams).subscribe((r: any) => {
-        this.volIsLoading = false;
-        if (r.code === '200') {
-          this.volumes = r.data.volumeList;
-          this.volumeTotal = r.data.count;
-          this.volumes.forEach(vol => {
-            vol.capacityUsageNum = vol.capacityUsage ? Number.parseFloat(vol.capacityUsage) : 0;
-          });
-          // 设置总页数、footer
-          this.setVolumeTotalAndFooter();
-
-          // this.totalPageNum = '/' + ' ' + Math.ceil(this.volumeTotal/(query ? query.pageSize:10));
-          if (this.volumeRadio === 'table2') {
-            this.listVolumesperformance();
-          }
-        }
-        this.cdr.detectChanges();
-      });
+      if (isMockData) {
+        handlerGetVolumeListListByPageSuccess(mockData.DMESTORAGE_VOLUMES_BY_PAGE);
+      } else {
+        this.detailService
+          .getVolumeListListByPage(reqParams)
+          .subscribe(handlerGetVolumeListListByPageSuccess, handlerResponseErrorSimple);
+      }
     } else {
       // 此处防止重复切换tab每次都去后台请求数据
       if (this.volumes == null) {
         this.volIsLoading = true;
-        this.detailService.getVolumeListListByPage(reqParams).subscribe((r: any) => {
-          this.volIsLoading = false;
-          if (r.code === '200') {
-            this.volumes = r.data.volumeList;
-            this.volumeTotal = r.data.count;
-            this.volumes.forEach(vol => {
-              vol.capacityUsageNum = vol.capacityUsage ? Number.parseFloat(vol.capacityUsage) : 0;
-            });
-            // 设置总页数、footer
-            this.setVolumeTotalAndFooter();
-            // this.totalPageNum = '/' + ' ' + Math.ceil(this.volumeTotal/(query ? query.pageSize:10));
-
-            if (this.volumeRadio === 'table2') {
-              this.listVolumesperformance();
-            }
-          }
-          this.cdr.detectChanges();
-        });
+        if (isMockData) {
+          handlerGetVolumeListListByPageSuccess(mockData.DMESTORAGE_VOLUMES_BY_PAGE);
+        } else {
+          this.detailService
+            .getVolumeListListByPage(reqParams)
+            .subscribe(handlerGetVolumeListListByPageSuccess, handlerResponseErrorSimple);
+        }
       }
     }
   }
@@ -764,28 +760,34 @@ export class DetailComponent implements OnInit, AfterViewInit {
   }
 
   getFileSystemList(fresh: boolean) {
+    const handlerGetFileSystemListSuccess = (r: any) => {
+      this.fsIsLoading = false;
+      if (r.code === '200') {
+        this.fsList = r.data;
+        this.fsTotal = this.fsList == null ? 0 : this.fsList.length;
+      }
+      this.cdr.detectChanges();
+    };
     if (fresh) {
       this.fsIsLoading = true;
-      this.detailService.getFileSystemList(this.storageId).subscribe((r: any) => {
-        this.fsIsLoading = false;
-        if (r.code === '200') {
-          this.fsList = r.data;
-          this.fsTotal = this.fsList == null ? 0 : this.fsList.length;
-        }
-        this.cdr.detectChanges();
-      });
+      if (isMockData) {
+        handlerGetFileSystemListSuccess(mockData.DMESTORAGE_FILESYSTEMS);
+      } else {
+        this.detailService
+          .getFileSystemList(this.storageId)
+          .subscribe(handlerGetFileSystemListSuccess, handlerResponseErrorSimple);
+      }
     } else {
       // 此处防止重复切换tab每次都去后台请求数据
       if (this.fsList == null) {
         this.fsIsLoading = true;
-        this.detailService.getFileSystemList(this.storageId).subscribe((r: any) => {
-          this.fsIsLoading = false;
-          if (r.code === '200') {
-            this.fsList = r.data;
-            this.fsTotal = this.fsList == null ? 0 : this.fsList.length;
-          }
-          this.cdr.detectChanges();
-        });
+        if (isMockData) {
+          handlerGetFileSystemListSuccess(mockData.DMESTORAGE_FILESYSTEMS);
+        } else {
+          this.detailService
+            .getFileSystemList(this.storageId)
+            .subscribe(handlerGetFileSystemListSuccess, handlerResponseErrorSimple);
+        }
       }
     }
   }
@@ -797,60 +799,73 @@ export class DetailComponent implements OnInit, AfterViewInit {
     if (this.dtreeQuotaFilter) {
       this.dtreeQuotaFilter.initQuota();
     }
-
     this.getDtreeList(true);
   }
 
   getDtreeList(fresh: boolean) {
+    const handlerGetDtreeListSuccess = (r: any) => {
+      this.dtreeIsLoading = false;
+      if (r.code === '200') {
+        this.dtrees = r.data;
+        this.dtreeTotal = this.dtrees == null ? 0 : this.dtrees.length;
+      }
+      this.cdr.detectChanges();
+    };
+
     if (fresh) {
       this.dtreeIsLoading = true;
-      this.detailService.getDtreeList(this.storageId).subscribe((r: any) => {
-        this.dtreeIsLoading = false;
-        if (r.code === '200') {
-          this.dtrees = r.data;
-          this.dtreeTotal = this.dtrees == null ? 0 : this.dtrees.length;
-        }
-        this.cdr.detectChanges();
-      });
+      if (isMockData) {
+        handlerGetDtreeListSuccess(mockData.DMESTORAGE_DTREES);
+      } else {
+        this.detailService
+          .getDtreeList(this.storageId)
+          .subscribe(handlerGetDtreeListSuccess, handlerResponseErrorSimple);
+      }
     } else {
       if (this.dtrees == null) {
         // 此处防止重复切换tab每次都去后台请求数据
         this.dtreeIsLoading = true;
-        this.detailService.getDtreeList(this.storageId).subscribe((r: any) => {
-          this.dtreeIsLoading = false;
-          if (r.code === '200') {
-            this.dtrees = r.data;
-            this.dtreeTotal = this.dtrees == null ? 0 : this.dtrees.length;
-          }
-          this.cdr.detectChanges();
-        });
+        if (isMockData) {
+          handlerGetDtreeListSuccess(mockData.DMESTORAGE_DTREES);
+        } else {
+          this.detailService
+            .getDtreeList(this.storageId)
+            .subscribe(handlerGetDtreeListSuccess, handlerResponseErrorSimple);
+        }
       }
     }
   }
 
   getShareList(fresh: boolean) {
+    const handlerGetShareListSuccess = (r: any) => {
+      this.shareIsLoading = false;
+      if (r.code === '200') {
+        this.shares = r.data;
+        this.shareTotal = this.shares == null ? 0 : this.shares.length;
+      }
+      this.cdr.detectChanges();
+    };
+
     if (fresh) {
       this.shareIsLoading = true;
-      this.detailService.getShareList(this.storageId).subscribe((r: any) => {
-        this.shareIsLoading = false;
-        if (r.code === '200') {
-          this.shares = r.data;
-          this.shareTotal = this.shares == null ? 0 : this.shares.length;
-        }
-        this.cdr.detectChanges();
-      });
+      if (isMockData) {
+        handlerGetShareListSuccess(mockData.DMESTORAGE_NFSSHARES);
+      } else {
+        this.detailService
+          .getShareList(this.storageId)
+          .subscribe(handlerGetShareListSuccess, handlerResponseErrorSimple);
+      }
     } else {
       // 此处防止重复切换tab每次都去后台请求数据
       if (this.shares == null) {
         this.shareIsLoading = true;
-        this.detailService.getShareList(this.storageId).subscribe((r: any) => {
-          this.shareIsLoading = false;
-          if (r.code === '200') {
-            this.shares = r.data;
-            this.shareTotal = this.shares == null ? 0 : this.shares.length;
-          }
-          this.cdr.detectChanges();
-        });
+        if (isMockData) {
+          handlerGetShareListSuccess(mockData.DMESTORAGE_NFSSHARES);
+        } else {
+          this.detailService
+            .getShareList(this.storageId)
+            .subscribe(handlerGetShareListSuccess, handlerResponseErrorSimple);
+        }
       }
     }
   }
@@ -1229,7 +1244,10 @@ export class DetailComponent implements OnInit, AfterViewInit {
         obj_ids: objIds,
         ...paramsInfo,
       };
-      this.nfsService.getLineChartData(url, params).subscribe((result: any) => {
+      const handlerGetLineChartDataSuccess = (result: any) => {
+        if (isMockData) {
+          objIds[0] = '9e1a6ffa-a278-11eb-994b-16eea383cc74';
+        }
         if (result.code === '200' && result.data && result.data[objIds[0]]) {
           const resData = result.data;
           // 设置标题
@@ -1268,7 +1286,15 @@ export class DetailComponent implements OnInit, AfterViewInit {
           console.log('get chartData fail: ', result.description);
         }
         resolve(chart);
-      });
+      };
+
+      if (isMockData) {
+        handlerGetLineChartDataSuccess(mockData.ATASTORESTATISTICHISTRORY_STORAGE_DEVICE);
+      } else {
+        this.nfsService
+          .getLineChartData(url, params)
+          .subscribe(handlerGetLineChartDataSuccess, handlerResponseErrorSimple);
+      }
     });
   }
 

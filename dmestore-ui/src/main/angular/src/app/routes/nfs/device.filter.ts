@@ -51,7 +51,7 @@ export class DeviceFilter implements ClrDatagridFilterInterface<List>, OnInit {
     if (isMockData) {
       deviceFilterOptionsHandler(genDemStorageList(100));
     } else {
-      this.storageService.getData().subscribe(deviceFilterOptionsHandler);
+      this.storageService.getData(false).subscribe(deviceFilterOptionsHandler);
     }
   }
   changes = new Subject<any>();

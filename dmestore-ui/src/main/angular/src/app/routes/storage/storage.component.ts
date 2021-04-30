@@ -76,7 +76,7 @@ export class StorageComponent implements OnInit, AfterViewInit {
       handlerGetDataSuccess(getDmestorageStoragesManystate(100));
       // handlerGetDataSuccess(mockData.DMESTORAGE_STORAGES);
     } else {
-      this.remoteSrv.getData().subscribe(handlerGetDataSuccess, handlerResponseErrorSimple);
+      this.remoteSrv.getData(false).subscribe(handlerGetDataSuccess, handlerResponseErrorSimple);
     }
   }
 

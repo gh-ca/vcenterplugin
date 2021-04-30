@@ -892,8 +892,8 @@ public class DmeAccessServiceImpl implements DmeAccessService {
                     objMap.put(ToolUtils.getStr(key), ToolUtils.getStr(value));
                 }
                 }
+                objList.add(objMap);
             }
-            objList.add(objMap);
         }
         return objList;
     }

@@ -31,6 +31,9 @@
   },
   "validations": {
     "required": "This field is required!",
+    "required_vmfs_name": "And can only contain half-width letters, half-width numbers, “_”、“-”、“.”、and Chinese characters.Length not more than {{length}} bytes, a Chinese character is three bytes",
+    "required_nfs_name": "And can only contain half-width letters, half-width numbers, “_”、“-”、“.”、and Chinese characters.Length not more than {{length}} letters",
+    "required_share_name": "Should have atleast 254 letters And can only contain half-width letters, half-width numbers, \\\"#&%$'()*+-·.;<=>?@[]^_`{|}~,:",
     "nameRequired": "This field is required! And can only contain half-width letters, half-width numbers, “_”、“-”、“.”、and Chinese characters.",
     "nameRequiredTwo": "This field is required! And can only contain half-width letters, half-width numbers, “_”、and Chinese characters.",
     "shareNameRequired": "This field is required! And can only contain half-width letters, half-width numbers, “_”.",
@@ -144,6 +147,7 @@
       "storagePool": "Storagepool",
       "controller": "Controller",
       "provisionType": "Provision Type",
+      "provisionType2": "Provision Type",
       "appSce": "Application Scenario",
       "dataDed": "Data Deduplication",
       "dataCom": "Data Compression",
@@ -373,7 +377,8 @@
       "syncFailed": "Failed",
       "status": "Running Status",
       "synStatus": "Synchronized State",
-      "Unknown": "Unknow"
+      "Unknown": "Unknow",
+      "Other": "Other"
     },
     "chart": {
       "total": " Total",
@@ -773,7 +778,9 @@
     "maxBandWidth": "Max BandWidth",
     "minBandWidth": "Min Band Width",
     "enable": "Enable",
+    "enabled": "Enable",
     "disable": "Disable",
+    "disabled": "Disable",
     "notMove": "Not Move",
     "autoMove": "Auto Move",
     "highPMove": "High Performance Move",
@@ -794,7 +801,7 @@
     "maxBandWidths": "OrderBy MaxBandWidth",
     "minBandWidths": "OrderBy MinBandWidth",
     "offLine": "Offline",
-    "normal": "Normal",
+    "normal": "Online",
     "abnormal": "Abnormal",
     "unknown": "Unknown",
     "faulty": "Faulty",

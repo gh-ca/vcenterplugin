@@ -6,7 +6,12 @@ import { UpdateNfs } from '../../nfs.service';
 import { StorageList } from '../../../storage/storage.service';
 import { VmfsListService } from '../../../vmfs/list/list.service';
 import { isMockData, mockData } from 'mock/mock';
-import { getQosCheckTipsTagInfo } from 'app/app.helpers';
+import {
+  getQosCheckTipsTagInfo,
+  isStringLengthByteOutRange,
+  print,
+  regExpCollection,
+} from 'app/app.helpers';
 
 @Component({
   selector: 'app-add',
@@ -22,6 +27,8 @@ export class NfsModifyComponent implements OnInit {
   objectId: string;
   updateNfs = new UpdateNfs();
   errorMsg: string;
+
+  print = print;
 
   maxbandwidthChoose = false; // 最大带宽 选中
   maxiopsChoose = false; // 最大iops 选中
@@ -67,8 +74,9 @@ export class NfsModifyComponent implements OnInit {
     if (this.pluginFlag == null) {
       //入口来至Vcenter
       const ctx = this.gs.getClientSdk().app.getContextObjects();
-      this.objectId = ctx[0].id;
-      // this.objectId="urn:vmomi:Datastore:datastore-10020:674908e5-ab21-4079-9cb1-596358ee5dd1";
+      this.objectId = ctx
+        ? ctx[0].id
+        : 'urn:vmomi:Datastore:datastore-10020:674908e5-ab21-4079-9cb1-596358ee5dd1';
     }
 
     const handlerGetNfsDetailById = (result: any) => {
@@ -185,7 +193,7 @@ export class NfsModifyComponent implements OnInit {
       this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
     };
     if (isMockData) {
-      handlerGetNfsDetailById(mockData.DMESTORAGE_STORAGES);
+      handlerGetNfsDetailById(mockData.OPERATENFS_EDITNFSSTORE);
     } else {
       this.modifyService.getNfsDetailById(this.objectId).subscribe(handlerGetNfsDetailById);
     }
@@ -391,16 +399,27 @@ export class NfsModifyComponent implements OnInit {
   oldShareName: string;
   oldFsName: string;
 
+  setSameName() {
+    if (this.updateNfs.sameName) {
+      this.updateNfs.shareName = this.updateNfs.nfsName;
+      this.updateNfs.fsName = this.updateNfs.nfsName;
+    }
+  }
+
   checkNfsName() {
     if (this.updateNfs.nfsName == null) {
       return false;
     }
-    if (this.oldNfsName == this.updateNfs.nfsName) {
+    /*   if (this.oldNfsName == this.updateNfs.nfsName) {
       return false;
-    }
-    this.oldNfsName = this.updateNfs.nfsName;
-    let reg5: RegExp = new RegExp('^[0-9a-zA-Z\u4e00-\u9fa5a"_"]*$');
-    if (reg5.test(this.updateNfs.nfsName)) {
+    } */
+    // this.oldNfsName = this.updateNfs.nfsName;
+    
+    const inLimit = !isStringLengthByteOutRange(this.updateNfs.nfsName, 42, 'letters');
+    let reg5: RegExp = regExpCollection.nfsName();
+    // let reg5: RegExp = new RegExp('^[0-9a-zA-Z\u4e00-\u9fa5a"_"]*$');
+    if (reg5.test(this.updateNfs.nfsName) && inLimit) {
+      this.setSameName();
       //验证重复
       this.matchErr = false;
       if (this.updateNfs.sameName) {
@@ -416,6 +435,30 @@ export class NfsModifyComponent implements OnInit {
       //不满足的时候置空
       this.updateNfs.nfsName = null;
       console.log('验证不通过');
+    }
+  }
+
+  checkFsName() {
+    if (this.updateNfs.fsName == null) {
+      return false;
+    }
+    if (this.oldFsName == this.updateNfs.fsName) {
+      return false;
+    }
+
+    this.oldFsName = this.updateNfs.fsName;
+
+    const inLimit = !isStringLengthByteOutRange(this.updateNfs.fsName, 42, 'letters');
+
+    let reg5: RegExp = regExpCollection.nfsName();
+    // let reg5: RegExp = new RegExp('^[0-9a-zA-Z\u4e00-\u9fa5a"_"]*$');
+    if (reg5.test(this.updateNfs.fsName) && inLimit) {
+      //验证重复
+      this.matchErr = false;
+      this.checkShareNameExist(this.updateNfs.fsName);
+    } else {
+      this.matchErr = true;
+      this.updateNfs.fsName = null;
     }
   }
 
@@ -436,26 +479,6 @@ export class NfsModifyComponent implements OnInit {
     } else {
       this.matchErr = true;
       this.updateNfs.shareName = null;
-    }
-  }
-
-  checkFsName() {
-    if (this.updateNfs.fsName == null) {
-      return false;
-    }
-    if (this.oldFsName == this.updateNfs.fsName) {
-      return false;
-    }
-
-    this.oldFsName = this.updateNfs.fsName;
-    let reg5: RegExp = new RegExp('^[0-9a-zA-Z\u4e00-\u9fa5a"_"]*$');
-    if (reg5.test(this.updateNfs.fsName)) {
-      //验证重复
-      this.matchErr = false;
-      this.checkShareNameExist(this.updateNfs.fsName);
-    } else {
-      this.matchErr = true;
-      this.updateNfs.fsName = null;
     }
   }
 
@@ -607,7 +630,7 @@ export class NfsModifyComponent implements OnInit {
     const upperObj = document.getElementById(upperId) as HTMLInputElement;
     const lowerObj = document.getElementById(lowerId) as HTMLInputElement;
     // qos策略 1 支持复选(上限、下限) 2支持单选（上限或下限） 3只支持上限
-    let qosTag = this.storage.storageTypeShow.qosTag;
+    let qosTag = this.storage?.storageTypeShow.qosTag || 2;
 
     let upperChecked;
     if (upperObj) {

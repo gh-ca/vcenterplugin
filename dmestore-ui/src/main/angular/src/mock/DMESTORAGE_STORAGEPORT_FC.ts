@@ -1,6 +1,7 @@
 export default {
   code: '200',
   data: [
+    null,
     {
       id: 'C6250A26868232E3AD3959763EDACC28',
       nativeId: 'nedn=a21430cc-a0e1-11eb-983f-183d5ebec943,id=549773705218,objecttype=212',
