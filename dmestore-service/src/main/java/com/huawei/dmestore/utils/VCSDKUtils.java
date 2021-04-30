@@ -1286,6 +1286,54 @@ public class VCSDKUtils {
         }
     }
 
+    public void rescanHbaByHostObjectId(String hostObjectId) throws VcenterException {
+        try {
+            String serverguid = vcConnectionHelpers.objectId2Serverguid(hostObjectId);
+            VmwareContext vmwareContext = vcConnectionHelpers.getServerContext(serverguid);
+            ManagedObjectReference objmor = vcConnectionHelpers.objectId2Mor(hostObjectId);
+            HostMo hostMo = hostVmwareFactory.build(vmwareContext, objmor);
+
+            // 在查找可用LUN前先扫描hba，已发现新的卷
+            List<String> devices = getHbaDeviceByHost(hostMo);
+            if (devices != null && devices.size() > 0) {
+                for (String device : devices) {
+                    hostMo.getHostStorageSystemMo().rescanHba(device);
+                }
+            }
+        } catch (Exception e) {
+            logger.error("vmware host rescan HBA error:", e);
+            throw new VcenterException(e.getMessage());
+        }
+    }
+
+    public void rescanHbaByClusterObjectId(String clusterObjectId) throws VcenterException {
+        try {
+            String serverguid = vcConnectionHelpers.objectId2Serverguid(clusterObjectId);
+            VmwareContext vmwareContext = vcConnectionHelpers.getServerContext(serverguid);
+            ManagedObjectReference objmor = vcConnectionHelpers.objectId2Mor(clusterObjectId);
+            ClusterMo cl1 = clusterVmwareMoFactory.build(vmwareContext, objmor);
+            List<Pair<ManagedObjectReference, String>> hosts = cl1.getClusterHosts();
+            if (hosts != null && hosts.size() > 0) {
+                Map<String, HostMo> hostMap = new HashMap<>();
+                List<HostScsiDisk> objHostScsiDisks = new ArrayList<>();
+                for (Pair<ManagedObjectReference, String> host : hosts) {
+                    HostMo hostMo = hostVmwareFactory.build(vmwareContext, host.first());
+
+                    // 在查找可用LUN前先扫描hba，已发现新的卷
+                    List<String> devices = getHbaDeviceByHost(hostMo);
+                    if (devices != null && devices.size() > 0) {
+                        for (String device : devices) {
+                            hostMo.getHostStorageSystemMo().rescanHba(device);
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            logger.error("vmware host rescan HBA error:", e);
+            throw new VcenterException(e.getMessage());
+        }
+    }
+
     /**
      * 得到主机对应的可用LUN
      *
@@ -1362,12 +1410,12 @@ public class VCSDKUtils {
             HostMo hostMo = hostVmwareFactory.build(vmwareContext, objmor);
 
             // 在查找可用LUN前先扫描hba，已发现新的卷
-            List<String> devices = getHbaDeviceByHost(hostMo);
+           /* List<String> devices = getHbaDeviceByHost(hostMo);
             if (devices != null && devices.size() > 0) {
                 for (String device : devices) {
                     hostMo.getHostStorageSystemMo().rescanHba(device);
                 }
-            }
+            }*/
             HostDatastoreSystemMo hostDatastoreSystem = hostMo.getHostDatastoreSystemMo();
             List<HostScsiDisk> hostScsiDisks = hostDatastoreSystem.queryAvailableDisksForVmfs();
             candidateHostScsiDisk = getObjectLuns(hostScsiDisks, capacity, volumeWwn);
@@ -1486,12 +1534,12 @@ public class VCSDKUtils {
                     HostMo hostMo = hostVmwareFactory.build(vmwareContext, host.first());
 
                     // 在查找可用LUN前先扫描hba，已发现新的卷
-                    List<String> devices = getHbaDeviceByHost(hostMo);
+                   /* List<String> devices = getHbaDeviceByHost(hostMo);
                     if (devices != null && devices.size() > 0) {
                         for (String device : devices) {
                             hostMo.getHostStorageSystemMo().rescanHba(device);
                         }
-                    }
+                    }*/
                     HostDatastoreSystemMo hostDatastoreSystem = hostMo.getHostDatastoreSystemMo();
                     List<HostScsiDisk> hostScsiDisks = hostDatastoreSystem.queryAvailableDisksForVmfs();
                     if (hostScsiDisks != null && hostScsiDisks.size() > 0) {
@@ -1586,7 +1634,7 @@ public class VCSDKUtils {
                                 unmapGranularity, unmapPriority);
 
                         logger.info("rescanVmfs after createVmfsDatastore!datastore={}", datastore);
-                        hostMo.getHostStorageSystemMo().rescanVmfs();
+
                     } catch (Exception e) {
                         throw new VcenterException(e.getMessage());
                     }

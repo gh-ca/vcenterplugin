@@ -32,7 +32,7 @@ public interface TaskService {
      * @param timeout timeout
      * @param startTime startTime
      **/
-    void getTaskStatus(List<String> taskIds, Map<String, Integer> taskStatusMap, int timeout, long startTime);
+    void getTaskStatus(List<String> taskIds, Map<String, Integer> taskStatusMap, long timeout, long startTime);
 
     /**
      * task status check
@@ -41,6 +41,14 @@ public interface TaskService {
      * @return Boolean
      **/
     boolean checkTaskStatus(List<String> taskIds);
+
+    /**
+     * task status check
+     *
+     * @param taskIds taskIds
+     * @return Boolean
+     **/
+    boolean checkTaskStatus(List<String> taskIds,long timeout);
 
     /**
      * get task info untill finish
