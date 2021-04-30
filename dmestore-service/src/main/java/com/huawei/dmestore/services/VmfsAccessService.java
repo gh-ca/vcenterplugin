@@ -175,7 +175,7 @@ public interface VmfsAccessService {
      * @return java.lang.String
      * @throws DmeException DmeException
      **/
-    String checkOrCreateToHost(String hostIp, String hostId) throws DmeException;
+    String checkOrCreateToHost(String hostIp, String hostId,Map<String,List<Map<String, Object>>> allinitionators) throws DmeException;
 
     /**
      * 判断dme主机或者主机组的连通性
@@ -188,4 +188,6 @@ public interface VmfsAccessService {
      */
     List<Map<String, String>> estimateConnectivityOfHostOrHostgroup(String storageId, String hostId, String hostgroupId)
         throws DmeException;
+
+    Map<String,List<Map<String, Object>>> getAllInitionator() throws DmeException ;
 }

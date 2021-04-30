@@ -56,7 +56,7 @@ public class TaskServiceImpl implements TaskService {
     /**
      * 轮询任务状态的超值时间
      */
-    private final int taskTimeOut = 10 * 60 * 1000;
+    private final long taskTimeOut = 10 * 60 * 1000;
 
     private Gson gson = new Gson();
 
@@ -110,7 +110,7 @@ public class TaskServiceImpl implements TaskService {
         String url = DmeConstants.QUERY_TASK_URL.replace("{task_id}", taskId);
         boolean isLoop = true;
         int waitTime = TWO_SECEND;
-        int times = taskTimeOut / waitTime;
+        long times = taskTimeOut / waitTime;
         while (isLoop) {
             ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
             if (responseEntity.getStatusCodeValue() == HTTP_STATUS_200) {
@@ -222,7 +222,7 @@ public class TaskServiceImpl implements TaskService {
      * @param startTime 任务查询开始时间 单位ms
      */
     @Override
-    public void getTaskStatus(List<String> taskIds, Map<String, Integer> taskStatusMap, int timeout, long startTime) {
+    public void getTaskStatus(List<String> taskIds, Map<String, Integer> taskStatusMap, long timeout, long startTime) {
         long start = startTime;
 
         // 没传开始时间或开始时间小于格林威治启用时间,初始话为当前时间
@@ -278,10 +278,16 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public boolean checkTaskStatus(List<String> taskIds) {
+
+        return checkTaskStatus(taskIds,taskTimeOut);
+    }
+
+    @Override
+    public boolean checkTaskStatus(List<String> taskIds,long timeout) {
         boolean isSuccess = false;
         if (taskIds != null && taskIds.size() > 0) {
             Map<String, Integer> taskStatusMap = new HashMap<>();
-            getTaskStatus(taskIds, taskStatusMap, taskTimeOut, System.currentTimeMillis());
+            getTaskStatus(taskIds, taskStatusMap, timeout, System.currentTimeMillis());
             for (Map.Entry<String, Integer> entry : taskStatusMap.entrySet()) {
                 int status = entry.getValue();
                 if (status == TASK_SUCCESS) {
