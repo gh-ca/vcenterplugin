@@ -10,7 +10,7 @@ export class VmfsCommon {
 
   constructor() {
     this.createAddFormAndWatchFormChange();
-    this.checkPageOne = debounce(this.checkPageOne.bind(this), 300);
+    (this.checkPageOne as any) = debounce(this.checkPageOne.bind(this), 300);
   }
 
   handlerValueChanges(addForm) {
@@ -50,6 +50,11 @@ export class VmfsCommon {
     this.form.spaceReclamationPriority = this.addForm.value.spaceReclamationPriority;
     this.form.chooseDevice = this.addForm.value.chooseDevice;
 
+    try {
+      /* 数量 */
+      // console.log("countBlur");
+      (this as any).countBlur();
+    } catch (error) {}
     const isname = !!this.form.name;
     const isvolumeName = !!this.form.volumeName;
     const isversion = !!this.form.version;
@@ -59,7 +64,7 @@ export class VmfsCommon {
     const isspaceReclamationGranularity = !!this.form.spaceReclamationGranularity;
     const isspaceReclamationPriority = !!this.form.spaceReclamationPriority;
     const ischooseDevice = !!this.form.chooseDevice;
-
+/* 
     console.log(
       'isname',
       isname,
@@ -80,7 +85,7 @@ export class VmfsCommon {
       'ischooseDevice',
       ischooseDevice
     );
-
+ */
     this.isPageNextDisabled = !(
       isname &&
       isvolumeName &&
@@ -93,6 +98,7 @@ export class VmfsCommon {
       ischooseDevice
     );
     this.cdr.detectChanges();
+    return true;
   }
 
   createAddFormAndWatchFormChange() {

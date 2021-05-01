@@ -317,8 +317,13 @@
 
     <!--Page1 -->
     <!-- vmfs 数据存储 添加 -->
-    <clr-wizard-page #addPageOne [clrWizardPageNextDisabled]="isPageNextDisabled">
+    <clr-wizard-page #addPageOne [clrWizardPageNextDisabled]="checkPageOne()&&isPageNextDisabled">
       <ng-template clrPageTitle>{{'vmfs.datastoreSetting' | translate}}</ng-template> <!-- mandatory -->
+      <!--       <pre>
+        {{checkPageOne()}}
+        {{print(form)}}
+      </pre>
+ -->
       <form clrForm [formGroup]="addForm" #formPageOne="ngForm">
         <!--数据存储名称 -->
         <clr-input-container>
@@ -424,8 +429,7 @@
               {{'vmfs.capacityTips' | translate}}
             </div>
           </clr-control-helper>
-          <clr-control-error>{{'validations.required' | translate}}：{{'vmfs.capacityTips' | translate}}
-          </clr-control-error>
+          <clr-control-error>{{'validations.required' | translate}}：{{'vmfs.capacityTips' | translate}} </clr-control-error>
         </clr-input-container>
         <!-- 块大小 -->
         <clr-select-container class="selectClass" *ngIf="isShowInput">

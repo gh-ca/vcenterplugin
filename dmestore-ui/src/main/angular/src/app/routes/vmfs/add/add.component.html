@@ -21,7 +21,7 @@
     </span>
   </div>
   <!--Page1 -->
-  <clr-wizard-page #addPageOne [clrWizardPageNextDisabled]="isPageNextDisabled">
+  <clr-wizard-page #addPageOne [clrWizardPageNextDisabled]="checkPageOne()&&isPageNextDisabled">
     <ng-template clrPageTitle>{{'vmfs.datastoreSetting' | translate}}</ng-template> <!-- mandatory -->
 
     <form clrForm #formPageOne="ngForm" [formGroup]="addForm">
@@ -131,7 +131,9 @@
             <clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{'vmfs.capacityTips' | translate}}
           </div>
         </clr-control-helper>
-        <clr-control-error>{{'validations.required' | translate}}</clr-control-error>
+        <!-- <clr-control-error>{{'validations.required' | translate}}</clr-control-error> -->
+        <clr-control-error>{{'validations.required' | translate}}：{{'vmfs.capacityTips' | translate}}
+        </clr-control-error>
       </clr-input-container>
 
       <!-- 块大小 -->
