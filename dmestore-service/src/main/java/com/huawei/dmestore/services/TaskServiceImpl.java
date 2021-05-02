@@ -27,6 +27,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 /**
  * TaskServiceImpl
@@ -38,6 +39,10 @@ public class TaskServiceImpl implements TaskService {
     private static final Logger LOG = LoggerFactory.getLogger(TaskServiceImpl.class);
 
     private static final int TASK_SUCCESS = 3;
+
+    private static final int TASK_FAILURE = 5;
+
+    private static final int TASK_TIMEOUT = 6;
 
     private static final int TASK_FLAG_2 = 2;
 
@@ -90,10 +95,8 @@ public class TaskServiceImpl implements TaskService {
                 LOG.error("queryTaskById failed!taskId={},errorMsg:{}", taskId, responseEntity.getBody());
                 return null;
             }
-        } catch (DmeException ex) {
-            LOG.error("queryTaskById error, errorMsg:{}", ex.getMessage());
-            return null;
-        }
+           // LOG.info("task="+url+"------resutl="+responseEntity.getBody());
+
 
         // 解析responseEntity 转换为 TaskDetailInfo
         Object object = responseEntity.getBody();
@@ -101,6 +104,10 @@ public class TaskServiceImpl implements TaskService {
         if (tasks != null && tasks.size() > 0) {
             return tasks.get(0);
         } else {
+            return null;
+        }
+        } catch (DmeException ex) {
+            LOG.error("queryTaskById error, errorMsg:{}", ex.getMessage());
             return null;
         }
     }
@@ -217,6 +224,43 @@ public class TaskServiceImpl implements TaskService {
      * getTaskStatus
      *
      * @param taskIds 待查询的任务id集合
+     */
+    @Override
+    public Map<String, Integer> getTaskStatusWhile(Set<String> taskIds) {
+        Map<String, Integer> taskStatusMap = new HashMap<>();
+        List<TaskDetailInfo> detailInfos = new ArrayList<>();
+        //Set<String> queryTaskIds = new HashSet<>();
+        for (String taskId : taskIds) {
+            TaskDetailInfo taskDetailInfo = queryTaskById(taskId);
+            if (taskDetailInfo != null) {
+                detailInfos.add(taskDetailInfo);
+            }
+        }
+        for (TaskDetailInfo taskInfo : detailInfos) {
+            if (taskInfo != null) {
+                String taskId = taskInfo.getId();
+
+                // 过滤子任务
+                if (!taskIds.contains(taskId)) {
+                    continue;
+                }
+                int status = taskInfo.getStatus();
+                int progress = taskInfo.getProgress();
+
+                taskStatusMap.put(taskId, status);
+
+            }
+        }
+
+
+
+        return taskStatusMap;
+    }
+
+    /**
+     * getTaskStatus
+     *
+     * @param taskIds 待查询的任务id集合
      * @param taskStatusMap 结束任务对应的状态集合
      * @param timeout 任务查询超时时间 单位ms
      * @param startTime 任务查询开始时间 单位ms
@@ -247,7 +291,8 @@ public class TaskServiceImpl implements TaskService {
                 }
                 int status = taskInfo.getStatus();
                 int progress = taskInfo.getProgress();
-                if (progress == TASK_FINISH || status > TASK_FLAG_2) {
+                //由于判断progress会导致，progress是100，但是statu还没有正常反应过来，还是2的情况，故去掉progress判断
+                if ( status > TASK_FLAG_2) {
                     taskStatusMap.put(taskId, status);
                 } else {
                     queryTaskIds.add(taskId);
@@ -295,6 +340,65 @@ public class TaskServiceImpl implements TaskService {
                     break;
                 }
             }
+        }
+        return isSuccess;
+    }
+
+    @Override
+    public boolean checkTaskStatusLarge(Set<String> taskIds,long timeout) {
+        LOG.info("checking taskid="+gson.toJson(taskIds));
+        boolean isSuccess = false;
+        long currentmilitions=System.currentTimeMillis();
+        if (taskIds != null && taskIds.size() > 0) {
+            Map<String, Integer> taskStatusMap=new HashMap<>();
+            Set<String> remaintasks = new HashSet<>(taskIds);
+            do {
+                long inccurrentmilitions=System.currentTimeMillis();
+                if (inccurrentmilitions-currentmilitions>timeout)
+                break;
+
+                // 未超时 判断是否还有任务未结束
+                if (remaintasks.size()>0) {
+                    try {
+                        //Thread.sleep(ONE_SECEND);
+                        TimeUnit.SECONDS.sleep(2);
+                    } catch (InterruptedException e) {
+                        LOG.info("===wait one secend error==={}", e.getMessage());
+                    }
+                } else {
+                    break;
+                }
+                try {
+                    LOG.info("remain task size="+remaintasks.size());
+                    Map<String, Integer> taskmapping=getTaskStatusWhile(remaintasks);
+                    LOG.info("checking taskmapping="+gson.toJson(taskmapping));
+                    //LOG.info("checking taskStatusMap="+gson.toJson(taskStatusMap));
+                    //taskStatusMap.putAll(taskmapping);
+                    for (Map.Entry<String, Integer> entry : taskmapping.entrySet()) {
+                        int status = entry.getValue();
+                        if (status >TASK_FLAG_2) {
+                            taskStatusMap.put(entry.getKey(),entry.getValue());
+                            remaintasks.remove(entry.getKey());
+                        }
+                    }
+
+                }catch (Exception e){
+                    LOG.error("wait task falut=",e);
+                }
+            } while (true);
+            for (Map.Entry<String, Integer> entry : taskStatusMap.entrySet()) {
+                int status=entry.getValue();
+                if (status==TASK_SUCCESS){
+                    isSuccess=true;
+                }else if (status==TASK_FAILURE||status==TASK_TIMEOUT){
+                    return false;
+                }
+            }
+        }
+        else
+        {
+            //无任务，或者传入任务为空，则直接返回成功
+            return true;
         }
         return isSuccess;
     }

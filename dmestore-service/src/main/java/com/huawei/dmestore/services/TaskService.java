@@ -6,6 +6,7 @@ import com.google.gson.JsonObject;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * TaskService
@@ -34,6 +35,8 @@ public interface TaskService {
      **/
     void getTaskStatus(List<String> taskIds, Map<String, Integer> taskStatusMap, long timeout, long startTime);
 
+    public Map<String, Integer> getTaskStatusWhile(Set<String> taskIds) ;
+
     /**
      * task status check
      *
@@ -49,6 +52,14 @@ public interface TaskService {
      * @return Boolean
      **/
     boolean checkTaskStatus(List<String> taskIds,long timeout);
+
+    /**
+     * checkTaskStatusLarge
+     *
+     * @param taskIds taskIds
+     * @return Boolean
+     **/
+    boolean checkTaskStatusLarge(Set<String> taskIds,long timeout);
 
     /**
      * get task info untill finish

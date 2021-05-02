@@ -302,9 +302,9 @@
     <bean id="threadPoolTaskExecutor"
           class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
 
-        <property name="corePoolSize" value="10"/>
+        <property name="corePoolSize" value="3"/>
 
-        <property name="maxPoolSize" value="20"/>
+        <property name="maxPoolSize" value="5"/>
 
         <property name="queueCapacity" value="100"/>
 

@@ -877,9 +877,10 @@ public class DmeAccessServiceImpl implements DmeAccessService {
      */
     private   List<Map<String, Object>> replaceSpecialChar(List<Map<String, Object>> list) {
         List<Map<String, Object>> objList = new ArrayList<>();
-        Map<String, Object> objMap = new HashMap<>();
+
         if (!CollectionUtils.isEmpty(list)) {
             for (Map<String, Object> map : list) {
+                Map<String, Object> objMap = new HashMap<>();
                 if (!CollectionUtils.isEmpty(map)){
                 Iterator<Map.Entry<String, Object>> it = map.entrySet().iterator();
                 while (it.hasNext()) {
