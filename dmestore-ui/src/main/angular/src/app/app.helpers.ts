@@ -153,6 +153,7 @@ export const regExpCollection = {
   /* shareFsName */
   shareFsName: () => /^[A-Za-z0-9!\s!\\\"#&%\$'\(\)\*\+\-,·.:;<=>\?@\[\]\^_`\{\|\}~ ]{1,}$/,
   // shareFsName: new RegExp(`^[a-zA-Z0-9!\"#&%$'()*+-·.;<=>?@\[\]^_\`{|}~,:\s]*$`),
+  integer:()=>/^[1-9]\d*$/
 };
 
 /**

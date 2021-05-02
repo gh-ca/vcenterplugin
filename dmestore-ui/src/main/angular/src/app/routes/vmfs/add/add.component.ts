@@ -790,6 +790,7 @@ export class AddComponent extends VmfsCommon implements OnInit {
    */
   countBlur() {
     let count = this.form.count;
+    /*
     if (count && count !== null && count !== '') {
       if ((count + '').indexOf('.') !== -1) {
         // 小数
@@ -802,6 +803,14 @@ export class AddComponent extends VmfsCommon implements OnInit {
       count = '';
     }
     this.form.count = count;
+   */
+    /* 且容量必须为单位为G的正整数，数量必须为正整数且不超过100 */
+    const isInteger = regExpCollection.integer().test(count);
+    // console.log("🚀 ~ file: add.component.ts ~ line 810 ~ AddComponent ~ countBlur ~ isInteger", isInteger);
+
+    if (!(isInteger && count > 0 && count <= 100)) {
+      this.form.count = null;
+    }
   }
 
   /**
