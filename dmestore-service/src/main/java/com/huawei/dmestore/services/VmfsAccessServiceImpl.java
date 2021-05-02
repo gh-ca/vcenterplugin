@@ -654,42 +654,42 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
 
         CountDownLatch countDownLatch = new CountDownLatch(volumelist.size());
         for (Map<String, Object> volumemap : volumelist) {
-            threadPoolExecutor.submit(()->{
-                Map<String, Object> paramstemp = new HashMap<>(params);
-                try {
-                    // 创建vmware中的vmfs存储。
-                    paramstemp.put(VOLUME_WWN, volumemap.get(VOLUME_WWN));
-                    paramstemp.put(VOLUME_NAME, volumemap.get(VOLUME_NAME));
-                    String dataStoreStr = createVmfsOnVmware(paramstemp);
-                    if (!StringUtils.isEmpty(dataStoreStr)) {
-                        Map<String, Object> dataStoreMap = gson.fromJson(dataStoreStr,
-                                new TypeToken<Map<String, Object>>() {
-                                }.getType());
-                        if (dataStoreMap != null) {
-                            // 将DME卷与vmfs的关系保存数据库,因为可以同时创建几个卷，无法在此得到对应关系，所以此处不再保存关系信息
-                            saveDmeVmwareRalation(volumemap, dataStoreMap);
+            // threadPoolExecutor.submit(()->{
+            Map<String, Object> paramstemp = new HashMap<>(params);
+            try {
+                // 创建vmware中的vmfs存储。
+                paramstemp.put(VOLUME_WWN, volumemap.get(VOLUME_WWN));
+                paramstemp.put(VOLUME_NAME, volumemap.get(VOLUME_NAME));
+                String dataStoreStr = createVmfsOnVmware(paramstemp);
+                if (!StringUtils.isEmpty(dataStoreStr)) {
+                    Map<String, Object> dataStoreMap = gson.fromJson(dataStoreStr,
+                            new TypeToken<Map<String, Object>>() {
+                            }.getType());
+                    if (dataStoreMap != null) {
+                        // 将DME卷与vmfs的关系保存数据库,因为可以同时创建几个卷，无法在此得到对应关系，所以此处不再保存关系信息
+                        saveDmeVmwareRalation(volumemap, dataStoreMap);
 
-                            // 关联服务等级
-                            if (!StringUtils.isEmpty(paramstemp.get(SERVICE_LEVEL_ID))) {
-                                String serviceLevelName = ToolUtils.getStr(paramstemp.get(SERVICE_LEVEL_NAME));
-                                vcsdkUtils.attachTag(ToolUtils.getStr(dataStoreMap.get("type")),
-                                        ToolUtils.getStr(dataStoreMap.get(ID_FIELD)), serviceLevelName, vcentertemp);
-                            }
+                        // 关联服务等级
+                        if (!StringUtils.isEmpty(paramstemp.get(SERVICE_LEVEL_ID))) {
+                            String serviceLevelName = ToolUtils.getStr(paramstemp.get(SERVICE_LEVEL_NAME));
+                            vcsdkUtils.attachTag(ToolUtils.getStr(dataStoreMap.get("type")),
+                                    ToolUtils.getStr(dataStoreMap.get(ID_FIELD)), serviceLevelName, vcentertemp);
                         }
-                    } else {
-                        throw new DmeException("vmware create vmfs error:" + params.get(VOLUME_NAME));
                     }
-                }catch (Exception e){
-                    LOG.info("vmware create vmfs error:" + params.get(VOLUME_NAME));
+                } else {
+                    throw new DmeException("vmware create vmfs error:" + params.get(VOLUME_NAME));
                 }
-                countDownLatch.countDown();
-            });
+            }catch (Exception e){
+                LOG.info("vmware create vmfs error:" + params.get(VOLUME_NAME));
+            }
+            //   countDownLatch.countDown();
+            //  });
         }
-        try {
+        /*try {
             countDownLatch.await();
         } catch (InterruptedException e) {
             e.printStackTrace();
-        }
+        }*/
 
         /*for (Map<String, Object> volumemap : volumelist) {
             // 创建vmware中的vmfs存储。
