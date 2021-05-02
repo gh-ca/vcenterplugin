@@ -35,12 +35,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.util.StringUtils;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -416,6 +411,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
     public Map<String,List<Map<String, Object>>> getAllInitionator() throws DmeException {
         Map<String,List<Map<String, Object>>> hostinitionators=new HashMap<>();
         // 取出所有主机
+        LOG.info("get all getAllInitionator");
         List<Map<String, Object>> hostlist = dmeAccessService.getDmeHosts(null);
         if (hostlist != null && hostlist.size() > 0) {
             for (Map<String, Object> hostmap : hostlist) {
@@ -433,6 +429,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 }
             }
         }
+        LOG.info("get all getAllInitionator size="+hostinitionators.size());
         return hostinitionators;
     }
 
@@ -464,9 +461,10 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             //获取lun
             if (!StringUtils.isEmpty(taskId)) {
                 // 创建Lun结果判断
-                List<String> taskIds = new ArrayList<>();
+                Set<String> taskIds = new HashSet<>();
                 taskIds.add(taskId);
-                isCreated = taskService.checkTaskStatus(taskIds, longTaskTimeOut);
+                isCreated = taskService.checkTaskStatusLarge(taskIds, longTaskTimeOut);
+                LOG.info("create vms isCreated"+isCreated);
                 // 查询看创建任务是否完成。
                 if (isCreated) {
                     if (volumelist.size() == 0) {
@@ -474,20 +472,22 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                             null, null, ToolUtils.getStr(params.get(SERVICE_LEVEL_ID)),
                             ToolUtils.getStr(params.get(STORAGE_ID)), ToolUtils.getStr(params.get(POOL_RAW_ID)));
                     }
-
+                    LOG.info("create vms volumelist size="+volumelist.size());
                     volumeIds = getVolumeId(volumelist);
-                    taskIds = new ArrayList<>();
+                    Set<String> umaplist = new HashSet<>();
                     List<String> lunids = new ArrayList<>();
                     Map<String,List<Map<String, Object>>> allinitionators=getAllInitionator();
                     for (String volumeId : volumeIds) {
                         if (!StringUtils.isEmpty(volumeId)) {
                             params.put("volume_id", volumeId);
                         }
+                        LOG.info("create vms checkOrCreateToHostorHostGroup2");
                         List<Map<String, String>> maps = checkOrCreateToHostorHostGroup2(params,allinitionators);
                         if (maps.size() != 0) {
                             for (Map<String, String> map : maps) {
                                 objHostId = map.get(CONNECTIVITY_NORMAL);
                                 if (StringUtils.isEmpty(objHostId)) {
+                                    LOG.info("start rollback createvmfs");
                                     rollBack(volumeIds, dmeHostId, demHostGroupId, isCreated, isMappling);
                                     return maps;
                                 } else {
@@ -496,6 +496,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                             }
                         }
                         // 映射主机或者主机组
+                        LOG.info("create vms 映射主机或者主机组");
                         lunids.add(volumeId);
                         if (params.get(DmeConstants.HOST) != null && lunids.size()==volumeIds.size()) {
                             dmeHostId = objHostId;
@@ -506,9 +507,10 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                             demHostGroupId = objHostId;
                             taskId = lunMappingToHostOrHostgroup(lunids, null, demHostGroupId);
                         }
-                        taskIds.add(taskId);
+                        umaplist.add(taskId);
                     }
-                    isMappling = taskService.checkTaskStatus(taskIds,longTaskTimeOut);
+                    LOG.info("start mapping task checking");
+                    isMappling = taskService.checkTaskStatusLarge(umaplist,longTaskTimeOut);
                     if (isCreated && isMappling) {
                         // 创建了几个卷，就创建几个VMFS，用卷的wwn去找到lun
                         if (volumelist != null && volumelist.size() > 0) {
@@ -530,6 +532,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 }
             }
         } catch (DmeException e) {
+            LOG.info("start rollback createvmfs");
             rollBack(volumeIds, dmeHostId, demHostGroupId, isCreated, isMappling);
             throw new DmeException("create vmfs failed!",e.getMessage());
         }
@@ -559,9 +562,9 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                             .get("task_id"));
                 }
             }
-            List<String> taskIds = new ArrayList<>();
+            Set<String> taskIds = new HashSet<>();
             taskIds.add(taskId);
-            if (taskId.equals("") || taskService.checkTaskStatus(taskIds)) {
+            if (taskId.equals("") || taskService.checkTaskStatusLarge(taskIds,longTaskTimeOut)) {
                 volumeDelete(requestParam);
                 if (!StringUtils.isEmpty(demHostGroupId)) {
                     deleteHostgroup(demHostGroupId);
@@ -638,6 +641,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         if (!StringUtils.isEmpty(params.get(DmeConstants.SERVICELEVELID))) {
             vcenterinfo = vcenterinfoservice.getVcenterInfo();
         }
+        final VCenterInfo vcentertemp=vcenterinfo;
         //创建前先扫描hba，避免每次循环扫描
 
         String hostObjectId = ToolUtils.getStr(params.get(HOSTID));
@@ -648,8 +652,46 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             vcsdkUtils.rescanHbaByClusterObjectId(clusterObjectId);
         }
 
-
+        CountDownLatch countDownLatch = new CountDownLatch(volumelist.size());
         for (Map<String, Object> volumemap : volumelist) {
+            // threadPoolExecutor.submit(()->{
+            Map<String, Object> paramstemp = new HashMap<>(params);
+            try {
+                // 创建vmware中的vmfs存储。
+                paramstemp.put(VOLUME_WWN, volumemap.get(VOLUME_WWN));
+                paramstemp.put(VOLUME_NAME, volumemap.get(VOLUME_NAME));
+                String dataStoreStr = createVmfsOnVmware(paramstemp);
+                if (!StringUtils.isEmpty(dataStoreStr)) {
+                    Map<String, Object> dataStoreMap = gson.fromJson(dataStoreStr,
+                            new TypeToken<Map<String, Object>>() {
+                            }.getType());
+                    if (dataStoreMap != null) {
+                        // 将DME卷与vmfs的关系保存数据库,因为可以同时创建几个卷，无法在此得到对应关系，所以此处不再保存关系信息
+                        saveDmeVmwareRalation(volumemap, dataStoreMap);
+
+                        // 关联服务等级
+                        if (!StringUtils.isEmpty(paramstemp.get(SERVICE_LEVEL_ID))) {
+                            String serviceLevelName = ToolUtils.getStr(paramstemp.get(SERVICE_LEVEL_NAME));
+                            vcsdkUtils.attachTag(ToolUtils.getStr(dataStoreMap.get("type")),
+                                    ToolUtils.getStr(dataStoreMap.get(ID_FIELD)), serviceLevelName, vcentertemp);
+                        }
+                    }
+                } else {
+                    throw new DmeException("vmware create vmfs error:" + params.get(VOLUME_NAME));
+                }
+            }catch (Exception e){
+                LOG.info("vmware create vmfs error:" + params.get(VOLUME_NAME));
+            }
+            //   countDownLatch.countDown();
+            //  });
+        }
+        /*try {
+            countDownLatch.await();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }*/
+
+        /*for (Map<String, Object> volumemap : volumelist) {
             // 创建vmware中的vmfs存储。
             params.put(VOLUME_WWN, volumemap.get(VOLUME_WWN));
             params.put(VOLUME_NAME, volumemap.get(VOLUME_NAME));
@@ -671,7 +713,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             } else {
                 throw new DmeException("vmware create vmfs error:" + params.get(VOLUME_NAME));
             }
-        }
+        }*/
     }
 
     private String createVmfsOnVmware(Map<String, Object> params) throws DmeException {
@@ -1459,6 +1501,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             listVolumeUrl = listVolumeUrl + "&id=" + poolRawId;
         }
         try {
+            LOG.info("getallvolume url="+listVolumeUrl);
             ResponseEntity responseEntity = dmeAccessService.access(listVolumeUrl, HttpMethod.GET, null);
             if (responseEntity.getStatusCodeValue() == RestUtils.RES_STATE_I_200) {
                 JsonObject jsonObject = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonObject();
@@ -2786,6 +2829,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
     public List<Map<String, Object>> getHostsByStorageId2(String storeId) throws DmeException {
         List<Map<String, Object>> hostMapList = new ArrayList<>(DEFAULT_LEN);
 
+        Map<String,String> hostinitonatormap=new HashMap<>();
         // 先查询vcenter侧的主机
         String listStr = vcsdkUtils.getHostsByDsObjectId(storeId, true);
 
@@ -2815,7 +2859,14 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 // 排除已挂载在集群中的主机
                 if (excludehostmap.get(hostId) == null) {
                     String hostNmme = ToolUtils.getStr(host.get(HOST_NAME));
-                    String initiatorId = checkToHost(hostId);
+                    String initiatorId="";
+                    if (hostinitonatormap.get(hostId)==null){
+                         initiatorId = checkToHost(hostId);
+                        hostinitonatormap.put(hostId,initiatorId);
+                    }else {
+                         initiatorId = hostinitonatormap.get(hostId);
+                    }
+
                     if (!StringUtils.isEmpty(initiatorId)) {
                         Map<String, Object> tempMap = new HashMap<>();
                         tempMap.put(HOSTID, hostId);
