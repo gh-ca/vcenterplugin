@@ -947,7 +947,8 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
     public void unmountNfs(Map<String, Object> params) throws DmeException {
         String dataStoreObjectId = ToolUtils.getStr(params.get(DATASTOREOBJECTID));
         String hostObjId = ToolUtils.getStr(params.get("hostId"));
-        String name = vcsdkUtils.findHostById(hostObjId);
+        String name = vcsdkUtils.getVmKernelIpByHostObjectId(hostObjId);
+        LOG.info("unmountnfs vcenterhost="+name);
         DmeVmwareRelation dvr = dmeVmwareRalationDao.getDmeVmwareRelationByDsId(dataStoreObjectId);
         if (dvr == null) {
             LOG.error("unmountNfs get relation error!dataStoreObjectId={}", dataStoreObjectId);
@@ -957,17 +958,28 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
             unmountNfsFromHost(dataStoreObjectId, hostObjId);
         }
         String shareId = dvr.getShareId();
+        LOG.info("unmountnfs vcenterhost shareid="+shareId);
         List<AuthClient> authClientList = getNfsDatastoreShareAuthClients(shareId);
         if (authClientList != null && authClientList.size() > 0) {
             Map<String, String> authIdIpMap = new HashMap<>();
             for (AuthClient authClient : authClientList) {
                 String authId = authClient.getId();
                 String ip = authClient.getName();
+                LOG.info("unmountnfs vcenterhost authid="+authId);
+                LOG.info("unmountnfs vcenterhost ip="+ip);
                 if (!StringUtils.isEmpty(ip) && !StringUtils.isEmpty(authId)) {
-                    if ( ToolUtils.jsonToStr(new JsonParser().parse(name).getAsJsonArray().get(0).getAsJsonObject()
-                            .get("hostName")).equalsIgnoreCase(authClient.getName())) {
-                        authIdIpMap.put(authClient.getClientIdInStorage(), ip);
+                    JsonArray incarray=new JsonParser().parse(name).getAsJsonArray();
+                    for (JsonElement jsonElement : incarray) {
+                        LOG.info("unmountnfs vcenterhost equals ="+jsonElement.getAsJsonObject()
+                                .get("ipAddress"));
+                        if ( ToolUtils.jsonToStr(jsonElement.getAsJsonObject()
+                                .get("ipAddress")).equalsIgnoreCase(authClient.getName())) {
+                            LOG.info("unmountnfs vcenterhost equals getClientIdInStorage ="+authClient.getClientIdInStorage());
+                            LOG.info("unmountnfs vcenterhost equals ip ="+ip);
+                            authIdIpMap.put(authClient.getClientIdInStorage(), ip);
+                        }
                     }
+
                 }
             }
             String taskId = deleteAuthClient(shareId, authIdIpMap);
@@ -1070,6 +1082,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
             addtion.put(NAME_FIELD, authClient.getValue());
             listAddition.add(addtion);
         }
+        LOG.info("unmountnfs vcenterhost nfs_share_client_deletion listAddition ="+   gson.toJson(listAddition));
         requestbody.put(ID_FIELD, shareId);
         requestbody.put("nfs_share_client_deletion", listAddition);
         try {

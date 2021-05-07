@@ -2,12 +2,13 @@
   <!--  <div><span *ngFor="let item of rowSelected">{{item.name}}</span></div>-->
   <!-- 头部按钮组 -->
   <!-- <app-vmfs-create-faild-tips></app-vmfs-create-faild-tips> -->
-
+  <!-- <app-service-level-table [item]="item_test"></app-service-level-table> -->
   <div class="gh-btngroup-header">
     <div class="gh-btngroup-left">
       <!--添加-->
       <button class="btn btn-primary" (click)="addBtnClickFunc();">{{'menu.add' | translate}}</button>
       <!--编辑-->
+      <!-- modifyShow 861 -->
       <button class="btn btn-primary" [disabled]="rowSelected.length !== 1"
         (click)="modifyBtnClick()">{{'menu.edit' | translate}}</button>
       <!--扩容-->
@@ -132,7 +133,8 @@
     <clr-dg-column style="width: 250px;" [hidden]="radioCheck!=='list'" [clrDgField]="'serviceLevelName'">
       {{'vmfs.serviceLevelName' | translate}}
       <clr-dg-filter [clrDgFilter]="serviceLevelFilter">
-        <serviceLevel-filter #serviceLevelFilter></serviceLevel-filter>
+        <!-- DME·策略过滤器 -->
+        <serviceLevel-filter #serviceLevelFilter [list]="list" [prop]="'serviceLevelName'"></serviceLevel-filter>
       </clr-dg-filter>
     </clr-dg-column>
     <!--    <clr-dg-column [hidden]="radioCheck!=='list'" [clrDgField]="'protectionStatus'">-->
@@ -310,22 +312,30 @@
           style="margin-left: 20px;">
       </span>
     </div>
-    <!--Page1 -->
-    <clr-wizard-page #addPageOne [clrWizardPageNextDisabled]="!formPageOne.valid">
-      <ng-template clrPageTitle>{{'vmfs.datastoreSetting' | translate}}</ng-template> <!-- mandatory -->
 
+
+
+    <!--Page1 -->
+    <!-- vmfs 数据存储 添加 -->
+    <clr-wizard-page #addPageOne [clrWizardPageNextDisabled]="checkPageOne()&&isPageNextDisabled">
+      <ng-template clrPageTitle>{{'vmfs.datastoreSetting' | translate}}</ng-template> <!-- mandatory -->
+      <!--       <pre>
+        {{checkPageOne()}}
+        {{print(form)}}
+      </pre>
+ -->
       <form clrForm [formGroup]="addForm" #formPageOne="ngForm">
-        <!--名称 -->
+        <!--数据存储名称 -->
         <clr-input-container>
           <label style="color: #9F9F9F;">{{'vmfs.name' | translate}}</label>
           <input clrInput class="inputWidth100Percent" maxlength="256" [(ngModel)]="form.name" formControlName="name"
             name="name" (change)="nameCheck(true)" required />
-          <clr-control-helper *ngIf="matchErr && form.name == null">
+          <!-- <clr-control-helper *ngIf="matchErr && form.name == null">
             <div class="errorTips" readonly>
               <clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>
               {{'validations.nameRequired' | translate}}
             </div>
-          </clr-control-helper>
+          </clr-control-helper> -->
           <clr-control-helper *ngIf="vmfsNameRepeatErr">
             <div class="errorTips" readonly>
               <clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>
@@ -338,33 +348,45 @@
               {{'errorMsg.volNameRepeat' | translate}}
             </div>
           </clr-control-helper>
-          <clr-control-error>{{'validations.nameRequired' | translate}}</clr-control-error>
+          <clr-control-error>
+            <p class="clr-error clr-subtext">{{'errorMsg.require' | translate}}</p>
+            <p class="clr-error clr-subtext"> {{'validations.required_vmfs_name' | translate:'{length:27}'}}</p>
+          </clr-control-error>
         </clr-input-container>
+        <!-- 卷名称与数据存储名称相同 -->
         <clr-checkbox-container>
           <label></label>
           <clr-checkbox-wrapper>
             <input type="checkbox" clrCheckbox name="isSameName" formControlName="isSameName"
-              (change)="addSameBtnChangeFunc($event);" [(ngModel)]="form.isSameName" />
+              (change)="addSameBtnChangeFunc($event);nameCheck(true)" [(ngModel)]="form.isSameName" />
             <label style="width: 190px;">{{'vmfs.vmfsAddNameDesc' | translate}}</label>
           </clr-checkbox-wrapper>
         </clr-checkbox-container>
         <clr-input-container *ngIf="!form.isSameName">
           <label style="color: #9F9F9F;">{{'vmfs.volumeName' | translate}}</label>
-          <input clrInput class="inputWidth100Percent" maxlength="256" [(ngModel)]="form.volumeName"
-            formControlName="volumeName" name="volumeName" (blur)="nameCheck(false);" required />
-          <clr-control-helper *ngIf="matchErr">
+          <input clrInput class="inputWidth100Percent" maxlength="256"
+            formControlName="volumeName"
+            name="volumeName"
+            (blur)="nameCheck(false);"
+            [(ngModel)]="form.volumeName"
+            required />
+          <!-- <clr-control-helper *ngIf="matchErr">
             <div class="errorTips" readonly>
               <clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>
               {{'validations.nameRequired' | translate}}
             </div>
-          </clr-control-helper>
+          </clr-control-helper> -->
           <clr-control-helper *ngIf="volNameRepeatErr">
             <div class="errorTips" readonly>
               <clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>
               {{'errorMsg.volNameRepeat' | translate}}
             </div>
           </clr-control-helper>
-          <clr-control-error>{{'validations.nameRequired' | translate}}</clr-control-error>
+          <clr-control-error>
+            <p class="clr-error clr-subtext">{{'errorMsg.require' | translate}}</p>
+            <p class="clr-error clr-subtext"> {{'validations.required_vmfs_name' | translate:'{length:27}'}}</p>
+          </clr-control-error>
+          <!-- <clr-control-error>{{'validations.nameRequired' | translate}}</clr-control-error> -->
         </clr-input-container>
 
 
@@ -407,8 +429,7 @@
               {{'vmfs.capacityTips' | translate}}
             </div>
           </clr-control-helper>
-          <clr-control-error>{{'validations.required' | translate}}：{{'vmfs.capacityTips' | translate}}
-          </clr-control-error>
+          <clr-control-error>{{'validations.required' | translate}}：{{'vmfs.capacityTips' | translate}} </clr-control-error>
         </clr-input-container>
         <!-- 块大小 -->
         <clr-select-container class="selectClass" *ngIf="isShowInput">
@@ -470,6 +491,11 @@
           [type]="'custom-next'">{{'menu.next' | translate}}</clr-wizard-button>
       </ng-template>
     </clr-wizard-page>
+
+
+
+
+
     <!--Page2 储存库设置-->
     <clr-wizard-page #addPageTwo [clrWizardPageNextDisabled]="!formPageTwo.valid">
       <ng-template clrPageNavTitle>
@@ -481,9 +507,11 @@
           <!-- mandatory -->
           <span class="tabs-btn-wrap">
             <!-- 服务等级 -->
+            <!-- DME存储策略 -->
             <span (click)="serviceLevelBtnFunc();" class="tabs-btn"
               [ngClass]="{'tabs-btn_active': levelCheck === 'level'}">{{'vmfs.byServiceLevel' | translate}}</span>
             <!-- 非服务等级 -->
+            <!-- 自定义 -->
             <span (click)="customerClickFunc();" class="tabs-btn"
               [ngClass]="{'tabs-btn_active': levelCheck === 'customer'}">{{'vmfs.custom' | translate}}</span>
           </span>
@@ -512,6 +540,8 @@
               <clr-accordion-title class="" (click)="item.show ? this.hidden:this.show" *ngIf="!item.show"
                 style="height: 50px; line-height: 50px;color: #333;font-size:16px;">{{item.name}}</clr-accordion-title>
               <clr-accordion-content [(clrIfExpanded)]="item.show">
+
+                <!-- <app-service-level-table [item]="item"></app-service-level-table> -->
                 <table class="table table-vertical table-noborder table-compact">
                   <tbody>
                     <tr>
@@ -536,33 +566,33 @@
                         </div>
                       </th>
                       <th *ngIf="item.capabilities !== null && item.capabilities.qos !== null
-                        && item.capabilities.qos.qosParam !== null
-                        && item.capabilities.qos.qosParam.maxBandWidth !== 0">{{'vmfs.bandwidth' | translate}} <=
-                          {{item.capabilities.qos.qosParam.maxBandWidth}}MBPS/TB
+                        && item.capabilities.qos?.qosParam !== null
+                        && item.capabilities.qos?.qosParam.maxBandWidth !== 0">{{'vmfs.bandwidth' | translate}} <=
+                          {{item.capabilities.qos?.qosParam.maxBandWidth}}MBPS/TB
                           </th>
                           <th *ngIf="item.capabilities !== null && item.capabilities.qos !== null
-                        && item.capabilities.qos.qosParam !== null
-                        && item.capabilities.qos.qosParam.minBandWidth !== 0">{{'vmfs.bandwidth' | translate}} >=
-                          {{item.capabilities.qos.qosParam.minBandWidth}}MBPS/TB
+                        && item.capabilities.qos?.qosParam !== null
+                        && item.capabilities.qos?.qosParam.minBandWidth !== 0">{{'vmfs.bandwidth' | translate}} >=
+                          {{item.capabilities.qos?.qosParam.minBandWidth}}MBPS/TB
                       </th>
                       <th *ngIf="item.capabilities !== null && item.capabilities.qos !== null
-                        && item.capabilities.qos.qosParam !== null
-                        && item.capabilities.qos.qosParam.maxIOPS !== 0">{{'vmfs.iops' | translate}} <=
-                          {{item.capabilities.qos.qosParam.maxIOPS}}IOPS/TB
+                        && item.capabilities.qos?.qosParam !== null
+                        && item.capabilities.qos?.qosParam.maxIOPS !== 0">{{'vmfs.iops' | translate}} <=
+                          {{item.capabilities.qos?.qosParam.maxIOPS}}IOPS/TB
                           </th>
                           <th *ngIf="item.capabilities !== null && item.capabilities.qos !== null
-                        && item.capabilities.qos.qosParam !== null
-                        && item.capabilities.qos.qosParam.minIOPS !== 0 ">{{'vmfs.iops' | translate}} >=
-                          {{item.capabilities.qos.qosParam.minIOPS}}IOPS/TB
+                        && item.capabilities.qos?.qosParam !== null
+                        && item.capabilities.qos?.qosParam.minIOPS !== 0 ">{{'vmfs.iops' | translate}} >=
+                          {{item.capabilities.qos?.qosParam.minIOPS}}IOPS/TB
                       </th>
                       <th
-                        *ngIf="item.capabilities === null || item.capabilities.qos === null || item.capabilities.qos.qosParam === null
-                        || (item.capabilities.qos.qosParam.maxBandWidth === 0 && item.capabilities.qos.qosParam.minBandWidth === 0)">
+                        *ngIf="item.capabilities === null || item.capabilities.qos === null || item.capabilities.qos?.qosParam === null
+                        || (item.capabilities.qos?.qosParam.maxBandWidth === 0 && item.capabilities.qos?.qosParam.minBandWidth === 0)">
                         --
                       </th>
                       <th
-                        *ngIf="item.capabilities === null || item.capabilities.qos === null || item.capabilities.qos.qosParam === null
-                        || (item.capabilities.qos.qosParam.minIOPS === 0 && item.capabilities.qos.qosParam.maxIOPS === 0)">
+                        *ngIf="item.capabilities === null || item.capabilities.qos === null || item.capabilities.qos?.qosParam === null
+                        || (item.capabilities.qos?.qosParam.minIOPS === 0 && item.capabilities.qos?.qosParam.maxIOPS === 0)">
                         --
                       </th>
                     </tr>
@@ -571,12 +601,12 @@
                       <th>{{formatCapacity(item.usedCapacity, false)}} /{{formatCapacity(item.totalCapacity, false)}}
                       </th>
                       <th *ngIf="item.capabilities !== null && item.capabilities.qos !== null
-                        && item.capabilities.qos.qosParam !== null
-                        && item.capabilities.qos.qosParam.latency !== 0 ">{{'rdm.latency' | translate}}:
-                        {{item.capabilities.qos.qosParam.latency + item.capabilities.qos.qosParam.latencyUnit}}</th>
-                      <th
-                        *ngIf="item.capabilities === null || item.capabilities.qos === null || item.capabilities.qos.qosParam === null || item.capabilities.qos.qosParam.latency === 0">
-                        --
+                        && item.capabilities.qos?.qosParam !== null
+                        && item.capabilities.qos?.qosParam.latency !== 0 ">{{'rdm.latency' | translate}}<=
+                          {{item.capabilities.qos?.qosParam.latency + item.capabilities.qos?.qosParam.latencyUnit}}</th>
+                          <th
+                          *ngIf="item.capabilities === null || item.capabilities.qos === null || item.capabilities.qos?.qosParam === null || item.capabilities.qos?.qosParam.latency === 0">
+                          --
                       </th>
                     </tr>
                   </tbody>
@@ -646,15 +676,19 @@
               <label style="color: #9F9F9F;">{{'vmfs.controlPolicy' | translate}}</label>
               <!--上限-->
               <clr-checkbox-wrapper>
-                <input type="checkbox" id="control_policyUpper" clrCheckbox
-                  (change)="controlPolicyChangeFunc('control_policyUpper', 'control_policyLower', false, form, true);"
-                  name="control_policyUpper" />
+                <input type="checkbox"
+                  id="control_policyUpper"
+                  clrCheckbox
+                  [(ngModel)]="modifyForm.isCheckedUpper"
+                  (change)="handleModifyControlPolicyChange(false, form, true);" name="control_policyUpper" />
                 <label>{{'vmfs.upperLimitControl' | translate}}</label>
               </clr-checkbox-wrapper>
               <!--下限-->
               <clr-checkbox-wrapper *ngIf="!showLowerFlag">
-                <input type="checkbox" id="control_policyLower" clrCheckbox
-                  (change)="controlPolicyChangeFunc('control_policyUpper', 'control_policyLower', false, form, false);"
+                <input type="checkbox" id="control_policyLower"
+                  [(ngModel)]="modifyForm.isCheckedlower"
+                  clrCheckbox
+                  (change)="handleModifyControlPolicyChange(false, form, false);"
                   name="control_policyLower" />
                 <label>{{'vmfs.lowerLimitControl' | translate}}</label>
               </clr-checkbox-wrapper>
@@ -799,7 +833,7 @@
               <clr-checkbox-container *ngIf="iopsLimitErr">
                 <clr-control-helper style="color: red">
                   <clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>
-                  {{dorado?'tips.iopsLimitErr':'tips.iopsLimitErrNotV6' | translate}}
+                  {{(dorado?'tips.iopsLimitErr':'tips.iopsLimitErrNotV6' )| translate}}
                 </clr-control-helper>
               </clr-checkbox-container>
             </div>
@@ -854,15 +888,22 @@
         <!-- 名称 -->
         <clr-input-container>
           <label style="color: #9F9F9F;">{{'vmfs.name' | translate}}</label>
-          <input clrInput [(ngModel)]="modifyForm.name" (change)="modifyNameChange();" maxlength="256" name="name"
+          <input clrInput [(ngModel)]="modifyForm.name"
+            (change)="modifyNameChange();"
+            (blur)="modifyNameChange();"
+            maxlength="256" name="name"
             #name="ngModel" required /><br>
-          <clr-control-error>{{'validations.nameRequired' | translate}}</clr-control-error>
-          <clr-control-helper *ngIf="matchErr">
+          <clr-control-error>
+            <p class="clr-error clr-subtext">{{'errorMsg.require' | translate}}</p>
+            <p class="clr-error clr-subtext"> {{'validations.required_vmfs_name' | translate:'{length:27}'}}</p>
+          </clr-control-error>
+          <!-- <clr-control-error>{{'validations.nameRequired' | translate}}</clr-control-error> -->
+          <!-- <clr-control-helper *ngIf="matchErr">
             <div class="errorTips" readonly>
               <clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>
               {{'validations.nameRequired' | translate}}
             </div>
-          </clr-control-helper>
+          </clr-control-helper> -->
           <clr-control-helper *ngIf="vmfsNameRepeatErr">
             <div class="errorTips" readonly>
               <clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>
@@ -908,7 +949,8 @@
           <!--b.QoS 设置 -->
           <clr-toggle-wrapper style="margin-top: 1.2rem;width: 6rem;" class="selectClass">
             <label>{{'nfs.qosPolicy' | translate}}</label>
-            <input type="checkbox" clrToggle name="qosFlag" (change)="qoSEditFlagChange(modifyForm)" [(ngModel)]="modifyForm.qosFlag" />
+            <input type="checkbox" clrToggle name="qosFlag" (change)="qoSEditFlagChange(modifyForm)"
+              [(ngModel)]="modifyForm.qosFlag" />
           </clr-toggle-wrapper>
           <div *ngIf="modifyForm.qosFlag">
             <!-- 控制策略 -->
@@ -916,12 +958,14 @@
               <label style="color: #9F9F9F;">{{'vmfs.controlPolicy' | translate}}</label>
               <!--上限-->
               <clr-checkbox-wrapper>
-                <input type="checkbox" id="editControl_policyUpper" clrCheckbox [(ngModel)]="modifyForm.isCheckedUpper" name="isCheckedUpper" (change)="handleModifyControlPolicyChange(true, modifyForm, true);" />
+                <input type="checkbox" id="editControl_policyUpper" clrCheckbox [(ngModel)]="modifyForm.isCheckedUpper"
+                  name="isCheckedUpper" (change)="handleModifyControlPolicyChange(true, modifyForm, true);" />
                 <label>{{'vmfs.upperLimitControl' | translate}}</label>
               </clr-checkbox-wrapper>
               <!--下限-->
               <clr-checkbox-wrapper *ngIf="!showLowerFlag">
-                <input type="checkbox" id="editControl_policyLower" clrCheckbox [(ngModel)]="modifyForm.isCheckedlower" name="isCheckedlower" (change)="handleModifyControlPolicyChange(true, modifyForm, false);" />
+                <input type="checkbox" id="editControl_policyLower" clrCheckbox [(ngModel)]="modifyForm.isCheckedlower"
+                  name="isCheckedlower" (change)="handleModifyControlPolicyChange(true, modifyForm, false);" />
                 <label>{{'vmfs.lowerLimitControl' | translate}}</label>
               </clr-checkbox-wrapper>
             </clr-checkbox-container>
@@ -1067,7 +1111,7 @@
             <clr-checkbox-container *ngIf="iopsLimitErr">
               <clr-control-helper style="color: red">
                 <clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>
-                {{dorado?'tips.iopsLimitErr':'tips.iopsLimitErrNotV6' | translate}}
+                {{(dorado?'tips.iopsLimitErr':'tips.iopsLimitErrNotV6' )| translate}}
               </clr-control-helper>
             </clr-checkbox-container>
           </div>
@@ -1210,11 +1254,18 @@
           <clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>
           {{'vmfs.unmount.notChooseDeviceTips' | translate}}
         </div>
-        <clr-input-container>
+
+        <!-- 卸载 -->
+        <div class="flex middle clr-form-control clr-row">
+          <label style="color: #9F9F9F;" class="clr-control-label">{{'vmfs.name' | translate}}</label>
+          <div [title]="unmountForm.name" class="flex1 over_flow">{{unmountForm.name}}</div>
+        </div>
+        <!-- <clr-input-container>
           <label style="color: #9F9F9F;">{{'vmfs.name' | translate}}</label>
-          <input clrInput readonly [(ngModel)]="unmountForm.name" name="name" #name="ngModel" required /><br>
+          <input clrInput readonly [(ngModel)]="unmountForm.name" [title]="unmountForm.name" name="name" #name="ngModel"
+            required /><br>
           <clr-control-error>{{'validations.required' | translate}}</clr-control-error>
-        </clr-input-container>
+        </clr-input-container> -->
         <clr-radio-container clrInline>
           <label class="floatleft" style="color: #9F9F9F;">{{'vmfs.hostOrCluster' | translate}}</label>
           <clr-radio-wrapper>
@@ -1360,33 +1411,33 @@
 
                       </th>
                       <th *ngIf="item.capabilities !== null && item.capabilities.qos !== null
-                        && item.capabilities.qos.qosParam !== null
-                        && item.capabilities.qos.qosParam.maxBandWidth !== 0">{{'vmfs.bandwidth' | translate}} <=
-                          {{item.capabilities.qos.qosParam.maxBandWidth}}MBPS/TB
+                        && item.capabilities.qos?.qosParam !== null
+                        && item.capabilities.qos?.qosParam.maxBandWidth !== 0">{{'vmfs.bandwidth' | translate}} <=
+                          {{item.capabilities.qos?.qosParam.maxBandWidth}}MBPS/TB
                           </th>
                           <th *ngIf="item.capabilities !== null && item.capabilities.qos !== null
-                        && item.capabilities.qos.qosParam !== null
-                        && item.capabilities.qos.qosParam.minBandWidth !== 0">{{'vmfs.bandwidth' | translate}} >=
-                          {{item.capabilities.qos.qosParam.minBandWidth}}MBPS/TB
+                        && item.capabilities.qos?.qosParam !== null
+                        && item.capabilities.qos?.qosParam.minBandWidth !== 0">{{'vmfs.bandwidth' | translate}} >=
+                          {{item.capabilities.qos?.qosParam.minBandWidth}}MBPS/TB
                       </th>
                       <th *ngIf="item.capabilities !== null && item.capabilities.qos !== null
-                        && item.capabilities.qos.qosParam !== null
-                        && item.capabilities.qos.qosParam.maxIOPS !== 0">{{'vmfs.iops' | translate}} <=
-                          {{item.capabilities.qos.qosParam.maxIOPS}}IOPS/TB
+                        && item.capabilities.qos?.qosParam !== null
+                        && item.capabilities.qos?.qosParam.maxIOPS !== 0">{{'vmfs.iops' | translate}} <=
+                          {{item.capabilities.qos?.qosParam.maxIOPS}}IOPS/TB
                           </th>
                           <th *ngIf="item.capabilities !== null && item.capabilities.qos !== null
-                        && item.capabilities.qos.qosParam !== null
-                        && item.capabilities.qos.qosParam.minIOPS !== 0 ">{{'vmfs.iops' | translate}} >=
-                          {{item.capabilities.qos.qosParam.minIOPS}}IOPS/TB
+                        && item.capabilities.qos?.qosParam !== null
+                        && item.capabilities.qos?.qosParam.minIOPS !== 0 ">{{'vmfs.iops' | translate}} >=
+                          {{item.capabilities.qos?.qosParam.minIOPS}}IOPS/TB
                       </th>
                       <th
-                        *ngIf="item.capabilities === null || item.capabilities.qos === null || item.capabilities.qos.qosParam === null
-                        || (item.capabilities.qos.qosParam.maxBandWidth === 0 && item.capabilities.qos.qosParam.minBandWidth === 0)">
+                        *ngIf="item.capabilities === null || item.capabilities.qos === null || item.capabilities.qos?.qosParam === null
+                        || (item.capabilities.qos?.qosParam.maxBandWidth === 0 && item.capabilities.qos?.qosParam.minBandWidth === 0)">
                         --
                       </th>
                       <th
-                        *ngIf="item.capabilities === null || item.capabilities.qos === null || item.capabilities.qos.qosParam === null
-                        || (item.capabilities.qos.qosParam.minIOPS === 0 && item.capabilities.qos.qosParam.maxIOPS === 0)">
+                        *ngIf="item.capabilities === null || item.capabilities.qos === null || item.capabilities.qos?.qosParam === null
+                        || (item.capabilities.qos?.qosParam.minIOPS === 0 && item.capabilities.qos?.qosParam.maxIOPS === 0)">
                         --
                       </th>
                     </tr>
@@ -1395,12 +1446,12 @@
                       <th>{{formatCapacity(item.usedCapacity, false)}} /{{formatCapacity(item.totalCapacity, false)}}
                       </th>
                       <th *ngIf="item.capabilities !== null && item.capabilities.qos !== null
-                        && item.capabilities.qos.qosParam !== null
-                        && item.capabilities.qos.qosParam.latency !== 0 ">Latency:
-                        {{item.capabilities.qos.qosParam.latency + item.capabilities.qos.qosParam.latencyUnit}}</th>
-                      <th
-                        *ngIf="item.capabilities === null || item.capabilities.qos === null || item.capabilities.qos.qosParam === null || item.capabilities.qos.qosParam.latency === 0">
-                        --
+                        && item.capabilities.qos?.qosParam !== null
+                        && item.capabilities.qos?.qosParam.latency !== 0 ">{{'rdm.latency' | translate}}<=
+                          {{item.capabilities.qos?.qosParam.latency + item.capabilities.qos?.qosParam.latencyUnit}}</th>
+                          <th
+                          *ngIf="item.capabilities === null || item.capabilities.qos === null || item.capabilities.qos?.qosParam === null || item.capabilities.qos?.qosParam.latency === 0">
+                          --
                       </th>
                     </tr>
                   </tbody>

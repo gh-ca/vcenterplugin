@@ -126,6 +126,7 @@ public class BaseBestPracticeService {
         VmwareContext context = vcsdkUtils.getVcConnectionHelper().getServerContext(objectId);
         HostMo hostMo = this.getHostMoFactory().build(context, mor);
         String modlueOption = hostMo.getHostKernelModuleSystemMo().queryConfiguredModuleOptionString(moduleName);
+        logger.info("get host modlueOption value sucdess!host ip:{},moduleName={}, {}", hostMo.getName(), moduleName, modlueOption);
         String[] modlues = modlueOption.split("=");
         return modlues[1];
     }
