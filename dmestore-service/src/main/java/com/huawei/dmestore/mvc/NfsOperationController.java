@@ -325,6 +325,7 @@ public class NfsOperationController extends BaseController {
         throws DmeException {
         Map<String, Object> createNfsShareParam = new HashMap<>(DmeConstants.COLLECTION_CAPACITY_16);
         String storagId = (String) requestParams.get("storagId");
+        StorageTypeShow dorado = isDorado(storagId);
         targetParams.put("storage_id", storagId);
         targetParams.put("storage_pool_id", requestParams.get("storagePoolId"));
         targetParams.put("pool_raw_id", requestParams.get("poolRawId"));
@@ -345,18 +346,27 @@ public class NfsOperationController extends BaseController {
         filesystemSpec.put("capacity", requestParams.get("size"));
         filesystemSpec.put("count", 1);
         boolean sameName = (Boolean) requestParams.get("sameName");
+
         if (sameName) {
             createNfsShareParam.put(NAME_FIELD, FILE_SEPARATOR + nfsName);
             createNfsShareParam.put("share_path", FILE_SEPARATOR + nfsName + FILE_SEPARATOR);
             filesystemSpec.put(NAME_FIELD, nfsName);
             targetParams.put("exportPath", FILE_SEPARATOR + nfsName);
         } else {
-            createNfsShareParam.put(NAME_FIELD, FILE_SEPARATOR + requestParams.get("shareName"));
+            if (!dorado.getDorado()) {
+                createNfsShareParam.put(NAME_FIELD, FILE_SEPARATOR + requestParams.get("shareName"));
+                targetParams.put("exportPath", FILE_SEPARATOR + requestParams.get("shareName"));
+            } else {
+                // dorado v6设备不支持设置name别名
+                // createNfsShareParam.put(NAME_FIELD, FILE_SEPARATOR + requestParams.get(FSNAME_FIELD));
+                targetParams.put("exportPath", FILE_SEPARATOR + requestParams.get(FSNAME_FIELD));
+            }
             createNfsShareParam
-                .put("share_path", FILE_SEPARATOR + requestParams.get(FSNAME_FIELD) + FILE_SEPARATOR);
+                    .put("share_path", FILE_SEPARATOR + requestParams.get(FSNAME_FIELD) + FILE_SEPARATOR);
             filesystemSpec.put(NAME_FIELD, requestParams.get(FSNAME_FIELD));
-            targetParams.put("exportPath", FILE_SEPARATOR + requestParams.get("shareName"));
+
         }
+
         List<Map<String, Object>> filesystemSpecs = new ArrayList<>(DmeConstants.COLLECTION_CAPACITY_16);
         filesystemSpecs.add(filesystemSpec);
         targetParams.put("filesystem_specs", filesystemSpecs);
@@ -369,7 +379,7 @@ public class NfsOperationController extends BaseController {
         List<Map<String, Object>> nfsShareClientAdditions = new ArrayList<>(DmeConstants.COLLECTION_CAPACITY_16);
         nfsShareClientAdditions.add(nfsShareClientAddition);
         targetParams.put("nfs_share_client_addition", nfsShareClientAdditions);
-        advanceExcute(requestParams, targetParams, advance, isDorado(storagId));
+        advanceExcute(requestParams, targetParams, advance, dorado);
     }
 
     private void parseUpdateNfsParams(Map<String, Object> params,Map<String, Object> param) throws DmeException {
