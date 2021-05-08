@@ -95,17 +95,17 @@ public class TaskServiceImpl implements TaskService {
                 LOG.error("queryTaskById failed!taskId={},errorMsg:{}", taskId, responseEntity.getBody());
                 return null;
             }
-            // LOG.info("task="+url+"------resutl="+responseEntity.getBody());
+           // LOG.info("task="+url+"------resutl="+responseEntity.getBody());
 
 
-            // 解析responseEntity 转换为 TaskDetailInfo
-            Object object = responseEntity.getBody();
-            List<TaskDetailInfo> tasks = converBean(taskId, object);
-            if (tasks != null && tasks.size() > 0) {
-                return tasks.get(0);
-            } else {
-                return null;
-            }
+        // 解析responseEntity 转换为 TaskDetailInfo
+        Object object = responseEntity.getBody();
+        List<TaskDetailInfo> tasks = converBean(taskId, object);
+        if (tasks != null && tasks.size() > 0) {
+            return tasks.get(0);
+        } else {
+            return null;
+        }
         } catch (DmeException ex) {
             LOG.error("queryTaskById error, errorMsg:{}", ex.getMessage());
             return null;
@@ -355,7 +355,7 @@ public class TaskServiceImpl implements TaskService {
             do {
                 long inccurrentmilitions=System.currentTimeMillis();
                 if (inccurrentmilitions-currentmilitions>timeout)
-                    break;
+                break;
 
                 // 未超时 判断是否还有任务未结束
                 if (remaintasks.size()>0) {
