@@ -21,7 +21,7 @@
         <property name="aes">
             <bean class="com.huawei.dmestore.utils.CipherConfig$Aes">
                 <property name="algorithm" value="${cipher.aes.algorithm}"/>
-               <property name="key">
+                <property name="key">
                     <bean class="com.huawei.dmestore.utils.CipherConfig$Aes$Key">
                         <property name="algorithm" value="${cipher.aes.key.algorithm}"/>
                     </bean>
@@ -32,7 +32,7 @@
             <bean class="com.huawei.dmestore.utils.CipherConfig$RootKey">
                 <property name="algorithm" value="${cipher.rootkey.algorithm}"/>
                 <property name="iteration" value="${cipher.rootkey.iteration}"/>
-             <!--   <property name="salt" value="${cipher.rootkey.salt}"/>-->
+                <!--   <property name="salt" value="${cipher.rootkey.salt}"/>-->
             </bean>
         </property>
         <property name="pbkdf2">

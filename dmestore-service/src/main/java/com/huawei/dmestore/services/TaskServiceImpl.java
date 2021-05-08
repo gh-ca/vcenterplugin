@@ -129,7 +129,7 @@ public class TaskServiceImpl implements TaskService {
                     if (taskDetail.get(ID_FIELD).getAsString().equals(taskId)) {
                         // 任务进度完成100%或者任务状态不正常直接结束查询，否则等待2s后再尝试
                         if (taskDetail.get("progress").getAsInt() == TASK_FINISH
-                            || taskDetail.get("status").getAsInt() > TASK_FLAG_2) {
+                                || taskDetail.get("status").getAsInt() > TASK_FLAG_2) {
                             return taskDetail;
                         } else {
                             try {
