@@ -919,7 +919,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
                 : "read/write";
             addition.put("permission", accessval);
             addition.put("permission_constraint", "no_all_squash");
-            addition.put("root_permission_constraint", "root_squash");
+            addition.put("root_permission_constraint", "no_root_squash");
             addition.put("write_mode", "synchronization");
             addition.put("source_port_verification", "insecure");
 
