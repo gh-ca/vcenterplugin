@@ -14,6 +14,8 @@ import {
   getQueryParams,
   getURL,
   handlerResponseErrorSimple,
+  isStringLengthByteOutRange,
+  regExpCollection,
 } from 'app/app.helpers';
 import { isMockData, mockData } from 'mock/mock';
 import { getVmfsDmestorageStorageByTag } from 'mock/VMFS_DMESTORAGE_STORAGE';
@@ -307,7 +309,8 @@ export class ModifyComponent implements OnInit {
     this.volNameRepeatErr = false;
     this.matchErr = false;
 
-    let reg5: RegExp = new RegExp('^[0-9a-zA-Z-\u4e00-\u9fa5a"_""."]*$');
+    let reg5: RegExp = regExpCollection.vmfsName();
+    // let reg5: RegExp = new RegExp('^[0-9a-zA-Z-\u4e00-\u9fa5a"_""."]*$');
     if (
       this.bandWidthMaxErrTips ||
       this.iopsMaxErrTips ||
@@ -319,8 +322,10 @@ export class ModifyComponent implements OnInit {
     ) {
       return;
     }
+
     if (this.modifyForm.name) {
-      if (reg5.test(this.modifyForm.name)) {
+      const inLimit = !isStringLengthByteOutRange(this.modifyForm.name, 27);
+      if (reg5.test(this.modifyForm.name) && inLimit) {
         // 校验VMFS名称重复
         if (this.modifyNameChanged) {
           // this.modalHandleLoading = true;
@@ -387,13 +392,18 @@ export class ModifyComponent implements OnInit {
    * 编辑页面  名称变化Func
    */
   modifyNameChange() {
+    console.log('this.modifyForm.name', this.modifyForm.name);
+    const inLimit = !isStringLengthByteOutRange(this.modifyForm.name, 27);
+    if (!(regExpCollection.vmfsName().test(this.modifyForm.name) && inLimit)) {
+      this.matchErr = true;
+      this.modifyForm.name = null;
+    }
     const oldName = this.vmfsInfo.volumeName;
     if (oldName !== this.modifyForm.name) {
       this.modifyNameChanged = true;
     } else {
       this.modifyNameChanged = false;
     }
-    console.log('this.modifyForm.name', this.modifyForm.name);
   }
 
   qosEditFunc(form) {
@@ -509,7 +519,7 @@ export class ModifyComponent implements OnInit {
             const upperObj = document.getElementById('editControl_policyUpper') as HTMLInputElement;
             const lowerObj = document.getElementById('editControl_policyLower') as HTMLInputElement;
             /* 根据返回的数据判断是否需要展示 */
-            const smartQos = this.storage || {};
+            const smartQos = this.storage.smartQos || {};
             const { latency, maxbandwidth, maxiops, minbandwidth, miniops } = smartQos as any;
 
             this.modifyForm.max_iops = maxiops;

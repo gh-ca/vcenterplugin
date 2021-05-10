@@ -755,8 +755,9 @@ public class VmfsAccessServiceTest {
         Map<String, Object> initiatormap = new HashMap<>();
         initiatormap.put("port_name","jdoajhojd");
         List<Map<String, Object>> initiators =  Arrays.asList(initiatormap);
+        Map<String,List<Map<String, Object>>> allinitionators=vmfsAccessService.getAllInitionator();
         when(dmeAccessService.getDmeHostInitiators(anyString())).thenReturn(initiators);
-        vmfsAccessService.checkOrCreateToHost("454151","4574");
+        vmfsAccessService.checkOrCreateToHost("454151","4574",allinitionators);
 
     }
 }

@@ -29,18 +29,21 @@
                 <clr-icon shape="list" size="20"></clr-icon>
               </label>
             </div>
+            <!--  -->
             <div class="radio btn" title="{{'menu.capacity' | translate}}">
               <input (click)="radioCheck = 'table2'" type="radio" name="btn-group-demo-radios" id="btn-demo-radio-2">
               <label for="btn-demo-radio-2">
                 <clr-icon shape="dashboard" size="20"></clr-icon>
               </label>
             </div>
+            <!--  -->
             <div class="radio btn" title="{{'menu.performance' | translate}}">
               <input (click)="radioCheck = 'table3'" type="radio" name="btn-group-demo-radios" id="btn-demo-radio-3">
               <label for="btn-demo-radio-3">
                 <clr-icon shape="radar" size="15"></clr-icon>
               </label>
             </div>
+            <!--  -->
             <div class="radio btn merginLeft" title="{{'menu.refresh' | translate}}">
               <label>
                 <clr-icon shape="refresh" size="20" (click)="scanData()"></clr-icon>
@@ -72,12 +75,14 @@
           </clr-dg-column>
           <!--          <clr-dg-column [hidden]="radioCheck!=='table1'">{{'storage.list.wp' | translate}}</clr-dg-column>-->
 
+          <!-- 性能  -->
           <clr-dg-column #totalCapacity [hidden]="radioCheck!=='table2'" class="hideFilter"
             [clrDgField]="'totalCapacity'" style="position: relative" (clrDgSortedChange)="sortFunc($event);">
             {{'storage.list.rawCap' | translate}}
             <clr-icon *ngIf="sortFunc(totalCapacity.sorted);" shape="arrow down" class="is-solid"
               style="position: absolute;right: 1.1rem;"></clr-icon>
           </clr-dg-column>
+          <!-- 可得容量 -->
           <clr-dg-column #totalEffectiveCapacity [hidden]="radioCheck!=='table2'" class="hideFilter"
             [clrDgField]="'totalEffectiveCapacity'" style="position: relative" (clrDgSortedChange)="sortFunc($event);">
             {{'storage.list.tec' | translate}}
@@ -177,7 +182,7 @@
               {{item.location ? item.location:'--'}}
             </clr-dg-cell>
             <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='table1'">
-              <app-storage-dj-az-cell [items]="item.djAzs"></app-storage-dj-az-cell>
+              <app-storage-dj-az-cell [items]="item?.djAzs"></app-storage-dj-az-cell>
               <!-- {{item.azIds && item.azIds.length > 0 ? item.azIds:'--'}} -->
             </clr-dg-cell>
             <!--            <clr-dg-cell [hidden]="radioCheck!=='table1'">-->
@@ -189,25 +194,29 @@
             <!--              </span>-->
             <!--            </clr-dg-cell>-->
 
+            <!-- 裸容量 -->
             <clr-dg-cell [hidden]="radioCheck!=='table2'" style="text-align: right">
-              {{item.totalCapacity ? formatCapacity(item.totalCapacity):'--'}}
+              {{item.totalCapacity!=null ? formatCapacity(item.totalCapacity):'--'}}
             </clr-dg-cell>
+            <!-- 可得容量 -->
             <clr-dg-cell [hidden]="radioCheck!=='table2'" style="text-align: right">
-              {{item.totalEffectiveCapacity ? formatCapacity(item.totalEffectiveCapacity):'--'}}
+              {{item.totalEffectiveCapacity!=null ? formatCapacity(item.totalEffectiveCapacity):'--'}}
             </clr-dg-cell>
+            <!-- 总容量 -->
             <clr-dg-cell [hidden]="radioCheck!=='table2'" style="text-align: right">
-              {{item.totalPoolCapacity ? formatCapacity(item.totalPoolCapacity):'--'}}
+              {{item.totalPoolCapacity!=null ? formatCapacity(item.totalPoolCapacity):'--'}}
             </clr-dg-cell>
+            <!-- 已使用容量 -->
             <clr-dg-cell [hidden]="radioCheck!=='table2'" style="text-align: right">
-              {{item.usedCapacity ? formatCapacity(item.usedCapacity):'--'}}
+              {{item.usedCapacity!=null ? formatCapacity(item.usedCapacity):'--'}}
             </clr-dg-cell>
+            <!-- 容量利用率 -->
             <clr-dg-cell [hidden]="radioCheck!=='table2'" class="over_flow" style="text-align: right">
-              <div class="progress-block" *ngIf="item.totalPoolCapacity">
-                <clr-progress-bar clrValue="{{(item.usedCapacity/item.totalPoolCapacity * 100).toFixed(2)}}" clrSuccess>
-                </clr-progress-bar>
+              <div class="progress-block" *ngIf="item.usedCapacity!=null&&item.totalPoolCapacity>0">
+                <clr-progress-bar clrValue="{{(item.usedCapacity/item.totalPoolCapacity * 100).toFixed(2)}}" clrSuccess> </clr-progress-bar>
                 <span>{{(item.usedCapacity/item.totalPoolCapacity * 100).toFixed(2)}}%</span>
               </div>
-              <span *ngIf="!item.usedCapacity">--</span>
+              <span *ngIf="item.usedCapacity===null||item.totalPoolCapacity===0">--</span>
             </clr-dg-cell>
             <clr-dg-cell [hidden]="radioCheck!=='table2'" style="text-align: right">
               {{item.totalPoolCapacity ? formatCapacity(item.totalPoolCapacity-item.usedCapacity):'--'}}
@@ -215,7 +224,6 @@
             <clr-dg-cell [hidden]="radioCheck!=='table2'" style="text-align: right">
               {{item.totalPoolCapacity ? (item.subscriptionCapacity/item.totalPoolCapacity * 100).toFixed(3):'--'}} %
             </clr-dg-cell>
-
             <clr-dg-cell [hidden]="radioCheck!=='table3'" style="text-align: right">
               {{item.maxCpuUtilization ? item.maxCpuUtilization:'--'}}
             </clr-dg-cell>

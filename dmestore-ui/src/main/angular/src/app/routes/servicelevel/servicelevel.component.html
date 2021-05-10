@@ -98,6 +98,9 @@
     <clr-spinner class='spinner spinner-md'>Loading</clr-spinner>
   </div>
 </div>
+
+
+<!-- 弹出框 -->
 <clr-modal class='modal' [(clrModalOpen)]='popShow' [clrModalSize]="'lg'">
   <h3 class='modal-title'>
     <span>{{selectedModel.name}}</span>
@@ -132,11 +135,12 @@
               <span class='gh-info-value' *ngIf='selectedModel.usedCapacity'>{{selectedModel.usedCapacity}} GB</span>
               <span class='gh-info-value' *ngIf='!selectedModel.usedCapacity'>--</span>
             </div>
-            <div class='gh-info-item clr-col-4'>
+            <div class='gh-info-item clr-col-4 flex middle'>
               <span class='gh-info-lable'>{{'tier.usage'|translate}}</span>
-              <span class='gh-info-value' style='width: 60%' *ngIf='selectedModel.usedRate'>
-                <clr-progress-bar
-                  clrValue='{{selectedModel.usedRate}}' clrLabeled></clr-progress-bar>
+              <span class='flex1' *ngIf='selectedModel.usedRate'>
+                <!-- 20210422180405 -->
+                <app-progress-bar-cell [used]="selectedModel.usedRate"></app-progress-bar-cell>
+                <!-- <clr-progress-bar clrValue='{{selectedModel.usedRate}}' clrLabeled></clr-progress-bar> -->
               </span>
               <span class='gh-info-value' style='width: 60%' *ngIf='!selectedModel.usedRate'>--</span>
             </div>
@@ -163,19 +167,19 @@
           <div class='gh-info-wrap clr-row'>
             <div class='gh-info-item clr-col-4'>
               <span class='gh-info-lable'>{{'tier.controlP'|translate}}</span>
-              <span class='gh-info-value' *ngIf='selectedModel.capabilities.qos != undefined
-                                            && selectedModel.capabilities.qos.enabled == true'>
-                <span *ngIf='selectedModel.capabilities.qos.qosParam.maxBandWidth != undefined
-                                  && selectedModel.capabilities.qos.qosParam.maxIOPS != undefined'>
+              <span class='gh-info-value'
+                *ngIf='selectedModel.capabilities.qos != undefined && selectedModel.capabilities.qos.enabled == true'>
+                <span
+                  *ngIf='selectedModel.capabilities.qos.qosParam.maxBandWidth != undefined && selectedModel.capabilities.qos.qosParam.maxIOPS != undefined'>
                   {{'tier.uLimit'|translate}}
                 </span>
-                <span *ngIf='selectedModel.capabilities.qos.qosParam.minBandWidth != undefined
-                                  && selectedModel.capabilities.qos.qosParam.minIOPS != undefined '>
+                <span
+                  *ngIf='selectedModel.capabilities.qos.qosParam.minBandWidth != undefined && selectedModel.capabilities.qos.qosParam.minIOPS != undefined '>
                   {{'tier.lLimit'|translate}}
                 </span>
               </span>
-              <span class='gh-info-value' *ngIf='selectedModel.capabilities.qos == undefined
-                                            || selectedModel.capabilities.qos.enabled == false'>
+              <span class='gh-info-value'
+                *ngIf='selectedModel.capabilities.qos == undefined || selectedModel.capabilities.qos.enabled == false'>
                 --
               </span>
             </div>
@@ -192,6 +196,13 @@
                     MBPS/TB</span>
             </div>
             <div class='gh-info-item clr-col-4'
+              *ngIf='selectedModel.capabilities.qos  && selectedModel.capabilities.qos?.qosParam?.latency >=0'>
+              <span class='gh-info-lable'>{{'tier.latency'|translate}}</span>
+              <span class='gh-info-value'> <= {{selectedModel.capabilities.qos.qosParam.latency}} {{selectedModel.capabilities.qos.qosParam.latencyUnit}}</span>
+            </div>
+
+
+            <div class='gh-info-item clr-col-4'
               *ngIf='selectedModel.capabilities.qos != undefined && selectedModel.capabilities.qos.qosParam.maxIOPS != undefined'>
               <span class='gh-info-lable'>IOPS</span>
               <span class='gh-info-value'>
@@ -204,9 +215,11 @@
             </div>
           </div>
           <!-- 基础信息展示 -->
+          <!-- 资源调优 -->
           <div class='gh-info-head'>{{'tier.rtuning'|translate}}</div>
           <div class='gh-info-wrap clr-row'>
             <div class='gh-info-item clr-col-4'>
+              <!-- 资源分配类型 -->
               <span class='gh-info-lable'>{{'tier.alloctype'|translate}}</span>
               <span class='gh-info-value' *ngIf="selectedModel.capabilities.resourceType == undefined
                                                 || selectedModel.capabilities.resourceType == 'default_type'">--</span>
@@ -217,13 +230,15 @@
             </div>
             <div class='gh-info-item clr-col-4'>
               <span class='gh-info-lable'>{{'tier.dedupe'|translate}}</span>
-              <span class='gh-info-value' *ngIf='selectedModel.capabilities.deduplication == undefined'>--</span>
-              <span class='gh-info-value' *ngIf='selectedModel.capabilities.deduplication != undefined'>
+              <!-- 重复数据删除 -->
+              <span class='gh-info-value'
+                *ngIf='!helper.checkString(selectedModel.capabilities.deduplication)'>--</span>
+              <span class='gh-info-value' *ngIf='helper.checkString(selectedModel.capabilities.deduplication)'>
                 <span *ngIf="selectedModel.capabilities.deduplication == 'enabled'">
-                  {{'tier.enable'|translate}}
+                  {{'tier.enabled'|translate}}
                 </span>
                 <span *ngIf="selectedModel.capabilities.deduplication == 'disabled'">
-                  {{'tier.disable'|translate}}
+                  {{'tier.disabled'|translate}}
                 </span>
                 <span *ngIf="selectedModel.capabilities.deduplication == 'default_type'">
                   {{'rdm.default'|translate}}
@@ -231,18 +246,29 @@
               </span>
             </div>
             <div class='gh-info-item clr-col-4'>
+              <!-- 数据压缩 -->
               <span class='gh-info-lable'>{{'tier.compression'|translate}}</span>
-              <span class='gh-info-value' *ngIf='selectedModel.capabilities.compression == undefined'>--</span>
-              <span class='gh-info-value' *ngIf='selectedModel.capabilities.compression != undefined'>
+              <!-- <span class='gh-info-value' *ngIf='!checkBoolean(selectedModel.capabilities.compression)'>--</span>
+              <span class='gh-info-value' *ngIf='checkBoolean(selectedModel.capabilities.compression)'>
                 <span *ngIf='selectedModel.capabilities.compression == true'>
-                  {{'tier.enable'|translate}}
+                  {{'tier.enabled'|translate}}
                 </span>
                 <span *ngIf='selectedModel.capabilities.compression == false'>
-                  {{'tier.disable'|translate}}
+                  {{'tier.disabled'|translate}}
+                </span>
+              </span> -->
+              <span class='gh-info-value' *ngIf='!helper.checkString(selectedModel.capabilities.compression)'>--</span>
+              <span class='gh-info-value' *ngIf='helper.checkString(selectedModel.capabilities.compression)'>
+                <span *ngIf='selectedModel.capabilities.compression == "enabled"'>
+                  {{'tier.enabled'|translate}}
+                </span>
+                <span *ngIf='selectedModel.capabilities.compression == "disabled"'>
+                  {{'tier.disabled'|translate}}
                 </span>
               </span>
             </div>
             <div class='gh-info-item clr-col-4'>
+              <!-- SmartTier策略 -->
               <span class='gh-info-lable'>{{'tier.smartTierP'|translate}}</span>
               <span class='gh-info-value' *ngIf='selectedModel.capabilities.smarttier == undefined
                                                 || selectedModel.capabilities.smarttier.enabled == false'>--</span>
@@ -271,6 +297,7 @@
         </clr-tab-content>
       </clr-tab>
       <clr-tab>
+        <!-- 存储池 -->
         <button clrTabLink (click)='storagePoolRefresh()'>{{'tier.storagep'|translate}}</button>
         <clr-tab-content *clrIfActive>
 
@@ -479,6 +506,7 @@
         </clr-tab-content>
       </clr-tab>
       <clr-tab>
+        <!-- LUN  -->
         <button clrTabLink (click)='volumeRefresh()'>{{'storage.chart.volume'|translate}}</button>
         <clr-tab-content *clrIfActive>
 
@@ -553,9 +581,12 @@
                 style='position: absolute;right: 1.1rem;'></clr-icon>
             </clr-dg-column>
             <clr-dg-placeholder>{{'tips.noData' | translate}}</clr-dg-placeholder>
+            <!-- DataLIst -->
             <clr-dg-row *clrDgItems='let item of volumeList' [clrDgItem]='item'>
 
+              <!-- 名称 -->
               <clr-dg-cell>{{item.name}}</clr-dg-cell>
+              <!-- 状态 -->
               <clr-dg-cell class='over_flow'>
                 <span *ngIf="item.status == 'creating'">
                   <span class='color-square'
@@ -589,15 +620,15 @@
                   --
                 </span>
               </clr-dg-cell>
-
+              <!-- 总量 -->
               <clr-dg-cell [hidden]="volumeRadioCheck!=='basic'" style='text-align: right'>{{item.capacity}}GB
               </clr-dg-cell>
+              <!-- 资源分配类型 -->
               <clr-dg-cell [hidden]="volumeRadioCheck!=='basic'">{{item.alloctype}}</clr-dg-cell>
               <clr-dg-cell [hidden]="volumeRadioCheck!=='basic'" *ngIf="item.capacityUsage==''">--</clr-dg-cell>
               <clr-dg-cell [hidden]="volumeRadioCheck!=='basic'" *ngIf="item.capacityUsage!=''">
-                <clr-progress-bar clrValue='{{item.capacity_usage}}' clrSuccess clrLabeled></clr-progress-bar>
+                <app-progress-bar-cell [used]="item.capacityUsage" [color]="'success'"></app-progress-bar-cell>
               </clr-dg-cell>
-
               <clr-dg-cell [hidden]="volumeRadioCheck!=='performance'" style='text-align: right'>
                 <span *ngIf='item.latency != undefined'>{{item.latency}}</span>
                 <span *ngIf='item.latency == undefined'>--</span>

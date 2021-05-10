@@ -21,7 +21,12 @@ import {
 } from '../list/list.service';
 import { ClrWizard, ClrWizardPage } from '@clr/angular';
 import { GlobalsService } from '../../../shared/globals.service';
-import { getQosCheckTipsTagInfo } from 'app/app.helpers';
+import {
+  getQosCheckTipsTagInfo,
+  isStringLengthByteOutRange,
+  regExpCollection,
+} from 'app/app.helpers';
+import { VmfsCommon } from '../list/VmfsCommon';
 
 @Component({
   selector: 'app-list',
@@ -30,21 +35,21 @@ import { getQosCheckTipsTagInfo } from 'app/app.helpers';
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [AddService],
 })
-export class AddComponent implements OnInit {
+export class AddComponent extends VmfsCommon implements OnInit {
   constructor(
     private remoteSrv: AddService,
     private route: ActivatedRoute,
-    private cdr: ChangeDetectorRef,
+    public cdr: ChangeDetectorRef,
     private router: Router,
     private globalsService: GlobalsService
   ) {
+    super();
     this.form.version = '5'; // 版本
     this.setFormValueWhenHiden(false);
   }
 
   dorado = false; //是否是V6设备
 
-  
   isShowInput: boolean;
 
   // 初始化表单
@@ -147,6 +152,11 @@ export class AddComponent implements OnInit {
     });
     // 初始化表单
     this.form = new GetForm().getAddForm();
+    // 初始化form
+    this.addForm.reset(this.form);
+    /* 监听名字变化 根据是否一样给剩下两个赋值 */
+    this.addForm.valueChanges.subscribe(this.handlerValueChanges.bind(this));
+
     // 版本、块大小、粒度下拉框初始化
     this.setBlockSizeOptions();
 
@@ -780,6 +790,7 @@ export class AddComponent implements OnInit {
    */
   countBlur() {
     let count = this.form.count;
+    /*
     if (count && count !== null && count !== '') {
       if ((count + '').indexOf('.') !== -1) {
         // 小数
@@ -792,6 +803,14 @@ export class AddComponent implements OnInit {
       count = '';
     }
     this.form.count = count;
+   */
+    /* 且容量必须为单位为G的正整数，数量必须为正整数且不超过100 */
+    const isInteger = regExpCollection.integer().test(count);
+    // console.log("🚀 ~ file: add.component.ts ~ line 810 ~ AddComponent ~ countBlur ~ isInteger", isInteger);
+
+    if (!(isInteger && count > 0 && count <= 100)) {
+      this.form.count = null;
+    }
   }
 
   /**
@@ -879,10 +898,10 @@ export class AddComponent implements OnInit {
     this.volNameRepeatErr = false;
     this.matchErr = false;
 
-    const reg5: RegExp = new RegExp('^[0-9a-zA-Z-\u4e00-\u9fa5a"_""."]*$');
     if (isVmfs) {
       if (this.form.name) {
-        if (reg5.test(this.form.name)) {
+        const inLimit = !isStringLengthByteOutRange(this.form.name, 27);
+        if (regExpCollection.vmfsName().test(this.form.name) && inLimit) {
           // 校验VMFS名称重复
           this.checkVmfsName(this.form.name);
           if (this.form.isSameName) {
@@ -897,7 +916,10 @@ export class AddComponent implements OnInit {
       }
     } else {
       if (this.form.volumeName) {
-        if (reg5.test(this.form.volumeName)) {
+        if (
+          regExpCollection.vmfsName().test(this.form.volumeName) &&
+          !isStringLengthByteOutRange(this.form.volumeName, 27)
+        ) {
           // 校验Vol名称重复
           this.checkVolName(this.form.volumeName);
         } else {
@@ -1208,11 +1230,12 @@ export class AddComponent implements OnInit {
    *
    * 添加页面名称相同按钮点击事件
    */
-  addSameBtnChangeFunc(obj) {
+  /*   addSameBtnChangeFunc(obj) {
     if (this.form.isSameName) {
       this.form.volumeName = this.form.name;
+      this.checkPageOne();
     }
-  }
+  } */
 
   /**
    * iops错误提示

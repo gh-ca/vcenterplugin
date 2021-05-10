@@ -1,4 +1,6 @@
+import { regExpCollection } from 'app/app.helpers';
 import { AddNfs } from './subpages/add/nfs-add.service';
+import debounce from 'just-debounce';
 
 export class NfsComponentCommon {
   addForm;
@@ -6,28 +8,38 @@ export class NfsComponentCommon {
   cdr;
   addFormGroup;
 
+  /*  */
+  latencyErrTips;
+  bandwidthLimitErr;
+  iopsLimitErr;
+  matchErr;
+
+  handlerAddFormGroupValueChange;
+
+  constructor() {
+    var vm = this;
+    // this.handlerAddFormGroupValueChange = debounce(() => { vm.checkAddForm(); }, 300);
+  }
+
   /**
    * @Description 创建并监听表单数据变动，检测数据符合校验规则
    * @date 2021-04-20
    * @returns {any}
    */
+
   createAddFormAndWatchFormChange() {
     this.addForm = new AddNfs();
-
     /* 监听名字变化 根据是否一样给剩下两个赋值 */
-    this.addFormGroup.valueChanges.subscribe(addForm => {
-      if (addForm.sameName) {
-        const isSameShare = this.addForm.shareName === addForm.nfsName;
-        const isSameFs = (this.addForm.fsName = addForm.nfsName);
-        if (!(isSameShare && isSameFs)) {
-          this.addForm.fsName = this.addForm.shareName = addForm.nfsName;
-        }
-      }
-      this.checkAddForm();
-    });
+
+    this.addFormGroup.valueChanges.subscribe(this.handlerAddFormGroupValueChange);
   }
 
-  checkAddForm() {
+  checkAddForm(prop = ''): boolean {
+    console.log("NfsComponentCommon", prop);
+    (this as any).checkNfsName();
+    (this as any).checkFsName();
+    (this as any).checkShareName();
+
     const isStoragId = !!this.addForm.storagId;
     const isStoragePoolId = !!this.addForm.storagePoolId;
     const isCurrentPortId = !!this.addForm.currentPortId;
@@ -51,5 +63,23 @@ export class NfsComponentCommon {
       isShareName
     );
     this.cdr.detectChanges();
+    return true;
+  }
+
+  isDisableFormPageTwo(formPge) {
+    if (!formPge.valid) {
+      return true;
+    }
+
+    if (this.latencyErrTips) {
+      return true;
+    }
+    if (this.bandwidthLimitErr) {
+      return true;
+    }
+    if (this.iopsLimitErr) {
+      return true;
+    }
+    return false;
   }
 }

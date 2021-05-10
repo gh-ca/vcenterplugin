@@ -17,6 +17,8 @@ import { BpCellMulRowComponent } from './bp-cell-mul-row/bp-cell-mul-row.compone
 import { StorageDjAzCellComponent } from './storage-dj-az-cell/storage-dj-az-cell.component';
 import { FormItemQosGroupComponent } from './form-item-qos-group/form-item-qos-group.component';
 import { StorageStatusCellComponent } from './storage-status-cell/storage-status-cell.component';
+import { ProgressBarCellComponent } from './progress-bar-cell/progress-bar-cell.component';
+import { ServiceLevelTableComponent } from './service-level-table/service-level-table.component';
 
 const THIRD_MODULES = [MaterialModule, TranslateModule];
 const COMPONENTS = [
@@ -34,6 +36,10 @@ const COMPONENTS = [
   StorageStatusCellComponent,
   /* qos策略 */
   FormItemQosGroupComponent,
+  /* 精度条 百分比 */
+  ProgressBarCellComponent,
+  /* vmfs 选择策略*/
+  ServiceLevelTableComponent,
 ];
 const COMPONENTS_DYNAMIC = [];
 const DIRECTIVES = [];

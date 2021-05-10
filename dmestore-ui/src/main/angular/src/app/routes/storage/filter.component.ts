@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
 import { StorageList, StorageService } from './storage.service';
 import { ClrDatagridFilter, ClrDatagridFilterInterface } from '@clr/angular';
 import { Subject } from 'rxjs';
@@ -21,25 +21,9 @@ import {
   FCPort,
   LogicPort,
 } from './detail/port.service';
-
-export const STATUS_ARRAY = [
-  { value: '', label: 'vmfs.filter.all', color: '#A9A9A9' },
-  { value: 1, label: 'storage.list.normal', color: '#7CDFA0' },
-  { value: 0, label: 'storage.list.Offline', color: '#A9A9A9' },
-  { value: 2, label: 'storage.list.Abnormal', color: 'red' },
-  { value: 9, label: 'storage.list.Unmanaged', color: 'yellow' },
-  { value: -1, label: 'storage.list.Unknown', color: '#A9A9A9' },
-  { value: 5, label: 'storage.list.degraded', color: '#A9A9A9' },
-];
-
-export const SYN_STATUS_ARRAY = [
-  { value: '', label: 'vmfs.filter.all', color: '#A9A9A9' },
-  { value: 0, label: 'storage.list.unsync', color: '#A9A9A9' },
-  { value: 1, label: 'storage.list.Sync', color: '#00BFFF' },
-  { value: 2, label: 'storage.list.synced', color: '#7CDFA0' },
-  { value: 3, label: 'storage.list.syncFailed', color: 'red' },
-  { value: -1, label: 'storage.list.Unknown', color: '#A9A9A9' },
-];
+import { isMockData, mockData } from 'mock/mock';
+import { handlerResponseErrorSimple } from 'app/app.helpers';
+import { STATUS_ARRAY, SYN_STATUS_ARRAY } from 'mock/URLS_STORAGE/DMESTORAGE_STORAGES';
 
 @Component({
   selector: 'storage-status-filter',
@@ -302,6 +286,17 @@ export class StoragePoolTypeFilter implements ClrDatagridFilterInterface<Storage
         />
         <label>{{ 'storage.list.Unknown' | translate }}</label>
       </clr-radio-wrapper>
+      <clr-radio-wrapper>
+        <input
+          type="radio"
+          clrRadio
+          name="status"
+          (change)="changeFunc($event)"
+          [(ngModel)]="status"
+          value="Other"
+        />
+        <label>{{ 'storage.list.Other' | translate }}</label>
+      </clr-radio-wrapper>
     </clr-radio-container>
   `,
 })
@@ -316,8 +311,8 @@ export class StoragePoolStatusFilter implements ClrDatagridFilterInterface<Stora
     } else {
       const status = String(item.healthStatus);
       /* 选择未知 不在范围内 */
-      if (this.status === 'Unknown') {
-        return !['normal', 'fault', 'degraded', 'degraded'].includes(status);
+      if (this.status === 'Other') {
+        return !['normal', 'fault', 'degraded', 'degraded', 'unknown'].includes(status);
       }
       return this.status == status;
     }
@@ -699,6 +694,7 @@ export class VolStoragePoolFilter implements ClrDatagridFilterInterface<Volume> 
   providers: [VmfsListService],
 })
 export class VolServiceLevelFilter implements ClrDatagridFilterInterface<Volume>, OnInit {
+  // @Input() list;
   changes = new Subject<any>();
   serviceLevel;
   serviceLevelList: string[]; // 服务等级列表
@@ -708,7 +704,7 @@ export class VolServiceLevelFilter implements ClrDatagridFilterInterface<Volume>
   constructor(private vmfsListService: VmfsListService, private cdr: ChangeDetectorRef) {}
 
   ngOnInit(): void {
-    this.vmfsListService.getServiceLevelList().subscribe((result: any) => {
+    const handlerGetServiceLevelListSuccess = (result: any) => {
       console.log(result);
       if (result.code === '200' && result.data !== null) {
         this.serviceLevelList = result.data
@@ -716,16 +712,25 @@ export class VolServiceLevelFilter implements ClrDatagridFilterInterface<Volume>
           .map(item => item.name);
       }
       this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
-    });
+    };
+    if (isMockData) {
+      handlerGetServiceLevelListSuccess(mockData.DMESTORE_REST_SERVICELEVEL_LISTSERVICELEVEL);
+    } else {
+      this.vmfsListService
+        .getServiceLevelList()
+        .subscribe(handlerGetServiceLevelListSuccess, handlerResponseErrorSimple);
+    }
   }
 
   accepts(item: Volume): boolean {
+    const capital = item.serviceLevelName;
+    if (this.serviceLevel === '') {
+      return !capital;
+    }
     if (!this.serviceLevel || this.serviceLevel == 'all') {
       return true;
-    } else {
-      const capital = item.serviceLevelName;
-      return this.serviceLevel == capital;
     }
+    return this.serviceLevel == capital;
   }
 
   isActive(): boolean {
@@ -1260,6 +1265,17 @@ export class HardwareStatusFilter implements ClrDatagridFilterInterface<StorageC
         />
         <label>{{ 'enum.status.fault' | translate }}</label>
       </clr-radio-wrapper>
+      <clr-radio-wrapper>
+        <input
+          type="radio"
+          clrRadio
+          name="status"
+          (change)="changeFunc($event)"
+          [(ngModel)]="status"
+          value="Other"
+        />
+        <label>{{ 'storage.list.Other' | translate }}</label>
+      </clr-radio-wrapper>
     </clr-radio-container>
   `,
 })
@@ -1280,9 +1296,9 @@ export class DiskStatusFilter implements ClrDatagridFilterInterface<StorageDisk>
         );
       } else {
         /* 选择未知 不在范围内 */
-     
-        if (this.status === 'unknown') {
-          return !['normal', 'fault'].includes(quota);
+
+        if (this.status === 'Other') {
+          return !['normal', 'fault', 'unknown'].includes(quota);
         }
 
         return quota.toLowerCase().indexOf(this.status.toLowerCase()) >= 0;
@@ -1485,7 +1501,7 @@ export class FcStatusFilter implements ClrDatagridFilterInterface<FCPort> {
     if (!this.status || this.status == 'all') {
       return true;
     } else {
-      const connectStatus = item.connectStatus;
+      const connectStatus = item?.connectStatus;
       return this.status == connectStatus;
     }
   }

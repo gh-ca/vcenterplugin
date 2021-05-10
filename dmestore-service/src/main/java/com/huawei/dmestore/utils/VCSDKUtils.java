@@ -1286,6 +1286,54 @@ public class VCSDKUtils {
         }
     }
 
+    public void rescanHbaByHostObjectId(String hostObjectId) throws VcenterException {
+        try {
+            String serverguid = vcConnectionHelpers.objectId2Serverguid(hostObjectId);
+            VmwareContext vmwareContext = vcConnectionHelpers.getServerContext(serverguid);
+            ManagedObjectReference objmor = vcConnectionHelpers.objectId2Mor(hostObjectId);
+            HostMo hostMo = hostVmwareFactory.build(vmwareContext, objmor);
+
+            // 在查找可用LUN前先扫描hba，已发现新的卷
+            List<String> devices = getHbaDeviceByHost(hostMo);
+            if (devices != null && devices.size() > 0) {
+                for (String device : devices) {
+                    hostMo.getHostStorageSystemMo().rescanHba(device);
+                }
+            }
+        } catch (Exception e) {
+            logger.error("vmware host rescan HBA error:", e);
+            throw new VcenterException(e.getMessage());
+        }
+    }
+
+    public void rescanHbaByClusterObjectId(String clusterObjectId) throws VcenterException {
+        try {
+            String serverguid = vcConnectionHelpers.objectId2Serverguid(clusterObjectId);
+            VmwareContext vmwareContext = vcConnectionHelpers.getServerContext(serverguid);
+            ManagedObjectReference objmor = vcConnectionHelpers.objectId2Mor(clusterObjectId);
+            ClusterMo cl1 = clusterVmwareMoFactory.build(vmwareContext, objmor);
+            List<Pair<ManagedObjectReference, String>> hosts = cl1.getClusterHosts();
+            if (hosts != null && hosts.size() > 0) {
+                Map<String, HostMo> hostMap = new HashMap<>();
+                List<HostScsiDisk> objHostScsiDisks = new ArrayList<>();
+                for (Pair<ManagedObjectReference, String> host : hosts) {
+                    HostMo hostMo = hostVmwareFactory.build(vmwareContext, host.first());
+
+                    // 在查找可用LUN前先扫描hba，已发现新的卷
+                    List<String> devices = getHbaDeviceByHost(hostMo);
+                    if (devices != null && devices.size() > 0) {
+                        for (String device : devices) {
+                            hostMo.getHostStorageSystemMo().rescanHba(device);
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            logger.error("vmware host rescan HBA error:", e);
+            throw new VcenterException(e.getMessage());
+        }
+    }
+
     /**
      * 得到主机对应的可用LUN
      *
@@ -1362,12 +1410,12 @@ public class VCSDKUtils {
             HostMo hostMo = hostVmwareFactory.build(vmwareContext, objmor);
 
             // 在查找可用LUN前先扫描hba，已发现新的卷
-            List<String> devices = getHbaDeviceByHost(hostMo);
+           /* List<String> devices = getHbaDeviceByHost(hostMo);
             if (devices != null && devices.size() > 0) {
                 for (String device : devices) {
                     hostMo.getHostStorageSystemMo().rescanHba(device);
                 }
-            }
+            }*/
             HostDatastoreSystemMo hostDatastoreSystem = hostMo.getHostDatastoreSystemMo();
             List<HostScsiDisk> hostScsiDisks = hostDatastoreSystem.queryAvailableDisksForVmfs();
             candidateHostScsiDisk = getObjectLuns(hostScsiDisks, capacity, volumeWwn);
@@ -1486,12 +1534,12 @@ public class VCSDKUtils {
                     HostMo hostMo = hostVmwareFactory.build(vmwareContext, host.first());
 
                     // 在查找可用LUN前先扫描hba，已发现新的卷
-                    List<String> devices = getHbaDeviceByHost(hostMo);
+                   /* List<String> devices = getHbaDeviceByHost(hostMo);
                     if (devices != null && devices.size() > 0) {
                         for (String device : devices) {
                             hostMo.getHostStorageSystemMo().rescanHba(device);
                         }
-                    }
+                    }*/
                     HostDatastoreSystemMo hostDatastoreSystem = hostMo.getHostDatastoreSystemMo();
                     List<HostScsiDisk> hostScsiDisks = hostDatastoreSystem.queryAvailableDisksForVmfs();
                     if (hostScsiDisks != null && hostScsiDisks.size() > 0) {
@@ -1586,7 +1634,7 @@ public class VCSDKUtils {
                                 unmapGranularity, unmapPriority);
 
                         logger.info("rescanVmfs after createVmfsDatastore!datastore={}", datastore);
-                        hostMo.getHostStorageSystemMo().rescanVmfs();
+
                     } catch (Exception e) {
                         throw new VcenterException(e.getMessage());
                     }
@@ -3385,8 +3433,8 @@ public class VCSDKUtils {
             perfQuerySpecs.add(qSpec);
             List<PerfEntityMetricBase> perfEntityMetricBases = performanceManagerMo.queryPerf(perfQuerySpecs);
             perResult = gson.toJson(perfEntityMetricBases);
-        } catch (Exception e) {
-            logger.error("queryPerfAllCount error");
+        } catch (Exception ex) {
+            logger.error("queryPerfAllCount error!", ex);
         }
         return perResult;
     }
@@ -3416,8 +3464,8 @@ public class VCSDKUtils {
                     map.put(key, satpMap);
                 }
             }
-        } catch (Exception e) {
-            logger.error("xmlRulesFormat error:{}", e.toString());
+        } catch (Exception ex) {
+            logger.error("xmlRulesFormat error!", ex);
         }
         return map;
     }
@@ -3464,7 +3512,7 @@ public class VCSDKUtils {
         map1.put("psp", "VMW_PSP_RR");
         map1.put("claimOption", "tpgs_on");
         map1.put("model", modelValue);
-        map1.put("vendor", modelValue);
+        map1.put("vendor", vendorValue);
         String satpKey1 = getSatpKey(map1);
         if(!satpRuleMap.containsKey(satpKey1)){
             ruleList.add(map1);
@@ -3474,8 +3522,8 @@ public class VCSDKUtils {
         map2.put("satp", "VMW_SATP_DEFAULT_AA");
         map2.put("psp", "VMW_PSP_RR");
         map2.put("claimOption", "tpgs_off");
-        map1.put("model", modelValue);
-        map1.put("vendor", modelValue);
+        map2.put("model", modelValue);
+        map2.put("vendor", vendorValue);
         String satpKey2 = getSatpKey(map2);
         if(!satpRuleMap.containsKey(satpKey2)){
             ruleList.add(map2);
@@ -3530,7 +3578,8 @@ public class VCSDKUtils {
             soapArgumentList.add(vendor);
 
             ManagedMethodExecuter.SoapArgument[] var4 = soapArgumentList.toArray(new ManagedMethodExecuter.SoapArgument[0]);
-            satpRuleProcess(hostObjectId, vcenterinfo, moid, esxCLI, var4);
+            String processStr = satpRuleProcess(hostObjectId, vcenterinfo, moid, esxCLI, var4);
+            logger.info("add SATP rule {}, {}, hostObjectId={}", map.get("satp"), StringUtils.isEmpty(processStr) ? "failed" : "success", hostObjectId);
         }
 
     }
@@ -3599,7 +3648,7 @@ public class VCSDKUtils {
             return re;
 
         } catch (Exception ex) {
-            logger.error("error:", ex);
+            logger.error("satpRuleProcess error!hostObjectId={},esxCLI={},{}", hostObjectId, esxCLI, ex);
         } finally {
             if (sessionManager != null) {
                 sessionManager.logout();
@@ -3612,7 +3661,5 @@ public class VCSDKUtils {
         return null;
 
     }
-
-
 
 }
