@@ -201,6 +201,7 @@
     <clr-wizard-title>{{'table.createDmeStorage' | translate}}</clr-wizard-title>
     <p *ngIf="errorMsg" class="clr-error"><span class="clr-subtext"> {{'errorMsg.addError' | translate}} </span></p>
     <!-- <p *ngIf="errorMsg" class="clr-error clr-subtext">{{'errorMsg.addError' | translate}}</p> -->
+    <!-- <h1>dorado: {{dorado}}</h1> -->
     <div *ngIf="modalLoading" class="loadingDiv">
       <span>
         {{'vmfs.loadingTips' | translate}}<img src="./assets/images/loading.gif" width="20px" height="20px"
@@ -292,7 +293,8 @@
             <!-- disabled checkbox samename -->
             <input type="checkbox" clrCheckbox *ngIf="!isCheckSameName();" [(ngModel)]="addForm.sameName"
               name="sameName" formControlName="sameName" disabled />
-            <label style="width: 280px;">{{'nfs.sameName' | translate}}</label>
+              <!-- 20210510105017  -->
+            <label style="width: 280px;">{{(dorado?'nfs.modifySameName':'nfs.sameName') | translate}}</label>
           </clr-checkbox-wrapper>
         </clr-checkbox-container>
         <!-- 如果名字可以不一样 -->
@@ -320,8 +322,8 @@
           </clr-control-error>
         </clr-input-container>
         <!-- <p class="clr-error clr-subtext">{{'validations.required_share_name' | translate:'{length:254}'}}</p> -->
-        <!-- 共享名称 -->
-        <clr-input-container *ngIf="!addForm.sameName">
+        <!-- 共享名称 v6不显示-->
+        <clr-input-container *ngIf="!dorado&&!addForm.sameName">
           <label>{{'nfs.shareName' | translate}}</label>
           <input class="inputWidth100Percent"
             clrInput

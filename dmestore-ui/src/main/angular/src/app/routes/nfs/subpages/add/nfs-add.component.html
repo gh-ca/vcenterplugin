@@ -79,7 +79,8 @@
             (change)="setSameName();" name="sameName" formControlName="sameName" />
           <input type="checkbox" clrCheckbox *ngIf="!isCheckSameName();" [(ngModel)]="addForm.sameName"
             name="sameName" formControlName="sameName" disabled />
-          <label style="width: 280px;">{{'nfs.sameName' | translate}}</label>
+          <!-- 20210510105017  -->
+          <label style="width: 280px;">{{(dorado?'nfs.modifySameName':'nfs.sameName') | translate}}</label>
         </clr-checkbox-wrapper>
       </clr-checkbox-container>
 
@@ -98,8 +99,8 @@
           <p *ngIf="fsNameRepeatErr" class="clr-error clr-subtext">{{'errorMsg.fsrepeat' | translate}}</p>
         </clr-control-error>
       </clr-input-container>
-      <!-- 共享名称 -->
-      <clr-input-container *ngIf="!addForm.sameName">
+      <!-- 共享名称 v6不显示-->
+      <clr-input-container *ngIf="!dorado&&!addForm.sameName">
         <label>{{'nfs.shareName' | translate}}</label>
         <input class="inputWidth100Percent" maxlength="256" clrInput [(ngModel)]="addForm.shareName"
           name="shareName"
@@ -512,7 +513,8 @@
             (change)="setSameName();" name="sameName" formControlName="sameName" />
           <input type="checkbox" clrCheckbox *ngIf="!isCheckSameName();" [(ngModel)]="addForm.sameName"
             name="sameName" formControlName="sameName" disabled />
-          <label style="width: 280px;">{{'nfs.sameName' | translate}}</label>
+          <!-- 20210510105017  -->
+          <label style="width: 280px;">{{(dorado?'nfs.modifySameName':'nfs.sameName') | translate}}</label>
         </clr-checkbox-wrapper>
       </clr-checkbox-container>
 
@@ -531,8 +533,8 @@
           <p *ngIf="fsNameRepeatErr" class="clr-error clr-subtext">{{'errorMsg.fsrepeat' | translate}}</p>
         </clr-control-error>
       </clr-input-container>
-      <!-- 共享名称 -->
-      <clr-input-container *ngIf="!addForm.sameName">
+      <!-- 共享名称 v6不显示-->
+      <clr-input-container *ngIf="!dorado&&!addForm.sameName">
         <label>{{'nfs.shareName' | translate}}</label>
         <input class="inputWidth100Percent" maxlength="256" clrInput [(ngModel)]="addForm.shareName" name="shareName"
           formControlName="shareName" (blur)="checkShareName();" />

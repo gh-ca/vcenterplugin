@@ -1,0 +1,15 @@
+<div>
+  <form [formGroup]='form'>
+    <div *ngFor='let item of formInfo' class='form-row'>
+      <app-gh-dynamic-form-item [configs]='item' [form]='form' (onItemValueChange)='handleItemValueChange($event)'> </app-gh-dynamic-form-item>
+    </div>
+
+    <div class='form-row'>
+      <button type='submit' [disabled]='!form?.valid'>Save</button>
+    </div>
+  </form>
+
+  <div *ngIf='payLoad' class='form-row'>
+    <strong>Saved the following values</strong><br>{{payLoad}}
+  </div>
+</div>
