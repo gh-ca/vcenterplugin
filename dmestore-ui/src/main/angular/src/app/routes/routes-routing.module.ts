@@ -36,6 +36,7 @@ const routes: Routes = [
       },
       {
         path: 'storage/detail',
+        component: DetailComponent,
         data: { title: 'detail', titleI18n: 'detail' },
       },
       {
