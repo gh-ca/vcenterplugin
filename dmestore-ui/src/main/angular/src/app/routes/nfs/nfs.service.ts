@@ -515,23 +515,24 @@ export class MakePerformance {
 
         if (result.code === '200' && result.data && result.data[objIds[0]]) {
           const resData = result.data;
-          let upperData;
-          let lowerData;
+          let upperData, uppers, pmaxData;
+          let lowerData, lower, lmaxData;
+          // 上、下限数据
+
           try {
             // 上限对象
             upperData = resData[objIds[0]][indicatorIds[0]];
+            uppers = upperData.series;
+            // 上限最大值
+            pmaxData = this.getUpperOrLower(upperData, 'upper');
+          } catch (error) {}
+          try {
             // 下限对象
             lowerData = resData[objIds[0]][indicatorIds[1]];
-          } catch (error) { }
-          
-          // 上、下限数据
-          const uppers: any[] = upperData.series;
-          const lower: any[] = lowerData.series;
-
-          // 上限最大值
-          let pmaxData = this.getUpperOrLower(upperData, 'upper');
-          // 下限最大值
-          let lmaxData = this.getUpperOrLower(lowerData, 'upper');
+            lower = lowerData.series;
+            // 下限最大值
+            lmaxData = this.getUpperOrLower(lowerData, 'upper');
+          } catch (error) {}
 
           const chart: ChartOptions = this.getNewChartWithResponse(
             height,
