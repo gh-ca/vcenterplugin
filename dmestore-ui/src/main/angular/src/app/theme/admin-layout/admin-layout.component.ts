@@ -81,6 +81,7 @@ export class AdminLayoutComponent implements OnInit, OnDestroy {
     this.dir.value = this.options.dir;
     this.document.body.dir = this.dir.value;
     this.linkInfo = [
+      { link: './demo', label: 'demo' },
       { link: './dashboard', label: 'Overview' },
       { link: './storage', label: 'Storage Device' },
       { link: './storage/detail', label: 'Storage Device detail' },
