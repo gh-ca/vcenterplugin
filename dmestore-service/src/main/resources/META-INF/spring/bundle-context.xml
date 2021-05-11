@@ -110,6 +110,7 @@
     </bean>
 
     <bean name="ServiceLevelServiceImpl" class="com.huawei.dmestore.services.ServiceLevelServiceImpl">
+        <property name="dmeVmwareRalationDao" ref="dmeVmwareRalationDao"/>
         <property name="dmeAccessService" ref="DmeAccessServiceImpl"/>
         <property name="dmeStorageService" ref="DmeStorageServiceImpl"/>
         <property name="dmeRelationInstanceService" ref="DmeRelationInstanceServiceImpl"/>
