@@ -7,8 +7,9 @@ import { AuthLayoutComponent } from '../theme/auth-layout/auth-layout.component'
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { StorageComponent } from './storage/storage.component';
 import { AuthGuard } from '@core';
-import {DetailComponent} from './storage/detail/detail.component';
-import {ServicelevelComponent} from "./servicelevel/servicelevel.component";
+import { DetailComponent } from './storage/detail/detail.component';
+import { ServicelevelComponent } from './servicelevel/servicelevel.component';
+import { DevDemoComponentComponent } from '@shared/dev-demo-component/dev-demo-component.component';
 
 const routes: Routes = [
   {
@@ -18,6 +19,11 @@ const routes: Routes = [
     canActivateChild: [AuthGuard],
     children: [
       // { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+      {
+        path: 'demo',
+        component: DevDemoComponentComponent,
+        data: { title: 'demo', titleI18n: 'demo' },
+      },
       {
         path: 'dashboard',
         component: DashboardComponent,
@@ -38,39 +44,46 @@ const routes: Routes = [
         loadChildren: () => import('./vmfs/vmfs.module').then(m => m.VmfsModule),
         data: { title: 'VMFS', titleI18n: 'VMFS' },
       },
-      { path: 'nfs',
+      {
+        path: 'nfs',
         loadChildren: () => import('./nfs/nfs.module').then(m => m.NfsModule),
-        data: { title: 'NFS', titleI18n: 'NFS' }
+        data: { title: 'NFS', titleI18n: 'NFS' },
       },
-      { path: 'servicelevel',
-        loadChildren: () => import('./servicelevel/servicelevel.module').then(m => m.ServicelevelModule),
-        data: { title: 'servicelevel', titleI18n: 'servicelevel' }
+      {
+        path: 'servicelevel',
+        loadChildren: () =>
+          import('./servicelevel/servicelevel.module').then(m => m.ServicelevelModule),
+        data: { title: 'servicelevel', titleI18n: 'servicelevel' },
       },
-      { path: 'bestpractice',
-        loadChildren: () => import('./bestpractice/bestpractice.module').then(m => m.BestpracticeModule),
-        data: { title: 'bestpractice', titleI18n: 'bestpractice' }
+      {
+        path: 'bestpractice',
+        loadChildren: () =>
+          import('./bestpractice/bestpractice.module').then(m => m.BestpracticeModule),
+        data: { title: 'bestpractice', titleI18n: 'bestpractice' },
       },
-      { path: 'iscsi',
+      {
+        path: 'iscsi',
         loadChildren: () => import('./iscsi/iscsi.module').then(m => m.IscsiModule),
-        data: { title: 'iscsi', titleI18n: 'iscsi' }
+        data: { title: 'iscsi', titleI18n: 'iscsi' },
       },
-      { path: 'rdm',
+      {
+        path: 'rdm',
         loadChildren: () => import('./rdm/rdm.module').then(m => m.RdmModule),
-        data: { title: 'rdm', titleI18n: 'rdm' }
+        data: { title: 'rdm', titleI18n: 'rdm' },
       },
-      { path: 'best',
+      {
+        path: 'best',
         loadChildren: () => import('./applybp/applybp.module').then(m => m.ApplybpModule),
-        data: { title: 'applybp', titleI18n: 'applybp' }
+        data: { title: 'applybp', titleI18n: 'applybp' },
       },
     ],
   },
   {
     path: 'auth',
     component: AuthLayoutComponent,
-    children: [
-    ],
+    children: [],
   },
-  { path: '**', redirectTo: 'dashboard' }
+  { path: '**', redirectTo: 'dashboard' },
 ];
 
 @NgModule({
