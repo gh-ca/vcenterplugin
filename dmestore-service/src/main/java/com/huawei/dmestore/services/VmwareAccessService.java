@@ -3,6 +3,7 @@ package com.huawei.dmestore.services;
 import com.huawei.dmestore.entity.DmeVmwareRelation;
 import com.huawei.dmestore.exception.DmeException;
 import com.huawei.dmestore.exception.DmeSqlException;
+import com.huawei.dmestore.model.ClusterTree;
 
 import java.util.List;
 import java.util.Map;
@@ -109,4 +110,22 @@ public interface VmwareAccessService {
      * @throws DmeSqlException DmeSqlException
      */
     DmeVmwareRelation getDmeVmwareRelationByDsId(String storeId) throws DmeSqlException;
+    /**
+      * @Description:  get cluster tree
+      * @Param @param null
+      * @return @return
+      * @throws DmeException
+      * @author yc
+      * @Date 2021/5/11 14:21
+     */
+    List<ClusterTree> listclustersReturnTree() throws DmeException;
+    /**
+      * @Description: 挂载页面查询主机组
+      * @Param @param null
+      * @return @return 
+      * @throws 
+      * @author yc
+      * @Date 2021/5/14 9:47
+     */
+    List<ClusterTree> getClustersByDsObjectIdNew(String dataStoreObjectId) throws DmeException;
 }

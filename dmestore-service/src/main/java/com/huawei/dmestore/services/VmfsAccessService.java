@@ -1,6 +1,7 @@
 package com.huawei.dmestore.services;
 
 import com.huawei.dmestore.exception.DmeException;
+import com.huawei.dmestore.model.ClusterTree;
 import com.huawei.dmestore.model.ResponseBodyBean;
 import com.huawei.dmestore.model.VmfsDataInfo;
 import com.huawei.dmestore.model.VmfsDatastoreVolumeDetail;
@@ -190,4 +191,40 @@ public interface VmfsAccessService {
         throws DmeException;
 
     Map<String,List<Map<String, Object>>> getAllInitionator() throws DmeException ;
+    /**
+      * @Description:  创建Vmfs支持批量选择主机或者主机组
+      * @Param @param null
+      * @return @return 
+      * @throws 
+      * @author yc
+      * @Date 2021/5/14 10:38
+     */
+    List<Map<String, String>> createVmfsNew(Map<String, Object> params) throws DmeException ;
+    /**
+      * @Description: vmfs挂载新方法，支持批量选择主机或者主机组
+      * @Param @param null
+      * @return @return 
+      * @throws 
+      * @author yc
+      * @Date 2021/5/14 10:48
+     */
+    List<Map<String, String>> mountVmfsNew(Map<String, Object> params) throws DmeException;
+    /**
+      * @Description: 获取主机组下的主机信息
+      * @Param @param null
+      * @return @return 
+      * @throws 
+      * @author yc
+      * @Date 2021/5/14 16:17
+     */
+    List<ClusterTree> getHostGroupsByStorageIdNew(String storageId) throws DmeException;
+    /**
+      * @Description: vfms卸载功能新接口
+      * @Param @param null
+      * @return @return 
+      * @throws 
+      * @author yc
+      * @Date 2021/5/14 16:17
+     */
+    void unmountVmfsNew(Map<String, Object> params) throws DmeException;
 }

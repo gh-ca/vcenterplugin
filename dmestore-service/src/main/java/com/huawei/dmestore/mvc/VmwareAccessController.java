@@ -2,6 +2,7 @@ package com.huawei.dmestore.mvc;
 
 import com.huawei.dmestore.exception.DmeException;
 import com.huawei.dmestore.exception.DmeSqlException;
+import com.huawei.dmestore.model.ClusterTree;
 import com.huawei.dmestore.model.ResponseBodyBean;
 import com.huawei.dmestore.services.VmwareAccessService;
 
@@ -229,5 +230,41 @@ public class VmwareAccessController extends BaseController {
         } catch (DmeSqlException e) {
             return failure("get dme volume by datastore failed!" + e.toString());
         }
+    }
+    /**
+     * Access clusters
+     *
+     * @return ResponseBodyBean
+     */
+    @RequestMapping(value = "/listclusters", method = RequestMethod.GET)
+    public ResponseBodyBean listclustersReturnTree() {
+        String failureStr = "";
+        try {
+            List<ClusterTree> lists = vmwareAccessService.listclustersReturnTree();
+            return success(lists);
+        } catch (DmeException e) {
+            failureStr = "list vmware cluster failure:" + e.toString();
+        }
+        return failure(failureStr);
+    }
+
+    /**
+     * Access clusters
+     *
+     * @param dataStoreObjectId dataStore ObjectId
+     * @return ResponseBodyBean
+     * @throws Exception when error
+     */
+    @RequestMapping(value = "/getclustersbydsobjectidreturntree", method = RequestMethod.GET)
+    public ResponseBodyBean getClustersByDsObjectIdNew(@RequestParam("dataStoreObjectId") String dataStoreObjectId) {
+        String failureStr = "";
+        try {
+            List<ClusterTree> lists = vmwareAccessService.getClustersByDsObjectIdNew(dataStoreObjectId);
+            return success(lists);
+        } catch (DmeException e) {
+            LOG.error("getClustersByDsObjectId vmware host failure:", e);
+            failureStr = e.getMessage();
+        }
+        return failure(failureStr);
     }
 }
