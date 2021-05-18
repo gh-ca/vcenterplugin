@@ -19,9 +19,18 @@ import { FormItemQosGroupComponent } from './form-item-qos-group/form-item-qos-g
 import { StorageStatusCellComponent } from './storage-status-cell/storage-status-cell.component';
 import { ProgressBarCellComponent } from './progress-bar-cell/progress-bar-cell.component';
 import { ServiceLevelTableComponent } from './service-level-table/service-level-table.component';
+import { DevDemoComponentComponent } from './dev-demo-component/dev-demo-component.component';
+import { GhDynamicFormComponent } from './gh-dynamic-form/gh-dynamic-form.component';
+import { GhDynamicFormItemComponent } from './gh-dynamic-form-item/gh-dynamic-form-item.component';
+import { DynamicComponentDirectiveDirective } from './directives/dynamic-component-directive.directive';
+import { GhTreeCheckboxComponent } from './gh-tree-checkbox/gh-tree-checkbox.component';
+import { ErrorTipsComponent } from './error-tips/error-tips.component';
 
 const THIRD_MODULES = [MaterialModule, TranslateModule];
 const COMPONENTS = [
+  /* demo */
+  DevDemoComponentComponent,
+  /* demo */
   BreadcrumbComponent,
   PageHeaderComponent,
   ErrorCodeComponent,
@@ -40,9 +49,17 @@ const COMPONENTS = [
   ProgressBarCellComponent,
   /* vmfs 选择策略*/
   ServiceLevelTableComponent,
+  /* 动态表单 */
+  GhDynamicFormComponent,
+  /* 动态表单Item */
+  GhDynamicFormItemComponent,
+  /* 表单Item tree CheckBox */
+  GhTreeCheckboxComponent,
+  /* 错误提示 */
+  ErrorTipsComponent,
 ];
 const COMPONENTS_DYNAMIC = [];
-const DIRECTIVES = [];
+const DIRECTIVES = [DynamicComponentDirectiveDirective];
 const PIPES = [];
 const FILTER = [
   /* 状态 正常 告警 告示 */
