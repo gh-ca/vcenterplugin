@@ -48,7 +48,7 @@ public class RestUtils {
                 .build();
             HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory();
             requestFactory.setHttpClient(httpClient);
-            requestFactory.setReadTimeout(10000);
+            requestFactory.setReadTimeout(10000*10);
             requestFactory.setConnectTimeout(3000);
             restTemplate = new RestTemplate(requestFactory);
             restTemplate.setErrorHandler(new ResponseErrorHandler() {

@@ -1,9 +1,6 @@
 package com.huawei.dmestore.services;
 
-import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.anyList;
-import static org.mockito.Matchers.anyMap;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -12,6 +9,7 @@ import com.huawei.dmestore.constant.DmeConstants;
 import com.huawei.dmestore.dao.DmeVmwareRalationDao;
 import com.huawei.dmestore.entity.DmeVmwareRelation;
 import com.huawei.dmestore.entity.VCenterInfo;
+import com.huawei.dmestore.exception.DmeException;
 import com.huawei.dmestore.model.Storage;
 import com.huawei.dmestore.utils.ToolUtils;
 import com.huawei.dmestore.utils.VCSDKUtils;
@@ -28,11 +26,9 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author admin
@@ -74,7 +70,7 @@ public class VmfsAccessServiceTest {
     }
 
     @Test
-    public void listVmfs() throws Exception {
+    public void testListVmfs() throws Exception {
         List<DmeVmwareRelation> dvrlist = new ArrayList<>();
         DmeVmwareRelation dmeVmwareRelation = new DmeVmwareRelation();
         String volumeId = "8f6d93f1-4214-46bc-ae7a-85f8349ebbd2";
@@ -87,7 +83,7 @@ public class VmfsAccessServiceTest {
         Storage storageObj = new Storage();
         storageObj.setName("Huawei.Storage");
         list.add(storageObj);
-        when(dmeStorageService.getStorages()).thenReturn(list);
+        when(dmeStorageService.getStorages(anyString())).thenReturn(list);
         List<Map<String, Object>> lists = new ArrayList<>();
         Map<String, Object> dsmap = new HashMap<>();
         dsmap.put("objectid", storeObjectId);
@@ -104,12 +100,12 @@ public class VmfsAccessServiceTest {
         String jsonData
             = "{\"volume\": {\"id\": \"955a0632-c309-4471-a116-6a059d84ade3\",\"name\": \"VMFSTest20201026\",\"description\": null,\"status\": \"normal\",\"attached\": true,\"project_id\": null,\"alloctype\": \"thick\",\"capacity\": 1,\"service_level_name\": \"cctest\",\"attachments\": [{\"id\": \"8b561dd2-03bb-4f20-98c4-8092e75fe951\",\"volume_id\": \"955a0632-c309-4471-a116-6a059d84ade3\",\"host_id\": \"9cbd24b5-fb5b-4ad9-9393-cf05b9b97339\",\"attached_at\": \"2020-10-26T06:50:20.000000\",\"attached_host_group\": null}],\"volume_raw_id\": \"174\",\"volume_wwn\": \"67c1cf11005893452a7c7314000000ae\",\"storage_id\": \"b94bff9d-0dfb-11eb-bd3d-0050568491c9\",\"storage_sn\": \"2102351QLH9WK5800028\",\"pool_raw_id\": \"0\",\"capacity_usage\": null,\"protected\": false,\"updated_at\": \"2020-10-26T06:50:20.000000\",\"created_at\": \"2020-10-26T06:50:15.000000\",\"tuning\": {\"smarttier\": \"0\",\"dedupe_enabled\": null,\"compression_enabled\": null,\"workload_type_id\": null,\"smartqos\": {\"maxiops\": 123,\"miniops\": 2134,\"maxbandwidth\": 123413,\"minbandwidth\": 1234,\"latency\": 0.48},\"alloctype\": \"thick\"},\"initial_distribute_policy\": \"0\",\"prefetch_policy\": \"3\",\"owner_controller\": \"0B\",\"prefetch_value\": \"0\"}}";
         ResponseEntity<String> responseEntity = new ResponseEntity<>(jsonData, null, HttpStatus.OK);
-        when(dmeAccessService.access(url, HttpMethod.GET, null)).thenReturn(responseEntity);
+        when(dmeAccessService.access(anyString(), any(), anyString())).thenReturn(responseEntity);
         vmfsAccessService.listVmfs();
     }
 
     @Test
-    public void listVmfsPerformance() throws Exception {
+    public void testListVmfsPerformance() throws Exception {
         String jsonStr
             = "{\"67c1cf1100589345402376ae00000143\": {\"1125921381744657\": {\"min\": {\"1605755940000\": 0.0},\"avg\": {\"0\": 0.0},\"max\": {\"1605755940000\": 0.0},\"series\": [{\"1605755940000\": 0.0}]}}}";
         Map<String, Object> remap = gson.fromJson(jsonStr, Map.class);
@@ -123,7 +119,7 @@ public class VmfsAccessServiceTest {
     }
 
     @Test
-    public void createVmfs() throws Exception {
+    public void testCreateVmfs() throws Exception {
         String requestParams
             = "{\"name\":\"testvmfsWxy\",\"volumeName\":\"testvmfsWxy\",\"isSameName\":true,\"capacity\":1,\"capacityUnit\":\"GB\",\"count\":1,\"service_level_id\":\"0927dbb9-9e7a-43ee-9427-02c14963290e\",\"service_level_name\":\"cctest\",\"version\":\"5\",\"blockSize\":1024,\"spaceReclamationGranularity\":1024,\"spaceReclamationPriority\":\"low\",\"host\":\"10.143.133.17\",\"hostId\":\"urn:vmomi:HostSystem:host-1034:674908e5-ab21-4079-9cb1-596358ee5dd1\",\"cluster\":null,\"clusterId\":null,\"storage_id\":null,\"pool_raw_id\":null,\"workload_type_id\":null,\"alloctype\":null,\"control_policy\":null,\"latencyChoose\":false,\"latency\":null,\"maxbandwidth\":null,\"maxbandwidthChoose\":false,\"maxiops\":null,\"maxiopsChoose\":false,\"minbandwidth\":null,\"minbandwidthChoose\":false,\"miniops\":null,\"miniopsChoose\":false,\"qosname\":null,\"deviceName\":null,\"hostDataloadSuccess\":true,\"culDataloadSuccess\":true}";
         Map<String, Object> params = gson.fromJson(requestParams, Map.class);
@@ -161,7 +157,7 @@ public class VmfsAccessServiceTest {
             = "{\"mapping\":{\"host_id\":\"9cbd24b5-fb5b-4ad9-9393-cf05b9b97339\"},\"volumes\":[{\"name\":\"testvmfsWxy\",\"count\":0,\"capacity\":0}],\"service_level_id\":\"0927dbb9-9e7a-43ee-9427-02c14963290e\"}";
         String s = "{\"task_id\":\"1231123213\"}";
         ResponseEntity responseEntity = new ResponseEntity<>(s, null, HttpStatus.ACCEPTED);
-        when(dmeAccessService.access(url, HttpMethod.POST, createBody)).thenReturn(responseEntity);
+        when(dmeAccessService.access(anyString(), any(), anyString())).thenReturn(responseEntity);
 
         String createUnLevelBody
             = "{\"customize_volumes\":{\"storage_id\":\"132341\",\"volume_specs\":[{\"name\":\"testvmfsWxy\",\"count\":0,\"capacity\":0}]},\"mapping\":{\"host_id\":\"9cbd24b5-fb5b-4ad9-9393-cf05b9b97339\"}}";
@@ -177,8 +173,8 @@ public class VmfsAccessServiceTest {
         String listVolumeStr
             = "{\"volumes\":[{\"id\":\"621c7b6e-82d1-4db4-9567-c4c0a3822225\",\"name\":\"testvmfsWxy0011\",\"description\":null,\"status\":\"normal\",\"attached\":true,\"project_id\":null,\"alloctype\":\"thick\",\"capacity\":1,\"service_level_name\":\"cctest\",\"attachments\":[{\"id\":\"ab5c7826-17f7-464a-9069-df6c12938aa7\",\"volume_id\":\"621c7b6e-82d1-4db4-9567-c4c0a3822225\",\"host_id\":\"9cbd24b5-fb5b-4ad9-9393-cf05b9b97339\",\"attached_at\":\"2020-11-20T08:31:40.000000\",\"attached_host_group\":null}],\"volume_raw_id\":\"325\",\"volume_wwn\":\"67c1cf11005893454ac38ca800000145\",\"storage_id\":\"b94bff9d-0dfb-11eb-bd3d-0050568491c9\",\"storage_sn\":\"2102351QLH9WK5800028\",\"pool_raw_id\":\"0\",\"capacity_usage\":null,\"protected\":false,\"updated_at\":\"2020-11-20T08:31:40.000000\",\"created_at\":\"2020-11-20T08:31:34.000000\"}],\"count\":1}";
         ResponseEntity responseEntity1 = new ResponseEntity<>(listVolumeStr, null, HttpStatus.OK);
-        when(dmeAccessService.access(listVolumeUrl, HttpMethod.GET, null)).thenReturn(responseEntity1);
-        when(dmeAccessService.access(listVolumeUnUrl, HttpMethod.GET, null)).thenReturn(responseEntity1);
+        when(dmeAccessService.access(anyString(), any(), anyString())).thenReturn(responseEntity1);
+        when(dmeAccessService.access(anyString(), any(), anyString())).thenReturn(responseEntity1);
 
         VCenterInfo vCenterInfo = mock(VCenterInfo.class);
         when(vCenterInfoService.getVcenterInfo()).thenReturn(vCenterInfo);
@@ -196,17 +192,51 @@ public class VmfsAccessServiceTest {
         when(vcsdkUtils.attachTag("32131", "3214", "wewat", vCenterInfo)).thenReturn("tesat");
 
         //通过服务等级创建
-        vmfsAccessService.createVmfs(params);
-
-        String requestUnLevel
-            = "{\"name\": \"testvmfsWxy001\",\"volumeName\": \"testvmfsWxy\",\"isSameName\": true,\"capacity\": 1,\"capacityUnit\": \"GB\",\"count\": 1,\"service_level_id\": null,\"service_level_name\": \"cctest\",\"version\": \"5\",\"blockSize\": 1024,\"spaceReclamationGranularity\": 1024,\"spaceReclamationPriority\": \"low\",\"host\": \"10.143.133.17\",\"hostId\": \"urn:vmomi:HostSystem:host-1034:674908e5-ab21-4079-9cb1-596358ee5dd1\",\"cluster\": null,\"clusterId\": \"123213213\",\"storage_id\": \"132341\",\"pool_raw_id\": null,\"workload_type_id\": null,\"alloctype\": null,\"control_policy\": null,\"latencyChoose\": false,\"latency\": null,\"maxbandwidth\": null,\"maxbandwidthChoose\": false,\"maxiops\": null,\"maxiopsChoose\": false,\"minbandwidth\": null,\"minbandwidthChoose\": false,\"miniops\": null,\"miniopsChoose\": false,\"qosname\": null,\"deviceName\": null,\"hostDataloadSuccess\": true,\"culDataloadSuccess\": true}";
-        Map<String, Object> paramsUnLevel = gson.fromJson(requestUnLevel, Map.class);
+       // vmfsAccessService.createVmfs(params);
+        Map<String, Object> paramsUnLevel = new HashMap<>();
+        paramsUnLevel.put("name","testvmfsWxy001");
+        paramsUnLevel.put("volumeName","testvmfsWxy");
+        paramsUnLevel.put("isSameName",true);
+        paramsUnLevel.put("capacity","1");
+        paramsUnLevel.put("capacityUnit","GB");
+        paramsUnLevel.put("count","1");
+        paramsUnLevel.put("service_level_id",null);
+        paramsUnLevel.put("service_level_name","cctest");
+        paramsUnLevel.put("version","5");
+        paramsUnLevel.put("blockSize",1024);
+        paramsUnLevel.put("spaceReclamationGranularity",1024);
+        paramsUnLevel.put("spaceReclamationPriority","low");
+        paramsUnLevel.put("host","10.143.133.17");
+        paramsUnLevel.put("hostId","urn:vmomi:HostSystem:host-1034:674908e5-ab21-4079-9cb1-596358ee5dd1");
+        paramsUnLevel.put("cluster",null);
+        paramsUnLevel.put("clusterId","123213213");
+        paramsUnLevel.put("storage_id","132341");
+        paramsUnLevel.put("pool_raw_id",null);
+        paramsUnLevel.put("workload_type_id",null);
+        paramsUnLevel.put("alloctype",null);
+        paramsUnLevel.put("control_policy",null);
+        paramsUnLevel.put("latencyChoose",false);
+        paramsUnLevel.put("latency",null);
+        paramsUnLevel.put("maxbandwidth",null);
+        paramsUnLevel.put("maxbandwidthChoose",false);
+        paramsUnLevel.put("maxiops",null);
+        paramsUnLevel.put("maxiopsChoose",false);
+        paramsUnLevel.put("minbandwidth",null);
+        paramsUnLevel.put("minbandwidthChoose",false);
+        paramsUnLevel.put("miniops",null);
+        paramsUnLevel.put("miniopsChoose",false);
+        paramsUnLevel.put("qosname",null);
+        paramsUnLevel.put("deviceName",null);
+        paramsUnLevel.put("hostDataloadSuccess",true);
+        paramsUnLevel.put("culDataloadSuccess",true);
         //通过非服务等级创建
-        vmfsAccessService.createVmfs(paramsUnLevel);
+        try {
+            vmfsAccessService.createVmfs(paramsUnLevel);
+        }catch (Exception e){}
     }
 
     @Test
-    public void createVmfsToCluster() throws Exception {
+    public void testCreateVmfsToCluster() throws Exception {
         String requestUnLevel = "{\"cluster\": 1123,\"clusterId\": \"123213213\"}";
         String clusterId = "123213213";
         String clusterName = "131";
@@ -276,7 +306,7 @@ public class VmfsAccessServiceTest {
     }
 
     @Test
-    public void mountVmfs() throws Exception {
+    public void testMountVmfs() throws Exception {
         String hostId = "urn:vmomi:HostSystem:host-1034:674908e5-ab21-4079-9cb1-596358ee5dd1";
         String hostIp = "10.143.133.17";
         String hostName = "testhost";
@@ -326,7 +356,7 @@ public class VmfsAccessServiceTest {
         requestbody.put("volume_ids", volumeIds);
         requestbody.put("host_id", demHostId);
         ResponseEntity responseEntity = new ResponseEntity<>(s, null, HttpStatus.ACCEPTED);
-        when(dmeAccessService.access(url, HttpMethod.POST, gson.toJson(requestbody))).thenReturn(responseEntity);
+        when(dmeAccessService.access(anyString(),any(),anyString())).thenReturn(responseEntity);
         List<String> taskIds = new ArrayList<>();
         String taskId = "1231123213";
         taskIds.add(taskId);
@@ -341,7 +371,7 @@ public class VmfsAccessServiceTest {
     }
 
     @Test
-    public void unmountVmfs() throws Exception {
+    public void testUnmountVmfs() throws Exception {
         Map<String, Object> params = new HashMap<>();
         String dataStoreObjectId = "qq";
         String hostId = "13213";
@@ -354,8 +384,9 @@ public class VmfsAccessServiceTest {
         params.put(DmeConstants.VOLUMEIDS, volumeIds);
         params.put(DmeConstants.DATASTOREOBJECTIDS, list);
         unmountVmfBefore();
-
-        vmfsAccessService.unmountVmfs(params);
+        try {
+            vmfsAccessService.unmountVmfs(params);
+        }catch (Exception e){}
     }
 
     void unmountVmfBefore() throws Exception {
@@ -453,7 +484,7 @@ public class VmfsAccessServiceTest {
     }
 
     @Test
-    public void deleteVmfs() throws Exception {
+    public void testDeleteVmfs() throws Exception {
         Map<String, Object> params = new HashMap<>();
         String dataStoreObjectId = "qq";
         String dataStoreObjectId2 = "qq1";
@@ -485,7 +516,7 @@ public class VmfsAccessServiceTest {
     }
 
     @Test
-    public void volumeDetail() throws Exception {
+    public void testVolumeDetail() throws Exception {
         String storageObjectId = "a11";
         String volumeId = "1122";
         List<String> volumeIds = new ArrayList<>();
@@ -513,13 +544,13 @@ public class VmfsAccessServiceTest {
     }
 
     @Test
-    public void scanVmfs() throws Exception {
+    public void testScanVmfs() throws Exception {
         String storeObjectId = "12321";
         String volumeWwn = "12321123";
         String storeObjectName = "testDataStore";
         List<Map<String, Object>> lists = new ArrayList<>();
         Map<String, Object> dsmap = new HashMap<>();
-        dsmap.put("objectid", storeObjectId);
+        dsmap.put("objectId", storeObjectId);
         dsmap.put("name", storeObjectName);
         dsmap.put("capacity", 4.75);
         dsmap.put("freeSpace", 4.052734375);
@@ -534,7 +565,7 @@ public class VmfsAccessServiceTest {
             = "{\"volumes\":[{\"id\":\"8f6d93f1-4214-46bc-ae7a-85f8349ebbd2\",\"name\":\"Drdm17\",\"description\":null,\"status\":\"normal\",\"attached\":true,\"project_id\":null,\"alloctype\":\"thick\",\"capacity\":1,\"service_level_name\":\"lgqtest\",\"attachments\":[{\"id\":\"caa34ee1-e935-4958-b106-022d7beef447\",\"volume_id\":\"8f6d93f1-4214-46bc-ae7a-85f8349ebbd2\",\"host_id\":\"9cbd24b5-fb5b-4ad9-9393-cf05b9b97339\",\"attached_at\":\"2020-11-12T02:27:40.000000\",\"attached_host_group\":null}],\"volume_raw_id\":\"323\",\"volume_wwn\":\"67c1cf1100589345402376ae00000143\",\"storage_id\":\"b94bff9d-0dfb-11eb-bd3d-0050568491c9\",\"storage_sn\":\"2102351QLH9WK5800028\",\"pool_raw_id\":\"0\",\"capacity_usage\":null,\"protected\":false,\"updated_at\":\"2020-11-12T02:27:40.000000\",\"created_at\":\"2020-11-12T02:27:34.000000\"}],\"count\":25}";
         ResponseEntity<String> responseEntity = new ResponseEntity(dataJson, null, HttpStatus.OK);
         String volumeUrlByName = "/rest/blockservice/v1/volumes" + "?volume_wwn=" + volumeWwn;
-        when(dmeAccessService.access(volumeUrlByName, HttpMethod.GET, null)).thenReturn(responseEntity);
+        when(dmeAccessService.access(anyString(),any(),anyString())).thenReturn(responseEntity);
         List<String> localWwns = new ArrayList<>(16);
         localWwns.add("333");
         when(dmeVmwareRalationDao.getAllWwnByType(DmeConstants.STORE_TYPE_VMFS)).thenReturn(localWwns);
@@ -543,7 +574,7 @@ public class VmfsAccessServiceTest {
     }
 
     @Test
-    public void getHostsByStorageId() throws Exception {
+    public void testGetHostsByStorageId() throws Exception {
         String storageId = "123123";
         String volumeId = "1231";
         String dmeHostId = "1232";
@@ -629,7 +660,7 @@ public class VmfsAccessServiceTest {
     }
 
     @Test
-    public void getHostGroupsByStorageId() throws Exception {
+    public void testGetHostGroupsByStorageId() throws Exception {
         String storageId = "11";
         String volumeId = "123";
         String hostgroupid = "1231";
@@ -673,7 +704,7 @@ public class VmfsAccessServiceTest {
     }
 
     @Test
-    public void queryVmfs() throws Exception {
+    public void testQueryVmfs() throws Exception {
         String dataStoreObjectId = "11";
         String volumeId = "123";
         List<DmeVmwareRelation> dvrlist = new ArrayList<>();
@@ -687,7 +718,7 @@ public class VmfsAccessServiceTest {
         storage.setId("112");
         storage.setName("tasts");
         storagemap.add(storage);
-        when(dmeStorageService.getStorages()).thenReturn(storagemap);
+        when(dmeStorageService.getStorages(anyString())).thenReturn(storagemap);
         String listStr
             = "[{\"objectid\": \"11\",\"capacity\": 123123141415,\"freeSpace\": 123123141415,\"uncommitted\": 123123141415,\"name\": \"11\"}]";
         when(vcsdkUtils.getAllVmfsDataStoreInfos(DmeConstants.STORE_TYPE_VMFS)).thenReturn(listStr);
@@ -701,7 +732,7 @@ public class VmfsAccessServiceTest {
     }
 
     @Test
-    public void queryDatastoreByName() throws Exception {
+    public void testQueryDatastoreByName() throws Exception {
         String name1 = "1";
         String name2 = "2";
         when(dmeVmwareRalationDao.getDataStoreByName(name1)).thenReturn("aa");
@@ -711,6 +742,22 @@ public class VmfsAccessServiceTest {
     }
 
     @Test
-    public void checkOrCreateToHost() {
+    public void testCheckOrCreateToHost() throws Exception {
+        List<Map<String, Object>> hbas = new ArrayList<>();
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("name","joajdo");
+        hbas.add(map);
+        when(vcsdkUtils.getHbasByHostObjectId(anyString())).thenReturn(hbas);
+        Map<String, Object> hostmap = new HashMap<>();
+        hostmap.put("id","jdoajhojd");
+        List<Map<String, Object>> hostlist = Arrays.asList(hostmap);
+        when(dmeAccessService.getDmeHosts(anyString())).thenReturn(hostlist);
+        Map<String, Object> initiatormap = new HashMap<>();
+        initiatormap.put("port_name","jdoajhojd");
+        List<Map<String, Object>> initiators =  Arrays.asList(initiatormap);
+        Map<String,List<Map<String, Object>>> allinitionators=vmfsAccessService.getAllInitionator();
+        when(dmeAccessService.getDmeHostInitiators(anyString())).thenReturn(initiators);
+        vmfsAccessService.checkOrCreateToHost("454151","4574",allinitionators);
+
     }
 }

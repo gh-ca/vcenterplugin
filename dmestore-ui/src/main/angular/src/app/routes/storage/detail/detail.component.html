@@ -1,12 +1,15 @@
 <div class="detail-outer">
   <div class="detail-header">
-    <button style="float: right" type="button" class="btn btn-outline-primary btn-sm" (click)="backToList()">{{'menu.back' | translate}}</button>
+    <button style="float: right" type="button" class="btn btn-outline-primary btn-sm"
+      (click)="backToList()">{{'menu.back' | translate}}</button>
   </div>
   <div class="detail-content">
     <div>
       <clr-tabs>
-        <clr-tab >
-          <button clrTabLink id="conf" (click)="changeTab('conf')">{{'storage.detail.conf.configuration' | translate}}</button>
+        <clr-tab>
+          <!-- 配置 -->
+          <button clrTabLink id="conf"
+            (click)="changeTab('conf')">{{'storage.detail.conf.configuration' | translate}}</button>
           <clr-tab-content id="configuration">
             <table class="table table-noborder" *ngIf="detail" [clrLoading]="detailLoading">
               <tr>
@@ -21,20 +24,24 @@
                 <td class="left">{{'storage.detail.conf.status' | translate}}</td>
                 <td class="left">
                   <span *ngIf="detail.status == 0">
-                <span class="color-square" style="background-color: #A9A9A9; margin-right: 10px"></span>{{'storage.list.offLine' | translate}}
-              </span>
+                    <span class="color-square"
+                      style="background-color: #A9A9A9; margin-right: 10px"></span>{{'storage.list.offLine' | translate}}
+                  </span>
                   <span *ngIf="detail.status == 1">
-                <span class="color-square" style="background-color: #7CDFA0; margin-right: 10px;"></span>{{'storage.list.normal' | translate}}
-              </span>
+                    <span class="color-square"
+                      style="background-color: #7CDFA0; margin-right: 10px;"></span>{{'storage.list.normal' | translate}}
+                  </span>
                   <span *ngIf="detail.status == 2">
-                <span class="color-square" style="background-color: red; margin-right: 10px"></span>{{'storage.list.fault' | translate}}
-              </span>
+                    <span class="color-square"
+                      style="background-color: red; margin-right: 10px"></span>{{'storage.list.fault' | translate}}
+                  </span>
                   <span *ngIf="detail.status == 9">
-                <span class="color-square" style="background-color: yellow; margin-right: 10px"></span>{{'storage.list.notMgr' | translate}}
-              </span>
+                    <span class="color-square"
+                      style="background-color: yellow; margin-right: 10px"></span>{{'storage.list.notMgr' | translate}}
+                  </span>
                   <span *ngIf="!detail.status">
-                <span class="color-square" style="background-color: #A9A9A9; margin-right: 10px"></span>--
-              </span>
+                    <span class="color-square" style="background-color: #A9A9A9; margin-right: 10px"></span>--
+                  </span>
                 </td>
                 <td class="left">{{'storage.detail.conf.fv' | translate}}</td>
                 <td class="left">{{detail.productVersion?detail.productVersion:'--'}}</td>
@@ -54,20 +61,23 @@
                 <td class="left">{{'storage.detail.conf.wp' | translate}}</td>
                 <td class="left">{{detail.maintenanceStart}}--{{detail.maintenanceOvertime}}</td>
                 <td class="left">{{'storage.detail.conf.location' | translate}}</td>
-                <td class="left over_flow" title="{{detail.location !=null?detail.location:'--'}}" style="width: 11rem;display: inline-block;">{{detail.location !=null?detail.location:'--'}}</td>
+                <td class="left over_flow" title="{{detail.location !=null?detail.location:'--'}}"
+                  style="width: 11rem;display: inline-block;">{{detail.location !=null?detail.location:'--'}}</td>
               </tr>
             </table>
-              <div *ngIf="!detail">
-                <cds-alert-group type="light" size="lg">
-                  <cds-alert *ngIf="!detailLoading" status="warning">{{'errorMsg.cantFindData' | translate}}</cds-alert>
-                  <img [hidden]="!detailLoading" src="./assets/images/loading.gif" style="width: 20px;height: 20px">
-                  <cds-alert *ngIf="detailLoading" status="loading">{{'vmfs.loadingTips' | translate}}</cds-alert>
-                </cds-alert-group>
+            <div *ngIf="!detail">
+              <cds-alert-group type="light" size="lg">
+                <cds-alert *ngIf="!detailLoading" status="warning">{{'errorMsg.cantFindData' | translate}}</cds-alert>
+                <img [hidden]="!detailLoading" src="./assets/images/loading.gif" style="width: 20px;height: 20px">
+                <cds-alert *ngIf="detailLoading" status="loading">{{'vmfs.loadingTips' | translate}}</cds-alert>
+              </cds-alert-group>
             </div>
             <clr-tabs *ngIf="detail">
               <!--Storage Pools-->
+              <!-- 存储池 -->
               <clr-tab>
-                <button clrTabLink id="storage" (click)="changeTab('pool')">{{'storage.detail.storagePool.storagePool' | translate}}</button>
+                <button clrTabLink id="storage"
+                  (click)="changeTab('pool')">{{'storage.detail.storagePool.storagePool' | translate}}</button>
                 <clr-tab-content id="storagePool">
                   <div class="detail-margin-top">
                     <!-- 头部按钮组 -->
@@ -76,75 +86,119 @@
                       <!-- 基本视图、性能视图、刷新 -->
                       <div class="btn-group btn-icon">
                         <div class="radio btn" title="{{'menu.conventional' | translate}}">
-                          <input (click)="poolRadio = 'table1'" type="radio" name="btn-group-demo-radios" id="btn-demo-radio-1" checked>
-                          <label for="btn-demo-radio-1"><clr-icon shape="list" size="20"></clr-icon></label>
+                          <input (click)="poolRadio = 'table1'" type="radio" name="btn-group-demo-radios"
+                            id="btn-demo-radio-1" checked>
+                          <label for="btn-demo-radio-1">
+                            <clr-icon shape="list" size="20"></clr-icon>
+                          </label>
                         </div>
-                        <div class="radio btn"  title="{{'menu.capacity' | translate}}">
-                          <input (click)="poolRadio = 'table2'" type="radio" name="btn-group-demo-radios" id="btn-demo-radio-2">
-                          <label for="btn-demo-radio-2"><clr-icon shape="dashboard" size="20"></clr-icon></label>
+                        <div class="radio btn" title="{{'menu.capacity' | translate}}">
+                          <input (click)="poolRadio = 'table2'" type="radio" name="btn-group-demo-radios"
+                            id="btn-demo-radio-2">
+                          <label for="btn-demo-radio-2">
+                            <clr-icon shape="dashboard" size="20"></clr-icon>
+                          </label>
                         </div>
                         <div class="radio btn" title="{{'menu.performance' | translate}}">
-                          <input (click)="poolRadio = 'table3'" type="radio" name="btn-group-demo-radios" id="btn-demo-radio-3">
-                          <label for="btn-demo-radio-3"><clr-icon shape="radar" size="20"></clr-icon></label>
+                          <input (click)="poolRadio = 'table3'" type="radio" name="btn-group-demo-radios"
+                            id="btn-demo-radio-3">
+                          <label for="btn-demo-radio-3">
+                            <clr-icon shape="radar" size="20"></clr-icon>
+                          </label>
                         </div>
                         <div class="radio btn merginLeft" title="{{'menu.refresh' | translate}}">
-                          <label><clr-icon shape="refresh" size="20" (click)="refreshStoragePool()"></clr-icon></label>
+                          <label>
+                            <clr-icon shape="refresh" size="20" (click)="refreshStoragePool()"></clr-icon>
+                          </label>
                         </div>
                       </div>
                     </div>
                     <!-- 列表页 -->
-                    <clr-datagrid  [clrDgLoading]="isLoading">
+                    <clr-datagrid [clrDgLoading]="isLoading">
 
-                      <clr-dg-column [clrDgField]="'name'">{{'storage.detail.storagePool.name' | translate}}</clr-dg-column>
+                      <clr-dg-column [clrDgField]="'name'">{{'storage.detail.storagePool.name' | translate}}
+                      </clr-dg-column>
                       <clr-dg-column>
                         {{'storage.detail.storagePool.status' | translate}}
                         <clr-dg-filter [clrDgFilter]="storagePoolStatusFilter">
+                          <!-- 20210421162921 -->
                           <storage-pool-status-filter #storagePoolStatusFilter></storage-pool-status-filter>
                         </clr-dg-filter>
                       </clr-dg-column>
 
-                      <clr-dg-column [hidden]="poolRadio!=='table1'" [clrDgField]="'physicalType'">{{'storage.detail.storagePool.diskType' | translate}}</clr-dg-column>
+                      <clr-dg-column [hidden]="poolRadio!=='table1'" [clrDgField]="'physicalType'">
+                        {{'storage.detail.storagePool.diskType' | translate}}</clr-dg-column>
                       <clr-dg-column [hidden]="poolRadio!=='table1'" [clrDgField]="'mediaType'">
                         {{'storage.detail.storagePool.type' | translate}}
                         <clr-dg-filter [clrDgFilter]="storagePoolTypeFilter">
                           <storage-pool-type-filter #storagePoolTypeFilter></storage-pool-type-filter>
                         </clr-dg-filter>
                       </clr-dg-column>
-                      <clr-dg-column style="width: 250px" [hidden]="poolRadio!=='table1'" [clrDgField]="'serviceLevelName'">{{'storage.detail.storagePool.serviceLevel' | translate}}</clr-dg-column>
-                      <clr-dg-column [hidden]="poolRadio!=='table1'" [clrDgField]="'raidLevel'">{{'storage.detail.storagePool.raidLevel' | translate}}</clr-dg-column>
+                      <clr-dg-column style="width: 250px" [hidden]="poolRadio!=='table1'"
+                        [clrDgField]="'serviceLevelName'">{{'storage.detail.storagePool.serviceLevel' | translate}}
+                      </clr-dg-column>
+                      <clr-dg-column [hidden]="poolRadio!=='table1'" [clrDgField]="'raidLevel'">
+                        {{'storage.detail.storagePool.raidLevel' | translate}}</clr-dg-column>
 
-                      <clr-dg-column #poolTotalCap [hidden]="poolRadio!=='table2'" class="hideFilter" [clrDgField]="'totalCapacity'" style="position: relative" (clrDgSortedChange)="sortFunc($event);">
+                      <!-- 性能 -->
+                      <!-- 总量 -->
+                      <clr-dg-column #poolTotalCap [hidden]="poolRadio!=='table2'" class="hideFilter"
+                        [clrDgField]="'totalCapacity'" style="position: relative"
+                        (clrDgSortedChange)="sortFunc($event);">
                         {{'storage.detail.storagePool.totalCap' | translate}}
-                        <clr-icon *ngIf="sortFunc(poolTotalCap.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+                        <clr-icon *ngIf="sortFunc(poolTotalCap.sorted);" shape="arrow down" class="is-solid"
+                          style="position: absolute;right: 1.1rem;"></clr-icon>
                       </clr-dg-column>
-                      <clr-dg-column #poolUsedCap [hidden]="poolRadio!=='table2'" class="hideFilter" [clrDgField]="'consumedCapacity'" style="position: relative" (clrDgSortedChange)="sortFunc($event);">
+                      <!-- 已用容量 -->
+                      <clr-dg-column #poolUsedCap [hidden]="poolRadio!=='table2'" class="hideFilter"
+                        [clrDgField]="'consumedCapacity'" style="position: relative"
+                        (clrDgSortedChange)="sortFunc($event);">
                         {{'storage.detail.storagePool.usedCap' | translate}}
-                        <clr-icon *ngIf="sortFunc(poolUsedCap.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+                        <clr-icon *ngIf="sortFunc(poolUsedCap.sorted);" shape="arrow down" class="is-solid"
+                          style="position: absolute;right: 1.1rem;"></clr-icon>
                       </clr-dg-column>
-                      <clr-dg-column #poolCapUsage [hidden]="poolRadio!=='table2'" class="hideFilter" [clrDgField]="'capUsage'" style="width: 11rem;position: relative"(clrDgSortedChange)="sortFunc($event);">
+                      <!-- 容量利用率 -->
+                      <clr-dg-column #poolCapUsage [hidden]="poolRadio!=='table2'" class="hideFilter"
+                        [clrDgField]="'capUsage'" style="width: 11rem;position: relative"
+                        (clrDgSortedChange)="sortFunc($event);">
                         {{'storage.detail.storagePool.capUsage' | translate}}
-                        <clr-icon *ngIf="sortFunc(poolCapUsage.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+                        <clr-icon *ngIf="sortFunc(poolCapUsage.sorted);" shape="arrow down" class="is-solid"
+                          style="position: absolute;right: 1.1rem;"></clr-icon>
                       </clr-dg-column>
-                      <clr-dg-column #poolFreeCap [hidden]="poolRadio!=='table2'" class="hideFilter" [clrDgField]="'freeCapacity'" style="position: relative" (clrDgSortedChange)="sortFunc($event);">
+                      <clr-dg-column #poolFreeCap [hidden]="poolRadio!=='table2'" class="hideFilter"
+                        [clrDgField]="'freeCapacity'" style="position: relative"
+                        (clrDgSortedChange)="sortFunc($event);">
                         {{'storage.detail.storagePool.freeCap' | translate}}
-                        <clr-icon *ngIf="sortFunc(poolFreeCap.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+                        <clr-icon *ngIf="sortFunc(poolFreeCap.sorted);" shape="arrow down" class="is-solid"
+                          style="position: absolute;right: 1.1rem;"></clr-icon>
                       </clr-dg-column>
-                      <clr-dg-column #poolSupRate [hidden]="poolRadio!=='table2'" class="hideFilter" [clrDgField]="'supRate'" style="position: relative" (clrDgSortedChange)="sortFunc($event);">
+                      <clr-dg-column #poolSupRate [hidden]="poolRadio!=='table2'" class="hideFilter"
+                        [clrDgField]="'supRate'" style="position: relative" (clrDgSortedChange)="sortFunc($event);">
                         {{'storage.detail.storagePool.supRate' | translate}}
-                        <clr-icon *ngIf="sortFunc(poolSupRate.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+                        <clr-icon *ngIf="sortFunc(poolSupRate.sorted);" shape="arrow down" class="is-solid"
+                          style="position: absolute;right: 1.1rem;"></clr-icon>
                       </clr-dg-column>
 
-                      <clr-dg-column #poolLatency class="hideFilter" [clrDgField]="'maxLatency'" [hidden]="poolRadio!=='table3'" style="min-width: 9rem;position: relative" (clrDgSortedChange)="sortFunc($event);">
+                      <clr-dg-column #poolLatency class="hideFilter" [clrDgField]="'maxLatency'"
+                        [hidden]="poolRadio!=='table3'" style="min-width: 9rem;position: relative"
+                        (clrDgSortedChange)="sortFunc($event);">
                         {{'storage.detail.storagePool.latency' | translate}}
-                        <clr-icon *ngIf="sortFunc(poolLatency.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+                        <clr-icon *ngIf="sortFunc(poolLatency.sorted);" shape="arrow down" class="is-solid"
+                          style="position: absolute;right: 1.1rem;"></clr-icon>
                       </clr-dg-column>
-                      <clr-dg-column #poolIops class="hideFilter" [clrDgField]="'maxIops'" [hidden]="poolRadio!=='table3'" style="position: relative" (clrDgSortedChange)="sortFunc($event);">
+                      <clr-dg-column #poolIops class="hideFilter" [clrDgField]="'maxIops'"
+                        [hidden]="poolRadio!=='table3'" style="position: relative"
+                        (clrDgSortedChange)="sortFunc($event);">
                         {{'storage.detail.storagePool.iops' | translate}}
-                        <clr-icon *ngIf="sortFunc(poolIops.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+                        <clr-icon *ngIf="sortFunc(poolIops.sorted);" shape="arrow down" class="is-solid"
+                          style="position: absolute;right: 1.1rem;"></clr-icon>
                       </clr-dg-column>
-                      <clr-dg-column #poolBandwidth class="hideFilter" [clrDgField]="'maxBandwidth'" [hidden]="poolRadio!=='table3'" style="position: relative" (clrDgSortedChange)="sortFunc($event);">
+                      <clr-dg-column #poolBandwidth class="hideFilter" [clrDgField]="'maxBandwidth'"
+                        [hidden]="poolRadio!=='table3'" style="position: relative"
+                        (clrDgSortedChange)="sortFunc($event);">
                         {{'storage.detail.storagePool.bandwidth' | translate}}
-                        <clr-icon *ngIf="sortFunc(poolBandwidth.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+                        <clr-icon *ngIf="sortFunc(poolBandwidth.sorted);" shape="arrow down" class="is-solid"
+                          style="position: absolute;right: 1.1rem;"></clr-icon>
                       </clr-dg-column>
 
                       <clr-dg-placeholder>{{'tips.noData' | translate}}</clr-dg-placeholder>
@@ -152,6 +206,7 @@
                       <clr-dg-row *clrDgItems="let item of storagePool" [clrDgItem]="item">
                         <clr-dg-cell class="over_flow">{{item.name ? item.name:'--'}}</clr-dg-cell>
                         <clr-dg-cell class="over_flow">
+                          <!-- print{{print(item)}} -->
                           <span *ngIf="item.healthStatus == 'normal'">
                             <span class="color-square" style="background-color: #7CDFA0; margin-right: 10px"></span>
                             {{'storage.detail.storagePool.normal' | translate}}
@@ -176,37 +231,49 @@
                           <span *ngIf="item.mediaType == 'block'">{{'enum.type.block' | translate}}</span>
                           <span *ngIf="item.mediaType == 'block/file'">{{'enum.type.blockAndFile' | translate}}</span>
                         </clr-dg-cell>
-                        <clr-dg-cell title="{{formatArry(item.serviceLevelName)}}" class="over_flow" [hidden]="poolRadio!=='table1'">
+                        <clr-dg-cell title="{{formatArry(item.serviceLevelName)}}" class="over_flow"
+                          [hidden]="poolRadio!=='table1'">
                           {{item.serviceLevelName ? formatArry(item.serviceLevelName):'--'}}
                         </clr-dg-cell>
                         <clr-dg-cell [hidden]="poolRadio!=='table1'">
                           {{item.raidLevel ? item.raidLevel:'--'}}
                         </clr-dg-cell>
-
-                        <clr-dg-cell [hidden]="poolRadio!=='table2'" style="text-align: right">{{item.totalCapacity ? formatCapacity(item.totalCapacity):'--'}}</clr-dg-cell>
-                        <clr-dg-cell [hidden]="poolRadio!=='table2'" style="text-align: right">{{item.consumedCapacity ? formatCapacity(item.consumedCapacity):'--'}}</clr-dg-cell>
+                        <!-- 总量 -->
                         <clr-dg-cell [hidden]="poolRadio!=='table2'" style="text-align: right">
-                          <div class="progress-block" *ngIf="item.consumedCapacity">
-                            <clr-progress-bar clrValue="{{((item.consumedCapacity)/item.totalCapacity * 100).toFixed(2)}}" clrSuccess></clr-progress-bar>
+                          {{item.totalCapacity!==null ? formatCapacity(item.totalCapacity):'--'}}</clr-dg-cell>
+                        <!-- 已用容量 -->
+                        <clr-dg-cell [hidden]="poolRadio!=='table2'" style="text-align: right">
+                          {{item.consumedCapacity!==null ? formatCapacity(item.consumedCapacity):'--'}}</clr-dg-cell>
+                        <!-- 容量利用率 -->
+                        <clr-dg-cell [hidden]="poolRadio!=='table2'" style="text-align: right">
+                          <div class="progress-block" *ngIf="item.consumedCapacity!==null&&item.totalCapacity>0">
+                            <clr-progress-bar
+                              clrValue="{{((item.consumedCapacity)/item.totalCapacity * 100).toFixed(2)}}" clrSuccess>
+                            </clr-progress-bar>
                             <span>{{((item.consumedCapacity)/item.totalCapacity * 100).toFixed(2)}}%</span>
                           </div>
-                          <span *ngIf="!item.consumedCapacity">--</span>
+                          <span *ngIf="item.consumedCapacity===null">--</span>
                         </clr-dg-cell>
-                        <clr-dg-cell [hidden]="poolRadio!=='table2'" style="text-align: right">{{item.freeCapacity ? formatCapacity(item.freeCapacity):'--'}}</clr-dg-cell>
                         <clr-dg-cell [hidden]="poolRadio!=='table2'" style="text-align: right">
-                          <span *ngIf="item.subscribedCapacity">
+                          {{item.freeCapacity ? formatCapacity(item.freeCapacity):'--'}}</clr-dg-cell>
+                        <clr-dg-cell [hidden]="poolRadio!=='table2'" style="text-align: right">
+                          <span *ngIf="item.subscribedCapacity!==null&&item.totalCapacity>0">
                             {{(item.subscribedCapacity/item.totalCapacity*100).toFixed(2)}}%
                           </span>
-                          <span *ngIf="!item.subscribedCapacity">--</span>
+                          <span *ngIf="item.subscribedCapacity===null">--</span>
                         </clr-dg-cell>
 
-                        <clr-dg-cell [hidden]="poolRadio!=='table3'" style="text-align: right;min-width: 9rem;">{{item.maxLatency!=null?item.maxLatency.toFixed(2):'--'}}</clr-dg-cell>
-                        <clr-dg-cell [hidden]="poolRadio!=='table3'" style="text-align: right">{{item.maxIops!=null?item.maxIops.toFixed(1):'--'}}</clr-dg-cell>
-                        <clr-dg-cell [hidden]="poolRadio!=='table3'" style="text-align: right">{{item.maxBandwidth!=null?item.maxBandwidth.toFixed(1):'--'}}</clr-dg-cell>
+                        <clr-dg-cell [hidden]="poolRadio!=='table3'" style="text-align: right;min-width: 9rem;">
+                          {{item.maxLatency!=null?item.maxLatency.toFixed(2):'--'}}</clr-dg-cell>
+                        <clr-dg-cell [hidden]="poolRadio!=='table3'" style="text-align: right">
+                          {{item.maxIops!=null?item.maxIops.toFixed(1):'--'}}</clr-dg-cell>
+                        <clr-dg-cell [hidden]="poolRadio!=='table3'" style="text-align: right">
+                          {{item.maxBandwidth!=null?item.maxBandwidth.toFixed(1):'--'}}</clr-dg-cell>
                       </clr-dg-row>
                       <clr-dg-footer>
                         <clr-dg-pagination #pagination [clrDgPageSize]="10" [clrDgTotalItems]="poolTotal">
-                          <clr-dg-page-size [clrPageSizeOptions]="[10,20,50,100]">{{'storage.detail.perPage' | translate}}</clr-dg-page-size>
+                          <clr-dg-page-size [clrPageSizeOptions]="[10,20,50,100]">
+                            {{'storage.detail.perPage' | translate}}</clr-dg-page-size>
                           {{pagination.firstItem + 1}} - {{pagination.lastItem + 1}}
                           of {{pagination.totalItems}}
                         </clr-dg-pagination>
@@ -216,8 +283,10 @@
                 </clr-tab-content>
               </clr-tab>
               <!--volumes-->
+              <!-- LUNS -->
               <clr-tab>
-                <button clrTabLink id="volume" (click)="changeTab('volume')">{{'storage.detail.volumes.volumes' | translate}}</button>
+                <button clrTabLink id="volume"
+                  (click)="changeTab('volume')">{{'storage.detail.volumes.volumes' | translate}}</button>
                 <clr-tab-content id="volumes">
                   <div class="detail-margin-top">
                     <div class="gh-btngroup-header">
@@ -225,15 +294,23 @@
                       <!-- 基本视图、性能视图、刷新 -->
                       <div class="btn-group btn-icon">
                         <div class="radio btn" title="{{'menu.conventional' | translate}}">
-                          <input (click)="volumeRadio = 'table1'" type="radio" name="btn-group-volume-radios" id="btn-demo-radio-4" checked>
-                          <label for="btn-demo-radio-4"><clr-icon shape="list" size="20"></clr-icon></label>
+                          <input (click)="volumeRadio = 'table1'" type="radio" name="btn-group-volume-radios"
+                            id="btn-demo-radio-4" checked>
+                          <label for="btn-demo-radio-4">
+                            <clr-icon shape="list" size="20"></clr-icon>
+                          </label>
                         </div>
                         <div class="radio btn" title="{{'menu.performance' | translate}}">
-                          <input (click)="volumeRadio = 'table2';listVolumesperformance();" type="radio" name="btn-group-volume-radios" id="btn-demo-radio-5">
-                          <label for="btn-demo-radio-5"><clr-icon shape="dashboard" size="20"></clr-icon></label>
+                          <input (click)="volumeRadio = 'table2';listVolumesperformance();" type="radio"
+                            name="btn-group-volume-radios" id="btn-demo-radio-5">
+                          <label for="btn-demo-radio-5">
+                            <clr-icon shape="dashboard" size="20"></clr-icon>
+                          </label>
                         </div>
                         <div class="radio btn merginLeft" title="{{'menu.refresh' | translate}}">
-                          <label><clr-icon shape="refresh" size="20" (click)="refreshVolList();"></clr-icon></label>
+                          <label>
+                            <clr-icon shape="refresh" size="20" (click)="refreshVolList();"></clr-icon>
+                          </label>
                         </div>
                       </div>
                     </div>
@@ -244,61 +321,84 @@
                       <clr-dg-column>
                         {{'storage.detail.volumes.status' | translate}}
                         <clr-dg-filter [clrDgFilter]="volStatusFilter">
-                          <vol-status-filter #volStatusFilter (change)="volQueryChange(null, null, null);"></vol-status-filter>
+                          <vol-status-filter #volStatusFilter (change)="volQueryChange(null, null, null);">
+                          </vol-status-filter>
                         </clr-dg-filter>
                       </clr-dg-column>
-
-                      <clr-dg-column #volTotalCap class="hideFilter" [clrDgField]="'capacity'" (clrDgSortOrderChange)="volQueryChange(null, $event, null)" [hidden]="volumeRadio!=='table1'" style="position: relative">
+                      <!-- 总容量 -->
+                      <clr-dg-column #volTotalCap class="hideFilter" [clrDgField]="'capacity'"
+                        (clrDgSortOrderChange)="volQueryChange(null, $event, null)" [hidden]="volumeRadio!=='table1'"
+                        style="position: relative">
                         {{'storage.detail.volumes.totalCap' | translate}}
-                        <clr-icon *ngIf="sortFunc(volTotalCap.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+                        <clr-icon *ngIf="sortFunc(volTotalCap.sorted);" shape="arrow down" class="is-solid"
+                          style="position: absolute;right: 1.1rem;"></clr-icon>
                       </clr-dg-column>
+                      <!--  -->
                       <clr-dg-column [hidden]="volumeRadio!=='table1'">
                         {{'storage.detail.volumes.proType' | translate}}
                         <clr-dg-filter [clrDgFilter]="portTypeFilter">
-                          <por-type-filter #portTypeFilter (change)="volQueryChange(null, null, null);"></por-type-filter>
+                          <por-type-filter #portTypeFilter (change)="volQueryChange(null, null, null);">
+                          </por-type-filter>
                         </clr-dg-filter>
                       </clr-dg-column>
-                      <clr-dg-column #volCapUsage class="hideFilter" [clrDgField]="'capacityUsageNum'" [hidden]="volumeRadio!=='table1'" style="width: 11rem;position: relative;" (clrDgSortedChange)="sortFunc($event);">
+                      <!--  -->
+                      <clr-dg-column #volCapUsage class="hideFilter" [clrDgField]="'capacityUsageNum'"
+                        [hidden]="volumeRadio!=='table1'" style="width: 11rem;position: relative;"
+                        (clrDgSortedChange)="sortFunc($event);">
                         {{'storage.detail.volumes.capUsage' | translate}}
-                        <clr-icon *ngIf="sortFunc(volCapUsage.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+                        <clr-icon *ngIf="sortFunc(volCapUsage.sorted);" shape="arrow down" class="is-solid"
+                          style="position: absolute;right: 1.1rem;"></clr-icon>
                       </clr-dg-column>
                       <clr-dg-column [hidden]="volumeRadio!=='table1'">
                         {{'storage.detail.volumes.mapStatus' | translate}}
                         <clr-dg-filter [clrDgFilter]="mapStatusFilter">
-                          <map-status-filter #mapStatusFilter (change)="volQueryChange(null, null, null);"></map-status-filter>
+                          <map-status-filter #mapStatusFilter (change)="volQueryChange(null, null, null);">
+                          </map-status-filter>
                         </clr-dg-filter>
                       </clr-dg-column>
                       <clr-dg-column [hidden]="volumeRadio!=='table1'">
                         {{'storage.detail.volumes.stoPool' | translate}}
                         <clr-dg-filter [clrDgFilter]="volStoragePoolFilter">
-                          <vol-pool-filter #volStoragePoolFilter (change)="volQueryChange(null, null, null);"></vol-pool-filter>
+                          <vol-pool-filter #volStoragePoolFilter (change)="volQueryChange(null, null, null);">
+                          </vol-pool-filter>
                         </clr-dg-filter>
                       </clr-dg-column>
-                      <clr-dg-column  style="width: 150px" [hidden]="volumeRadio!=='table1'">
+                      <!-- DME存储策略 -->
+                      <clr-dg-column style="width: 150px" [hidden]="volumeRadio!=='table1'">
                         {{'storage.detail.volumes.serviceLevel' | translate}}
                         <clr-dg-filter [clrDgFilter]="volServiceLevelFilter">
-                          <vol-serviceLevel-filter #volServiceLevelFilter (change)="volQueryChange(null, null, null);"></vol-serviceLevel-filter>
+                          <vol-serviceLevel-filter #volServiceLevelFilter (change)="volQueryChange(null, null, null);">
+                          </vol-serviceLevel-filter>
                         </clr-dg-filter>
                       </clr-dg-column>
-<!--                      <clr-dg-column [hidden]="volumeRadio!=='table1'">-->
-<!--                        {{'storage.detail.volumes.protStatus' | translate}}-->
-<!--                        <clr-dg-filter [clrDgFilter]="volProtectionStatusFilter">-->
-<!--                          <vol-protection-status-filter #volProtectionStatusFilter></vol-protection-status-filter>-->
-<!--                        </clr-dg-filter>-->
-<!--                      </clr-dg-column>-->
-                      <clr-dg-column [hidden]="volumeRadio!=='table1'">{{'storage.detail.volumes.dataStore' | translate}}</clr-dg-column>
+                      <!--                      <clr-dg-column [hidden]="volumeRadio!=='table1'">-->
+                      <!--                        {{'storage.detail.volumes.protStatus' | translate}}-->
+                      <!--                        <clr-dg-filter [clrDgFilter]="volProtectionStatusFilter">-->
+                      <!--                          <vol-protection-status-filter #volProtectionStatusFilter></vol-protection-status-filter>-->
+                      <!--                        </clr-dg-filter>-->
+                      <!--                      </clr-dg-column>-->
+                      <clr-dg-column [hidden]="volumeRadio!=='table1'">
+                        {{'storage.detail.volumes.dataStore' | translate}}</clr-dg-column>
 
-                      <clr-dg-column #volLatency class="hideFilter" [clrDgField]="'lantency'" [hidden]="volumeRadio!=='table2'" style="min-width: 9rem;position: relative" (clrDgSortedChange)="sortFunc($event);">
+                      <clr-dg-column #volLatency class="hideFilter" [clrDgField]="'lantency'"
+                        [hidden]="volumeRadio!=='table2'" style="min-width: 9rem;position: relative"
+                        (clrDgSortedChange)="sortFunc($event);">
                         {{'storage.detail.volumes.latency' | translate}}
-                        <clr-icon *ngIf="sortFunc(volLatency.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+                        <clr-icon *ngIf="sortFunc(volLatency.sorted);" shape="arrow down" class="is-solid"
+                          style="position: absolute;right: 1.1rem;"></clr-icon>
                       </clr-dg-column>
-                      <clr-dg-column #volIops class="hideFilter" [clrDgField]="'iops'" [hidden]="volumeRadio!=='table2'" style="position: relative" (clrDgSortedChange)="sortFunc($event);">
+                      <clr-dg-column #volIops class="hideFilter" [clrDgField]="'iops'" [hidden]="volumeRadio!=='table2'"
+                        style="position: relative" (clrDgSortedChange)="sortFunc($event);">
                         {{'storage.detail.volumes.iops' | translate}}
-                        <clr-icon *ngIf="sortFunc(volIops.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+                        <clr-icon *ngIf="sortFunc(volIops.sorted);" shape="arrow down" class="is-solid"
+                          style="position: absolute;right: 1.1rem;"></clr-icon>
                       </clr-dg-column>
-                      <clr-dg-column #volBandwidth class="hideFilter" [clrDgField]="'bandwith'" [hidden]="volumeRadio!=='table2'" style="position: relative" (clrDgSortedChange)="sortFunc($event);">
+                      <clr-dg-column #volBandwidth class="hideFilter" [clrDgField]="'bandwith'"
+                        [hidden]="volumeRadio!=='table2'" style="position: relative"
+                        (clrDgSortedChange)="sortFunc($event);">
                         {{'storage.detail.volumes.bandwidth' | translate}}
-                        <clr-icon *ngIf="sortFunc(volBandwidth.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+                        <clr-icon *ngIf="sortFunc(volBandwidth.sorted);" shape="arrow down" class="is-solid"
+                          style="position: absolute;right: 1.1rem;"></clr-icon>
                       </clr-dg-column>
 
                       <clr-dg-placeholder>{{'tips.noData' | translate}}</clr-dg-placeholder>
@@ -306,31 +406,39 @@
                         <clr-dg-cell class="over_flow">{{item.name ? item.name:'--'}}</clr-dg-cell>
                         <clr-dg-cell class="over_flow">
                           <span *ngIf="item.status == 'creating'">
-                            <span class="color-square" style="background-color: green; margin-right: 10px"></span>{{'enum.status.creating' | translate}}
+                            <span class="color-square"
+                              style="background-color: green; margin-right: 10px"></span>{{'enum.status.creating' | translate}}
                           </span>
                           <span *ngIf="item.status == 'normal'">
-                            <span class="color-square" style="background-color: #7CDFA0; margin-right: 10px"></span>{{'enum.status.normal' | translate}}
+                            <span class="color-square"
+                              style="background-color: #7CDFA0; margin-right: 10px"></span>{{'enum.status.normal' | translate}}
                           </span>
                           <span *ngIf="item.status == 'mapping'">
-                            <span class="color-square" style="background-color: gold; margin-right: 10px"></span>{{'enum.status.mapping' | translate}}
+                            <span class="color-square"
+                              style="background-color: gold; margin-right: 10px"></span>{{'enum.status.mapping' | translate}}
                           </span>
                           <span *ngIf="item.status == 'unmapping'">
-                            <span class="color-square" style="background-color: blueviolet; margin-right: 10px"></span>{{'enum.status.unmapping' | translate}}
+                            <span class="color-square"
+                              style="background-color: blueviolet; margin-right: 10px"></span>{{'enum.status.unmapping' | translate}}
                           </span>
                           <span *ngIf="item.status == 'deleting'">
-                            <span class="color-square" style="background-color: bisque; margin-right: 10px"></span>{{'enum.status.deleting' | translate}}
+                            <span class="color-square"
+                              style="background-color: bisque; margin-right: 10px"></span>{{'enum.status.deleting' | translate}}
                           </span>
                           <span *ngIf="item.status == 'error'">
-                            <span class="color-square" style="background-color: red; margin-right: 10px"></span>{{'enum.status.error' | translate}}
+                            <span class="color-square"
+                              style="background-color: red; margin-right: 10px"></span>{{'enum.status.error' | translate}}
                           </span>
                           <span *ngIf="item.status == 'expanding'">
-                            <span class="color-square" style="background-color: darkmagenta; margin-right: 10px"></span>{{'enum.status.expanding' | translate}}
+                            <span class="color-square"
+                              style="background-color: darkmagenta; margin-right: 10px"></span>{{'enum.status.expanding' | translate}}
                           </span>
                           <span *ngIf="!item.status">
                             --
                           </span>
                         </clr-dg-cell>
-                        <clr-dg-cell [hidden]="volumeRadio!=='table1'" style="text-align: right">{{item.capacity ? formatCapacity(item.capacity):'--'}}</clr-dg-cell>
+                        <clr-dg-cell [hidden]="volumeRadio!=='table1'" style="text-align: right">
+                          {{item.capacity ? formatCapacity(item.capacity):'--'}}</clr-dg-cell>
                         <clr-dg-cell [hidden]="volumeRadio!=='table1'">
                           <span *ngIf="item.alloctype == 'thick'">Thick</span>
                           <span *ngIf="item.alloctype == 'thin'">Thin</span>
@@ -340,9 +448,10 @@
                         <clr-dg-cell [hidden]="volumeRadio!=='table1'" *ngIf="!item.capacityUsage">
                           --
                         </clr-dg-cell>
-                        <clr-dg-cell [hidden]="volumeRadio!=='table1'"*ngIf="item.capacityUsage">
+                        <clr-dg-cell [hidden]="volumeRadio!=='table1'" *ngIf="item.capacityUsage">
                           <div class="progress-block" *ngIf="item.capacityUsage">
-                            <clr-progress-bar clrValue="{{parseUsage(item.capacityUsage)}}" clrSuccess></clr-progress-bar>
+                            <clr-progress-bar clrValue="{{parseUsage(item.capacityUsage)}}" clrSuccess>
+                            </clr-progress-bar>
                             <span>{{parseUsage(item.capacityUsage)}}%</span>
                           </div>
                           <span *ngIf="!item.capacityUsage">--</span>
@@ -353,70 +462,87 @@
                           <span *ngIf="item.attached">{{'enum.status.mapped' | translate}}</span>
                           <span *ngIf="item.attached == null">--</span>
                         </clr-dg-cell>
-                        <clr-dg-cell [hidden]="volumeRadio!=='table1'">{{item.storagePoolName ? item.storagePoolName:'--'}}</clr-dg-cell>
-                        <clr-dg-cell title="{{item.serviceLevelName}}" class="over_flow" [hidden]="volumeRadio!=='table1'">
+                        <clr-dg-cell [hidden]="volumeRadio!=='table1'">
+                          {{item.storagePoolName ? item.storagePoolName:'--'}}</clr-dg-cell>
+                        <clr-dg-cell title="{{item.serviceLevelName}}" class="over_flow"
+                          [hidden]="volumeRadio!=='table1'">
                           {{item.serviceLevelName ? item.serviceLevelName:'--'}}
                         </clr-dg-cell>
-<!--                        <clr-dg-cell [hidden]="volumeRadio!=='table1'">-->
-<!--                          <span *ngIf="item.protectionStatus">{{'enum.status.protected' | translate}}</span>-->
-<!--                          <span *ngIf="!item.protectionStatus">{{'enum.status.unprotected' | translate}}</span>-->
-<!--                        </clr-dg-cell>-->
+                        <!--                        <clr-dg-cell [hidden]="volumeRadio!=='table1'">-->
+                        <!--                          <span *ngIf="item.protectionStatus">{{'enum.status.protected' | translate}}</span>-->
+                        <!--                          <span *ngIf="!item.protectionStatus">{{'enum.status.unprotected' | translate}}</span>-->
+                        <!--                        </clr-dg-cell>-->
                         <clr-dg-cell [hidden]="volumeRadio!=='table1'">
                           {{item.datastores ? item.datastores:'--'}}
                         </clr-dg-cell>
 
-                        <clr-dg-cell [hidden]="volumeRadio!=='table2'" style="text-align: right;min-width: 9rem;">{{item.lantency!=null?item.lantency.toFixed(2):'--'}}</clr-dg-cell>
-                        <clr-dg-cell [hidden]="volumeRadio!=='table2'" style="text-align: right">{{item.iops!=null?item.iops.toFixed(2):'--'}}</clr-dg-cell>
-                        <clr-dg-cell [hidden]="volumeRadio!=='table2'" style="text-align: right">{{item.bandwith!=null?item.bandwith.toFixed(2):'--'}}</clr-dg-cell>
+                        <clr-dg-cell [hidden]="volumeRadio!=='table2'" style="text-align: right;min-width: 9rem;">
+                          <!-- {{item.lantency?item.lantency.toFixed(2):'--'}}</clr-dg-cell> -->
+                          {{item.lantency!=null?item.lantency.toFixed(2):'--'}}</clr-dg-cell>
+                        <clr-dg-cell [hidden]="volumeRadio!=='table2'" style="text-align: right">
+                          <!-- {{item.iops?item.iops.toFixed(2):'--'}}</clr-dg-cell> -->
+                          {{item.iops!=null?item.iops.toFixed(2):'--'}}</clr-dg-cell>
+                        <clr-dg-cell [hidden]="volumeRadio!=='table2'" style="text-align: right">
+                          <!-- {{item.bandwith?item.bandwith.toFixed(2):'--'}}</clr-dg-cell> -->
+                          {{item.bandwith!=null?item.bandwith.toFixed(2):'--'}}</clr-dg-cell>
                       </clr-dg-row>
-<!--                      <clr-dg-footer>-->
-<!--                        <clr-dg-pagination  #paginationVolume [clrDgPageSize]="10" [clrDgTotalItems]="volumeTotal">-->
-<!--                          <clr-dg-page-size (page)="pageEvent = testFunc($event)"  (change)="testFunc(paginationVolume);" [clrPageSizeOptions]="[10,20]">{{'storage.detail.perPage' | translate}}</clr-dg-page-size>-->
-<!--                          {{paginationVolume.firstItem + 1}} - {{paginationVolume.lastItem + 1}}-->
-<!--                          of {{volumeTotal}}-->
-<!--                        </clr-dg-pagination>-->
-<!--                      </clr-dg-footer>-->
+                      <!--                      <clr-dg-footer>-->
+                      <!--                        <clr-dg-pagination  #paginationVolume [clrDgPageSize]="10" [clrDgTotalItems]="volumeTotal">-->
+                      <!--                          <clr-dg-page-size (page)="pageEvent = testFunc($event)"  (change)="testFunc(paginationVolume);" [clrPageSizeOptions]="[10,20]">{{'storage.detail.perPage' | translate}}</clr-dg-page-size>-->
+                      <!--                          {{paginationVolume.firstItem + 1}} - {{paginationVolume.lastItem + 1}}-->
+                      <!--                          of {{volumeTotal}}-->
+                      <!--                        </clr-dg-pagination>-->
+                      <!--                      </clr-dg-footer>-->
                     </clr-datagrid>
                     <div style="position: relative">
-<!--                      <mat-paginator class="pageSet" #matPaginator [showFirstLastButtons]="true" [hidePageSize]="false"-->
-<!--                                     [length]="volumeTotal"-->
-<!--                                     [pageSize]="10"-->
-<!--                                     [pageSizeOptions]="[10,20]"-->
-<!--                                     (page)="pageEvent = getVolDataByPage($event)">-->
-<!--                        <MatPaginatorIntl></MatPaginatorIntl>-->
-<!--                      </mat-paginator>-->
-<!--                      <input type="number" (blur)="jumpPage($event, matPaginator);" value="{{matPaginator.pageIndex + 1}}" (keydown)="jumpPage($event, matPaginator);"-->
-<!--                             class="jumpPageClass">-->
-<!--                      <input class="totalPageClass" [value]="totalPageNum" disabled>-->
+                      <!--                      <mat-paginator class="pageSet" #matPaginator [showFirstLastButtons]="true" [hidePageSize]="false"-->
+                      <!--                                     [length]="volumeTotal"-->
+                      <!--                                     [pageSize]="10"-->
+                      <!--                                     [pageSizeOptions]="[10,20]"-->
+                      <!--                                     (page)="pageEvent = getVolDataByPage($event)">-->
+                      <!--                        <MatPaginatorIntl></MatPaginatorIntl>-->
+                      <!--                      </mat-paginator>-->
+                      <!--                      <input type="number" (blur)="jumpPage($event, matPaginator);" value="{{matPaginator.pageIndex + 1}}" (keydown)="jumpPage($event, matPaginator);"-->
+                      <!--                             class="jumpPageClass">-->
+                      <!--                      <input class="totalPageClass" [value]="totalPageNum" disabled>-->
                       <div class="datagrid-footer">
                         <div class="pagination-size ng-star-inserted">
-                          <div class="datagrid-footer-select" _ngcontent-ohg-c584="" ng-reflect-page-size-options="10,20">
+                          <div class="datagrid-footer-select" _ngcontent-ohg-c584=""
+                            ng-reflect-page-size-options="10,20">
                             {{'page.perPage' | translate}}
                             <div class="clr-select-wrapper">
-                              <select class="clr-page-size-select ng-untouched ng-pristine ng-valid" ng-reflect-model="10" [(ngModel)]="volumePageSize" (change)="pageSizeChange($event.target);">
+                              <select class="clr-page-size-select ng-untouched ng-pristine ng-valid"
+                                ng-reflect-model="10" [(ngModel)]="volumePageSize"
+                                (change)="pageSizeChange($event.target);">
                                 <option value="10" ng-reflect-ng-value="10" class="ng-star-inserted">10</option>
                                 <option value="20" ng-reflect-ng-value="20" class="ng-star-inserted">20</option>
                               </select>
                             </div>
                           </div>
                         </div>
-                        <div class="pagination-description ng-star-inserted"> {{volumeFooter}} {{'page.all' | translate}} {{volumeTotal}} </div>
+                        <div class="pagination-description ng-star-inserted"> {{volumeFooter}}
+                          {{'page.all' | translate}} {{volumeTotal}} </div>
                         <div class="pagination">
                           <div class="pagination-description ng-star-inserted"></div>
                           <div class="pagination-list ng-star-inserted" *ngIf="volumeTotalPage > 1">
-                            <button type="button" (click)="volmeFirstPage();" class="pagination-first" aria-label="First Page" [disabled]="volumeCurrentPage == 1">
+                            <button type="button" (click)="volmeFirstPage();" class="pagination-first"
+                              aria-label="First Page" [disabled]="volumeCurrentPage == 1">
                               <clr-icon shape="step-forward-2 down"></clr-icon>
                             </button>
-                            <button type="button" (click)="volumePreviousPage();" class="pagination-previous" aria-label="Previous Page" [disabled]="volumeCurrentPage == 1">
+                            <button type="button" (click)="volumePreviousPage();" class="pagination-previous"
+                              aria-label="Previous Page" [disabled]="volumeCurrentPage == 1">
                               <clr-icon shape="angle left"></clr-icon>
                             </button>
-                            <input type="text" (blur)="jumpPage($event);" [value]="volumeCurrentPage" class="pagination-current clr-input ng-star-inserted" size="2" aria-label="Current Page">
+                            <input type="text" (blur)="jumpPage($event);" [value]="volumeCurrentPage"
+                              class="pagination-current clr-input ng-star-inserted" size="2" aria-label="Current Page">
                             &nbsp;/&nbsp;
                             <span aria-label="Total Pages">{{volumeTotalPage}}</span>
-                            <button type="button" (click)="volumeNextPage();" class="pagination-next" aria-label="Next Page" [disabled]="volumeCurrentPage == volumeTotalPage">
+                            <button type="button" (click)="volumeNextPage();" class="pagination-next"
+                              aria-label="Next Page" [disabled]="volumeCurrentPage == volumeTotalPage">
                               <clr-icon shape="angle right"></clr-icon>
                             </button>
-                            <button type="button" (click)="volmeLastPage();" class="pagination-last" aria-label="Last Page" [disabled]="volumeCurrentPage == volumeTotalPage">
+                            <button type="button" (click)="volmeLastPage();" class="pagination-last"
+                              aria-label="Last Page" [disabled]="volumeCurrentPage == volumeTotalPage">
                               <clr-icon shape="step-forward-2 up"></clr-icon>
                             </button>
                           </div>
@@ -428,7 +554,8 @@
               </clr-tab>
               <!--fileSystems-->
               <clr-tab *ngIf="storageDetailTag && storageDetailTag == 2">
-                <button clrTabLink id="fs" (click)="changeTab('fs')">{{'storage.detail.fileSystems.fileSystems' | translate}}</button>
+                <button clrTabLink id="fs"
+                  (click)="changeTab('fs')">{{'storage.detail.fileSystems.fileSystems' | translate}}</button>
                 <clr-tab-content id="fileSystems">
                   <div class="detail-margin-top">
                     <div class="gh-btngroup-header">
@@ -436,12 +563,15 @@
                       <!--刷新 -->
                       <div class="btn-group btn-icon">
                         <div class="radio btn merginLeft" title="{{'menu.refresh' | translate}}">
-                          <label><clr-icon shape="refresh" (click)="refreshFileSystem()" size="20"></clr-icon></label>
+                          <label>
+                            <clr-icon shape="refresh" (click)="refreshFileSystem()" size="20"></clr-icon>
+                          </label>
                         </div>
                       </div>
                     </div>
                     <clr-datagrid [clrDgLoading]="fsIsLoading">
-                      <clr-dg-column [clrDgField]="'name'">{{'storage.detail.fileSystems.name' | translate}}</clr-dg-column>
+                      <clr-dg-column [clrDgField]="'name'">{{'storage.detail.fileSystems.name' | translate}}
+                      </clr-dg-column>
                       <clr-dg-column>
                         {{'storage.detail.fileSystems.status' | translate}}
                         <clr-dg-filter [clrDgFilter]="fsStatusFilter">
@@ -455,64 +585,88 @@
                         </clr-dg-filter>
                       </clr-dg-column>
                       <clr-dg-column>{{'storage.detail.fileSystems.fileType' | translate}}</clr-dg-column>
-                      <clr-dg-column #fsTotalCap class="hideFilter" [clrDgField]="'capacity'" style="position: relative" (clrDgSortedChange)="sortFunc($event);">
+                      <clr-dg-column #fsTotalCap class="hideFilter" [clrDgField]="'capacity'" style="position: relative"
+                        (clrDgSortedChange)="sortFunc($event);">
                         {{'storage.detail.fileSystems.totalCap' | translate}}
-                        <clr-icon *ngIf="sortFunc(fsTotalCap.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+                        <clr-icon *ngIf="sortFunc(fsTotalCap.sorted);" shape="arrow down" class="is-solid"
+                          style="position: absolute;right: 1.1rem;"></clr-icon>
                       </clr-dg-column>
-                      <clr-dg-column #fsFreeCap class="hideFilter" [clrDgField]="'availableCapacity'" style="position: relative" (clrDgSortedChange)="sortFunc($event);">
+                      <clr-dg-column #fsFreeCap class="hideFilter" [clrDgField]="'availableCapacity'"
+                        style="position: relative" (clrDgSortedChange)="sortFunc($event);">
                         {{'storage.detail.fileSystems.freeCap' | translate}}
-                        <clr-icon *ngIf="sortFunc(fsFreeCap.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+                        <clr-icon *ngIf="sortFunc(fsFreeCap.sorted);" shape="arrow down" class="is-solid"
+                          style="position: absolute;right: 1.1rem;"></clr-icon>
                       </clr-dg-column>
-                      <clr-dg-column #fsCapacityUsage class="hideFilter" [clrDgField]="'capacityUsageRatio'" style="width: 11rem;position: relative" (clrDgSortedChange)="sortFunc($event);">
+                      <clr-dg-column #fsCapacityUsage class="hideFilter" [clrDgField]="'capacityUsageRatio'"
+                        style="width: 11rem;position: relative" (clrDgSortedChange)="sortFunc($event);">
                         {{'storage.detail.fileSystems.capacityUsage' | translate}}
-                        <clr-icon *ngIf="sortFunc(fsCapacityUsage.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+                        <clr-icon *ngIf="sortFunc(fsCapacityUsage.sorted);" shape="arrow down" class="is-solid"
+                          style="position: absolute;right: 1.1rem;"></clr-icon>
                       </clr-dg-column>
-                      <clr-dg-column [clrDgField]="'storagePoolName'">{{'storage.detail.fileSystems.ownSto' | translate}}</clr-dg-column>
-                      <clr-dg-column #fsNfs class="hideFilter" [clrDgField]="'nfsCount'" style="position: relative" (clrDgSortedChange)="sortFunc($event);">
+                      <clr-dg-column [clrDgField]="'storagePoolName'">
+                        {{'storage.detail.fileSystems.ownSto' | translate}}</clr-dg-column>
+                      <clr-dg-column #fsNfs class="hideFilter" [clrDgField]="'nfsCount'" style="position: relative"
+                        (clrDgSortedChange)="sortFunc($event);">
                         {{'storage.detail.fileSystems.nfs' | translate}}
-                        <clr-icon *ngIf="sortFunc(fsNfs.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+                        <clr-icon *ngIf="sortFunc(fsNfs.sorted);" shape="arrow down" class="is-solid"
+                          style="position: absolute;right: 1.1rem;"></clr-icon>
                       </clr-dg-column>
                       <!--<clr-dg-column>{{'storage.detail.fileSystems.cifs' | translate}}</clr-dg-column>-->
-                      <clr-dg-column #fsDtree class="hideFilter" [clrDgField]="'dtreeCount'" style="position: relative" (clrDgSortedChange)="sortFunc($event);">
+                      <clr-dg-column #fsDtree class="hideFilter" [clrDgField]="'dtreeCount'" style="position: relative"
+                        (clrDgSortedChange)="sortFunc($event);">
                         {{'storage.detail.fileSystems.dtree' | translate}}
-                        <clr-icon *ngIf="sortFunc(fsDtree.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+                        <clr-icon *ngIf="sortFunc(fsDtree.sorted);" shape="arrow down" class="is-solid"
+                          style="position: absolute;right: 1.1rem;"></clr-icon>
                       </clr-dg-column>
 
                       <clr-dg-placeholder>{{'tips.noData' | translate}}</clr-dg-placeholder>
                       <clr-dg-row *clrDgItems="let item of fsList" [clrDgItem]="item">
                         <clr-dg-cell class="over_flow">{{item.name ? item.name:'--'}}</clr-dg-cell>
+                        <!-- 文件系统-状态 -->
                         <clr-dg-cell class="over_flow">
                           <span *ngIf="item.healthStatus == 'normal'">
-                            <span class="color-square" style="background-color: #7CDFA0; margin-right: 10px"></span>{{'enum.status.normal' | translate}}
+                            <span class="color-square"
+                              style="background-color: #7CDFA0; margin-right: 10px"></span>{{'enum.status.normal' | translate}}
                           </span>
                           <span *ngIf="item.healthStatus == 'faulty'">
-                            <span class="color-square" style="background-color: gold; margin-right: 10px"></span>{{'enum.status.faulty' | translate}}
+                            <span class="color-square"
+                              style="background-color: gold; margin-right: 10px"></span>{{'enum.status.faulty' | translate}}
                           </span>
                           <span *ngIf="!item.healthStatus">--</span>
                         </clr-dg-cell>
+                        <!-- 文件系统-分配类型 -->
                         <clr-dg-cell class="over_flow">
                           <span *ngIf="item.allocType == 'thick'">Thick</span>
                           <span *ngIf="item.allocType == 'thin'">Thin</span>
                           <span *ngIf="!item.allocType">--</span>
                         </clr-dg-cell>
+                        <!-- 文件系统-文件系统类型 -->
                         <clr-dg-cell class="over_flow">
                           <span *ngIf="item.type == 'normal'">{{'enum.status.normalFs' | translate}}</span>
                           <span *ngIf="item.type == 'worm'">{{'enum.status.wormFs' | translate}}</span>
                           <span *ngIf="!item.type">--</span>
                         </clr-dg-cell>
-                        <clr-dg-cell class="over_flow" style="text-align: right">{{item.capacity ? formatCapacity(item.capacity):'--'}}</clr-dg-cell>
-                        <clr-dg-cell class="over_flow" style="text-align: right">{{item.availableCapacity ? formatCapacity(item.availableCapacity):'--'}}</clr-dg-cell>
+                        <!-- 总容量 -->
+                        <clr-dg-cell class="over_flow" style="text-align: right">
+                          {{item.capacity ? formatCapacity(item.capacity):'--'}}</clr-dg-cell>
+                        <clr-dg-cell class="over_flow" style="text-align: right">
+                          {{item.availableCapacity ? formatCapacity(item.availableCapacity):'--'}}</clr-dg-cell>
                         <clr-dg-cell class="over_flow">
-                          <div class="progress-block" *ngIf="item.capacityUsageRatio">
-                            <clr-progress-bar clrValue="{{item.capacityUsageRatio.toFixed(2)}}" clrSuccess></clr-progress-bar>
+                          <div class="progress-block" *ngIf="item.capacityUsageRatio!==null">
+                            <clr-progress-bar clrValue="{{item.capacityUsageRatio.toFixed(2)}}" clrSuccess>
+                            </clr-progress-bar>
                             <span>{{item.capacityUsageRatio.toFixed(2)}}%</span>
                           </div>
-                          <span *ngIf="!item.capacityUsageRatio">--</span>
+                          <span *ngIf="item.capacityUsageRatio===null">--</span>
                         </clr-dg-cell>
-                        <clr-dg-cell class="over_flow" style="text-align: right">{{item.storagePoolName ? item.storagePoolName:'--'}}</clr-dg-cell>
-                        <clr-dg-cell class="over_flow" style="text-align: right">{{item.nfsCount ? item.nfsCount:'--'}}</clr-dg-cell>
+                        <clr-dg-cell class="over_flow" style="text-align: right">
+                          {{item.storagePoolName ? item.storagePoolName:'--'}}</clr-dg-cell>
+                        <clr-dg-cell class="over_flow" style="text-align: right">
+                          {{item.nfsCount!==null ? item.nfsCount:'--'}}
+                        </clr-dg-cell>
                         <!--<clr-dg-cell class="over_flow">{{item.cifs_count}}</clr-dg-cell>-->
-                        <clr-dg-cell class="over_flow" style="text-align: right">{{item.dtreeCount ? item.dtreeCount:'--'}}</clr-dg-cell>
+                        <clr-dg-cell class="over_flow" style="text-align: right">
+                          {{item.dtreeCount!==null ? item.dtreeCount:'--'}}</clr-dg-cell>
                       </clr-dg-row>
 
                       <clr-dg-footer>
@@ -529,7 +683,8 @@
               </clr-tab>
               <!--dtrees-->
               <clr-tab *ngIf="storageDetailTag && storageDetailTag == 2">
-                <button clrTabLink id="dt" (click)="changeTab('dtrees')">{{'storage.detail.dtrees.dtrees' | translate}}</button>
+                <button clrTabLink id="dt"
+                  (click)="changeTab('dtrees')">{{'storage.detail.dtrees.dtrees' | translate}}</button>
                 <clr-tab-content id="dtrees">
                   <div class="detail-margin-top">
                     <div class="gh-btngroup-header">
@@ -537,42 +692,55 @@
                       <!--刷新 -->
                       <div class="btn-group btn-icon">
                         <div class="radio btn merginLeft" title="{{'menu.refresh' | translate}}">
-                          <label><clr-icon shape="refresh" size="20" (click)="refreshDtree()"></clr-icon></label>
+                          <label>
+                            <clr-icon shape="refresh" size="20" (click)="refreshDtree()"></clr-icon>
+                          </label>
                         </div>
                       </div>
                     </div>
                     <clr-datagrid [clrDgLoading]="dtreeIsLoading">
                       <clr-dg-column [clrDgField]="'name'">{{'storage.detail.dtrees.name' | translate}}</clr-dg-column>
                       <clr-dg-column [clrDgField]="'fsName'">{{'storage.detail.dtrees.ofs' | translate}}</clr-dg-column>
-                      <clr-dg-column style="width: 250px" [clrDgField]="'tierName'">{{'storage.detail.dtrees.osl' | translate}}</clr-dg-column>
+                      <!-- 20210422140256 -->
+                      <!-- <clr-dg-column style="width: 250px" [clrDgField]="'tierName'"> {{'storage.detail.dtrees.osl' | translate}}</clr-dg-column> -->
                       <clr-dg-column>
                         {{'storage.detail.dtrees.secMod' | translate}}
                         <clr-dg-filter [clrDgFilter]="dtreeSecModFilter">
                           <dtree-secMod-filter #dtreeSecModFilter></dtree-secMod-filter>
                         </clr-dg-filter>
                       </clr-dg-column>
-                      <clr-dg-column #dtreeDfs class="hideFilter" [clrDgField]="'nfsCount'" style="position: relative" (clrDgSortedChange)="sortFunc($event);">
+                      <clr-dg-column #dtreeDfs class="hideFilter" [clrDgField]="'nfsCount'" style="position: relative"
+                        (clrDgSortedChange)="sortFunc($event);">
                         {{'storage.detail.dtrees.nfs' | translate}}
-                        <clr-icon *ngIf="sortFunc(dtreeDfs.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+                        <clr-icon *ngIf="sortFunc(dtreeDfs.sorted);" shape="arrow down" class="is-solid"
+                          style="position: absolute;right: 1.1rem;"></clr-icon>
                       </clr-dg-column>
                       <!--<clr-dg-column>{{'storage.detail.dtrees.cifs' | translate}}</clr-dg-column>-->
+                      <!-- 配额 -->
                       <clr-dg-column>
                         {{'storage.detail.dtrees.quota' | translate}}
                         <clr-dg-filter [clrDgFilter]="dtreeQuotaFilter">
                           <dtree-quota-filter #dtreeQuotaFilter></dtree-quota-filter>
                         </clr-dg-filter>
                       </clr-dg-column>
+
                       <clr-dg-placeholder>{{'tips.noData' | translate}}</clr-dg-placeholder>
-                      <clr-dg-row  *clrDgItems="let item of dtrees" [clrDgItem]="item">
+                      <!-- DTrees  Row cell -->
+                      <clr-dg-row *clrDgItems="let item of dtrees" [clrDgItem]="item">
+                        <!-- 名称 -->
                         <clr-dg-cell class="over_flow">{{item.name ? item.name:'--'}}</clr-dg-cell>
+                        <!-- 所属文件系统 -->
                         <clr-dg-cell class="over_flow">{{item.fsName ? item.fsName:'--'}}</clr-dg-cell>
-                        <clr-dg-cell title="{{item.tierName!=null?item.tierName!=''?item.tierName:'--':'--'}}" class="over_flow">{{item.tierName!=null?item.tierName!=''?item.tierName:'--':'--'}}</clr-dg-cell>
+                        <!-- 20210422140256 -->
+                        <!-- <clr-dg-cell title="{{item.tierName!=null?item.tierName!=''?item.tierName:'--':'--'}}" class="over_flow">{{item.tierName!=null?item.tierName!=''?item.tierName:'--':'--'}} </clr-dg-cell> -->
                         <clr-dg-cell class="over_flow">
                           <span *ngIf="item.securityStyle">{{item.securityStyle}}</span>
                           <span *ngIf="!item.securityStyle||item.securityStyle==''">--</span>
                         </clr-dg-cell>
+                        <!-- NFS -->
                         <clr-dg-cell class="over_flow" style="text-align: right">{{item.nfsCount}}</clr-dg-cell>
                         <!--<clr-dg-cell class="over_flow">{{item.cifs_count}}</clr-dg-cell>-->
+                        <!-- 配额 -->
                         <clr-dg-cell class="over_flow">
                           <span *ngIf="item.quotaSwitch">{{'enum.status.enabled' | translate}}</span>
                           <span *ngIf="!item.quotaSwitch">{{'enum.status.notEnabled' | translate}}</span>
@@ -581,7 +749,8 @@
                       </clr-dg-row>
                       <clr-dg-footer>
                         <clr-dg-pagination #paginationDT [clrDgPageSize]="10" [clrDgTotalItems]="dtreeTotal">
-                          <clr-dg-page-size [clrPageSizeOptions]="[10,20,50,100]">{{'storage.detail.perPage' | translate}}</clr-dg-page-size>
+                          <clr-dg-page-size [clrPageSizeOptions]="[10,20,50,100]">
+                            {{'storage.detail.perPage' | translate}}</clr-dg-page-size>
                           {{paginationDT.firstItem + 1}} - {{paginationDT.lastItem + 1}}
                           of {{paginationDT.totalItems}}
                         </clr-dg-pagination>
@@ -590,216 +759,249 @@
                   </div>
                 </clr-tab-content>
               </clr-tab>
-              <!--shares-->
+              <!--shares 共享-->
               <clr-tab *ngIf="storageDetailTag && storageDetailTag == 2">
-                <button clrTabLink id="sh" (click)="changeTab('shares')">{{'storage.detail.shares.shares' | translate}}</button>
-                <clr-tab-content id="shares" >
+                <button clrTabLink id="sh"
+                  (click)="changeTab('shares')">{{'storage.detail.shares.shares' | translate}}</button>
+                <clr-tab-content id="shares">
                   <div class="detail-margin-top">
-                      <div class="gh-btngroup-header">
-                        <div class="gh-btngroup-left"></div>
-                        <!--刷新 -->
-                        <div class="btn-group btn-icon">
-                          <div class="radio btn merginLeft" title="{{'menu.refresh' | translate}}">
-                            <label><clr-icon shape="refresh" size="20" (click)="getShareList(true)"></clr-icon></label>
-                          </div>
+                    <div class="gh-btngroup-header">
+                      <div class="gh-btngroup-left"></div>
+                      <!--刷新 -->
+                      <div class="btn-group btn-icon">
+                        <div class="radio btn merginLeft" title="{{'menu.refresh' | translate}}">
+                          <label>
+                            <clr-icon shape="refresh" size="20" (click)="getShareList(true)"></clr-icon>
+                          </label>
                         </div>
                       </div>
-                      <clr-datagrid [clrDgLoading]="shareIsLoading">
-                        <clr-dg-column [clrDgField]="'name'">{{'storage.detail.shares.name' | translate}}</clr-dg-column>
-                        <clr-dg-column [clrDgField]="'sharePath'">{{'storage.detail.shares.sharePath' | translate}}</clr-dg-column>
-                        <clr-dg-column [clrDgField]="'fsName'">{{'storage.detail.shares.ofs' | translate}}</clr-dg-column>
-                        <clr-dg-column [clrDgField]="'owningDtreeName'">{{'storage.detail.shares.od' | translate}}</clr-dg-column>
-                        <clr-dg-column style="width: 250px" [clrDgField]="'tierName'">{{'storage.detail.shares.osl' | translate}}</clr-dg-column>
-                        <clr-dg-placeholder>{{'tips.noData' | translate}}</clr-dg-placeholder>
-                        <clr-dg-row  *clrDgItems="let item of shares" [clrDgItem]="item">
-                          <clr-dg-cell class="over_flow">{{item.name ? item.name:'--'}}</clr-dg-cell>
-                          <clr-dg-cell class="over_flow">{{item.sharePath ? item.sharePath:'--'}}</clr-dg-cell>
-                          <clr-dg-cell class="over_flow">{{item.fsName ? item.sharePath:'--'}}</clr-dg-cell>
-                          <clr-dg-cell class="over_flow">{{item.owningDtreeName!=null?item.owningDtreeName!=''?item.owningDtreeName:'--':'--'}}</clr-dg-cell>
-                          <clr-dg-cell title="{{item.tierName!=null?item.tierName:'--'}}" class="over_flow">{{item.tierName!=null?item.tierName!=''?item.tierName:'--':'--'}}</clr-dg-cell>
-                        </clr-dg-row>
-                        <clr-dg-footer>
-                          <clr-dg-pagination #paginationST [clrDgPageSize]="10" [clrDgTotalItems]="shareTotal">
-                            <clr-dg-page-size [clrPageSizeOptions]="[10,20,50,100]">{{'storage.detail.perPage' | translate}}</clr-dg-page-size>
-                            {{paginationST.firstItem + 1}} - {{paginationST.lastItem + 1}}
-                            of {{paginationST.totalItems}}
-                          </clr-dg-pagination>
-                        </clr-dg-footer>
-                      </clr-datagrid>
                     </div>
+                    <clr-datagrid [clrDgLoading]="shareIsLoading">
+                      <clr-dg-column [clrDgField]="'name'">{{'storage.detail.shares.name' | translate}}</clr-dg-column>
+                      <clr-dg-column [clrDgField]="'sharePath'">{{'storage.detail.shares.sharePath' | translate}}
+                      </clr-dg-column>
+                      <clr-dg-column [clrDgField]="'fsName'">{{'storage.detail.shares.ofs' | translate}}</clr-dg-column>
+                      <clr-dg-column [clrDgField]="'owningDtreeName'">{{'storage.detail.shares.od' | translate}}
+                      </clr-dg-column>
+                      <!-- 20210422141011 -->
+                      <!-- <clr-dg-column style="width: 250px" [clrDgField]="'tierName'"> {{'storage.detail.shares.osl' | translate}}</clr-dg-column> -->
+                      <clr-dg-placeholder>{{'tips.noData' | translate}}</clr-dg-placeholder>
+                      <clr-dg-row *clrDgItems="let item of shares" [clrDgItem]="item">
+                        <clr-dg-cell class="over_flow">{{item.name ? item.name:'--'}}</clr-dg-cell>
+                        <clr-dg-cell class="over_flow">{{item.sharePath ? item.sharePath:'--'}}</clr-dg-cell>
+                        <!-- 20210422141609 -->
+                        <clr-dg-cell class="over_flow">{{item.fsName ? item.fsName:'--'}}</clr-dg-cell>
+                        <clr-dg-cell class="over_flow">
+                          {{item.owningDtreeName!=null?item.owningDtreeName!=''?item.owningDtreeName:'--':'--'}}
+                        </clr-dg-cell>
+                        <!-- 20210422141011 -->
+                        <!-- <clr-dg-cell title="{{item.tierName!=null?item.tierName:'--'}}" class="over_flow"> {{item.tierName!=null?item.tierName!=''?item.tierName:'--':'--'}}</clr-dg-cell> -->
+                      </clr-dg-row>
+                      <clr-dg-footer>
+                        <clr-dg-pagination #paginationST [clrDgPageSize]="10" [clrDgTotalItems]="shareTotal">
+                          <clr-dg-page-size [clrPageSizeOptions]="[10,20,50,100]">
+                            {{'storage.detail.perPage' | translate}}</clr-dg-page-size>
+                          {{paginationST.firstItem + 1}} - {{paginationST.lastItem + 1}}
+                          of {{paginationST.totalItems}}
+                        </clr-dg-pagination>
+                      </clr-dg-footer>
+                    </clr-datagrid>
+                  </div>
                 </clr-tab-content>
               </clr-tab>
             </clr-tabs>
           </clr-tab-content>
         </clr-tab>
         <clr-tab>
+          <!-- 容量 -->
           <button clrTabLink (click)="changeTab('capacity')">{{'storage.detail.cap.capacity' | translate}}</button>
-          <clr-tab-content >
+          <clr-tab-content>
             <div class="detail-margin-top">
-              <div *ngIf="detail" class="clr-row" >
-                  <div class="clr-col-4">
-                    <!--容量利用率-->
-                    <div class="info-content-title" style="margin-bottom: 2%">{{'storage.detail.cap.capacityUsage' | translate}}</div>
-                    <div style=".data">
-                      <!--可得容量-->
-                      <div class="capacity-wrap" *ngIf="detail.storageTypeShow.dorado">
-                        <span class="capacity-label">{{'storage.list.tec' | translate}}</span>
-                        <div class="num-bar_outer">
-                          <div class="num-bar_inner"></div>
-                        </div>
-                        <span class="capacity-span">{{detail.totalEffectiveCapacity ? formatCapacity(detail.totalEffectiveCapacity):'--'}}</span>
+              <div *ngIf="detail" class="clr-row">
+                <div class="clr-col-4">
+                  <!--容量利用率-->
+                  <div class="info-content-title" style="margin-bottom: 2%">
+                    {{'storage.detail.cap.capacityUsage' | translate}}</div>
+                  <div style=".data">
+                    <!--可得容量-->
+                    <div class="capacity-wrap" *ngIf="detail.storageTypeShow.dorado">
+                      <span class="capacity-label">{{'storage.list.tec' | translate}}</span>
+                      <div class="num-bar_outer">
+                        <div class="num-bar_inner"></div>
                       </div>
-                      <!--裸容量-->
-                      <div class="capacity-wrap" *ngIf="!detail.storageTypeShow.dorado">
-                        <span class="capacity-label">{{'storage.detail.cap.bareCapacity' | translate}}</span>
-                        <div class="num-bar_outer">
-                          <div class="num-bar_inner"></div>
-                        </div>
-                        <span class="capacity-span">{{detail.totalCapacity ? formatCapacity(detail.totalCapacity):'--'}}</span>
+                      <span
+                        class="capacity-span">{{detail.totalEffectiveCapacity ? formatCapacity(detail.totalEffectiveCapacity):'--'}}</span>
+                    </div>
+                    <!--裸容量-->
+                    <div class="capacity-wrap" *ngIf="!detail.storageTypeShow.dorado">
+                      <span class="capacity-label">{{'storage.detail.cap.bareCapacity' | translate}}</span>
+                      <div class="num-bar_outer">
+                        <div class="num-bar_inner"></div>
                       </div>
-                      <!--总容量-->
-                      <div class="capacity-wrap" *ngIf="!detail.storageTypeShow.dorado">
-                        <span class="capacity-label">{{'storage.detail.cap.totalCapacity' | translate}}</span>
-                        <div class="num-bar_outer" *ngIf="detail.totalEffectiveCapacity">
-                          <div class="num-bar_inner total" [ngStyle]="{'width':(detail.totalEffectiveCapacity/detail.totalCapacity * 100)+'%'}"></div>
-                        </div>
-                        <span class="capacity-span">{{detail.totalEffectiveCapacity ? formatCapacity(detail.totalEffectiveCapacity):'--'}}</span>
+                      <span
+                        class="capacity-span">{{detail.totalCapacity ? formatCapacity(detail.totalCapacity):'--'}}</span>
+                    </div>
+                    <!--总容量-->
+                    <div class="capacity-wrap" *ngIf="!detail.storageTypeShow.dorado">
+                      <span class="capacity-label">{{'storage.detail.cap.totalCapacity' | translate}}</span>
+                      <div class="num-bar_outer" *ngIf="detail.totalEffectiveCapacity">
+                        <div class="num-bar_inner total"
+                          [ngStyle]="{'width':(detail.totalEffectiveCapacity/detail.totalCapacity * 100)+'%'}"></div>
                       </div>
-                      <!--已使用|空闲-->
-                      <div class="capacity-wrap">
-                        <span class="capacity-label">{{'storage.detail.cap.useFree' | translate}}</span>
-                        <div class="num-bar_outer">
-                          <clr-progress-bar id="usedCapacityId" clrValue="{{detail.usedCapacity/detail.totalEffectiveCapacity * 100}}"></clr-progress-bar>
-<!--                          <div class="num-bar_inner total progress" [ngStyle]="{'width':(detail.usedCapacity/detail.totalCapacity * 100)+'%'}"></div>-->
-<!--                          <div class="num-bar_inner free" [ngStyle]="{'width':((detail.totalEffectiveCapacity-detail.usedCapacity)/detail.totalCapacity * 100)+'%'}"></div>-->
-                        </div>
-                        <span *ngIf="!detail.storageTypeShow.dorado" class="capacity-span">{{formatCapacity(detail.usedCapacity)}} / {{getFreeCapacity(detail.totalEffectiveCapacity,detail.usedCapacity)}}</span>
-                        <span *ngIf="detail.storageTypeShow.dorado" class="capacity-span">{{formatCapacity(detail.usedCapacity)}} / {{formatCapacity(detail.totalEffectiveCapacity-detail.blockFileCapacity-detail.protectionCapacity)}}</span>
+                      <span
+                        class="capacity-span">{{detail.totalEffectiveCapacity ? formatCapacity(detail.totalEffectiveCapacity):'--'}}</span>
+                    </div>
+                    <!--已使用|空闲-->
+                    <div class="capacity-wrap">
+                      <span class="capacity-label">{{'storage.detail.cap.useFree' | translate}}</span>
+                      <div class="num-bar_outer">
+                        <clr-progress-bar id="usedCapacityId"
+                          clrValue="{{detail.usedCapacity/detail.totalEffectiveCapacity * 100}}"></clr-progress-bar>
+                        <!--                          <div class="num-bar_inner total progress" [ngStyle]="{'width':(detail.usedCapacity/detail.totalCapacity * 100)+'%'}"></div>-->
+                        <!--                          <div class="num-bar_inner free" [ngStyle]="{'width':((detail.totalEffectiveCapacity-detail.usedCapacity)/detail.totalCapacity * 100)+'%'}"></div>-->
                       </div>
-                      <!--已订阅-->
-                      <div class="capacity-wrap">
-                        <span class="capacity-label">{{'storage.detail.cap.subscribe' | translate}}</span>
-                        <div class="num-bar_outer">
-                          <div class="num-bar_inner total" [ngStyle]="{'width':(detail.subscriptionCapacity/detail.totalEffectiveCapacity * 100)+'%'}"></div>
+                      <span *ngIf="!detail.storageTypeShow.dorado"
+                        class="capacity-span">{{formatCapacity(detail.usedCapacity)}} /
+                        {{getFreeCapacity(detail.totalEffectiveCapacity,detail.usedCapacity)}}</span>
+                      <span *ngIf="detail.storageTypeShow.dorado"
+                        class="capacity-span">{{formatCapacity(detail.usedCapacity)}} /
+                        {{formatCapacity(detail.totalEffectiveCapacity-detail.blockFileCapacity-detail.protectionCapacity)}}</span>
+                    </div>
+                    <!--已订阅-->
+                    <div class="capacity-wrap">
+                      <span class="capacity-label">{{'storage.detail.cap.subscribe' | translate}}</span>
+                      <div class="num-bar_outer">
+                        <div class="num-bar_inner total"
+                          [ngStyle]="{'width':(detail.subscriptionCapacity/detail.totalEffectiveCapacity * 100)+'%'}">
                         </div>
-                        <span class="capacity-span">{{detail.subscriptionCapacity ? formatCapacity(detail.subscriptionCapacity):'--'}}</span>
+                      </div>
+                      <span
+                        class="capacity-span">{{detail.subscriptionCapacity ? formatCapacity(detail.subscriptionCapacity):'--'}}</span>
+                    </div>
+                  </div>
+                </div>
+                <!--容量-->
+                <div class="clr-col-4">
+                  <div class=" d-info-content-title">{{'storage.chart.capacity' | translate}}</div>
+                  <div *ngIf="cd" class="d-info-charts-wrap" style=".data">
+                    <div echarts [options]="cd.chart" id="chart3" style="width: 30%;height: 120px;"></div>
+                    <div class="d-info-content">
+                      <!--保护-->
+                      <div class="d-info-content-text">
+                        <span>{{'storage.chart.protection' | translate}}</span>
+                        <span>{{cd.protection ? cd.protection:'--'}}</span>
+                        <span class="squre protection"></span>
+                      </div>
+                      <!--块/文件-->
+                      <div class="d-info-content-text" *ngIf="detail.storageTypeShow.dorado">
+                        <span>{{'storage.chart.blockFile' | translate}}</span>
+                        <span>{{cd.blockFile ? cd.blockFile:'--'}}</span>
+                        <span class="squre fs"></span>
+                      </div>
+                      <!--文件系统-->
+                      <div class="d-info-content-text" *ngIf="!detail.storageTypeShow.dorado">
+                        <span>{{'storage.chart.fileSystem' | translate}}</span>
+                        <span>{{cd.fileSystem ? cd.fileSystem:'--'}}</span>
+                        <span class="squre fs"></span>
+                      </div>
+                      <!--LUN-->
+                      <div class="d-info-content-text" *ngIf="!detail.storageTypeShow.dorado">
+                        <span>{{'storage.chart.volume' | translate}}</span>
+                        <span>{{cd.volume ? cd.volume:'--'}}</span>
+                        <span class="squre volume"></span>
+                      </div>
+                      <!--空闲容量-->
+                      <div class="d-info-content-text">
+                        <span>{{'storage.chart.freeCapacity' | translate}}</span>
+                        <span>{{cd.freeCapacity ? cd.freeCapacity:'--'}}</span>
+                        <span class="squre free"></span>
                       </div>
                     </div>
                   </div>
-                  <!--容量-->
-                  <div class="clr-col-4">
-                    <div class=" d-info-content-title">{{'storage.chart.capacity' | translate}}</div>
-                    <div *ngIf="cd" class="d-info-charts-wrap" style=".data">
-                      <div echarts [options]="cd.chart" id="chart3" style="width: 30%;height: 120px;"></div>
-                      <div class="d-info-content">
-                        <!--保护-->
-                        <div class="d-info-content-text">
-                          <span>{{'storage.chart.protection' | translate}}</span>
-                          <span>{{cd.protection ? cd.protection:'--'}}</span>
-                          <span class="squre protection"></span>
+                </div>
+                <!--容量节省率-->
+                <div class="clr-col-4" *ngIf="!detail.storageTypeShow.dorado">
+                  <div class="info-content-title">{{'storage.detail.cap.capacitySavings' | translate}}</div>
+                  <div *ngIf="capSave" class="availability-box" style=".data">
+                    <div class="unit-banner">
+                      <div class="unit-label"></div>
+                      <div class="unit-outer">
+                        <div *ngFor="let item of capSave.bars" class="unit-inner" [ngStyle]="{'width':(1/4 * 100)+'%'}">
+                          {{item}}
                         </div>
-                        <!--块/文件-->
-                        <div class="d-info-content-text" *ngIf="detail.storageTypeShow.dorado">
-                          <span>{{'storage.chart.blockFile' | translate}}</span>
-                          <span>{{cd.blockFile ? cd.blockFile:'--'}}</span>
-                          <span class="squre fs"></span>
+                      </div>
+                      <div>({{capSave.unit}})</div>
+                    </div>
+                    <div class="capacity-line">
+                      <div class="unit-label">{{'storage.detail.cap.beforeSave' | translate}}</div>
+                      <div class="unit-outer">
+                        <div class="unit-inner_bar" [ngStyle]="{'width':(capSave.beforeSave/capSave.max * 100)+'%'}">
                         </div>
-                        <!--文件系统-->
-                        <div class="d-info-content-text" *ngIf="!detail.storageTypeShow.dorado">
-                          <span>{{'storage.chart.fileSystem' | translate}}</span>
-                          <span>{{cd.fileSystem ? cd.fileSystem:'--'}}</span>
-                          <span class="squre fs"></span>
+                        <span class="num">{{capSave.beforeSave==0?'':capSave.beforeSave}}</span>
+                      </div>
+                    </div>
+                    <div class="capacity-line">
+                      <div class="unit-tips">{{'storage.detail.cap.dedupe' | translate}}</div>
+                      <div class="unit-outer">
+                        <div class="unit-inner_bar" [ngStyle]="{'width':(capSave.dedupe/capSave.max * 100)+'%'}"></div>
+                        <span class="num">{{capSave.dedupe==0?'':capSave.dedupe}}</span>
+                      </div>
+                    </div>
+                    <div class="capacity-line">
+                      <div class="unit-tips">{{'storage.detail.cap.compression' | translate}}</div>
+                      <div class="unit-outer">
+                        <div class="unit-inner_bar" [ngStyle]="{'width':(capSave.compression/capSave.max * 100)+'%'}">
                         </div>
-                        <!--LUN-->
-                        <div class="d-info-content-text" *ngIf="!detail.storageTypeShow.dorado">
-                          <span>{{'storage.chart.volume' | translate}}</span>
-                          <span>{{cd.volume ? cd.volume:'--'}}</span>
-                          <span class="squre volume"></span>
+                        <span class="num">{{capSave.compression==0?'':capSave.compression}}</span>
+                      </div>
+                    </div>
+                    <div class="capacity-line">
+                      <div class="unit-label">{{'storage.detail.cap.afterSave' | translate}}</div>
+                      <div class="unit-outer">
+                        <div class="unit-inner_bar" [ngStyle]="{'width':(capSave.afterSave/capSave.max * 100)+'%'}">
                         </div>
-                        <!--空闲容量-->
-                        <div class="d-info-content-text">
-                          <span>{{'storage.chart.freeCapacity' | translate}}</span>
-                          <span>{{cd.freeCapacity ? cd.freeCapacity:'--'}}</span>
-                          <span class="squre free"></span>
-                        </div>
+                        <span class="num">{{capSave.afterSave==0?'':capSave.afterSave}}</span>
                       </div>
                     </div>
                   </div>
-                  <!--容量节省率-->
-                  <div class="clr-col-4" *ngIf="!detail.storageTypeShow.dorado">
-                    <div class="info-content-title">{{'storage.detail.cap.capacitySavings' | translate}}</div>
-                    <div *ngIf="capSave" class="availability-box"  style=".data">
-                      <div class="unit-banner">
-                        <div class="unit-label"></div>
-                        <div class="unit-outer">
-                          <div *ngFor="let item of capSave.bars" class="unit-inner" [ngStyle]="{'width':(1/4 * 100)+'%'}">
-                            {{item}}
-                          </div>
-                        </div>
-                        <div>({{capSave.unit}})</div>
-                      </div>
-                      <div class="capacity-line">
-                        <div class="unit-label">{{'storage.detail.cap.beforeSave' | translate}}</div>
-                        <div class="unit-outer">
-                          <div class="unit-inner_bar" [ngStyle]="{'width':(capSave.beforeSave/capSave.max * 100)+'%'}"></div>
-                          <span class="num">{{capSave.beforeSave==0?'':capSave.beforeSave}}</span>
-                        </div>
-                      </div>
-                      <div class="capacity-line">
-                        <div class="unit-tips">{{'storage.detail.cap.dedupe' | translate}}</div>
-                        <div class="unit-outer">
-                          <div class="unit-inner_bar" [ngStyle]="{'width':(capSave.dedupe/capSave.max * 100)+'%'}"></div>
-                          <span class="num">{{capSave.dedupe==0?'':capSave.dedupe}}</span>
-                        </div>
-                      </div>
-                      <div class="capacity-line">
-                        <div class="unit-tips">{{'storage.detail.cap.compression' | translate}}</div>
-                        <div class="unit-outer">
-                          <div class="unit-inner_bar" [ngStyle]="{'width':(capSave.compression/capSave.max * 100)+'%'}"></div>
-                          <span class="num">{{capSave.compression==0?'':capSave.compression}}</span>
-                        </div>
-                      </div>
-                      <div class="capacity-line">
-                        <div class="unit-label">{{'storage.detail.cap.afterSave' | translate}}</div>
-                        <div class="unit-outer">
-                          <div class="unit-inner_bar" [ngStyle]="{'width':(capSave.afterSave/capSave.max * 100)+'%'}"></div>
-                          <span class="num">{{capSave.afterSave==0?'':capSave.afterSave}}</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+                </div>
               </div>
               <div *ngIf="!detail">
                 {{'vmfs.none' | translate}}
               </div>
+              <!-- 容量存储池 -->
               <div style="width: 75%">
                 <div class="info-content-title">{{'storage.detail.cap.storagePool' | translate}}</div>
                 <clr-datagrid>
                   <clr-dg-column>{{'storage.detail.capacity.pool.name' | translate}}</clr-dg-column>
                   <clr-dg-column>{{'storage.detail.capacity.pool.status' | translate}}</clr-dg-column>
-                  <clr-dg-column #detailCapacity class="hideFilter" [clrDgField]="'consumedCapacity'"  style="width: 11rem;" style="position: relative" (clrDgSortedChange)="sortFunc($event);">
+                  <clr-dg-column>{{'storage.detail.capacity.pool.capacity' | translate}}</clr-dg-column>
+                  <!-- <clr-dg-column #detailCapacity class="hideFilter" [clrDgField]="'consumedCapacity'"
+                    style="width: 11rem;" style="position: relative" (clrDgSortedChange)="sortFunc($event);">
                     {{'storage.detail.capacity.pool.capacity' | translate}}
-                    <clr-icon *ngIf="sortFunc(detailCapacity.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
-                  </clr-dg-column>
+                    <clr-icon *ngIf="sortFunc(detailCapacity.sorted);" shape="arrow down" class="is-solid"
+                      style="position: absolute;right: 1.1rem;"></clr-icon>
+                  </clr-dg-column> -->
                   <clr-dg-row *clrDgItems="let item of storagePool" [clrDgItem]="item">
                     <clr-dg-cell class="over_flow">{{item.name}}</clr-dg-cell>
                     <clr-dg-cell class="over_flow">
                       <span *ngIf="item.healthStatus == 'normal'">
-                            <span class="color-square" style="background-color: #7CDFA0; margin-right: 10px"></span>
-                            {{'storage.detail.storagePool.normal' | translate}}
-                          </span>
+                        <span class="color-square" style="background-color: #7CDFA0; margin-right: 10px"></span>
+                        {{'storage.detail.storagePool.normal' | translate}}
+                      </span>
                       <span *ngIf="item.healthStatus == 'fault'">
-                            <span class="color-square" style="background-color: red; margin-right: 10px"></span>
-                            {{'storage.detail.storagePool.fault' | translate}}
-                          </span>
+                        <span class="color-square" style="background-color: red; margin-right: 10px"></span>
+                        {{'storage.detail.storagePool.fault' | translate}}
+                      </span>
                       <span *ngIf="item.healthStatus == 'degraded'">
-                            <span class="color-square" style="background-color: #A9A9A9; margin-right: 10px"></span>
-                            {{'storage.detail.storagePool.degraded' | translate}}
-                          </span>
+                        <span class="color-square" style="background-color: #A9A9A9; margin-right: 10px"></span>
+                        {{'storage.detail.storagePool.degraded' | translate}}
+                      </span>
                     </clr-dg-cell>
                     <clr-dg-cell class="over_flow">
                       <div class="progress-block">
-                        <clr-progress-bar clrValue="{{((item.consumedCapacity/item.totalCapacity) * 100).toFixed(2)}}" clrSuccess></clr-progress-bar>
+                        <clr-progress-bar clrValue="{{((item.consumedCapacity/item.totalCapacity) * 100).toFixed(2)}}"
+                          clrSuccess></clr-progress-bar>
                         <span>{{((item.consumedCapacity/item.totalCapacity) * 100).toFixed(2)}}%</span>
                       </div>
                       <span>{{'storage.detail.cap.used' | translate}}{{formatCapacity(item.consumedCapacity)}}/{{formatCapacity(item.totalCapacity)}}</span>
@@ -811,24 +1013,21 @@
           </clr-tab-content>
         </clr-tab>
         <clr-tab>
-          <button  clrTabLink>{{'storage.detail.performance.performance' | translate}}</button>
+          <!-- 性能 -->
+          <button clrTabLink>{{'storage.detail.performance.performance' | translate}}</button>
           <clr-tab-content clrTabLinkInOverflow="true">
             <div style="margin-bottom: 1%;font-size: 5px">{{'storage.detail.performance.ptc' | translate}}</div>
             <div style="position:relative;">
               <div style="float: right;">
-                <table cellpadding="5" >
+                <table cellpadding="5">
                   <tr>
                     <td>
                       <clr-select-container>
-                        <select clrSelect (ngModelOptions)="ranges" [(ngModel)]="selectRange" name="defaultSelect" class="clr-select" (change)="changeFunc()">
-                          <option value="LAST_5_MINUTE">{{'chart.select.last5Minute'|translate}}</option>
-                          <option value="LAST_1_HOUR">{{'chart.select.last1Hour'|translate}}</option>
-                          <option value="LAST_1_DAY">{{'chart.select.last1Day'|translate}}</option>
-                          <option value="LAST_1_WEEK">{{'chart.select.last1Week'|translate}}</option>
-                          <option value="LAST_1_MONTH">{{'chart.select.last1Month'|translate}}</option>
-                          <option value="LAST_1_QUARTER">{{'chart.select.last1Quarter'|translate}}</option>
-                          <option value="HALF_1_YEAR">{{'chart.select.half1Year'|translate}}</option>
-                          <option value="LAST_1_YEAR">{{'chart.select.last1Year'|translate}}</option>
+                        <!--   /* DTS202103270EB3F3P0G00 */ -->
+                        <select clrSelect name="defaultSelect" class="clr-select"
+                          [(ngModel)]="selectRange"
+                          (change)="changeFunc()">
+                          <option [value]="i.value" *ngFor="let i of timeSelectorRanges">{{i.key | translate}}</option>
                         </select>
                       </clr-select-container>
                     </td>
@@ -839,87 +1038,118 @@
               <div echarts [options]="bandwidthChart" style="height: 300px;"></div>
 
               <div *ngIf="iopsChartDataIsNull" style="position: absolute;width: 100%;top: 15%;">
-                <span style="color: #b3b3b3;display: inline-block;width: 100%;text-align: center;font-size: 20px;font-weight: 600;">
-                  <clr-icon shape="info-standard" class="is-warning" size="20"></clr-icon>&nbsp;{{'tips.noData' | translate}}
+                <span
+                  style="color: #b3b3b3;display: inline-block;width: 100%;text-align: center;font-size: 20px;font-weight: 600;">
+                  <clr-icon shape="info-standard" class="is-warning" size="20"></clr-icon>
+                  &nbsp;{{'tips.noData' | translate}}
                 </span>
               </div>
               <div *ngIf="bdwtChartDataIsNull" style="position: absolute;width: 100%;top: 64%;">
-                <span style="color: #b3b3b3;display: inline-block;width: 100%;text-align: center;font-size: 20px;font-weight: 600;">
-                  <clr-icon shape="info-standard" class="is-warning" size="20"></clr-icon>&nbsp;{{'tips.noData' | translate}}
+                <span
+                  style="color: #b3b3b3;display: inline-block;width: 100%;text-align: center;font-size: 20px;font-weight: 600;">
+                  <clr-icon shape="info-standard" class="is-warning" size="20"></clr-icon>
+                  &nbsp;{{'tips.noData' | translate}}
                 </span>
               </div>
             </div>
           </clr-tab-content>
         </clr-tab>
         <clr-tab>
-          <button clrTabLink (click)="changeTab('hardware')">{{'storage.detail.hardware.hardware' | translate }}</button>
+          <!-- 硬件 -->
+          <button clrTabLink
+            (click)="changeTab('hardware')">{{'storage.detail.hardware.hardware' | translate }}</button>
           <clr-tab-content>
             <div class="detail-margin-top">
               <clr-tabs>
                 <clr-tab>
-                  <button clrTabLink (click)="changeTab('controller')">{{'storage.detail.hardware.controllers.controllers' | translate}}</button>
-                  <clr-tab-content >
+                  <!-- 控制器 -->
+                  <button clrTabLink
+                    (click)="changeTab('controller')">{{'storage.detail.hardware.controllers.controllers' | translate}}</button>
+                  <clr-tab-content>
                     <div class="detail-margin-top">
                       <clr-datagrid [clrDgLoading]="controIsLoading">
-                        <clr-dg-column [clrDgField]="'name'">{{'storage.detail.hardware.controllers.controller' | translate}}</clr-dg-column>
+                        <clr-dg-column [clrDgField]="'name'">
+                          {{'storage.detail.hardware.controllers.controller' | translate}}</clr-dg-column>
                         <clr-dg-column>
                           {{'storage.detail.hardware.controllers.status' | translate}}
                           <clr-dg-filter [clrDgFilter]="hdStatusFilter">
                             <hd-status-filter #hdStatusFilter></hd-status-filter>
                           </clr-dg-filter>
                         </clr-dg-column>
-                        <clr-dg-column [clrDgField]="'softVer'">{{'storage.detail.hardware.controllers.version' | translate}}</clr-dg-column>
-                        <clr-dg-column #conCpuUsage class="hideFilter"  [clrDgField]="'cpuUsage'" style="position: relative;min-width: 6rem;" (clrDgSortedChange)="sortFunc($event);">
+                        <clr-dg-column [clrDgField]="'softVer'">
+                          {{'storage.detail.hardware.controllers.version' | translate}}</clr-dg-column>
+                        <clr-dg-column #conCpuUsage class="hideFilter" [clrDgField]="'cpuUsage'"
+                          style="position: relative;min-width: 6rem;" (clrDgSortedChange)="sortFunc($event);">
                           {{'storage.detail.hardware.controllers.cpuUsage' | translate}}
-                          <clr-icon *ngIf="sortFunc(conCpuUsage.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+                          <clr-icon *ngIf="sortFunc(conCpuUsage.sorted);" shape="arrow down" class="is-solid"
+                            style="position: absolute;right: 1.1rem;"></clr-icon>
                         </clr-dg-column>
-                        <clr-dg-column #conIops class="hideFilter"  [clrDgField]="'iops'" style="position: relative" (clrDgSortedChange)="sortFunc($event);">
+                        <clr-dg-column #conIops class="hideFilter" [clrDgField]="'iops'" style="position: relative"
+                          (clrDgSortedChange)="sortFunc($event);">
                           {{'storage.detail.hardware.controllers.iops' | translate}}
-                          <clr-icon *ngIf="sortFunc(conIops.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+                          <clr-icon *ngIf="sortFunc(conIops.sorted);" shape="arrow down" class="is-solid"
+                            style="position: absolute;right: 1.1rem;"></clr-icon>
                         </clr-dg-column>
-                        <clr-dg-column #conOps class="hideFilter"  [clrDgField]="'ops'" style="position: relative" (clrDgSortedChange)="sortFunc($event);">
+                        <clr-dg-column #conOps class="hideFilter" [clrDgField]="'ops'" style="position: relative"
+                          (clrDgSortedChange)="sortFunc($event);">
                           {{'storage.detail.hardware.controllers.ops' | translate}}
-                          <clr-icon *ngIf="sortFunc(conOps.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+                          <clr-icon *ngIf="sortFunc(conOps.sorted);" shape="arrow down" class="is-solid"
+                            style="position: absolute;right: 1.1rem;"></clr-icon>
                         </clr-dg-column>
-                        <clr-dg-column #conLatency class="hideFilter"  [clrDgField]="'lantency'" style="position: relative;min-width: 9rem;" (clrDgSortedChange)="sortFunc($event);">
+                        <clr-dg-column #conLatency class="hideFilter" [clrDgField]="'lantency'"
+                          style="position: relative;min-width: 9rem;" (clrDgSortedChange)="sortFunc($event);">
                           {{'storage.detail.hardware.controllers.latency' | translate}}
-                          <clr-icon *ngIf="sortFunc(conLatency.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+                          <clr-icon *ngIf="sortFunc(conLatency.sorted);" shape="arrow down" class="is-solid"
+                            style="position: absolute;right: 1.1rem;"></clr-icon>
                         </clr-dg-column>
-                        <clr-dg-column #conBandwidth class="hideFilter"  [clrDgField]="'bandwith'" style="position: relative;min-width: 6rem;" (clrDgSortedChange)="sortFunc($event);">
+                        <clr-dg-column #conBandwidth class="hideFilter" [clrDgField]="'bandwith'"
+                          style="position: relative;min-width: 6rem;" (clrDgSortedChange)="sortFunc($event);">
                           {{'storage.detail.hardware.controllers.bandwidth' | translate}}
-                          <clr-icon *ngIf="sortFunc(conBandwidth.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+                          <clr-icon *ngIf="sortFunc(conBandwidth.sorted);" shape="arrow down" class="is-solid"
+                            style="position: absolute;right: 1.1rem;"></clr-icon>
                         </clr-dg-column>
                         <clr-dg-placeholder>{{'tips.noData' | translate}}</clr-dg-placeholder>
-                        <clr-dg-row  *clrDgItems="let item of controllers" [clrDgItem]="item">
+                        <clr-dg-row *clrDgItems="let item of controllers" [clrDgItem]="item">
                           <clr-dg-cell class="over_flow">{{item.name ? item.name:'--'}}</clr-dg-cell>
                           <clr-dg-cell class="over_flow">
                             <span *ngIf="item.status == 'unknown'">
-                              <span class="color-square" style="background-color: beige; margin-right: 10px"></span>{{'enum.status.unknown' | translate}}
+                              <span class="color-square"
+                                style="background-color: beige; margin-right: 10px"></span>{{'enum.status.unknown' | translate}}
                             </span>
                             <span *ngIf="item.status == 'normal'">
-                              <span class="color-square" style="background-color: #7CDFA0; margin-right: 10px"></span>{{'enum.status.normal' | translate}}
+                              <span class="color-square"
+                                style="background-color: #7CDFA0; margin-right: 10px"></span>{{'enum.status.normal' | translate}}
                             </span>
                             <span *ngIf="item.status == 'running'">
-                              <span class="color-square" style="background-color: green; margin-right: 10px"></span>{{'enum.status.running' | translate}}
+                              <span class="color-square"
+                                style="background-color: green; margin-right: 10px"></span>{{'enum.status.running' | translate}}
                             </span>
                             <span *ngIf="item.status == 'connected'">
-                              <span class="color-square" style="background-color: yellow; margin-right: 10px"></span>{{'enum.status.connected' | translate}}
+                              <span class="color-square"
+                                style="background-color: yellow; margin-right: 10px"></span>{{'enum.status.connected' | translate}}
                             </span>
                             <span *ngIf="item.status == 'disconnected'">
-                            <span class="color-square" style="background-color: red; margin-right: 10px"></span>{{'enum.status.disconnected' | translate}}
-                          </span>
+                              <span class="color-square"
+                                style="background-color: red; margin-right: 10px"></span>{{'enum.status.disconnected' | translate}}
+                            </span>
                             <span *ngIf="!item.status">--</span>
                           </clr-dg-cell>
                           <clr-dg-cell class="over_flow">{{item.softVer ? item.softVer:'--'}}</clr-dg-cell>
-                          <clr-dg-cell class="over_flow" style="text-align: right;min-width: 6rem;">{{item.cpuUsage!=null?item.cpuUsage:'--'}}</clr-dg-cell>
-                          <clr-dg-cell class="over_flow" style="text-align: right;">{{item.iops!=null?item.iops:'--'}}</clr-dg-cell>
-                          <clr-dg-cell class="over_flow" style="text-align: right;">{{item.ops!=null?item.ops:'--'}}</clr-dg-cell>
-                          <clr-dg-cell class="over_flow" style="text-align: right;min-width: 9rem;">{{item.lantency!=null?item.lantency:'--'}}</clr-dg-cell>
-                          <clr-dg-cell class="over_flow" style="text-align: right;min-width: 6rem;">{{item.bandwith!=null?item.bandwith:'--'}}</clr-dg-cell>
+                          <clr-dg-cell class="over_flow" style="text-align: right;min-width: 6rem;">
+                            {{item.cpuUsage!=null?item.cpuUsage:'--'}}</clr-dg-cell>
+                          <clr-dg-cell class="over_flow" style="text-align: right;">{{item.iops!=null?item.iops:'--'}}
+                          </clr-dg-cell>
+                          <clr-dg-cell class="over_flow" style="text-align: right;">{{item.ops!=null?item.ops:'--'}}
+                          </clr-dg-cell>
+                          <clr-dg-cell class="over_flow" style="text-align: right;min-width: 9rem;">
+                            {{item.lantency!=null?item.lantency:'--'}}</clr-dg-cell>
+                          <clr-dg-cell class="over_flow" style="text-align: right;min-width: 6rem;">
+                            {{item.bandwith!=null?item.bandwith:'--'}}</clr-dg-cell>
                         </clr-dg-row>
                         <clr-dg-footer>
                           <clr-dg-pagination #paginationController [clrDgPageSize]="10" [clrDgTotalItems]="conTotal">
-                            <clr-dg-page-size [clrPageSizeOptions]="[10,20,50,100]">{{'storage.detail.perPage' | translate}}</clr-dg-page-size>
+                            <clr-dg-page-size [clrPageSizeOptions]="[10,20,50,100]">
+                              {{'storage.detail.perPage' | translate}}</clr-dg-page-size>
                             {{paginationController.firstItem + 1}} - {{paginationController.lastItem + 1}}
                             of {{paginationController.totalItems}}
                           </clr-dg-pagination>
@@ -929,12 +1159,15 @@
                   </clr-tab-content>
                 </clr-tab>
                 <clr-tab>
-                  <button clrTabLink (click)="changeTab('disk')">{{'storage.detail.hardware.disks.disks' | translate}}</button>
-                  <clr-tab-content >
+                  <!-- 硬盘 -->
+                  <button clrTabLink
+                    (click)="changeTab('disk')">{{'storage.detail.hardware.disks.disks' | translate}}</button>
+                  <clr-tab-content>
                     <div class="detail-margin-top">
                       <clr-datagrid [clrDgLoading]="diskIsLoading">
-                        <clr-dg-column [clrDgField]="'name'">{{'storage.detail.hardware.disks.location' | translate}}</clr-dg-column>
-                        <clr-dg-column >
+                        <clr-dg-column [clrDgField]="'name'">{{'storage.detail.hardware.disks.location' | translate}}
+                        </clr-dg-column>
+                        <clr-dg-column>
                           {{'storage.detail.hardware.disks.status' | translate}}
                           <clr-dg-filter [clrDgFilter]="diskStatusFilter">
                             <disk-status-filter #diskStatusFilter></disk-status-filter>
@@ -942,72 +1175,100 @@
                         </clr-dg-column>
                         <clr-dg-column [clrDgField]="'physicalType'">
                           {{'storage.detail.hardware.disks.type' | translate}}
-<!--                          <clr-dg-filter [clrDgFilter]="diskTypeFilter">-->
-<!--                            <disk-type-filter #diskTypeFilter></disk-type-filter>-->
-<!--                          </clr-dg-filter>-->
+                          <!--                          <clr-dg-filter [clrDgFilter]="diskTypeFilter">-->
+                          <!--                            <disk-type-filter #diskTypeFilter></disk-type-filter>-->
+                          <!--                          </clr-dg-filter>-->
                         </clr-dg-column>
-                        <clr-dg-column #diskCapacity  class="hideFilter" [clrDgField]="'capacity'" style="position: relative" (clrDgSortedChange)="sortFunc($event);">
+                        <clr-dg-column #diskCapacity class="hideFilter" [clrDgField]="'capacity'"
+                          style="position: relative" (clrDgSortedChange)="sortFunc($event);">
                           {{'storage.detail.hardware.disks.capacity' | translate}}
-                          <clr-icon *ngIf="sortFunc(diskCapacity.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+                          <clr-icon *ngIf="sortFunc(diskCapacity.sorted);" shape="arrow down" class="is-solid"
+                            style="position: absolute;right: 1.1rem;"></clr-icon>
                         </clr-dg-column>
-                        <clr-dg-column [clrDgField]="'member'">{{'storage.detail.hardware.disks.role' | translate}}</clr-dg-column>
-                        <clr-dg-column [clrDgField]="'diskDomain'">{{'storage.detail.hardware.disks.diskDomain' | translate}}</clr-dg-column>
-                        <clr-dg-column #diskSpeed class="hideFilter" [clrDgField]="'speed'" style="position: relative" (clrDgSortedChange)="sortFunc($event);">
+                        <clr-dg-column [clrDgField]="'member'">{{'storage.detail.hardware.disks.role' | translate}}
+                        </clr-dg-column>
+                        <clr-dg-column [clrDgField]="'diskDomain'">
+                          {{'storage.detail.hardware.disks.diskDomain' | translate}}</clr-dg-column>
+                        <clr-dg-column #diskSpeed class="hideFilter" [clrDgField]="'speed'" style="position: relative"
+                          (clrDgSortedChange)="sortFunc($event);">
                           {{'storage.detail.hardware.disks.rotationalSpeed' | translate}}
-                          <clr-icon *ngIf="sortFunc(diskSpeed.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+                          <clr-icon *ngIf="sortFunc(diskSpeed.sorted);" shape="arrow down" class="is-solid"
+                            style="position: absolute;right: 1.1rem;"></clr-icon>
                         </clr-dg-column>
-                        <clr-dg-column #diskIops class="hideFilter"  [clrDgField]="'iops'" style="position: relative" (clrDgSortedChange)="sortFunc($event);">
+                        <clr-dg-column #diskIops class="hideFilter" [clrDgField]="'iops'" style="position: relative"
+                          (clrDgSortedChange)="sortFunc($event);">
                           {{'storage.detail.hardware.disks.iops' | translate}}
-                          <clr-icon *ngIf="sortFunc(diskIops.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+                          <clr-icon *ngIf="sortFunc(diskIops.sorted);" shape="arrow down" class="is-solid"
+                            style="position: absolute;right: 1.1rem;"></clr-icon>
                         </clr-dg-column>
-                        <clr-dg-column #diskLatency class="hideFilter"  [clrDgField]="'lantency'" style="position: relative;min-width: 9rem;" (clrDgSortedChange)="sortFunc($event);">
+                        <clr-dg-column #diskLatency class="hideFilter" [clrDgField]="'lantency'"
+                          style="position: relative;min-width: 9rem;" (clrDgSortedChange)="sortFunc($event);">
                           {{'storage.detail.hardware.disks.latency' | translate}}
-                          <clr-icon *ngIf="sortFunc(diskLatency.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+                          <clr-icon *ngIf="sortFunc(diskLatency.sorted);" shape="arrow down" class="is-solid"
+                            style="position: absolute;right: 1.1rem;"></clr-icon>
                         </clr-dg-column>
-                        <clr-dg-column #diskBandwidth class="hideFilter"  [clrDgField]="'bandwith'" style="position: relative;min-width: 6rem;" (clrDgSortedChange)="sortFunc($event);">
+                        <clr-dg-column #diskBandwidth class="hideFilter" [clrDgField]="'bandwith'"
+                          style="position: relative;min-width: 6rem;" (clrDgSortedChange)="sortFunc($event);">
                           {{'storage.detail.hardware.disks.bandwidth' | translate}}
-                          <clr-icon *ngIf="sortFunc(diskBandwidth.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+                          <clr-icon *ngIf="sortFunc(diskBandwidth.sorted);" shape="arrow down" class="is-solid"
+                            style="position: absolute;right: 1.1rem;"></clr-icon>
                         </clr-dg-column>
-                        <clr-dg-column #diskUsage class="hideFilter"  [clrDgField]="'useage'" style="position: relative;min-width: 6rem;" (clrDgSortedChange)="sortFunc($event);">
+                        <clr-dg-column #diskUsage class="hideFilter" [clrDgField]="'useage'"
+                          style="position: relative;min-width: 6rem;" (clrDgSortedChange)="sortFunc($event);">
                           {{'storage.detail.hardware.disks.usage' | translate}}
-                          <clr-icon *ngIf="sortFunc(diskUsage.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+                          <clr-icon *ngIf="sortFunc(diskUsage.sorted);" shape="arrow down" class="is-solid"
+                            style="position: absolute;right: 1.1rem;"></clr-icon>
                         </clr-dg-column>
                         <clr-dg-placeholder>{{'tips.noData' | translate}}</clr-dg-placeholder>
-                        <clr-dg-row  *clrDgItems="let item of disks" [clrDgItem]="item">
+                        <!-- 20210421162737 -->
+                        <clr-dg-row *clrDgItems="let item of disks" [clrDgItem]="item">
                           <clr-dg-cell class="over_flow">{{item.name ? item.name:'--'}}</clr-dg-cell>
                           <clr-dg-cell class="over_flow">
                             <span *ngIf="item.status == 'unknown'">
-                              <span class="color-square" style="background-color: beige; margin-right: 10px"></span>{{'enum.status.unknown' | translate}}
+                              <span class="color-square"
+                                style="background-color: beige; margin-right: 10px"></span>{{'enum.status.unknown' | translate}}
                             </span>
                             <span *ngIf="item.status == 'normal'">
-                              <span class="color-square" style="background-color: #7CDFA0; margin-right: 10px"></span>{{'enum.status.normal' | translate}}
+                              <span class="color-square"
+                                style="background-color: #7CDFA0; margin-right: 10px"></span>{{'enum.status.normal' | translate}}
                             </span>
                             <span *ngIf="item.status == 'fault' || item.status == 'offline'">
-                              <span class="color-square" style="background-color: red; margin-right: 10px"></span>{{'enum.status.fault' | translate}}
+                              <span class="color-square"
+                                style="background-color: red; margin-right: 10px"></span>{{'enum.status.fault' | translate}}
                             </span>
                             <span *ngIf="!item.status">--</span>
                           </clr-dg-cell>
                           <clr-dg-cell class="over_flow">
                             <span *ngIf="item.physicalType == null || item.physicalType == ''">--</span>
-                            <span *ngIf="item.physicalType == 'unknown' || item.physicalType == 'UNKNOWN'">{{'storage.detail.storagePool.unknown' | translate}}</span>
-                            <span *ngIf="item.physicalType != null && item.physicalType != ''
+                            <span
+                              *ngIf="item.physicalType == 'unknown' || item.physicalType == 'UNKNOWN'">{{'storage.detail.storagePool.unknown' | translate}}</span>
+                            <span
+                              *ngIf="item.physicalType != null && item.physicalType != ''
                             && item.physicalType != 'unknown' && item.physicalType != 'UNKNOWN'">{{item.physicalType}}</span>
                           </clr-dg-cell>
-                          <clr-dg-cell class="over_flo w" style="text-align: right">{{formatCapacity(item.capacity)}}</clr-dg-cell>
+                          <clr-dg-cell class="over_flo w" style="text-align: right">{{formatCapacity(item.capacity)}}
+                          </clr-dg-cell>
                           <clr-dg-cell class="over_flow">
                             <span *ngIf="item.logicalType == 'member'">{{'enum.status.member' | translate}}</span>
                             <span *ngIf="!item.logicalType">--</span>
                           </clr-dg-cell>
                           <clr-dg-cell class="over_flow">{{item.diskDomain ? item.diskDomain:'--'}}</clr-dg-cell>
-                          <clr-dg-cell class="over_flow" style="text-align: right;">{{item.speed ? item.speed:'--'}}</clr-dg-cell>
-                          <clr-dg-cell class="over_flow" style="text-align: right;">{{item.iops!=null?item.iops.toFixed(2):'--'}}</clr-dg-cell>
-                          <clr-dg-cell class="over_flow" style="text-align: right;min-width: 9rem;">{{item.lantency!=null?item.lantency.toFixed(2):'--'}}</clr-dg-cell>
-                          <clr-dg-cell class="over_flow" style="text-align: right;min-width: 6rem;">{{item.bandwith!=null?item.bandwith.toFixed(2):'--'}}</clr-dg-cell>
-                          <clr-dg-cell class="over_flow" style="text-align: right;min-width: 6rem;">{{item.useage!=null?item.useage.toFixed(2):'--'}}</clr-dg-cell>
+                          <clr-dg-cell class="over_flow" style="text-align: right;">
+                            {{item.speed!=null?item.speed.toFixed(2):'--'}}
+                          </clr-dg-cell>
+                          <clr-dg-cell class="over_flow" style="text-align: right;">
+                            {{item.iops!=null?item.iops.toFixed(2):'--'}}</clr-dg-cell>
+                          <clr-dg-cell class="over_flow" style="text-align: right;min-width: 9rem;">
+                            {{item.lantency!=null?item.lantency.toFixed(2):'--'}}</clr-dg-cell>
+                          <clr-dg-cell class="over_flow" style="text-align: right;min-width: 6rem;">
+                            {{item.bandwith!=null?item.bandwith.toFixed(2):'--'}}</clr-dg-cell>
+                          <clr-dg-cell class="over_flow" style="text-align: right;min-width: 6rem;">
+                            {{item.useage!=null?item.useage.toFixed(2):'--'}}</clr-dg-cell>
                         </clr-dg-row>
                         <clr-dg-footer>
                           <clr-dg-pagination #paginationDisk [clrDgPageSize]="10" [clrDgTotalItems]="diskTotal">
-                            <clr-dg-page-size [clrPageSizeOptions]="[10,20,50,100]">{{'storage.detail.perPage' | translate}}</clr-dg-page-size>
+                            <clr-dg-page-size [clrPageSizeOptions]="[10,20,50,100]">
+                              {{'storage.detail.perPage' | translate}}</clr-dg-page-size>
                             {{paginationDisk.firstItem + 1}} - {{paginationDisk.lastItem + 1}}
                             of {{paginationDisk.totalItems}}
                           </clr-dg-pagination>
@@ -1017,63 +1278,91 @@
                   </clr-tab-content>
                 </clr-tab>
                 <clr-tab>
-                  <button clrTabLink (click)="changeTab('port')">{{'storage.detail.hardware.ports.ports' | translate}}</button>
-                  <clr-tab-content >
+                  <button clrTabLink
+                    (click)="changeTab('port')">{{'storage.detail.hardware.ports.ports' | translate}}</button>
+                  <clr-tab-content>
                     <div class="detail-margin-top">
                       <clr-accordion>
                         <clr-accordion-panel>
-                          <clr-accordion-title>{{'storage.detail.hardware.ports.fc' | translate}}({{fcs==null?0:fcs.length}})</clr-accordion-title>
+                          <!-- FC FC端口-->
+                          <clr-accordion-title>
+                            {{'storage.detail.hardware.ports.fc' | translate}}({{fcs==null?0:fcs.length}})
+                          </clr-accordion-title>
                           <clr-accordion-content *clrIfExpanded>
                             <clr-datagrid [clrDgLoading]="fcportIsLoading">
-                              <clr-dg-column [clrDgField]="'location'">{{'storage.detail.hardware.ports.location' | translate}}</clr-dg-column>
-                              <clr-dg-column >
+                              <clr-dg-column [clrDgField]="'location'">
+                                {{'storage.detail.hardware.ports.location' | translate}}</clr-dg-column>
+                              <clr-dg-column>
                                 {{'storage.detail.hardware.ports.status' | translate}}
                                 <clr-dg-filter [clrDgFilter]="fcStatusFilter">
                                   <fc-status-filter #fcStatusFilter></fc-status-filter>
                                 </clr-dg-filter>
                               </clr-dg-column>
-                              <clr-dg-column [clrDgField]="'wwn'">{{'storage.detail.hardware.ports.wwn' | translate}}</clr-dg-column>
-                              <clr-dg-column #fcSpeed class="hideFilter" [clrDgField]="'speed'" style="min-width: 7rem;position: relative" (clrDgSortedChange)="sortFunc($event);">
+                              <clr-dg-column [clrDgField]="'wwn'">{{'storage.detail.hardware.ports.wwn' | translate}}
+                              </clr-dg-column>
+                              <clr-dg-column #fcSpeed class="hideFilter" [clrDgField]="'speed'"
+                                style="min-width: 7rem;position: relative" (clrDgSortedChange)="sortFunc($event);">
                                 {{'storage.detail.hardware.ports.workingRate' | translate}}
-                                <clr-icon *ngIf="sortFunc(fcSpeed.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+                                <clr-icon *ngIf="sortFunc(fcSpeed.sorted);" shape="arrow down" class="is-solid"
+                                  style="position: absolute;right: 1.1rem;"></clr-icon>
                               </clr-dg-column>
-                              <clr-dg-column #fcIops class="hideFilter" [clrDgField]="'iops'" style="position: relative" (clrDgSortedChange)="sortFunc($event);">
+                              <clr-dg-column #fcIops class="hideFilter" [clrDgField]="'iops'" style="position: relative"
+                                (clrDgSortedChange)="sortFunc($event);">
                                 {{'storage.detail.hardware.ports.iops' | translate}}
-                                <clr-icon *ngIf="sortFunc(fcIops.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+                                <clr-icon *ngIf="sortFunc(fcIops.sorted);" shape="arrow down" class="is-solid"
+                                  style="position: absolute;right: 1.1rem;"></clr-icon>
                               </clr-dg-column>
-                              <clr-dg-column #fcLanteny class="hideFilter" [clrDgField]="'lantency'" style="min-width: 9rem;position: relative;" (clrDgSortedChange)="sortFunc($event);">
+                              <clr-dg-column #fcLanteny class="hideFilter" [clrDgField]="'lantency'"
+                                style="min-width: 9rem;position: relative;" (clrDgSortedChange)="sortFunc($event);">
                                 {{'storage.detail.hardware.ports.latency' | translate}}
-                                <clr-icon *ngIf="sortFunc(fcLanteny.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+                                <clr-icon *ngIf="sortFunc(fcLanteny.sorted);" shape="arrow down" class="is-solid"
+                                  style="position: absolute;right: 1.1rem;"></clr-icon>
                               </clr-dg-column>
-                              <clr-dg-column #fcBandwith class="hideFilter" [clrDgField]="'bandwith'" style="min-width: 6rem;position: relative" (clrDgSortedChange)="sortFunc($event);">
+                              <clr-dg-column #fcBandwith class="hideFilter" [clrDgField]="'bandwith'"
+                                style="min-width: 6rem;position: relative" (clrDgSortedChange)="sortFunc($event);">
                                 {{'storage.detail.hardware.ports.bandwidth' | translate}}
-                                <clr-icon *ngIf="sortFunc(fcBandwith.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+                                <clr-icon *ngIf="sortFunc(fcBandwith.sorted);" shape="arrow down" class="is-solid"
+                                  style="position: absolute;right: 1.1rem;"></clr-icon>
                               </clr-dg-column>
-                              <clr-dg-column #fcUseage class="hideFilter" [clrDgField]="'useage'" style="min-width: 6rem;position: relative" (clrDgSortedChange)="sortFunc($event);">
+                              <clr-dg-column #fcUseage class="hideFilter" [clrDgField]="'useage'"
+                                style="min-width: 6rem;position: relative" (clrDgSortedChange)="sortFunc($event);">
                                 {{'storage.detail.hardware.ports.usage' | translate}}
-                                <clr-icon *ngIf="sortFunc(fcUseage.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+                                <clr-icon *ngIf="sortFunc(fcUseage.sorted);" shape="arrow down" class="is-solid"
+                                  style="position: absolute;right: 1.1rem;"></clr-icon>
                               </clr-dg-column>
                               <clr-dg-placeholder>{{'tips.noData' | translate}}</clr-dg-placeholder>
-                              <clr-dg-row  *clrDgItems="let item of fcs" [clrDgItem]="item">
-                                <clr-dg-cell class="over_flow">{{item.location ? item.location:'--'}}</clr-dg-cell>
+                              <clr-dg-row *clrDgItems="let item of fcs" [clrDgItem]="item">
+                                <!-- 20210422143135 -->
+                                <clr-dg-cell class="over_flow">{{item?.location ? item?.location:'--'}}</clr-dg-cell>
                                 <clr-dg-cell class="over_flow">
-                                  <span *ngIf="item.connectStatus == 'unknown'">{{'enum.status.unknown' | translate}}</span>
-                                  <span *ngIf="item.connectStatus == 'normal'">{{'enum.status.normal' | translate}}</span>
-                                  <span *ngIf="item.connectStatus == 'running'">{{'enum.status.running' | translate}}</span>
-                                  <span *ngIf="item.connectStatus == 'connected'">{{'enum.status.connected' | translate}}</span>
-                                  <span *ngIf="item.connectStatus == 'disconnected'">{{'enum.status.disconnected' | translate}}</span>
-                                  <span *ngIf="!item.status">--</span>
+                                  <span
+                                    *ngIf="item?.connectStatus == 'unknown'">{{'enum.status.unknown' | translate}}</span>
+                                  <span
+                                    *ngIf="item?.connectStatus == 'normal'">{{'enum.status.normal' | translate}}</span>
+                                  <span
+                                    *ngIf="item?.connectStatus == 'running'">{{'enum.status.running' | translate}}</span>
+                                  <span
+                                    *ngIf="item?.connectStatus == 'connected'">{{'enum.status.connected' | translate}}</span>
+                                  <span
+                                    *ngIf="item?.connectStatus == 'disconnected'">{{'enum.status.disconnected' | translate}}</span>
+                                  <span *ngIf="!item?.status">--</span>
                                 </clr-dg-cell>
-                                <clr-dg-cell class="over_flow">{{item.wwn ? item.wwn:'--'}}</clr-dg-cell>
-                                <clr-dg-cell class="over_flow" style="text-align: right;min-width: 7rem;">{{item.speed!=null?item.iops.toFixed(2):'--'}}</clr-dg-cell>
-                                <clr-dg-cell class="over_flow" style="text-align: right;">{{item.iops!=null?item.iops.toFixed(2):'--'}}</clr-dg-cell>
-                                <clr-dg-cell class="over_flow" style="text-align: right;min-width: 9rem;">{{item.lantency!=null?item.lantency.toFixed(2):'--'}}</clr-dg-cell>
-                                <clr-dg-cell class="over_flow" style="text-align: right;min-width: 6rem;">{{item.bandwith!=null?item.bandwith.toFixed(2):'--'}}</clr-dg-cell>
-                                <clr-dg-cell class="over_flow" style="text-align: right;min-width: 6rem;">{{item.useage!=null?item.useage.toFixed(2):'--'}}</clr-dg-cell>
+                                <clr-dg-cell class="over_flow">{{item?.wwn ? item?.wwn:'--'}}</clr-dg-cell>
+                                <clr-dg-cell class="over_flow" style="text-align: right;min-width: 7rem;">
+                                  {{item?.speed!=null?item?.speed.toFixed(2):'--'}}</clr-dg-cell>
+                                <clr-dg-cell class="over_flow" style="text-align: right;">
+                                  {{item?.iops!=null?item?.iops.toFixed(2):'--'}}</clr-dg-cell>
+                                <clr-dg-cell class="over_flow" style="text-align: right;min-width: 9rem;">
+                                  {{item?.lantency!=null?item?.lantency.toFixed(2):'--'}}</clr-dg-cell>
+                                <clr-dg-cell class="over_flow" style="text-align: right;min-width: 6rem;">
+                                  {{item?.bandwith!=null?item?.bandwith.toFixed(2):'--'}}</clr-dg-cell>
+                                <clr-dg-cell class="over_flow" style="text-align: right;min-width: 6rem;">
+                                  {{item?.useage!=null?item?.useage.toFixed(2):'--'}}</clr-dg-cell>
                               </clr-dg-row>
                               <clr-dg-footer>
                                 <clr-dg-pagination #paginationPort [clrDgPageSize]="10" [clrDgTotalItems]="fcTotal">
-                                  <clr-dg-page-size [clrPageSizeOptions]="[10,20,50,100]">{{'storage.detail.perPage' | translate}}</clr-dg-page-size>
+                                  <clr-dg-page-size [clrPageSizeOptions]="[10,20,50,100]">
+                                    {{'storage.detail.perPage' | translate}}</clr-dg-page-size>
                                   {{paginationPort.firstItem + 1}} - {{paginationPort.lastItem + 1}}
                                   of {{paginationPort.totalItems}}
                                 </clr-dg-pagination>
@@ -1082,63 +1371,91 @@
                           </clr-accordion-content>
                         </clr-accordion-panel>
                         <clr-accordion-panel>
-                          <clr-accordion-title>{{'storage.detail.hardware.ports.eth' | translate}}({{eths==null?0:eths.length}})</clr-accordion-title>
+                          <!-- 以太 -->
+                          <clr-accordion-title>
+                            {{'storage.detail.hardware.ports.eth' | translate}}({{eths==null?0:eths.length}})
+                          </clr-accordion-title>
                           <clr-accordion-content *clrIfExpanded>
                             <clr-datagrid [clrDgLoading]="ethsIsLoading">
-                              <clr-dg-column [clrDgField]="'location'">{{'storage.detail.hardware.ports.location' | translate}}</clr-dg-column>
-                              <clr-dg-column >
+                              <clr-dg-column [clrDgField]="'location'">
+                                {{'storage.detail.hardware.ports.location' | translate}}</clr-dg-column>
+                              <clr-dg-column>
                                 {{'storage.detail.hardware.ports.status' | translate}}
                                 <clr-dg-filter [clrDgFilter]="ethStatusFilter">
                                   <eth-status-filter #ethStatusFilter></eth-status-filter>
                                 </clr-dg-filter>
                               </clr-dg-column>
-                              <clr-dg-column [clrDgField]="'mgmtIp'">{{'storage.detail.hardware.ports.ipv4' | translate}}</clr-dg-column>
-                              <clr-dg-column [clrDgField]="'mgmtIpv6'">{{'storage.detail.hardware.ports.ipv6' | translate}}</clr-dg-column>
-                              <clr-dg-column #ethSpeed class="hideFilter" [clrDgField]="'speed'" style="min-width: 7rem;position: relative" (clrDgSortedChange)="sortFunc($event);">
+                              <clr-dg-column [clrDgField]="'mgmtIp'">
+                                {{'storage.detail.hardware.ports.ipv4' | translate}}</clr-dg-column>
+                              <clr-dg-column [clrDgField]="'mgmtIpv6'">
+                                {{'storage.detail.hardware.ports.ipv6' | translate}}</clr-dg-column>
+                              <clr-dg-column #ethSpeed class="hideFilter" [clrDgField]="'speed'"
+                                style="min-width: 7rem;position: relative" (clrDgSortedChange)="sortFunc($event);">
                                 {{'storage.detail.hardware.ports.workingRate' | translate}}
-                                <clr-icon *ngIf="sortFunc(ethSpeed.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+                                <clr-icon *ngIf="sortFunc(ethSpeed.sorted);" shape="arrow down" class="is-solid"
+                                  style="position: absolute;right: 1.1rem;"></clr-icon>
                               </clr-dg-column>
-                              <clr-dg-column #ethIops class="hideFilter" [clrDgField]="'iops'" style="position: relative" (clrDgSortedChange)="sortFunc($event);">
+                              <clr-dg-column #ethIops class="hideFilter" [clrDgField]="'iops'"
+                                style="position: relative" (clrDgSortedChange)="sortFunc($event);">
                                 {{'storage.detail.hardware.ports.iops' | translate}}
-                                <clr-icon *ngIf="sortFunc(ethIops.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+                                <clr-icon *ngIf="sortFunc(ethIops.sorted);" shape="arrow down" class="is-solid"
+                                  style="position: absolute;right: 1.1rem;"></clr-icon>
                               </clr-dg-column>
-                              <clr-dg-column #ethLatency class="hideFilter" [clrDgField]="'lantency'" style="min-width: 9rem;position: relative;" (clrDgSortedChange)="sortFunc($event);">
+                              <clr-dg-column #ethLatency class="hideFilter" [clrDgField]="'lantency'"
+                                style="min-width: 9rem;position: relative;" (clrDgSortedChange)="sortFunc($event);">
                                 {{'storage.detail.hardware.ports.latency' | translate}}
-                                <clr-icon *ngIf="sortFunc(ethLatency.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+                                <clr-icon *ngIf="sortFunc(ethLatency.sorted);" shape="arrow down" class="is-solid"
+                                  style="position: absolute;right: 1.1rem;"></clr-icon>
                               </clr-dg-column>
-                              <clr-dg-column #ethBandwidth class="hideFilter" [clrDgField]="'bandwith'" style="min-width: 6rem;position: relative" (clrDgSortedChange)="sortFunc($event);">
+                              <clr-dg-column #ethBandwidth class="hideFilter" [clrDgField]="'bandwith'"
+                                style="min-width: 6rem;position: relative" (clrDgSortedChange)="sortFunc($event);">
                                 {{'storage.detail.hardware.ports.bandwidth' | translate}}
-                                <clr-icon *ngIf="sortFunc(ethBandwidth.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+                                <clr-icon *ngIf="sortFunc(ethBandwidth.sorted);" shape="arrow down" class="is-solid"
+                                  style="position: absolute;right: 1.1rem;"></clr-icon>
                               </clr-dg-column>
-                              <clr-dg-column #ethUsage class="hideFilter" [clrDgField]="'useage'" style="min-width: 6rem;position: relative" (clrDgSortedChange)="sortFunc($event);">
+                              <clr-dg-column #ethUsage class="hideFilter" [clrDgField]="'useage'"
+                                style="min-width: 6rem;position: relative" (clrDgSortedChange)="sortFunc($event);">
                                 {{'storage.detail.hardware.ports.usage' | translate}}
-                                <clr-icon *ngIf="sortFunc(ethUsage.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+                                <clr-icon *ngIf="sortFunc(ethUsage.sorted);" shape="arrow down" class="is-solid"
+                                  style="position: absolute;right: 1.1rem;"></clr-icon>
                               </clr-dg-column>
                               <clr-dg-placeholder>{{'tips.noData' | translate}}</clr-dg-placeholder>
-                              <clr-dg-row  *clrDgItems="let item of eths" [clrDgItem]="item">
+                              <clr-dg-row *clrDgItems="let item of eths" [clrDgItem]="item">
                                 <clr-dg-cell class="over_flow">{{item.location ? item.location:'--'}}</clr-dg-cell>
 
                                 <clr-dg-cell class="over_flow">
-                                  <span *ngIf="item.connectStatus == 'unknown'">{{'enum.status.unknown' | translate}}</span>
-                                  <span *ngIf="item.connectStatus == 'normal'">{{'enum.status.normal' | translate}}</span>
-                                  <span *ngIf="item.connectStatus == 'running'">{{'enum.status.running' | translate}}</span>
-                                  <span *ngIf="item.connectStatus == 'connected'">{{'enum.status.connected' | translate}}</span>
-                                  <span *ngIf="item.connectStatus == 'disconnected'">{{'enum.status.disconnected' | translate}}</span>
+                                  <span
+                                    *ngIf="item.connectStatus == 'unknown'">{{'enum.status.unknown' | translate}}</span>
+                                  <span
+                                    *ngIf="item.connectStatus == 'normal'">{{'enum.status.normal' | translate}}</span>
+                                  <span
+                                    *ngIf="item.connectStatus == 'running'">{{'enum.status.running' | translate}}</span>
+                                  <span
+                                    *ngIf="item.connectStatus == 'connected'">{{'enum.status.connected' | translate}}</span>
+                                  <span
+                                    *ngIf="item.connectStatus == 'disconnected'">{{'enum.status.disconnected' | translate}}</span>
                                   <span *ngIf="!item.connectStatus">--</span>
                                 </clr-dg-cell>
-                                <clr-dg-cell class="over_flow">{{item.mgmtIp!=null?item.mgmtIp!=''?item.mgmtIp:'--':'--'}}</clr-dg-cell>
-                                <clr-dg-cell  class="over_flow">
+                                <clr-dg-cell class="over_flow">
+                                  {{item.mgmtIp!=null?item.mgmtIp!=''?item.mgmtIp:'--':'--'}}</clr-dg-cell>
+                                <clr-dg-cell class="over_flow">
                                   {{item.mgmtIpv6!=null?item.mgmtIpv6!=''?item.mgmtIpv6:'--':'--'}}
                                 </clr-dg-cell>
-                                <clr-dg-cell class="over_flow" style="text-align: right;min-width: 7rem;">{{item.speed!=null?item.speed:'--'}}</clr-dg-cell>
-                                <clr-dg-cell class="over_flow" style="text-align: right;">{{item.iops!=null?item.iops:'--'}}</clr-dg-cell>
-                                <clr-dg-cell class="over_flow" style="text-align: right;min-width: 9rem;">{{item.lantency!=null?item.lantency:'--'}}</clr-dg-cell>
-                                <clr-dg-cell class="over_flow" style="text-align: right;min-width: 6rem;">{{item.bandwith!=null?item.bandwith:'--'}}</clr-dg-cell>
-                                <clr-dg-cell class="over_flow" style="text-align: right;min-width: 6rem;">{{item.useage!=null?item.useage:'--'}}</clr-dg-cell>
+                                <clr-dg-cell class="over_flow" style="text-align: right;min-width: 7rem;">
+                                  {{item.speed!=null?item.speed:'--'}}</clr-dg-cell>
+                                <clr-dg-cell class="over_flow" style="text-align: right;">
+                                  {{item.iops!=null?item.iops:'--'}}</clr-dg-cell>
+                                <clr-dg-cell class="over_flow" style="text-align: right;min-width: 9rem;">
+                                  {{item.lantency!=null?item.lantency:'--'}}</clr-dg-cell>
+                                <clr-dg-cell class="over_flow" style="text-align: right;min-width: 6rem;">
+                                  {{item.bandwith!=null?item.bandwith:'--'}}</clr-dg-cell>
+                                <clr-dg-cell class="over_flow" style="text-align: right;min-width: 6rem;">
+                                  {{item.useage!=null?item.useage:'--'}}</clr-dg-cell>
                               </clr-dg-row>
                               <clr-dg-footer>
                                 <clr-dg-pagination #paginationEth [clrDgPageSize]="10" [clrDgTotalItems]="ethTotal">
-                                  <clr-dg-page-size [clrPageSizeOptions]="[10,20,50,100]">{{'storage.detail.perPage' | translate}}</clr-dg-page-size>
+                                  <clr-dg-page-size [clrPageSizeOptions]="[10,20,50,100]">
+                                    {{'storage.detail.perPage' | translate}}</clr-dg-page-size>
                                   {{paginationEth.firstItem + 1}} - {{paginationEth.lastItem + 1}}
                                   of {{paginationEth.totalItems}}
                                 </clr-dg-pagination>
@@ -1147,60 +1464,85 @@
                           </clr-accordion-content>
                         </clr-accordion-panel>
                         <clr-accordion-panel>
-                          <clr-accordion-title>{{'storage.detail.hardware.ports.fcoe' | translate}}({{fcoes==null?0:fcoes.length}})</clr-accordion-title>
+                          <!-- FCoE -->
+                          <clr-accordion-title>
+                            {{'storage.detail.hardware.ports.fcoe' | translate}}({{fcoes==null?0:fcoes.length}})
+                          </clr-accordion-title>
                           <clr-accordion-content *clrIfExpanded>
                             <clr-datagrid [clrDgLoading]="fcoeportIsLoading">
                               <clr-dg-column [clrDgField]="'location'">
                                 {{'storage.detail.hardware.ports.location' | translate}}
                               </clr-dg-column>
-                              <clr-dg-column >
+                              <clr-dg-column>
                                 {{'storage.detail.hardware.ports.status' | translate}}
                                 <clr-dg-filter [clrDgFilter]="fceoConnectStatus">
                                   <fcoe-status-filter #fceoConnectStatus></fcoe-status-filter>
                                 </clr-dg-filter>
                               </clr-dg-column>
-                              <clr-dg-column [clrDgField]="'status'">{{'storage.detail.hardware.ports.wwn' | translate}}</clr-dg-column>
-                              <clr-dg-column #fcoeSpeed class="hideFilter" [clrDgField]="'speed'" style="min-width: 7rem;position: relative" (clrDgSortedChange)="sortFunc($event);">
+                              <clr-dg-column [clrDgField]="'status'">{{'storage.detail.hardware.ports.wwn' | translate}}
+                              </clr-dg-column>
+                              <clr-dg-column #fcoeSpeed class="hideFilter" [clrDgField]="'speed'"
+                                style="min-width: 7rem;position: relative" (clrDgSortedChange)="sortFunc($event);">
                                 {{'storage.detail.hardware.ports.workingRate' | translate}}
-                                <clr-icon *ngIf="sortFunc(fcoeSpeed.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+                                <clr-icon *ngIf="sortFunc(fcoeSpeed.sorted);" shape="arrow down" class="is-solid"
+                                  style="position: absolute;right: 1.1rem;"></clr-icon>
                               </clr-dg-column>
-                              <clr-dg-column #fcoeIops class="hideFilter" [clrDgField]="'iops'" style="position: relative" (clrDgSortedChange)="sortFunc($event);">
+                              <clr-dg-column #fcoeIops class="hideFilter" [clrDgField]="'iops'"
+                                style="position: relative" (clrDgSortedChange)="sortFunc($event);">
                                 {{'storage.detail.hardware.ports.iops' | translate}}
-                                <clr-icon *ngIf="sortFunc(fcoeIops.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+                                <clr-icon *ngIf="sortFunc(fcoeIops.sorted);" shape="arrow down" class="is-solid"
+                                  style="position: absolute;right: 1.1rem;"></clr-icon>
                               </clr-dg-column>
-                              <clr-dg-column #fcoeLatency class="hideFilter" [clrDgField]="'latency'" style="min-width: 9rem;position: relative;" (clrDgSortedChange)="sortFunc($event);">
+                              <clr-dg-column #fcoeLatency class="hideFilter" [clrDgField]="'latency'"
+                                style="min-width: 9rem;position: relative;" (clrDgSortedChange)="sortFunc($event);">
                                 {{'storage.detail.hardware.ports.latency' | translate}}
-                                <clr-icon *ngIf="sortFunc(fcoeLatency.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+                                <clr-icon *ngIf="sortFunc(fcoeLatency.sorted);" shape="arrow down" class="is-solid"
+                                  style="position: absolute;right: 1.1rem;"></clr-icon>
                               </clr-dg-column>
-                              <clr-dg-column #fcoeBandwidth class="hideFilter" [clrDgField]="'bandwidth'" style="min-width: 6rem;position: relative" (clrDgSortedChange)="sortFunc($event);">
+                              <clr-dg-column #fcoeBandwidth class="hideFilter" [clrDgField]="'bandwidth'"
+                                style="min-width: 6rem;position: relative" (clrDgSortedChange)="sortFunc($event);">
                                 {{'storage.detail.hardware.ports.bandwidth' | translate}}
-                                <clr-icon *ngIf="sortFunc(fcoeBandwidth.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+                                <clr-icon *ngIf="sortFunc(fcoeBandwidth.sorted);" shape="arrow down" class="is-solid"
+                                  style="position: absolute;right: 1.1rem;"></clr-icon>
                               </clr-dg-column>
-                              <clr-dg-column #fcoeUsage class="hideFilter" [clrDgField]="'usage'"  style="min-width: 6rem;position: relative" (clrDgSortedChange)="sortFunc($event);">
+                              <clr-dg-column #fcoeUsage class="hideFilter" [clrDgField]="'usage'"
+                                style="min-width: 6rem;position: relative" (clrDgSortedChange)="sortFunc($event);">
                                 {{'storage.detail.hardware.ports.usage' | translate}}
-                                <clr-icon *ngIf="sortFunc(fcoeUsage.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+                                <clr-icon *ngIf="sortFunc(fcoeUsage.sorted);" shape="arrow down" class="is-solid"
+                                  style="position: absolute;right: 1.1rem;"></clr-icon>
                               </clr-dg-column>
                               <clr-dg-placeholder>{{'tips.noData' | translate}}</clr-dg-placeholder>
-                              <clr-dg-row  *clrDgItems="let item of fcoes" [clrDgItem]="item">
+                              <clr-dg-row *clrDgItems="let item of fcoes" [clrDgItem]="item">
                                 <clr-dg-cell class="over_flow">{{item.location ? item.location:'--'}}</clr-dg-cell>
                                 <clr-dg-cell class="over_flow">
-                                  <span *ngIf="item.connectStatus == 'unknown'">{{'enum.status.unknown' | translate}}</span>
-                                  <span *ngIf="item.connectStatus == 'normal'">{{'enum.status.normal' | translate}}</span>
-                                  <span *ngIf="item.connectStatus == 'running'">{{'enum.status.running' | translate}}</span>
-                                  <span *ngIf="item.connectStatus == 'connected'">{{'enum.status.connected' | translate}}</span>
-                                  <span *ngIf="item.connectStatus == 'disconnected'">{{'enum.status.disconnected' | translate}}</span>
+                                  <span
+                                    *ngIf="item.connectStatus == 'unknown'">{{'enum.status.unknown' | translate}}</span>
+                                  <span
+                                    *ngIf="item.connectStatus == 'normal'">{{'enum.status.normal' | translate}}</span>
+                                  <span
+                                    *ngIf="item.connectStatus == 'running'">{{'enum.status.running' | translate}}</span>
+                                  <span
+                                    *ngIf="item.connectStatus == 'connected'">{{'enum.status.connected' | translate}}</span>
+                                  <span
+                                    *ngIf="item.connectStatus == 'disconnected'">{{'enum.status.disconnected' | translate}}</span>
                                   <span *ngIf="!item.connectStatus">--</span>
                                 </clr-dg-cell>
                                 <clr-dg-cell class="over_flow">{{item.wwn ? item.wwn:'--'}}</clr-dg-cell>
-                                <clr-dg-cell class="over_flow" style="text-align: right;min-width: 7rem;">{{item.speed ? item.speed:'--'}}</clr-dg-cell>
-                                <clr-dg-cell class="over_flow" style="text-align: right;">{{item.iops!=null?item.iops:'--'}}</clr-dg-cell>
-                                <clr-dg-cell class="over_flow" style="text-align: right;min-width: 9rem;">{{item.latency!=null?item.latency:'--'}}</clr-dg-cell>
-                                <clr-dg-cell class="over_flow" style="text-align: right;min-width: 6rem;">{{item.bandwidth!=null?item.bandwidth:'--'}}</clr-dg-cell>
-                                <clr-dg-cell class="over_flow" style="text-align: right;min-width: 6rem;">{{item.usage!=null?item.usage:'--'}}</clr-dg-cell>
+                                <clr-dg-cell class="over_flow" style="text-align: right;min-width: 7rem;">
+                                  {{item.speed!=null?item.speed:'--'}}</clr-dg-cell>
+                                <clr-dg-cell class="over_flow" style="text-align: right;">
+                                  {{item.iops!=null?item.iops:'--'}}</clr-dg-cell>
+                                <clr-dg-cell class="over_flow" style="text-align: right;min-width: 9rem;">
+                                  {{item.latency!=null?item.latency:'--'}}</clr-dg-cell>
+                                <clr-dg-cell class="over_flow" style="text-align: right;min-width: 6rem;">
+                                  {{item.bandwidth!=null?item.bandwidth:'--'}}</clr-dg-cell>
+                                <clr-dg-cell class="over_flow" style="text-align: right;min-width: 6rem;">
+                                  {{item.usage!=null?item.usage:'--'}}</clr-dg-cell>
                               </clr-dg-row>
                               <clr-dg-footer>
                                 <clr-dg-pagination #paginationFcoe [clrDgPageSize]="10" [clrDgTotalItems]="fcoeTotal">
-                                  <clr-dg-page-size [clrPageSizeOptions]="[10,20,50,100]">{{'storage.detail.perPage' | translate}}</clr-dg-page-size>
+                                  <clr-dg-page-size [clrPageSizeOptions]="[10,20,50,100]">
+                                    {{'storage.detail.perPage' | translate}}</clr-dg-page-size>
                                   {{paginationFcoe.firstItem + 1}} - {{paginationFcoe.lastItem + 1}}
                                   of {{paginationFcoe.totalItems}}
                                 </clr-dg-pagination>
@@ -1209,68 +1551,98 @@
                           </clr-accordion-content>
                         </clr-accordion-panel>
                         <clr-accordion-panel>
-                          <clr-accordion-title>{{'storage.detail.hardware.ports.bond' | translate}}({{bonds==null?0:bonds.length}})</clr-accordion-title>
+                          <!-- 绑定 -->
+                          <clr-accordion-title>
+                            {{'storage.detail.hardware.ports.bond' | translate}}({{bonds==null?0:bonds.length}})
+                          </clr-accordion-title>
                           <clr-accordion-content *clrIfExpanded>
                             <clr-datagrid [clrDgLoading]="bondIsLoading">
-                              <clr-dg-column [clrDgField]="'name'">{{'storage.detail.hardware.ports.name' | translate}}</clr-dg-column>
-                              <clr-dg-column >
+                              <clr-dg-column [clrDgField]="'name'">{{'storage.detail.hardware.ports.name' | translate}}
+                              </clr-dg-column>
+                              <clr-dg-column>
                                 {{'storage.detail.hardware.ports.healthStatus' | translate}}
                                 <clr-dg-filter [clrDgFilter]="healthStatusFilter">
                                   <health-status-filter #healthStatusFilter></health-status-filter>
                                 </clr-dg-filter>
                               </clr-dg-column>
-                              <clr-dg-column >
+                              <clr-dg-column>
                                 {{'storage.detail.hardware.ports.runningStatus' | translate}}
                                 <clr-dg-filter [clrDgFilter]="portsRunningStatusFilter">
                                   <ports-running-status-filter #portsRunningStatusFilter></ports-running-status-filter>
                                 </clr-dg-filter>
                               </clr-dg-column>
-                              <clr-dg-column #bondMtu class="hideFilter" [clrDgField]="'mtu'" style="position: relative" (clrDgSortedChange)="sortFunc($event);">
+                              <clr-dg-column #bondMtu class="hideFilter" [clrDgField]="'mtu'" style="position: relative"
+                                (clrDgSortedChange)="sortFunc($event);">
                                 {{'storage.detail.hardware.ports.mtu' | translate}}
-                                <clr-icon *ngIf="sortFunc(bondMtu.sorted);" shape="arrow down" class="is-solid" style="min-width: 6rem;position: absolute;right: 1.1rem;"></clr-icon>
+                                <clr-icon *ngIf="sortFunc(bondMtu.sorted);" shape="arrow down" class="is-solid"
+                                  style="min-width: 6rem;position: absolute;right: 1.1rem;"></clr-icon>
                               </clr-dg-column>
-                              <clr-dg-column #bondIops class="hideFilter" [clrDgField]="'iops'" style="min-width: 9rem;position: relative;" (clrDgSortedChange)="sortFunc($event);">
+                              <clr-dg-column #bondIops class="hideFilter" [clrDgField]="'iops'"
+                                style="min-width: 9rem;position: relative;" (clrDgSortedChange)="sortFunc($event);">
                                 {{'storage.detail.hardware.ports.totalIops' | translate}}
-                                <clr-icon *ngIf="sortFunc(bondIops.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+                                <clr-icon *ngIf="sortFunc(bondIops.sorted);" shape="arrow down" class="is-solid"
+                                  style="position: absolute;right: 1.1rem;"></clr-icon>
                               </clr-dg-column>
-                              <clr-dg-column #bondLatency class="hideFilter" [clrDgField]="'latency'" style="min-width: 9rem;position: relative;" (clrDgSortedChange)="sortFunc($event);">
+                              <clr-dg-column #bondLatency class="hideFilter" [clrDgField]="'latency'"
+                                style="min-width: 9rem;position: relative;" (clrDgSortedChange)="sortFunc($event);">
                                 {{'storage.detail.hardware.ports.avg' | translate}}
-                                <clr-icon *ngIf="sortFunc(bondLatency.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+                                <clr-icon *ngIf="sortFunc(bondLatency.sorted);" shape="arrow down" class="is-solid"
+                                  style="position: absolute;right: 1.1rem;"></clr-icon>
                               </clr-dg-column>
-                              <clr-dg-column #bondBandwidth class="hideFilter" [clrDgField]="'bandwidth'" style="min-width: 7rem;position: relative" (clrDgSortedChange)="sortFunc($event);">
+                              <clr-dg-column #bondBandwidth class="hideFilter" [clrDgField]="'bandwidth'"
+                                style="min-width: 7rem;position: relative" (clrDgSortedChange)="sortFunc($event);">
                                 {{'storage.detail.hardware.ports.totalBandwidth' | translate}}
-                                <clr-icon *ngIf="sortFunc(bondBandwidth.sorted);" shape="arrow down" class="is-solid" style="position: absolute;right: 1.1rem;"></clr-icon>
+                                <clr-icon *ngIf="sortFunc(bondBandwidth.sorted);" shape="arrow down" class="is-solid"
+                                  style="position: absolute;right: 1.1rem;"></clr-icon>
                               </clr-dg-column>
                               <clr-dg-placeholder>{{'tips.noData' | translate}}</clr-dg-placeholder>
-                              <clr-dg-row  *clrDgItems="let item of bonds" [clrDgItem]="item">
+                              <clr-dg-row *clrDgItems="let item of bonds" [clrDgItem]="item">
                                 <clr-dg-cell class="over_flow">{{item.name ? item.name:'--'}}</clr-dg-cell>
                                 <clr-dg-cell class="over_flow">
-                                  <span *ngIf="item.healthStatus == 'unknown'">{{'enum.status.unknown' | translate}}</span>
-                                  <span *ngIf="item.healthStatus == 'normal'">{{'enum.status.normal' | translate}}</span>
-                                  <span *ngIf="item.healthStatus == 'faulty'">{{'enum.status.faulty' | translate}}</span>
-                                  <span *ngIf="item.healthStatus == 'about to fail'">{{'enum.status.aboutToFail' | translate}}</span>
-                                  <span *ngIf="item.healthStatus == 'partially damaged'">{{'enum.status.partiallyDamaged' | translate}}</span>
-                                  <span *ngIf="item.healthStatus == 'inconsistent'">{{'enum.status.inconsistent' | translate}}</span>
+                                  <span
+                                    *ngIf="item.healthStatus == 'unknown'">{{'enum.status.unknown' | translate}}</span>
+                                  <span
+                                    *ngIf="item.healthStatus == 'normal'">{{'enum.status.normal' | translate}}</span>
+                                  <span
+                                    *ngIf="item.healthStatus == 'faulty'">{{'enum.status.faulty' | translate}}</span>
+                                  <span
+                                    *ngIf="item.healthStatus == 'about to fail'">{{'enum.status.aboutToFail' | translate}}</span>
+                                  <span
+                                    *ngIf="item.healthStatus == 'partially damaged'">{{'enum.status.partiallyDamaged' | translate}}</span>
+                                  <span
+                                    *ngIf="item.healthStatus == 'inconsistent'">{{'enum.status.inconsistent' | translate}}</span>
                                   <span *ngIf="!item.healthStatus">--</span>
                                 </clr-dg-cell>
                                 <clr-dg-cell class="over_flow">
-                                  <span *ngIf="item.runningStatus == 'UNKNOWN'">{{'enum.status.unknown' | translate}}</span>
-                                  <span *ngIf="item.runningStatus == 'NORMAL'">{{'enum.status.normal' | translate}}</span>
-                                  <span *ngIf="item.runningStatus == 'RUNNING'">{{'enum.status.running' | translate}}</span>
-                                  <span *ngIf="item.runningStatus == 'LINK_UP'">{{'enum.status.connected' | translate}}</span>
-                                  <span *ngIf="item.runningStatus == 'LINK_DOWN'">{{'enum.status.disconnected' | translate}}</span>
-                                  <span *ngIf="item.runningStatus == 'to be recovered'">{{'enum.status.toBeRecovered' | translate}}</span>
-                                  <span *ngIf="item.runningStatus == 'initializing'">{{'enum.status.initializing' | translate}}</span>
+                                  <span
+                                    *ngIf="item.runningStatus == 'UNKNOWN'">{{'enum.status.unknown' | translate}}</span>
+                                  <span
+                                    *ngIf="item.runningStatus == 'NORMAL'">{{'enum.status.normal' | translate}}</span>
+                                  <span
+                                    *ngIf="item.runningStatus == 'RUNNING'">{{'enum.status.running' | translate}}</span>
+                                  <span
+                                    *ngIf="item.runningStatus == 'LINK_UP'">{{'enum.status.connected' | translate}}</span>
+                                  <span
+                                    *ngIf="item.runningStatus == 'LINK_DOWN'">{{'enum.status.disconnected' | translate}}</span>
+                                  <span
+                                    *ngIf="item.runningStatus == 'to be recovered'">{{'enum.status.toBeRecovered' | translate}}</span>
+                                  <span
+                                    *ngIf="item.runningStatus == 'initializing'">{{'enum.status.initializing' | translate}}</span>
                                   <span *ngIf="!item.runningStatus">--</span>
                                 </clr-dg-cell>
-                                <clr-dg-cell class="over_flow" style="text-align: right;min-width: 6rem;">{{item.mtu ? item.mtu:'--'}}</clr-dg-cell>
-                                <clr-dg-cell class="over_flow" style="text-align: right;min-width: 9rem;">{{item.iops!=null?item.iops:'--'}}</clr-dg-cell>
-                                <clr-dg-cell class="over_flow" style="text-align: right;min-width: 9rem;">{{item.latency!=null?item.latency:'--'}}</clr-dg-cell>
-                                <clr-dg-cell class="over_flow" style="text-align: right;min-width: 7rem;">{{item.bandwidth!=null?item.bandwidth:'--'}}</clr-dg-cell>
+                                <clr-dg-cell class="over_flow" style="text-align: right;min-width: 6rem;">
+                                  {{item.mtu ? item.mtu:'--'}}</clr-dg-cell>
+                                <clr-dg-cell class="over_flow" style="text-align: right;min-width: 9rem;">
+                                  {{item.iops!=null?item.iops:'--'}}</clr-dg-cell>
+                                <clr-dg-cell class="over_flow" style="text-align: right;min-width: 9rem;">
+                                  {{item.latency!=null?item.latency:'--'}}</clr-dg-cell>
+                                <clr-dg-cell class="over_flow" style="text-align: right;min-width: 7rem;">
+                                  {{item.bandwidth!=null?item.bandwidth:'--'}}</clr-dg-cell>
                               </clr-dg-row>
                               <clr-dg-footer>
                                 <clr-dg-pagination #paginationBond [clrDgPageSize]="10" [clrDgTotalItems]="bondTotal">
-                                  <clr-dg-page-size [clrPageSizeOptions]="[10,20,50,100]">{{'storage.detail.perPage' | translate}}</clr-dg-page-size>
+                                  <clr-dg-page-size [clrPageSizeOptions]="[10,20,50,100]">
+                                    {{'storage.detail.perPage' | translate}}</clr-dg-page-size>
                                   {{paginationBond.firstItem + 1}} - {{paginationBond.lastItem + 1}}
                                   of {{paginationBond.totalItems}}
                                 </clr-dg-pagination>
@@ -1279,25 +1651,31 @@
                           </clr-accordion-content>
                         </clr-accordion-panel>
                         <clr-accordion-panel>
-                          <clr-accordion-title>{{'storage.detail.hardware.ports.logic' | translate}}({{logicports==null?0:logicports.length}})</clr-accordion-title>
+                          <!-- 逻辑 -->
+                          <clr-accordion-title>
+                            {{'storage.detail.hardware.ports.logic' | translate}}({{logicports==null?0:logicports.length}})
+                          </clr-accordion-title>
                           <clr-accordion-content *clrIfExpanded>
                             <clr-datagrid [clrDgLoading]="logicPortIsLoading">
-                              <clr-dg-column >{{'storage.detail.hardware.ports.name' | translate}}</clr-dg-column>
-                              <clr-dg-column >
+                              <clr-dg-column>{{'storage.detail.hardware.ports.name' | translate}}</clr-dg-column>
+                              <clr-dg-column>
                                 {{'storage.detail.hardware.ports.runningStatus' | translate}}
                                 <clr-dg-filter [clrDgFilter]="logicRunningStatusFilter">
                                   <logic-running-status-filter #logicRunningStatusFilter></logic-running-status-filter>
                                 </clr-dg-filter>
                               </clr-dg-column>
-                              <clr-dg-column >
+                              <clr-dg-column>
                                 {{'storage.detail.hardware.ports.status' | translate}}
                                 <clr-dg-filter [clrDgFilter]="logicStatusFilter">
                                   <logic-status-filter #logicStatusFilter></logic-status-filter>
                                 </clr-dg-filter>
                               </clr-dg-column>
-                              <clr-dg-column [clrDgField]="'mgmtIp'">{{'storage.detail.hardware.ports.ipv4' | translate}}</clr-dg-column>
-                              <clr-dg-column [clrDgField]="'mgmtIpv6'">{{'storage.detail.hardware.ports.ipv6' | translate}}</clr-dg-column>
-                              <clr-dg-column [clrDgField]="'currentPortName'">{{'storage.detail.hardware.ports.currentPort' | translate}}</clr-dg-column>
+                              <clr-dg-column [clrDgField]="'mgmtIp'">
+                                {{'storage.detail.hardware.ports.ipv4' | translate}}</clr-dg-column>
+                              <clr-dg-column [clrDgField]="'mgmtIpv6'">
+                                {{'storage.detail.hardware.ports.ipv6' | translate}}</clr-dg-column>
+                              <clr-dg-column [clrDgField]="'currentPortName'">
+                                {{'storage.detail.hardware.ports.currentPort' | translate}}</clr-dg-column>
                               <clr-dg-column>
                                 {{'storage.detail.hardware.ports.role' | translate}}
                                 <clr-dg-filter [clrDgFilter]="logicRoleFilter">
@@ -1310,46 +1688,65 @@
                                   <logic-ddns-status-filter #logicDdnsStatusFilter></logic-ddns-status-filter>
                                 </clr-dg-filter>
                               </clr-dg-column>
-                              <clr-dg-column [clrDgField]="'supportProtocol'">{{'storage.detail.hardware.ports.dataProtocol' | translate}}</clr-dg-column>
-                              <clr-dg-column [clrDgField]="'managementAccess'">{{'storage.detail.hardware.ports.manageAccess' | translate}}</clr-dg-column>
-                              <clr-dg-column [clrDgField]="'vstoreName'">{{'storage.detail.hardware.ports.vStoreName' | translate}}</clr-dg-column>
+                              <clr-dg-column [clrDgField]="'supportProtocol'">
+                                {{'storage.detail.hardware.ports.dataProtocol' | translate}}</clr-dg-column>
+                              <clr-dg-column [clrDgField]="'managementAccess'">
+                                {{'storage.detail.hardware.ports.manageAccess' | translate}}</clr-dg-column>
+                              <clr-dg-column [clrDgField]="'vstoreName'">
+                                {{'storage.detail.hardware.ports.vStoreName' | translate}}</clr-dg-column>
                               <clr-dg-placeholder>{{'tips.noData' | translate}}</clr-dg-placeholder>
-                              <clr-dg-row  *clrDgItems="let item of logicports" [clrDgItem]="item">
-                                <clr-dg-cell class="over_flow" title="{{item.name ? item.name:'--'}}">{{item.name ? item.name:'--'}}</clr-dg-cell>
+                              <clr-dg-row *clrDgItems="let item of logicports" [clrDgItem]="item">
+                                <clr-dg-cell class="over_flow" title="{{item.name ? item.name:'--'}}">
+                                  {{item.name ? item.name:'--'}}</clr-dg-cell>
                                 <clr-dg-cell class="over_flow">
-                                  <span *ngIf="item.runningStatus == 'LINK_DOWN'">{{'enum.status.linkDown' | translate}}</span>
-                                  <span *ngIf="item.runningStatus == 'LINK_UP'">{{'enum.status.linkUp' | translate}}</span>
+                                  <span
+                                    *ngIf="item.runningStatus == 'LINK_DOWN'">{{'enum.status.linkDown' | translate}}</span>
+                                  <span
+                                    *ngIf="item.runningStatus == 'LINK_UP'">{{'enum.status.linkUp' | translate}}</span>
                                   <span *ngIf="!item.runningStatus">--</span>
                                 </clr-dg-cell>
                                 <clr-dg-cell class="over_flow">
-                                  <span *ngIf="item.operationalStatus == 'ACTIVATED'">{{'enum.status.activated' | translate}}</span>
-                                  <span *ngIf="item.operationalStatus != 'ACTIVATED'">{{'enum.status.unActivated' | translate}}</span>
+                                  <span
+                                    *ngIf="item.operationalStatus == 'ACTIVATED'">{{'enum.status.activated' | translate}}</span>
+                                  <span
+                                    *ngIf="item.operationalStatus != 'ACTIVATED'">{{'enum.status.unActivated' | translate}}</span>
                                   <span *ngIf="item.operationalStatus == null">--</span>
                                 </clr-dg-cell>
-                                <clr-dg-cell class="over_flow" title="{{item.mgmtIp!=null?item.mgmtIp!=''?item.mgmtIp:'--':'--'}}">{{item.mgmtIp!=null?item.mgmtIp!=''?item.mgmtIp:'--':'--'}}</clr-dg-cell>
-                                <clr-dg-cell  class="over_flow">
+                                <clr-dg-cell class="over_flow"
+                                  title="{{item.mgmtIp!=null?item.mgmtIp!=''?item.mgmtIp:'--':'--'}}">
+                                  {{item.mgmtIp!=null?item.mgmtIp!=''?item.mgmtIp:'--':'--'}}</clr-dg-cell>
+                                <clr-dg-cell class="over_flow">
                                   {{item.mgmtIpv6!=null?item.mgmtIpv6!=''?item.mgmtIpv6:'--':'--'}}
                                 </clr-dg-cell>
-                                <clr-dg-cell class="over_flow">{{item.currentPortName!=null?item.currentPortName:'--'}}</clr-dg-cell>
+                                <clr-dg-cell class="over_flow">{{item.currentPortName!=null?item.currentPortName:'--'}}
+                                </clr-dg-cell>
                                 <clr-dg-cell class="over_flow">
                                   <span *ngIf="item.role == '1'">{{'enum.status.management' | translate}}</span>
                                   <span *ngIf="item.role == '2'">{{'enum.status.service' | translate}}</span>
-                                  <span *ngIf="item.role == '3'">{{'enum.status.managementAndService' | translate}}</span>
+                                  <span
+                                    *ngIf="item.role == '3'">{{'enum.status.managementAndService' | translate}}</span>
                                   <span *ngIf="item.role != '1' && item.role != '2' && item.role != '3'">--</span>
                                 </clr-dg-cell>
                                 <clr-dg-cell class="over_flow">
-                                  <span *ngIf="item.ddnsStatus == 'INVALID'">{{'enum.status.invalid' | translate}}</span>
+                                  <span
+                                    *ngIf="item.ddnsStatus == 'INVALID'">{{'enum.status.invalid' | translate}}</span>
                                   <span *ngIf="item.ddnsStatus == 'ENABLE'">{{'enum.status.enable' | translate}}</span>
-                                  <span *ngIf="item.ddnsStatus != 'ENABLE' && item.ddnsStatus != 'INVALID'">{{'enum.status.notActivated' | translate}}</span>
+                                  <span
+                                    *ngIf="item.ddnsStatus != 'ENABLE' && item.ddnsStatus != 'INVALID'">{{'enum.status.notActivated' | translate}}</span>
                                   <span *ngIf="item.ddnsStatus == null">--</span>
                                 </clr-dg-cell>
-                                <clr-dg-cell class="over_flow" title="{{item.supportProtocol!=null?item.supportProtocol:'--'}}">{{item.supportProtocol!=null?item.supportProtocol:'--'}}</clr-dg-cell>
-                                <clr-dg-cell class="over_flow">{{item.managementAccess!=null?item.managementAccess:'--'}}</clr-dg-cell>
-                                <clr-dg-cell class="over_flow">{{item.vstoreName!=null?item.vstoreName!=''?item.vstoreName:'--':'--'}}</clr-dg-cell>
+                                <clr-dg-cell class="over_flow"
+                                  title="{{item.supportProtocol!=null?item.supportProtocol:'--'}}">
+                                  {{item.supportProtocol!=null?item.supportProtocol:'--'}}</clr-dg-cell>
+                                <clr-dg-cell class="over_flow">
+                                  {{item.managementAccess!=null?item.managementAccess:'--'}}</clr-dg-cell>
+                                <clr-dg-cell class="over_flow">
+                                  {{item.vstoreName!=null?item.vstoreName!=''?item.vstoreName:'--':'--'}}</clr-dg-cell>
                               </clr-dg-row>
                               <clr-dg-footer>
                                 <clr-dg-pagination #paginationLogic [clrDgPageSize]="10" [clrDgTotalItems]="logicTotal">
-                                  <clr-dg-page-size [clrPageSizeOptions]="[10,20,50,100]">{{'storage.detail.perPage' | translate}}</clr-dg-page-size>
+                                  <clr-dg-page-size [clrPageSizeOptions]="[10,20,50,100]">
+                                    {{'storage.detail.perPage' | translate}}</clr-dg-page-size>
                                   {{paginationLogic.firstItem + 1}} - {{paginationLogic.lastItem + 1}}
                                   of {{paginationLogic.totalItems}}
                                 </clr-dg-pagination>
@@ -1358,28 +1755,36 @@
                           </clr-accordion-content>
                         </clr-accordion-panel>
                         <clr-accordion-panel>
-                          <clr-accordion-title>{{'storage.detail.hardware.ports.fail' | translate}}({{fgs==null?0:fgs.length}})</clr-accordion-title>
+                          <!-- 漂移 -->
+                          <clr-accordion-title>
+                            {{'storage.detail.hardware.ports.fail' | translate}}({{fgs==null?0:fgs.length}})
+                          </clr-accordion-title>
                           <clr-accordion-content *clrIfExpanded>
                             <clr-datagrid [clrDgLoading]="fgsIsLoading">
-                              <clr-dg-column [clrDgField]="'name'">{{'storage.detail.hardware.ports.name' | translate}}</clr-dg-column>
-                              <clr-dg-column >
+                              <clr-dg-column [clrDgField]="'name'">{{'storage.detail.hardware.ports.name' | translate}}
+                              </clr-dg-column>
+                              <clr-dg-column>
                                 {{'storage.detail.hardware.ports.type' | translate}}
                                 <clr-dg-filter [clrDgFilter]="failoverGroupTypeFilter">
                                   <failover-group-type-filter #failoverGroupTypeFilter></failover-group-type-filter>
                                 </clr-dg-filter>
                               </clr-dg-column>
                               <clr-dg-placeholder>{{'tips.noData' | translate}}</clr-dg-placeholder>
-                              <clr-dg-row  *clrDgItems="let item of fgs" [clrDgItem]="item">
+                              <clr-dg-row *clrDgItems="let item of fgs" [clrDgItem]="item">
                                 <clr-dg-cell class="over_flow">{{item.name ? item.name:'--'}}</clr-dg-cell>
-                                <clr-dg-cell class="over_flow" *ngIf="item.failoverGroupType == 'system'">{{'enum.status.system' | translate}}</clr-dg-cell>
-                                <clr-dg-cell class="over_flow" *ngIf="item.failoverGroupType == 'VLAN'">{{'enum.status.vlan' | translate}}</clr-dg-cell>
-                                <clr-dg-cell class="over_flow" *ngIf="item.failoverGroupType == 'customized'">{{'enum.status.customized' | translate}}</clr-dg-cell>
+                                <clr-dg-cell class="over_flow" *ngIf="item.failoverGroupType == 'system'">
+                                  {{'enum.status.system' | translate}}</clr-dg-cell>
+                                <clr-dg-cell class="over_flow" *ngIf="item.failoverGroupType == 'VLAN'">
+                                  {{'enum.status.vlan' | translate}}</clr-dg-cell>
+                                <clr-dg-cell class="over_flow" *ngIf="item.failoverGroupType == 'customized'">
+                                  {{'enum.status.customized' | translate}}</clr-dg-cell>
                                 <clr-dg-cell class="over_flow" *ngIf="!item.failoverGroupType">--</clr-dg-cell>
 
                               </clr-dg-row>
                               <clr-dg-footer>
                                 <clr-dg-pagination #paginationFgs [clrDgPageSize]="10" [clrDgTotalItems]="failTotal">
-                                  <clr-dg-page-size [clrPageSizeOptions]="[10,20,50,100]">{{'storage.detail.perPage' | translate}}</clr-dg-page-size>
+                                  <clr-dg-page-size [clrPageSizeOptions]="[10,20,50,100]">
+                                    {{'storage.detail.perPage' | translate}}</clr-dg-page-size>
                                   {{paginationFgs.firstItem + 1}} - {{paginationFgs.lastItem + 1}}
                                   of {{paginationFgs.totalItems}}
                                 </clr-dg-pagination>
@@ -1399,4 +1804,3 @@
     </div>
   </div>
 </div>
-

@@ -245,3 +245,61 @@
   white-space: nowrap;
 }
 
+clr-dg-cell.datagrid-cell{
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+
+.flex {
+  display: flex;
+
+  &1 {
+    flex: 1;
+  }
+
+  &2 {
+    flex: 2;
+  }
+
+  &3 {
+    flex: 3;
+  }
+
+  &4 {
+    flex: 4;
+  }
+
+  &5 {
+    flex: 5;
+  }
+
+  &.vertical {
+    flex-flow: column nowrap;
+  }
+
+  &.like-float {
+    flex-flow: row wrap;
+
+    .el-button + .el-button {
+      margin-left: 0;
+    }
+  }
+
+  &.between {
+    justify-content: space-between;
+  }
+
+  &.center {
+    justify-content: center;
+  }
+
+  &.middle {
+    align-items: center;
+  }
+}
+
+.color-notice{
+  color:red;
+}

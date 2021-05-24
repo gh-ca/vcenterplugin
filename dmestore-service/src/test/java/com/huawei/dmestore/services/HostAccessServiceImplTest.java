@@ -52,7 +52,7 @@ public class HostAccessServiceImplTest {
     }
 
     @Test
-    public void configureIscsi() throws DmeException {
+    public void testConfigureIscsi() throws DmeException {
         hostAccessService.configureIscsi(params);
 
     }

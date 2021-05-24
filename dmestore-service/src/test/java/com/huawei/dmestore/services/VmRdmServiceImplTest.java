@@ -1,14 +1,7 @@
 package com.huawei.dmestore.services;
 
 import com.huawei.dmestore.exception.DmeException;
-import com.huawei.dmestore.model.CreateVolumesRequest;
-import com.huawei.dmestore.model.CustomizeVolumeTuningForCreate;
-import com.huawei.dmestore.model.CustomizeVolumes;
-import com.huawei.dmestore.model.CustomizeVolumesRequest;
-import com.huawei.dmestore.model.ServiceVolumeBasicParams;
-import com.huawei.dmestore.model.ServiceVolumeMapping;
-import com.huawei.dmestore.model.SmartQosForRdmCreate;
-import com.huawei.dmestore.model.VmRdmCreateBean;
+import com.huawei.dmestore.model.*;
 import com.huawei.dmestore.utils.VCSDKUtils;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -27,6 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.when;
 
 /**
@@ -44,6 +38,9 @@ public class VmRdmServiceImplTest {
     private Gson gson = new Gson();
     @Mock
     private VCSDKUtils vcsdkUtils;
+    @Mock
+    private DmeStorageService dmeStorageService;
+
     @InjectMocks
     VmRdmService vmRdmService = new VmRdmServiceImpl();
 
@@ -53,7 +50,7 @@ public class VmRdmServiceImplTest {
     }
 
     @Test
-    public void createRdm() throws DmeException {
+    public void testCreateRdm() throws DmeException {
         VmRdmCreateBean vmRdmCreateBean = new VmRdmCreateBean();
         List<ServiceVolumeBasicParams> volumes = new ArrayList<>();
         ServiceVolumeBasicParams serviceVolumeBasicParams = new ServiceVolumeBasicParams();
@@ -119,7 +116,8 @@ public class VmRdmServiceImplTest {
         Map<String, String> map1 = new HashMap<>();
         map1.put("hostObjectId", "321");
         map1.put("hostName", "321");
-        when(vcsdkUtils.getHostByVmObjectId("321")).thenReturn(map1);
+        map1.put("hostId", "321");
+        when(vcsdkUtils.getHostByVmObjectId(anyString())).thenReturn(map1);
         String resp1 = "{\n" +
             "    \"id\": \"319585d6-13da-4b9d-9591-33ce63b52c0a\", \n" +
             "    \"project_id\": \"319585d6-13da-4b9d-9591-33ce63b52c0a\", \n" +
@@ -164,12 +162,24 @@ public class VmRdmServiceImplTest {
         map3.put("blockSize", "321");
         lunlist.add(map3);
         when(vcsdkUtils.getLunsOnHost("321")).thenReturn(gson.toJson(lunlist));
+        ArrayList<Map<String,String>> list = new ArrayList<>();
+        Map<String,String> hostmap1 = new HashMap<>();
+        hostmap1.put("hostId","154651");
+        hostmap1.put("hostObjectId", "321");
+        hostmap1.put("hostName", "321");
+        Map<String,String> hostmap2 = new HashMap<>();
+        hostmap2.put("hostId","1546512");
+        hostmap2.put("hostObjectId", "321");
+        hostmap2.put("hostName", "321");
+        list.add(hostmap1);
+        list.add(hostmap2);
+        when(vcsdkUtils.getMountHostsByDsObjectId(anyString())).thenReturn(gson.toJson(list));
         vmRdmService.createRdm("321", "321", vmRdmCreateBean, null);
 
     }
 
     @Test
-    public void createRdm1() throws DmeException {
+    public void testCreateRdm1() throws DmeException {
         VmRdmCreateBean vmRdmCreateBean = new VmRdmCreateBean();
         List<ServiceVolumeBasicParams> volumes = new ArrayList<>();
         ServiceVolumeBasicParams serviceVolumeBasicParams = new ServiceVolumeBasicParams();
@@ -212,7 +222,8 @@ public class VmRdmServiceImplTest {
         customizeVolumesRequest.setMapping(serviceVolumeMapping);
         customizeVolumesRequest.setCustomizeVolumes(customizeVolumes);
         vmRdmCreateBean.setCustomizeVolumesRequest(customizeVolumesRequest);
-
+        StorageDetail storageObj = new StorageDetail();
+        when(dmeStorageService.getStorageDetail(anyString())).thenReturn(storageObj);
         String reqString =
             "{\"customize_volumes\":{\"initial_distribute_policy\":\"321\",\"tuning\":{\"workload_type_id\":12,\"dedupe_enabled\":false,\"compression_enabled\":true,\"smartqos\":{\"maxbandwidth\":21," +
                 "\"control_policy\":\"321\",\"maxiops\":1,\"latency\":1,\"miniops\":12,\"name\":\"321\",\"minbandwidth\":12},\"alloctype\":\"321\"},\"prefetch_policy\":\"321\",\"storage_id\":\"321\"," +
@@ -220,11 +231,10 @@ public class VmRdmServiceImplTest {
         JsonObject jsonObject4 = new JsonObject();
         jsonObject4.addProperty("task_id", "321");
         ResponseEntity<String> responseEntity3 = new ResponseEntity<>(gson.toJson(jsonObject4),null,HttpStatus.ACCEPTED);
-        when(dmeAccessService.access("/rest/blockservice/v1/volumes/customize-volumes", HttpMethod.POST, reqString))
-            .thenReturn(responseEntity3);
+        when(dmeAccessService.access(anyString(),any(),anyString())).thenReturn(responseEntity3);
         JsonObject jsonObject1 = new JsonObject();
         jsonObject1.addProperty("status", 3);
-        when(taskService.queryTaskByIdUntilFinish("321")).thenReturn(jsonObject1);
+        when(taskService.queryTaskByIdUntilFinish(anyString())).thenReturn(jsonObject1);
         String res = "{\n" +
             "    \"id\": \"02bb989a-7ac2-40cd-852d-c9b26bb2ab5b\", \n" +
             "    \"name\": \"volume001\", \n" +
@@ -260,11 +270,13 @@ public class VmRdmServiceImplTest {
         Map<String, Object> map = new HashMap<>();
         map.put("volumes", jsonObjects);
         map.put("count", 1);
+        map.put("task_id", "45ndahjohj45454");
         ResponseEntity<String> responseEntity1 = new ResponseEntity<>(gson.toJson(map), null, HttpStatus.OK);
-        when(dmeAccessService.access("/rest/blockservice/v1/volumes?name=321", HttpMethod.GET, null)).thenReturn(responseEntity1);
+        when(dmeAccessService.access(anyString(),any(),anyString())).thenReturn(responseEntity1);
         Map<String, String> map1 = new HashMap<>();
         map1.put("hostObjectId", "321");
         map1.put("hostName", "321");
+        map1.put("hostId", "321");
         when(vcsdkUtils.getHostByVmObjectId("321")).thenReturn(map1);
         String resp1 = "{\n" +
             "    \"id\": \"319585d6-13da-4b9d-9591-33ce63b52c0a\", \n" +
@@ -310,18 +322,30 @@ public class VmRdmServiceImplTest {
         map3.put("blockSize", "321");
         lunlist.add(map3);
         when(vcsdkUtils.getLunsOnHost("321")).thenReturn(gson.toJson(lunlist));
-        vmRdmService.createRdm("321", "321", vmRdmCreateBean, null);
+        ArrayList<Map<String,String>> list = new ArrayList<>();
+        Map<String,String> hostmap1 = new HashMap<>();
+        hostmap1.put("hostId","154651");
+        hostmap1.put("hostObjectId", "321");
+        hostmap1.put("hostName", "321");
+        Map<String,String> hostmap2 = new HashMap<>();
+        hostmap2.put("hostId","1546512");
+        hostmap2.put("hostObjectId", "321");
+        hostmap2.put("hostName", "321");
+        list.add(hostmap1);
+        list.add(hostmap2);
+        when(vcsdkUtils.getMountHostsByDsObjectId(anyString())).thenReturn(gson.toJson(list));
+                vmRdmService.createRdm("321", "321", vmRdmCreateBean, null);
     }
 
     @Test
-    public void getAllDmeHost() throws DmeException {
+    public void testGetAllDmeHost() throws DmeException {
         List<Map<String, Object>> list = new ArrayList<>();
         when(dmeAccessService.getDmeHosts(null)).thenReturn(list);
         vmRdmService.getAllDmeHost();
     }
 
     @Test
-    public void getDatastoreMountsOnHost() throws DmeException {
+    public void testGetDatastoreMountsOnHost() throws DmeException {
         when(vcsdkUtils.getDatastoreMountsOnHost("321")).thenReturn(new ArrayList<>());
         vmRdmService.getDatastoreMountsOnHost("321");
     }

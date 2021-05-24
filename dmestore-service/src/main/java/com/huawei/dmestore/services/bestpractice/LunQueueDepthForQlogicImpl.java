@@ -1,6 +1,10 @@
 package com.huawei.dmestore.services.bestpractice;
 
 import com.huawei.dmestore.utils.VCSDKUtils;
+import com.huawei.vmware.mo.HostMo;
+import com.huawei.vmware.util.VmwareContext;
+import com.vmware.vim25.AboutInfo;
+import com.vmware.vim25.ManagedObjectReference;
 
 /**
  * LunQueueDepthForQlogicImpl
@@ -41,6 +45,21 @@ public class LunQueueDepthForQlogicImpl extends BaseBestPracticeService implemen
 
     @Override
     public boolean check(VCSDKUtils vcsdkUtils, String objectId) throws Exception {
+        // ESXI6.7的版本才执行这一项检查。
+        ManagedObjectReference mor = vcsdkUtils.getVcConnectionHelper().objectId2Mor(objectId);
+        VmwareContext context = vcsdkUtils.getVcConnectionHelper().getServerContext(objectId);
+        HostMo hostMo = this.getHostMoFactory().build(context, mor);
+        AboutInfo aboutInfo = hostMo.getHostAboutInfo();
+        String apiVersion = aboutInfo.getApiVersion();
+        try {
+            String esxiApiVersion = apiVersion.substring(0, 3);
+            if (Float.parseFloat(esxiApiVersion) != Float.parseFloat("6.7")) {
+                return true;
+            }
+        } catch (Exception ex) {
+            logger.error("get host recommend value key error!host_ip={},apiVersion={}", hostMo.getName(), apiVersion);
+            throw ex;
+        }
         return super.checkModuleOption(vcsdkUtils, objectId, getModuleName(), getRecommendValue());
     }
 

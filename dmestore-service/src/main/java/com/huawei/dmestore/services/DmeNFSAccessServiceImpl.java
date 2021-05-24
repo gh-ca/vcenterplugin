@@ -29,6 +29,8 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.util.StringUtils;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -295,7 +297,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
         LOG.info("vmware list nfs success!");
 
         // 将DME的存储设备集合转换为map key:ip value:Storage
-        List<Storage> storages = dmeStorageService.getStorages();
+        List<Storage> storages = dmeStorageService.getStorages(null);
         Map<String, Storage> storageMap = converStorage(storages);
         if (storageMap == null || storageMap.size() == 0) {
             LOG.error("get dme storage failed!storages is null!");
@@ -303,8 +305,8 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
         }
         LOG.info("get dme storage success!storages size={}", storages.size());
         JsonArray jsonArray = new JsonParser().parse(listStr).getAsJsonArray();
-        List<DmeVmwareRelation> relationList = new ArrayList<>();
-        List<JsonObject> ns = new ArrayList<>();
+        List<DmeVmwareRelation> relationList = new CopyOnWriteArrayList<>();
+        List<JsonObject> ns = new CopyOnWriteArrayList<>();
         int k = 0;
         long start = System.currentTimeMillis();
         for (int index = 0; index < jsonArray.size(); index++) {
@@ -492,7 +494,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
     }
 
     private List<Map<String, Object>> queryShareInfo() throws DmeException {
-        List<Map<String, Object>> shareList = new ArrayList<>();
+        List<Map<String, Object>> shareList = new CopyOnWriteArrayList<>();
         int total=0;
         int pageno=1;
         int allpageno=1;
@@ -551,7 +553,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
     }
 
     private List<Map<String, Object>> queryFsInfo() throws DmeException {
-        List<Map<String, Object>> fsList = new ArrayList<>();
+        List<Map<String, Object>> fsList = new CopyOnWriteArrayList<>();
         int total=0;
         int pageno=1;
         int allpageno=1;
@@ -662,7 +664,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
     }
 
     private Map<String, Storage> converStorage(List<Storage> storages) {
-        Map<String, Storage> storageMap = new HashMap<>();
+        Map<String, Storage> storageMap = new ConcurrentHashMap<>();
         for (Storage storage : storages) {
             String ip = storage.getIp();
             storageMap.put(ip, storage);
@@ -688,7 +690,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
             throw new DmeException("list NFS from vcenter failed!");
         }
 
-        Map<String, NfsDataInfo> volIds = new HashMap<>();
+        Map<String, NfsDataInfo> volIds = new ConcurrentHashMap<>();
 
         JsonArray jsonArray = new JsonParser().parse(listStr).getAsJsonArray();
         for (int index = 0; index < jsonArray.size(); index++) {
@@ -715,6 +717,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
                     nfsDataInfo.setShareId(dvr.getShareId());
                     nfsDataInfo.setFs(dvr.getFsName());
                     nfsDataInfo.setFsId(dvr.getFsId());
+                    nfsDataInfo.setAlarmState(ToolUtils.jsonToStr(jo.get("alarmState")));
                     nfsDataInfo.setObjectid(ToolUtils.jsonToStr(jo.get(OBJECTID)));
                     volIds.put(dvr.getFsId(), nfsDataInfo);
                     relists.add(nfsDataInfo);
@@ -725,18 +728,6 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
         int k = 0;
         Map<String, NfsDataInfo> tm = new HashMap<>();
         long start1 = System.currentTimeMillis();
-        /*while(iterator.hasNext()){
-            k++;
-            String key = iterator.next();
-            tm.put(key, volIds.get(key));
-            if (k % 20 == 0){
-                getNfsSync(tm);
-                tm = new HashMap<>();
-            }
-        }
-        if (k % 20 > 0){
-            getNfsSync(tm);
-        }*/
         getNfsSync(volIds);
         LOG.info("调用nfs存储接口时间：{}ms", System.currentTimeMillis() - start1);
 
@@ -897,8 +888,9 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
                     hostObjectId = ToolUtils.getStr(params.get("hostObjectId"));
                     logicPortIp = ToolUtils.getStr(params.get(HOSTVKERNELIP));
                 }
+                NfsDataStoreShareAttr shareAttr = this.getNfsDatastoreShareAttr(dataStoreObjectId);
                 vcsdkUtils.mountNfs(dataStoreObjectId, hostObjectId, logicPortIp,
-                    ToolUtils.getStr(params.get("mountType")));
+                    ToolUtils.getStr(params.get("mountType")), shareAttr.getName());
             } else {
                 TaskDetailInfo taskDetailInfo = taskService.queryTaskById(taskId);
                 LOG.error("mountnfs error!{}", taskDetailInfo.getDetail());
@@ -955,6 +947,8 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
     public void unmountNfs(Map<String, Object> params) throws DmeException {
         String dataStoreObjectId = ToolUtils.getStr(params.get(DATASTOREOBJECTID));
         String hostObjId = ToolUtils.getStr(params.get("hostId"));
+        String name = vcsdkUtils.getVmKernelIpByHostObjectId(hostObjId);
+        LOG.info("unmountnfs vcenterhost="+name);
         DmeVmwareRelation dvr = dmeVmwareRalationDao.getDmeVmwareRelationByDsId(dataStoreObjectId);
         if (dvr == null) {
             LOG.error("unmountNfs get relation error!dataStoreObjectId={}", dataStoreObjectId);
@@ -964,14 +958,28 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
             unmountNfsFromHost(dataStoreObjectId, hostObjId);
         }
         String shareId = dvr.getShareId();
+        LOG.info("unmountnfs vcenterhost shareid="+shareId);
         List<AuthClient> authClientList = getNfsDatastoreShareAuthClients(shareId);
         if (authClientList != null && authClientList.size() > 0) {
             Map<String, String> authIdIpMap = new HashMap<>();
             for (AuthClient authClient : authClientList) {
                 String authId = authClient.getId();
                 String ip = authClient.getName();
+                LOG.info("unmountnfs vcenterhost authid="+authId);
+                LOG.info("unmountnfs vcenterhost ip="+ip);
                 if (!StringUtils.isEmpty(ip) && !StringUtils.isEmpty(authId)) {
-                    authIdIpMap.put(authClient.getClientIdInStorage(), ip);
+                    JsonArray incarray=new JsonParser().parse(name).getAsJsonArray();
+                    for (JsonElement jsonElement : incarray) {
+                        LOG.info("unmountnfs vcenterhost equals ="+jsonElement.getAsJsonObject()
+                                .get("ipAddress"));
+                        if ( ToolUtils.jsonToStr(jsonElement.getAsJsonObject()
+                                .get("ipAddress")).equalsIgnoreCase(authClient.getName())) {
+                            LOG.info("unmountnfs vcenterhost equals getClientIdInStorage ="+authClient.getClientIdInStorage());
+                            LOG.info("unmountnfs vcenterhost equals ip ="+ip);
+                            authIdIpMap.put(authClient.getClientIdInStorage(), ip);
+                        }
+                    }
+
                 }
             }
             String taskId = deleteAuthClient(shareId, authIdIpMap);
@@ -1060,7 +1068,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
         LOG.info("dme delete nfs end!");
     }
 
-    private void unmountNfsFromHost(String dataStoreObjectId, String hostId) throws VcenterException {
+    private void unmountNfsFromHost(String dataStoreObjectId, String hostId) throws DmeException {
         vcsdkUtils.unmountNfsOnHost(dataStoreObjectId, hostId);
     }
 
@@ -1074,6 +1082,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
             addtion.put(NAME_FIELD, authClient.getValue());
             listAddition.add(addtion);
         }
+        LOG.info("unmountnfs vcenterhost nfs_share_client_deletion listAddition ="+   gson.toJson(listAddition));
         requestbody.put(ID_FIELD, shareId);
         requestbody.put("nfs_share_client_deletion", listAddition);
         try {

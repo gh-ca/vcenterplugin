@@ -1,13 +1,14 @@
 package com.huawei.dmestore.utils;
 
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.stereotype.Component;
-
-
+/**
+ * CipherConfig
+ *
+ * @since 2020-03-30
+ */
 public class CipherConfig {
-    private RootKey rootKey=new RootKey();
-    private Aes aes=new Aes();
-    private Pbkdf2 pbkdf2=new Pbkdf2();
+    private RootKey rootKey = new RootKey();
+    private Aes aes = new Aes();
+    private Pbkdf2 pbkdf2 = new Pbkdf2();
     private String delimiter;
 
     public Aes getAes() {
@@ -41,8 +42,13 @@ public class CipherConfig {
     public void setRootKey(RootKey rootKey) {
         this.rootKey = rootKey;
     }
+    /**
+     * RootKey
+     *
+     * @since 2020-03-30
+     */
 
-    public static class RootKey{
+    public static class RootKey {
         private String key;
         private String algorithm;
         private String salt;
@@ -80,6 +86,11 @@ public class CipherConfig {
             this.iteration = iteration;
         }
     }
+    /**
+     * Aes
+     *
+     * @since 2020-03-30
+     */
 
     public static class Aes {
         private String workKey;
@@ -110,7 +121,13 @@ public class CipherConfig {
             this.key = key;
         }
 
-        public static class Key{
+        /**
+         * Key
+         *
+         * @since 2020-03-30
+         */
+
+        public static class Key {
             private String algorithm;
 
             public String getAlgorithm() {
@@ -122,6 +139,12 @@ public class CipherConfig {
             }
         }
     }
+
+    /**
+     * Pbkdf2
+     *
+     * @since 2020-03-30
+     */
 
     public static class Pbkdf2 {
         private String iteration;
@@ -143,5 +166,4 @@ public class CipherConfig {
             this.length = length;
         }
     }
-
 }

@@ -27,7 +27,7 @@ public class Volume {
     /**
      * 状态.
      */
-    private Boolean attached;
+    private boolean attached;
     /**
      * 分配类型.
      */
@@ -51,7 +51,7 @@ public class Volume {
     /**
      * 保护状态.
      */
-    private Boolean protectionStatus;
+    private boolean protectionStatus;
     /**
      * hostIds.
      */
@@ -67,7 +67,7 @@ public class Volume {
     /**
      * 总容量 单位GB.
      */
-    private Integer capacity;
+    private int capacity;
     /**
      * 关联的datastore.
      */
@@ -84,15 +84,15 @@ public class Volume {
     /**
      * iops .
      */
-    private Float iops;
+    private float iops;
     /**
      * lantency .
      */
-    private Float lantency;
+    private float lantency;
     /**
      * bandwith .
      */
-    private Float bandwith;
+    private float bandwith;
 
     /**
      * getId .
@@ -151,9 +151,9 @@ public class Volume {
     /**
      * getAttached .
      *
-     * @return Boolean .
+     * @return boolean .
      */
-    public Boolean getAttached() {
+    public boolean getAttached() {
         return attached;
     }
 
@@ -162,7 +162,7 @@ public class Volume {
      *
      * @param param .
      */
-    public void setAttached(final Boolean param) {
+    public void setAttached(final boolean param) {
         this.attached = param;
     }
 
@@ -261,7 +261,7 @@ public class Volume {
      *
      * @return String .
      */
-    public Boolean getProtectionStatus() {
+    public boolean getProtectionStatus() {
         return protectionStatus;
     }
 
@@ -270,7 +270,7 @@ public class Volume {
      *
      * @param param .
      */
-    public void setProtectionStatus(final Boolean param) {
+    public void setProtectionStatus(final boolean param) {
         this.protectionStatus = param;
     }
 
@@ -331,9 +331,9 @@ public class Volume {
     /**
      * getCapacity .
      *
-     * @return Integer .
+     * @return int .
      */
-    public Integer getCapacity() {
+    public int getCapacity() {
         return capacity;
     }
 
@@ -342,7 +342,7 @@ public class Volume {
      *
      * @param param .
      */
-    public void setCapacity(final Integer param) {
+    public void setCapacity(final int param) {
         this.capacity = param;
     }
 
@@ -385,9 +385,9 @@ public class Volume {
     /**
      * getId .
      *
-     * @return Float .
+     * @return float .
      */
-    public Float getIops() {
+    public float getIops() {
         return iops;
     }
 
@@ -396,16 +396,16 @@ public class Volume {
      *
      * @param param .
      */
-    public void setIops(final Float param) {
+    public void setIops(final float param) {
         this.iops = param;
     }
 
     /**
      * getLantency .
      *
-     * @return Float .
+     * @return float .
      */
-    public Float getLantency() {
+    public float getLantency() {
         return lantency;
     }
 
@@ -414,16 +414,16 @@ public class Volume {
      *
      * @param param .
      */
-    public void setLantency(final Float param) {
+    public void setLantency(final float param) {
         this.lantency = param;
     }
 
     /**
      * getBandwith .
      *
-     * @return Float .
+     * @return float .
      */
-    public Float getBandwith() {
+    public float getBandwith() {
         return bandwith;
     }
 
@@ -432,7 +432,7 @@ public class Volume {
      *
      * @param param .
      */
-    public void setBandwith(final Float param) {
+    public void setBandwith(final float param) {
         this.bandwith = param;
     }
 

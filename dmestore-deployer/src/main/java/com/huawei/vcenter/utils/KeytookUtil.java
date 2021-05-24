@@ -7,6 +7,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.security.NoSuchAlgorithmException;
 
 /**
  * KeytookUtil
@@ -24,13 +25,15 @@ public class KeytookUtil {
     private KeytookUtil() {
     }
 
-    public static void genKey() throws IOException {
+    public static void genKey() throws IOException, NoSuchAlgorithmException {
         LOGGER.info("Checking keystore file...");
         File file = new File(KEY);
         if (!file.exists()) {
             LOGGER.info("Generating keystore file...");
+            String randompass=FileUtil.getSafeRandomToString(6);
+            FileUtil.saveKey(randompass,FileUtil.KEYSTORE_PASS_NAME);
             String cmd
-                = "keytool -genkeypair -alias tomcat -keyalg RSA  -keystore ./tomcat.keystore  -keypass changeit -storepass changeit -dname CN=localhost,OU=cn,O=cn,L=cn,ST=cn,C=cn";
+                = "keytool -genkeypair -alias tomcat -keyalg RSA  -keystore ./tomcat.keystore  -keypass "+randompass+" -storepass "+randompass+" -dname CN=localhost,OU=cn,O=cn,L=cn,ST=cn,C=cn";
             Runtime.getRuntime().exec(cmd);
         } else {
             LOGGER.info("Keystore file exists");
@@ -41,7 +44,8 @@ public class KeytookUtil {
         BufferedReader input = null;
         InputStreamReader inr = null;
         try {
-            String cmd = "keytool -list -keypass changeit -storepass changeit -keystore ./tomcat.keystore";
+            String randompass=FileUtil.getKey(FileUtil.KEYSTORE_PASS_NAME);
+            String cmd = "keytool -list -keypass "+randompass+" -storepass "+randompass+" -keystore ./tomcat.keystore";
             Process process = Runtime.getRuntime().exec(cmd);
             inr = new InputStreamReader(process.getInputStream(), "utf-8");
             input = new BufferedReader(inr);

@@ -10,6 +10,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+
+import static com.huawei.dmestore.utils.AESCipher.KEY_SIZE;
+import static com.huawei.dmestore.utils.AESCipher.getSafeRandomToString;
+
 
 public class RootKeyGenerator {
 
@@ -19,6 +25,8 @@ public class RootKeyGenerator {
         return cipherConfig;
     }
 
+
+
     public void setCipherConfig(CipherConfig cipherConfig) {
         this.cipherConfig = cipherConfig;
     }
@@ -26,11 +34,14 @@ public class RootKeyGenerator {
     private static final Logger LOG= LoggerFactory.getLogger(RootKeyGenerator.class);
     private static final byte[] CODED_COMPONENT={10,21,30,69,85,120,21,17,73,121,11,2,3,69,85,100,21,33,76,12,17,63,25,53,69,8,69,49,73,13,11,40};
 
-    protected  byte[] generateRootKey(){
+    protected  byte[] generateRootKey() throws NoSuchAlgorithmException {
         int length=CODED_COMPONENT.length;
-        //byte[] rootKey=CipherUtil.parseHexstr2Byte(System.getProperty("cipher.rootKey.key"));
-        //System.out.println("rootkey="+cipherConfig.getRootKey().getKey());
-        byte[] rootKey=CipherUtil.parseHexstr2Byte(cipherConfig.getRootKey().getKey());
+        String fileStringKey = FileUtils.getKey(FileUtils.BASE_FILE_NAME);
+        if (fileStringKey == null) {
+            fileStringKey = getSafeRandomToString(KEY_SIZE);
+            FileUtils.saveKey(fileStringKey, FileUtils.BASE_FILE_NAME);
+        }
+        byte[] rootKey=CipherUtil.parseHexstr2Byte(fileStringKey);
         if(null==rootKey||length!=rootKey.length)
         {
             throw new IllegalArgumentException("ROOT KEY Illegeal");
@@ -44,7 +55,13 @@ public class RootKeyGenerator {
         if("PBKDF2".equalsIgnoreCase(rootAlgorithm)){
             String key=CipherUtil.parseByte2Hexstr(modResult);
             //byte[] rootsalt=CipherUtil.parseHexstr2Byte(System.getProperty("cipher.rootKey.salt"));
-            byte[] rootsalt=CipherUtil.parseHexstr2Byte(cipherConfig.getRootKey().getSalt());
+            //String randomsalt= getSafeRandomToString(KEY_SIZE);
+            String saltKey = FileUtils.getKey(FileUtils.SALT_FILE_NAME);
+            if (saltKey == null) {
+                saltKey= getSafeRandomToString(KEY_SIZE);
+                FileUtils.saveKey(saltKey,FileUtils.SALT_FILE_NAME);
+            }
+            byte[] rootsalt=CipherUtil.parseHexstr2Byte(saltKey);
             //Integer rootIteration=Integer.valueOf(System.getProperty("cipher.rootKey.iteration"));
             Integer rootIteration=Integer.valueOf(cipherConfig.getRootKey().getIteration());
             return encryptRootKey(key,rootsalt,rootIteration);
@@ -64,4 +81,6 @@ public class RootKeyGenerator {
         KeyParameter parameter= (KeyParameter) generator.generateDerivedMacParameters(length);
         return parameter.getKey();
     }
+
+
 }

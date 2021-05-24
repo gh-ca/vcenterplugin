@@ -21,6 +21,8 @@ public final class NfsDataInfo {
      * 状态.
      **/
     private String status;
+
+    private String alarmState;
     /**
      * 总容量 单位GB.
      **/
@@ -304,6 +306,14 @@ public final class NfsDataInfo {
      */
     public void setSharePath(final String param) {
         this.sharePath = param;
+    }
+
+    public String getAlarmState() {
+        return alarmState;
+    }
+
+    public void setAlarmState(String alarmState) {
+        this.alarmState = alarmState;
     }
 
     /**

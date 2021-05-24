@@ -93,7 +93,7 @@ public class NfsAccessController extends BaseController {
         try {
             dmeNfsAccessService.mountNfs(params);
             return success(null, "Mount nfs success");
-        } catch (DmeException e) {
+        } catch (Exception e) {
             LOG.error("mount nfs failure:", e);
             failureStr = "mount nfs failure:" + e.toString();
         }

@@ -9,16 +9,16 @@ import { MountComponent } from './mount/mount.component';
 import { AddComponent } from './add/add.component';
 import { ServiceLevelComponent } from './serviceLevel/serviceLevel.component';
 import { NgxEchartsModule } from 'ngx-echarts';
-import {FormsModule} from "@angular/forms";
-import {ClarityModule, ClrCheckbox} from "@clr/angular";
-import {CommonModule} from "@angular/common";
-import {TranslateModule} from "@ngx-translate/core";
-import {ExpandComponent} from "./expand/expand.component";
-import {ModifyComponent} from "./modify/modify.component";
-import {ReclaimComponent} from "./reclaim/reclaim.component";
-import {DeleteComponent} from "./delete/delete.component";
-import {DeviceFilter, ProtectionStatusFilter, ServiceLevelFilter, StatusFilter} from "./list/filter.component";
-import {StorageService} from "../storage/storage.service";
+import { FormsModule } from "@angular/forms";
+import { ClarityModule, ClrCheckbox } from "@clr/angular";
+import { CommonModule } from "@angular/common";
+import { TranslateModule } from "@ngx-translate/core";
+import { ExpandComponent } from "./expand/expand.component";
+import { ModifyComponent } from "./modify/modify.component";
+import { ReclaimComponent } from "./reclaim/reclaim.component";
+import { DeleteComponent } from "./delete/delete.component";
+import { DeviceFilter, ProtectionStatusFilter, ServiceLevelFilter, StatusFilter } from "./list/filter.component";
+import { StorageService } from "../storage/storage.service";
 
 const COMPONENTS = [VmfsListComponent];
 const COMPONENTS_DYNAMIC = [];
@@ -31,4 +31,4 @@ const COMPONENTS_DYNAMIC = [];
   entryComponents: COMPONENTS_DYNAMIC,
   providers: [StorageService]
 })
-export class VmfsModule {}
+export class VmfsModule { }
