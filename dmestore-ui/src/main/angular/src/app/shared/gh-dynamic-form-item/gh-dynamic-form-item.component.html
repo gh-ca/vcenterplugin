@@ -1,0 +1,17 @@
+  <clr-control-container [formGroup]="form" [ngSwitch]="configs.controlType">
+    <label [attr.for]="configs.prop">{{configs.label}}</label>
+    <!-- input -->
+    <input *ngSwitchCase="GhFormItemType.input" clrInput [formControlName]="configs.prop" [id]="configs.prop" [type]="configs.type" />
+    <!-- input -->
+    
+    <!--select-->
+    <select *ngSwitchCase="GhFormItemType.select" clrSelect [formControlName]="configs.prop" [id]="configs.prop">
+      <option *ngFor="let opt of configs.options" [value]="opt.value">{{opt.label}}</option>
+    </select>
+    <!--select-->
+    
+    <!--default-->
+    <div *ngSwitchCase="GhFormItemType.empty"> empty </div>
+    <!--default-->
+    <clr-control-error *ngIf="!isValid">{{tips}}</clr-control-error>
+  </clr-control-container>

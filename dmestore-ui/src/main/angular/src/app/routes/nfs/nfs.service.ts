@@ -28,9 +28,11 @@ export class NfsService {
   static vmfsUrl = 'datastorestatistichistrory/vmfs';
 
   // NFS IOPS 0Read 1Write
-  static nfsOPS: Array<string> = ['1126179079716867', '1126179079716870'];
+  static nfsOPS: Array<string> = ['1126179079716865'];
+  // static nfsOPS: Array<string> = ['1126179079716867', '1126179079716870'];
   // NFS  bandwidth 0Read 1Write
-  static nfsBDWT: Array<string> = ['1126179079716868', '1126179079716871'];
+  static nfsBDWT: Array<string> = ['1126179079716878'];
+  // static nfsBDWT: Array<string> = ['1126179079716868', '1126179079716871'];
   // NFS  latency 0Read 1Write
   static nfsLatency: Array<string> = ['1126179079716869', '1126179079716872'];
   // NFS  url
@@ -513,19 +515,24 @@ export class MakePerformance {
 
         if (result.code === '200' && result.data && result.data[objIds[0]]) {
           const resData = result.data;
-          // 上限对象
-          let upperData = resData[objIds[0]][indicatorIds[0]];
-          // 下限对象
-          let lowerData = resData[objIds[0]][indicatorIds[1]];
-
+          let upperData, uppers, pmaxData;
+          let lowerData, lower, lmaxData;
           // 上、下限数据
-          const uppers: any[] = upperData.series;
-          const lower: any[] = lowerData.series;
 
-          // 上限最大值
-          let pmaxData = this.getUpperOrLower(upperData, 'upper');
-          // 下限最大值
-          let lmaxData = this.getUpperOrLower(lowerData, 'upper');
+          try {
+            // 上限对象
+            upperData = resData[objIds[0]][indicatorIds[0]];
+            uppers = upperData.series;
+            // 上限最大值
+            pmaxData = this.getUpperOrLower(upperData, 'upper');
+          } catch (error) {}
+          try {
+            // 下限对象
+            lowerData = resData[objIds[0]][indicatorIds[1]];
+            lower = lowerData.series;
+            // 下限最大值
+            lmaxData = this.getUpperOrLower(lowerData, 'upper');
+          } catch (error) {}
 
           const chart: ChartOptions = this.getNewChartWithResponse(
             height,
@@ -534,7 +541,8 @@ export class MakePerformance {
             resData,
             uppers,
             lower,
-            objIds[0]
+            objIds[0],
+            indicatorIds
           );
 
           // 设置标题
@@ -743,7 +751,8 @@ export class MakePerformance {
     res,
     uppers,
     lower,
-    objId
+    objId,
+    indicatorIds
   ) {
     const chart: ChartOptions = new ChartOptions();
     // 高度
@@ -798,71 +807,95 @@ export class MakePerformance {
     // 数据(格式)
     const series: Serie[] = [];
 
-    /*  */
-    // 设置上限、均值 折线图数据 upper read
-    // 设置下限、均值 折线图数据 lower write
+    const isNfsChartOpsBand = (responseData => {
+      for (const key of Object.keys(responseData)) {
+        if ([NfsService.nfsOPS[0], NfsService.nfsBDWT[0]].includes(key)) {
+          return true;
+        }
+      }
+      return false;
+    })(res[objId]);
 
-    const target_upper = res[objId].upper;
-    if (is.string(target_upper) && target_upper.length > 0 && target_upper !== 'null') {
-      legendData.push(this.setLengdData('Upper Limit', 'line'));
-      const series_upper = this.setSerieData(
-        'Upper Limit',
-        'line',
-        true,
-        'dotted',
-        '#DB2000',
-        null
-      );
-      series_upper.data = uppers.map(i => ({
-        value: Number(Number(target_upper).toFixed(4)),
-        symbol: 'none',
-      }));
-      series.push(series_upper);
-    }
+    if (isNfsChartOpsBand) {
+      (() => {
+        legendData.push(this.setLengdData('Avg', 'circle'));
+        const series_avg = this.setSerieData('Avg', 'line', true, 'solid', '#6870c4', null);
+        series_avg.data = res[objId][indicatorIds[0]].series.map(i => {
+          const value = helper.valueFormObj(i);
+          return {
+            value: Number(Number(value).toFixed(4)),
+            symbol: 'none',
+          };
+        });
+        series.push(series_avg);
+      })();
+    } else {
+      /*  */
+      // 设置上限、均值 折线图数据 upper read
+      // 设置下限、均值 折线图数据 lower write
 
-    const target_lower = res[objId].lower;
-    if (is.string(target_lower) && target_lower.length > 0 && target_lower !== 'null') {
-      legendData.push(this.setLengdData('Lower Limit', 'line'));
-      const series_lower = this.setSerieData(
-        'Lower Limit',
-        'line',
-        true,
-        'dotted',
-        '#F8E082',
-        null
-      );
-      series_lower.data = lower.map(i => ({
-        value: Number(Number(target_lower).toFixed(4)),
-        symbol: 'none',
-      }));
-      series.push(series_lower);
-    }
-
-    (() => {
-      legendData.push(this.setLengdData('Read', 'circle'));
-      const series_read = this.setSerieData('Read', 'line', true, 'solid', '#6870c4', null);
-      series_read.data = uppers.map(i => {
-        const value = helper.valueFormObj(i);
-        return {
-          value: Number(Number(value).toFixed(4)),
+      const target_upper = res[objId].upper;
+      if (is.string(target_upper) && target_upper.length > 0 && target_upper !== 'null') {
+        legendData.push(this.setLengdData('Upper Limit', 'line'));
+        const series_upper = this.setSerieData(
+          'Upper Limit',
+          'line',
+          true,
+          'dotted',
+          '#DB2000',
+          null
+        );
+        series_upper.data = uppers.map(i => ({
+          value: Number(Number(target_upper).toFixed(4)),
           symbol: 'none',
-        };
-      });
-      series.push(series_read);
-    })();
+        }));
+        series.push(series_upper);
+      }
 
-    (() => {
-      legendData.push(this.setLengdData('Write', 'circle'));
-      const series_write = this.setSerieData('Write', 'line', true, 'solid', '#01bfa8', null);
-      series_write.data = lower.map(i => {
-        const value = helper.valueFormObj(i);
-        return {
-          value: Number(Number(value).toFixed(4)),
+      const target_lower = res[objId].lower;
+      if (is.string(target_lower) && target_lower.length > 0 && target_lower !== 'null') {
+        legendData.push(this.setLengdData('Lower Limit', 'line'));
+        const series_lower = this.setSerieData(
+          'Lower Limit',
+          'line',
+          true,
+          'dotted',
+          '#F8E082',
+          null
+        );
+        series_lower.data = lower.map(i => ({
+          value: Number(Number(target_lower).toFixed(4)),
           symbol: 'none',
-        };
-      });
-      series.push(series_write);
-    })();
+        }));
+        series.push(series_lower);
+      }
+
+      (() => {
+        legendData.push(this.setLengdData('Read', 'circle'));
+        const series_read = this.setSerieData('Read', 'line', true, 'solid', '#6870c4', null);
+        series_read.data = uppers.map(i => {
+          const value = helper.valueFormObj(i);
+          return {
+            value: Number(Number(value).toFixed(4)),
+            symbol: 'none',
+          };
+        });
+        series.push(series_read);
+      })();
+
+      (() => {
+        legendData.push(this.setLengdData('Write', 'circle'));
+        const series_write = this.setSerieData('Write', 'line', true, 'solid', '#01bfa8', null);
+        series_write.data = lower.map(i => {
+          const value = helper.valueFormObj(i);
+          return {
+            value: Number(Number(value).toFixed(4)),
+            symbol: 'none',
+          };
+        });
+        series.push(series_write);
+      })();
+    }
     /*  */
 
     legend.x = 'right';

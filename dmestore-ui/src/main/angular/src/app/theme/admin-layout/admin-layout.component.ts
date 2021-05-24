@@ -81,6 +81,7 @@ export class AdminLayoutComponent implements OnInit, OnDestroy {
     this.dir.value = this.options.dir;
     this.document.body.dir = this.dir.value;
     this.linkInfo = [
+      { link: './demo', label: 'demo' },
       { link: './dashboard', label: 'Overview' },
       { link: './storage', label: 'Storage Device' },
       { link: './storage/detail', label: 'Storage Device detail' },
@@ -89,6 +90,7 @@ export class AdminLayoutComponent implements OnInit, OnDestroy {
       { link: './vmfs/performance', label: './vmfs/performance' },
       { link: './vmfs/attribute', label: './vmfs/attribute' },
       { link: './vmfs/unmount', label: './vmfs/unmount' },
+      { link: './vmfs/mount', label: './vmfs/mount' },
       { link: './nfs', label: 'NFS Datastore' },
       { link: './nfs/add', label: './nfs/add' },
       { link: './nfs/performance', label: './nfs/performance' },

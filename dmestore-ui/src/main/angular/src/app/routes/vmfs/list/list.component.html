@@ -54,13 +54,15 @@
           <clr-icon shape="list" size="20"></clr-icon>
         </label>
       </div>
-      <!--       <div class="radio btn" title="{{'menu.performance' | translate}}">
-        <input (click)="radioCheck = 'chart';charBtnClickFunc();" type="radio" name="btn-group-demo-radios"
-          id="btn-demo-radio-2">
-        <label for="btn-demo-radio-2">
-          <clr-icon shape="dashboard" size="20"></clr-icon>
-        </label>
-      </div> -->
+      <!--
+        <div class="radio btn" title="{{'menu.performance' | translate}}">
+          <input (click)="radioCheck = 'chart';charBtnClickFunc();" type="radio" name="btn-group-demo-radios"
+            id="btn-demo-radio-2">
+          <label for="btn-demo-radio-2">
+            <clr-icon shape="dashboard" size="20"></clr-icon>
+          </label>
+        </div> 
+      -->
       <div class="radio btn merginLeft" title="{{'menu.refresh' | translate}}">
         <!--<input type="radio" name="btn-group-demo-radios" id="btn-demo-radio-3">-->
         <label>
@@ -313,17 +315,16 @@
       </span>
     </div>
 
-
-
     <!--Page1 -->
     <!-- vmfs 数据存储 添加 -->
     <clr-wizard-page #addPageOne [clrWizardPageNextDisabled]="checkPageOne()&&isPageNextDisabled">
       <ng-template clrPageTitle>{{'vmfs.datastoreSetting' | translate}}</ng-template> <!-- mandatory -->
-      <!--       <pre>
+      <!--
+      <pre>
         {{checkPageOne()}}
         {{print(form)}}
       </pre>
- -->
+    -->
       <form clrForm [formGroup]="addForm" #formPageOne="ngForm">
         <!--数据存储名称 -->
         <clr-input-container>
@@ -429,7 +430,8 @@
               {{'vmfs.capacityTips' | translate}}
             </div>
           </clr-control-helper>
-          <clr-control-error>{{'validations.required' | translate}}：{{'vmfs.capacityTips' | translate}} </clr-control-error>
+          <clr-control-error>{{'validations.required' | translate}}：{{'vmfs.capacityTips' | translate}}
+          </clr-control-error>
         </clr-input-container>
         <!-- 块大小 -->
         <clr-select-container class="selectClass" *ngIf="isShowInput">
@@ -453,8 +455,10 @@
         <!-- 空间回收优先级 -->
         <clr-select-container class="selectClass" *ngIf="isShowInput">
           <label style="color: #9F9F9F;">{{'vmfs.spaceReclamationPriority' | translate}}</label>
-          <select clrSelect [(ngModel)]="form.spaceReclamationPriority" name="spaceReclamationPriority"
-            formControlName="spaceReclamationPriority" required>
+          <select clrSelect required
+            [(ngModel)]="form.spaceReclamationPriority"
+            name="spaceReclamationPriority"
+            formControlName="spaceReclamationPriority">
             <option value="low">{{'vmfs.low' | translate}}</option>
             <option value="none">{{'vmfs.none' | translate}}</option>
           </select>
@@ -462,6 +466,19 @@
         </clr-select-container>
 
         <!-- 主机/集群 -->
+        <!-- {{helper.print(deviceList)}} -->
+        <clr-control-container>
+          <label style="color: #9F9F9F;">{{'vmfs.hostOrCluster' | translate}}</label>
+          <app-gh-tree-checkbox
+            [tree]="deviceList"
+            (valueChange)="handleChooseDeviceChange(this.addForm,'chooseDevice',$event)">
+          </app-gh-tree-checkbox>
+          <app-error-tips
+            [isShow]="!this.addForm.controls.chooseDevice.valid"
+            [tips]="'validations.required' | translate">
+          </app-error-tips>
+        </clr-control-container>
+        <!-- 
         <clr-combobox-container>
           <label style="color: #9F9F9F;">{{'vmfs.hostOrCluster' | translate}}</label>
           <clr-combobox *ngIf="form.hostDataloadSuccess && form.culDataloadSuccess" [(ngModel)]="chooseDevice"
@@ -482,7 +499,8 @@
             {{'validations.comboboxTips' | translate}}
           </clr-control-helper>
           <clr-control-error>{{'validations.required' | translate}}</clr-control-error>
-        </clr-combobox-container>
+        </clr-combobox-container> 
+      -->
       </form>
       <ng-template clrPageButtons>
         <clr-wizard-button [type]="'cancel'">{{'menu.cancel' | translate}}</clr-wizard-button>
@@ -831,7 +849,7 @@
                 </clr-control-helper>
               </clr-checkbox-container>
               <clr-checkbox-container *ngIf="iopsLimitErr">
-                <clr-control-helper style="color: red">
+                <clr-control-helper class="clr-error clr-subtext">
                   <clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>
                   {{(dorado?'tips.iopsLimitErr':'tips.iopsLimitErrNotV6' )| translate}}
                 </clr-control-helper>
@@ -1109,7 +1127,7 @@
               </clr-control-helper>
             </clr-checkbox-container>
             <clr-checkbox-container *ngIf="iopsLimitErr">
-              <clr-control-helper style="color: red">
+              <clr-control-helper class="clr-error clr-subtext">
                 <clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>
                 {{(dorado?'tips.iopsLimitErr':'tips.iopsLimitErrNotV6' )| translate}}
               </clr-control-helper>
@@ -1144,6 +1162,7 @@
         <div *ngIf="isOperationErr" class="errorTips" readonly>
           <clr-icon shape="exclamation-circle" class="is-solid"></clr-icon> {{'errorMsg.mountError' | translate}}
         </div>
+        <!-- 
         <clr-radio-container clrInline>
           <label class="floatleft" style="color: #9F9F9F;">{{'vmfs.hostOrCluster' | translate}}</label>
           <clr-radio-wrapper>
@@ -1194,7 +1213,16 @@
           </clr-control-helper>
           <clr-control-error>{{'validations.required' | translate}}：{{'vmfs.mount.mountErr' | translate}}
           </clr-control-error>
-        </clr-combobox-container>
+        </clr-combobox-container> -->
+
+        <div style="display: block;height: 128px;overflow-y: auto;overflow-x: hidden;">
+          <clr-control-container>
+            <label style="color: #9F9F9F;">{{'vmfs.hostOrCluster' | translate}}</label>
+            <app-gh-tree-checkbox [tree]="deviceList" (valueChange)="handleChooseDeviceChange(this.addForm,'chooseDevice',$event)"> </app-gh-tree-checkbox>
+            <app-error-tips [isShow]="!this.addForm.controls.chooseDevice.valid" [tips]="'validations.required' | translate"> </app-error-tips>
+          </clr-control-container>
+        </div>
+
 
         <div class="modal-footer">
           <button type="button" class="btn btn-outline"
@@ -1226,6 +1254,9 @@
       <button type="submit" class="btn btn-primary" (click)="delHandleFunc()">{{'menu.ok' | translate}}</button>
     </div>
   </clr-modal>
+
+
+
   <!--卸载-->
   <clr-modal [(clrModalOpen)]="unmountShow" [clrModalSize]="'lg'" [clrModalClosable]="false">
     <h3 class="modal-title modelTile">{{'vmfs.unmount.title' | translate}}</h3>
@@ -1266,7 +1297,7 @@
             required /><br>
           <clr-control-error>{{'validations.required' | translate}}</clr-control-error>
         </clr-input-container> -->
-        <clr-radio-container clrInline>
+        <!-- <clr-radio-container clrInline>
           <label class="floatleft" style="color: #9F9F9F;">{{'vmfs.hostOrCluster' | translate}}</label>
           <clr-radio-wrapper>
             <input type="radio" clrRadio name="controlPolicy" value="1" [(ngModel)]="unmountForm.mountType"
@@ -1306,7 +1337,16 @@
             <clr-dg-cell>{{item.deviceName}}</clr-dg-cell>
             <clr-dg-cell>{{'vmfs.cluster' | translate}}</clr-dg-cell>
           </clr-dg-row>
-        </clr-datagrid>
+        </clr-datagrid> -->
+        <div style="display: block;height: 128px;overflow-y: auto;overflow-x: hidden;">
+          <clr-control-container>
+            <label style="color: #9F9F9F;">{{'vmfs.hostOrCluster' | translate}}</label>
+            <app-gh-tree-checkbox [tree]="deviceList"
+              (valueChange)="handleChooseDeviceChange(this.addForm,'chooseDevice',$event)"> </app-gh-tree-checkbox>
+            <app-error-tips [isShow]="!this.addForm.controls.chooseDevice.valid"
+              [tips]="'validations.required' | translate"> </app-error-tips>
+          </clr-control-container>
+        </div>
       </form>
     </div>
     <div class="modal-footer">

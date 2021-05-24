@@ -1,4 +1,10 @@
+import { AbstractControl } from '@angular/forms';
+import { ClrSelectedState } from '@clr/angular';
+import { ValidatorFn } from '@angular/forms';
 import { FormControl, ValidationErrors } from '@angular/forms';
+import { getLodash } from './shared/lib';
+
+export const _ = getLodash();
 
 export const handleRes = (res, successOptions, faildOptions?) => {
   if (res.code === '200') {
@@ -125,6 +131,10 @@ export function getQosCheckTipsTagInfo({
     if (maxIopsChoose && maxIops && Number(maxIops) < 100) {
       result.iopsLimitErr = true;
     }
+    /* v6 上下限都要大于100 */
+    if (minIopsChoose && minIops && Number(minIops) < 100) {
+      result.iopsLimitErr = true;
+    }
   } else {
     result.iopsLimitErr = false;
     result.bandwidthLimitErr = false;
@@ -147,13 +157,13 @@ export const COLOR = {
 export const regExpCollection = {
   vmfsName: () =>
     /^[A-Za-z0-9\u4e00-\u9fa5\u3002\uff1f\uff01\uff0c\u3001\uff1b\uff1a\u201c\u201d\u2018\u2019\uff08\uff09\u300a\u300b\u3008\u3009\u3010\u3011\u300e\u300f\u300c\u300d\ufe43\ufe44\u3014\u3015\u2026\u2014\uff5e\ufe4f\uffe5\u00b7\-._]+$/g,
-  nfsName: () => /^[0-9a-zA-Z_\-《：“”‘’，。；》——\u4e00-\u9fa5a\.]*$/,
+  nfsName: () => /^[0-9a-zA-Z_\-《：“”‘’，。；》——\u4e00-\u9fa5\.]*$/,
   /* 中文字符 */
-  chinise: () => /^[《：“”‘’，。；》——\u4e00-\u9fa5a]*$/,
+  chinise: () => /^[《：“”‘’，。；》——\u4e00-\u9fa5]*$/,
   /* shareFsName */
   shareFsName: () => /^[A-Za-z0-9!\s!\\\"#&%\$'\(\)\*\+\-,·.:;<=>\?@\[\]\^_`\{\|\}~ ]{1,}$/,
   // shareFsName: new RegExp(`^[a-zA-Z0-9!\"#&%$'()*+-·.;<=>?@\[\]^_\`{|}~,:\s]*$`),
-  integer:()=>/^[1-9]\d*$/
+  integer: () => /^[1-9]\d*$/,
 };
 
 /**
@@ -191,11 +201,15 @@ export function isStringLengthByteOutRange(nameString, limit = 27, name = 'byte'
   }
 
   /* 字节 一个汉字三个字节 */
-  let length = nameString.length;
-  for (let index = 0; index < nameString.length - 1; index++) {
+  let length = Number(nameString.length);
+  for (let index = 0; index < nameString.length; index++) {
     const element = nameString.charAt(index);
     if (regExpCollection.chinise().test(element)) {
       length = length + 2;
+      console.log(
+        '🚀 ~ file: app.helpers.ts ~ line 197 ~ isStringLengthByteOutRange ~ length',
+        length
+      );
     }
   }
   return length > limit;
@@ -238,3 +252,51 @@ export const is = {
   array: item => Array.isArray(item),
   string: item => typeof item === 'string',
 };
+
+export function CustomValidatorFaild(checkFn: any): ValidatorFn {
+  return (control: AbstractControl): { [key: string]: any } | null => {
+    return checkFn(control.value) ? { custom: { value: control.value } } : null;
+  };
+}
+
+export type VMFS_CLUSTER_NODE = {
+  clusterId: string;
+  clusterName: string;
+  children?: any[];
+  selected?: number;
+};
+
+/**
+ * @Description vmfs 集群 主机 树 第一层是集群 第二层是主机
+ * 选了集群只传集群，
+ *
+ * @date 2021-05-12
+ * @param {any} clusterArray:VMFS_CLUSTER_NODE[]
+ * @returns {any}
+ */
+export function getSelectedFromTree(clusterArray: VMFS_CLUSTER_NODE[]) {
+  console.log(
+    '🚀 ~ file: app.helpers.ts ~ line 278 ~ getSelectedFromTree ~ clusterArray',
+    clusterArray
+  );
+  let result = [];
+  for (const clusterNode of clusterArray) {
+    if (String(clusterNode.selected) === String(ClrSelectedState.SELECTED)) {
+      const _node = _.omit(clusterNode, ['children', 'selected']);
+      _node['deviceType'] = 'cluster';
+      result.push(_node);
+      continue;
+    }
+
+    if (clusterNode.children && clusterNode.children.length > 0) {
+      for (const hostNode of clusterNode.children) {
+        if (String(hostNode.selected) === String(ClrSelectedState.SELECTED)) {
+          const _node = _.omit(hostNode, ['children', 'selected']);
+          _node['deviceType'] = 'host';
+          result.push(_node);
+        }
+      }
+    }
+  }
+  return result;
+}

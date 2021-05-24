@@ -44,13 +44,17 @@ import { getVmfsDmestorageStorageByTag } from './../../../../mock/VMFS_DMESTORAG
 import { SimpleChange } from '@angular/core';
 import { handleRes } from './../../../app.helpers';
 import { VmfsCommon } from './VmfsCommon';
+import { AddService } from './../add/add.service';
+import { getLodash } from './../../../shared/lib';
+import { CommonService } from './../../common.service';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-list',
   templateUrl: './list.component.html',
   styleUrls: ['./list.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [VmfsListService],
+  providers: [VmfsListService, AddService, CommonService, TranslatePipe],
 })
 export class VmfsListComponent extends VmfsCommon implements OnInit {
   get params() {
@@ -60,6 +64,7 @@ export class VmfsListComponent extends VmfsCommon implements OnInit {
   }
 
   constructor(
+    private commonService: CommonService,
     private remoteSrv: VmfsListService,
     public cdr: ChangeDetectorRef,
     public gs: GlobalsService,
@@ -168,7 +173,7 @@ export class VmfsListComponent extends VmfsCommon implements OnInit {
   blockSizeOptions = []; // 块大小选择
   srgOptions = []; // 空间回收粒度初始化
   deviceList: HostOrCluster[] = []; // 主机AND集群
-  chooseDevice: HostOrCluster; // 已选择的主机/集群
+  chooseDevice: HostOrCluster[]; // 已选择的主机/集群
 
   serviceLevelList: ServiceLevelList[] = []; // 服务等级列表
   mountShow = false; // 挂载窗口
@@ -549,7 +554,7 @@ wwn: "67c1cf110058934511ba6e5a00000344"
             }
           }
         }
-      } 
+      }
       this.isLoading = false;
       this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
     };
@@ -784,6 +789,7 @@ wwn: "67c1cf110058934511ba6e5a00000344"
 
   // 设置设备数据
   setDeviceList() {
+    // setDeviceList() {
     // 初始化数据
     this.deviceList = [];
     // const nullDevice =  {
@@ -909,7 +915,8 @@ wwn: "67c1cf110058934511ba6e5a00000344"
     this.setBlockSizeOptions();
 
     // 设置主机/集群
-    this.setDeviceList();
+    this.setDeviceList_new(this);
+    // this.setDeviceList();
 
     // Page2默认打开服务等级也页面
     this.levelCheck = 'level';
@@ -959,7 +966,7 @@ wwn: "67c1cf110058934511ba6e5a00000344"
   }
 
   // 添加vmfs 处理
-  addVmfsHanlde() {
+  async addVmfsHanlde() {
     if (
       this.bandWidthMaxErrTips ||
       this.iopsMaxErrTips ||
@@ -1005,13 +1012,15 @@ wwn: "67c1cf110058934511ba6e5a00000344"
           break;
       }
       // 主机/集群数据处理
-      if (this.chooseDevice.deviceType === 'host') {
+      this.chooseDevice = this.addForm.value.chooseDevice;
+      /* 630修改 不需要区分集群和主机 */
+      /*  if (this.chooseDevice.deviceType === 'host') {
         addSubmitForm.host = this.chooseDevice.deviceName;
         addSubmitForm.hostId = this.chooseDevice.deviceId;
       } else {
         addSubmitForm.cluster = this.chooseDevice.deviceName;
         addSubmitForm.clusterId = this.chooseDevice.deviceId;
-      }
+      } */
       if (this.levelCheck === 'customer') {
         // 未选择 服务等级 需要将服务等级数据设置为空
         addSubmitForm.service_level_id = null;
@@ -1038,7 +1047,16 @@ wwn: "67c1cf110058934511ba6e5a00000344"
       // 打开 loading
       // this.gs.loading = true;
       this.modalHandleLoading = true;
-      this.remoteSrv.createVmfs(addSubmitForm).subscribe((result: any) => {
+      const _ = getLodash();
+
+      const params = _.merge(
+        {
+          chooseDevice: this.chooseDevice,
+        },
+        addSubmitForm
+      );
+
+      const handlerCreateVmfsSuccess = (result: any) => {
         // 关闭 loading
         // this.gs.loading = false;
         this.modalHandleLoading = false;
@@ -1072,8 +1090,13 @@ wwn: "67c1cf110058934511ba6e5a00000344"
           // 失败信息
           this.isOperationErr = true;
         }
-        this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
-      });
+        // 此方法变化检测，异步处理数据都要添加此方法
+        this.cdr.detectChanges();
+      };
+
+      const res = await this.commonService.remoteCreateVmfs(params);
+      handlerCreateVmfsSuccess(res);
+      // this.remoteSrv.createVmfs(params).subscribe(handlerCreateVmfsSuccess);
     } else {
       this.serviceLevelIsNull = true;
     }
@@ -1225,10 +1248,8 @@ wwn: "67c1cf110058934511ba6e5a00000344"
       this.showDetail = false;
 
       // 加载主机与集群数据
-      this.mountDeviceLoad();
-
-      // // 打开挂载页面
-      this.mountShow = true;
+      this.mountDeviceLoad_new();
+      // this.mountDeviceLoad();
       // this.jumpPage(this.rowSelected[0].objectid,"vmfs/dataStore/mount");
     }
   }
@@ -1236,6 +1257,32 @@ wwn: "67c1cf110058934511ba6e5a00000344"
   /**
    * 挂载页面 主机集群数据加载
    */
+
+  async mountDeviceLoad_new() {
+    this.chooseDevice = [];
+    // 初始化主机
+    this.mountHostData = false;
+    this.hostList = [];
+    this.chooseHost = undefined;
+
+    // 初始化集群
+    this.mountClusterData = false;
+    this.clusterList = [];
+    this.chooseCluster = undefined;
+
+    this.modalLoading = true;
+
+    this.deviceList = await this.commonService.remoteGetVmfsDeviceListById_mount(
+      this.rowSelected[0].objectid
+    );
+    this.mountClusterData = true;
+    this.mountHostData = true;
+    // 打开挂载页面
+    this.mountShow = true;
+
+    this.modalLoading = false;
+  }
+
   mountDeviceLoad() {
     // 初始化主机
     this.mountHostData = false;
@@ -1304,23 +1351,27 @@ wwn: "67c1cf110058934511ba6e5a00000344"
   }
 
   // 挂载提交
-  mountSubmit() {
+  async mountSubmit() {
     console.log('this.chooseHost', this.chooseHost);
-    if (this.chooseHost || this.chooseCluster) {
+    const _ = getLodash();
+    const chooseDevice = this.addForm.value.chooseDevice;
+
+    if (_.isArray(chooseDevice) && chooseDevice.length > 0) {
+      // if (this.chooseHost || this.chooseCluster) {
       this.mountErr = false;
       // 数据封装
       if (this.mountForm.mountType === '1') {
         // 服务器
-        this.mountForm.hostId = this.chooseHost.hostId;
-        this.mountForm.host = this.chooseHost.hostName;
+        this.mountForm.hostId = this.chooseHost?.hostId;
+        this.mountForm.host = this.chooseHost?.hostName;
       } else if (this.mountForm.mountType === '2') {
         // 集群
-        this.mountForm.cluster = this.chooseCluster.clusterName;
-        this.mountForm.clusterId = this.chooseCluster.clusterId;
+        this.mountForm.cluster = this.chooseCluster?.clusterName;
+        this.mountForm.clusterId = this.chooseCluster?.clusterId;
       }
 
       this.modalHandleLoading = true;
-      this.remoteSrv.mountVmfs(this.mountForm).subscribe((result: any) => {
+      const handlerMountVmfsSuccess = (result: any) => {
         this.modalHandleLoading = false;
         if (result.code === '200') {
           console.log('挂载成功');
@@ -1351,13 +1402,17 @@ wwn: "67c1cf110058934511ba6e5a00000344"
           console.log('挂载异常：' + result.description);
           this.isOperationErr = true;
         }
-        this.cdr.detectChanges();
-      });
+      };
+      const params = _.merge({ chooseDevice }, this.mountForm);
+      const res = await this.commonService.remoteVmfs_Mount(params);
+      handlerMountVmfsSuccess(res);
+      this.cdr.detectChanges();
+      // this.remoteSrv.mountVmfs(this.mountForm).subscribe();
     }
   }
 
   // 卸载按钮点击事件
-  unmountBtnFunc() {
+  async unmountBtnFunc() {
     if (this.rowSelected.length === 1) {
       this.modalLoading = true;
       this.modalHandleLoading = false;
@@ -1378,9 +1433,15 @@ wwn: "67c1cf110058934511ba6e5a00000344"
       }
       this.mountedHost = null;
       this.mountedCluster = null;
+      this.chooseDevice = [];
+      this.deviceList = await this.commonService.remoteGetVmfsDeviceListById_unmount(
+        this.rowSelected[0].objectid
+      );
+      this.modalLoading = false;
+      this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
 
       /*2.*/
-      const handlerGetMountClusterSuccess = (result: any) => {
+      /*  const handlerGetMountClusterSuccess = (result: any) => {
         console.log(result);
         if (result.code === '200' && result.data !== null && result.data.length >= 1) {
           this.unmountForm.mountType = '2';
@@ -1397,9 +1458,9 @@ wwn: "67c1cf110058934511ba6e5a00000344"
         }
         this.modalLoading = false;
         this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
-      };
+      }; */
       /*1.*/
-      const handlerGetMountHost = (result: any) => {
+      /*  const handlerGetMountHost = async (result: any) => {
         console.log(result);
         if (result.code === '200' && result.data !== null && result.data.length >= 1) {
           this.unmountForm.mountType = '1';
@@ -1414,29 +1475,31 @@ wwn: "67c1cf110058934511ba6e5a00000344"
           });
           this.mountedHost = mountHost;
           console.log('this.serviceLevelList', this.serviceLevelList);
-        }
+        } */
 
-        // 获取集群
+      // 获取集群
+      /* 
         if (isMockData) {
           handlerGetMountClusterSuccess(mockData.ACCESSVMFS_GETHOSTGROUPSBYSTORAGEID);
         } else {
-          this.remoteSrv
-            .getMountCluster(this.rowSelected[0].objectid)
-            .subscribe(handlerGetMountClusterSuccess);
+          // this.remoteSrv.getMountCluster(this.rowSelected[0].objectid).subscribe(handlerGetMountClusterSuccess);
         }
+        */
+    }
 
-        this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
-      };
-
-      // 获取主机
+    /* // 获取主机
       if (isMockData) {
         handlerGetMountHost(mockData.ACCESSVMFS_GETHOSTSBYSTORAGEID);
       } else {
         this.remoteSrv.getMountHost(this.rowSelected[0].objectid).subscribe(handlerGetMountHost);
-      }
+      } */
 
-      this.unmountShow = true;
-    }
+    this.deviceList = await this.commonService.remoteGetVmfsDeviceListById_unmount(
+      this.rowSelected[0].objectid
+    );
+
+    this.unmountShow = true;
+    this.cdr.detectChanges();
   }
 
   // 卸载确认
@@ -2146,7 +2209,10 @@ wwn: "67c1cf110058934511ba6e5a00000344"
    * vmfs重名校验
    */
   checkVmfsName(name: string) {
+    if ((this as any).checkVmfsNameExist_oldName === name) return;
+    (this as any).checkVmfsNameExist_oldName = name;
     this.modalHandleLoading = true;
+
     this.remoteSrv.checkVmfsName(name).subscribe((result: any) => {
       this.modalHandleLoading = false;
       if (result.code === '200') {
@@ -2170,7 +2236,10 @@ wwn: "67c1cf110058934511ba6e5a00000344"
    * vol重名校验
    */
   checkVolName(name: string) {
+    if ((this as any).checkVolNameExist_oldName === name) return;
+    (this as any).checkVolNameExist_oldName = name;
     this.modalHandleLoading = true;
+
     // 校验VMFS名称重复
     this.remoteSrv.checkVolName(name).subscribe((result: any) => {
       this.modalHandleLoading = false;
