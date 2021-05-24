@@ -32,15 +32,38 @@ import {
   FailoverGroupTypeFilter,
   HealthStatusFilter,
   PortsRunningStatusFilter,
-} from "./storage/filter.component";
+} from './storage/filter.component';
 
-const COMPONENTS = [DashboardComponent, StorageComponent, StorageStatusFilter,
-  StoragePoolStatusFilter, VolStatusFilter, ProTypeFilter,
-  MapStatusFilter, VolStoragePoolFilter, VolServiceLevelFilter, VolProtectionStatusFilter,
-  FsStatusFilter, FsTypeFilter, DtreeSecModFilter, DtreeQuotaFilter, HardwareStatusFilter,
-  DiskStatusFilter, DiskTypeFilter, FcStatusFilter, EthStatusFilter, FcoeStatusFilter,
-  LogicRunningStatusFilter, LogicStatusFilter, StorageStatusFilter, LogicDdnsStatusFilter,
-  LogicRoleFilter, FailoverGroupTypeFilter, HealthStatusFilter, PortsRunningStatusFilter];
+const COMPONENTS = [
+  DashboardComponent,
+  StorageComponent,
+  StorageStatusFilter,
+  StoragePoolStatusFilter,
+  VolStatusFilter,
+  ProTypeFilter,
+  MapStatusFilter,
+  VolStoragePoolFilter,
+  VolServiceLevelFilter,
+  VolProtectionStatusFilter,
+  FsStatusFilter,
+  FsTypeFilter,
+  DtreeSecModFilter,
+  DtreeQuotaFilter,
+  HardwareStatusFilter,
+  DiskStatusFilter,
+  DiskTypeFilter,
+  FcStatusFilter,
+  EthStatusFilter,
+  FcoeStatusFilter,
+  LogicRunningStatusFilter,
+  LogicStatusFilter,
+  StorageStatusFilter,
+  LogicDdnsStatusFilter,
+  LogicRoleFilter,
+  FailoverGroupTypeFilter,
+  HealthStatusFilter,
+  PortsRunningStatusFilter,
+];
 const COMPONENTS_DYNAMIC = [];
 
 @NgModule({

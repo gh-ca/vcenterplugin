@@ -16,9 +16,9 @@ export class VmfsCommon {
   handlerValueChanges(addForm) {
     try {
       /* name 数据存储 */
-      (this as any).nameChaeck(true);
+      (this as any).nameCheck(true);
       /* volumeName 卷 */
-      (this as any).nameChaeck(false);
+      (this as any).nameCheck(false);
     } catch (error) {}
     this.checkPageOne();
   }

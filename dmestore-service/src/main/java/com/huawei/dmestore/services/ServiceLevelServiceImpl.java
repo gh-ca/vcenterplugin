@@ -1,47 +1,28 @@
 package com.huawei.dmestore.services;
 
+import com.google.gson.*;
 import com.huawei.dmestore.constant.DmeConstants;
+import com.huawei.dmestore.dao.DmeVmwareRalationDao;
+import com.huawei.dmestore.entity.DmeVmwareRelation;
 import com.huawei.dmestore.entity.VCenterInfo;
 import com.huawei.dmestore.exception.DmeException;
 import com.huawei.dmestore.exception.VcenterException;
-import com.huawei.dmestore.model.CapabilitiesIopriority;
-import com.huawei.dmestore.model.CapabilitiesQos;
-import com.huawei.dmestore.model.CapabilitiesSmarttier;
-import com.huawei.dmestore.model.DmeDatasetsQueryResponse;
-import com.huawei.dmestore.model.QosParam;
-import com.huawei.dmestore.model.RelationInstance;
-import com.huawei.dmestore.model.SimpleCapabilities;
-import com.huawei.dmestore.model.SimpleServiceLevel;
-import com.huawei.dmestore.model.StoragePool;
-import com.huawei.dmestore.model.Volume;
+import com.huawei.dmestore.model.*;
 import com.huawei.dmestore.utils.CipherUtils;
 import com.huawei.dmestore.utils.ToolUtils;
 import com.huawei.dmestore.utils.VCSDKUtils;
 import com.huawei.vmware.autosdk.SessionHelper;
-
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import com.google.gson.JsonPrimitive;
 import com.vmware.cis.tagging.TagModel;
 import com.vmware.pbm.PbmProfile;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * ServiceLevelService
@@ -64,6 +45,8 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
 
     private DmeStorageService dmeStorageService;
 
+    private DmeVmwareRalationDao dmeVmwareRalationDao;
+
     private VCenterInfoService vcenterinfoservice;
 
     private VCSDKUtils vcsdkUtils;
@@ -71,6 +54,14 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
     private CipherUtils cipherUtils;
 
     private Gson gson = new Gson();
+
+    public DmeVmwareRalationDao getDmeVmwareRalationDao() {
+        return dmeVmwareRalationDao;
+    }
+
+    public void setDmeVmwareRalationDao(DmeVmwareRalationDao dmeVmwareRalationDao) {
+        this.dmeVmwareRalationDao = dmeVmwareRalationDao;
+    }
 
     public CipherUtils getCipherUtils() {
         return cipherUtils;
@@ -156,12 +147,37 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
                 List<PbmProfile> pbmProfiles = vcsdkUtils.getAllSelfPolicyInallcontext();
                 ResponseEntity responseEntity = dmeAccessService.access(DmeConstants.LIST_SERVICE_LEVEL_URL,
                     HttpMethod.GET, null);
+                // 从关系表中取得DME卷与vcenter存储的对应关系
+                List<DmeVmwareRelation> dvrlist = dmeVmwareRalationDao.getDmeVmwareRelation(DmeConstants.STORE_TYPE_VMFS);
+                if (dvrlist == null || dvrlist.size() == 0) {
+                    return;
+                }
+                List<String> volids = new ArrayList<>();
+                for (DmeVmwareRelation relation : dvrlist) {
+                    volids.add(relation.getVolumeId());
+                }
+
                 Object object = responseEntity.getBody();
                 JsonObject jsonObject = new JsonParser().parse(object.toString()).getAsJsonObject();
                 JsonArray jsonArray = jsonObject.get("service-levels").getAsJsonArray();
+
+                JsonArray updates = new JsonArray();
+                for (JsonElement jsonElement : jsonArray) {
+                    JsonObject object1 = new JsonParser().parse(jsonElement.toString()).getAsJsonObject();
+                    List<Volume> volumes = this.getVolumeInfosByServiceLevelId(object1.get(ID_FIELD).getAsString());
+                    if (!CollectionUtils.isEmpty(volumes)){
+                        for (Volume volume : volumes){
+                            if (volids.contains(volume.getId())){
+                                updates.add(jsonElement);
+                                break;
+                            }
+                        }
+                    }
+                }
+
                 List<TagModel> alreadyhasList = new ArrayList<>();
                 List<PbmProfile> alreadyhasPolicyList = new ArrayList<>();
-                for (JsonElement jsonElement : jsonArray) {
+                for (JsonElement jsonElement : updates) {
                     JsonObject object1 = new JsonParser().parse(jsonElement.toString()).getAsJsonObject();
                     String name = object1.get(NAME_FIELD).getAsString();
                     boolean alreadyhas = false;
@@ -200,6 +216,17 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
         } catch (Exception exception) {
             log.error(exception.getMessage());
         }
+    }
+
+
+    private Map<String, JsonElement> parseTiers(JsonArray jsonArray){
+        Map<String, JsonElement> ret = new HashMap<>(16);
+        for (JsonElement jsonElement : jsonArray) {
+            JsonObject object1 = new JsonParser().parse(jsonElement.toString()).getAsJsonObject();
+            String name = object1.get(NAME_FIELD).getAsString();
+            ret.put(name, jsonElement);
+        }
+        return ret;
     }
 
     /**

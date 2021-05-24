@@ -936,6 +936,9 @@ export class AddComponent extends VmfsCommon implements OnInit {
    * vmfs重名校验
    */
   checkVmfsName(name: string) {
+    if ((this as any).checkVmfsNameExist_oldName === name) return;
+    (this as any).checkVmfsNameExist_oldName = name;
+
     this.modalHandleLoading = true;
     this.remoteSrv.checkVmfsName(name).subscribe((result: any) => {
       this.modalHandleLoading = false;
@@ -961,6 +964,8 @@ export class AddComponent extends VmfsCommon implements OnInit {
    * vol重名校验
    */
   checkVolName(name: string) {
+    if ((this as any).checkVolNameExist_oldName === name) return;
+    (this as any).checkVolNameExist_oldName = name;
     this.modalHandleLoading = true;
     // 校验VMFS名称重复
     this.remoteSrv.checkVolName(name).subscribe((result: any) => {

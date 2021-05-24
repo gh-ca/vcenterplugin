@@ -303,3 +303,9 @@ clr-dg-cell.datagrid-cell{
 .color-notice{
   color:red;
 }
+
+
+.clr-error.clr-subtext{
+  color: #c21d00;
+  color: var(--clr-forms-invalid-color, #c21d00);
+}
