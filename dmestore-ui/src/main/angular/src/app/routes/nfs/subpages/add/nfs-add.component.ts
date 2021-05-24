@@ -524,27 +524,27 @@ export class NfsAddComponent extends NfsComponentCommon implements OnInit {
 
   setSameName() {
     if (this.addForm.sameName) {
-      this.addForm.shareName = this.addForm.nfsName;
+      this.setShareName(this.addForm.nfsName);
       this.addForm.fsName = this.addForm.nfsName;
     }
   }
 
   whenChoseSameName() {
-    this.addForm.shareName = this.addForm.nfsName;
+    this.setShareName(this.addForm.nfsName);
     this.addForm.fsName = this.addForm.nfsName;
     // 共享名称不能包含中文
     /* 取值范围为1到254个字符，只能由字母、数字、字符!\"#&%$'()*+-·.;<=>?@[]^_`{|}~,:和空格组成。 */
     /* 如果有中文，不可以相同，清空并打开 */
     if (!regExpCollection.shareFsName().test(this.addForm.nfsName)) {
       this.addForm.sameName = false;
-      this.addForm.shareName = '';
+      this.setShareName('');
       this.shareNameContainsCN = true;
     } else {
       this.shareNameContainsCN = false;
-      this.checkShareNameExist(this.addForm.nfsName);
+      this.checkShareNameExist(this.addForm.shareName);
     }
     this.checkNfsNameExist(this.addForm.nfsName);
-    this.checkFsNameExist(this.addForm.nfsName);
+    this.checkFsNameExist(this.addForm.fsName);
   }
 
   checkNfsName() {
@@ -582,7 +582,7 @@ export class NfsAddComponent extends NfsComponentCommon implements OnInit {
     if (regExpCollection.nfsName().test(this.addForm.fsName) && inLimit) {
       //验证重复
       this.matchErr = false;
-      this.checkShareNameExist(this.addForm.fsName);
+      this.checkFsNameExist(this.addForm.fsName);
     } else {
       this.matchErr = true;
       this.addForm.fsName = null;
@@ -613,6 +613,8 @@ export class NfsAddComponent extends NfsComponentCommon implements OnInit {
   }
 
   checkNfsNameExist(name: string) {
+    if ((this as any).checkNfsNameExist_oldName === name) return;
+    (this as any).checkNfsNameExist_oldName = name;
     this.addService.checkNfsNameExist(name).subscribe((r: any) => {
       if (r.code == '200') {
         if (r.data) {
@@ -626,6 +628,10 @@ export class NfsAddComponent extends NfsComponentCommon implements OnInit {
   }
 
   checkShareNameExist(name: string) {
+    /* v6 不需要 */
+    if (this.dorado) return;
+    if ((this as any).checkShareNameExist_oldName === name) return;
+    (this as any).checkShareNameExist_oldName = name;
     this.addService.checkShareNameExist(name).subscribe((r: any) => {
       if (r.code == '200') {
         if (r.data) {
@@ -639,6 +645,8 @@ export class NfsAddComponent extends NfsComponentCommon implements OnInit {
   }
 
   checkFsNameExist(name: string) {
+    if ((this as any).checkFsNameExist_oldName === name) return;
+    (this as any).checkFsNameExist_oldName = name;
     this.addService.checkFsNameExist(name).subscribe((r: any) => {
       if (r.code == '200') {
         if (r.data) {
