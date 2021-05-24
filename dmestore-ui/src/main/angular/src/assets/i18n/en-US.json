@@ -913,7 +913,7 @@
     "mountVmfsConnFail": "Mount failure,connectivity of host or hostgroup on dme error!",
     "details": "Details",
     "bandwidthLimitErr": "The lower limit of bandwidth cannot be greater than the upper limit!",
-    "iopsLimitErr": "The upper limit of IOPS is at least 100, and the lower limit cannot be greater than the upper limit!",
+    "iopsLimitErr": "The upper limit of IOPS and the lower limit of IOPS are at least 100, and the lower limit cannot be greater than the upper limit!",
     "iopsLimitErrNotV6": "The lower limit cannot be greater than the upper limit!",
     "syncSuccess": "Data synchronization is successful!"
   },

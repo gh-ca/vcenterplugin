@@ -378,10 +378,8 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
             ) {
                 map = queryVfmsQosInfo(params);
             } else if (
-                    indicatorlist.contains(DmeIndicatorConstants.COUNTER_ID_FS_READTHROUGHPUT)
-                            || indicatorlist.contains(DmeIndicatorConstants.COUNTER_ID_FS_WRITETHROUGHPUT)
-                            || indicatorlist.contains(DmeIndicatorConstants.COUNTER_ID_FS_READBANDWIDTH)
-                            || indicatorlist.contains(DmeIndicatorConstants.COUNTER_ID_FS_WRITEBANDWIDTH)
+                    indicatorlist.contains(DmeIndicatorConstants.COUNTER_ID_FS_THROUGHPUT)
+                            || indicatorlist.contains(DmeIndicatorConstants.COUNTER_ID_FS_BANDWIDTH)
                             || indicatorlist.contains(DmeIndicatorConstants.COUNTER_ID_FS_READRESPONSETIME)
                             || indicatorlist.contains(DmeIndicatorConstants.COUNTER_ID_FS_WRITERESPONSETIME)
             ) {
@@ -394,8 +392,10 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
                     for (JsonElement element : objIdJsonArray) {
                         String id = ToolUtils.jsonToStr(element);
                         Map<String, Object> tempMap = (Map<String,Object>)resultmap.get(id);
-                        tempMap.put("upper", ToolUtils.getStr(((Map<String,Object>)map.get(id)).get("upper")));
-                        tempMap.put("lower", ToolUtils.getStr(((Map<String,Object>)map.get(id)).get("lower")));
+                        if (!CollectionUtils.isEmpty(tempMap)) {
+                            tempMap.put("upper", ToolUtils.getStr(((Map<String, Object>) map.get(id)).get("upper")));
+                            tempMap.put("lower", ToolUtils.getStr(((Map<String, Object>) map.get(id)).get("lower")));
+                        }
                         resultmap.put(id,tempMap);
                     }
                 }

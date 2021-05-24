@@ -549,7 +549,7 @@ wwn: "67c1cf110058934511ba6e5a00000344"
             }
           }
         }
-      } 
+      }
       this.isLoading = false;
       this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
     };
@@ -2146,7 +2146,10 @@ wwn: "67c1cf110058934511ba6e5a00000344"
    * vmfs重名校验
    */
   checkVmfsName(name: string) {
+    if ((this as any).checkVmfsNameExist_oldName === name) return;
+    (this as any).checkVmfsNameExist_oldName = name;
     this.modalHandleLoading = true;
+
     this.remoteSrv.checkVmfsName(name).subscribe((result: any) => {
       this.modalHandleLoading = false;
       if (result.code === '200') {
@@ -2170,7 +2173,10 @@ wwn: "67c1cf110058934511ba6e5a00000344"
    * vol重名校验
    */
   checkVolName(name: string) {
+    if ((this as any).checkVolNameExist_oldName === name) return;
+    (this as any).checkVolNameExist_oldName = name;
     this.modalHandleLoading = true;
+    
     // 校验VMFS名称重复
     this.remoteSrv.checkVolName(name).subscribe((result: any) => {
       this.modalHandleLoading = false;
