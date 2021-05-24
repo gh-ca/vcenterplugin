@@ -1,24 +1,23 @@
 import { Component, NgZone, OnInit, ChangeDetectorRef } from '@angular/core';
 import { EChartOption } from 'echarts';
 import { VmfsPerformanceService } from './performance.service';
-import { NfsService, MakePerformance } from "../../nfs/nfs.service";
-import { VolumeInfo } from "../volume-attribute/attribute.service";
-import { FormControl, FormGroup } from "@angular/forms";
-import { GlobalsService } from "@shared/globals.service";
-import { TranslatePipe } from "@ngx-translate/core";
+import { NfsService, MakePerformance } from '../../nfs/nfs.service';
+import { VolumeInfo } from '../volume-attribute/attribute.service';
+import { FormControl, FormGroup } from '@angular/forms';
+import { GlobalsService } from '@shared/globals.service';
+import { TranslatePipe } from '@ngx-translate/core';
 import { CommonService } from './../../common.service';
 
 @Component({
   selector: 'app-performance',
   templateUrl: './performance.component.html',
   styleUrls: ['./performance.component.scss'],
-  providers: [CommonService,VmfsPerformanceService, MakePerformance, NfsService, TranslatePipe],
+  providers: [CommonService, VmfsPerformanceService, MakePerformance, NfsService, TranslatePipe],
 })
 export class PerformanceComponent implements OnInit {
-
   rangeTime = new FormGroup({
     start: new FormControl(),
-    end: new FormControl()
+    end: new FormControl(),
   });
   // 创建表格对象
   // IOPS+QoS上下限
@@ -72,50 +71,95 @@ export class PerformanceComponent implements OnInit {
   // endTime
   endTime = null;
 
-  constructor(private nfsService: NfsService, private makePerformance: MakePerformance,
-    private perService: VmfsPerformanceService, private ngZone: NgZone,
-    private cdr: ChangeDetectorRef, private gs: GlobalsService, private translatePipe: TranslatePipe,
-    private commonService: CommonService,
+  constructor(
+    private nfsService: NfsService,
+    private makePerformance: MakePerformance,
+    private perService: VmfsPerformanceService,
+    private ngZone: NgZone,
+    private cdr: ChangeDetectorRef,
+    private gs: GlobalsService,
+    private translatePipe: TranslatePipe,
+    private commonService: CommonService
   ) {
     /* DTS202103270EB3F3P0G00 */
-    this.timeSelectorRanges = this.commonService.timeSelectorRanges_type2
-
+    this.timeSelectorRanges = this.commonService.timeSelectorRanges_type2;
   }
-
 
   ngOnInit(): void {
     // 初始化卷信息
     const ctx = this.gs.getClientSdk().app.getContextObjects();
-    // const objectId = 'urn:vmomi:Datastore:datastore-1212:674908e5-ab21-4079-9cb1-596358ee5dd1';
-    const objectId = ctx[0].id;
+    const objectId = ctx
+      ? ctx[0].id
+      : `urn:vmomi:Datastore:datastore-1212:674908e5-ab21-4079-9cb1-596358ee5dd1`;
     this.getVolumeInfoByVolID(objectId);
     this.selectRange = 'LAST_1_DAY';
   }
   // 初始化表格对象
   initChart(paramsInfo: typeTimeInfo = {}) {
-    console.log('this.rang', this.range)
+    console.log('this.rang', this.range);
     const volIds: string[] = [];
-    volIds.push(this.selectVolume.wwn);
+    volIds.push(this.selectVolume?.wwn || '1282FFE20AA03E4EAC9A814C687B780A');
     // volIds.push('1282FFE20AA03E4EAC9A814C687B780A');
+
     // IOPS
-    this.makePerformance.setChart(paramsInfo, 300, this.translatePipe.transform('vmfs.iops'), 'IO/s', NfsService.vmfsIOPS, volIds, this.selectRange, NfsService.vmfsUrl, this.startTime, this.endTime).then(res => {
-      this.iopsChart = res;
-      this.iopsChartDataIsNull = res['series'][0].data.length < 1;
-      this.cdr.detectChanges();
-    });
+    this.makePerformance
+      .setChartVmfs(
+        paramsInfo,
+        300,
+        this.translatePipe.transform('vmfs.iops'),
+        'IO/s',
+        NfsService.vmfsIOPS,
+        volIds,
+        this.selectRange,
+        NfsService.vmfsUrl,
+        this.startTime,
+        this.endTime
+      )
+      .then(res => {
+        this.iopsChart = res;
+        this.iopsChartDataIsNull = res['series'][0].data.length < 1;
+        this.cdr.detectChanges();
+      });
 
     // 带宽
-    this.makePerformance.setChart(paramsInfo, 300, this.translatePipe.transform('vmfs.bandwidth'), 'MB/s', NfsService.vmfsBDWT, volIds, this.selectRange, NfsService.vmfsUrl, this.startTime, this.endTime).then(res => {
-      this.bandwidthChart = res;
-      this.bandwidthChartDataIsNull = res['series'][0].data.length < 1;
-      this.cdr.detectChanges();
-    });
-    // 响应时间
-    this.makePerformance.setChart(paramsInfo, 300, this.translatePipe.transform('vmfs.latency'), 'ms', NfsService.vmfsLatency, volIds, this.selectRange, NfsService.vmfsUrl, this.startTime, this.endTime).then(res => {
-      this.latencyChart = res;
-      this.latencyChartDataIsNull = res['series'][0].data.length < 1;
-      this.cdr.detectChanges();
-    });
+    this.makePerformance
+      .setChartVmfs(
+        paramsInfo,
+        300,
+        this.translatePipe.transform('vmfs.bandwidth'),
+        'MB/s',
+        NfsService.vmfsBDWT,
+        volIds,
+        this.selectRange,
+        NfsService.vmfsUrl,
+        this.startTime,
+        this.endTime
+      )
+      .then(res => {
+        this.bandwidthChart = res;
+        this.bandwidthChartDataIsNull = res['series'][0].data.length < 1;
+        this.cdr.detectChanges();
+      });
+
+    // 响应时间 时延
+    this.makePerformance
+      .setChartVmfs(
+        paramsInfo,
+        300,
+        this.translatePipe.transform('vmfs.latency'),
+        'ms',
+        NfsService.vmfsLatency,
+        volIds,
+        this.selectRange,
+        NfsService.vmfsUrl,
+        this.startTime,
+        this.endTime
+      )
+      .then(res => {
+        this.latencyChart = res;
+        this.latencyChartDataIsNull = res['series'][0].data.length < 1;
+        this.cdr.detectChanges();
+      });
   }
   // 切换卷函数
   changeVolFunc() {
@@ -125,7 +169,8 @@ export class PerformanceComponent implements OnInit {
         console.log('开始结束时间不能为空');
         return;
       }
-    } else { // 初始化开始结束时间
+    } else {
+      // 初始化开始结束时间
       this.startTime = null;
       this.endTime = null;
     }
@@ -136,7 +181,10 @@ export class PerformanceComponent implements OnInit {
 
       console.log('this.selectVolName+this.selectRange', this.selectVolName, this.selectRange);
       // 获取已选择的卷
-      this.selectVolume = this.makePerformance.getVolByName(this.selectVolName, this.volumeInfoList);
+      this.selectVolume = this.makePerformance.getVolByName(
+        this.selectVolName,
+        this.volumeInfoList
+      );
       // 请求后台重新加载折线图
       this.initChart(paramsInfo);
     } else {
@@ -148,9 +196,13 @@ export class PerformanceComponent implements OnInit {
    * 开始结束时间触发
    */
   changeDate() {
-    if (!this.rangeTime.controls.start.hasError('matStartDateInvalid')
-      && !this.rangeTime.controls.end.hasError('matEndDateInvalid')
-      && this.rangeTime.controls.start.value !== null && this.rangeTime.controls.end.value !== null) { // 需满足输入规范且不为空
+    if (
+      !this.rangeTime.controls.start.hasError('matStartDateInvalid') &&
+      !this.rangeTime.controls.end.hasError('matEndDateInvalid') &&
+      this.rangeTime.controls.start.value !== null &&
+      this.rangeTime.controls.end.value !== null
+    ) {
+      // 需满足输入规范且不为空
       this.startTime = this.rangeTime.controls.start.value._d.getTime();
       this.endTime = this.rangeTime.controls.end.value._d.getTime();
       console.log('startTime', this.startTime);

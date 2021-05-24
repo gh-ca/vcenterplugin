@@ -205,7 +205,7 @@ public final class DpSqlFileConstants {
     public static final String DP_DME_BEST_PRACTICE_CHECK_SQL = "DROP TABLE IF EXISTS \"DP_DME_BEST_PRACTICE_CHECK\"; "
         + "CREATE TABLE \"DP_DME_BEST_PRACTICE_CHECK\" ( " + "\"ID\"  integer PRIMARY KEY AUTO_INCREMENT NOT NULL, "
         + "\"HOST_ID\"  nvarchar(255), " + "\"HOST_NAME\"  nvarchar(255), " + "\"HOST_SETTING\"  nvarchar(255), "
-        + "\"RECOMMEND_VALUE\"  nvarchar(50) NOT NULL, " + "\"ACTUAL_VALUE\"  clob, " + "\"HINT_LEVEL\"  nvarchar(20), "
+        + "\"RECOMMEND_VALUE\"  nvarchar(255) NOT NULL, " + "\"ACTUAL_VALUE\"  clob, " + "\"HINT_LEVEL\"  nvarchar(20), "
         + "\"NEED_REBOOT\"  nvarchar(10), " + "\"AUTO_REPAIR\"  nvarchar(10), " + "\"CREATE_TIME\"  datetime " + ");";
 
     /**
@@ -213,6 +213,12 @@ public final class DpSqlFileConstants {
      */
     public static final String DP_DME_BEST_PRACTICE_CHECK_ALTER_SQL = "ALTER TABLE DP_DME_BEST_PRACTICE_CHECK "
         + "ALTER COLUMN ACTUAL_VALUE CLOB;";
+
+    /**
+     * DP_DME_BEST_PRACTICE_CHECK_ALTER_SQL.
+     */
+    public static final String DP_DME_BEST_PRACTICE_CHECK_ALTER_SQL1 = "ALTER TABLE DP_DME_BEST_PRACTICE_CHECK "
+            + " ALTER COLUMN RECOMMEND_VALUE nvarchar(255);";
 
     /**
      * DP_DME_VCENTER_INFO_SQL.

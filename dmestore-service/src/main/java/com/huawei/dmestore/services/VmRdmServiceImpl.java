@@ -272,9 +272,10 @@ public class VmRdmServiceImpl implements VmRdmService {
                 hostId = ToolUtils.jsonToStr(hostObject.get(ID_FIELD));
             }
         }
+        Map<String,List<Map<String, Object>>> allinitionators=vmfsAccessService.getAllInitionator();
 
         if (hostId == null) {
-            hostId = vmfsAccessService.checkOrCreateToHost(hostIp, hostObjectId);
+            hostId = vmfsAccessService.checkOrCreateToHost(hostIp, hostObjectId,allinitionators);
         }
         return hostId;
     }

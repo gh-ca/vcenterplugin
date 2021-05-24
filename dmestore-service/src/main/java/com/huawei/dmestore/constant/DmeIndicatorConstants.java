@@ -211,6 +211,11 @@ public class DmeIndicatorConstants {
     public static final String COUNTER_ID_STORDEVICE_THROUGHPUT = "1125904201875465";
 
     /**
+     * OPS
+     */
+    public static final String COUNTER_ID_STORDEVICE_OPS = "1125904201875467";
+
+    /**
      * 存储控制器 SYS_Controller
      * <p>
      * CPU使用率
@@ -335,6 +340,11 @@ public class DmeIndicatorConstants {
      * 写IOPS
      */
     public static final String COUNTER_ID_STORAGEDISK_WRITETHROUGHPUT = "1125917086777348";
+
+    /**
+     * IOPS
+     */
+    public static final String COUNTER_ID_STORAGEDISK_THROUGHPUT = "1125917086777352";
 
     /**
      * 平均IO响应时间

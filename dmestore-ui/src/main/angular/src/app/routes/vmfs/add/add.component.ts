@@ -1,17 +1,32 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, ViewChild } from "@angular/core";
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
 import { AddService } from './add.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
-  ClusterList, ConnFaildData,
+  ClusterList,
+  ConnFaildData,
   GetForm,
   HostList,
   HostOrCluster,
-  ServiceLevelList, StorageList,
-  StoragePoolList, StoragePoolMap,
-  VmfsListService, Workload
+  ServiceLevelList,
+  StorageList,
+  StoragePoolList,
+  StoragePoolMap,
+  Workload,
 } from '../list/list.service';
-import { ClrWizard, ClrWizardPage } from "@clr/angular";
-import { GlobalsService } from "../../../shared/globals.service";
+import { ClrWizard, ClrWizardPage } from '@clr/angular';
+import { GlobalsService } from '../../../shared/globals.service';
+import {
+  getQosCheckTipsTagInfo,
+  isStringLengthByteOutRange,
+  regExpCollection,
+} from 'app/app.helpers';
+import { VmfsCommon } from '../list/VmfsCommon';
 
 @Component({
   selector: 'app-list',
@@ -20,23 +35,22 @@ import { GlobalsService } from "../../../shared/globals.service";
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [AddService],
 })
-export class AddComponent implements OnInit {
-
-  isShowInput: boolean;
-
-  constructor(private remoteSrv: AddService, private route: ActivatedRoute, private cdr: ChangeDetectorRef,
-    private router: Router, private globalsService: GlobalsService) {
+export class AddComponent extends VmfsCommon implements OnInit {
+  constructor(
+    private remoteSrv: AddService,
+    private route: ActivatedRoute,
+    public cdr: ChangeDetectorRef,
+    private router: Router,
+    private globalsService: GlobalsService
+  ) {
+    super();
     this.form.version = '5'; // 版本
     this.setFormValueWhenHiden(false);
-
   }
 
-  setFormValueWhenHiden(isShowInput) {
-    this.isShowInput = isShowInput;
-    this.form.blockSize = '1024'; // 块大小，单位KB
-    this.form.spaceReclamationGranularity = '1024'; // 空间回收粒度 单位K
-    this.form.spaceReclamationPriority = 'low';
-  }
+  dorado = false; //是否是V6设备
+
+  isShowInput: boolean;
 
   // 初始化表单
   form = new GetForm().getAddForm();
@@ -76,7 +90,6 @@ export class AddComponent implements OnInit {
   vmfsNameRepeatErr = false; // vmfs名称是否重复 true：是 false 否
   volNameRepeatErr = false; // 卷名称是否重复 true：是 false 否
 
-
   connectivityFailure = false; // 主机联通性测试失败
   connFailData: ConnFaildData[]; //  主机联通性测试失败数据
   showDetail = false; // 展示主机联通异常数据
@@ -92,13 +105,20 @@ export class AddComponent implements OnInit {
   showWorkLoadFlag = false; // 应用类型展示
   latencyIsSelect = false; // 时延为下拉框
 
-  bandWidthMaxErrTips = false;// 带宽上限错误提示
-  bandWidthMinErrTips = false;// 带宽下限错误提示
-  iopsMaxErrTips = false;// IOPS上限错误提示
-  iopsMinErrTips = false;// IOPS下限错误提示
-  latencyErrTips = false;// 时延错误提示
+  bandWidthMaxErrTips = false; // 带宽上限错误提示
+  bandWidthMinErrTips = false; // 带宽下限错误提示
+  iopsMaxErrTips = false; // IOPS上限错误提示
+  iopsMinErrTips = false; // IOPS下限错误提示
+  latencyErrTips = false; // 时延错误提示
   bandwidthLimitErr = false; // v6 设备 带宽 下限大于上限
   iopsLimitErr = false; // v6 设备 IOPS 下限大于上限
+
+  setFormValueWhenHiden(isShowInput) {
+    this.isShowInput = isShowInput;
+    this.form.blockSize = '1024'; // 块大小，单位KB
+    this.form.spaceReclamationGranularity = '1024'; // 空间回收粒度 单位K
+    this.form.spaceReclamationPriority = 'low';
+  }
 
   ngOnInit(): void {
     this.initData();
@@ -132,6 +152,11 @@ export class AddComponent implements OnInit {
     });
     // 初始化表单
     this.form = new GetForm().getAddForm();
+    // 初始化form
+    this.addForm.reset(this.form);
+    /* 监听名字变化 根据是否一样给剩下两个赋值 */
+    this.addForm.valueChanges.subscribe(this.handlerValueChanges.bind(this));
+
     // 版本、块大小、粒度下拉框初始化
     this.setBlockSizeOptions();
 
@@ -152,6 +177,7 @@ export class AddComponent implements OnInit {
     // 容量设置
     this.capacityOnblur();
   }
+
   // 页面跳转
   jumpTo(page: ClrWizardPage) {
     if (this.wizard) {
@@ -186,8 +212,6 @@ export class AddComponent implements OnInit {
     this.form.blockSize = this.blockSizeOptions[0].key;
     // 重置空间回收粒度
     this.setSrgOptions();
-
-
   }
 
   /**
@@ -213,7 +237,7 @@ export class AddComponent implements OnInit {
       }
     }
     this.srgOptions = options;
-    this.form.spaceReclamationGranularity = this.srgOptions[0].key;;
+    this.form.spaceReclamationGranularity = this.srgOptions[0].key;
 
     // 容量设置
     this.capacityOnblur();
@@ -251,7 +275,6 @@ export class AddComponent implements OnInit {
         if (result.code === '200' && result.data !== null) {
           hostList = result.data;
           hostList.forEach(item => {
-
             const hostInfo = {
               deviceId: item.hostId,
               deviceName: item.hostName,
@@ -266,6 +289,7 @@ export class AddComponent implements OnInit {
       });
     });
   }
+
   // 设置集群数据
   setClusterDatas() {
     return new Promise((resolve, reject) => {
@@ -276,7 +300,6 @@ export class AddComponent implements OnInit {
         if (result.code === '200' && result.data !== null) {
           clusterList = result.data;
           clusterList.forEach(item => {
-
             const clusterInfo = {
               deviceId: item.clusterId,
               deviceName: item.clusterName,
@@ -319,6 +342,7 @@ export class AddComponent implements OnInit {
     this.isOperationErr = false;
     this.setServiceLevelList();
   }
+
   // 未选择服务等级 时调用方法
   customerClickFunc() {
     this.levelCheck = 'customer';
@@ -344,21 +368,24 @@ export class AddComponent implements OnInit {
 
     this.getStorageList();
   }
+
   // 获取所有存储数据
   getStorageList() {
-    this.remoteSrv.getStorages().subscribe((result: any) => {
+    /*  */
+
+    const handlerGetStorageListSuccess = (result: any) => {
       console.log(result);
       if (result.code === '200' && result.data !== null) {
         this.storageList = result.data;
 
-        const allPoolMap: StoragePoolMap[] = []
+        const allPoolMap: StoragePoolMap[] = [];
 
         result.data.forEach(item => {
           const poolMap: StoragePoolMap = {
             storageId: item.id,
             storagePoolList: null,
-            workloadList: null
-          }
+            workloadList: null,
+          };
           allPoolMap.push(poolMap);
         });
 
@@ -367,8 +394,11 @@ export class AddComponent implements OnInit {
       }
       this.modalLoading = false;
       this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
-    });
+    };
+
+    this.remoteSrv.getStorages().subscribe(handlerGetStorageListSuccess);
   }
+
   // 获取存储池数据
   getStoragePoolsByStorId() {
     this.form.pool_raw_id = undefined;
@@ -377,7 +407,6 @@ export class AddComponent implements OnInit {
     this.workloads = [];
     console.log('selectSotrageId' + this.form.storage_id);
     if (null !== this.form.storage_id && '' !== this.form.storage_id) {
-
       // qos上下限
       this.addQosUpperAndLower();
       this.addSmartTierInit();
@@ -385,30 +414,41 @@ export class AddComponent implements OnInit {
       this.addWorkLoadShowInit();
       this.addLatencyChoose();
 
-      const storagePoolMap = this.storagePoolMap.filter(item => item.storageId == this.form.storage_id);
+      const storagePoolMap = this.storagePoolMap.filter(
+        item => item.storageId == this.form.storage_id
+      );
 
       const storagePoolList = storagePoolMap[0].storagePoolList;
       const workloads = storagePoolMap[0].workloadList;
       const storages = this.storageList.filter(item => item.id == this.form.storage_id)[0];
       const dorado = storages.storageTypeShow.dorado;
       let mediaType;
-      if (dorado) { // v6设备
+      if (dorado) {
+        // v6设备
         mediaType = 'block-and-file';
-      } else { // V5设备
+      } else {
+        // V5设备
         mediaType = 'block';
       }
       // 获取存储池数据
       // if (!storagePoolList) {
-      this.remoteSrv.getStoragePoolsByStorId(this.form.storage_id, mediaType).subscribe((result: any) => {
-        console.log('storagePools', result);
-        console.log('result.code === \'200\' && result.data !== null', result.code === '200' && result.data !== null);
-        if (result.code === '200' && result.data !== null) {
-          this.storagePoolList = result.data;
-          this.storagePoolMap.filter(item => item.storageId == this.form.storage_id)[0].storagePoolList = result.data;
+      this.remoteSrv
+        .getStoragePoolsByStorId(this.form.storage_id, mediaType)
+        .subscribe((result: any) => {
+          console.log('storagePools', result);
+          console.log(
+            "result.code === '200' && result.data !== null",
+            result.code === '200' && result.data !== null
+          );
+          if (result.code === '200' && result.data !== null) {
+            this.storagePoolList = result.data;
+            this.storagePoolMap.filter(
+              item => item.storageId == this.form.storage_id
+            )[0].storagePoolList = result.data;
 
-          this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
-        }
-      });
+            this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
+          }
+        });
       // } else {
       //   this.storagePoolList = storagePoolList;
       // }
@@ -418,7 +458,9 @@ export class AddComponent implements OnInit {
           console.log('storagePools', result);
           if (result.code === '200' && result.data !== null) {
             this.workloads = result.data;
-            this.storagePoolMap.filter(item => item.storageId == this.form.storage_id)[0].workloadList = result.data;
+            this.storagePoolMap.filter(
+              item => item.storageId == this.form.storage_id
+            )[0].workloadList = result.data;
 
             this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
           }
@@ -433,29 +475,43 @@ export class AddComponent implements OnInit {
    * 取消
    */
   cancel() {
-    this.wizard.close();// 关闭弹窗
-    if (this.resource === 'list') { // 列表入口
+    this.wizard.close(); // 关闭弹窗
+    if (this.resource === 'list') {
+      // 列表入口
       this.router.navigate(['vmfs/list']);
-    } else { // dataStore入口
+    } else {
+      // dataStore入口
       this.globalsService.getClientSdk().modal.close();
     }
   }
 
   // 添加vmfs 处理
   addVmfsHanlde() {
-    if (this.bandWidthMaxErrTips || this.iopsMaxErrTips
-      || this.bandWidthMinErrTips || this.iopsMinErrTips || this.latencyErrTips || this.bandwidthLimitErr || this.iopsLimitErr) {
+    if (
+      this.bandWidthMaxErrTips ||
+      this.iopsMaxErrTips ||
+      this.bandWidthMinErrTips ||
+      this.iopsMinErrTips ||
+      this.latencyErrTips ||
+      this.bandwidthLimitErr ||
+      this.iopsLimitErr
+    ) {
       return;
     }
     const selectResult = this.serviceLevelList.find(item => item.show === true);
     console.log('selectResult', this.levelCheck === 'level' && selectResult);
-    if ((this.levelCheck === 'level' && selectResult && selectResult.totalCapacity !== 0) || this.levelCheck !== 'level') { // 选择服务等级
+    if (
+      (this.levelCheck === 'level' && selectResult && selectResult.totalCapacity !== 0) ||
+      this.levelCheck !== 'level'
+    ) {
+      // 选择服务等级
       if (selectResult) {
         this.form.service_level_id = selectResult.id;
         this.form.service_level_name = selectResult.name;
       }
       // 数据预处----卷名称
-      if (this.form.isSameName) { // 卷名称与vmfs名称相同（PS：不同时为必填）
+      if (this.form.isSameName) {
+        // 卷名称与vmfs名称相同（PS：不同时为必填）
         this.form.volumeName = this.form.name;
       }
       const addSubmitForm = new GetForm().getAddForm();
@@ -471,7 +527,8 @@ export class AddComponent implements OnInit {
         case 'KB':
           addSubmitForm.capacity = addSubmitForm.capacity / (1024 * 1024);
           break;
-        default: // 默认GB 不变
+        default:
+          // 默认GB 不变
           break;
       }
       // 主机/集群数据处理
@@ -482,21 +539,29 @@ export class AddComponent implements OnInit {
         addSubmitForm.cluster = this.chooseDevice.deviceName;
         addSubmitForm.clusterId = this.chooseDevice.deviceId;
       }
-      if (this.levelCheck === 'customer') { // 未选择 服务等级 需要将服务等级数据设置为空
+      if (this.levelCheck === 'customer') {
+        // 未选择 服务等级 需要将服务等级数据设置为空
         addSubmitForm.service_level_id = null;
         addSubmitForm.service_level_name = null;
       }
       // 若控制策略数据为空，则将控制策略变量置为空
-      if (addSubmitForm.maxbandwidth === null && addSubmitForm.maxiops === null
-        && addSubmitForm.minbandwidth === null && addSubmitForm.miniops === null && addSubmitForm.latency === null) {
+      if (
+        addSubmitForm.maxbandwidth === null &&
+        addSubmitForm.maxiops === null &&
+        addSubmitForm.minbandwidth === null &&
+        addSubmitForm.miniops === null &&
+        addSubmitForm.latency === null
+      ) {
         addSubmitForm.control_policy = null;
       }
       // 控制策略若未选清空数据
       if (this.levelCheck == 'customer') {
         this.qosFunc(addSubmitForm);
-        if (addSubmitForm.control_policyUpper == '1') { // 上限+全选（上下限）
+        if (addSubmitForm.control_policyUpper == '1') {
+          // 上限+全选（上下限）
           addSubmitForm.control_policy = '1';
-        } else if (addSubmitForm.control_policyLower == '0') {// 下限
+        } else if (addSubmitForm.control_policyLower == '0') {
+          // 下限
           addSubmitForm.control_policy = '0';
         } else {
           addSubmitForm.control_policy = null;
@@ -518,17 +583,16 @@ export class AddComponent implements OnInit {
           console.log('创建成功');
           // 打开成功提示窗口
           this.addSuccessShow = true;
-
         } else if (result.code === '-60001') {
           this.connectivityFailure = true;
           this.showDetail = false;
           const connFailDatas: ConnFaildData[] = [];
           if (result.data) {
             result.data.forEach(item => {
-              for (let key in item) {
+              for (const key in item) {
                 const conFailData = {
                   hostName: key,
-                  description: item[key]
+                  description: item[key],
                 };
                 connFailDatas.push(conFailData);
               }
@@ -546,13 +610,15 @@ export class AddComponent implements OnInit {
       this.serviceLevelIsNull = true;
     }
   }
+
   // 容量单位转换
   capacityChange(obj: any) {
     console.log('event', obj.value === '1');
-    const objValue = obj.value.match(/\d+(\.\d{0,2})?/) ? obj.value.match(/\d+(\.\d{0,2})?/)[0] : '';
+    const objValue = obj.value.match(/\d+(\.\d{0,2})?/)
+      ? obj.value.match(/\d+(\.\d{0,2})?/)[0]
+      : '';
 
     if (objValue !== '') {
-
       let capatityG;
       // 数据预处----容量 （后端默认单位为GB）
       switch (this.form.capacityUnit) {
@@ -565,7 +631,8 @@ export class AddComponent implements OnInit {
         case 'KB':
           capatityG = objValue / (1024 * 1024);
           break;
-        default: // 默认GB 不变
+        default:
+          // 默认GB 不变
           capatityG = objValue;
           break;
       }
@@ -586,7 +653,8 @@ export class AddComponent implements OnInit {
         case 'KB':
           capatityG = capatityG * (1024 * 1024);
           break;
-        default: // 默认GB 不变
+        default:
+          // 默认GB 不变
           capatityG = capatityG;
           break;
       }
@@ -596,6 +664,7 @@ export class AddComponent implements OnInit {
       obj.value = objValue;
     }
   }
+
   /**
    * 容量格式化
    * @param c 容量值
@@ -612,6 +681,7 @@ export class AddComponent implements OnInit {
     }
     return cNum;
   }
+
   /**
    * 容量
    * @param obj
@@ -621,18 +691,19 @@ export class AddComponent implements OnInit {
     let capacity = this.form.capacity;
     // 标准容量 单位G
     let capacityG;
-    console.log('capacity', capacity)
+    console.log('capacity', capacity);
     if (capacity && capacity !== null && capacity !== '') {
-
       if (capacity > 0) {
         switch (this.form.capacityUnit) {
-          case "TB":
+          case 'TB':
             capacityG = capacity * 1024 + '';
             console.log('capacityG2', capacityG);
-            if (capacityG.indexOf(".") !== -1) { // 小数
+            if (capacityG.indexOf('.') !== -1) {
+              // 小数
               this.capacityErr = true;
               capacity = '';
-            } else { // 整数
+            } else {
+              // 整数
               if (this.form.version === '5') {
                 if (capacity < 1 / 1024) {
                   capacity = '';
@@ -650,12 +721,14 @@ export class AddComponent implements OnInit {
               }
             }
             break;
-          case "MB":
+          case 'MB':
             capacityG = capacity / 1024 + '';
-            if (capacityG.indexOf(".") !== -1) { // 小数
+            if (capacityG.indexOf('.') !== -1) {
+              // 小数
               this.capacityErr = true;
               capacity = '';
-            } else { // 整数
+            } else {
+              // 整数
               if (this.form.version === '5') {
                 if (capacity < 1 * 1024) {
                   capacity = '';
@@ -675,10 +748,12 @@ export class AddComponent implements OnInit {
             break;
           default:
             capacityG = capacity + '';
-            if (capacityG.indexOf(".") !== -1) { // 小数
+            if (capacityG.indexOf('.') !== -1) {
+              // 小数
               capacity = '';
               this.capacityErr = true;
-            } else {// 整数
+            } else {
+              // 整数
               if (this.form.version === '5') {
                 if (capacity < 1) {
                   capacity = '';
@@ -694,7 +769,6 @@ export class AddComponent implements OnInit {
                   this.capacityErr = false;
                 }
               }
-
             }
             break;
         }
@@ -716,8 +790,10 @@ export class AddComponent implements OnInit {
    */
   countBlur() {
     let count = this.form.count;
+    /*
     if (count && count !== null && count !== '') {
-      if ((count + '').indexOf(".") !== -1) { // 小数
+      if ((count + '').indexOf('.') !== -1) {
+        // 小数
         count = '';
         this.capacityErr = true;
       } else {
@@ -727,6 +803,14 @@ export class AddComponent implements OnInit {
       count = '';
     }
     this.form.count = count;
+   */
+    /* 且容量必须为单位为G的正整数，数量必须为正整数且不超过100 */
+    const isInteger = regExpCollection.integer().test(count);
+    // console.log("🚀 ~ file: add.component.ts ~ line 810 ~ AddComponent ~ countBlur ~ isInteger", isInteger);
+
+    if (!(isInteger && count > 0 && count <= 100)) {
+      this.form.count = null;
+    }
   }
 
   /**
@@ -737,6 +821,7 @@ export class AddComponent implements OnInit {
       this.wizard.next();
     }
   }
+
   /**
    * 带宽 blur
    * @param type
@@ -744,7 +829,6 @@ export class AddComponent implements OnInit {
    * @param valType
    */
   qosBlur(type: String, operationType: string) {
-
     let objVal;
     switch (operationType) {
       case 'maxbandwidth':
@@ -792,7 +876,6 @@ export class AddComponent implements OnInit {
         this.form.latency = objVal;
         break;
     }
-    ;
     this.iopsErrTips(objVal, operationType);
     // 下限大于上限 检测
     this.qosV6Check('add');
@@ -815,10 +898,10 @@ export class AddComponent implements OnInit {
     this.volNameRepeatErr = false;
     this.matchErr = false;
 
-    let reg5: RegExp = new RegExp('^[0-9a-zA-Z-\u4e00-\u9fa5a"_""."]*$');
     if (isVmfs) {
       if (this.form.name) {
-        if (reg5.test(this.form.name)) {
+        const inLimit = !isStringLengthByteOutRange(this.form.name, 27);
+        if (regExpCollection.vmfsName().test(this.form.name) && inLimit) {
           // 校验VMFS名称重复
           this.checkVmfsName(this.form.name);
           if (this.form.isSameName) {
@@ -833,7 +916,10 @@ export class AddComponent implements OnInit {
       }
     } else {
       if (this.form.volumeName) {
-        if (reg5.test(this.form.volumeName)) {
+        if (
+          regExpCollection.vmfsName().test(this.form.volumeName) &&
+          !isStringLengthByteOutRange(this.form.volumeName, 27)
+        ) {
           // 校验Vol名称重复
           this.checkVolName(this.form.volumeName);
         } else {
@@ -853,9 +939,11 @@ export class AddComponent implements OnInit {
     this.modalHandleLoading = true;
     this.remoteSrv.checkVmfsName(name).subscribe((result: any) => {
       this.modalHandleLoading = false;
-      if (result.code === '200') { // result.data true 不重复 false 重复
+      if (result.code === '200') {
+        // result.data true 不重复 false 重复
         this.vmfsNameRepeatErr = !result.data;
-        if (this.vmfsNameRepeatErr) { // 名称重复
+        if (this.vmfsNameRepeatErr) {
+          // 名称重复
           // this.form.name = null;
           this.volNameRepeatErr = false;
           this.matchErr = false;
@@ -877,7 +965,8 @@ export class AddComponent implements OnInit {
     // 校验VMFS名称重复
     this.remoteSrv.checkVolName(name).subscribe((result: any) => {
       this.modalHandleLoading = false;
-      if (result.code === '200') { // result.data true 不重复 false 重复
+      if (result.code === '200') {
+        // result.data true 不重复 false 重复
         this.volNameRepeatErr = !result.data;
         // if (!this.vmfsNameRepeatErr && this.volNameRepeatErr) {
         //   this.form.name = null;
@@ -888,15 +977,17 @@ export class AddComponent implements OnInit {
           this.matchErr = false;
         }
       }
-      console.log("this.modalHandleLoading", this.modalHandleLoading)
+      console.log('this.modalHandleLoading', this.modalHandleLoading);
       this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
     });
   }
+
   qosFunc(form) {
-    console.log("form.qosFlag", form.qosFlag);
+    console.log('form.qosFlag', form.qosFlag);
     // qos策略 1 支持复选(上限、下限) 2支持单选（上限或下限） 3只支持上限
     const qosTag = this.getStorageQosTag(form.storage_id);
-    if (!form.qosFlag) {// 关闭状态
+    if (!form.qosFlag) {
+      // 关闭状态
       this.initAddMinInfo(form);
       this.initAddMaxInfo(form);
     } else {
@@ -938,6 +1029,7 @@ export class AddComponent implements OnInit {
       form.control_policy = null;
     }
   }
+
   initAddMinInfo(form) {
     form.control_policyLower = undefined;
     form.minbandwidthChoose = false;
@@ -947,6 +1039,7 @@ export class AddComponent implements OnInit {
     form.latencyChoose = false;
     form.latency = null;
   }
+
   initAddMaxInfo(form) {
     form.control_policyUpper = undefined;
     form.maxbandwidthChoose = false;
@@ -981,8 +1074,8 @@ export class AddComponent implements OnInit {
     const qosTag = this.getStorageQosTag(this.form.storage_id);
     this.form.control_policyLower = undefined;
     this.form.control_policyUpper = undefined;
-    const upperObj = document.getElementById("control_policyUpper") as HTMLInputElement;
-    const lowerObj = document.getElementById("control_policyLower") as HTMLInputElement;
+    const upperObj = document.getElementById('control_policyUpper') as HTMLInputElement;
+    const lowerObj = document.getElementById('control_policyLower') as HTMLInputElement;
     if (upperObj && upperObj.checked) {
       upperObj.checked = false;
     }
@@ -1065,6 +1158,7 @@ export class AddComponent implements OnInit {
     const qosTag = storageTypeShow[0].storageTypeShow.qosTag;
     return qosTag;
   }
+
   /**
    * 添加页面 时延为下拉框
    */
@@ -1074,7 +1168,6 @@ export class AddComponent implements OnInit {
     this.latencyIsSelect = qosTag == 1;
   }
 
-
   /**
    * 控制策略变更
    * @param upperObj
@@ -1082,8 +1175,8 @@ export class AddComponent implements OnInit {
    * @param isUpper true:upper、false:lower
    */
   controlPolicyChangeFunc(isUpper) {
-    const upperObj = document.getElementById("control_policyUpper") as HTMLInputElement;
-    const lowerObj = document.getElementById("control_policyLower") as HTMLInputElement;
+    const upperObj = document.getElementById('control_policyUpper') as HTMLInputElement;
+    const lowerObj = document.getElementById('control_policyLower') as HTMLInputElement;
     // qos策略 1 支持复选(上限、下限) 2支持单选（上限或下限） 3只支持上限
     const qosTag = this.getStorageQosTag(this.form.storage_id);
 
@@ -1102,8 +1195,9 @@ export class AddComponent implements OnInit {
       } else {
         this.form.control_policyUpper = undefined;
       }
-      if (qosTag == 2 && upperChecked) { // 单选
-        console.log("单选1", qosTag)
+      if (qosTag == 2 && upperChecked) {
+        // 单选
+        console.log('单选1', qosTag);
         this.form.control_policyLower = undefined;
         lowerObj.checked = false;
       }
@@ -1114,7 +1208,7 @@ export class AddComponent implements OnInit {
         this.form.control_policyLower = undefined;
       }
       if (lowerChecked && qosTag == 2) {
-        console.log("单选2", qosTag)
+        console.log('单选2', qosTag);
         this.form.control_policyUpper = undefined;
         upperObj.checked = false;
       }
@@ -1128,7 +1222,7 @@ export class AddComponent implements OnInit {
       this.form.miniopsChoose = false;
       this.form.latencyChoose = false;
     }
-    console.log("lowerChecked", this.form)
+    console.log('lowerChecked', this.form);
     this.qosV6Check('add');
   }
 
@@ -1136,11 +1230,13 @@ export class AddComponent implements OnInit {
    *
    * 添加页面名称相同按钮点击事件
    */
-  addSameBtnChangeFunc(obj) {
+  /*   addSameBtnChangeFunc(obj) {
     if (this.form.isSameName) {
-      this.form.volumeName = this.form.name
+      this.form.volumeName = this.form.name;
+      this.checkPageOne();
     }
-  }
+  } */
+
   /**
    * iops错误提示
    * @param objVal
@@ -1187,6 +1283,7 @@ export class AddComponent implements OnInit {
       }
     }
   }
+
   /**
    * 初始化IOPS错误提示
    */
@@ -1201,6 +1298,7 @@ export class AddComponent implements OnInit {
       this.latencyErrTips = false;
     }
   }
+
   resetQosFlag(objValue: boolean, operationType: string) {
     switch (operationType) {
       case 'maxbandwidth':
@@ -1230,16 +1328,43 @@ export class AddComponent implements OnInit {
         break;
     }
   }
+
   qosV6Check(type: string) {
     if (type == 'add') {
       if (this.form.storage_id) {
         const chooseStorage = this.storageList.filter(item => item.id == this.form.storage_id)[0];
         if (chooseStorage) {
-          const qosTag = chooseStorage.storageTypeShow.qosTag
+          const qosTag = chooseStorage.storageTypeShow.qosTag;
+          this.dorado = String(qosTag) === '1';
+          const { bandwidthLimitErr, iopsLimitErr } = getQosCheckTipsTagInfo({
+            qosTag,
+            minBandwidthChoose: this.form.minbandwidthChoose,
+            minBandwidth: this.form.minbandwidth,
+            maxBandwidthChoose: this.form.maxbandwidthChoose,
+            maxBandwidth: this.form.maxbandwidth,
+            minIopsChoose: this.form.miniopsChoose,
+            minIops: this.form.miniops,
+            maxIopsChoose: this.form.maxiopsChoose,
+            maxIops: this.form.maxiops,
+            control_policyUpper: this.form.control_policyUpper,
+            control_policyLower: this.form.control_policyLower,
+          });
+          this.bandwidthLimitErr = bandwidthLimitErr;
+          this.iopsLimitErr = iopsLimitErr;
+
+          /* 
+          
+          
+          
+          const qosTag = chooseStorage.storageTypeShow.qosTag;
           if (qosTag == 1) {
             if (this.form.minbandwidthChoose && this.form.maxbandwidthChoose) {
               // 带宽上限小于下限
-              if (this.form.minbandwidth && this.form.maxbandwidth && Number(this.form.minbandwidth) > Number(this.form.maxbandwidth)) {
+              if (
+                this.form.minbandwidth &&
+                this.form.maxbandwidth &&
+                Number(this.form.minbandwidth) > Number(this.form.maxbandwidth)
+              ) {
                 this.bandwidthLimitErr = true;
               } else {
                 this.bandwidthLimitErr = false;
@@ -1249,7 +1374,11 @@ export class AddComponent implements OnInit {
             }
             if (this.form.miniopsChoose && this.form.maxiopsChoose) {
               // iops上限小于下限
-              if (this.form.miniops && this.form.maxiops && Number(this.form.miniops) > Number(this.form.maxiops)) {
+              if (
+                this.form.miniops &&
+                this.form.maxiops &&
+                Number(this.form.miniops) > Number(this.form.maxiops)
+              ) {
                 this.iopsLimitErr = true;
               } else {
                 this.iopsLimitErr = false;
@@ -1271,8 +1400,9 @@ export class AddComponent implements OnInit {
           if (this.form.control_policyLower == undefined) {
             this.bandwidthLimitErr = false;
           }
+        
+          */
         }
-
       }
     }
   }

@@ -1,14 +1,10 @@
-import {
-  Component,
-  OnInit,
-  ChangeDetectionStrategy, ChangeDetectorRef,
-} from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { CommonService } from '../common.service';
-import { GlobalsService } from "../../shared/globals.service";
-import { TranslatePipe } from "@ngx-translate/core";
+import { GlobalsService } from '../../shared/globals.service';
+import { TranslatePipe } from '@ngx-translate/core';
 import { isMockData, mockData } from 'mock/mock';
-import { handlerResponseErrorSimple } from 'app/app.helpers';
+import { getTypeOf, handlerResponseErrorSimple } from 'app/app.helpers';
 
 export const MTU = 'mtu';
 export const MTU_TAG = 'Jumbo Frame (MTU)';
@@ -18,17 +14,17 @@ export const MTU_TAG = 'Jumbo Frame (MTU)';
   templateUrl: './bestpractice.component.html',
   styleUrls: ['./bestpractice.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [CommonService, TranslatePipe]
+  providers: [CommonService, TranslatePipe],
 })
 export class BestpracticeComponent implements OnInit {
-
   // ================最佳实践列表=============
   rowSelected = []; // 当前选中数据
   isLoading = true; // table数据loading
   list: Bestpractice[] = []; // 数据列表
   total = 0; // 总数据数量
 
-  query = { // 查询数据
+  query = {
+    // 查询数据
   };
   // =================END===============
 
@@ -48,21 +44,21 @@ export class BestpracticeComponent implements OnInit {
   ips = '';
   applyType = '1';
 
-
   tipModalSuccess = false;
   tipModalFail = false;
 
   applyLoading = false;
   checkLoading = false;
 
-  applyTips = false;// 实施最佳实践提示（违规数为0时提示）
+  applyTips = false; // 实施最佳实践提示（违规数为0时提示）
 
-  constructor(private cdr: ChangeDetectorRef,
+  constructor(
+    private cdr: ChangeDetectorRef,
     public gs: GlobalsService,
     private http: HttpClient,
     private commonService: CommonService,
-    private translatePipe: TranslatePipe) {
-  }
+    private translatePipe: TranslatePipe
+  ) {}
 
   ngOnInit(): void {
     this.practiceRefresh();
@@ -75,13 +71,13 @@ export class BestpracticeComponent implements OnInit {
   packApplyPracticeParams() {
     const params = [];
     this.ips = '';
-    this.rowSelected.forEach((item) => {
+    this.rowSelected.forEach(item => {
       const i = { hostSetting: '', hostObjectIds: [] };
       i.hostSetting = item.hostSetting;
-      item.hostList.forEach((s) => {
+      item.hostList.forEach(s => {
         i.hostObjectIds.push(s.hostObjectId);
-        if (s.needReboot == "true") {
-          this.ips += s.hostName + ",";
+        if (s.needReboot == 'true') {
+          this.ips += s.hostName + ',';
         }
       });
       params.push(i);
@@ -98,10 +94,10 @@ export class BestpracticeComponent implements OnInit {
     const i = { hostSetting: '', hostObjectIds: [] };
     i.hostSetting = this.currentBestpractice.hostSetting;
     let ips = '';
-    this.hostSelected.forEach((s) => {
+    this.hostSelected.forEach(s => {
       i.hostObjectIds.push(s.hostObjectId);
-      if (s.needReboot == "true") {
-        ips += s.hostName + ",";
+      if (s.needReboot == 'true') {
+        ips += s.hostName + ',';
       }
     });
     params.push(i);
@@ -115,21 +111,24 @@ export class BestpracticeComponent implements OnInit {
    */
   applyPractice(params) {
     this.applyLoading = true;
-    this.http.post('v1/bestpractice/update/bylist', params).subscribe((result: any) => {
-      this.applyLoading = false;
-      if (result?.code == '200') {
-        this.tipModalSuccess = true;
-        if (this.applyType != '1') {
-          this.hostModalShow = false;
+    this.http.post('v1/bestpractice/update/bylist', params).subscribe(
+      (result: any) => {
+        this.applyLoading = false;
+        if (result?.code == '200') {
+          this.tipModalSuccess = true;
+          if (this.applyType != '1') {
+            this.hostModalShow = false;
+          }
+          this.practiceRefresh();
+        } else {
+          this.tipModalFail = true;
         }
-        this.practiceRefresh();
-      } else {
-        this.tipModalFail = true;
+        this.cdr.detectChanges();
+      },
+      err => {
+        console.error('ERROR', err);
       }
-      this.cdr.detectChanges();
-    }, err => {
-      console.error('ERROR', err);
-    });
+    );
   }
 
   openTip() {
@@ -142,7 +141,7 @@ export class BestpracticeComponent implements OnInit {
 
   applyClick(type: string) {
     if (type == '1') {
-      this.rowSelected.forEach((item) => {
+      this.rowSelected.forEach(item => {
         if (item.count == 0) {
           this.applyTips = true;
           return;
@@ -179,20 +178,22 @@ export class BestpracticeComponent implements OnInit {
 
   recheck() {
     this.checkLoading = true;
-    this.http.post('v1/bestpractice/check', {}).subscribe((result: any) => {
-      this.checkLoading = false;
-      if (result.code == '200') {
-        this.tipModalSuccess = true;
-        this.practiceRefresh();
-      } else {
-        this.tipModalFail = true;
+    this.http.post('v1/bestpractice/check', {}).subscribe(
+      (result: any) => {
+        this.checkLoading = false;
+        if (result.code == '200') {
+          this.tipModalSuccess = true;
+          this.practiceRefresh();
+        } else {
+          this.tipModalFail = true;
+        }
+        this.cdr.detectChanges();
+      },
+      err => {
+        console.error('ERROR', err);
       }
-      this.cdr.detectChanges();
-    }, err => {
-      console.error('ERROR', err);
-    });
+    );
   }
-
 
   practiceRefresh() {
     this.isLoading = true;
@@ -206,10 +207,10 @@ export class BestpracticeComponent implements OnInit {
           this.list = this.list.map(item => {
             const _item = { ...item };
             const LEVEL_MAP = {
-              "Critical": [4, "overview.critical"],
-              "Major": [3, "overview.major"],
-              "Warning": [2, "overview.warning"],
-              "Info": [1, "overview.info"],
+              Critical: [4, 'overview.critical'],
+              Major: [3, 'overview.major'],
+              Warning: [2, 'overview.warning'],
+              Info: [1, 'overview.info'],
             };
             let levelDesc = '--';
             let levelNum = 0;
@@ -223,19 +224,19 @@ export class BestpracticeComponent implements OnInit {
 
             // 设置描述信息
             const DESCRIPTION_MAP = {
-              'VMFS3.UseATSForHBOnVMFS5': ('bestPractice.description.vmfs5'),
-              'VMFS3.HardwareAcceleratedLocking': ('bestPractice.description.locking'),
-              'DataMover.HardwareAcceleratedInit': ('bestPractice.description.init'),
-              'DataMover.HardwareAcceleratedMove': ('bestPractice.description.move'),
-              'VMFS3.EnableBlockDelete': ('bestPractice.description.delete'),
-              'Disk.SchedQuantum': ('bestPractice.description.quanTum'),
-              'Disk.DiskMaxIOSize': ('bestPractice.description.diskMaxIOSize'),
-              'LUN Queue Depth for Qlogic': ('bestPractice.description.depthForQlogic'),
-              'LUN Queue Depth for Emulex': ('bestPractice.description.depthForEmulex'),
-              'NMP path switch policy': ('bestPractice.description.pathSwitchPolicy'),
-              'Jumbo Frame (MTU)': ('bestPractice.description.jumboFrame'),
-              'VMFS-6 Auto-Space Reclamation': ('bestPractice.description.reclamation'),
-              'Number of volumes in Datastore': ('bestPractice.description.numberOfVolInDatastore'),
+              'VMFS3.UseATSForHBOnVMFS5': 'bestPractice.description.vmfs5',
+              'VMFS3.HardwareAcceleratedLocking': 'bestPractice.description.locking',
+              'DataMover.HardwareAcceleratedInit': 'bestPractice.description.init',
+              'DataMover.HardwareAcceleratedMove': 'bestPractice.description.move',
+              'VMFS3.EnableBlockDelete': 'bestPractice.description.delete',
+              'Disk.SchedQuantum': 'bestPractice.description.quanTum',
+              'Disk.DiskMaxIOSize': 'bestPractice.description.diskMaxIOSize',
+              'LUN Queue Depth for Qlogic': 'bestPractice.description.depthForQlogic',
+              'LUN Queue Depth for Emulex': 'bestPractice.description.depthForEmulex',
+              'NMP path switch policy': 'bestPractice.description.pathSwitchPolicy',
+              'Jumbo Frame (MTU)': 'bestPractice.description.jumboFrame',
+              'VMFS-6 Auto-Space Reclamation': 'bestPractice.description.reclamation',
+              'Number of volumes in Datastore': 'bestPractice.description.numberOfVolInDatastore',
             };
             const mapDescription = DESCRIPTION_MAP[String(item.hostSetting).trim()];
             let description = this.translatePipe.transform(mapDescription) || '--';
@@ -244,7 +245,7 @@ export class BestpracticeComponent implements OnInit {
             // 违规主机实际值修改
             _item.hostList = _item.hostList.map(hostInfo => ({
               ...hostInfo,
-              actualObjValue: this.getTypeOf(hostInfo.actualValue)
+              actualObjValue: getTypeOf(hostInfo.actualValue),
             }));
             return _item;
           });
@@ -258,10 +259,11 @@ export class BestpracticeComponent implements OnInit {
     if (isMockData) {
       handlerGetRecordsAllSuccess(mockData.BESTPRACTICE_RECORDS_ALL);
     } else {
-      this.http.get('v1/bestpractice/records/all', {}).subscribe(handlerGetRecordsAllSuccess, handlerResponseErrorSimple);
+      this.http
+        .get('v1/bestpractice/records/all', {})
+        .subscribe(handlerGetRecordsAllSuccess, handlerResponseErrorSimple);
     }
   }
-
 
   checkBescpractice(bestpractice) {
     this.currentBestpractice = bestpractice;
@@ -300,10 +302,10 @@ export class BestpracticeComponent implements OnInit {
     this.ips = '';
     const i = { hostSetting: '', hostObjectIds: [] };
     i.hostSetting = item.hostSetting;
-    item.hostList.forEach((s) => {
+    item.hostList.forEach(s => {
       i.hostObjectIds.push(s.hostObjectId);
-      if (s.needReboot == "true") {
-        this.ips += s.hostName + ",";
+      if (s.needReboot == 'true') {
+        this.ips += s.hostName + ',';
       }
     });
     params.push(i);
@@ -316,7 +318,7 @@ export class BestpracticeComponent implements OnInit {
    */
   getTypeOf(obj) {
     let object: object;
-    if (typeof obj == 'string' && obj.indexOf("[{") != -1) {
+    if (typeof obj == 'string' && obj.indexOf('[{') != -1) {
       object = JSON.parse(obj);
     } else {
       object = obj;
@@ -329,7 +331,7 @@ export class BestpracticeComponent implements OnInit {
    * @param obj
    */
   isObjectValue(obj) {
-    return (typeof obj) == 'object';
+    return Array.isArray(obj) && obj.length > 0;
   }
 
   /**
@@ -339,7 +341,7 @@ export class BestpracticeComponent implements OnInit {
   getObjectTitle(obj) {
     let title = '';
     obj.forEach(item => {
-      title += item.name + " | " + item.value + '\n';
+      title += item.name + ' | ' + item.value + '\n';
     });
     return title;
   }

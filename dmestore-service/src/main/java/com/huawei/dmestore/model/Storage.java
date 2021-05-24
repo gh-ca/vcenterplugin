@@ -1,5 +1,7 @@
 package com.huawei.dmestore.model;
 
+import java.util.List;
+
 /**
  * Storage
  *
@@ -77,6 +79,8 @@ public class Storage {
      * 可用分区.
      **/
     private String[] azIds;
+
+    private List<DjAz> djAzs;
     /**
      * 设备序列号.
      **/
@@ -132,6 +136,15 @@ public class Storage {
 
     public void setStorageTypeShow(StorageTypeShow storageTypeShow) {
         this.storageTypeShow = storageTypeShow;
+    }
+
+
+    public List<DjAz> getDjAzs() {
+        return djAzs;
+    }
+
+    public void setDjAzs(List<DjAz> djAzs) {
+        this.djAzs = djAzs;
     }
 
     /**

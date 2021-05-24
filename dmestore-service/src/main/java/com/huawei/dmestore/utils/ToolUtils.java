@@ -33,6 +33,12 @@ public class ToolUtils {
 
     public static final int MB = 1024 * 1024;
 
+    //vmfs分区位置
+    public static final String CURRENT_END_SECTOR = "currentEndSector";
+    public static final String TOTAL_END_SECTOR = "totalEndSector";
+    //storage device format type 512n  后期有其他类型，可以灵活更换
+    public static final int DISK_SECTOR_SIZE = 512;
+
     private static final Logger LOG = LoggerFactory.getLogger(ToolUtils.class);
 
     private static final Gson GSON = new Gson();

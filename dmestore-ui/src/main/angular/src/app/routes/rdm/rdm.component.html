@@ -336,7 +336,7 @@
               <clr-control-helper  style="color: red"><clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{'tips.bandwidthLimitErr' | translate}}</clr-control-helper>
             </clr-checkbox-container>
             <clr-checkbox-container *ngIf="iopsLimitErr">
-              <clr-control-helper style="color: red"><clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{'tips.iopsLimitErr' | translate}}</clr-control-helper>
+              <clr-control-helper style="color: red"><clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{(dorado?'tips.iopsLimitErr':'tips.iopsLimitErrNotV6' )| translate}}</clr-control-helper>
             </clr-checkbox-container>
           </div>
         </div>

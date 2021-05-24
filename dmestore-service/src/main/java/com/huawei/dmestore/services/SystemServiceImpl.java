@@ -45,6 +45,8 @@ public class SystemServiceImpl implements SystemService {
             LOGGER.info("creating table over...");
             systemDao.initData(DpSqlFileConstants.DP_DME_BEST_PRACTICE_CHECK_ALTER_SQL);
 
+            systemDao.initData(DpSqlFileConstants.DP_DME_BEST_PRACTICE_CHECK_ALTER_SQL1);
+
             systemDao.initData(DpSqlFileConstants.DP_DME_TASK_DATA_SYNCSERVICELEVEL_SQL);
 
             systemDao.initData(DpSqlFileConstants.DP_DME_TASK_DATA_SYNCBESTPRACTISE_SQL);
@@ -54,7 +56,6 @@ public class SystemServiceImpl implements SystemService {
             systemDao.initData(DpSqlFileConstants.DP_DME_TASK_DATA_REFRESHRESOURCEINSTANCE_SQL);
 
             systemDao.initData(DpSqlFileConstants.DP_DME_TASK_DATA_REFRESHKEY_SQL);
-
             LOGGER.info("init data over...");
         } catch (SQLException e) {
             LOGGER.error("Failed to init DB: {}", e.getMessage());

@@ -17,7 +17,7 @@ public class DmeConstants {
      *  public static final String DME_ESTIMATE_CONNECTIVITY = "/rest/vmmgmt/v1/connectivity/host-storage";
      */
     //public static final String DME_ESTIMATE_CONNECTIVITY = "/rest/vmmgmt/v1/connectivity/host-storage";
-    public static final String DME_ESTIMATE_CONNECTIVITY = "/hostmgmt/v1/connectivity/host-and-storage";
+    public static final String DME_ESTIMATE_CONNECTIVITY = "/rest/hostmgmt/v1/connectivity/host-and-storage";
     /**
      * nfs share detail
      **/
@@ -149,6 +149,11 @@ public class DmeConstants {
     public static final String HOSTGROUP_UNMAPPING = "/rest/blockservice/v1/volumes/hostgroup-unmapping";
 
     /**
+     * hostgroup remove
+     **/
+    public static final String HOSTGROUP_REMOVE = "/rest/hostmgmt/v1/hostgroups/{hostgroup_id}";
+
+    /**
      * hostgroup mapping
      **/
     public static final String MOUNT_VOLUME_TO_HOSTGROUP_URL = "/rest/blockservice/v1/volumes/hostgroup-mapping";
@@ -192,6 +197,11 @@ public class DmeConstants {
      * storage base url
      **/
     public static final String API_STORAGES = "/rest/storagemgmt/v1/storages?start=1&limit=1000";
+
+    /**
+     * az list
+     */
+    public static final String GET_AZ_URL = "/rest/azmgmt/v1/availability-zones?start=1&limit=512";
 
     /**
      * storage detail query

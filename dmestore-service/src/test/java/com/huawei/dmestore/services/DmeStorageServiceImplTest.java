@@ -111,7 +111,7 @@ public class DmeStorageServiceImplTest {
         reqMap.put("datas", reqList);
         ResponseEntity<String> responseEntity = new ResponseEntity<>(gson.toJson(reqMap), null, HttpStatus.OK);
         when(dmeAccessService.access(anyString(), any(), anyString())).thenReturn(responseEntity);
-        List<Storage> storages = dmeStorageService.getStorages();
+        List<Storage> storages = dmeStorageService.getStorages(null);
         System.out.println(storages);
     }
 
@@ -227,7 +227,7 @@ public class DmeStorageServiceImplTest {
         map.put("logic_ports", list);
         ResponseEntity<String> responseEntity = new ResponseEntity<>(gson.toJson(map), null, HttpStatus.OK);
         when(dmeAccessService.access(anyString(), any(), anyString())).thenReturn(responseEntity);
-        List<LogicPorts> logicPorts = dmeStorageService.getLogicPorts(storageId,"ihuiohjoh");
+        List<LogicPorts> logicPorts = dmeStorageService.getLogicPorts(storageId,"ihuiohjoh",null);
         System.out.println(logicPorts);
 
     }

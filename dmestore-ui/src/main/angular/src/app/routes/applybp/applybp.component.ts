@@ -1,30 +1,32 @@
 import { ChangeDetectorRef, Component, OnInit, AfterViewInit } from '@angular/core';
-import { GlobalsService } from "../../shared/globals.service";
-import { HttpClient } from "@angular/common/http";
-import { ActivatedRoute } from "@angular/router";
-import { TranslatePipe } from "@ngx-translate/core";
-import { CommonService } from "../common.service";
-import { handlerResponseErrorSimple } from 'app/app.helpers';
+import { GlobalsService } from '../../shared/globals.service';
+import { HttpClient } from '@angular/common/http';
+import { ActivatedRoute } from '@angular/router';
+import { TranslatePipe } from '@ngx-translate/core';
+import { CommonService } from '../common.service';
+import { getTypeOf, handlerResponseErrorSimple } from 'app/app.helpers';
 import { isMockData, mockData } from 'mock/mock';
-import { MTU, MTU_TAG } from "../bestpractice/bestpractice.component"
+import { MTU, MTU_TAG } from '../bestpractice/bestpractice.component';
 
 @Component({
   selector: 'app-applybp',
   templateUrl: './applybp.component.html',
   styleUrls: ['./applybp.component.scss'],
-  providers: [CommonService, TranslatePipe]
+  providers: [CommonService, TranslatePipe],
 })
 export class ApplybpComponent implements OnInit {
-
-
   hiddenTip = true;
   // 1 执行中， 2 完成， 3 出错
   status = 1;
 
-  constructor(private cdr: ChangeDetectorRef,
+  constructor(
+    private cdr: ChangeDetectorRef,
     private http: HttpClient,
-    private gs: GlobalsService, private activatedRoute: ActivatedRoute, private commonService: CommonService,
-    private translatePipe: TranslatePipe) { }
+    private gs: GlobalsService,
+    private activatedRoute: ActivatedRoute,
+    private commonService: CommonService,
+    private translatePipe: TranslatePipe
+  ) {}
 
   ngOnInit(): void {
     this.practiceRefresh();
@@ -100,7 +102,8 @@ export class ApplybpComponent implements OnInit {
   list: Bestpractice[] = []; // 数据列表
   total = 0; // 总数据数量
 
-  query = { // 查询数据
+  query = {
+    // 查询数据
   };
   // =================END===============
 
@@ -120,14 +123,13 @@ export class ApplybpComponent implements OnInit {
   ips = '';
   applyType = '1';
 
-
   tipModalSuccess = false;
   tipModalFail = false;
 
   applyLoading = false;
   checkLoading = false;
 
-  applyTips = false;// 实施最佳实践提示（违规数为0时提示）
+  applyTips = false; // 实施最佳实践提示（违规数为0时提示）
 
   /**
    * 列表实时最佳实践 参数封装
@@ -136,13 +138,13 @@ export class ApplybpComponent implements OnInit {
   packApplyPracticeParams() {
     const params = [];
     this.ips = '';
-    this.rowSelected.forEach((item) => {
+    this.rowSelected.forEach(item => {
       const i = { hostSetting: '', hostObjectIds: [] };
       i.hostSetting = item.hostSetting;
-      item.hostList.forEach((s) => {
+      item.hostList.forEach(s => {
         i.hostObjectIds.push(s.hostObjectId);
-        if (s.needReboot == "true") {
-          this.ips += s.hostName + ",";
+        if (s.needReboot == 'true') {
+          this.ips += s.hostName + ',';
         }
       });
       params.push(i);
@@ -159,10 +161,10 @@ export class ApplybpComponent implements OnInit {
     const i = { hostSetting: '', hostObjectIds: [] };
     i.hostSetting = this.currentBestpractice.hostSetting;
     let ips = '';
-    this.hostSelected.forEach((s) => {
+    this.hostSelected.forEach(s => {
       i.hostObjectIds.push(s.hostObjectId);
-      if (s.needReboot == "true") {
-        ips += s.hostName + ",";
+      if (s.needReboot == 'true') {
+        ips += s.hostName + ',';
       }
     });
     params.push(i);
@@ -176,21 +178,24 @@ export class ApplybpComponent implements OnInit {
    */
   applyPractice(params) {
     this.applyLoading = true;
-    this.http.post('v1/bestpractice/update/bylist', params).subscribe((result: any) => {
-      this.applyLoading = false;
-      if (result.code == '200') {
-        this.tipModalSuccess = true;
-        if (this.applyType != '1') {
-          this.hostModalShow = false;
+    this.http.post('v1/bestpractice/update/bylist', params).subscribe(
+      (result: any) => {
+        this.applyLoading = false;
+        if (result.code == '200') {
+          this.tipModalSuccess = true;
+          if (this.applyType != '1') {
+            this.hostModalShow = false;
+          }
+          this.practiceRefresh();
+        } else {
+          this.tipModalFail = true;
         }
-        this.practiceRefresh();
-      } else {
-        this.tipModalFail = true;
+        this.cdr.detectChanges();
+      },
+      err => {
+        console.error('ERROR', err);
       }
-      this.cdr.detectChanges();
-    }, err => {
-      console.error('ERROR', err);
-    });
+    );
   }
 
   openTip() {
@@ -203,7 +208,7 @@ export class ApplybpComponent implements OnInit {
 
   applyClick(type: string) {
     if (type == '1') {
-      this.rowSelected.forEach((item) => {
+      this.rowSelected.forEach(item => {
         if (item.count == 0) {
           this.applyTips = true;
           return;
@@ -240,23 +245,28 @@ export class ApplybpComponent implements OnInit {
 
   recheck() {
     this.checkLoading = true;
-    this.http.post('v1/bestpractice/check', {}).subscribe((result: any) => {
-      this.checkLoading = false;
-      if (result.code == '200') {
-        this.tipModalSuccess = true;
-        this.practiceRefresh();
-      } else {
-        this.tipModalFail = true;
+    this.http.post('v1/bestpractice/check', {}).subscribe(
+      (result: any) => {
+        this.checkLoading = false;
+        if (result.code == '200') {
+          this.tipModalSuccess = true;
+          this.practiceRefresh();
+        } else {
+          this.tipModalFail = true;
+        }
+        this.cdr.detectChanges();
+      },
+      err => {
+        console.error('ERROR', err);
       }
-      this.cdr.detectChanges();
-    }, err => {
-      console.error('ERROR', err);
-    });
+    );
   }
 
   practiceRefresh() {
     const ctx = this.gs.getClientSdk().app.getContextObjects();
-    const objectId = ctx ? ctx[0].id : 'urn:vmomi:ClusterComputeResource:domain-c2038:674908e5-ab21-4079-9cb1-596358ee5dd1';
+    const objectId = ctx
+      ? ctx[0].id
+      : 'urn:vmomi:ClusterComputeResource:domain-c2038:674908e5-ab21-4079-9cb1-596358ee5dd1';
     let type = '';
     this.activatedRoute.url.subscribe(url => {
       type = url[0].path;
@@ -271,25 +281,25 @@ export class ApplybpComponent implements OnInit {
             let levelDesc;
             let levelNum;
             switch (item.level) {
-              case "Critical":
+              case 'Critical':
                 levelNum = 4;
-                levelDesc = this.translatePipe.transform("overview.critical");
+                levelDesc = this.translatePipe.transform('overview.critical');
                 break;
-              case "Major":
+              case 'Major':
                 levelNum = 3;
-                levelDesc = this.translatePipe.transform("overview.major");
+                levelDesc = this.translatePipe.transform('overview.major');
                 break;
-              case "Warning":
+              case 'Warning':
                 levelNum = 2;
-                levelDesc = this.translatePipe.transform("overview.warning");
+                levelDesc = this.translatePipe.transform('overview.warning');
                 break;
-              case "Info":
+              case 'Info':
                 levelNum = 1;
-                levelDesc = this.translatePipe.transform("overview.info");
+                levelDesc = this.translatePipe.transform('overview.info');
                 break;
               default:
                 levelNum = 0;
-                levelDesc = "--";
+                levelDesc = '--';
                 break;
             }
             item.levelDesc = levelDesc;
@@ -316,32 +326,46 @@ export class ApplybpComponent implements OnInit {
                 item.description = this.translatePipe.transform('bestPractice.description.quanTum');
                 break;
               case 'Disk.DiskMaxIOSize':
-                item.description = this.translatePipe.transform('bestPractice.description.diskMaxIOSize');
+                item.description = this.translatePipe.transform(
+                  'bestPractice.description.diskMaxIOSize'
+                );
                 break;
               case 'LUN Queue Depth for Qlogic':
-                item.description = this.translatePipe.transform('bestPractice.description.depthForQlogic');
+                item.description = this.translatePipe.transform(
+                  'bestPractice.description.depthForQlogic'
+                );
                 break;
               case 'LUN Queue Depth for Emulex':
-                item.description = this.translatePipe.transform('bestPractice.description.depthForEmulex');
+                item.description = this.translatePipe.transform(
+                  'bestPractice.description.depthForEmulex'
+                );
                 break;
               case 'NMP path switch policy':
-                item.description = this.translatePipe.transform('bestPractice.description.pathSwitchPolicy');
+                item.description = this.translatePipe.transform(
+                  'bestPractice.description.pathSwitchPolicy'
+                );
                 break;
               case 'Jumbo Frame (MTU)':
-                item.description = this.translatePipe.transform('bestPractice.description.jumboFrame');
+                item.description = this.translatePipe.transform(
+                  'bestPractice.description.jumboFrame'
+                );
                 break;
               case 'VMFS-6 Auto-Space Reclamation':
-                item.description = this.translatePipe.transform('bestPractice.description.reclamation');
+                item.description = this.translatePipe.transform(
+                  'bestPractice.description.reclamation'
+                );
                 break;
               case 'Number of volumes in Datastore':
-                item.description = this.translatePipe.transform('bestPractice.description.numberOfVolInDatastore');
+                item.description = this.translatePipe.transform(
+                  'bestPractice.description.numberOfVolInDatastore'
+                );
                 break;
               default:
                 item.description = '--';
             }
             // 违规主机实际值修改
             item.hostList.forEach(hostInfo => {
-              hostInfo.actualObjValue = this.getTypeOf(hostInfo.actualValue);
+              hostInfo.actualObjValue = getTypeOf(hostInfo.actualValue);
             });
           });
         }
@@ -354,7 +378,9 @@ export class ApplybpComponent implements OnInit {
     if (isMockData) {
       handlerGetRecords(mockData.BESTPRACTICE_RECORDS_ALL);
     } else {
-      this.http.get('v1/bestpractice/records/all?objectId=' + objectId + '&type=' + type).subscribe(handlerGetRecords, handlerResponseErrorSimple);
+      this.http
+        .get('v1/bestpractice/records/all?objectId=' + objectId + '&type=' + type)
+        .subscribe(handlerGetRecords, handlerResponseErrorSimple);
     }
   }
 
@@ -396,10 +422,10 @@ export class ApplybpComponent implements OnInit {
     this.ips = '';
     const i = { hostSetting: '', hostObjectIds: [] };
     i.hostSetting = item.hostSetting;
-    item.hostList.forEach((s) => {
+    item.hostList.forEach(s => {
       i.hostObjectIds.push(s.hostObjectId);
-      if (s.needReboot == "true") {
-        this.ips += s.hostName + ",";
+      if (s.needReboot == 'true') {
+        this.ips += s.hostName + ',';
       }
     });
     params.push(i);
@@ -412,7 +438,7 @@ export class ApplybpComponent implements OnInit {
    */
   getTypeOf(obj) {
     let object: object;
-    if (typeof obj == 'string' && obj.indexOf("[{") != -1) {
+    if (typeof obj == 'string' && obj.indexOf('[{') != -1) {
       object = JSON.parse(obj);
     } else {
       object = obj;
@@ -425,7 +451,7 @@ export class ApplybpComponent implements OnInit {
    * @param obj
    */
   isObjectValue(obj) {
-    return (typeof obj) == 'object';
+    return typeof obj == 'object';
   }
 
   /**
@@ -435,7 +461,7 @@ export class ApplybpComponent implements OnInit {
   getObjectTitle(obj) {
     let title = '';
     obj.forEach(item => {
-      title += item.name + " | " + item.value + '\n';
+      title += item.name + ' | ' + item.value + '\n';
     });
     return title;
   }

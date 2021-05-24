@@ -18,6 +18,7 @@ import com.huawei.dmestore.model.StoragePort;
 import com.huawei.dmestore.model.Volume;
 import com.huawei.dmestore.model.VolumeListRestponse;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -36,7 +37,7 @@ public interface DmeStorageService {
      * @return List
      * @throws DmeException when error
      */
-    List<Storage> getStorages() throws DmeException;
+    List<Storage> getStorages(String flag) throws DmeException;
 
     /**
      * get storage detail
@@ -65,7 +66,7 @@ public interface DmeStorageService {
      * @return List
      * @throws DmeException when error
      */
-    List<LogicPorts> getLogicPorts(String storageId,String supportProtocol) throws DmeException;
+    List<LogicPorts> getLogicPorts(String storageId,String supportProtocol,String flag) throws DmeException;
 
     /**
      * list volumes by page
@@ -284,7 +285,7 @@ public interface DmeStorageService {
      * @return String
      * @throws DmeException when error
      */
-    String getStorageByPoolRawId(String poolRawId) throws DmeException;
+    String getStorageByPoolRawId(String poolRawId,String storageId) throws DmeException;
 
     /**
      * list Volume Performance
