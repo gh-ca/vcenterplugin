@@ -31,7 +31,7 @@ import java.util.*;
 /**
  * VmfsOperationService
  *
- * @author lianqiang
+ * @author lianqiangN
  * @since 2020-09-09
  **/
 public class VmfsOperationServiceImpl implements VmfsOperationService {
@@ -40,8 +40,6 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
     private static final int DEFAULT_CAPACITY = 16;
 
     private static final String CODE_403 = "403";
-
-    private static final String CODE_20883 = "20883";
 
     private static final String CODE_503 = "503";
 
@@ -337,12 +335,9 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
                 int available = (int)Math.floor((totalCurrentSector - currentEndSector) * ToolUtils.DISK_SECTOR_SIZE / ToolUtils.GI);
                 if (Long.compare(available, 1) != -1) {
                     lunAddCapacity -= available;
-                    sectors.put(CHANGE_SECTOR, changedSector);
-                    sectors.put(LUN_ADD_CAPACITY, Long.valueOf(lunAddCapacity));
-                } else {
-                    sectors.put(CHANGE_SECTOR, changedSector);
-                    sectors.put(LUN_ADD_CAPACITY, Long.valueOf(lunAddCapacity));
                 }
+                sectors.put(CHANGE_SECTOR, changedSector);
+                sectors.put(LUN_ADD_CAPACITY, Long.valueOf(lunAddCapacity));
             }
         }
         return sectors;
