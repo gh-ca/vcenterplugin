@@ -3400,7 +3400,7 @@ public class VCSDKUtils {
             qSpec.setFormat("csv");
             qSpec.setIntervalId(new Integer(300));
             PerfMetricId perfMetricId = new PerfMetricId();
-            perfMetricId.setCounterId(268);
+            perfMetricId.setCounterId(268);//disk.used.latest KB
             perfMetricId.setInstance("");
             qSpec.getMetricId().add(perfMetricId);
             List<PerfQuerySpec> perfQuerySpecs = new ArrayList<>();
