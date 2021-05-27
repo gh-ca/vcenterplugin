@@ -4,7 +4,9 @@ import com.huawei.dmestore.constant.DmeConstants;
 import com.huawei.dmestore.exception.DmeException;
 import com.huawei.dmestore.exception.DmeSqlException;
 import com.huawei.dmestore.model.TaskDetailInfo;
+import com.huawei.dmestore.model.TaskDetailInfoNew;
 import com.huawei.dmestore.model.TaskDetailResource;
+import com.huawei.dmestore.model.TasksResultObject;
 import com.huawei.dmestore.utils.ToolUtils;
 
 import com.google.gson.Gson;
@@ -18,6 +20,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
@@ -28,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 /**
  * TaskServiceImpl
@@ -409,5 +413,151 @@ public class TaskServiceImpl implements TaskService {
 
     public DmeAccessService getDmeAccessService() {
         return dmeAccessService;
+    }
+
+
+    /**
+      * @Description: 新方法-检查任务状态
+      * @Param taskId,timeout
+      * @return TasksResultObject
+      * @author yc
+      * @Date 2021/5/21 15:38
+     */
+    @Override
+    public TasksResultObject checkTaskStatusNew(String taskId, long timeout)  {
+        //首先进行参数判断
+        if(StringUtils.isEmpty(taskId)){
+            return new TasksResultObject(true);
+        }
+        //设置方法的默认超时时间为3分钟
+        long overTime  = 3*60*1000;
+        if (0!= timeout){
+            overTime = timeout;
+        }
+        long currentmilitions=System.currentTimeMillis();
+        TasksResultObject result = new TasksResultObject();
+        do{
+            try {
+                //程序每次进入等待2秒
+                TimeUnit.SECONDS.sleep(2);
+            } catch (InterruptedException e) {
+                LOG.info("===wait one secend error==={}", e.getMessage());
+            }
+            //首先根据任务号查询任务状态
+            result = queryTaskByIdNew(taskId);
+            if (StringUtils.isEmpty(result)){
+                return null;
+            }else if (result.isStatus()){
+                return result;
+            }
+        }while (System.currentTimeMillis()-overTime < currentmilitions);
+        return result;
+    }
+
+    /**
+      * @Description: 根据任务号查询任务结果，并且分组统计
+      * @Param @param null
+      * @return @return
+      * @throws
+      * @author yc
+      * @Date 2021/5/21 15:16
+     */
+    private TasksResultObject queryTaskByIdNew(String taskId) {
+        String url = DmeConstants.QUERY_TASK_URL.replace("{task_id}", taskId);
+        ResponseEntity<String> responseEntity;
+        try {
+            //调用接口查询任务状态
+            responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
+            if (responseEntity.getStatusCodeValue() != HttpStatus.OK.value() || StringUtils.isEmpty(responseEntity.getBody())) {
+                LOG.error("queryTaskById failed!taskId={},errorMsg:{}", taskId, responseEntity.getBody());
+                return null;
+            }
+            // 解析返回结果，返回任务状态和成功或者失败的
+            List<TaskDetailInfoNew> taskInfos = analyzeTaskRequestResult(responseEntity.getBody());
+            TasksResultObject resultMap = analyzeTaskDetailInfo(taskId,taskInfos);
+            if (StringUtils.isEmpty(resultMap)) {
+                return null;
+            }
+            return resultMap;
+        } catch (DmeException ex) {
+            LOG.error("queryTaskById error, errorMsg:{}", ex.getMessage());
+            return null;
+        }
+    }
+
+
+    /**
+      * @Description: 获取任务对应的子任务集合
+      * @Param body
+      * @return List<TaskDetailInfo>
+      * @author yc
+      * @Date 2021/5/21 11:44
+     */
+    private List<TaskDetailInfoNew> analyzeTaskRequestResult(String body) {
+        if (StringUtils.isEmpty(body)){
+            return null;
+        }
+        JsonArray jsonArray;
+        if (body.contains("total") && body.contains("tasks")) {
+            JsonObject jsonObject = new JsonParser().parse(body).getAsJsonObject();
+            jsonArray = jsonObject.get("tasks").getAsJsonArray();
+        } else {
+            jsonArray = new JsonParser().parse(body).getAsJsonArray();
+        }
+        List<TaskDetailInfoNew>  taskDetailInfoList = new ArrayList<>();
+        if (CollectionUtils.isEmpty(Collections.singleton(jsonArray))){
+            return null;
+        }
+        jsonArray.forEach(item -> {
+            TaskDetailInfoNew taskDetailInfo = new TaskDetailInfoNew();
+            JsonObject jsonObject = item.getAsJsonObject();
+            taskDetailInfo.setId(ToolUtils.jsonToStr(jsonObject.get("id")));
+            taskDetailInfo.setNameCn(ToolUtils.jsonToStr(jsonObject.get("name_cn")));
+            taskDetailInfo.setNameEn(ToolUtils.jsonToStr(jsonObject.get("name_en")));
+            taskDetailInfo.setStatus(ToolUtils.jsonToInt(jsonObject.get("status")));
+            taskDetailInfo.setProgress(ToolUtils.jsonToInt(jsonObject.get("progress")));
+            taskDetailInfo.setOwnerName(ToolUtils.jsonToStr(jsonObject.get("owner_name")));
+            taskDetailInfo.setOwnerId(ToolUtils.jsonToStr(jsonObject.get("owner_id")));
+            taskDetailInfo.setStartTime(ToolUtils.getLong(jsonObject.get("create_time")));
+            taskDetailInfo.setCreateTime(ToolUtils.getLong(jsonObject.get("create_time")));
+            taskDetailInfo.setEndTime(ToolUtils.getLong(jsonObject.get("end_time")));
+            taskDetailInfo.setDetailEn(ToolUtils.jsonToStr(jsonObject.get("detail_en")));
+            taskDetailInfo.setDetailCn(ToolUtils.jsonToStr(jsonObject.get("detail_cn")));
+            JsonArray resourcesArray = jsonObject.getAsJsonArray("resources");
+            if (resourcesArray != null) {
+                List<TaskDetailResource> resourceList = getTaskDetailResources(resourcesArray);
+                taskDetailInfo.setResources(resourceList);
+            }
+            taskDetailInfoList.add(taskDetailInfo);
+        });
+       return taskDetailInfoList;
+    }
+    /**
+      * @Description: 使用流的方式过滤子任务状态和进行统计
+      * @Param @param null
+      * @return @return
+      * @throws
+      * @author yc
+      * @Date 2021/5/21 15:13
+     */
+    private TasksResultObject analyzeTaskDetailInfo(String taskId, List<TaskDetailInfoNew> taskInfos) {
+        //首先判断任务集合是否为空
+        if(CollectionUtils.isEmpty(taskInfos)){
+            return null;
+        }
+        //根据taskid获取集合中对应的任务状态，如果为100，说明创建成功
+        List<TaskDetailInfoNew> taskDeatailInfos  =
+                taskInfos.stream().filter(taskDetailInfoNew -> taskId.equalsIgnoreCase(taskDetailInfoNew.getId())).collect(Collectors.toList());
+        if (CollectionUtils.isEmpty(taskDeatailInfos) || taskDeatailInfos.size()>1){
+            return null;
+        }
+        String description = null;
+        if (100 == taskDeatailInfos.get(0).getProgress() || 3 < taskDeatailInfos.get(0).getStatus()){
+            TasksResultObject tasksResultObject2 = new TasksResultObject(true);
+            description = taskDeatailInfos.get(0).getDetailEn();
+            tasksResultObject2.setDescription(description);
+            return tasksResultObject2;
+        }
+    return new TasksResultObject(false);
     }
 }
