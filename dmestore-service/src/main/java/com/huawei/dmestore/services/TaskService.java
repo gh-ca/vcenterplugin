@@ -3,6 +3,7 @@ package com.huawei.dmestore.services;
 import com.huawei.dmestore.exception.DmeException;
 import com.huawei.dmestore.model.TaskDetailInfo;
 import com.google.gson.JsonObject;
+import com.huawei.dmestore.model.TasksResultObject;
 
 import java.util.List;
 import java.util.Map;
@@ -69,4 +70,11 @@ public interface TaskService {
      * @throws DmeException DmeException
      **/
     JsonObject queryTaskByIdUntilFinish(String taskId) throws DmeException;
+    /**
+     * checkTaskStatusNew
+     *
+     * @param taskId timeout
+     * @return TasksResultObject
+     **/
+    TasksResultObject checkTaskStatusNew(String taskId, long timeout);
 }
