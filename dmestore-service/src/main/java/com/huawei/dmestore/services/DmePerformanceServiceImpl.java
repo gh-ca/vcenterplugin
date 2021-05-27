@@ -58,16 +58,14 @@ public class DmePerformanceServiceImpl implements DmePerformanceService {
         Map<String, String> countValueMap = new HashMap<>();
         try {
             JsonArray array = gson.fromJson(perfResult, JsonArray.class);
-            if(null != array && array.size() > 0){
-                JsonElement element = array.get(0);//只有array(0)这一个值
-                JsonObject jsonObject = element.getAsJsonObject();
-                JsonArray valueArray = jsonObject.get("value").getAsJsonArray();
-                for(JsonElement valueElement : valueArray){
-                    int counterId = valueElement.getAsJsonObject().get("id").getAsJsonObject().get("counterId").getAsInt();
-                    String value = valueElement.getAsJsonObject().get("value").getAsString();
-                    value = stringCut(value, ",", 1);
-                    countValueMap.put(String.valueOf(counterId), value);
-                }
+            JsonElement element = array.get(0);
+            JsonObject jsonObject = element.getAsJsonObject();
+            JsonArray valueArray = jsonObject.get("value").getAsJsonArray();
+            for(JsonElement valueElement : valueArray){
+                int counterId = valueElement.getAsJsonObject().get("id").getAsJsonObject().get("counterId").getAsInt();
+                String value = valueElement.getAsJsonObject().get("value").getAsString();
+                value = stringCut(value, ",", 1);
+                countValueMap.put(String.valueOf(counterId), value);
             }
         } catch (JsonSyntaxException e) {
             log.error("parsePerf error!");
