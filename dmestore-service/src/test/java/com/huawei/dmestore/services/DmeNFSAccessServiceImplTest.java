@@ -21,8 +21,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import java.util.*;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.when;
 
 /**
@@ -264,7 +263,7 @@ public class DmeNFSAccessServiceImplTest {
         storage.setLocation("321");
         storage.setTotalCapacity(60.0);
         storages.add(storage);
-        when(dmeStorageService.getStorages()).thenReturn(storages);
+        when(dmeStorageService.getStorages(anyString())).thenReturn(storages);
         String resp = "{\n" +
                 "    \"id\": \"string\", \n" +
                 "    \"name\": \"string\", \n" +
@@ -555,7 +554,7 @@ public class DmeNFSAccessServiceImplTest {
     }
 
     @Test
-    public void testUnmountNfs() throws DmeException {
+    public void testUnmountNfs() throws Exception {
         Map<String, Object> params = new HashMap<>();
         params.put("dataStoreObjectId", "321");
         params.put("hostId", "321");

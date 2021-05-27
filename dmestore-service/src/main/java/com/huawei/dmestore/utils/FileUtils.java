@@ -45,6 +45,8 @@ public class FileUtils {
 
     public static final String WORK_FILE_NAME = "workV3.txt";
 
+    public static final String SALT_FILE_NAME = "saltV3.txt";
+
     private static String PATH = null;
 
     public static void setFilePermission(File file) throws IOException {

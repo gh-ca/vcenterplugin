@@ -1,8 +1,8 @@
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit} from '@angular/core';
-import {ServiceLevelService} from './serviceLevel.service';
-import {ActivatedRoute, Router} from '@angular/router';
-import {GetForm, ServiceLevelList, VmfsInfo, VmfsListService} from '../list/list.service';
-import {GlobalsService} from "../../../shared/globals.service";
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ServiceLevelService } from './serviceLevel.service';
+import { ActivatedRoute, Router } from '@angular/router';
+import { GetForm, ServiceLevelList, VmfsInfo, VmfsListService } from '../list/list.service';
+import { GlobalsService } from '../../../shared/globals.service';
 
 @Component({
   selector: 'app-list',
@@ -11,12 +11,14 @@ import {GlobalsService} from "../../../shared/globals.service";
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [ServiceLevelService],
 })
-export class ServiceLevelComponent implements OnInit{
-
-  constructor(private remoteSrv: ServiceLevelService, private route: ActivatedRoute, private cdr: ChangeDetectorRef,
-              private router:Router, private globalsService: GlobalsService) {
-
-  }
+export class ServiceLevelComponent implements OnInit {
+  constructor(
+    private remoteSrv: ServiceLevelService,
+    private route: ActivatedRoute,
+    private cdr: ChangeDetectorRef,
+    private router: Router,
+    private globalsService: GlobalsService
+  ) {}
 
   // 未选择服务等级true未选择 false选择
   serviceLevelIsNull = false;
@@ -59,21 +61,23 @@ export class ServiceLevelComponent implements OnInit{
       console.log('url', url);
       this.route.queryParams.subscribe(queryParam => {
         this.resource = queryParam.resource;
-        if (this.resource === 'list') {// 以列表为入口
+        if (this.resource === 'list') {
+          // 以列表为入口
           this.objectId = queryParam.objectId;
-        } else { // 以dataStore为入口
+        } else {
+          // 以dataStore为入口
           const ctx = this.globalsService.getClientSdk().app.getContextObjects();
           console.log('ctx', ctx);
-          this.objectId = ctx[0].id;
-          // this.objectId = "urn:vmomi:Datastore:datastore-10019:674908e5-ab21-4079-9cb1-596358ee5dd1";
-
+          this.objectId = ctx
+            ? ctx[0].id
+            : 'urn:vmomi:Datastore:datastore-10019:674908e5-ab21-4079-9cb1-596358ee5dd1';
         }
 
         // todo 获取vmfs数据
-        this.remoteSrv.getVmfsById(this.objectId).subscribe((result:any) => {
+        this.remoteSrv.getVmfsById(this.objectId).subscribe((result: any) => {
           if (result.code === '200' && null != result.data) {
             this.vmfsInfo = result.data[0];
-            if (this.vmfsInfo.serviceLevelName){
+            if (this.vmfsInfo.serviceLevelName) {
               this.remoteSrv.getStorageById(this.objectId).subscribe((result: any) => {
                 if (result.code === '200' && null != result.data) {
                   // 表单数据初始化
@@ -87,7 +91,8 @@ export class ServiceLevelComponent implements OnInit{
                 this.loadingData = false;
                 this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
               });
-            } else { // 非服务等级的VMFS不允许变更服务等级
+            } else {
+              // 非服务等级的VMFS不允许变更服务等级
               this.loadingData = false;
               this.isStorageVmfs = true;
             }
@@ -129,9 +134,11 @@ export class ServiceLevelComponent implements OnInit{
    */
   cancel() {
     this.changeServiceLevelShow = false;
-    if (this.resource === 'list') { // 列表入口
+    if (this.resource === 'list') {
+      // 列表入口
       this.router.navigate(['vmfs/list']);
-    } else { // dataStore入口
+    } else {
+      // dataStore入口
       this.globalsService.getClientSdk().modal.close();
     }
   }
@@ -150,11 +157,11 @@ export class ServiceLevelComponent implements OnInit{
       this.modalHandleLoading = true;
       this.remoteSrv.changeServiceLevel(this.changeServiceLevelForm).subscribe((result: any) => {
         this.modalHandleLoading = false;
-        if (result.code === '200'){
+        if (result.code === '200') {
           console.log('change service level success:' + name);
           this.changeServiceLevelSuccessShow = true;
         } else {
-          console.log('change service level faild: ' + name  + ' Reason:' + result.description);
+          console.log('change service level faild: ' + name + ' Reason:' + result.description);
           this.isOperationErr = true;
         }
         this.cdr.detectChanges();
@@ -169,14 +176,14 @@ export class ServiceLevelComponent implements OnInit{
    * @param c 容量值
    * @param isGB true GB、false MB
    */
-  formatCapacity(c: number, isGB:boolean){
+  formatCapacity(c: number, isGB: boolean) {
     let cNum;
-    if (c < 1024){
-      cNum = isGB ? c.toFixed(3)+'GB':c.toFixed(3)+'MB';
-    }else if(c >= 1024 && c< 1048576){
-      cNum = isGB ? (c/1024).toFixed(3) + 'TB' : (c/1024).toFixed(3) + 'GB';
-    }else if(c>= 1048576){
-      cNum = isGB ? (c/1024/1024).toFixed(3) + 'PB':(c/1024/1024).toFixed(3) + 'TB';
+    if (c < 1024) {
+      cNum = isGB ? c.toFixed(3) + 'GB' : c.toFixed(3) + 'MB';
+    } else if (c >= 1024 && c < 1048576) {
+      cNum = isGB ? (c / 1024).toFixed(3) + 'TB' : (c / 1024).toFixed(3) + 'GB';
+    } else if (c >= 1048576) {
+      cNum = isGB ? (c / 1024 / 1024).toFixed(3) + 'PB' : (c / 1024 / 1024).toFixed(3) + 'TB';
     }
     return cNum;
   }

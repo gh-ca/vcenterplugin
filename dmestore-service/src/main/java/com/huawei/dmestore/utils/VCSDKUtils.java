@@ -4,6 +4,7 @@ import com.google.gson.JsonArray;
 import com.huawei.dmestore.constant.DmeConstants;
 import com.huawei.dmestore.entity.DmeVmwareRelation;
 import com.huawei.dmestore.entity.VCenterInfo;
+import com.huawei.dmestore.exception.DmeException;
 import com.huawei.dmestore.exception.VcenterException;
 import com.huawei.dmestore.model.UpHostVnicRequestBean;
 import com.huawei.vmware.VcConnectionHelpers;
@@ -57,6 +58,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.util.StringUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -1284,6 +1286,54 @@ public class VCSDKUtils {
         }
     }
 
+    public void rescanHbaByHostObjectId(String hostObjectId) throws VcenterException {
+        try {
+            String serverguid = vcConnectionHelpers.objectId2Serverguid(hostObjectId);
+            VmwareContext vmwareContext = vcConnectionHelpers.getServerContext(serverguid);
+            ManagedObjectReference objmor = vcConnectionHelpers.objectId2Mor(hostObjectId);
+            HostMo hostMo = hostVmwareFactory.build(vmwareContext, objmor);
+
+            // 在查找可用LUN前先扫描hba，已发现新的卷
+            List<String> devices = getHbaDeviceByHost(hostMo);
+            if (devices != null && devices.size() > 0) {
+                for (String device : devices) {
+                    hostMo.getHostStorageSystemMo().rescanHba(device);
+                }
+            }
+        } catch (Exception e) {
+            logger.error("vmware host rescan HBA error:", e);
+            throw new VcenterException(e.getMessage());
+        }
+    }
+
+    public void rescanHbaByClusterObjectId(String clusterObjectId) throws VcenterException {
+        try {
+            String serverguid = vcConnectionHelpers.objectId2Serverguid(clusterObjectId);
+            VmwareContext vmwareContext = vcConnectionHelpers.getServerContext(serverguid);
+            ManagedObjectReference objmor = vcConnectionHelpers.objectId2Mor(clusterObjectId);
+            ClusterMo cl1 = clusterVmwareMoFactory.build(vmwareContext, objmor);
+            List<Pair<ManagedObjectReference, String>> hosts = cl1.getClusterHosts();
+            if (hosts != null && hosts.size() > 0) {
+                Map<String, HostMo> hostMap = new HashMap<>();
+                List<HostScsiDisk> objHostScsiDisks = new ArrayList<>();
+                for (Pair<ManagedObjectReference, String> host : hosts) {
+                    HostMo hostMo = hostVmwareFactory.build(vmwareContext, host.first());
+
+                    // 在查找可用LUN前先扫描hba，已发现新的卷
+                    List<String> devices = getHbaDeviceByHost(hostMo);
+                    if (devices != null && devices.size() > 0) {
+                        for (String device : devices) {
+                            hostMo.getHostStorageSystemMo().rescanHba(device);
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            logger.error("vmware host rescan HBA error:", e);
+            throw new VcenterException(e.getMessage());
+        }
+    }
+
     /**
      * 得到主机对应的可用LUN
      *
@@ -1360,12 +1410,12 @@ public class VCSDKUtils {
             HostMo hostMo = hostVmwareFactory.build(vmwareContext, objmor);
 
             // 在查找可用LUN前先扫描hba，已发现新的卷
-            List<String> devices = getHbaDeviceByHost(hostMo);
+           /* List<String> devices = getHbaDeviceByHost(hostMo);
             if (devices != null && devices.size() > 0) {
                 for (String device : devices) {
                     hostMo.getHostStorageSystemMo().rescanHba(device);
                 }
-            }
+            }*/
             HostDatastoreSystemMo hostDatastoreSystem = hostMo.getHostDatastoreSystemMo();
             List<HostScsiDisk> hostScsiDisks = hostDatastoreSystem.queryAvailableDisksForVmfs();
             candidateHostScsiDisk = getObjectLuns(hostScsiDisks, capacity, volumeWwn);
@@ -1484,12 +1534,12 @@ public class VCSDKUtils {
                     HostMo hostMo = hostVmwareFactory.build(vmwareContext, host.first());
 
                     // 在查找可用LUN前先扫描hba，已发现新的卷
-                    List<String> devices = getHbaDeviceByHost(hostMo);
+                   /* List<String> devices = getHbaDeviceByHost(hostMo);
                     if (devices != null && devices.size() > 0) {
                         for (String device : devices) {
                             hostMo.getHostStorageSystemMo().rescanHba(device);
                         }
-                    }
+                    }*/
                     HostDatastoreSystemMo hostDatastoreSystem = hostMo.getHostDatastoreSystemMo();
                     List<HostScsiDisk> hostScsiDisks = hostDatastoreSystem.queryAvailableDisksForVmfs();
                     if (hostScsiDisks != null && hostScsiDisks.size() > 0) {
@@ -1584,7 +1634,7 @@ public class VCSDKUtils {
                                 unmapGranularity, unmapPriority);
 
                         logger.info("rescanVmfs after createVmfsDatastore!datastore={}", datastore);
-                        hostMo.getHostStorageSystemMo().rescanVmfs();
+
                     } catch (Exception e) {
                         throw new VcenterException(e.getMessage());
                     }
@@ -2049,7 +2099,7 @@ public class VCSDKUtils {
      * @param mountType mountType
      * @throws VcenterException VcenterException
      **/
-    public void mountNfs(String datastoreobjectid, String hostobjectid, String logicPortIp, String mountType) {
+    public void mountNfs(String datastoreobjectid, String hostobjectid, String logicPortIp, String mountType, String shareName) throws DmeException {
         try {
             if (datastoreobjectid == null) {
                 logger.info("param datastore is null");
@@ -2076,7 +2126,7 @@ public class VCSDKUtils {
             // 挂载NFS
             NasDatastoreInfo nasdsinfo = (NasDatastoreInfo) datastoreMo.getInfo();
             hostMo.getHostDatastoreSystemMo()
-                .createNfsDatastore(nasdsinfo.getNas().getRemoteHost(), 0, nasdsinfo.getNas().getRemotePath(),
+                .createNfsDatastore(nasdsinfo.getNas().getRemoteHost(), 0, shareName,
                     datastoreMo.getName(), mountType, nasdsinfo.getNas().getType(),
                     nasdsinfo.getNas().getSecurityType());
             logger.info("mount nfs success:{}:", hostMo.getName(), datastoreMo.getName());
@@ -2086,6 +2136,7 @@ public class VCSDKUtils {
             logger.info("Rescan datastore after mounting");
         } catch (Exception e) {
             logger.error("vmware mount nfs error:{}", e.getMessage());
+            throw new DmeException(e.getMessage());
         }
     }
 
@@ -2096,7 +2147,7 @@ public class VCSDKUtils {
      * @param hostMo hostMo
      * @param datastoreobjectid datastoreobjectid
      */
-    public void unmountNfsOnHost(DatastoreMo dsmo, HostMo hostMo, String datastoreobjectid) {
+    public void unmountNfsOnHost(DatastoreMo dsmo, HostMo hostMo, String datastoreobjectid) throws Exception {
         try {
             if (dsmo == null) {
                 logger.info("datastore is null");
@@ -2119,10 +2170,12 @@ public class VCSDKUtils {
             logger.info("Rescan datastore after unmounting");
         } catch (Exception e) {
             logger.error("unmount nfs error:{}", e.getMessage());
+            throw new Exception(e.getMessage());
+
         }
     }
 
-    public void unmountNfsOnHost(String dataStoreObjectId, String hostObjId) throws VcenterException {
+    public void unmountNfsOnHost(String dataStoreObjectId, String hostObjId) throws DmeException {
         try {
             if (StringUtils.isEmpty(dataStoreObjectId)) {
                 logger.info("param dataStoreObjectId is null");
@@ -2143,7 +2196,7 @@ public class VCSDKUtils {
             unmountNfsOnHost(dsmo, hostmo, dataStoreObjectId);
         } catch (Exception e) {
             logger.error("unmount nfs On host error:{}", e.getMessage());
-            throw new VcenterException(e.getMessage());
+            throw new DmeException(e.getMessage());
         }
     }
 
@@ -3248,7 +3301,7 @@ public class VCSDKUtils {
     /**
      * 获取主机网卡信息
      *
-     * @param hostObjectId 主机objectid
+     * @param hostObjectIds 主机objectid
      * @param recommendMtu MTU期望值
      * @return String String
      */
@@ -3297,8 +3350,8 @@ public class VCSDKUtils {
     /**
      * 获取主机网卡信息
      *
-     * @param hostObjectId 主机objectid
-     * @param recommendMtu MTU期望值
+     * @param beans 主机objectid
+     * @param recommendValue MTU期望值
      */
     public void updateVirtualNicList(List<UpHostVnicRequestBean> beans, int recommendValue) {
         JsonArray jsonArray = new JsonArray();
@@ -3380,103 +3433,140 @@ public class VCSDKUtils {
             perfQuerySpecs.add(qSpec);
             List<PerfEntityMetricBase> perfEntityMetricBases = performanceManagerMo.queryPerf(perfQuerySpecs);
             perResult = gson.toJson(perfEntityMetricBases);
-        } catch (Exception e) {
-            logger.error("queryPerfAllCount error");
+        } catch (Exception ex) {
+            logger.error("queryPerfAllCount error!", ex);
         }
         return perResult;
     }
 
-    public String xmlRulesFormat(String unformattedXml) {
+    public Map<String, Map<String, String>> xmlRulesFormat(String unformattedXml) {
+        Map<String, Map<String, String>> map = new HashMap<>();
         try {
             final Document document = parseXmlFile(unformattedXml);
-            NodeList sms = document.getElementsByTagName("obj");
-            for(int index = 0; index < sms.getLength(); index++){
+            NodeList sms = document.getElementsByTagName("DataObject");
+            for (int index = 0; index < sms.getLength(); index++) {
                 Element sm = (Element) sms.item(index);
-
+                NodeList vendor = sm.getElementsByTagName("Vendor");
+                Node vendorNode = vendor.item(0).getFirstChild();
+                String vendorValue = vendorNode == null? null : vendorNode.getNodeValue();
+                if(StringUtil.isNotBlank(vendorValue) && vendorValue.equals("HUAWEI")){
+                    Map<String, String> satpMap = new HashMap<>();
+                    String pspValue = sm.getElementsByTagName("DefaultPSP").item(0).getFirstChild().getNodeValue();
+                    String satpValue = sm.getElementsByTagName("Name").item(0).getFirstChild().getNodeValue();
+                    String claimOptionValue = sm.getElementsByTagName("ClaimOptions").item(0).getFirstChild().getNodeValue();
+                    String modelValue =  sm.getElementsByTagName("Model").item(0).getFirstChild().getNodeValue();
+                    satpMap.put("vendor", vendorValue);
+                    satpMap.put("model", modelValue);
+                    satpMap.put("satp", satpValue);
+                    satpMap.put("psp", pspValue);
+                    satpMap.put("claimOption", claimOptionValue);
+                    String key = getSatpKey(satpMap);
+                    map.put(key, satpMap);
+                }
             }
-        } catch (Exception e) {
-            logger.error("xmlFormat error:{}", e.toString());
+        } catch (Exception ex) {
+            logger.error("xmlRulesFormat error!", ex);
         }
-        return null;
+        return map;
     }
 
-    public void satpRuleList(String hostObjectId, VCenterInfo vcenterinfo) {
+    private String getSatpKey(Map<String, String> satpMap){
+         String key = new StringBuilder(satpMap.get("vendor"))
+                 .append(satpMap.get("model"))
+                 .append(satpMap.get("satp"))
+                 .append(satpMap.get("psp"))
+                 .append(satpMap.get("claimOption"))
+                 .toString();
+         return key;
+    }
+
+    public Map<String, Map<String, String>> satpRuleList(String hostObjectId, VCenterInfo vcenterinfo) {
         String moid = "ha-cli-handler-storage-nmp-satp-rule";
         String esxCLI = "vim.EsxCLI.storage.nmp.satp.rule.list";
-        ManagedMethodExecuter.SoapArgument pspQuery
-                = new ManagedMethodExecuter.SoapArgument();
-        pspQuery.setName("psp");
-        pspQuery.setVal("<psp>" + "VMW_PSP_RR" + "</psp>");
-        String ruleList = satpRuleProcess(hostObjectId, vcenterinfo, moid, esxCLI, new ManagedMethodExecuter.SoapArgument[]{pspQuery});
-        xmlRulesFormat(ruleList);
+        String[] satps = new String[]{"VMW_SATP_DEFAULT_AA", "VMW_SATP_ALUA"};
+        Map<String, Map<String, String>> satpRuleMap = new HashMap();
+        for(String stap : satps){
+            ManagedMethodExecuter.SoapArgument satpArgument0 = new ManagedMethodExecuter.SoapArgument();
+            satpArgument0.setName("satp");
+            satpArgument0.setVal("<satp>" + stap + "</satp>");
+            ManagedMethodExecuter.SoapArgument[] soapArguments = new ManagedMethodExecuter.SoapArgument[]{satpArgument0};
+            String ruleList = satpRuleProcess(hostObjectId, vcenterinfo, moid, esxCLI, soapArguments);
+            satpRuleMap.putAll(xmlRulesFormat(ruleList));
+        }
 
+        return satpRuleMap;
     }
 
 
     public void satpRuleAdd(String hostObjectId, VCenterInfo vcenterinfo) {
+        // 获取主机上配置的satp规则信息
+        Map<String, Map<String, String>> satpRuleMap = satpRuleList(hostObjectId, vcenterinfo);
+
         String moid = "ha-cli-handler-storage-nmp-satp-rule";
         String esxCLI = "vim.EsxCLI.storage.nmp.satp.rule.add";
+        String modelValue = "XSG1";
+        String vendorValue = "HUAWEI";
         List<Map<String, String>> ruleList = new ArrayList<>();
         Map<String, String> map1 = new HashMap();
         map1.put("satp", "VMW_SATP_ALUA");
         map1.put("psp", "VMW_PSP_RR");
-        map1.put("claimoption", "tpgs_on");
-        ruleList.add(map1);
+        map1.put("claimOption", "tpgs_on");
+        map1.put("model", modelValue);
+        map1.put("vendor", vendorValue);
+        String satpKey1 = getSatpKey(map1);
+        if(!satpRuleMap.containsKey(satpKey1)){
+            ruleList.add(map1);
+        }
 
         Map<String, String> map2 = new HashMap();
         map2.put("satp", "VMW_SATP_DEFAULT_AA");
         map2.put("psp", "VMW_PSP_RR");
-        map2.put("claimoption", "tpgs_off");
-        ruleList.add(map2);
+        map2.put("claimOption", "tpgs_off");
+        map2.put("model", modelValue);
+        map2.put("vendor", vendorValue);
+        String satpKey2 = getSatpKey(map2);
+        if(!satpRuleMap.containsKey(satpKey2)){
+            ruleList.add(map2);
+        }
 
-
-        // 用于判断所有的线程是否结束
         for (int index = 0; index < ruleList.size(); index++) {
             Map<String, String> map = ruleList.get(index);
             List<ManagedMethodExecuter.SoapArgument> soapArgumentList = new ArrayList<>();
 
-            ManagedMethodExecuter.SoapArgument vendor
-                    = new ManagedMethodExecuter.SoapArgument();
+            ManagedMethodExecuter.SoapArgument vendor = new ManagedMethodExecuter.SoapArgument();
             vendor.setName("vendor");
             vendor.setVal("<vendor  xmlns:xsi=\"http:// www.w3.org/2001/XMLSchema-instance\" "
                     + "xmlns:xsd=\"http:// www.w3.org/2001/XMLSchema\" "
-                    + "xmlns=\"urn:vim25\">" + "HUAWEI" + "</vendor>");
+                    + "xmlns=\"urn:vim25\">" + vendorValue + "</vendor>");
 
-            ManagedMethodExecuter.SoapArgument model
-                    = new ManagedMethodExecuter.SoapArgument();
+            ManagedMethodExecuter.SoapArgument model = new ManagedMethodExecuter.SoapArgument();
             model.setName("model");
             model.setVal("<model  xmlns:xsi=\"http:// www.w3.org/2001/XMLSchema-instance\" "
                     + "xmlns:xsd=\"http:// www.w3.org/2001/XMLSchema\" "
-                    + "xmlns=\"urn:vim25\">" + "XSG1" + "</model>");
+                    + "xmlns=\"urn:vim25\">" + modelValue + "</model>");
 
-            ManagedMethodExecuter.SoapArgument satp
-                    = new ManagedMethodExecuter.SoapArgument();
+            ManagedMethodExecuter.SoapArgument satp = new ManagedMethodExecuter.SoapArgument();
             satp.setName("satp");
             satp.setVal("<satp  xmlns:xsi=\"http:// www.w3.org/2001/XMLSchema-instance\" "
                     + "xmlns:xsd=\"http:// www.w3.org/2001/XMLSchema\" "
                     + "xmlns=\"urn:vim25\">" + map.get("satp") + "</satp>");
 
 
-            ManagedMethodExecuter.SoapArgument psp
-                    = new ManagedMethodExecuter.SoapArgument();
+            ManagedMethodExecuter.SoapArgument psp = new ManagedMethodExecuter.SoapArgument();
             psp.setName("psp");
             psp.setVal("<psp  xmlns:xsi=\"http:// www.w3.org/2001/XMLSchema-instance\" "
                     + "xmlns:xsd=\"http:// www.w3.org/2001/XMLSchema\" "
                     + "xmlns=\"urn:vim25\">" + map.get("psp") + "</psp>");
 
-            ManagedMethodExecuter.SoapArgument claimoption
-                    = new ManagedMethodExecuter.SoapArgument();
+            ManagedMethodExecuter.SoapArgument claimoption = new ManagedMethodExecuter.SoapArgument();
             claimoption.setName("claimoption");
-            claimoption.setVal(
-                    "<claimoption  xmlns:xsi=\"http:// www.w3.org/2001/XMLSchema-instance\" "
+            claimoption.setVal("<claimoption  xmlns:xsi=\"http:// www.w3.org/2001/XMLSchema-instance\" "
                             + "xmlns:xsd=\"http:// www.w3.org/2001/XMLSchema\" "
-                            + "xmlns=\"urn:vim25\">" + map.get("claimoption") + "</claimoption>");
+                            + "xmlns=\"urn:vim25\">" + map.get("claimOption") + "</claimoption>");
 
-            ManagedMethodExecuter.SoapArgument force
-                    = new ManagedMethodExecuter.SoapArgument();
+            ManagedMethodExecuter.SoapArgument force = new ManagedMethodExecuter.SoapArgument();
             force.setName("force");
-            force.setVal(
-                    "<force  xmlns:xsi=\"http:// www.w3.org/2001/XMLSchema-instance\" "
+            force.setVal("<force  xmlns:xsi=\"http:// www.w3.org/2001/XMLSchema-instance\" "
                             + "xmlns:xsd=\"http:// www.w3.org/2001/XMLSchema\" "
                             + "xmlns=\"urn:vim25\">" + "true" + "</force>");
 
@@ -3488,7 +3578,8 @@ public class VCSDKUtils {
             soapArgumentList.add(vendor);
 
             ManagedMethodExecuter.SoapArgument[] var4 = soapArgumentList.toArray(new ManagedMethodExecuter.SoapArgument[0]);
-            satpRuleProcess(hostObjectId, vcenterinfo, moid, esxCLI, var4);
+            String processStr = satpRuleProcess(hostObjectId, vcenterinfo, moid, esxCLI, var4);
+            logger.info("add SATP rule {}, {}, hostObjectId={}", map.get("satp"), StringUtils.isEmpty(processStr) ? "failed" : "success", hostObjectId);
         }
 
     }
@@ -3549,15 +3640,15 @@ public class VCSDKUtils {
             ManagedMethodExecuter methodExecuter = vmomiClient.createStub(ManagedMethodExecuter.class, methodexecutor);
             ManagedMethodExecuter.SoapResult soapResult = methodExecuter.executeSoap(moid,"urn:vim25/6.5", esxCLI, soapArguments);
             String re = null;
-            if(soapResult.response != null){
+            if (soapResult.response != null) {
                 re = new String(soapResult.getResponse().getBytes("ISO-8859-1"), "UTF-8");
-
+            } else {
+                logger.error("satpRuleProcess failed!errMsg={}", soapResult.getFault().faultDetail);
             }
-            logger.info("satpRuleProcess,re={}", re);
             return re;
 
         } catch (Exception ex) {
-            logger.error("error:", ex);
+            logger.error("satpRuleProcess error!hostObjectId={},esxCLI={},{}", hostObjectId, esxCLI, ex);
         } finally {
             if (sessionManager != null) {
                 sessionManager.logout();
@@ -3570,7 +3661,5 @@ public class VCSDKUtils {
         return null;
 
     }
-
-
 
 }

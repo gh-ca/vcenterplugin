@@ -1,0 +1,11 @@
+<span>
+  <span class="color-square filter-cell" [style.background-color]="status&&status.color"></span>
+  <span *ngIf="status">{{status.label | translate}}</span>
+  <span *ngIf="!status">{{"storage.list.Unknown" | translate}}</span>
+</span>
+<br />
+<span>
+  <span class="color-square filter-cell" [style.background-color]="synStatus&&synStatus.color"></span>
+  <span *ngIf="synStatus">{{synStatus.label | translate}}</span>
+  <span *ngIf="!synStatus">{{"storage.list.Unknown" | translate}}</span>
+</span>

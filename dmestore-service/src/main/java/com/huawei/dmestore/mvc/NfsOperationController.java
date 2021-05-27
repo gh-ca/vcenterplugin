@@ -209,9 +209,9 @@ public class NfsOperationController extends BaseController {
                     capacityAutonegotiation.put("max_auto_size", 16777216);
                     capacityAutonegotiation.put("min_auto_size", 16777216);
                     capacityAutonegotiation.put("auto_size_increment", 1024);
-                    capacityAutonegotiation.put(AUTO_SIZE_ENABLE_FIELD, requestParams.get(AUTO_SIZE_ENABLE_REQUEST_FIELD));
+                    capacityAutonegotiation.put(AUTO_SIZE_ENABLE_FIELD, true);
+                    capacityAutonegotiation.put(ADJUSTING_MODE_FIELD, capacitymode);
                 }
-                capacityAutonegotiation.put(ADJUSTING_MODE_FIELD, capacitymode);
             }
         } else {
             tuning.put(ALLOCATION_TYPE_FIELD, THIN_FIELD);
@@ -279,10 +279,15 @@ public class NfsOperationController extends BaseController {
             }
             if (qosPolicy != null && qosPolicy.size() != 0) {
                 if (enabled) {
-                    qosPolicy.put("enabled", enabled);
+                    qosPolicy.put("enabled", qosFlag);
                 }
                 param.put("qos_policy", qosPolicy);
             }
+        }else {
+            Map<String, Object> enableMap = new HashMap<>(DmeConstants.COLLECTION_CAPACITY_16);
+            if (enabled) {
+                enableMap.put("enabled", qosFlag);
+                param.put("qos_policy", enableMap);            }
         }
     }
 
@@ -290,35 +295,37 @@ public class NfsOperationController extends BaseController {
         throws DmeException {
         Map<String, Object> filesystemDetail = getFilesystemDetail((String) params.get("fileSystemId"));
         Map<String, Object> capacityAutonegotiationMap =
-            (Map<String, Object>) filesystemDetail.get("capacity_auto_negotiation");
+                (Map<String, Object>) filesystemDetail.get("capacity_auto_negotiation");
         Map<String, Object> capacityAutonegotiation = new HashMap<>(DmeConstants.COLLECTION_CAPACITY_16);
+        String capacitymode = null;
         if (autoSizeEnable != null) {
-            String capacitymode = (Boolean) autoSizeEnable
-                ? CapacityAutonegotiation.CAPACITY_MODE_AUTO
-                : CapacityAutonegotiation.CAPACITY_MODE_OFF;
-            if (!"grow-off".equalsIgnoreCase(capacitymode)) {
-                capacityAutonegotiation.put(AUTO_SIZE_ENABLE_FIELD, params.get(AUTO_SIZE_ENABLE_REQUEST_FIELD));
-                capacityAutonegotiation
-                    .put("capacity_recycle_mode", capacityAutonegotiationMap.get("capacity_recycle_mode"));
-                capacityAutonegotiation
-                    .put("auto_grow_threshold_percent", capacityAutonegotiationMap.get("auto_grow_threshold_percent"));
-                capacityAutonegotiation.put("auto_shrink_threshold_percent",
-                    capacityAutonegotiationMap.get("auto_shrink_threshold_percent"));
-                capacityAutonegotiation.put("max_auto_size", capacityAutonegotiationMap.get("max_auto_size"));
-                capacityAutonegotiation.put("min_auto_size", capacityAutonegotiationMap.get("min_auto_size"));
-                capacityAutonegotiation
-                    .put("auto_size_increment", capacityAutonegotiationMap.get("auto_size_increment"));
-            }
-            capacityAutonegotiation.put(ADJUSTING_MODE_FIELD, capacitymode);
-            param.put("capacity", filesystemDetail.get("capacity"));
-            param.put("capacity_autonegotiation", capacityAutonegotiation);
+            capacitymode = (Boolean) autoSizeEnable
+                    ? CapacityAutonegotiation.CAPACITY_MODE_AUTO
+                    : CapacityAutonegotiation.CAPACITY_MODE_OFF;
         }
+        capacityAutonegotiation.put(AUTO_SIZE_ENABLE_FIELD, true);
+        capacityAutonegotiation
+                .put("capacity_recycle_mode", capacityAutonegotiationMap.get("capacity_recycle_mode"));
+        capacityAutonegotiation
+                .put("auto_grow_threshold_percent", capacityAutonegotiationMap.get("auto_grow_threshold_percent"));
+        capacityAutonegotiation.put("auto_shrink_threshold_percent",
+                capacityAutonegotiationMap.get("auto_shrink_threshold_percent"));
+        capacityAutonegotiation.put("max_auto_size", capacityAutonegotiationMap.get("max_auto_size"));
+        capacityAutonegotiation.put("min_auto_size", capacityAutonegotiationMap.get("min_auto_size"));
+        capacityAutonegotiation
+                .put("auto_size_increment", capacityAutonegotiationMap.get("auto_size_increment"));
+
+        capacityAutonegotiation.put(ADJUSTING_MODE_FIELD, capacitymode);
+        param.put("capacity", filesystemDetail.get("capacity"));
+        param.put("capacity_autonegotiation", capacityAutonegotiation);
+
     }
 
     private void parseCreateNfsParams(Map<String, Object> requestParams,Map<String, Object> targetParams)
         throws DmeException {
         Map<String, Object> createNfsShareParam = new HashMap<>(DmeConstants.COLLECTION_CAPACITY_16);
         String storagId = (String) requestParams.get("storagId");
+        StorageTypeShow dorado = isDorado(storagId);
         targetParams.put("storage_id", storagId);
         targetParams.put("storage_pool_id", requestParams.get("storagePoolId"));
         targetParams.put("pool_raw_id", requestParams.get("poolRawId"));
@@ -339,18 +346,27 @@ public class NfsOperationController extends BaseController {
         filesystemSpec.put("capacity", requestParams.get("size"));
         filesystemSpec.put("count", 1);
         boolean sameName = (Boolean) requestParams.get("sameName");
+
         if (sameName) {
             createNfsShareParam.put(NAME_FIELD, FILE_SEPARATOR + nfsName);
             createNfsShareParam.put("share_path", FILE_SEPARATOR + nfsName + FILE_SEPARATOR);
             filesystemSpec.put(NAME_FIELD, nfsName);
             targetParams.put("exportPath", FILE_SEPARATOR + nfsName);
         } else {
-            createNfsShareParam.put(NAME_FIELD, FILE_SEPARATOR + requestParams.get("shareName"));
+            if (!dorado.getDorado()) {
+                createNfsShareParam.put(NAME_FIELD, FILE_SEPARATOR + requestParams.get("shareName"));
+                targetParams.put("exportPath", FILE_SEPARATOR + requestParams.get("shareName"));
+            } else {
+                // dorado v6设备不支持设置name别名
+                // createNfsShareParam.put(NAME_FIELD, FILE_SEPARATOR + requestParams.get(FSNAME_FIELD));
+                targetParams.put("exportPath", FILE_SEPARATOR + requestParams.get(FSNAME_FIELD));
+            }
             createNfsShareParam
-                .put("share_path", FILE_SEPARATOR + requestParams.get(FSNAME_FIELD) + FILE_SEPARATOR);
+                    .put("share_path", FILE_SEPARATOR + requestParams.get(FSNAME_FIELD) + FILE_SEPARATOR);
             filesystemSpec.put(NAME_FIELD, requestParams.get(FSNAME_FIELD));
-            targetParams.put("exportPath", FILE_SEPARATOR + requestParams.get("shareName"));
+
         }
+
         List<Map<String, Object>> filesystemSpecs = new ArrayList<>(DmeConstants.COLLECTION_CAPACITY_16);
         filesystemSpecs.add(filesystemSpec);
         targetParams.put("filesystem_specs", filesystemSpecs);
@@ -363,7 +379,7 @@ public class NfsOperationController extends BaseController {
         List<Map<String, Object>> nfsShareClientAdditions = new ArrayList<>(DmeConstants.COLLECTION_CAPACITY_16);
         nfsShareClientAdditions.add(nfsShareClientAddition);
         targetParams.put("nfs_share_client_addition", nfsShareClientAdditions);
-        advanceExcute(requestParams, targetParams, advance, isDorado(storagId));
+        advanceExcute(requestParams, targetParams, advance, dorado);
     }
 
     private void parseUpdateNfsParams(Map<String, Object> params,Map<String, Object> param) throws DmeException {

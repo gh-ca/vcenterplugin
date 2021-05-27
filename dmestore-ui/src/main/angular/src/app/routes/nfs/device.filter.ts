@@ -1,28 +1,44 @@
-import { ChangeDetectorRef, Component, OnInit } from "@angular/core";
-import { ClrDatagridFilterInterface } from "@clr/angular";
-import { Subject } from "rxjs";
-import { List } from "./nfs.service";
-import { StorageList, StorageService } from "../storage/storage.service";
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ClrDatagridFilterInterface } from '@clr/angular';
+import { Subject } from 'rxjs';
+import { List } from './nfs.service';
+import { StorageList, StorageService } from '../storage/storage.service';
 import { isMockData, mockData } from './../../../mock/mock';
-import { URLS_STORAGE } from './../storage/storage.service';
+import { getList as genDemStorageList } from 'mock/URLS_STORAGE/DMESTORAGE_STORAGES';
 
 @Component({
-  selector: "device-filter",
+  selector: 'device-filter',
   template: `
+    <div class="over_flow" style="max-height: 500px;overflow: auto">
       <clr-radio-container style="margin-top: 0px;">
         <clr-radio-wrapper>
-          <input type="radio" clrRadio name="options" (change)="changeFunc($event)" [(ngModel)]="options" value="" />
-          <label>{{'enum.status.all' | translate}}</label>
+          <input
+            type="radio"
+            clrRadio
+            name="options"
+            (change)="changeFunc($event)"
+            [(ngModel)]="options"
+            value=""
+          />
+          <label>{{ 'enum.status.all' | translate }}</label>
         </clr-radio-wrapper>
-        <clr-radio-wrapper *ngFor="let item of storageList">
-          <input type="radio" clrRadio name="options" (change)="changeFunc($event)" [(ngModel)]="options" value="{{item.name}}"/>
-          <label>{{item.name}}</label>
+        <clr-radio-wrapper *ngFor="let item of storageList" title="{{ item.name }}">
+          <input
+            type="radio"
+            clrRadio
+            name="options"
+            (change)="changeFunc($event)"
+            [(ngModel)]="options"
+            value="{{ item.name }}"
+          />
+          <label [title]="item.name">{{ item.name }}</label>
         </clr-radio-wrapper>
       </clr-radio-container>
-  `
+    </div>
+  `,
 })
 export class DeviceFilter implements ClrDatagridFilterInterface<List>, OnInit {
-  constructor(private storageService: StorageService, private cdr: ChangeDetectorRef) { }
+  constructor(private storageService: StorageService, private cdr: ChangeDetectorRef) {}
 
   ngOnInit(): void {
     const deviceFilterOptionsHandler = (s: any) => {
@@ -33,9 +49,9 @@ export class DeviceFilter implements ClrDatagridFilterInterface<List>, OnInit {
     };
     /* TODO: */
     if (isMockData) {
-      deviceFilterOptionsHandler(mockData[URLS_STORAGE.DMESTORAGE_STORAGES]);
+      deviceFilterOptionsHandler(genDemStorageList(100));
     } else {
-      this.storageService.getData().subscribe(deviceFilterOptionsHandler);
+      this.storageService.getData(false).subscribe(deviceFilterOptionsHandler);
     }
   }
   changes = new Subject<any>();

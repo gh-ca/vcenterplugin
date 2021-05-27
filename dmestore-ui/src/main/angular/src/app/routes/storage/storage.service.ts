@@ -1,18 +1,17 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { StorageTypeShow } from "../vmfs/list/list.service";
-import { TranslatePipe } from "@ngx-translate/core";
+import { StorageTypeShow } from '../vmfs/list/list.service';
+import { TranslatePipe } from '@ngx-translate/core';
 
-
-export const URLS_STORAGE = {
-  DMESTORAGE_STORAGES: 'dmestorage/storages'
-}
 @Injectable()
 export class StorageService {
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
-  getData() {
-    return this.http.get(URLS_STORAGE.DMESTORAGE_STORAGES);
+  getData(flag) {
+    if (flag) {
+      return this.http.get('dmestorage/storages', { params: { flag } });
+    }
+    return this.http.get('dmestorage/storages');
   }
   getStoragePoolListByStorageId(mediaType: string, storageId: string) {
     return this.http.get('dmestorage/storagepools', { params: { storageId, mediaType } });
@@ -76,11 +75,11 @@ export class StorageChart {
   name: string;
   ip: string;
   model: string; // 5300 V5(OceanStor)
-  capacity: string;// 总容量
-  usedCapacity: string;// 已使用容量
-  freeCapacity: string;// 空闲容量
-  alarms: number;// 告警数
-  events: number;// 事件数
+  capacity: string; // 总容量
+  usedCapacity: string; // 已使用容量
+  freeCapacity: string; // 空闲容量
+  alarms: number; // 告警数
+  events: number; // 事件数
   chart: CapacityChart;
   iops: PerforChart;
   bandwidth: PerforChart;
@@ -98,18 +97,17 @@ export class CapacityChart {
       textVerticalAlign: 'middle',
       textStyle: {
         fontSize: 15,
-        color: '#6C92FA'
+        color: '#6C92FA',
       },
       subtextStyle: {
         fontSize: 10,
         color: '#c2c6dc',
-        align: 'center'
+        align: 'center',
       },
       left: '50%',
       top: '50%',
       //subtext: '234'
     };
-
   }
 }
 export class CapacitySerie {
@@ -123,27 +121,35 @@ export class CapacitySerie {
   labelLine: any;
   color: any;
   data: D[] = [];
-  constructor(protection: number, fs: number, volume: number, free: number, blockFile: number, isDorado: boolean, translatePipe: TranslatePipe) {
-    this.name = "";
-    this.type = "pie";
+  constructor(
+    protection: number,
+    fs: number,
+    volume: number,
+    free: number,
+    blockFile: number,
+    isDorado: boolean,
+    translatePipe: TranslatePipe
+  ) {
+    this.name = '';
+    this.type = 'pie';
     this.radius = ['60%', '70%'];
     this.center = ['50%', '50%'];
     this.avoidLabelOverlap = false;
     this.label = {
       show: false,
-      position: 'center'
+      position: 'center',
     };
     this.emphasis = {
       label: {
         show: false,
         fontSize: '20',
-        fontWeight: 'bold'
-      }
+        fontWeight: 'bold',
+      },
     };
     // 保护
     const p = new D();
     p.value = protection;
-    p.name = translatePipe.transform("storage.chart.protection");
+    p.name = translatePipe.transform('storage.chart.protection');
     this.data.push(p);
 
     if (isDorado) {
@@ -154,7 +160,12 @@ export class CapacitySerie {
       bf.name = translatePipe.transform('storage.chart.blockFile');
       this.data.push(bf);
     } else {
-      this.color = ['hsl(164,58%, 52%)', 'hsl(48, 77%, 55%)', 'hsl(224, 93%, 70%)', 'hsl(0, 0%, 90%)'];
+      this.color = [
+        'hsl(164,58%, 52%)',
+        'hsl(48, 77%, 55%)',
+        'hsl(224, 93%, 70%)',
+        'hsl(0, 0%, 90%)',
+      ];
       // 文件系统
       const f = new D();
       f.value = fs;
@@ -167,14 +178,13 @@ export class CapacitySerie {
       this.data.push(v);
     }
     this.labelLine = {
-      show: false
+      show: false,
     };
     // 空闲
     const fr = new D();
     fr.value = free;
     fr.name = translatePipe.transform('storage.chart.free');
     this.data.push(fr);
-
   }
 }
 export class D {
@@ -190,18 +200,19 @@ export class PerforChart {
   constructor(d: number[]) {
     this.xAxis = {
       show: true,
-      type: 'category'
+      type: 'category',
     };
     this.yAxis = {
       show: false,
-      type: 'value'
+      type: 'value',
     };
     this.color = ['hsl(198, 100%, 32%)'];
     this.series = [
       {
         data: d,
         type: 'line',
-        barCategoryGap: 0
-      }];
+        barCategoryGap: 0,
+      },
+    ];
   }
 }

@@ -60,6 +60,9 @@ public class RefreshKeyServiceImpl implements RefreshKeyService{
             if (dmeInfo != null) {
                 dmeInfo.setPassword(dmeInfo.getPassword());
             }
+            //更新salt，重新加密
+            String saltkey = AESCipher.getSafeRandomToString(KEY_SIZE);
+            FileUtils.saveKey(saltkey, FileUtils.SALT_FILE_NAME);
 
             //更新密钥，重新加密
             String fileStringKey = AESCipher.getSafeRandomToString(KEY_SIZE);

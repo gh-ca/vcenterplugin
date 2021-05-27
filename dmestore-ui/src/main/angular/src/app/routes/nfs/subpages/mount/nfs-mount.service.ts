@@ -1,52 +1,57 @@
-import {Injectable} from "@angular/core";
-import {HttpClient} from "@angular/common/http";
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 
 @Injectable()
-export class NfsMountService{
+export class NfsMountService {
   constructor(private http: HttpClient) {}
-  getHostListByObjectId(dataStoreObjectId: string){
-    return this.http.get('accessvmware/gethostsbydsobjectid', {params: {dataStoreObjectId}});
+  getHostListByObjectId(dataStoreObjectId: string) {
+    return this.http.get('accessvmware/gethostsbydsobjectid', { params: { dataStoreObjectId } });
   }
-  getClusterListByObjectId(dataStoreObjectId: string){
-    return this.http.get('accessvmware/getclustersbydsobjectid', {params: {dataStoreObjectId}});
+  getClusterListByObjectId(dataStoreObjectId: string) {
+    return this.http.get('accessvmware/getclustersbydsobjectid', { params: { dataStoreObjectId } });
   }
 
-  getDatastoreListByHostObjectId(hostObjectId:string, dataStoreType:string){
-    return this.http.get('accessvmware/getdatastoresbyhostobjectid', {params:{hostObjectId, dataStoreType}});
+  getDatastoreListByHostObjectId(hostObjectId: string, dataStoreType: string) {
+    return this.http.get('accessvmware/getdatastoresbyhostobjectid', {
+      params: { hostObjectId, dataStoreType },
+    });
   }
-  getDatastoreListByClusterObjectId(params:{}){
+  getDatastoreListByClusterObjectId(params: {}) {
     return this.http.get('accessvmware/getdatastoresbyclusterobjectid', params);
   }
-  mountNfs(params= {}){
+  mountNfs(params = {}) {
     return this.http.post('accessnfs/mountnfs', params);
   }
   //获取主机对应的虚拟ip列表
-  getVmkernelListByObjectId(hostObjectId:string){
-    return this.http.get('accessvmware/getvmkernelipbyhostobjectid',{params: {hostObjectId}} );
+  getVmkernelListByObjectId(hostObjectId: string) {
+    return this.http.get('accessvmware/getvmkernelipbyhostobjectid', { params: { hostObjectId } });
   }
-  getLogicPortListByStorageId(storageId: string){
-    return this.http.get('dmestorage/logicports', {params: {storageId}});
+  getLogicPortListByStorageId(storageId: string, flag) {
+    if (flag) {
+      return this.http.get('dmestorage/logicports', { params: { storageId, flag } });
+    }
+    return this.http.get('dmestorage/logicports', { params: { storageId } });
   }
 }
-export class DataStore{
-  freeSpace:string;
+export class DataStore {
+  freeSpace: string;
   name: string;
-  id : string;
+  id: string;
   type: string;
   objectId: string;
   status: string;
   capacity: string;
 }
-export class Vmkernel{
+export class Vmkernel {
   portgroup: string;
   ipAddress: string;
   device: string;
   key: string;
   mac: string;
 }
-export class Mount{
+export class Mount {
   dataStoreObjectId: string;
-  hostObjectId
-  hostVkernelIp:string;//  虚拟网卡ip
+  hostObjectId;
+  hostVkernelIp: string; //  虚拟网卡ip
   mountType: string;
 }

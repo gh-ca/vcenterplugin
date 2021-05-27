@@ -67,7 +67,7 @@ public class OverviewServiceImplTest {
         Storage storage = new Storage();
         List<Storage> storages = new ArrayList<>();
         storages.add(storage);
-        when(dmeStorageService.getStorages()).thenReturn(storages);
+        when(dmeStorageService.getStorages(anyString())).thenReturn(storages);
         overviewService.getStorageNum();
     }
 

@@ -12,6 +12,7 @@ import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
@@ -30,7 +31,7 @@ public class VcenterDeployerApplication {
         try {
             KeytookUtil.genKey();
             LOGGER.info("Starting server...");
-        } catch (IOException e) {
+        } catch (IOException | NoSuchAlgorithmException e) {
             LOGGER.error("Starting server error!");
         }
 

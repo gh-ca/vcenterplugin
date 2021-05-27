@@ -164,7 +164,6 @@ public class DmeVmwareRalationDao extends H2DataBaseDao {
         }
         return dvr;
     }
-
     public List<String> getAllWwnByType(String storeType) throws DmeSqlException {
         List<String> lists = new ArrayList<>();
         Connection con = null;
@@ -365,7 +364,7 @@ public class DmeVmwareRalationDao extends H2DataBaseDao {
         try {
             con = getConnection();
             String sql = "UPDATE " + DpSqlFileConstants.DP_DME_VMWARE_RELATION
-                + " SET STORE_ID=?,VOLUME_ID=?,STORE_NAME=?,VOLUME_NAME=?,UPDATETIME=? where VOLUME_WWN=?";
+                    + " SET STORE_ID=?,VOLUME_ID=?,STORE_NAME=?,VOLUME_NAME=?,UPDATETIME=?,STORAGE_DEVICE_ID =? where VOLUME_WWN=?";
             pstm = con.prepareStatement(sql);
             LOGGER.info("updateVmfs!sql={}, connection is not null:{}", sql, con == null ? false : true);
             con.setAutoCommit(false);
@@ -377,6 +376,7 @@ public class DmeVmwareRalationDao extends H2DataBaseDao {
                 pstm.setDate(DpSqlFileConstants.DIGIT_5, new Date(System.currentTimeMillis()));
                 pstm.setString(DpSqlFileConstants.DIGIT_6, relation.getVolumeWwn());
                 pstm.setString(DpSqlFileConstants.DIGIT_7, relation.getStorageType());
+                pstm.setString(DpSqlFileConstants.DIGIT_8, relation.getStorageDeviceId());
                 pstm.addBatch();
             }
             pstm.executeBatch();
@@ -892,4 +892,28 @@ public class DmeVmwareRalationDao extends H2DataBaseDao {
             closeConnection(con, pstm, null);
         }
     }
+     public String getVolumeIdBywwn(String objId) throws DmeSqlException {
+            String volumeId = "";
+            Connection con = null;
+            PreparedStatement ps = null;
+            ResultSet rs = null;
+            try {
+                con = getConnection();
+                String sql = "SELECT * FROM " + DpSqlFileConstants.DP_DME_VMWARE_RELATION
+                        + " WHERE state=1 and STORE_TYPE='" + DmeConstants.STORE_TYPE_VMFS + "'and VOLUME_WWN ='" + objId
+                        + "'";
+                ps = con.prepareStatement(sql);
+                rs = ps.executeQuery();
+                while (rs.next()) {
+                    volumeId = rs.getString(VOLUME_ID);
+                    break;
+                }
+            } catch (DataBaseException | SQLException e) {
+                LOGGER.error("Failed to get vmfs datastore on: {},{}", objId, e.getMessage());
+                throw new DmeSqlException(e.getMessage());
+            } finally {
+                closeConnection(con, ps, rs);
+            }
+            return volumeId;
+        }
 }
