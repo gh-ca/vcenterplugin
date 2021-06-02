@@ -23,6 +23,8 @@ import { DevDemoComponentComponent } from './dev-demo-component/dev-demo-compone
 import { GhDynamicFormComponent } from './gh-dynamic-form/gh-dynamic-form.component';
 import { GhDynamicFormItemComponent } from './gh-dynamic-form-item/gh-dynamic-form-item.component';
 import { DynamicComponentDirectiveDirective } from './directives/dynamic-component-directive.directive';
+import { GhTreeCheckboxComponent } from './gh-tree-checkbox/gh-tree-checkbox.component';
+import { ErrorTipsComponent } from './error-tips/error-tips.component';
 
 const THIRD_MODULES = [MaterialModule, TranslateModule];
 const COMPONENTS = [
@@ -51,6 +53,10 @@ const COMPONENTS = [
   GhDynamicFormComponent,
   /* 动态表单Item */
   GhDynamicFormItemComponent,
+  /* 表单Item tree CheckBox */
+  GhTreeCheckboxComponent,
+  /* 错误提示 */
+  ErrorTipsComponent,
 ];
 const COMPONENTS_DYNAMIC = [];
 const DIRECTIVES = [DynamicComponentDirectiveDirective];

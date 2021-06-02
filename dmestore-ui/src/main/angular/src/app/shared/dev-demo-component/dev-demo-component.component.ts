@@ -7,6 +7,8 @@ import {
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { CustomValidatorFaild, helper } from '../../app.helpers';
 import { regExpCollection } from 'app/app.helpers';
+import { vmfsClusterTreeData } from './../../../mock/vmfsClusterTree';
+import { mockServerData } from './../../app.helpers';
 
 @Component({
   selector: 'app-dev-demo-component',
@@ -18,23 +20,27 @@ export class DevDemoComponentComponent implements OnInit {
   form: FormGroup;
   value;
   helper = helper;
+  vmfsTree;
+  vmfsList;
 
   constructor() {
     this.initForm();
+
+    (async () => {
+      this.vmfsTree = await mockServerData(vmfsClusterTreeData);
+      this.vmfsList = await mockServerData(vmfsClusterTreeData,1000);
+    })();
   }
 
   initForm() {
     /*初始化和校验规则*/
     this.form = new FormGroup({
       brave: new FormControl('', Validators.required),
+      tree: new FormControl('', Validators.required),
       firstName: new FormControl('', Validators.required),
       emailAddress: new FormControl('', [
         Validators.required,
-        CustomValidatorFaild(value => {
-          const res = regExpCollection.integer().test(value);
-          console.log('🚀DevDemoComponentComponent ', value, res);
-          return res;
-        }),
+        CustomValidatorFaild(value => regExpCollection.integer().test(value)),
       ]),
     });
 
@@ -88,6 +94,10 @@ export class DevDemoComponentComponent implements OnInit {
 
   handlePayLoadChange(value) {
     this.value = value;
+  }
+
+  handleTreeValueChange(prop, val) {
+    this.form.patchValue({ [prop]: val });
   }
 
   ngOnInit(): void {}

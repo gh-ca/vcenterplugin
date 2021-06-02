@@ -1,6 +1,10 @@
 import { AbstractControl } from '@angular/forms';
+import { ClrSelectedState } from '@clr/angular';
 import { ValidatorFn } from '@angular/forms';
 import { FormControl, ValidationErrors } from '@angular/forms';
+import { getLodash } from './shared/lib';
+
+export const _ = getLodash();
 
 export const handleRes = (res, successOptions, faildOptions?) => {
   if (res.code === '200') {
@@ -202,7 +206,10 @@ export function isStringLengthByteOutRange(nameString, limit = 27, name = 'byte'
     const element = nameString.charAt(index);
     if (regExpCollection.chinise().test(element)) {
       length = length + 2;
-      console.log( '🚀 ~ file: app.helpers.ts ~ line 197 ~ isStringLengthByteOutRange ~ length', length );
+      console.log(
+        '🚀 ~ file: app.helpers.ts ~ line 197 ~ isStringLengthByteOutRange ~ length',
+        length
+      );
     }
   }
   return length > limit;
@@ -250,4 +257,125 @@ export function CustomValidatorFaild(checkFn: any): ValidatorFn {
   return (control: AbstractControl): { [key: string]: any } | null => {
     return checkFn(control.value) ? { custom: { value: control.value } } : null;
   };
+}
+
+export type VMFS_CLUSTER_NODE = {
+  clusterId: string;
+  clusterName: string;
+  children?: any[];
+  selected?: number;
+};
+
+/**
+ * @Description vmfs 集群 主机 树 第一层是集群 第二层是主机
+ * 选了集群只传集群，
+ *
+ * @date 2021-05-12
+ * @param {any} clusterArray:VMFS_CLUSTER_NODE[]
+ * @returns {any}
+ */
+export function getSelectedFromTree(clusterArray: VMFS_CLUSTER_NODE[], resType = '') {
+  let result = [];
+  let selectedCluster: any = false;
+  /* 一旦选择一个集群，只能该集权 */
+  /* 一旦选择一个主机，只能该主机所在集群 */
+  for (const clusterNode of clusterArray) {
+    if (String(clusterNode.selected) === String(ClrSelectedState.SELECTED)) {
+      const _node = _.omit(clusterNode, ['children', 'selected']);
+      _node['deviceType'] = 'cluster';
+      result.push(_node);
+      if (!selectedCluster) {
+        selectedCluster = clusterNode;
+      }
+      continue;
+    }
+
+    if (clusterNode.children && clusterNode.children.length > 0) {
+      for (const hostNode of clusterNode.children) {
+        if (String(hostNode.selected) === String(ClrSelectedState.SELECTED)) {
+          const _node = _.omit(hostNode, ['children', 'selected']);
+          _node['deviceType'] = 'host';
+          if (!selectedCluster) {
+            selectedCluster = clusterNode;
+          }
+          result.push(_node);
+        }
+      }
+    }
+  }
+
+  const setDisabled = setDisabledTrue => {
+    /* 需要设置disabled，部分置灰 */
+    for (const clusterNode of clusterArray) {
+      const setOtherDisabled = () => {
+        (clusterNode as any).isDisabled = true;
+        if (clusterNode.children && clusterNode.children.length > 0) {
+          for (const hostNode of clusterNode.children) {
+            (hostNode as any).isDisabled = true;
+          }
+        }
+      };
+
+      const setEnable = () => {
+        (clusterNode as any).isDisabled = false;
+        if (clusterNode.children && clusterNode.children.length > 0) {
+          for (const hostNode of clusterNode.children) {
+            (hostNode as any).isDisabled = false;
+          }
+        }
+      };
+
+      const setAllEnable = () => {
+        (clusterNode as any).isDisabled = false;
+        if (clusterNode.children && clusterNode.children.length > 0) {
+          for (const hostNode of clusterNode.children) {
+            (hostNode as any).isDisabled = false;
+          }
+        }
+      };
+
+      if (setDisabledTrue) {
+        /* 不同集群，置灰 */
+        if (clusterNode.clusterId !== selectedCluster.clusterId) {
+          setOtherDisabled();
+        } else {
+          /* 相同集群，可选 */
+          setEnable();
+        }
+      } else {
+        /* 全部可选 */
+        setAllEnable();
+      }
+    }
+  };
+
+  if (resType === 'mount') {
+    console.log('🚀 ~ file: app.helpers.ts ~ line 353 ~ getSelectedFromTree ~ resType', resType);
+  } else {
+    setDisabled(result.length > 0);
+  }
+  return result;
+}
+
+export function getSelectedFromList(hostArray: VMFS_CLUSTER_NODE[]) {
+  let result = [];
+  for (const clusterNode of hostArray) {
+    if (String(clusterNode.selected) === String(ClrSelectedState.SELECTED)) {
+      result.push(clusterNode);
+      continue;
+    }
+  }
+  return result;
+}
+
+export function getVmfsCreateTreeFilterBySelect(tree) {
+  return tree;
+}
+
+export function mockServerData(data, delay = 50) {
+  return new Promise(resolve => {
+    setTimeout(() => {
+      resolve(_.cloneDeep(data) as any[]);
+    }, delay);
+  });
 }
