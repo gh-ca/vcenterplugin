@@ -4528,4 +4528,86 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             });
         return attachmentList;
     }
+    /**
+     * @return @return
+     * @throws
+     * @Description: 检查主机组和集群的一致性
+     * @Param @param null
+     * @author yc
+     * @Date 2021/5/31 17:21
+     */
+    public HostGroupAndClusterConsistency checkConsistencyAndGetclusterId(String clusterId) throws DmeException {
+        //校验集群id(clusterId)不能为空
+        if (StringUtils.isEmpty(clusterId)) {
+            throw new DmeException("check consistency error : the clusterId is empty!");
+        }
+        //首先根据集群id获取集群信息
+        String prefix = vcsdkUtils.getVcConnectionHelper().objectId2Mor(clusterId).getValue();
+        List<Map<String, Object>> dmeHostGroupList = new ArrayList<>();
+        List<Map<String, Object>> dmeHostGroups = dmeAccessService.getDmeHostGroups(prefix);
+        //根据集群的名称和主机数量查询主机，对查询出的主机组进行筛选
+        String vmwarehosts = vcsdkUtils.getHostsOnCluster(clusterId);
+        if (StringUtils.isEmpty(vmwarehosts)) {
+            new DmeException("the cluster has no host");
+        }
+        List<Map<String, String>> vmwarehostlists = gson.fromJson(vmwarehosts,
+                new TypeToken<List<Map<String, String>>>() {
+                }.getType());
+        //循环dme上的集群的主机组，获取和集群中主机数量相等的主机组；
+        if (!CollectionUtils.isEmpty(dmeHostGroups)) {
+            dmeHostGroupList = dmeHostGroups.stream().filter(hostGroupMap -> (int) hostGroupMap.get("host_count") == vmwarehostlists.size()).collect(Collectors.toList());
+        }
+        //校验DME中的启动器是否包含vcenter,如果包含默认为两者为同一集群
+        //1.根据集群中主机的获取主机对应的启动器（Vcenter侧）
+        Map<String, List<Map<String, Object>>> hbas = vcsdkUtils.getHbasByClusterObjectId2(clusterId);//获取name
+        ArrayList<String> hbaList = new ArrayList<String>();
+        if (!CollectionUtils.isEmpty(hbas)) {
+            //准备一个Boolean类型的set用于判断启动器相等判断的最后结果
+            for (String hostId : hbas.keySet()) {
+                if (!CollectionUtils.isEmpty(hbas.get(hostId))) {
+                    hbas.get(hostId).forEach(hba -> {
+                        hbaList.add((String) hba.get("name"));
+                    });
+                }
+            }
+        }
+        List<String> hbaListTemp = hbaList.stream().filter(Objects::nonNull).collect(Collectors.toList());
+        //2.Dme侧获取启动器
+        if (!CollectionUtils.isEmpty(dmeHostGroupList)) {
+            for (Map<String, Object> dmeHostGroupMap : dmeHostGroupList) {
+                //1.查询主机数量相等的主机组中的主机，根据主机获取主机对应的启动器(DME侧)
+                String hostGroupId = null;
+                List<String> initiators = new ArrayList<>();
+                if (!CollectionUtils.isEmpty(dmeHostGroupMap)) {
+                    hostGroupId = (String) dmeHostGroupMap.get(ID_FIELD);
+                }
+                //2.根据主机组id获取主机，并且获取主机的启动器
+                if (!StringUtils.isEmpty(hostGroupId)) {
+                    List<Map<String, Object>> hostList = dmeAccessService.getDmeHostInHostGroup(hostGroupId);
+                    //2.1.根据主机获取主机的所有启动器
+                    if (!CollectionUtils.isEmpty(hostList)) {
+                        for (Map<String, Object> dmehost : hostList) {
+                            // 得到主机的启动器
+                            if (!CollectionUtils.isEmpty(dmehost)) {
+                                String demHostId = ToolUtils.getStr(dmehost.get(ID_FIELD));
+                                List<Map<String, Object>> subinitiators = dmeAccessService.getDmeHostInitiators(demHostId);
+                                LOG.info("initiators of host on dme！",
+                                        gson.toJson(initiators) + "host size:" + initiators.size());
+                                if (!CollectionUtils.isEmpty(subinitiators)) {
+                                    subinitiators.stream().forEach(s -> {
+                                        initiators.add((String) s.get(PORT_NAME));
+                                    });
+                                }
+                            }
+                        }
+                    }
+                }
+                List<String> initiatorsTemp = initiators.stream().filter(Objects::nonNull).collect(Collectors.toList());
+                if (initiatorsTemp.containsAll(hbaListTemp)) {
+                    return new HostGroupAndClusterConsistency(true, hostGroupId);
+                }
+            }
+        }
+        return new HostGroupAndClusterConsistency(false);
+    }
 }
