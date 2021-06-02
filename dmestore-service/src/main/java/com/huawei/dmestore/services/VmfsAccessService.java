@@ -1,10 +1,7 @@
 package com.huawei.dmestore.services;
 
 import com.huawei.dmestore.exception.DmeException;
-import com.huawei.dmestore.model.ClusterTree;
-import com.huawei.dmestore.model.ResponseBodyBean;
-import com.huawei.dmestore.model.VmfsDataInfo;
-import com.huawei.dmestore.model.VmfsDatastoreVolumeDetail;
+import com.huawei.dmestore.model.*;
 
 import java.util.List;
 import java.util.Map;
@@ -199,7 +196,7 @@ public interface VmfsAccessService {
       * @author yc
       * @Date 2021/5/14 10:38
      */
-    int createVmfsNew(Map<String, Object> params) throws DmeException ;
+    CreateVmfsResponse createVmfsNew(Map<String, Object> params) throws DmeException ;
     /**
       * @Description: vmfs挂载新方法，支持批量选择主机或者主机组
       * @Param @param null

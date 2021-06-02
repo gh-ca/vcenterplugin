@@ -2,10 +2,7 @@ package com.huawei.dmestore.mvc;
 
 import com.huawei.dmestore.constant.DmeConstants;
 import com.huawei.dmestore.exception.DmeException;
-import com.huawei.dmestore.model.ClusterTree;
-import com.huawei.dmestore.model.ResponseBodyBean;
-import com.huawei.dmestore.model.VmfsDataInfo;
-import com.huawei.dmestore.model.VmfsDatastoreVolumeDetail;
+import com.huawei.dmestore.model.*;
 import com.huawei.dmestore.services.VmfsAccessService;
 import com.google.gson.Gson;
 
@@ -281,12 +278,14 @@ public class VmfsAccessController extends BaseController {
         LOG.info("accessvmfs/createvmfsnew=={}", gson.toJson(params));
         String failureStr = "";
         try {
-            int num = vmfsAccessService.createVmfsNew(params);
-            if (num == 0) {
-                return failure(DmeConstants.CODE_CONNECTIVITY_FAILURE,
-                        "create vmfs failure,connectivity of host or hostgroup on dme error!", num);
+            CreateVmfsResponse result = vmfsAccessService.createVmfsNew(params);
+            if (result.getSuccessNo() == 0) {
+                return failure("create vmfs failure!"+result.getDescription(), result.getConnectionResult());
+            }else if (result.getFailNo() != 0){
+                return partialSuccess(result,"create vmfs partial success!");
+            }else {
+                return success(result, "create vmfs success");
             }
-            return success(null, "Create vmfs success,total:"+num);
         } catch (DmeException e) {
             failureStr = "create vmfs failure:" + e.getMessage();
         }
