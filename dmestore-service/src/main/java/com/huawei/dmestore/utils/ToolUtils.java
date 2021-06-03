@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import jdk.internal.dynalink.beans.StaticClass;
@@ -468,5 +469,34 @@ public class ToolUtils {
             LOG.error("jsonToFloat2 error:{}", e.toString());
         }
         return re;
+    }
+    /**
+     * @Description: 处理从接口接受的时间的格式
+     * @Param dateValue
+     * @return Date
+     * @author yc
+     * @Date 2021/6/3 9:50
+     */
+    public static Date getDate(String dateValue) {
+        //处理传入的时间字符串对多余的”“
+        String dateStr = null;
+        if (!StringUtils.isEmpty(dateValue) && dateValue.startsWith("\"") && dateValue.endsWith(("\""))){
+            dateStr = dateValue.substring(1, dateValue.length() - 1);
+        }
+        if(dateStr.contains("T")) {
+            dateStr = dateStr.replace("T"," ");
+        }
+        Date date = null;
+
+        if (StringUtils.isEmpty(dateStr)){
+            return date;
+        }
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSSSSS");
+        try {
+            date = sdf.parse(dateStr);
+        } catch (ParseException e) {
+            LOG.error("getDate error:{}", e.toString());
+        }
+        return date;
     }
 }
