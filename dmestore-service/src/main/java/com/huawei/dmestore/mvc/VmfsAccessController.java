@@ -352,4 +352,20 @@ public class VmfsAccessController extends BaseController {
         }
         return failure(failureStr);
     }*/
+    /**
+     * queryCreationMethodByDatastore  查询存储的创建方式
+     *
+     * @param dataStoreObjectId
+     * @return ResponseBodyBean
+     */
+    @GetMapping("/queryCreationMethodByDatastore")
+    public ResponseBodyBean queryCreationMethodByDatastore(@RequestParam("dataStoreObjectId") String dataStoreObjectId) {
+        try {
+            String createmethod = vmfsAccessService.queryCreationMethodByDatastore(dataStoreObjectId);
+            return success(createmethod);
+        } catch (DmeException e) {
+            return failure(e.getMessage());
+        }
+    }
+
 }

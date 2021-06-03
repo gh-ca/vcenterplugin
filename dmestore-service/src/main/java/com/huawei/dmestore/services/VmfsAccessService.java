@@ -224,4 +224,13 @@ public interface VmfsAccessService {
       * @Date 2021/5/14 16:17
      */
    // void unmountVmfsNew(Map<String, Object> params) throws DmeException;
+    /**
+     * @Description: 查询存储设备的创建方式
+     * @Param dataStoreObjectIds
+     * @return @return
+     * @throws String
+     * @author yc
+     * @Date 2021/6/2 15:29
+     */
+    String queryCreationMethodByDatastore(String dataStoreObjectId) throws DmeException;
 }

@@ -98,6 +98,8 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
 
     private static final String HOST = "host";
 
+    private static final String CLUSTER = "cluster";
+
     private static final String CLUSTER_ID = "clusterId";
 
     private static final String TUNING = "tuning";
@@ -4770,49 +4772,44 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
     }
 
     private List<Attachment> findMappedHostsAndClusters(String volumeId) throws DmeException {
-        if(StringUtils.isEmpty(volumeId)){
+        if (StringUtils.isEmpty(volumeId)) {
             throw new DmeException("findMappedHostsAndClusters error:the param is empty");
         }
         //调用dme查询指定lun的详细信息
-      String url =DmeConstants.DME_VOLUME_BASE_URL+"/"+volumeId;
+        String url = DmeConstants.DME_VOLUME_BASE_URL + "/" + volumeId;
         ResponseEntity<String> responseEntity;
         try {
             responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
 
-        }catch (Exception e){
-            throw new DmeException("findMappedHostsAndClusters error :response "+e.getMessage());
+        } catch (Exception e) {
+            throw new DmeException("findMappedHostsAndClusters error :response " + e.getMessage());
         }
         if (responseEntity.getStatusCodeValue() != HttpStatus.OK.value()) {
             LOG.error("queryTaskById failed!taskId={},errorMsg:{}", volumeId, responseEntity.getBody());
             throw new DmeException("findMappedHostsAndClusters error :response error");
         }
         //解析响应结果，获取lun所映射的主机和主机组信息
+        JsonObject jsonObject = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonObject();
         String response = responseEntity.getBody();
-        JsonObject jsonObject = new JsonObject();
-        if (!StringUtils.isEmpty(response)) {
-            jsonObject = new JsonParser().parse(response).getAsJsonObject();
-        }
-       JsonArray volumeDetails = new JsonArray();
-        if (!StringUtils.isEmpty(response)){
-            volumeDetails = jsonObject.get("volume").getAsJsonArray();
+        JsonObject volumeDetail = new JsonObject();
+        if (!StringUtils.isEmpty(jsonObject)) {
+            volumeDetail = jsonObject.get("volume").getAsJsonObject();
         }
         List<Attachment> attachmentList = new ArrayList<>();
 
-
-        volumeDetails.forEach(jsonElement -> {
-            JsonObject json = jsonElement.getAsJsonObject();
-            JsonArray attachments = json.get("attachments").getAsJsonArray();
-            Attachment attachment = new Attachment();
-            attachments.forEach(jsonElement1 ->  {
-                JsonObject json1 = jsonElement1.getAsJsonObject();
-                attachment.setId(ToolUtils.getStr(json1.get(ID_FIELD)));
-                attachment.setVolumeId(ToolUtils.getStr(json1.get(VOLUME_ID)));
-                attachment.setHostId(ToolUtils.getStr(json1.get(HOST_ID)));
-                attachment.setAttachedAt(ToolUtils.getStr(json1.get("attached_at")));
-                attachment.setAttachedHostGroup(ToolUtils.getStr(json1.get("attached_host_group")));
-            });
+        JsonArray attachments = volumeDetail.get("attachments").getAsJsonArray();
+        Attachment attachment = new Attachment();
+        for (JsonElement jsonElement1 : attachments) {
+            JsonObject json1 = jsonElement1.getAsJsonObject();
+            attachment.setId(ToolUtils.getStr(json1.get(ID_FIELD)));
+            attachment.setVolumeId(ToolUtils.getStr(json1.get("volume_id")));
+            attachment.setHostId(ToolUtils.getStr(json1.get(HOST_ID)));
+            attachment.setAttachedAt(ToolUtils.getStr(json1.get("attached_at")));
+            attachment.setAttachedHostGroup(ToolUtils.getStr(json1.get("attached_host_group")));
+            attachment.setAttachedAtDate(ToolUtils.getDate(ToolUtils.getStr(json1.get("attached_at"))));
             attachmentList.add(attachment);
-            });
+        }
+
         return attachmentList;
     }
     /**
@@ -4960,5 +4957,49 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         }
         return hostIds;
     }
+    /**
+     * @Description: 查询存储设备的创建方式
+     * @Param dataStoreObjectIds
+     * @return String
+     * @throws
+     * @author yc
+     * @Date 2021/6/2 15:31
+     */
+    @Override
+    public String queryCreationMethodByDatastore(String dataStoreObjectId) throws DmeException {
+
+        //根据存储设备获取设备上映射的卷信息
+        String result = null;
+        if(StringUtils.isEmpty(dataStoreObjectId)){
+            throw new DmeException("query creation method by datastore error,param is empty");
+        }
+        String volumeId = null;
+        DmeVmwareRelation dvr = dmeVmwareRalationDao.getDmeVmwareRelationByDsId(dataStoreObjectId);
+        if (!StringUtils.isEmpty(dvr)) {
+            volumeId = dvr.getVolumeId();
+        }
+        if (StringUtils.isEmpty(volumeId)){
+            throw new DmeException("get volumeid fail");
+        }
+        //查询指定lun，获取映射信息
+        List<Attachment> attachmentList = findMappedHostsAndClusters(volumeId);
+        //获取映射数据中时间最早的映射方式
+        if (CollectionUtils.isEmpty(attachmentList)){
+            throw new DmeException("query lun info error");
+        }
+        Attachment mindatares = attachmentList.stream().min(Comparator.comparing(attachment -> attachment.getAttachedAtDate())).get();
+        //判断时间最小的映射方式（如果为主机组，就返回‘cluster’,如果为主机返回‘host’,其他报错）
+        if (!StringUtils.isEmpty(mindatares.getHostId()) && !mindatares.getHostId().equalsIgnoreCase("null")){
+            result = HOST;
+        }
+        if (!StringUtils.isEmpty(mindatares.getAttachedHostGroup()) && !mindatares.getAttachedHostGroup().equalsIgnoreCase("null")){
+            result = CLUSTER;
+        }
+        if(StringUtils.isEmpty(result)){
+            throw new DmeException("query vmfs create mothed error");
+        }
+        return result;
+    }
+
 
 }
