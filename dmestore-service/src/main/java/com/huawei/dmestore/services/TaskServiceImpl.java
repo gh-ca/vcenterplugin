@@ -560,4 +560,65 @@ public class TaskServiceImpl implements TaskService {
         }
     return new TasksResultObject(false);
     }
+
+    /**
+     * @return TaskDetailInfoNew
+     * @Description: 根据任务号查询任务状态，返回主任务状态
+     * @Param taskId
+     * @author yc
+     * @Date 2021/5/31 14:57
+     */
+    @Override
+    public TaskDetailInfoNew queryTaskByIdReturnMainTask(String taskId,long overTime) {
+        String url = DmeConstants.QUERY_TASK_URL.replace("{task_id}", taskId);
+        ResponseEntity<String> responseEntity;
+        long currentmilitions=System.currentTimeMillis();
+        TaskDetailInfoNew taskDetailInfoNew = null;
+        try {
+            do{
+                try {
+                    //程序每次进入等待2秒
+                    TimeUnit.SECONDS.sleep(2);
+                } catch (InterruptedException e) {
+                    LOG.info("===wait one secend error==={}", e.getMessage());
+                }
+                //首先根据任务号查询任务状态
+                responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
+                if (responseEntity.getStatusCodeValue() != HttpStatus.OK.value() || StringUtils.isEmpty(responseEntity.getBody())) {
+                    LOG.error("queryTaskById failed!taskId={},errorMsg:{}", taskId, responseEntity.getBody());
+                    return null;
+                }
+                List<TaskDetailInfoNew> taskInfos = analyzeTaskRequestResult(responseEntity.getBody());
+                taskDetailInfoNew  = getMainTaskInfo(taskId, taskInfos);
+                if (!StringUtils.isEmpty(taskDetailInfoNew) && (100 == taskDetailInfoNew.getProgress() || 3 < taskDetailInfoNew.getStatus())){
+                    return taskDetailInfoNew;
+                }
+            }while (System.currentTimeMillis()-overTime < currentmilitions);
+        } catch (DmeException ex) {
+            LOG.error("queryTaskById error, errorMsg:{}", ex.getMessage());
+        }
+        return taskDetailInfoNew;
+
+    }
+
+    /**
+     * @return TaskDetailInfoNew
+     * @Description: 获取任务集合中的住任务状态
+     * @Param taskId, taskInfos
+     * @author yc
+     * @Date 2021/5/31 15:02
+     */
+    private TaskDetailInfoNew getMainTaskInfo(String taskId, List<TaskDetailInfoNew> taskInfos) {
+        //首先判断任务集合是否为空
+        if (CollectionUtils.isEmpty(taskInfos)) {
+            return null;
+        }
+        //根据taskid获取集合中对应的任务状态
+        List<TaskDetailInfoNew> taskDeatailInfos =
+                taskInfos.stream().filter(taskDetailInfoNew -> taskId.equalsIgnoreCase(taskDetailInfoNew.getId())).collect(Collectors.toList());
+        if (CollectionUtils.isEmpty(taskDeatailInfos) || taskDeatailInfos.size() > 1) {
+            return null;
+        }
+        return taskDeatailInfos.get(0);
+    }
 }
