@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import construct = Reflect.construct;
 
-
 @Injectable()
 export class VmfsListService {
   constructor(private http: HttpClient) {}
@@ -303,6 +302,7 @@ export class GetForm {
   // 获取添加form表单（初始化的添加表单）
   getAddForm() {
     const addform = {
+      chooseDevice: [],
       name: null, // vmfs stor的名称 必
       volumeName: null, // 卷名称 必
       isSameName: true, // 卷名称与数据存储名称相同 true相同 false 不同

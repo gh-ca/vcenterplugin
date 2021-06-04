@@ -27,23 +27,37 @@ import {
   regExpCollection,
 } from 'app/app.helpers';
 import { VmfsCommon } from '../list/VmfsCommon';
+import { isMockData, mockData } from 'mock/mock';
+import { responseVmfsClusterTreeData } from 'mock/vmfsClusterTree';
+import { getLodash } from '@shared/lib';
+import { CommonService } from './../../common.service';
+import { TranslatePipe } from '@ngx-translate/core';
+const _ = getLodash();
 
 @Component({
   selector: 'app-list',
   templateUrl: './add.component.html',
   styleUrls: ['./add.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [AddService],
+  providers: [AddService, CommonService, TranslatePipe],
 })
 export class AddComponent extends VmfsCommon implements OnInit {
   constructor(
-    private remoteSrv: AddService,
+    private commonService: CommonService,
+    private remoteService: AddService,
     private route: ActivatedRoute,
     public cdr: ChangeDetectorRef,
     private router: Router,
     private globalsService: GlobalsService
   ) {
     super();
+    // 设置主机/集群
+    this.setDeviceList_new(this, async () => {
+      await this.setHostDatas_new();
+      // 此方法变化检测，异步处理数据都要添加此方法
+      this.cdr.detectChanges();
+    });
+    // this.setDeviceList();
     this.form.version = '5'; // 版本
     this.setFormValueWhenHiden(false);
   }
@@ -60,6 +74,7 @@ export class AddComponent extends VmfsCommon implements OnInit {
   srgOptions = [];
   // 主机AND集群
   deviceList: HostOrCluster[] = [];
+  deviceList_list: HostOrCluster[] = [];
   // 已选择的主机/集群
   chooseDevice;
 
@@ -159,9 +174,6 @@ export class AddComponent extends VmfsCommon implements OnInit {
 
     // 版本、块大小、粒度下拉框初始化
     this.setBlockSizeOptions();
-
-    // 设置主机/集群
-    this.setDeviceList();
 
     // 初始化服务等级数据
     this.setServiceLevelList();
@@ -269,7 +281,7 @@ export class AddComponent extends VmfsCommon implements OnInit {
   // 设置主机数据
   setHostDatas() {
     return new Promise((resolve, reject) => {
-      this.remoteSrv.getHostList().subscribe((result: any) => {
+      const handlerSetHostDataSuccess = (result: any) => {
         let hostList: HostList[] = []; // 主机列表
         console.log('host', result);
         if (result.code === '200' && result.data !== null) {
@@ -286,14 +298,44 @@ export class AddComponent extends VmfsCommon implements OnInit {
         this.form.hostDataloadSuccess = true;
         resolve(this.deviceList);
         this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
-      });
+      };
+
+      if (isMockData) {
+        handlerSetHostDataSuccess(responseVmfsClusterTreeData);
+      } else {
+        this.remoteService.getHostList().subscribe(handlerSetHostDataSuccess);
+      }
+    });
+  }
+  setHostDatas_new() {
+    return new Promise((resolve, reject) => {
+      const handlerSetHostDataSuccess = (result: any) => {
+        console.log('host', result);
+        if (result.code === '200' && result.data !== null) {
+          this.deviceList_list = _.map(result.data, item => {
+            return {
+              clusterId: item.hostId,
+              clusterName: item.hostName,
+              deviceType: 'host',
+            };
+          });
+        }
+        this.form.hostDataloadSuccess = true;
+        resolve(this.deviceList_list);
+      };
+
+      if (isMockData) {
+        handlerSetHostDataSuccess(mockData.ACCESSVMWARE_LISTHOST);
+      } else {
+        this.remoteService.getHostList().subscribe(handlerSetHostDataSuccess, reject);
+      }
     });
   }
 
   // 设置集群数据
   setClusterDatas() {
     return new Promise((resolve, reject) => {
-      this.remoteSrv.getClusterList().subscribe((result: any) => {
+      this.remoteService.getClusterList().subscribe((result: any) => {
         let clusterList: ClusterList[] = []; // 集群列表
         console.log('cluster', result);
         console.log('cluster', result.data !== null);
@@ -321,7 +363,7 @@ export class AddComponent extends VmfsCommon implements OnInit {
     // 初始化服务等级选择参数
     this.serviceLevelIsNull = false;
     // 获取服务等级数据
-    this.remoteSrv.getServiceLevelList().subscribe((result: any) => {
+    this.remoteService.getServiceLevelList().subscribe((result: any) => {
       console.log(result);
       if (result.code === '200' && result.data !== null) {
         this.serviceLevelList = result.data.filter(item => item.totalCapacity !== 0);
@@ -396,7 +438,7 @@ export class AddComponent extends VmfsCommon implements OnInit {
       this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
     };
 
-    this.remoteSrv.getStorages().subscribe(handlerGetStorageListSuccess);
+    this.remoteService.getStorages().subscribe(handlerGetStorageListSuccess);
   }
 
   // 获取存储池数据
@@ -432,7 +474,7 @@ export class AddComponent extends VmfsCommon implements OnInit {
       }
       // 获取存储池数据
       // if (!storagePoolList) {
-      this.remoteSrv
+      this.remoteService
         .getStoragePoolsByStorId(this.form.storage_id, mediaType)
         .subscribe((result: any) => {
           console.log('storagePools', result);
@@ -454,7 +496,7 @@ export class AddComponent extends VmfsCommon implements OnInit {
       // }
       // 获取workLoad
       if (this.showWorkLoadFlag) {
-        this.remoteSrv.getWorkLoads(this.form.storage_id).subscribe((result: any) => {
+        this.remoteService.getWorkLoads(this.form.storage_id).subscribe((result: any) => {
           console.log('storagePools', result);
           if (result.code === '200' && result.data !== null) {
             this.workloads = result.data;
@@ -486,7 +528,7 @@ export class AddComponent extends VmfsCommon implements OnInit {
   }
 
   // 添加vmfs 处理
-  addVmfsHanlde() {
+  async addVmfsHanlde() {
     if (
       this.bandWidthMaxErrTips ||
       this.iopsMaxErrTips ||
@@ -531,15 +573,29 @@ export class AddComponent extends VmfsCommon implements OnInit {
           // 默认GB 不变
           break;
       }
+
       // 主机/集群数据处理
-      if (this.chooseDevice.deviceType === 'host') {
+      this.chooseDevice = this.addForm.chooseDevice;
+      /* 630修改 不需要区分集群和主机 */
+      /*  if (this.chooseDevice.deviceType === 'host') {
+              addSubmitForm.host = this.chooseDevice.deviceName;
+              addSubmitForm.hostId = this.chooseDevice.deviceId;
+            } else {
+              addSubmitForm.cluster = this.chooseDevice.deviceName;
+              addSubmitForm.clusterId = this.chooseDevice.deviceId;
+            } */
+
+      // 主机/集群数据处理
+      /*       if (this.chooseDevice.deviceType === 'host') {
         addSubmitForm.host = this.chooseDevice.deviceName;
         addSubmitForm.hostId = this.chooseDevice.deviceId;
       } else {
         addSubmitForm.cluster = this.chooseDevice.deviceName;
         addSubmitForm.clusterId = this.chooseDevice.deviceId;
       }
-      if (this.levelCheck === 'customer') {
+ */ if (
+        this.levelCheck === 'customer'
+      ) {
         // 未选择 服务等级 需要将服务等级数据设置为空
         addSubmitForm.service_level_id = null;
         addSubmitForm.service_level_name = null;
@@ -577,7 +633,13 @@ export class AddComponent extends VmfsCommon implements OnInit {
       // 打开 loading
       // this.globalsService.loading = true;
       this.modalHandleLoading = true;
-      this.remoteSrv.createVmfs(addSubmitForm).subscribe((result: any) => {
+      const params = _.merge(
+        {
+          chooseDevice: this.chooseDevice,
+        },
+        addSubmitForm
+      );
+      const handlerCreateVmfsSuccess = (result: any) => {
         this.modalHandleLoading = false;
         if (result.code === '200') {
           console.log('创建成功');
@@ -605,7 +667,11 @@ export class AddComponent extends VmfsCommon implements OnInit {
           this.isOperationErr = true;
         }
         this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
-      });
+      };
+
+      const res = await this.commonService.remoteCreateVmfs(params);
+      handlerCreateVmfsSuccess(res);
+      // this.remoteSrv.createVmfs(addSubmitForm).subscribe(handlerCreateVmfsSuccess);
     } else {
       this.serviceLevelIsNull = true;
     }
@@ -940,7 +1006,7 @@ export class AddComponent extends VmfsCommon implements OnInit {
     (this as any).checkVmfsNameExist_oldName = name;
 
     this.modalHandleLoading = true;
-    this.remoteSrv.checkVmfsName(name).subscribe((result: any) => {
+    this.remoteService.checkVmfsName(name).subscribe((result: any) => {
       this.modalHandleLoading = false;
       if (result.code === '200') {
         // result.data true 不重复 false 重复
@@ -968,7 +1034,7 @@ export class AddComponent extends VmfsCommon implements OnInit {
     (this as any).checkVolNameExist_oldName = name;
     this.modalHandleLoading = true;
     // 校验VMFS名称重复
-    this.remoteSrv.checkVolName(name).subscribe((result: any) => {
+    this.remoteService.checkVolName(name).subscribe((result: any) => {
       this.modalHandleLoading = false;
       if (result.code === '200') {
         // result.data true 不重复 false 重复
