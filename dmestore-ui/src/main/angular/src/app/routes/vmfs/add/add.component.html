@@ -166,12 +166,13 @@
         </select>
         <clr-control-error>{{'validations.required' | translate}}</clr-control-error>
       </clr-select-container>
-
       <!-- 主机/集群 -->
-      <clr-combobox-container>
-        <label style="color: #9F9F9F;">{{'vmfs.hostOrCluster' | translate}}</label>
-        <clr-combobox *ngIf="form.hostDataloadSuccess && form.culDataloadSuccess" [(ngModel)]="chooseDevice"
-          name="chooseDevice" formControlName="chooseDevice" required>
+      <clr-control-container [formGroup]="addForm">
+        <label style="color: #9F9F9F;">
+          {{'vmfs.hostOrCluster' | translate}}
+        </label>
+        <!-- 
+          <clr-combobox *ngIf="form.hostDataloadSuccess && form.culDataloadSuccess" [(ngModel)]="chooseDevice" name="chooseDevice" formControlName="chooseDevice" required>
           <clr-options style="max-height: 6.5rem;overflow: auto">
             <clr-option id="deviceSelect" *clrOptionItems="let device of deviceList; field:'deviceName'"
               [clrValue]="device">
@@ -182,17 +183,21 @@
               {{device.deviceName}}
             </clr-option>
           </clr-options>
-        </clr-combobox>
-        <clr-control-helper>
-          <clr-icon shape="info-circle"></clr-icon>{{'validations.comboboxTips' | translate}}
-        </clr-control-helper>
-        <clr-control-error>{{'validations.required' | translate}}</clr-control-error>
-      </clr-combobox-container>
+          </clr-combobox> 
+        -->
+        <app-gh-tree-checkbox
+          [list]="deviceList_list"
+          [tree]="deviceList"
+          (valueChange)="handleChooseDeviceChange(this.addForm,'chooseDevice',$event)">
+        </app-gh-tree-checkbox>
+        <app-error-tips [isShow]="!this.addForm.controls.chooseDevice.valid"
+          [tips]="'validations.required' | translate">
+        </app-error-tips>
+      </clr-control-container>
     </form>
     <ng-template clrPageButtons>
       <clr-wizard-button [type]="'cancel'" (click)="cancel();">{{'menu.cancel' | translate}}</clr-wizard-button>
-      <clr-wizard-button [clrWizardButtonDisabled]="matchErr || vmfsNameRepeatErr || volNameRepeatErr"
-        (click)="addNextPage();" [type]="'custom-next'">{{'menu.next' | translate}}</clr-wizard-button>
+      <clr-wizard-button [clrWizardButtonDisabled]="matchErr || vmfsNameRepeatErr || volNameRepeatErr" (click)="addNextPage();" [type]="'custom-next'">{{'menu.next' | translate}}</clr-wizard-button>
     </ng-template>
   </clr-wizard-page>
   <!--Page2 储存库设置-->

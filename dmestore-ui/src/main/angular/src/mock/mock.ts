@@ -39,10 +39,11 @@ import DMESTORAGE_LISTSTORAGEPOOLPERFORMANCE from './DMESTORAGE_LISTSTORAGEPOOLP
 import OPERATENFS_EDITNFSSTORE from './OPERATENFS_EDITNFSSTORE';
 import ATASTORESTATISTICHISTRORY_STORAGE_DEVICE from './ATASTORESTATISTICHISTRORY_STORAGE_DEVICE';
 
-export const isMockData = false;
+export const isMockData = true;
 
 export const mockData = {
   ACCESSVMFS_LISTVMFSPERFORMANCE,
+  /*  */
   ACCESSNFS_LISTNFS,
   /* vmfs list */
   ACCESSVMFS_LISTVMFS,
@@ -114,6 +115,4 @@ export const mockData = {
   /* atastorestatistichistrory/storageDevice */
   ATASTORESTATISTICHISTRORY_STORAGE_DEVICE,
   /* datastorestatistichistrory/vmfs */
-
-
 };

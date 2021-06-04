@@ -309,3 +309,16 @@ clr-dg-cell.datagrid-cell{
   color: #c21d00;
   color: var(--clr-forms-invalid-color, #c21d00);
 }
+
+.clr-tree-node.disabled{
+  div.clr-treenode-content{
+    color:gray;
+    opacity: 0.5;
+  }
+  input.clr-checkbox{
+    display: none;
+  }
+  label.clr-control-label {
+    display:none;
+  }
+}
