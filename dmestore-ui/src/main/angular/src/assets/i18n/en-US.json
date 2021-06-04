@@ -875,6 +875,7 @@
     "reduceError": "Reduce failed!Please contact management!",
     "deleteError": "Delete failed!Please contact management!",
     "addError": "Add failed!Please contact management!",
+    "addPartError": "Add part successfully! Please contact the administrator!",
     "modifyError": "Modification failed!Please contact management!",
     "reclaimError": "Space reclamation failed! Please contact the administrator!",
     "serviceLevelError": "DME Storage Strategy change failed! Please contact the administrator!",
@@ -889,7 +890,9 @@
     "getDataFailed": "Failed to get data!",
     "cantChangeServiceLevel": "This device is a Custom type and does not support DME Storage Strategy change operation!",
     "iposMaxMinTips": "Can only be an integer from 1 to 999999999.",
-    "nfsSecurityTips": "To use Kerberos authentication, each host that mounts this datastore has to be a part of an Active Directory domain and its NFS authentication credentials need to be set. This is done on the Authentication Services page on each host."
+    "nfsSecurityTips": "To use Kerberos authentication, each host that mounts this datastore has to be a part of an Active Directory domain and its NFS authentication credentials need to be set. This is done on the Authentication Services page on each host.",
+    "errorDetailMessage": "Number of successful additions：{{partSuccess}}, Number of failed additions：{{partFail}}.",
+    "connectionFailMessage": "The following are the hosts that failed to connect to the host："
   },
   "page": {
     "perPage": "Per Page",

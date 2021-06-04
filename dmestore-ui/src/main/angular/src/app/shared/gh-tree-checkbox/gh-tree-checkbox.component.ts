@@ -24,6 +24,7 @@ export class GhTreeCheckboxComponent implements OnInit {
   @Input() list: VMFS_CLUSTER_NODE[];
   @Input() isCreate: boolean;
   @Input() resType: string = 'normal';
+  @Input() mountType:string;
   @Output() valueChange: EventEmitter<any>;
   treeValue;
   resValue;
@@ -43,9 +44,9 @@ export class GhTreeCheckboxComponent implements OnInit {
   constructor(private cdr: ChangeDetectorRef) {
     this.valueChange = new EventEmitter();
     (this.emitValueChange as any) = debounce(() => {
-      /* 
+      /*
       1单主机
-      2集群主机 
+      2集群主机
       check是否是选择了单主机
       还是集群
       */
@@ -57,7 +58,9 @@ export class GhTreeCheckboxComponent implements OnInit {
 
   getChildren = (node: VMFS_CLUSTER_NODE) => node.children;
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    // console.log(this.mountType)
+  }
 
   // ngOnChanges(changes: { [propKey: string]: SimpleChange }) {
   //   const tree: any = changes['tree'] || {};
@@ -67,6 +70,8 @@ export class GhTreeCheckboxComponent implements OnInit {
   //   }
   //   console.log('tree', tree);
   // }
+
+
 
   checkSelectedAndSetDisable() {
     /* 挂载可以跨集群 */
@@ -80,7 +85,7 @@ export class GhTreeCheckboxComponent implements OnInit {
       }
 
       if (this.isTree) {
-        const treeRes = getSelectedFromTree(this.tree, this.resType);
+        const treeRes = getSelectedFromTree(this.tree, this.resType,this.mountType);
         this.selectedCluster = false;
         res = _.concat(res, treeRes);
       }

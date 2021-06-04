@@ -22,6 +22,7 @@ export class DevDemoComponentComponent implements OnInit {
   helper = helper;
   vmfsTree;
   vmfsList;
+  partSuccessData;
 
   constructor() {
     this.initForm();
@@ -33,6 +34,17 @@ export class DevDemoComponentComponent implements OnInit {
   }
 
   initForm() {
+    //模拟返回数据
+    this.partSuccessData={
+      code:"-99999",
+      data:{
+        successNo:2,
+        failNo:1,
+        connectionResult:["10.12.22.167"],
+        descriptionEN:"loream....",
+        descriptionCN:"这里有一段内容"
+      }
+    }
     /*初始化和校验规则*/
     this.form = new FormGroup({
       brave: new FormControl('', Validators.required),
@@ -73,7 +85,7 @@ export class DevDemoComponentComponent implements OnInit {
         validTips_i18n: ['validations.required_vmfs_name', { length: 27 }],
       }),
     ];
-    /*  
+    /*
       let firstName = 0;
       setInterval(() => {
         this.form.patchValue({firstName: ++firstName});

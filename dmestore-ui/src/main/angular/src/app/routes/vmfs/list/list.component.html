@@ -61,7 +61,7 @@
           <label for="btn-demo-radio-2">
             <clr-icon shape="dashboard" size="20"></clr-icon>
           </label>
-        </div> 
+        </div>
       -->
       <div class="radio btn merginLeft" title="{{'menu.refresh' | translate}}">
         <!--<input type="radio" name="btn-group-demo-radios" id="btn-demo-radio-3">-->
@@ -80,11 +80,11 @@
     <clr-dg-column hidden>wwn</clr-dg-column>
     <clr-dg-column hidden>volumeName</clr-dg-column>
     <clr-dg-column hidden>objectid</clr-dg-column>
-    <!-- 
+    <!--
 <clr-dg-column [hidden]="radioCheck!=='list'" [clrDgField]="'status'">
   {{'vmfs.status' | translate}}
   <clr-dg-filter [clrDgFilter]="statusFilter"> <vmfs-filter #statusFilter></vmfs-filter> </clr-dg-filter>
-</clr-dg-column> 
+</clr-dg-column>
     -->
     <clr-dg-column [hidden]="radioCheck!=='list'">
       {{'nfs.status' | translate}}
@@ -465,7 +465,7 @@
 
         <!-- 主机/集群 -->
         <!-- {{helper.print(deviceList)}} -->
-        <clr-control-container>
+        <clr-control-container *ngIf="popListShow">
           <label style="color: #9F9F9F;">{{'vmfs.hostOrCluster' | translate}}</label>
           <app-gh-tree-checkbox
             [list]="deviceList_list"
@@ -477,7 +477,7 @@
             [tips]="'validations.required' | translate">
           </app-error-tips>
         </clr-control-container>
-        <!-- 
+        <!--
         <clr-combobox-container>
           <label style="color: #9F9F9F;">{{'vmfs.hostOrCluster' | translate}}</label>
           <clr-combobox *ngIf="form.hostDataloadSuccess && form.culDataloadSuccess" [(ngModel)]="chooseDevice"
@@ -498,7 +498,7 @@
             {{'validations.comboboxTips' | translate}}
           </clr-control-helper>
           <clr-control-error>{{'validations.required' | translate}}</clr-control-error>
-        </clr-combobox-container> 
+        </clr-combobox-container>
       -->
       </form>
       <ng-template clrPageButtons>
@@ -548,7 +548,7 @@
         </div> -->
         <!-- TODO 创建失败提示 -->
         <div *ngIf="isOperationErr" class="errorTips" readonly>
-          <app-vmfs-create-faild-tips></app-vmfs-create-faild-tips>
+          <app-vmfs-create-faild-tips [partSuccessData]="partSuccessData"></app-vmfs-create-faild-tips>
         </div>
         <!-- 1、选择 服务等级-->
         <ng-container *ngIf="levelCheck==='level'">
@@ -1161,7 +1161,7 @@
         <div *ngIf="isOperationErr" class="errorTips" readonly>
           <clr-icon shape="exclamation-circle" class="is-solid"></clr-icon> {{'errorMsg.mountError' | translate}}
         </div>
-        <!-- 
+        <!--
         <clr-radio-container clrInline>
           <label class="floatleft" style="color: #9F9F9F;">{{'vmfs.hostOrCluster' | translate}}</label>
           <clr-radio-wrapper>
@@ -1215,9 +1215,11 @@
         </clr-combobox-container> -->
 
         <div style="display: block;height: 128px;overflow-y: auto;overflow-x: hidden;">
-          <clr-control-container>
+          <clr-control-container *ngIf="mountShow">
             <label style="color: #9F9F9F;">{{'vmfs.hostOrCluster' | translate}}</label>
             <app-gh-tree-checkbox
+              [resType]="'mount'"
+              [mountType]="selectMountType"
               [list]="deviceList_list"
               [tree]="deviceList"
               (valueChange)="handleChooseDeviceChange(this.addForm,'chooseDevice',$event)"> </app-gh-tree-checkbox>
@@ -1342,7 +1344,7 @@
           </clr-dg-row>
         </clr-datagrid> -->
         <div style="display: block;height: 128px;overflow-y: auto;overflow-x: hidden;">
-          <clr-control-container>
+          <clr-control-container *ngIf="unmountShow">
             <label style="color: #9F9F9F;">{{'vmfs.hostOrCluster' | translate}}</label>
             <app-gh-tree-checkbox
               [list]="deviceList_list"

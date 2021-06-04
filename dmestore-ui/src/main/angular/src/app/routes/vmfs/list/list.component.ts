@@ -85,6 +85,8 @@ export class VmfsListComponent extends VmfsCommon implements OnInit {
   getLabelByValue;
   print;
 
+  // selectedId;//当前选中设备id
+  selectMountType;//当前选中设备类型：主机或集群
   item_test = {
     capabilities: {
       resourceType: 'thin',
@@ -151,6 +153,8 @@ export class VmfsListComponent extends VmfsCommon implements OnInit {
 
   popListShow = false; // 添加弹出层显示
   addSuccessShow = false; // 添加成功弹窗
+  addPartSuccessShow=false; //添加部分成功弹窗
+  partSuccessData;//添加部分成功返回数据
   connectivityFailure = false; // 主机联通性测试失败
   connFailData: ConnFaildData[]; //  主机联通性测试失败数据
   showDetail = false; // 展示主机联通异常数据
@@ -1098,9 +1102,14 @@ wwn: "67c1cf110058934511ba6e5a00000344"
           this.wizard.close();
           // 重新请求数据
           // this.scanDataStore();
-          // 打开成功提示窗口
+          // 打开成功提示窗口setServiceLevelList
           this.addSuccessShow = true;
-        } else if (result.code === '-60001') {
+        } else if(result.code==='206'){
+          // this.wizard.close();
+          this.isOperationErr=true;
+          this.partSuccessData=result
+        }
+        else if (result.code === '-60001') {
           this.connectivityFailure = true;
           this.showDetail = false;
           this.isAddPage = true;
@@ -1118,6 +1127,7 @@ wwn: "67c1cf110058934511ba6e5a00000344"
             this.connFailData = connFailDatas;
           }
         } else {
+          this.partSuccessData=result
           console.log('创建失败：' + result.description);
           // 失败信息
           this.isOperationErr = true;
@@ -1260,7 +1270,7 @@ wwn: "67c1cf110058934511ba6e5a00000344"
   }
 
   // 挂载按钮点击事件
-  mountBtnFunc() {
+ async mountBtnFunc() {
     // 初始化表单
     if (this.rowSelected.length === 1) {
       this.modalLoading = true;
@@ -1270,9 +1280,12 @@ wwn: "67c1cf110058934511ba6e5a00000344"
 
       this.mountForm = new GetForm().getMountForm();
       const objectIds = [];
+      // this.selectedId=this.rowSelected[0].objectid;
       objectIds.push(this.rowSelected[0].objectid);
+      this.selectMountType=await this.commonService.getMountTypeBySeletedId(this.rowSelected[0].objectId)
       this.mountForm.dataStoreObjectIds = objectIds;
       console.log('this.mountForm', this.mountForm);
+      console.log("this type",this.selectMountType)
 
       // 连通性测试相关
       this.connectivityFailure = false;
@@ -1568,7 +1581,7 @@ wwn: "67c1cf110058934511ba6e5a00000344"
         } */
 
       // 获取集群
-      /* 
+      /*
         if (isMockData) {
           handlerGetMountClusterSuccess(mockData.ACCESSVMFS_GETHOSTGROUPSBYSTORAGEID);
         } else {

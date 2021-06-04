@@ -171,7 +171,7 @@
         <label style="color: #9F9F9F;">
           {{'vmfs.hostOrCluster' | translate}}
         </label>
-        <!-- 
+        <!--
           <clr-combobox *ngIf="form.hostDataloadSuccess && form.culDataloadSuccess" [(ngModel)]="chooseDevice" name="chooseDevice" formControlName="chooseDevice" required>
           <clr-options style="max-height: 6.5rem;overflow: auto">
             <clr-option id="deviceSelect" *clrOptionItems="let device of deviceList; field:'deviceName'"
@@ -183,7 +183,7 @@
               {{device.deviceName}}
             </clr-option>
           </clr-options>
-          </clr-combobox> 
+          </clr-combobox>
         -->
         <app-gh-tree-checkbox
           [list]="deviceList_list"
@@ -230,7 +230,7 @@
       <!-- TODO 创建失败提示 -->
       <!-- <div class="errorTips" readonly> -->
       <div *ngIf="isOperationErr" class="errorTips" readonly>
-        <app-vmfs-create-faild-tips></app-vmfs-create-faild-tips>
+        <app-vmfs-create-faild-tips [partSuccessData]="partSuccessData"></app-vmfs-create-faild-tips>
       </div>
       <!-- 1、选择 服务等级-->
       <ng-container *ngIf="levelCheck==='level'">
