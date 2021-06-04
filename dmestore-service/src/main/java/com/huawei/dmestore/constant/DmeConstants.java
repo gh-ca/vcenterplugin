@@ -162,6 +162,12 @@ public class DmeConstants {
     public static final String MOUNT_VOLUME_TO_HOSTGROUP_URL = "/rest/blockservice/v1/volumes/hostgroup-mapping";
 
     /**
+     * hostgroup mapping view query
+     * post
+     **/
+    public static final String QUERY_HOSTGROUP_MAPPING_VIEW_URL = "/rest/blockservice/v1/volumes/mapping-view/query";
+
+    /**
      * volume expand
      **/
     public static final String API_VMFS_EXPAND = "/rest/blockservice/v1/volumes/expand";
