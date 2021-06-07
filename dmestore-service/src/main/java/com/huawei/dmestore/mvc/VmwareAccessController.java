@@ -267,4 +267,23 @@ public class VmwareAccessController extends BaseController {
         }
         return failure(failureStr);
     }
+    /**
+      * @Description: 创建vmfs，以树的方式展示可用的主机和集群
+      * @Param @param null
+      * @return @return 
+      * @throws 
+      * @author yc
+      * @Date 2021/6/7 17:29
+     */
+    @RequestMapping(value = "/listHostsAndClusterReturnTree", method = RequestMethod.GET)
+    public ResponseBodyBean listIndependenceHosts() {
+        String failureStr = "";
+        try {
+            return success(vmwareAccessService.listHostsAndClusterReturnTree());
+        } catch (DmeException e) {
+            LOG.error("list vmware host failure:", e);
+            failureStr = "list vmware host failure:" + e.toString();
+        }
+        return failure(failureStr);
+    }
 }

@@ -128,4 +128,14 @@ public interface VmwareAccessService {
       * @Date 2021/5/14 9:47
      */
     List<ClusterTree> getClustersByDsObjectIdNew(String dataStoreObjectId) throws DmeException;
+    /**
+      * @Description: 查询独立主机
+      * @Param @param null
+      * @return @return
+      * @throws
+      * @author yc
+      * @Date 2021/6/7 16:53
+     */
+    List<ClusterTree>  listHostsAndClusterReturnTree() throws DmeException;
+
 }
