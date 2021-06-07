@@ -97,12 +97,12 @@
           <label style="color: #9F9F9F;" class="clr-control-label">{{'vmfs.name' | translate}}</label>
           <div [title]="vmfsInfo?.name" class="flex1 over_flow">{{vmfsInfo?.name}}</div>
         </div>
-        <!--  
+        <!--
         <clr-input-container>
           <label style="color: #9F9F9F;">{{'vmfs.name' | translate}}</label>
           <input clrInput readonly [(ngModel)]="vmfsInfo?.name" name="name" #name="ngModel" required /><br>
           <clr-control-error>{{'validations.required' | translate}}</clr-control-error>
-        </clr-input-container> 
+        </clr-input-container>
         -->
         <!-- 主机、集群列表切换 -->
         <!-- <clr-radio-container clrInline>
@@ -152,9 +152,11 @@
           <clr-control-error>{{'validations.required' | translate}}：{{'vmfs.mount.mountErr' | translate}}
           </clr-control-error>
         </clr-combobox-container> -->
-        <clr-control-container>
+        <clr-control-container *ngIf="mountShow">
           <label style="color: #9F9F9F;">{{'vmfs.hostOrCluster' | translate}}</label>
           <app-gh-tree-checkbox
+            [resType]="'mount'"
+            [mountType]="selectMountType"
             [list]="deviceList_list"
             [tree]="deviceList"
             (valueChange)="handleChooseDeviceChange('chooseDevice',$event)">
@@ -225,7 +227,7 @@
         </clr-radio-container> -->
 
         <!-- 20210514164837 -->
-        <clr-control-container>
+        <clr-control-container *ngIf="unmountShow">
           <label class="floatleft" style="color: #9F9F9F;">{{'vmfs.hostOrCluster' | translate}}</label>
           <app-gh-tree-checkbox
             [list]="deviceList_list"

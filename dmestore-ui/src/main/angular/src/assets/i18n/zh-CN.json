@@ -875,6 +875,7 @@
     "reduceError": "缩容失败！请联系管理员！",
     "deleteError": "删除失败！请联系管理员！",
     "addError": "添加失败！请联系管理员！",
+    "addPartError": "添加部分成功！请联系管理员！",
     "modifyError": "编辑失败！请联系管理员！",
     "reclaimError": "空间回收失败！请联系管理员！",
     "serviceLevelError": "DME存储策略变更失败！请联系管理员！",
@@ -889,7 +890,9 @@
     "getDataFailed": "获取数据失败！",
     "cantChangeServiceLevel": "该设备为自定义类型，不支持DME存储策略变更操作！",
     "iposMaxMinTips": "只能为1到999999999的整数。",
-    "nfsSecurityTips": "要使用 Kerberos 身份验证，挂载此数据存储的每个主机都必须包含在 Active Directory 域中，并需要设置其 NFS 身份验证凭据。该过程在每个主机的“身份验证服务”页上完成。"
+    "nfsSecurityTips": "要使用 Kerberos 身份验证，挂载此数据存储的每个主机都必须包含在 Active Directory 域中，并需要设置其 NFS 身份验证凭据。该过程在每个主机的“身份验证服务”页上完成。",
+    "errorDetailMessage": "添加成功个数：{{partSuccess}}，添加失败个数：{{partFail}}。",
+    "connectionFailMessage": "以下是主机连通失败的主机："
   },
   "page": {
     "perPage": "每页",

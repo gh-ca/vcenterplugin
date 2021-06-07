@@ -7,6 +7,7 @@ import { vmfsClusterTreeData } from './../../mock/vmfsClusterTree';
 import { HttpClient } from '@angular/common/http';
 import { getLodash } from '@shared/lib';
 import { mockServerData } from './../app.helpers';
+import {rejects} from "assert";
 const _ = getLodash();
 
 function getSelectedDateFn(label) {
@@ -172,7 +173,15 @@ zh:'一年' ,range:'LAST_1_YEAR',   interval:  "DAY"
   async remoteCreateVmfs(params) {
     if (isMockData) {
       console.log(params);
-      return {};
+      return {
+        code:"-99999",
+        data:{
+          successNo:2,
+          failNo:1,
+          connectionResult:["10.12.22.167"],
+          descriptionEN:"loream....",
+          descriptionCN:"这里有一段内容"
+        }};
     } else {
       try {
         const res: any = await new Promise((resolve, reject) => {
@@ -275,13 +284,43 @@ zh:'一年' ,range:'LAST_1_YEAR',   interval:  "DAY"
       return data;
     }
   }
+
+  /**
+   * @Description 挂载 获取选中的挂载类型：主机或者集群
+   * @param {any} id
+   * @returns {string}
+   */
+  async getMountTypeBySeletedId(id){
+    let data:string=""
+    try{
+      if(isMockData){
+        // console.log(id);
+        data="host"
+      }else{
+        const res : any= await new Promise((resolve, reject)=>{
+          this.http
+            .get(`/accessvmfs/queryCreationMethodByDatastore？dataStoreObjectId=${id}`)
+            .subscribe(resolve, reject);
+        });
+        if (res.code==='200'){
+          data=res.data;
+        }
+      }
+    }
+    catch(error) {
+      console.log('vmfs获取选中挂载类型',error)
+    }
+    finally {
+      return data;
+    }
+  }
 }
 
-/* 
+/*
 async function getAccessvmwareListclusters(instance) {
 
   return new Promise((resolve,reject) => {
     instance
   })
-  
+
 } */

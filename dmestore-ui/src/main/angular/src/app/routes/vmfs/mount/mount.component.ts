@@ -47,6 +47,9 @@ export class MountComponent implements OnInit {
   deviceList_list: HostOrCluster[]; // 单主机
   deviceForm;
 
+  //当前挂载类型：主机或集群
+  selectMountType;
+
   /* 选择的集群主机 */
   chooseDevice;
   // dataStore数据
@@ -121,9 +124,10 @@ export class MountComponent implements OnInit {
     this.modalHandleLoading = false;
     this.isOperationErr = false;
     this.initData();
+
   }
 
-  initData() {
+ async initData() {
     // 设备类型 操作类型初始化
     this.activatedRoute.url.subscribe(url => {
       console.log('url', url);
@@ -133,7 +137,7 @@ export class MountComponent implements OnInit {
       } else {
         this.operationType = url[0] + '';
       }
-      this.activatedRoute.queryParams.subscribe(queryParam => {
+      this.activatedRoute.queryParams.subscribe( queryParam => {
         this.resource = queryParam.resource;
         const ctx = this.globalsService.getClientSdk().app.getContextObjects();
         if (this.resource !== 'others') {
@@ -180,6 +184,8 @@ export class MountComponent implements OnInit {
     });
     console.log('this.objectId', this.objectId);
     console.log('this.hostOrClusterId', this.hostOrClusterId);
+    this.selectMountType=await this.commonService.getMountTypeBySeletedId(this.objectId)
+   console.log(this.selectMountType)
     // 数据初始化
     this.getDataStore();
   }
@@ -303,7 +309,7 @@ export class MountComponent implements OnInit {
         loadUnmountHost();
 
         /* 2：处理获取集群的数据 */
-        /* 
+        /*
           const handlerGetMountClusterSuccess = (result: any) => {
           console.log(result);
           if (result.code === '200' && result.data !== null && result.data.length >= 1) {
