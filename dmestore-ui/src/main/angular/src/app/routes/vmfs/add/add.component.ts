@@ -22,7 +22,7 @@ import {
 import { ClrWizard, ClrWizardPage } from '@clr/angular';
 import { GlobalsService } from '../../../shared/globals.service';
 import {
-  getQosCheckTipsTagInfo,
+  getQosCheckTipsTagInfo, handlerResponseErrorSimple,
   isStringLengthByteOutRange,
   regExpCollection,
 } from 'app/app.helpers';
@@ -77,6 +77,9 @@ export class AddComponent extends VmfsCommon implements OnInit {
   deviceList_list: HostOrCluster[] = [];
   // 已选择的主机/集群
   chooseDevice;
+
+  //添加操作返回的数据
+  partSuccessData;
 
   // 服务等级列表
   serviceLevelList: ServiceLevelList[] = [];
@@ -363,16 +366,22 @@ export class AddComponent extends VmfsCommon implements OnInit {
     // 初始化服务等级选择参数
     this.serviceLevelIsNull = false;
     // 获取服务等级数据
-    this.remoteService.getServiceLevelList().subscribe((result: any) => {
-      console.log(result);
+    const HandlerGetServiceLeveListSuccess = (result: any) => {
       if (result.code === '200' && result.data !== null) {
         this.serviceLevelList = result.data.filter(item => item.totalCapacity !== 0);
-        console.log('this.serviceLevelList', this.serviceLevelList);
       }
+      // 隐藏loading
       this.modalLoading = false;
-      // this.globalsService.loading = false;
+      // this.gs.loading = false;
       this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
-    });
+    };
+    if (isMockData) {
+      HandlerGetServiceLeveListSuccess(mockData.SERVICELEVEL_LISTSERVICELEVEL);
+    } else {
+      this.remoteService
+        .getServiceLevelList()
+        .subscribe(HandlerGetServiceLeveListSuccess, handlerResponseErrorSimple);
+    }
   }
 
   // 选择服务等级时
@@ -645,6 +654,10 @@ export class AddComponent extends VmfsCommon implements OnInit {
           console.log('创建成功');
           // 打开成功提示窗口
           this.addSuccessShow = true;
+        }else if(result.code==='206'){
+          // this.wizard.close();
+          this.isOperationErr=true;
+          this.partSuccessData=result
         } else if (result.code === '-60001') {
           this.connectivityFailure = true;
           this.showDetail = false;
@@ -664,6 +677,7 @@ export class AddComponent extends VmfsCommon implements OnInit {
         } else {
           console.log('创建失败：' + result.description);
           // 失败信息
+          this.partSuccessData=result;
           this.isOperationErr = true;
         }
         this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
@@ -1423,10 +1437,10 @@ export class AddComponent extends VmfsCommon implements OnInit {
           this.bandwidthLimitErr = bandwidthLimitErr;
           this.iopsLimitErr = iopsLimitErr;
 
-          /* 
-          
-          
-          
+          /*
+
+
+
           const qosTag = chooseStorage.storageTypeShow.qosTag;
           if (qosTag == 1) {
             if (this.form.minbandwidthChoose && this.form.maxbandwidthChoose) {
@@ -1471,7 +1485,7 @@ export class AddComponent extends VmfsCommon implements OnInit {
           if (this.form.control_policyLower == undefined) {
             this.bandwidthLimitErr = false;
           }
-        
+
           */
         }
       }

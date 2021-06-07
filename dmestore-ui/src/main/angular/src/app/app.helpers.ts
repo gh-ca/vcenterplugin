@@ -274,31 +274,44 @@ export type VMFS_CLUSTER_NODE = {
  * @param {any} clusterArray:VMFS_CLUSTER_NODE[]
  * @returns {any}
  */
-export function getSelectedFromTree(clusterArray: VMFS_CLUSTER_NODE[], resType = '') {
+export function getSelectedFromTree(clusterArray: VMFS_CLUSTER_NODE[], resType = '',mountType='') {
   let result = [];
   let selectedCluster: any = false;
   /* 一旦选择一个集群，只能该集权 */
   /* 一旦选择一个主机，只能该主机所在集群 */
   for (const clusterNode of clusterArray) {
-    if (String(clusterNode.selected) === String(ClrSelectedState.SELECTED)) {
-      const _node = _.omit(clusterNode, ['children', 'selected']);
-      _node['deviceType'] = 'cluster';
-      result.push(_node);
-      if (!selectedCluster) {
-        selectedCluster = clusterNode;
+    if(mountType==='host'){
+      if (String(clusterNode.selected) === String(ClrSelectedState.SELECTED)) {
+        const _node = clusterNode;
+        _node['deviceType'] = 'cluster';
+
+        if (!selectedCluster) {
+          selectedCluster = clusterNode;
+        }
       }
-      continue;
+    }else{
+      if (String(clusterNode.selected) === String(ClrSelectedState.SELECTED)) {
+        const _node = _.omit(clusterNode, ['children']);
+        _node['deviceType'] = 'cluster';
+        result.push(_node);
+        // console.log(result)
+        if (!selectedCluster) {
+          selectedCluster = clusterNode;
+        }
+        continue;
+      }
     }
 
     if (clusterNode.children && clusterNode.children.length > 0) {
       for (const hostNode of clusterNode.children) {
         if (String(hostNode.selected) === String(ClrSelectedState.SELECTED)) {
-          const _node = _.omit(hostNode, ['children', 'selected']);
+          const _node = _.omit(hostNode, ['children']);
           _node['deviceType'] = 'host';
           if (!selectedCluster) {
             selectedCluster = clusterNode;
           }
           result.push(_node);
+          // console.log(result)
         }
       }
     }
@@ -354,6 +367,7 @@ export function getSelectedFromTree(clusterArray: VMFS_CLUSTER_NODE[], resType =
   } else {
     setDisabled(result.length > 0);
   }
+  // console.log(result)
   return result;
 }
 
@@ -365,6 +379,7 @@ export function getSelectedFromList(hostArray: VMFS_CLUSTER_NODE[]) {
       continue;
     }
   }
+  // console.log(result)
   return result;
 }
 
