@@ -2308,57 +2308,22 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                     // volume映射给主机 解除映射；volume映射给主机组 不解除映射
                     Map<String, Boolean> isNeedUnmapping = isNeedUnmapping(volumeIds, ToolUtils.getStr(hostMap.get(ID_FIELD)));
                     List<String> lunids = new ArrayList<>();
-                    for (String volumeId : volumeIds) {
-                        // 便利确认需要解除映射的Lun
-                        if (isNeedUnmapping.get(volumeId)) {
-                            lunids.add(volumeId);
+                    if (!CollectionUtils.isEmpty(isNeedUnmapping)) {
+                        for (String volumeId : volumeIds) {
+                            // 便利确认需要解除映射的Lun
+                            if (isNeedUnmapping.get(volumeId)) {
+                                lunids.add(volumeId);
+                            }
                         }
-                    }
-                    if (lunids.size() > 0) {
-                        params.put(VOLUMEIDS, lunids);
-                        String taskId = unmountHostGetTaskId2(params);
-                        taskIds.add(taskId);
-                    }
-                    // 解除映射之前先查看主机是所对应的主机组是否映射该lun 找到直接从主机组种移除主机
-                    // 主机被移除主机组后，属于该主机组映射的lun直接被移除
-                    //isUnmounted = findMappingVolumeToHostgroup(volumeIds, hostMap);
-                    /*if (!isUnmounted) {
-                        String taskId = unmountHostGetTaskId2(params);
-                        if (!StringUtils.isEmpty(taskId)) {
+                        if (lunids.size() > 0) {
+                            params.put(VOLUMEIDS, lunids);
+                            String taskId = unmountHostGetTaskId2(params);
                             taskIds.add(taskId);
                         }
-                    }*/
+                    }
                 }
             }
-            /*if (params.get(CLUSTER_ID) != null) {
-                clusterObjId = ToolUtils.getStr(params.get(CLUSTER_ID));
-                // 根据cluster获取dme侧目标主机组
-                Map<String, String> hostGroupMappingOrientedVolume =
-                    getHostGroupMappingOrientedVolume(clusterObjId, volumeIds);
-                if (hostGroupMappingOrientedVolume != null && hostGroupMappingOrientedVolume.size() > 0) {
-                    List<String> volumeids = new ArrayList<>();
-                    for (Map.Entry<String, String> entry : hostGroupMappingOrientedVolume.entrySet()) {
-                        volumeids.add(entry.getValue());
-                        params.put(HOST_GROUP_ID1, entry.getKey());
-                        params.put(VOLUME_IDS, volumeids);
-                        String taskId = unmountHostGroupGetTaskId(params);
-                        if (!StringUtils.isEmpty(taskId)) {
-                            taskIds.add(taskId);
-                        }
-                        boolean isUnmappingHostgroup = taskService.checkTaskStatus(taskIds);
-                        if (isUnmappingHostgroup) {
-                            taskId = removeHostgroupGetTaskId(params);
-                        }
-                        if (!StringUtils.isEmpty(taskId)) {
-                            taskIds.clear();
-                            taskIds.add(taskId);
-                        }
-
-                    }
-                }
-            }*/
         }
-
         // 获取卸载的任务完成后的状态,默认超时时间10分钟
         boolean isUnmounted = false;
         if (taskIds.size() > 0) {
@@ -2367,28 +2332,6 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             isUnmounted = true;
         }
 
-        // 判断是否卸载vmfs上的全部主机或集群 若是 则删除dme侧的卷，目前卸载参数中的主机/集群只支持单个,所以vmfs只挂载了一个主机或集群dme侧就直接删除卷
-       /* boolean isDeleteFalg = false;
-        if (params.get(HOSTID) != null) {
-            for (String dsObj : dataStoreObjectIds) {
-                List<Map<String, Object>> hosts = getHostsByStorageId2(dsObj);
-                if (hosts != null && hosts.size() == 1) {
-                    isDeleteFalg = true;
-                    break;
-                }
-            }
-        }*/
-        /*if (!isDeleteFalg && params.get(CLUSTER_ID) != null) {
-            for (String dsObjId : dataStoreObjectIds) {
-                List<Map<String, Object>> hostGroups = getHostGroupsByStorageId2(dsObjId);
-                if (hostGroups != null && hostGroups.size() == 0) {
-                    // todo 此处注释代码暂时不要删除
-                    //volumeDelete(params);
-                    isDeleteFalg = true;
-                    break;
-                }
-            }
-        }*/
         if (!isUnmounted) {
             throw new DmeException(
                 "unmount volume precondition unmount host and hostGroup error(task status),taskIds:(" + gson.toJson(
@@ -2430,17 +2373,18 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             JsonArray attachments = volume.get("attachments").getAsJsonArray();
             LOG.info("query oriented volume attachments,{}", attachments);
             if (attachments.size() < 1) {
-                throw new DmeException("query oriented volume attachments is null!{}", volumeId);
-            }
-            for (JsonElement jsonElement : attachments) {
-                JsonObject attachmentsAsJsonObject = jsonElement.getAsJsonObject();
-                Map<String, String> volumeAttachments = new HashMap<>();
-                volumeAttachments.put(ID_FIELD, ToolUtils.jsonToStr(attachmentsAsJsonObject.get(ID_FIELD)));
-                volumeAttachments.put(VOLUME_ID, ToolUtils.jsonToStr(attachmentsAsJsonObject.get(VOLUME_ID)));
-                volumeAttachments.put(HOST_ID, ToolUtils.jsonToStr(attachmentsAsJsonObject.get(HOST_ID)));
-                volumeAttachments.put("attached_at", ToolUtils.jsonToStr(attachmentsAsJsonObject.get("attached_at")));
-                volumeAttachments.put("attached_host_group", ToolUtils.jsonToStr(attachmentsAsJsonObject.get("attached_host_group")));
-                response.add(volumeAttachments);
+                LOG.info("query oriented volume attachments is null!{}", volumeId);
+            } else {
+                for (JsonElement jsonElement : attachments) {
+                    JsonObject attachmentsAsJsonObject = jsonElement.getAsJsonObject();
+                    Map<String, String> volumeAttachments = new HashMap<>();
+                    volumeAttachments.put(ID_FIELD, ToolUtils.jsonToStr(attachmentsAsJsonObject.get(ID_FIELD)));
+                    volumeAttachments.put(VOLUME_ID, ToolUtils.jsonToStr(attachmentsAsJsonObject.get(VOLUME_ID)));
+                    volumeAttachments.put(HOST_ID, ToolUtils.jsonToStr(attachmentsAsJsonObject.get(HOST_ID)));
+                    volumeAttachments.put("attached_at", ToolUtils.jsonToStr(attachmentsAsJsonObject.get("attached_at")));
+                    volumeAttachments.put("attached_host_group", ToolUtils.jsonToStr(attachmentsAsJsonObject.get("attached_host_group")));
+                    response.add(volumeAttachments);
+                }
             }
         }
         return response;
