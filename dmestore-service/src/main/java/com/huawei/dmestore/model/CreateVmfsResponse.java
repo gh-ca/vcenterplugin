@@ -1,6 +1,7 @@
 package com.huawei.dmestore.model;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -14,8 +15,9 @@ public class CreateVmfsResponse implements Serializable {
 
     private int successNo;
     private int failNo;
-    private Map<String,String> connectionResult ;
-    private String description;
+    private List<String> connectionResult ;
+    private String descriptionEN;
+    private String descriptionCN;
 
     public CreateVmfsResponse() {
     }
@@ -38,7 +40,7 @@ public class CreateVmfsResponse implements Serializable {
         this.failNo = failNo;
     }
 
-    public CreateVmfsResponse(int successNo, int failNo, Map<String, String> connectionResult) {
+    public CreateVmfsResponse(int successNo, int failNo, List<String>  connectionResult) {
         this.successNo = successNo;
         this.failNo = failNo;
         this.connectionResult = connectionResult;
@@ -60,26 +62,35 @@ public class CreateVmfsResponse implements Serializable {
         this.failNo = failNo;
     }
 
-    public Map<String, String> getConnectionResult() {
+    public List<String>  getConnectionResult() {
         return connectionResult;
     }
 
-    public void setConnectionResult(Map<String, String> connectionResult) {
+    public void setConnectionResult(List<String>  connectionResult) {
         this.connectionResult = connectionResult;
     }
 
-    public String getDescription() {
-        return description;
+    public String getDescriptionEN() {
+        return descriptionEN;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setDescriptionEN(String descriptionEN) {
+        this.descriptionEN = descriptionEN;
     }
 
-    public CreateVmfsResponse(int successNo, int failNo, Map<String, String> connectionResult, String description) {
+    public String getDescriptionCN() {
+        return descriptionCN;
+    }
+
+    public void setDescriptionCN(String descriptionCN) {
+        this.descriptionCN = descriptionCN;
+    }
+
+    public CreateVmfsResponse(int successNo, int failNo, List<String>  connectionResult, String descriptionEN, String descriptionCN) {
         this.successNo = successNo;
         this.failNo = failNo;
         this.connectionResult = connectionResult;
-        this.description = description;
+        this.descriptionEN = descriptionEN;
+        this.descriptionCN = descriptionCN;
     }
 }
