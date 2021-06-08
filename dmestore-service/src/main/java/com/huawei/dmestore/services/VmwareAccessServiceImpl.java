@@ -15,9 +15,11 @@ import com.google.gson.reflect.TypeToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -31,6 +33,10 @@ public class VmwareAccessServiceImpl implements VmwareAccessService {
     private static final Logger LOG = LoggerFactory.getLogger(VmwareAccessServiceImpl.class);
 
     private static final String OBJECT_ID = "objectId";
+
+    private static final String HOST_ID = "hostId";
+
+    private static final String HOST_NAME = "hostName";
 
     private Gson gson = new Gson();
 
@@ -356,4 +362,103 @@ public class VmwareAccessServiceImpl implements VmwareAccessService {
         }
         return clusterTreeList;
     }
+    /**
+      * @Description: 创建vmfs时，以树的方式返回可用的主机和集群
+      * @Param @param null
+      * @return @return 
+      * @throws 
+      * @author yc
+      * @Date 2021/6/7 17:32
+     */
+    @Override
+    public List<ClusterTree> listHostsAndClusterReturnTree() throws DmeException {
+        List<ClusterTree> treeList = new ArrayList<>();
+        List<Map<String, String>> hostList = new ArrayList<>();
+        List<Map<String, String>> clusterList = new ArrayList<>();
+        List<String> clusteridList = null;
+        try {
+            // 取得vcenter中的所有host。
+            String hostListStr = vcsdkUtils.getAllHosts();
+            clusteridList = vcsdkUtils.getAllClusterIds();
+            if (!StringUtils.isEmpty(hostListStr)) {
+                hostList = gson.fromJson(hostListStr, new TypeToken<List<Map<String, String>>>() {
+                }.getType());
+            }
+            String clusterListStr = vcsdkUtils.getAllClusters();
+            if (!StringUtils.isEmpty(clusterListStr)) {
+                clusterList = gson.fromJson(clusterListStr, new TypeToken<List<Map<String, String>>>() {
+                }.getType());
+            }
+            //获取独立主机
+            //准备暂存集合
+            Map<String, Map<String, String>> temp = new HashMap<>();
+            if (!CollectionUtils.isEmpty(hostList)) {
+                temp = getHostTempList(hostList);
+                //todo 查询主机是否属于集群，如果属于集群就不返回
+                for (Map<String, String> hostidMap : hostList) {
+                    if (!CollectionUtils.isEmpty(clusteridList)) {
+                        for (String clusterid : clusteridList) {
+                            List<String> hosts = vcsdkUtils.getHostidsOnCluster(clusterid);
+                            if (!CollectionUtils.isEmpty(hosts) && hosts.contains(hostidMap.get(HOST_ID))) {
+                                temp.remove(hostidMap.get(HOST_ID));
+                            }
+                        }
+                    }
+                }
+            }
+            if (!CollectionUtils.isEmpty(temp)) {
+                for (String key : temp.keySet()) {
+                    ClusterTree clusterTree = new ClusterTree();
+                    clusterTree.setClusterId(temp.get(key).get(HOST_ID));
+                    clusterTree.setClusterName(temp.get(key).get(HOST_NAME));
+                    treeList.add(clusterTree);
+                }
+            }
+            //处理集群
+            if (!CollectionUtils.isEmpty(clusterList)) {
+                for (Map<String, String> map : clusterList) {
+                    ClusterTree clusterTree = new ClusterTree();
+                    String vmwarehosts = vcsdkUtils.getHostsOnCluster(map.get("clusterId"));
+                    List<Map<String, String>> vmwarehostlists = new ArrayList<>();
+                    if (!StringUtils.isEmpty(vmwarehosts)) {
+                        vmwarehostlists = gson.fromJson(vmwarehosts,
+                                new TypeToken<List<Map<String, String>>>() {
+                                }.getType());
+                    }
+                    List<ClusterTree> hostListTmp = getHostList(vmwarehostlists);
+                    if (!CollectionUtils.isEmpty(hostListTmp)) {
+                        clusterTree.setClusterId(map.get("clusterId"));
+                        clusterTree.setClusterName(map.get("clusterName"));
+                        clusterTree.setChildren(hostListTmp);
+                    }
+                    if (!StringUtils.isEmpty(clusterTree.getClusterId())) {
+                        treeList.add(clusterTree);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            LOG.error("list hosts And clusters return tree error:", e);
+            throw new DmeException(e.getMessage());
+        }
+        return treeList;
+    }
+    /**
+      * @Description: 获取暂存主机集合对象
+      * @Param @param null
+      * @return @return 
+      * @throws 
+      * @author yc
+      * @Date 2021/6/7 18:44
+     */
+    private Map<String, Map<String, String>> getHostTempList(List<Map<String, String>> hostList) {
+        Map<String,Map<String,String>> temp = new HashMap<>();
+        if (!CollectionUtils.isEmpty(hostList)) {
+            for (Map<String, String> hostidMap : hostList) {
+                String hostId = hostidMap.get(HOST_ID);
+                temp.put(hostId,hostidMap);
+            }
+        }
+        return temp;
+    }
+        
 }

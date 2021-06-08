@@ -5482,11 +5482,10 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         }
         Attachment mindatares = attachmentList.stream().min(Comparator.comparing(attachment -> attachment.getAttachedAtDate())).get();
         //判断时间最小的映射方式（如果为主机组，就返回‘cluster’,如果为主机返回‘host’,其他报错）
-        if (!StringUtils.isEmpty(mindatares.getHostId()) && !mindatares.getHostId().equalsIgnoreCase("null")){
-            result = HOST;
-        }
         if (!StringUtils.isEmpty(mindatares.getAttachedHostGroup()) && !mindatares.getAttachedHostGroup().equalsIgnoreCase("null")){
             result = CLUSTER;
+        } else if (!StringUtils.isEmpty(mindatares.getHostId()) && !mindatares.getHostId().equalsIgnoreCase("null")){
+            result = HOST;
         }
         if(StringUtils.isEmpty(result)){
             throw new DmeException("query vmfs create method error");
