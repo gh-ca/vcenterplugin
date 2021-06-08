@@ -207,14 +207,14 @@ public interface VmfsAccessService {
      */
     List<Map<String, String>> mountVmfsNew(Map<String, Object> params) throws DmeException;
     /**
-      * @Description: 获取主机组下的主机信息
+      * @Description: 卸载页面，以树的形式返回可卸载的主机和集群（已过滤集群下未挂载的主机信息）
       * @Param @param null
       * @return @return
       * @throws
       * @author yc
       * @Date 2021/5/14 16:17
      */
-    List<ClusterTree> getHostGroupsByStorageIdNew(String storageId) throws DmeException;
+    List<ClusterTree> getMountedHostGroupsAndHostReturnTree(String dataStoreObjectId) throws Exception;
     /**
       * @Description: vfms卸载功能新接口
       * @Param @param null
