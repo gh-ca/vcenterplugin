@@ -3985,6 +3985,56 @@ public class VCSDKUtils {
             throw new VcenterException(e.getMessage());
         }
     }
+    /**
+      * @Description: 获取当前存储已经挂载的所有主机ID
+      * @Param @param null
+      * @return @return 
+      * @throws 
+      * @author yc
+      * @Date 2021/6/8 10:57
+     */
+    public List<String> getAllMountedHostId(String dataStoreObjectId) throws Exception {
+        DatastoreMo dsmo = null;
+        List<Pair<ManagedObjectReference, String>> hosts = new ArrayList<>();
+        List<String> hostObjIds = new ArrayList<>();
+        VmwareContext vmwareContext = null;
+        try {
+            // 得到当前的context
+            String serverguid = vcConnectionHelpers.objectId2Serverguid(dataStoreObjectId);
+            vmwareContext = vcConnectionHelpers.getServerContext(serverguid);
+            RootFsMo rootFsMo = rootVmwareMoFactory.build(vmwareContext, vmwareContext.getRootFolder());
+            hosts = rootFsMo.getAllHostOnRootFs();
+            ManagedObjectReference dsmor = vcConnectionHelpers.objectId2Mor(dataStoreObjectId);
 
+            // 取得该存储下所有已经挂载的主机ID
+            dsmo = datastoreVmwareMoFactory.build(vmwareContext, dsmor);
+        } catch (Exception e) {
+            logger.error("get mounted host info error:{}", e.getMessage());
+            throw new VcenterException("get mounted host info error:" + e.getMessage());
+        }
+        List<String> mounthostids = new ArrayList<>();
+        if (!StringUtils.isEmpty(dsmo)) {
+            List<DatastoreHostMount> dhms = dsmo.getHostMounts();
+            if (!CollectionUtils.isEmpty(dhms)) {
+                for (DatastoreHostMount dhm : dhms) {
+                    if (dhm.getMountInfo() != null && dhm.getMountInfo().isMounted()) {
+                        mounthostids.add(dhm.getKey().getValue());
+                    }
+                }
+            }
+        }
+        if (!CollectionUtils.isEmpty(mounthostids) && !CollectionUtils.isEmpty(hosts)){
+            for (String host : mounthostids){
+                for (Pair<ManagedObjectReference, String> hostPair : hosts) {
+                  if(  host.equalsIgnoreCase( hostPair.first().getValue())){
+                      HostMo host1 = hostVmwareFactory.build(vmwareContext, hostPair.first());
+                      String objectId = vcConnectionHelpers.mor2ObjectId(host1.getMor(), vmwareContext.getServerAddress());
+                      hostObjIds.add(objectId);
+                  }
+                }
+            }
+        }
+        return hostObjIds;
+    }
 
 }
