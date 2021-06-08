@@ -2592,7 +2592,6 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             }
 
             //查找Lun映射的所有集群
-            //List<Map<String, String>> hostgroupsByVolumeId = getHostgroupsByVolumeId(dvr.getVolumeId());
             List<Map<String, String>> volumeRientedHost = findOrientedVolumeMapping(dvr.getVolumeId());
             if (!CollectionUtils.isEmpty(volumeRientedHost)) {
                 //存在映射的主机组 解除映射
@@ -2636,6 +2635,15 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 }
             }
         }
+
+        //vcenter侧移除存储
+        for (String storeId : dsObjIds) {
+            // vcenter侧移除存储
+            if (!vcsdkUtils.deleteVmfsDataStore(storeId)) {
+                LOG.info("vcenter remove vmfs datastore error!", storeId);
+                continue;
+            }
+        }
         // 解除Lun映射（主机/主机组）
         if (!CollectionUtils.isEmpty(volumeMappedHostgroup)) {
             unMappingLunToHostGroup(taskIds, volumeMappedHostgroup, dvr.getStorageDeviceId());
@@ -2644,9 +2652,6 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             unMappingLunToHost(taskIds, volumeMappedHost);
         }
 
-        if (!CollectionUtils.isEmpty(dsObjIds)) {
-            params.put(HOST_OBJ_IDS, dsObjIds);
-        }
         return taskIds;
     }
 
@@ -2879,7 +2884,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         if (params != null && params.get(DmeConstants.DATASTOREOBJECTIDS) != null) {
             List<String> dataStoreObjectIds = (List<String>) params.get(DATASTORE_OBJECT_IDS);
             List<String> dataStorageIds = new ArrayList<>();
-            if (dataStoreObjectIds != null && dataStoreObjectIds.size() > 0) {
+            if (!CollectionUtils.isEmpty(dataStoreObjectIds)) {
                 List<String> volumeIds = new ArrayList<>();
                 List<String> dataStoreNames = new ArrayList<>();
                 for (String dsObjectId : dataStoreObjectIds) {
@@ -2909,7 +2914,6 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                     params.put(VOLUMEIDS, volumeIds);
                     params.put(DATASTORE_NAMES, dataStoreNames);
                 }
-
                 // 没有满足条件的datastore 直接返回taskids(size=0)
                 if (dataStorageIds.size() == 0) {
                     LOG.info("vmfs delete,all vmfs contain vm,can not delete!!!");
@@ -2918,12 +2922,12 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                     params.put(DATASTORE_OBJECT_IDS, dataStorageIds);
                 }
             }
+            // dme 侧解除关联
             List<String> unmountTaskIds = unmountVmfsByDatastores2(params);
             if (unmountTaskIds != null && unmountTaskIds.size() > 0) {
                 taskIds.addAll(unmountTaskIds);
             }
         }
-
         return taskIds;
     }
 
@@ -2943,30 +2947,13 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
 
         // vcenter侧 扫描
         List<String> hostObjIds = (List<String>) params.get(HOST_OBJ_IDS);
-        if (hostObjIds != null && hostObjIds.size() > 0) {
+        if (!CollectionUtils.isEmpty(hostObjIds)) {
             // 过滤重复的hostObjId
             hostObjIds = new ArrayList<>(new HashSet(hostObjIds));
             for (String hostObjId : hostObjIds) {
                 vcsdkUtils.scanDataStore(null, hostObjId);
             }
-        } else {
-            // dme侧已删除(卸载) hostObjectIds参数为空，此时通过dsObjectId查询hostObjId,再扫描一次
-            List<String> dataStoreObjectIds = (List<String>) params.get(DATASTORE_OBJECT_IDS);
-            if (dataStoreObjectIds != null && dataStoreObjectIds.size() > 0) {
-                for (String dsObjId : dataStoreObjectIds) {
-                    String listStr = vcsdkUtils.getMountHostsByDsObjectId(dsObjId);
-                    if (!StringUtils.isEmpty(listStr)) {
-                        List<Map<String, String>> lists = gson.fromJson(listStr,
-                            new TypeToken<List<Map<String, String>>>() { }.getType());
-                        for (Map<String, String> hostMap : lists) {
-                            String hostObjId = hostMap.get(HOSTID);
-                            vcsdkUtils.scanDataStore(null, hostObjId);
-                        }
-                    }
-                }
-            }
         }
-
         // 重新扫描关联关系 更新数据库
         scanVmfs();
     }
