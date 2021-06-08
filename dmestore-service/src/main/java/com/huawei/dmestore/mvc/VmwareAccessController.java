@@ -249,21 +249,41 @@ public class VmwareAccessController extends BaseController {
     }
 
     /**
-     * Access clusters
-     *
-     * @param dataStoreObjectId dataStore ObjectId
-     * @return ResponseBodyBean
-     * @throws Exception when error
+     * @Description: 挂载vmfs，以树的方式展示可挂载的主机和集群
+     * @Param @param null
+     * @return @return
+     * @throws
+     * @author yc
+     * @Date 2021/6/7 17:29
      */
-    @RequestMapping(value = "/getclustersbydsobjectidreturntree", method = RequestMethod.GET)
+    @RequestMapping(value = "/getClustersAndHostsByDsobjectIdReturnTree", method = RequestMethod.GET)
     public ResponseBodyBean getClustersByDsObjectIdNew(@RequestParam("dataStoreObjectId") String dataStoreObjectId) {
         String failureStr = "";
         try {
-            List<ClusterTree> lists = vmwareAccessService.getClustersByDsObjectIdNew(dataStoreObjectId);
+            List<ClusterTree> lists = vmwareAccessService.getClustersAndHostsByDsObjectIdNew(dataStoreObjectId);
             return success(lists);
         } catch (DmeException e) {
             LOG.error("getClustersByDsObjectId vmware host failure:", e);
             failureStr = e.getMessage();
+        }
+        return failure(failureStr);
+    }
+    /**
+      * @Description: 创建vmfs，以树的方式展示可用的主机和集群
+      * @Param @param null
+      * @return @return 
+      * @throws 
+      * @author yc
+      * @Date 2021/6/7 17:29
+     */
+    @RequestMapping(value = "/listHostsAndClusterReturnTree", method = RequestMethod.GET)
+    public ResponseBodyBean listIndependenceHosts() {
+        String failureStr = "";
+        try {
+            return success(vmwareAccessService.listHostsAndClusterReturnTree());
+        } catch (DmeException e) {
+            LOG.error("list vmware host failure:", e);
+            failureStr = "list vmware host failure:" + e.toString();
         }
         return failure(failureStr);
     }
