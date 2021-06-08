@@ -3,20 +3,7 @@ package com.huawei.vmware.mo;
 import com.huawei.vmware.util.VmwareContext;
 
 import com.google.gson.Gson;
-import com.vmware.vim25.DatastoreInfo;
-import com.vmware.vim25.HostNasVolumeSecurityType;
-import com.vmware.vim25.HostNasVolumeSpec;
-import com.vmware.vim25.HostScsiDisk;
-import com.vmware.vim25.ManagedObjectReference;
-import com.vmware.vim25.NasDatastoreInfo;
-import com.vmware.vim25.ObjectContent;
-import com.vmware.vim25.ObjectSpec;
-import com.vmware.vim25.PropertyFilterSpec;
-import com.vmware.vim25.PropertySpec;
-import com.vmware.vim25.TraversalSpec;
-import com.vmware.vim25.VmfsDatastoreCreateSpec;
-import com.vmware.vim25.VmfsDatastoreExpandSpec;
-import com.vmware.vim25.VmfsDatastoreOption;
+import com.vmware.vim25.*;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -128,6 +115,33 @@ public class HostDatastoreSystemMo extends BaseMo {
             return true;
         }
         return false;
+    }
+
+    public ManagedObjectReference findDatastore(String name) throws Exception {
+        // added Apache CloudStack specific name convention, we will use custom field "cloud.uuid" as datastore name as well
+        CustomFieldsManagerMo cfmMo = new CustomFieldsManagerMo(context, context.getServiceContent().getCustomFieldsManager());
+        int key = cfmMo.getCustomFieldKey("Datastore", CustomFieldConstants.CLOUD_UUID);
+        assert (key != 0);
+
+        List<ObjectContent> ocs = getDatastorePropertiesOnHostDatastoreSystem(new String[] {"name", String.format("value[%d]", key)});
+        if (ocs != null) {
+            for (ObjectContent oc : ocs) {
+                if (oc.getPropSet().get(0).getVal().equals(name))
+                    return oc.getObj();
+
+                if (oc.getPropSet().size() > 1) {
+                    DynamicProperty prop = oc.getPropSet().get(1);
+                    if (prop != null && prop.getVal() != null) {
+                        if (prop.getVal() instanceof CustomFieldStringValue) {
+                            String val = ((CustomFieldStringValue)prop.getVal()).getValue();
+                            if (val.equalsIgnoreCase(name))
+                                return oc.getObj();
+                        }
+                    }
+                }
+            }
+        }
+        return null;
     }
 
     /**
