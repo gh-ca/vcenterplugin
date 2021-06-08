@@ -153,6 +153,8 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
 
     private static final int DEFAULT_LEN = 16;
 
+    private static final String CLUSTER_NAME = "clusterName";
+
     /**
      * 轮询任务状态的超值时间，这里设置超长，避免创建超多的lun超时
      */
@@ -4777,53 +4779,71 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
       * @Date 2021/5/14 15:40
      */
     @Override
-    public List<ClusterTree> getHostGroupsByStorageIdNew(String storageId) throws DmeException {
-        List<ClusterTree> hostGroupMapList = new ArrayList<>();
+    public List<ClusterTree> getMountedHostGroupsAndHostReturnTree(String dataStoreObjectId) throws Exception {
 
-        // 取得vcenter中的所有cluster
-        DmeVmwareRelation dvr = dmeVmwareRalationDao.getDmeVmwareRelationByDsId(storageId);
-        if (dvr == null) {
-            throw new DmeException("存储关联关系为空");
+        List<ClusterTree> clusterTreeList = new ArrayList<>();
+        List<Map<String, String>> clusterList = new ArrayList<>();
+        //首先根据存储id获取存储下已经挂载的主机信息
+        List<String> hostObjectIds= vcsdkUtils.getAllMountedHostId(dataStoreObjectId);
+        //判断主机是否属于集群，如果主机属于集群需要获取集群的信息，将主机添加至集群中
+        try {
+            String clusterListStr = vcsdkUtils.getAllClusters();
+            if (!StringUtils.isEmpty(clusterListStr)) {
+                clusterList = gson.fromJson(clusterListStr, new TypeToken<List<Map<String, String>>>() {
+                }.getType());
+            }
+        } catch (Exception e) {
+            LOG.error("get all mounted hosts and clusters by  datastoreobjectid error:", e);
+            throw new DmeException("get all mounted hosts and clusters by  datastoreobjectid error:" + e.getMessage());
         }
-        List<String> hostgroupids = getDmeAttachHostGroupByVolumeId(dvr.getVolumeId());
-        Map<String, String> mappeddmegroups = new HashMap<>();
-        for (String hostgroupid : hostgroupids) {
-            Map<String, Object> hostgroupmap = dmeAccessService.getDmeHostGroup(hostgroupid);
-            mappeddmegroups.put(String.valueOf(hostgroupmap.get(NAME_FIELD)), "has");
-        }
-        String listStr = vcsdkUtils.getMountClustersByDsObjectId(storageId, mappeddmegroups);
-        if (!StringUtils.isEmpty(listStr)) {
-            List<Map<String, String>> clusters = gson.fromJson(listStr,
-                    new TypeToken<List<Map<String, String>>>() {
-                    }.getType());
-
-            // 通过名字判断主机组是否一致
-            for (Map<String, String> cluster : clusters) {
-                String clusterId = ToolUtils.getStr(cluster.get(CLUSTER_ID));
-                String clusterNmme = ToolUtils.getStr(cluster.get("clusterName"));
-                List<String> volumeIds = new ArrayList<>();
-                volumeIds.add(dvr.getVolumeId());
-                Map<String, String> hostGroupMappingOrientedVolume =
-                        getHostGroupMappingOrientedVolume(clusterId, volumeIds);
-                if (hostGroupMappingOrientedVolume.size() != 0) {
-                    ClusterTree clusterTree = new ClusterTree();
-                   // Map<String, Object> tempMap = new HashMap<>();
-                    clusterTree.setClusterId(clusterId);
-                    clusterTree.setClusterName(clusterNmme);
-                    //根据主机组id查询主机组下的所有主机数据
-                    String vmwarehosts = vcsdkUtils.getHostsOnCluster(clusterId);
-                    List<Map<String, String>> vmwarehostlists = new ArrayList<>();
-                    if (!StringUtils.isEmpty(vmwarehosts)) {
-                        vmwarehostlists = gson.fromJson(vmwarehosts,
-                                new TypeToken<List<Map<String, String>>>() {
-                                }.getType());
+        Map<String,List<String>> temp = new HashMap<>();
+        HashSet<String> hostIdSet = new HashSet<>(hostObjectIds);
+        if (!CollectionUtils.isEmpty(hostObjectIds) && !CollectionUtils.isEmpty(clusterList)) {
+                for (Map<String, String> clusterMap : clusterList) {
+                    List<String> hosts = vcsdkUtils.getHostidsOnCluster(clusterMap.get(CLUSTER_ID));
+                    List<String> hostMapTemp = new ArrayList<>();
+                    for (String hostid : hostObjectIds) {
+                    if (!CollectionUtils.isEmpty(hosts) && hosts.contains(hostid)){
+                        hostMapTemp.add(hostid);
+                        temp.put(clusterMap.get(CLUSTER_ID),hostMapTemp);
+                        hostIdSet.remove(hostid);
                     }
-                    clusterTree.setChildren(vmwareAccessService.getHostList(vmwarehostlists));
-                    hostGroupMapList.add(clusterTree);
                 }
             }
         }
-        return hostGroupMapList;
+        //组装树数据
+        if (!CollectionUtils.isEmpty(hostIdSet)){
+            for (String hostId : hostIdSet) {
+                ClusterTree hostTree = new ClusterTree();
+                hostTree.setClusterId(hostId);
+                hostTree.setClusterName(vcsdkUtils.getHostName(hostId));
+                if (!StringUtils.isEmpty(hostTree.getClusterId())){
+                    clusterTreeList.add(hostTree);
+                }
+            }
+        }
+        if (!CollectionUtils.isEmpty(temp)){
+            for (String clusterId: temp.keySet()) {
+               if (!CollectionUtils.isEmpty(temp.get(clusterId))){
+                List<ClusterTree> childTemp  = new ArrayList<>();
+                    for (String hostId : temp.get(clusterId)) {
+                        ClusterTree hostTree = new ClusterTree();
+                        hostTree.setClusterId(hostId);
+                        hostTree.setClusterName(vcsdkUtils.getHostName(hostId));
+                        childTemp.add(hostTree);
+                    }
+                   ClusterTree clusterTree = new ClusterTree();
+                   clusterTree.setClusterId(clusterId);
+                   clusterTree.setClusterName(vcsdkUtils.getClusterNameByClusterId(clusterId));
+                   clusterTree.setChildren(childTemp);
+                   clusterTreeList.add(clusterTree);
+                }
+            }
+        }
+
+
+
+        return clusterTreeList;
     }
 
     /**
@@ -5492,5 +5512,4 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         }
         return result;
     }
-
 }

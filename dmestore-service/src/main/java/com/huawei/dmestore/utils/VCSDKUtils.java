@@ -4036,5 +4036,32 @@ public class VCSDKUtils {
         }
         return hostObjIds;
     }
-
+    /**
+     * @Description: 根据集群id获取集群名称
+     * @Param @param null
+     * @return @return
+     * @throws
+     * @author yc
+     * @Date 2021/6/8 16:21
+     */
+    public String getClusterNameByClusterId(String clusterId) throws VcenterException {
+        String clusterName = null;
+        List<Map<String, String>> clusterList = new ArrayList<>();
+        String clusterListStr = getAllClusters();
+        if (!StringUtils.isEmpty(clusterListStr)) {
+            clusterList = gson.fromJson(clusterListStr, new TypeToken<List<Map<String, String>>>() {
+            }.getType());
+        }
+        if(!CollectionUtils.isEmpty(clusterList)){
+            for (Map<String, String> clusterMap : clusterList) {
+               if( clusterId.equalsIgnoreCase(clusterMap.get(CLUSTER_ID))) {
+                   clusterName = clusterMap.get(CLUSTER_NAME);
+               }
+                if (!StringUtils.isEmpty(clusterName)){
+                    return clusterName;
+                }
+            }
+        }
+        return clusterName;
+    }
 }

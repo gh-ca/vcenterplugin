@@ -317,18 +317,20 @@ public class VmfsAccessController extends BaseController {
         return failure(failureStr);
     }
 
-    /**
-     * getHostGroupsByStorageId
-     *
-     * @param storageId storageId
-     * @return ResponseBodyBean
-     */
-    @RequestMapping(value = "/gethostgroupsbystorageidreturntree/{storageId}", method = RequestMethod.GET)
+   /**
+     * @Description: 卸载页面以树的方式展示可卸载的主机和集群（以过滤集群下未挂载的主机）
+     * @Param @param null
+     * @return @return 
+     * @throws 
+     * @author yc
+     * @Date 2021/6/8 15:17
+    */
+    @RequestMapping(value = "/getMountedHostGroupsAndHostReturnTree/{storageId}", method = RequestMethod.GET)
     public ResponseBodyBean getHostGroupsByStorageIdNew(@PathVariable(value = "storageId") String storageId) {
         try {
-            List<ClusterTree> hosts = vmfsAccessService.getHostGroupsByStorageIdNew(storageId);
+            List<ClusterTree> hosts = vmfsAccessService.getMountedHostGroupsAndHostReturnTree(storageId);
             return success(hosts);
-        } catch (DmeException e) {
+        } catch (Exception e) {
             return failure(e.getMessage());
         }
     }
