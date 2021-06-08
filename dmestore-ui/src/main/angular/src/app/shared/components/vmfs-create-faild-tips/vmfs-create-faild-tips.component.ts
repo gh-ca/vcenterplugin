@@ -14,10 +14,14 @@ export class VmfsCreateFaildTipsComponent implements OnInit ,AfterViewChecked{
   partFail:number;
   descriptionContent:string;
   connectionResult:[];
+  detailShow:boolean;
+  // detailShow:boolean=false;
   ngOnInit(): void {
-    this.getFailStatus()
-    this.getDescriptionContent()
-    console.log(this.translateService.currentLang)
+      this.getFailStatus()
+      this.getDescriptionContent()
+    this.getFailDetail()
+
+    // console.log(this.translateService.currentLang)
   }
   ngAfterViewChecked() {
     // console.log(this.translateService.currentLang)
@@ -25,10 +29,9 @@ export class VmfsCreateFaildTipsComponent implements OnInit ,AfterViewChecked{
   }
 
   getFailStatus(){
-    this.failStatus=this.partSuccessData.code==='206'?0:1;
-    this.partSuccess=this.partSuccessData.data.successNo;
-    this.partFail=this.partSuccessData.data.failNo;
-
+      this.failStatus=this.partSuccessData.code==='206'?0:1;
+      this.partSuccess=this.partSuccessData.data.successNo;
+      this.partFail=this.partSuccessData.data.failNo;
   }
   getDescriptionContent(){
     if(this.partSuccessData && this.partSuccessData.data){
@@ -37,4 +40,11 @@ export class VmfsCreateFaildTipsComponent implements OnInit ,AfterViewChecked{
       this.connectionResult=this.partSuccessData.data.connectionResult
     }
   }
+  getFailDetail(){
+    if(this.partSuccessData.data.descriptionCN||this.partSuccessData.data.descriptionEN){
+      this.detailShow=true
+    }else {this.detailShow=false}
+
+  }
+
 }

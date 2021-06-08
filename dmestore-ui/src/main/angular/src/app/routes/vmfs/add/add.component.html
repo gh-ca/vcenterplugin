@@ -186,13 +186,12 @@
           </clr-combobox>
         -->
         <app-gh-tree-checkbox
-          [list]="deviceList_list"
           [tree]="deviceList"
           (valueChange)="handleChooseDeviceChange(this.addForm,'chooseDevice',$event)">
         </app-gh-tree-checkbox>
-        <app-error-tips [isShow]="!this.addForm.controls.chooseDevice.valid"
-          [tips]="'validations.required' | translate">
-        </app-error-tips>
+<!--        <app-error-tips [isShow]="!this.addForm.controls.chooseDevice.valid"-->
+<!--          [tips]="'validations.required' | translate">-->
+<!--        </app-error-tips>-->
       </clr-control-container>
     </form>
     <ng-template clrPageButtons>
