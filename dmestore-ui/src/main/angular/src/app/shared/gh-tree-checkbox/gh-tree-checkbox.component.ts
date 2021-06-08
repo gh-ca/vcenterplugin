@@ -21,7 +21,7 @@ const _ = getLodash();
 })
 export class GhTreeCheckboxComponent implements OnInit {
   @Input() tree: VMFS_CLUSTER_NODE[];
-  @Input() list: VMFS_CLUSTER_NODE[];
+  // @Input() list: VMFS_CLUSTER_NODE[];
   @Input() isCreate: boolean;
   @Input() resType: string = 'normal';
   @Input() mountType:string;
@@ -31,9 +31,9 @@ export class GhTreeCheckboxComponent implements OnInit {
   selectedHost = false;
   selectedCluster = false;
 
-  get isList() {
-    return _.isArray(this.list) && this.list.length > 0;
-  }
+  // get isList() {
+  //   return _.isArray(this.list) && this.list.length > 0;
+  // }
   get isTree() {
     return _.isArray(this.tree) && this.tree.length > 0;
   }
@@ -78,11 +78,11 @@ export class GhTreeCheckboxComponent implements OnInit {
     if (this.resType === 'mount') {
       let res = [];
 
-      if (this.isList) {
-        const listRes = getSelectedFromList(this.list);
-        this.selectedHost = false;
-        res = _.concat(res, listRes);
-      }
+      // if (this.isList) {
+      //   const listRes = getSelectedFromList(this.list);
+      //   this.selectedHost = false;
+      //   res = _.concat(res, listRes);
+      // }
 
       if (this.isTree) {
         const treeRes = getSelectedFromTree(this.tree, this.resType,this.mountType);
@@ -93,13 +93,13 @@ export class GhTreeCheckboxComponent implements OnInit {
       return res;
     } else {
       /* 如果有host ，但凡选了单主机，主机集群就不考虑了*/
-      if (this.isList) {
-        const listRes = getSelectedFromList(this.list);
-        this.selectedHost = listRes.length > 0;
-        if (this.selectedHost) {
-          return listRes;
-        }
-      }
+      // if (this.isList) {
+      //   const listRes = getSelectedFromList(this.list);
+      //   this.selectedHost = listRes.length > 0;
+      //   if (this.selectedHost) {
+      //     return listRes;
+      //   }
+      // }
 
       /* 主机集群 */
       if (this.isTree) {

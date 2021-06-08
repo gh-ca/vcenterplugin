@@ -20,17 +20,17 @@ import {
   StoragePoolMap,
   ConnFaildData,
 } from './list.service';
-import { ClrWizard, ClrWizardPage } from '@clr/angular';
-import { GlobalsService } from '../../../shared/globals.service';
-import { Router } from '@angular/router';
+import {ClrWizard, ClrWizardPage} from '@clr/angular';
+import {GlobalsService} from '../../../shared/globals.service';
+import {Router} from '@angular/router';
 import {
   DeviceFilter,
   ProtectionStatusFilter,
   ServiceLevelFilter,
   StatusFilter,
 } from './filter.component';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { isMockData, mockData } from 'mock/mock';
+import {FormControl, FormGroup, Validators} from '@angular/forms';
+import {isMockData, mockData} from 'mock/mock';
 import {
   getColorByType,
   getLabelByValue,
@@ -40,14 +40,15 @@ import {
   print,
   regExpCollection,
 } from 'app/app.helpers';
-import { getVmfsDmestorageStorageByTag } from './../../../../mock/VMFS_DMESTORAGE_STORAGE';
-import { SimpleChange } from '@angular/core';
-import { handleRes } from './../../../app.helpers';
-import { VmfsCommon } from './VmfsCommon';
-import { AddService } from './../add/add.service';
-import { getLodash } from './../../../shared/lib';
-import { CommonService } from './../../common.service';
-import { TranslatePipe } from '@ngx-translate/core';
+import {getVmfsDmestorageStorageByTag} from './../../../../mock/VMFS_DMESTORAGE_STORAGE';
+import {SimpleChange} from '@angular/core';
+import {handleRes} from './../../../app.helpers';
+import {VmfsCommon} from './VmfsCommon';
+import {AddService} from './../add/add.service';
+import {getLodash} from './../../../shared/lib';
+import {CommonService} from './../../common.service';
+import {TranslatePipe} from '@ngx-translate/core';
+
 const _ = getLodash();
 
 @Component({
@@ -153,8 +154,9 @@ export class VmfsListComponent extends VmfsCommon implements OnInit {
 
   popListShow = false; // 添加弹出层显示
   addSuccessShow = false; // 添加成功弹窗
-  addPartSuccessShow=false; //添加部分成功弹窗
+  addPartSuccessShow = false; //添加部分成功弹窗
   partSuccessData;//添加部分成功返回数据
+  partSuccessOrFail=false; //添加部分成功展示提示
   connectivityFailure = false; // 主机联通性测试失败
   connFailData: ConnFaildData[]; //  主机联通性测试失败数据
   showDetail = false; // 展示主机联通异常数据
@@ -389,7 +391,7 @@ wwn: "67c1cf110058934511ba6e5a00000344"
 
           /* 根据返回的数据判断是否需要展示 */
           const smartQos = this.storage.smartQos || {};
-          const { latency, maxbandwidth, maxiops, minbandwidth, miniops } = smartQos as any;
+          const {latency, maxbandwidth, maxiops, minbandwidth, miniops} = smartQos as any;
 
           this.modifyForm.max_iops = maxiops;
           this.modifyForm.max_bandwidth = maxbandwidth;
@@ -748,13 +750,13 @@ wwn: "67c1cf110058934511ba6e5a00000344"
     const options = [];
     const versionVal = this.form.version + '';
     if (versionVal === '6') {
-      const option1 = { key: 1024, value: '1MB' };
+      const option1 = {key: 1024, value: '1MB'};
       this.setFormValueWhenHiden(true);
       options.push(option1);
       // const option2 = {key: 64, value : '64KB'};
       // options.push(option2);
     } else if (versionVal === '5') {
-      const option1 = { key: 1024, value: '1MB' };
+      const option1 = {key: 1024, value: '1MB'};
       this.setFormValueWhenHiden(false);
       options.push(option1);
     }
@@ -772,17 +774,17 @@ wwn: "67c1cf110058934511ba6e5a00000344"
     const blockValue = this.form.blockSize + '';
     const versionVal = this.form.version + '';
     if (blockValue === '1024') {
-      const option1 = { key: 1024, value: '1MB' };
+      const option1 = {key: 1024, value: '1MB'};
       options.push(option1);
       if (versionVal === '5') {
-        const option2 = { key: 8, value: '8KB' };
+        const option2 = {key: 8, value: '8KB'};
         options.push(option2);
       }
     } else if (blockValue === '64') {
-      const option1 = { key: 64, value: '64KB' };
+      const option1 = {key: 64, value: '64KB'};
       options.push(option1);
       if (versionVal === '5') {
-        const option2 = { key: 8, value: '8KB' };
+        const option2 = {key: 8, value: '8KB'};
         options.push(option2);
       }
     }
@@ -1104,12 +1106,11 @@ wwn: "67c1cf110058934511ba6e5a00000344"
           // this.scanDataStore();
           // 打开成功提示窗口setServiceLevelList
           this.addSuccessShow = true;
-        } else if(result.code==='206'){
+        } else if (result.code === '206') {
           // this.wizard.close();
-          this.isOperationErr=true;
-          this.partSuccessData=result
-        }
-        else if (result.code === '-60001') {
+          this.partSuccessOrFail = true;
+          this.partSuccessData = result
+        } else if (result.code === '-60001') {
           this.connectivityFailure = true;
           this.showDetail = false;
           this.isAddPage = true;
@@ -1127,10 +1128,10 @@ wwn: "67c1cf110058934511ba6e5a00000344"
             this.connFailData = connFailDatas;
           }
         } else {
-          this.partSuccessData=result
+          this.partSuccessData = result
           console.log('创建失败：' + result.description);
           // 失败信息
-          this.isOperationErr = true;
+          this.partSuccessOrFail = true;
         }
         // 此方法变化检测，异步处理数据都要添加此方法
         this.cdr.detectChanges();
@@ -1270,7 +1271,7 @@ wwn: "67c1cf110058934511ba6e5a00000344"
   }
 
   // 挂载按钮点击事件
- async mountBtnFunc() {
+  async mountBtnFunc() {
     // 初始化表单
     if (this.rowSelected.length === 1) {
       this.modalLoading = true;
@@ -1282,10 +1283,10 @@ wwn: "67c1cf110058934511ba6e5a00000344"
       const objectIds = [];
       // this.selectedId=this.rowSelected[0].objectid;
       objectIds.push(this.rowSelected[0].objectid);
-      this.selectMountType=await this.commonService.getMountTypeBySeletedId(this.rowSelected[0].objectId)
+      this.selectMountType = await this.commonService.getMountTypeBySeletedId(this.rowSelected[0].objectid)
       this.mountForm.dataStoreObjectIds = objectIds;
       console.log('this.mountForm', this.mountForm);
-      console.log("this type",this.selectMountType)
+      console.log("this type", this.selectMountType)
 
       // 连通性测试相关
       this.connectivityFailure = false;
@@ -1478,7 +1479,7 @@ wwn: "67c1cf110058934511ba6e5a00000344"
           this.isOperationErr = true;
         }
       };
-      const params = _.merge({ chooseDevice }, this.mountForm);
+      const params = _.merge({chooseDevice}, this.mountForm);
       const res = await this.commonService.remoteVmfs_Mount(params);
       handlerMountVmfsSuccess(res);
       this.cdr.detectChanges();
@@ -1611,19 +1612,15 @@ wwn: "67c1cf110058934511ba6e5a00000344"
     console.log(
       'this.flag',
       (!this.chooseUnmountHost && this.unmountForm.mountType === '1') ||
-        (!this.chooseUnmountCluster && this.unmountForm.mountType === '2')
-    );
-    if (
-      (!this.chooseUnmountHost && this.unmountForm.mountType === '1') ||
       (!this.chooseUnmountCluster && this.unmountForm.mountType === '2')
-    ) {
-      this.notChooseUnmountDevice = true;
-    } else {
+    );
+
+    const submit = () => {
       this.unmountForm.dataStoreObjectIds.push(this.rowSelected[0].objectid);
       if (this.unmountForm.mountType === '1') {
-        this.unmountForm.hostId = this.chooseUnmountHost.deviceId;
+        this.unmountForm.hostId = this.chooseUnmountHost?.deviceId;
       } else {
-        this.unmountForm.clusterId = this.chooseUnmountCluster.deviceId;
+        this.unmountForm.clusterId = this.chooseUnmountCluster?.deviceId;
       }
       console.log('this.unmountForm', this.unmountForm);
       this.notChooseUnmountDevice = false;
@@ -1646,6 +1643,17 @@ wwn: "67c1cf110058934511ba6e5a00000344"
         this.cdr.detectChanges();
       });
     }
+if( this.form.chooseDevice.length>0 ){
+  submit();
+}
+
+
+    /* if (
+       (!this.chooseUnmountHost && this.unmountForm.mountType === '1') ||
+       (!this.chooseUnmountCluster && this.unmountForm.mountType === '2')
+     ) {
+       this.notChooseUnmountDevice = true;
+     } else */
   }
 
   // 回收空间 处理
@@ -2904,7 +2912,7 @@ wwn: "67c1cf110058934511ba6e5a00000344"
         if (chooseStorage) {
           const qosTag = chooseStorage.storageTypeShow.qosTag;
           this.dorado = String(qosTag) === '1';
-          const { bandwidthLimitErr, iopsLimitErr } = getQosCheckTipsTagInfo({
+          const {bandwidthLimitErr, iopsLimitErr} = getQosCheckTipsTagInfo({
             qosTag,
             minBandwidthChoose: this.form.minbandwidthChoose,
             minBandwidth: this.form.minbandwidth,

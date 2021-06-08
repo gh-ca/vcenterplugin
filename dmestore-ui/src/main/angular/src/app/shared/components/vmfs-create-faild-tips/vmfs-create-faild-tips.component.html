@@ -12,15 +12,15 @@
         {{'vmfs.creatfailtips'| translate}}
       </div>
       </div>
-      <div class="create-fail-description">
+      <div class="create-fail-description"  *ngIf="detailShow">
         <clr-signpost>
           <button class="btn btn-link"
                   clrSignpostTrigger>
             {{'tips.details'|translate}}
           </button>
-          <clr-signpost-content [clrPosition]="'bottom-left'" *clrIfOpen>
+          <clr-signpost-content  [clrPosition]="'bottom-left'" *clrIfOpen>
             <div>{{descriptionContent}}</div>
-            <div *ngIf="connectionResult.length>0">
+            <div *ngIf="connectionResult&&connectionResult.length>0">
               <h6>{{'errorMsg.connectionFailMessage'|translate}}</h6>
               <ul class="list-unstyled">
               <li *ngFor="let item of connectionResult">{{item}}</li>

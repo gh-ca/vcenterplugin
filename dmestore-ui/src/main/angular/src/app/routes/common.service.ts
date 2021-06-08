@@ -149,7 +149,7 @@ zh:'一年' ,range:'LAST_1_YEAR',   interval:  "DAY"
         data = await mockServerData(vmfsClusterTreeData);
       } else {
         const res: any = await new Promise((resolve, reject) => {
-          this.http.post('accessvmware/listclusters', {}).subscribe(resolve, reject);
+          this.http.get('accessvmware/listHostsAndClusterReturnTree', {}).subscribe(resolve, reject);
         });
 
         if (res.code === '200') {
@@ -172,7 +172,7 @@ zh:'一年' ,range:'LAST_1_YEAR',   interval:  "DAY"
 
   async remoteCreateVmfs(params) {
     if (isMockData) {
-      console.log(params);
+      // console.log(params);
       return {
         code:"-99999",
         data:{
@@ -181,7 +181,8 @@ zh:'一年' ,range:'LAST_1_YEAR',   interval:  "DAY"
           connectionResult:["10.12.22.167"],
           descriptionEN:"loream....",
           descriptionCN:"这里有一段内容"
-        }};
+        }
+        };
     } else {
       try {
         const res: any = await new Promise((resolve, reject) => {
@@ -250,7 +251,7 @@ zh:'一年' ,range:'LAST_1_YEAR',   interval:  "DAY"
       } else {
         const res: any = await new Promise((resolve, reject) => {
           this.http
-            .get(`/accessvmware/getclustersbydsobjectidreturntree?dataStoreObjectId=${id}`)
+            .get(`accessvmware/getClustersAndHostsByDsobjectIdReturnTree?dataStoreObjectId=${id}`)
             .subscribe(resolve, reject);
         });
         if (res.code === '200') {
@@ -271,7 +272,7 @@ zh:'一年' ,range:'LAST_1_YEAR',   interval:  "DAY"
       } else {
         const res: any = await new Promise((resolve, reject) => {
           this.http
-            .get(`/accessvmfs/gethostgroupsbystorageidreturntree/${id}`)
+            .get(`accessvmfs/getMountedHostGroupsAndHostReturnTree/${id}`)
             .subscribe(resolve, reject);
         });
         if (res.code === '200') {
@@ -299,7 +300,7 @@ zh:'一年' ,range:'LAST_1_YEAR',   interval:  "DAY"
       }else{
         const res : any= await new Promise((resolve, reject)=>{
           this.http
-            .get(`/accessvmfs/queryCreationMethodByDatastore？dataStoreObjectId=${id}`)
+            .get(`accessvmfs/queryCreationMethodByDatastore?dataStoreObjectId=${id}`)
             .subscribe(resolve, reject);
         });
         if (res.code==='200'){

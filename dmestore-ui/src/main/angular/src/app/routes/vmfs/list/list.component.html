@@ -468,14 +468,13 @@
         <clr-control-container *ngIf="popListShow">
           <label style="color: #9F9F9F;">{{'vmfs.hostOrCluster' | translate}}</label>
           <app-gh-tree-checkbox
-            [list]="deviceList_list"
             [tree]="deviceList"
             (valueChange)="handleChooseDeviceChange(this.addForm,'chooseDevice',$event)">
           </app-gh-tree-checkbox>
-          <app-error-tips
-            [isShow]="!this.addForm.controls.chooseDevice.valid"
-            [tips]="'validations.required' | translate">
-          </app-error-tips>
+<!--          <app-error-tips-->
+<!--            [isShow]="!this.addForm.controls.chooseDevice.valid"-->
+<!--            [tips]="'validations.required' | translate">-->
+<!--          </app-error-tips>-->
         </clr-control-container>
         <!--
         <clr-combobox-container>
@@ -547,7 +546,7 @@
           {{'errorMsg.addError' | translate}}
         </div> -->
         <!-- TODO 创建失败提示 -->
-        <div *ngIf="isOperationErr" class="errorTips" readonly>
+        <div *ngIf="partSuccessOrFail" class="errorTips" readonly>
           <app-vmfs-create-faild-tips [partSuccessData]="partSuccessData"></app-vmfs-create-faild-tips>
         </div>
         <!-- 1、选择 服务等级-->
@@ -1220,7 +1219,6 @@
             <app-gh-tree-checkbox
               [resType]="'mount'"
               [mountType]="selectMountType"
-              [list]="deviceList_list"
               [tree]="deviceList"
               (valueChange)="handleChooseDeviceChange(this.addForm,'chooseDevice',$event)"> </app-gh-tree-checkbox>
             <app-error-tips [isShow]="!this.addForm.controls.chooseDevice.valid"
@@ -1347,7 +1345,6 @@
           <clr-control-container *ngIf="unmountShow">
             <label style="color: #9F9F9F;">{{'vmfs.hostOrCluster' | translate}}</label>
             <app-gh-tree-checkbox
-              [list]="deviceList_list"
               [tree]="deviceList"
               (valueChange)="handleChooseDeviceChange(this.addForm,'chooseDevice',$event)"> </app-gh-tree-checkbox>
             <app-error-tips [isShow]="!this.addForm.controls.chooseDevice.valid"
