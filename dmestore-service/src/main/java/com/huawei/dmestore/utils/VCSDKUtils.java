@@ -1910,16 +1910,33 @@ public class VCSDKUtils {
     public boolean deleteVmfsDataStore(String datastoreobjectid) throws VcenterException {
         boolean isDelete = false;
         try {
-            VmwareContext[] vmwareContexts = vcConnectionHelpers.getAllContext();
-            for (VmwareContext vmwareContext : vmwareContexts) {
-                RootFsMo rootFsMo = rootVmwareMoFactory.build(vmwareContext, vmwareContext.getRootFolder());
-                List<Pair<ManagedObjectReference, String>> hosts = rootFsMo.getAllHostOnRootFs();
-                if (hosts != null && hosts.size() > 0) {
-                    for (Pair<ManagedObjectReference, String> host : hosts) {
-                        HostMo host1 = hostVmwareFactory.build(vmwareContext, host.first());
+
+            String serverguid = vcConnectionHelpers.objectId2Serverguid(datastoreobjectid);
+            VmwareContext vmwareContext = vcConnectionHelpers.getServerContext(serverguid);
+            ManagedObjectReference dataStoreMor = vcConnectionHelpers.objectId2Mor(datastoreobjectid);
+            DatastoreMo datastoreMo = new DatastoreMo(vmwareContext, dataStoreMor);
+
+            List<DatastoreHostMount> hostMounts = datastoreMo.getHostMounts();
+            List<String> mounthostids = new ArrayList<>();
+            if (!CollectionUtils.isEmpty(hostMounts)) {
+                for (DatastoreHostMount dhm : hostMounts) {
+                    if (dhm.getMountInfo() != null && dhm.getMountInfo().isMounted()) {
+                        mounthostids.add(dhm.getKey().getValue());
+                    }
+                }
+            }
+
+            RootFsMo rootFsMo = rootVmwareMoFactory.build(vmwareContext, vmwareContext.getRootFolder());
+            List<Pair<ManagedObjectReference, String>> hosts = rootFsMo.getAllHostOnRootFs();
+            if (hosts != null && hosts.size() > 0) {
+                for (Pair<ManagedObjectReference, String> host : hosts) {
+                    HostMo host1 = hostVmwareFactory.build(vmwareContext, host.first());
+                    if (!CollectionUtils.isEmpty(mounthostids) && mounthostids.contains(host1.getMor().getValue())) {
                         HostDatastoreSystemMo hdsMo = host1.getHostDatastoreSystemMo();
-                        if (null != datastoreobjectid) {
-                            isDelete = hdsMo.deleteDatastore(vcConnectionHelpers.objectId2Mor(datastoreobjectid));
+                        VmfsDatastoreInfo datastoreInfo = (VmfsDatastoreInfo) hdsMo.getDatastoreInfo(dataStoreMor);
+                        if (null != datastoreInfo) {
+                            String name = datastoreMo.getVmfsDatastoreInfo().getName();
+                            isDelete = hdsMo.deleteDatastore(hdsMo.findDatastore(name));
                             break;
                         }
                     }
@@ -3985,6 +4002,83 @@ public class VCSDKUtils {
             throw new VcenterException(e.getMessage());
         }
     }
+    /**
+      * @Description: 获取当前存储已经挂载的所有主机ID
+      * @Param @param null
+      * @return @return 
+      * @throws 
+      * @author yc
+      * @Date 2021/6/8 10:57
+     */
+    public List<String> getAllMountedHostId(String dataStoreObjectId) throws Exception {
+        DatastoreMo dsmo = null;
+        List<Pair<ManagedObjectReference, String>> hosts = new ArrayList<>();
+        List<String> hostObjIds = new ArrayList<>();
+        VmwareContext vmwareContext = null;
+        try {
+            // 得到当前的context
+            String serverguid = vcConnectionHelpers.objectId2Serverguid(dataStoreObjectId);
+            vmwareContext = vcConnectionHelpers.getServerContext(serverguid);
+            RootFsMo rootFsMo = rootVmwareMoFactory.build(vmwareContext, vmwareContext.getRootFolder());
+            hosts = rootFsMo.getAllHostOnRootFs();
+            ManagedObjectReference dsmor = vcConnectionHelpers.objectId2Mor(dataStoreObjectId);
 
-
+            // 取得该存储下所有已经挂载的主机ID
+            dsmo = datastoreVmwareMoFactory.build(vmwareContext, dsmor);
+        } catch (Exception e) {
+            logger.error("get mounted host info error:{}", e.getMessage());
+            throw new VcenterException("get mounted host info error:" + e.getMessage());
+        }
+        List<String> mounthostids = new ArrayList<>();
+        if (!StringUtils.isEmpty(dsmo)) {
+            List<DatastoreHostMount> dhms = dsmo.getHostMounts();
+            if (!CollectionUtils.isEmpty(dhms)) {
+                for (DatastoreHostMount dhm : dhms) {
+                    if (dhm.getMountInfo() != null && dhm.getMountInfo().isMounted()) {
+                        mounthostids.add(dhm.getKey().getValue());
+                    }
+                }
+            }
+        }
+        if (!CollectionUtils.isEmpty(mounthostids) && !CollectionUtils.isEmpty(hosts)){
+            for (String host : mounthostids){
+                for (Pair<ManagedObjectReference, String> hostPair : hosts) {
+                  if(  host.equalsIgnoreCase( hostPair.first().getValue())){
+                      HostMo host1 = hostVmwareFactory.build(vmwareContext, hostPair.first());
+                      String objectId = vcConnectionHelpers.mor2ObjectId(host1.getMor(), vmwareContext.getServerAddress());
+                      hostObjIds.add(objectId);
+                  }
+                }
+            }
+        }
+        return hostObjIds;
+    }
+    /**
+     * @Description: 根据集群id获取集群名称
+     * @Param @param null
+     * @return @return
+     * @throws
+     * @author yc
+     * @Date 2021/6/8 16:21
+     */
+    public String getClusterNameByClusterId(String clusterId) throws VcenterException {
+        String clusterName = null;
+        List<Map<String, String>> clusterList = new ArrayList<>();
+        String clusterListStr = getAllClusters();
+        if (!StringUtils.isEmpty(clusterListStr)) {
+            clusterList = gson.fromJson(clusterListStr, new TypeToken<List<Map<String, String>>>() {
+            }.getType());
+        }
+        if(!CollectionUtils.isEmpty(clusterList)){
+            for (Map<String, String> clusterMap : clusterList) {
+               if( clusterId.equalsIgnoreCase(clusterMap.get(CLUSTER_ID))) {
+                   clusterName = clusterMap.get(CLUSTER_NAME);
+               }
+                if (!StringUtils.isEmpty(clusterName)){
+                    return clusterName;
+                }
+            }
+        }
+        return clusterName;
+    }
 }

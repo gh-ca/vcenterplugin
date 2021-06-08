@@ -1,5 +1,7 @@
 package com.huawei.dmestore.model;
 
+import java.util.Date;
+
 /**
  * @author yc
  * @Title:
@@ -12,6 +14,7 @@ public class Attachment {
     private String hostId;
     private String attachedAt;
     private String attachedHostGroup;
+    private Date attachedAtDate;
 
     public Attachment() {
     }
@@ -54,5 +57,13 @@ public class Attachment {
 
     public void setAttachedHostGroup(String attachedHostGroup) {
         this.attachedHostGroup = attachedHostGroup;
+    }
+
+    public Date getAttachedAtDate() {
+        return attachedAtDate;
+    }
+
+    public void setAttachedAtDate(Date attachedAtDate) {
+        this.attachedAtDate = attachedAtDate;
     }
 }

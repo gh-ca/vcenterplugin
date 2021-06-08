@@ -2,10 +2,7 @@ package com.huawei.dmestore.mvc;
 
 import com.huawei.dmestore.constant.DmeConstants;
 import com.huawei.dmestore.exception.DmeException;
-import com.huawei.dmestore.model.ClusterTree;
-import com.huawei.dmestore.model.ResponseBodyBean;
-import com.huawei.dmestore.model.VmfsDataInfo;
-import com.huawei.dmestore.model.VmfsDatastoreVolumeDetail;
+import com.huawei.dmestore.model.*;
 import com.huawei.dmestore.services.VmfsAccessService;
 import com.google.gson.Gson;
 
@@ -281,12 +278,14 @@ public class VmfsAccessController extends BaseController {
         LOG.info("accessvmfs/createvmfsnew=={}", gson.toJson(params));
         String failureStr = "";
         try {
-            int num = vmfsAccessService.createVmfsNew(params);
-            if (num == 0) {
-                return failure(DmeConstants.CODE_CONNECTIVITY_FAILURE,
-                        "create vmfs failure,connectivity of host or hostgroup on dme error!", num);
+            CreateVmfsResponse result = vmfsAccessService.createVmfsNew(params);
+            if (result.getSuccessNo() == 0) {
+                return failure("create vmfs failure!",result);
+            }else if (result.getFailNo() != 0){
+                return partialSuccess(result,"create vmfs partial success!");
+            }else {
+                return success(result, "create vmfs success");
             }
-            return success(null, "Create vmfs success,total:"+num);
         } catch (DmeException e) {
             failureStr = "create vmfs failure:" + e.getMessage();
         }
@@ -318,18 +317,20 @@ public class VmfsAccessController extends BaseController {
         return failure(failureStr);
     }
 
-    /**
-     * getHostGroupsByStorageId
-     *
-     * @param storageId storageId
-     * @return ResponseBodyBean
-     */
-    @RequestMapping(value = "/gethostgroupsbystorageidreturntree/{storageId}", method = RequestMethod.GET)
+   /**
+     * @Description: 卸载页面以树的方式展示可卸载的主机和集群（以过滤集群下未挂载的主机）
+     * @Param @param null
+     * @return @return 
+     * @throws 
+     * @author yc
+     * @Date 2021/6/8 15:17
+    */
+    @RequestMapping(value = "/getMountedHostGroupsAndHostReturnTree/{storageId}", method = RequestMethod.GET)
     public ResponseBodyBean getHostGroupsByStorageIdNew(@PathVariable(value = "storageId") String storageId) {
         try {
-            List<ClusterTree> hosts = vmfsAccessService.getHostGroupsByStorageIdNew(storageId);
+            List<ClusterTree> hosts = vmfsAccessService.getMountedHostGroupsAndHostReturnTree(storageId);
             return success(hosts);
-        } catch (DmeException e) {
+        } catch (Exception e) {
             return failure(e.getMessage());
         }
     }
@@ -353,4 +354,20 @@ public class VmfsAccessController extends BaseController {
         }
         return failure(failureStr);
     }*/
+    /**
+     * queryCreationMethodByDatastore  查询存储的创建方式
+     *
+     * @param dataStoreObjectId
+     * @return ResponseBodyBean
+     */
+    @GetMapping("/queryCreationMethodByDatastore")
+    public ResponseBodyBean queryCreationMethodByDatastore(@RequestParam("dataStoreObjectId") String dataStoreObjectId) {
+        try {
+            String createmethod = vmfsAccessService.queryCreationMethodByDatastore(dataStoreObjectId);
+            return success(createmethod);
+        } catch (DmeException e) {
+            return failure(e.getMessage());
+        }
+    }
+
 }
