@@ -1910,16 +1910,33 @@ public class VCSDKUtils {
     public boolean deleteVmfsDataStore(String datastoreobjectid) throws VcenterException {
         boolean isDelete = false;
         try {
-            VmwareContext[] vmwareContexts = vcConnectionHelpers.getAllContext();
-            for (VmwareContext vmwareContext : vmwareContexts) {
-                RootFsMo rootFsMo = rootVmwareMoFactory.build(vmwareContext, vmwareContext.getRootFolder());
-                List<Pair<ManagedObjectReference, String>> hosts = rootFsMo.getAllHostOnRootFs();
-                if (hosts != null && hosts.size() > 0) {
-                    for (Pair<ManagedObjectReference, String> host : hosts) {
-                        HostMo host1 = hostVmwareFactory.build(vmwareContext, host.first());
+
+            String serverguid = vcConnectionHelpers.objectId2Serverguid(datastoreobjectid);
+            VmwareContext vmwareContext = vcConnectionHelpers.getServerContext(serverguid);
+            ManagedObjectReference dataStoreMor = vcConnectionHelpers.objectId2Mor(datastoreobjectid);
+            DatastoreMo datastoreMo = new DatastoreMo(vmwareContext, dataStoreMor);
+
+            List<DatastoreHostMount> hostMounts = datastoreMo.getHostMounts();
+            List<String> mounthostids = new ArrayList<>();
+            if (!CollectionUtils.isEmpty(hostMounts)) {
+                for (DatastoreHostMount dhm : hostMounts) {
+                    if (dhm.getMountInfo() != null && dhm.getMountInfo().isMounted()) {
+                        mounthostids.add(dhm.getKey().getValue());
+                    }
+                }
+            }
+
+            RootFsMo rootFsMo = rootVmwareMoFactory.build(vmwareContext, vmwareContext.getRootFolder());
+            List<Pair<ManagedObjectReference, String>> hosts = rootFsMo.getAllHostOnRootFs();
+            if (hosts != null && hosts.size() > 0) {
+                for (Pair<ManagedObjectReference, String> host : hosts) {
+                    HostMo host1 = hostVmwareFactory.build(vmwareContext, host.first());
+                    if (!CollectionUtils.isEmpty(mounthostids) && mounthostids.contains(host1.getMor().getValue())) {
                         HostDatastoreSystemMo hdsMo = host1.getHostDatastoreSystemMo();
-                        if (null != datastoreobjectid) {
-                            isDelete = hdsMo.deleteDatastore(vcConnectionHelpers.objectId2Mor(datastoreobjectid));
+                        VmfsDatastoreInfo datastoreInfo = (VmfsDatastoreInfo) hdsMo.getDatastoreInfo(dataStoreMor);
+                        if (null != datastoreInfo) {
+                            String name = datastoreMo.getVmfsDatastoreInfo().getName();
+                            isDelete = hdsMo.deleteDatastore(hdsMo.findDatastore(name));
                             break;
                         }
                     }
