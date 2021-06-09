@@ -30,8 +30,10 @@ export class VmfsCreateFaildTipsComponent implements OnInit ,AfterViewChecked{
 
   getFailStatus(){
       this.failStatus=this.partSuccessData.code==='206'?0:1;
-      this.partSuccess=this.partSuccessData.data.successNo;
-      this.partFail=this.partSuccessData.data.failNo;
+      if(this.failStatus===0) {
+        this.partSuccess = this.partSuccessData.data.successNo;
+        this.partFail = this.partSuccessData.data.failNo;
+      }
   }
   getDescriptionContent(){
     if(this.partSuccessData && this.partSuccessData.data){

@@ -52,6 +52,11 @@ export class GhTreeCheckboxComponent implements OnInit {
       */
 
       this.resValue = this.checkSelectedAndSetDisable();
+      this.resValue=this.resValue.map(i=>({
+        ...i,
+        deviceId:i.clusterId,
+        deviceName:i.clusterName
+      }));
       this.valueChange.emit(this.resValue);
     }, 300);
   }

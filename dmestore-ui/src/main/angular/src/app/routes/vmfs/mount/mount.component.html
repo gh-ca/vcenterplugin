@@ -157,14 +157,13 @@
           <app-gh-tree-checkbox
             [resType]="'mount'"
             [mountType]="selectMountType"
-            [list]="deviceList_list"
             [tree]="deviceList"
             (valueChange)="handleChooseDeviceChange('chooseDevice',$event)">
           </app-gh-tree-checkbox>
-          <app-error-tips
-            [isShow]="!deviceForm?.controls.chooseDevice.valid"
-            [tips]="'validations.required' | translate">
-          </app-error-tips>
+<!--          <app-error-tips-->
+<!--            [isShow]="!deviceForm?.controls.chooseDevice.valid"-->
+<!--            [tips]="'validations.required' | translate">-->
+<!--          </app-error-tips>-->
         </clr-control-container>
 
       </form>
@@ -230,14 +229,15 @@
         <clr-control-container *ngIf="unmountShow">
           <label class="floatleft" style="color: #9F9F9F;">{{'vmfs.hostOrCluster' | translate}}</label>
           <app-gh-tree-checkbox
-            [list]="deviceList_list"
+            [resType]="'mount'"
+            [mountType]="'host'"
             [tree]="deviceList"
             (valueChange)="handleChooseDeviceChange('chooseDevice',$event)">
           </app-gh-tree-checkbox>
-          <app-error-tips
-            [isShow]="!chooseDevice"
-            [tips]="'validations.required' | translate">
-          </app-error-tips>
+<!--          <app-error-tips-->
+<!--            [isShow]="!chooseDevice"-->
+<!--            [tips]="'validations.required' | translate">-->
+<!--          </app-error-tips>-->
         </clr-control-container>
 
         <!-- 主机列表 -->
