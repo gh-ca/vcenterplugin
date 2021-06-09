@@ -283,7 +283,7 @@ export function getSelectedFromTree(clusterArray: VMFS_CLUSTER_NODE[], resType =
     if(mountType==='host'){
       if (String(clusterNode.selected) === String(ClrSelectedState.SELECTED)) {
         const _node = clusterNode;
-        _node['deviceType'] = 'cluster';
+        // _node['deviceType'] = 'cluster';
 
         if (!selectedCluster) {
           selectedCluster = clusterNode;
@@ -291,8 +291,9 @@ export function getSelectedFromTree(clusterArray: VMFS_CLUSTER_NODE[], resType =
       }
     }else{
       if (String(clusterNode.selected) === String(ClrSelectedState.SELECTED)) {
+
         const _node = _.omit(clusterNode, ['children']);
-        _node['deviceType'] = 'cluster';
+        // _node['deviceType'] = 'cluster';
         result.push(_node);
         // console.log(result)
         if (!selectedCluster) {
@@ -306,7 +307,7 @@ export function getSelectedFromTree(clusterArray: VMFS_CLUSTER_NODE[], resType =
       for (const hostNode of clusterNode.children) {
         if (String(hostNode.selected) === String(ClrSelectedState.SELECTED)) {
           const _node = _.omit(hostNode, ['children']);
-          _node['deviceType'] = 'host';
+          // _node['deviceType'] = 'host';
           if (!selectedCluster) {
             selectedCluster = clusterNode;
           }

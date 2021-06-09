@@ -243,7 +243,7 @@ export class MountComponent implements OnInit {
 
         this.chooseCluster = undefined;
         this.chooseHost = undefined;
-        this.deviceList = await this.commonService.remoteGetVmfsDeviceListById_unmount(
+        this.deviceList = await this.commonService.remoteGetVmfsDeviceListById_mount(
           this.objectId
         );
 
@@ -283,7 +283,7 @@ export class MountComponent implements OnInit {
 
         let isShowHostList = false;
         console.log('isShowHostList', isShowHostList);
-        this.deviceList = await this.commonService.remoteGetVmfsDeviceListById_mount(this.objectId);
+        this.deviceList = await this.commonService.remoteGetVmfsDeviceListById_unmount(this.objectId);
 
         const loadUnmountHost = () => {
           const setDeviceList = (result: any) => {
@@ -699,7 +699,7 @@ export class MountComponent implements OnInit {
   }
 
   // 卸载处理函数
-  async unmountHandleFunc() {
+   unmountHandleFunc() {
     console.log('this.chooseUnmountHost', this.chooseUnmountHost);
     console.log('this.chooseUnmountCluster', this.chooseUnmountCluster);
     console.log(
@@ -707,12 +707,13 @@ export class MountComponent implements OnInit {
       (!this.chooseUnmountHost && this.unmountForm.mountType === '1') ||
         (!this.chooseUnmountCluster && this.unmountForm.mountType === '2')
     );
-    if (
-      (!this.chooseUnmountHost && this.unmountForm?.mountType === '1') ||
-      (!this.chooseUnmountCluster && this.unmountForm?.mountType === '2')
-    ) {
-      this.notChooseUnmountDevice = true;
-    } else {
+    // if (
+    //   (!this.chooseUnmountHost && this.unmountForm?.mountType === '1') ||
+    //   (!this.chooseUnmountCluster && this.unmountForm?.mountType === '2')
+    // ) {
+    //   this.notChooseUnmountDevice = true;
+    // } else {
+    const submit=()=>{
       this.unmountForm.dataStoreObjectIds.push(this.objectId);
       if (this.unmountForm.mountType === '1') {
         this.unmountForm.hostId = this.chooseUnmountHost?.deviceId;
@@ -734,12 +735,16 @@ export class MountComponent implements OnInit {
         }
         this.cdr.detectChanges();
       };
-
-      const params = _.merge({ chooseDevice: this.chooseDevice }, this.unmountForm);
-      const res = await this.commonService.remoteVmfs_Unmount(params);
-      handlerUnmountVmfsSuccess(res);
-
-      // this.remoteSrv.unmountVMFS(this.unmountForm).subscribe(handlerUnmountVmfsSuccess);
+      console.log('chooseDevice',this.chooseDevice)
+      console.log('unmountForm',this.unmountForm)
+      const params = _.merge(this.unmountForm,{ hostIds: this.chooseDevice.map(i=>i.deviceId) });
+      // const res = await this.commonService.remoteVmfs_Unmount(params);
+      // handlerUnmountVmfsSuccess(res);
+      console.log(params)
+      this.remoteSrv.unmountVMFS(params).subscribe(handlerUnmountVmfsSuccess);
+    }
+    if(this.chooseDevice.length>0){
+      submit()
     }
   }
 
