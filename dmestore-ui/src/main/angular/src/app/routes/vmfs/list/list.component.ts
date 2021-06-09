@@ -1480,6 +1480,7 @@ wwn: "67c1cf110058934511ba6e5a00000344"
         }
       };
       const params = _.merge({chooseDevice}, this.mountForm);
+      console.log(params)
       const res = await this.commonService.remoteVmfs_Mount(params);
       handlerMountVmfsSuccess(res);
       this.cdr.detectChanges();
@@ -1626,7 +1627,9 @@ wwn: "67c1cf110058934511ba6e5a00000344"
       this.notChooseUnmountDevice = false;
 
       this.modalHandleLoading = true;
-      this.remoteService.unmountVMFS(this.unmountForm).subscribe((result: any) => {
+      console.log('chooseDevice',this.addForm.value.chooseDevice)
+      console.log('unmountForm',this.unmountForm)
+      this.remoteService.unmountVMFS(_.merge(this.unmountForm,{ hostIds: this.addForm.value.chooseDevice.map(i=>i.deviceId) })).subscribe((result: any) => {
         this.modalHandleLoading = false;
         if (result.code === '200') {
           console.log('unmount ' + this.rowSelected[0].name + ' success');
