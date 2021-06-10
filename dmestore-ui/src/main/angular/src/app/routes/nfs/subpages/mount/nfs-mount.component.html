@@ -3,7 +3,7 @@
   <clr-modal [clrModalOpen]="viewPage=='mount_plugin'" [clrModalClosable]="false">
     <h3 class="modal-title modelTile">{{'vmfs.mount.mount' | translate}}</h3>
     <div class="modal-body">
-      <p *ngIf="errorMsg" style="color: red">{{'errorMsg.mountError' | translate}}</p>
+      <p *ngIf="errorMsg" style="color: #ff0000">{{'errorMsg.mountError' | translate}}</p>
       <div *ngIf="modalLoading" class="loadingDiv">
       <span>
         {{'vmfs.loadingTips' | translate}}<img src="./assets/images/loading.gif"  width="20px" height="20px" style="margin-left: 20px;">
@@ -53,7 +53,7 @@
     </div>
     <div class="modal-footer">
       <button type="button" class="btn btn-outline" (click)="backToNfsList()">{{'menu.cancel' | translate}}</button>
-      <button type="button" class="btn btn-primary" (click)="mountSubmit()">{{'menu.ok' | translate}}</button>
+      <button type="button" class="btn btn-primary" (click)="mountSubmit()" [disabled]="changeButtonAttrDatastore()">{{'menu.ok' | translate}}</button>
     </div>
   </clr-modal>
   <!--vcenter-datastore-->
@@ -108,7 +108,7 @@
     </div>
     <div style="float: right;" class="modal-footer">
       <button type="button" class="btn btn-outline" (click)="closeModel()">{{'menu.cancel' | translate}}</button>
-      <button type="button" class="btn btn-primary" (click)="mountSubmit()">{{'menu.ok' | translate}}</button>
+      <button type="button" class="btn btn-primary" (click)="mountSubmit()" [disabled]="changeButtonAttrDatastore()">{{'menu.ok' | translate}}</button>
     </div>
   </clr-modal>
   <!--vcenter-host-->
@@ -153,7 +153,7 @@
     </div>
     <div style="float: right;" class="modal-footer">
       <button type="button" class="btn btn-outline" (click)="closeModel()">{{'menu.cancel' | translate}}</button>
-      <button type="button" class="btn btn-primary" (click)="mountSubmit()">{{'menu.ok' | translate}}</button>
+      <button type="button" class="btn btn-primary" (click)="mountSubmit()" [disabled]="changeButtonAttrHostOrCluster()">{{'menu.ok' | translate}}</button>
     </div>
   </clr-modal>
 
