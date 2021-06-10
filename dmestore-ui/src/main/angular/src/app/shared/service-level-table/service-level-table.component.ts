@@ -66,6 +66,19 @@ export class ServiceLevelTableComponent implements OnInit {
     }
   }
 
+  check(prop) {
+    return (
+      this.item.capabilities !== null &&
+      this.item.capabilities.qos !== null &&
+      this.item.capabilities.qos?.qosParam !== null &&
+      this.item.capabilities.qos?.qosParam[prop] !== 0
+    );
+  }
+
+  getValue(prop) {
+    return this.item.capabilities.qos?.qosParam[prop];
+  }
+
   ngOnChanges(changes: { [propKey: string]: SimpleChange }) {
     this.changes = changes;
     this.itemChangeHandler();
