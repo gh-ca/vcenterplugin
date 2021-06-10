@@ -5,7 +5,7 @@ import { GlobalsService } from '../../shared/globals.service';
 import { ClrWizard, ClrWizardPage } from '@clr/angular';
 import { TranslatePipe } from '@ngx-translate/core';
 import { getQosCheckTipsTagInfo } from 'app/app.helpers';
-import { isMockData } from 'mock/mock';
+import { isMockData, mockData } from 'mock/mock';
 import { handlerResponseErrorSimple } from './../../app.helpers';
 import { DATASTORE_ON_HOST } from './../../../mock/DATASTORE_ON_HOST';
 
@@ -106,33 +106,36 @@ export class RdmComponent implements OnInit {
   // 刷新服务等级列表
   tierFresh() {
     this.tierLoading = true;
-    this.http.post('servicelevel/listservicelevel', {}).subscribe(
-      (response: any) => {
-        this.tierLoading = false;
-        if (response.code == '200') {
-          this.serviceLevelsRes = this.recursiveNullDelete(response.data);
-          this.serviceLevelsRes = this.serviceLevelsRes.filter(item => item.totalCapacity !== 0);
-          for (const i of this.serviceLevelsRes) {
-            if (i.totalCapacity == 0) {
-              i.usedRate = 0.0;
-            } else {
-              i.usedRate = ((i.usedCapacity / i.totalCapacity) * 100).toFixed(2);
-            }
-            i.usedCapacity = (i.usedCapacity / 1024).toFixed(2);
-            i.totalCapacity = (i.totalCapacity / 1024).toFixed(2);
-            i.freeCapacity = (i.freeCapacity / 1024).toFixed(2);
-
-            if (!i.capabilities) {
-              i.capabilities = {};
-            }
+    const handlerListservicelevelSuccess = (response: any) => {
+      this.tierLoading = false;
+      if (response.code == '200') {
+        this.serviceLevelsRes = this.recursiveNullDelete(response.data);
+        this.serviceLevelsRes = this.serviceLevelsRes.filter(item => item.totalCapacity !== 0);
+        for (const i of this.serviceLevelsRes) {
+          if (i.totalCapacity == 0) {
+            i.usedRate = 0.0;
+          } else {
+            i.usedRate = ((i.usedCapacity / i.totalCapacity) * 100).toFixed(2);
           }
-          this.search();
+         /*  i.usedCapacity = (i.usedCapacity / 1024).toFixed(2);
+          i.totalCapacity = (i.totalCapacity / 1024).toFixed(2);
+          i.freeCapacity = (i.freeCapacity / 1024).toFixed(2); */
+
+          if (!i.capabilities) {
+            i.capabilities = {};
+          }
         }
-      },
-      err => {
-        console.error('ERROR', err);
+        this.search();
       }
-    );
+    };
+
+    if (isMockData) {
+      handlerListservicelevelSuccess(mockData.SERVICELEVEL_LISTSERVICELEVEL);
+    } else {
+      this.http
+        .post('servicelevel/listservicelevel', {})
+        .subscribe(handlerListservicelevelSuccess, handlerResponseErrorSimple);
+    }
   }
 
   serviceLevelClick(id: string) {
