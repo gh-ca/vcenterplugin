@@ -159,7 +159,7 @@ zh:'一年' ,range:'LAST_1_YEAR',   interval:  "DAY"
             }else{
               firstNode.deviceType="cluster"
               if(firstNode&&firstNode.children.length>0){
-                for(let secondNode of firstNode){
+                for(let secondNode of firstNode.children){
                   if(!secondNode.children){
                     secondNode.deviceType="host"
                   }else {
@@ -278,7 +278,7 @@ zh:'一年' ,range:'LAST_1_YEAR',   interval:  "DAY"
             }else{
               firstNode.deviceType="cluster"
               if(firstNode&&firstNode.children.length>0){
-                for(let secondNode of firstNode){
+                for(let secondNode of firstNode.children){
                   if(!secondNode.children){
                     secondNode.deviceType="host"
                   }else {
