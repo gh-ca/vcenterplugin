@@ -2434,7 +2434,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                     if (StringUtils.isEmpty(hostgroupId)) {
                         temp = map.get(HOST_ID);
                     }
-                    if (!StringUtils.isEmpty(hostgroupId) && !StringUtils.isEmpty(temp) && dmeHostIds.contains(temp)) {
+                    if (!StringUtils.isEmpty(temp) && dmeHostIds.contains(temp)) {
                         hostId1 = temp;
                     }
                     if (!StringUtils.isEmpty(hostId1)) {
