@@ -1137,7 +1137,6 @@ wwn: "67c1cf110058934511ba6e5a00000344"
         this.cdr.detectChanges();
       };
       console.log(params)
-      debugger
       const res = await this.commonService.remoteCreateVmfs(params);
       handlerCreateVmfsSuccess(res);
       // this.remoteSrv.createVmfs(params).subscribe(handlerCreateVmfsSuccess);
