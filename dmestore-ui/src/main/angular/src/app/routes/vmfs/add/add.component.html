@@ -238,7 +238,8 @@
             <clr-accordion-title class="" (click)="item.show ? this.hidden:this.show" *ngIf="!item.show"
               style="height: 50px; line-height: 50px;color: #333;font-size:16px;">{{item.name}}</clr-accordion-title>
             <clr-accordion-content [(clrIfExpanded)]="item.show">
-              <table class="table table-vertical table-noborder table-compact">
+              <app-service-level-table [item]="item"></app-service-level-table>
+              <!-- <table class="table table-vertical table-noborder table-compact">
                 <tbody>
                   <tr>
                     <th hidden></th>
@@ -298,7 +299,7 @@
                         --</th>
                   </tr>
                 </tbody>
-              </table>
+              </table> -->
             </clr-accordion-content>
             <img src="./assets/images/selectDown.svg" style="position: absolute;right: 0px;bottom: 0px;" width="40px"
               height="40px">

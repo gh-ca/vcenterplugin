@@ -1,3 +1,8 @@
+<div>
+  <div class="s" style="margin:auto;width:600px;">
+    <app-service-level-table [item]="serviceItem"></app-service-level-table>
+  </div>
+</div>
 <app-gh-dynamic-form [formInfo]='formItemInfos' [form]='form' (onPayLoadChange)='handlePayLoadChange($event)'>
 </app-gh-dynamic-form>
 <app-gh-tree-checkbox
@@ -11,4 +16,4 @@
 <div>form.errors{{helper.print(form.errors)}}</div>
 <pre>form.value{{helper.print(form.value)}}</pre>
 <div>form.valid=>{{form.valid}}</div>
-<app-vmfs-create-faild-tips [partSuccessData]="partSuccessData" ></app-vmfs-create-faild-tips>
+<app-vmfs-create-faild-tips [partSuccessData]="partSuccessData"></app-vmfs-create-faild-tips>

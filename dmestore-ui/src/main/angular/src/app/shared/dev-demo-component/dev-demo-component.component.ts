@@ -23,9 +23,42 @@ export class DevDemoComponentComponent implements OnInit {
   vmfsTree;
   vmfsList;
   partSuccessData;
+  serviceItem;
 
   constructor() {
     this.initForm();
+
+    this.serviceItem = {
+      "capabilities": {
+        "resourceType": null,
+        "compression": null,
+        "deduplication": null,
+        "smarttier": null,
+        "iopriority": null,
+        "qos": {
+          "smartQos": null,
+          "qosParam": {
+            "enabled": null,
+            "latency": 0,
+            "latencyUnit": "ms",
+            "minBandWidth": 0,
+            "minIOPS": 0,
+            "maxBandWidth": 200,
+            "maxIOPS": 500,
+            "smartQos": null
+          },
+          "enabled": true
+        }
+      },
+      "id": "292ae048-486d-4b1b-822b-0c84a99be342",
+      "name": "zg_610",
+      "description": "block service-level for dj",
+      "type": "BLOCK",
+      "protocol": null,
+      "totalCapacity": 2208768.0,
+      "freeCapacity": 2064064.0,
+      "usedCapacity": 144704.0
+    };
 
     (async () => {
       this.vmfsTree = await mockServerData(vmfsClusterTreeData);

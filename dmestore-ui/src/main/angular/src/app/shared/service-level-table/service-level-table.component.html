@@ -1,70 +1,44 @@
-<table class="table table-vertical table-noborder table-compact">
+<table class="table table-vertical table-noborder table-compact service-level-table">
   <tbody>
     <tr>
-      <th hidden></th>
-      <th>
-        {{item.name}}
-      </th>
+      <td hidden></td>
+      <th> {{item.name}} </th>
     </tr>
     <tr>
-      <th hidden></th>
-      <td>{{'vmfs.capacityUsage' | translate}}</td>
-      <td>{{'vmfs.qos' | translate}}</td>
-      <td>{{'vmfs.protection' | translate}}</td>
+      <td hidden></td>
+      <th class="first">{{'vmfs.capacityUsage' | translate}}</th>
+      <th>{{'vmfs.qos' | translate}}</th>
+      <th>{{'vmfs.protection' | translate}}</th>
     </tr>
     <tr>
-      <th hidden></th>
-      <th>
+      <td hidden></td>
+      <td>
         <div class="progress-block">
           <app-progress-bar-cell [used]="(item.usedCapacity/item.totalCapacity * 100 || 0).toFixed(2)"
             [color]="'success'" style="width:100%;"></app-progress-bar-cell>
         </div>
-      </th>
-      <th *ngIf="item.capabilities !== null && item.capabilities.qos !== null
-          && item.capabilities.qos?.qosParam !== null
-          && item.capabilities.qos?.qosParam.maxBandWidth !== 0">{{'vmfs.bandwidth' | translate}} <=
-          {{item.capabilities.qos?.qosParam.maxBandWidth}}MBPS/TB
-          </th>
-
-          <th *ngIf="item.capabilities !== null && item.capabilities.qos !== null
-          && item.capabilities.qos?.qosParam !== null
-          && item.capabilities.qos?.qosParam.minBandWidth !== 0">{{'vmfs.bandwidth' | translate}} >=
-          {{item.capabilities.qos?.qosParam.minBandWidth}}MBPS/TB
-      </th>
-      <th *ngIf="item.capabilities !== null && item.capabilities.qos !== null
-          && item.capabilities.qos?.qosParam !== null
-          && item.capabilities.qos?.qosParam.maxIOPS !== 0">{{'vmfs.iops' | translate}} <=
-          {{item.capabilities.qos?.qosParam.maxIOPS}}IOPS/TB
-          </th>
-
-          <th *ngIf="item.capabilities !== null && item.capabilities.qos !== null
-          && item.capabilities.qos?.qosParam !== null
-          && item.capabilities.qos?.qosParam.minIOPS !== 0 ">{{'vmfs.iops' | translate}} >=
-          {{item.capabilities.qos?.qosParam.minIOPS}}IOPS/TB
-      </th>
-      <th
-        *ngIf="item.capabilities === null || item.capabilities.qos === null || item.capabilities.qos?.qosParam === null
-          || (item.capabilities.qos?.qosParam.maxBandWidth === 0 && item.capabilities.qos?.qosParam.minBandWidth === 0)">
-        --
-      </th>
-      <th
-        *ngIf="item.capabilities === null || item.capabilities.qos === null || item.capabilities.qos?.qosParam === null
-          || (item.capabilities.qos?.qosParam.minIOPS === 0 && item.capabilities.qos?.qosParam.maxIOPS === 0)">
-        --
-      </th>
+      </td>
+      <!-- QoS -->
+      <td rowspan="2">
+        <!-- 带宽 -->
+        <div *ngIf="check('maxBandWidth')">{{'vmfs.bandwidth' | translate}} <= {{getValue('maxBandWidth')}} MBPS/TB </div>
+        <div *ngIf="check('minBandWidth')">{{'vmfs.bandwidth' | translate}} >= {{getValue('minBandWidth')}} MBPS/TB </div> 
+        <!-- IOPS -->
+        <div *ngIf="check('maxIOPS')">{{'vmfs.iops' | translate}} <= {{getValue('maxIOPS')}} IOPS/TB </div>
+        <div *ngIf="check('minIOPS')">{{'vmfs.iops' | translate}} >= {{getValue('minIOPS')}} IOPS/TB </div>
+        <!-- 时延 -->
+        <div *ngIf="check('latency')">{{'rdm.latency' | translate}} <= {{getValue('latency') + getValue('latencyUnit')}}</div>
+        <!-- 一个能用的都没有 -->
+        <div *ngIf="!check('maxBandWidth') && !check('minBandWidth') &&!check('maxIOPS') && !check('minIOPS') && !check('latency')">--</div>
+      </td>
+      <!-- 保护 -->
+      <td rowspan="2">
+         --
+      </td>
     </tr>
     <tr>
-      <th hidden></th>
-      <th>{{formatCapacity(item.usedCapacity, false)}} /{{formatCapacity(item.totalCapacity, false)}}
-      </th>
-      <th *ngIf="item.capabilities !== null && item.capabilities.qos !== null
-          && item.capabilities.qos?.qosParam !== null
-          && item.capabilities.qos?.qosParam.latency !== 0 ">{{'rdm.latency' | translate}}<=
-          {{item.capabilities.qos?.qosParam.latency + item.capabilities.qos?.qosParam.latencyUnit}}</th>
-          <th
-          *ngIf="item.capabilities === null || item.capabilities.qos === null || item.capabilities.qos?.qosParam === null || item.capabilities.qos?.qosParam.latency === 0">
-          --
-      </th>
+      <td hidden></td>
+      <td>{{formatCapacity(item.usedCapacity, false)}} /{{formatCapacity(item.totalCapacity, false)}} </td>
     </tr>
   </tbody>
 </table>

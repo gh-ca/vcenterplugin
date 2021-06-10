@@ -1136,7 +1136,7 @@ wwn: "67c1cf110058934511ba6e5a00000344"
         // 此方法变化检测，异步处理数据都要添加此方法
         this.cdr.detectChanges();
       };
-
+      console.log(params)
       const res = await this.commonService.remoteCreateVmfs(params);
       handlerCreateVmfsSuccess(res);
       // this.remoteSrv.createVmfs(params).subscribe(handlerCreateVmfsSuccess);
