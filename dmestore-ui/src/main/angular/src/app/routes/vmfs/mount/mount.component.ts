@@ -567,6 +567,7 @@ export class MountComponent implements OnInit {
       const unmountObjIds = this.chooseMountDataStore.map(item => item.objectId);
       this.unmountForm.dataStoreObjectIds = unmountObjIds;
       this.modalHandleLoading = true;
+      console.log(this.unmountForm)
       this.remoteSrv.unmountVMFS(this.unmountForm).subscribe((result: any) => {
         this.modalHandleLoading = false;
         if (result.code === '200') {

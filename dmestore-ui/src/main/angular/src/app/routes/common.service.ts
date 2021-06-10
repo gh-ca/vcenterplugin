@@ -153,6 +153,23 @@ zh:'一年' ,range:'LAST_1_YEAR',   interval:  "DAY"
         });
 
         if (res.code === '200') {
+          for( let firstNode of res.data){
+            if(!firstNode.children){
+              firstNode.deviceType="host"
+            }else{
+              firstNode.deviceType="cluster"
+              if(firstNode&&firstNode.children.length>0){
+                for(let secondNode of firstNode){
+                  if(!secondNode.children){
+                    secondNode.deviceType="host"
+                  }else {
+                    secondNode.deviceType = "cluster"
+                  }
+                }
+              }
+
+            }
+          }
           data = res.data;
         }
       }
@@ -260,13 +277,16 @@ zh:'一年' ,range:'LAST_1_YEAR',   interval:  "DAY"
               firstNode.deviceType="host"
             }else{
               firstNode.deviceType="cluster"
-              // for(let secondNode of firstNode){
-              //   if(!firstNode.children){
-              //     firstNode.deviceType="host"
-              //   }else {
-              //     firstNode.deviceType = "cluster"
-              //   }
-              // }
+              if(firstNode&&firstNode.children.length>0){
+                for(let secondNode of firstNode){
+                  if(!secondNode.children){
+                    secondNode.deviceType="host"
+                  }else {
+                    secondNode.deviceType = "cluster"
+                  }
+                }
+              }
+
             }
           }
           data = res.data;
