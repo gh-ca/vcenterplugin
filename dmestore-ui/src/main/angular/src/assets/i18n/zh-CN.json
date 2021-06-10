@@ -267,7 +267,7 @@
     "startTime": "开始时间",
     "endTime": "结束时间",
     "timeInputTips": "请输入开始-结束时间！",
-    "capacityTips": "若版本为VMFS5则容量最小值为1G，若版本为VMFS6则容量最小值为2G，且容量必须为单位为G的正整数，数量必须为正整数且不超过100",
+    "capacityTips": "若版本为VMFS5则容量最小值为1G，若版本为VMFS6则容量最小值为2G，且容量必须为单位为G的正整数，数量必须为正整数且不超过200",
     "serviceLevelCantBeNull": "DME存储策略是必选项，且只能选择容量不为0的DME存储策略！",
     "expandTips": "扩容容量只能单位为GB的正整数。",
     "expandTipsMax": "扩容后总容量不能超过256TB。",

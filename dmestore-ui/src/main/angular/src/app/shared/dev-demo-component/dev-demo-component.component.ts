@@ -24,6 +24,10 @@ export class DevDemoComponentComponent implements OnInit {
   vmfsList;
   partSuccessData;
   serviceItem;
+  firstData;
+  secondData;
+  thirdData;
+  buttonDisableOrNot:boolean=true;
 
   constructor() {
     this.initForm();
@@ -146,4 +150,18 @@ export class DevDemoComponentComponent implements OnInit {
   }
 
   ngOnInit(): void {}
+  // ngDoCheck() {
+  //   this.changeButtonAttr()
+  // }
+
+  changeButtonAttr(){
+
+    if(this.firstData&&this.secondData&&this.thirdData){
+      return false
+    }else {
+      return true
+    }
+  }
 }
+
+

@@ -2021,7 +2021,7 @@ if( this.form.chooseDevice.length>0 ){
     /* 且容量必须为单位为G的正整数，数量必须为正整数且不超过100 */
     const isInteger = regExpCollection.integer().test(count);
 
-    if (!(isInteger && count > 0 && count <= 100)) {
+    if (!(isInteger && count > 0 && count <= 200)) {
       this.form.count = null;
     }
   }

@@ -171,4 +171,21 @@ export class NfsMountComponent implements OnInit {
       this.closeModel();
     }
   }
+//  控制button是否可选 list和存储
+  changeButtonAttrDatastore(){
+    if (this.mountForm.hostObjectId&&this.mountForm.hostVkernelIp&&this.mountForm.mountType){
+      return false
+    }else {
+      return true
+    }
+  }
+
+  //控制button是否可选  主机和集群
+  changeButtonAttrHostOrCluster(){
+    if(this.mountForm.hostVkernelIp&&this.mountForm.dataStoreObjectId&&this.mountForm.mountType){
+      return false
+    }else {
+      return  true
+    }
+  }
 }
