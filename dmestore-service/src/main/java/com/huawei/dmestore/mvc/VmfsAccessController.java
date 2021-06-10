@@ -9,6 +9,7 @@ import com.google.gson.Gson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -305,7 +306,7 @@ public class VmfsAccessController extends BaseController {
         String failureStr = "";
         try {
             List<Map<String, String>> list = vmfsAccessService.mountVmfsNew(params);
-            if (list.size() != 0) {
+            if (!CollectionUtils.isEmpty(list)) {
                 return failure(DmeConstants.CODE_CONNECTIVITY_FAILURE,
                         "mount vmfs failure,connectivity of host or hostgroup on dme error!", list);
             }

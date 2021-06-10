@@ -4081,4 +4081,63 @@ public class VCSDKUtils {
         }
         return clusterName;
     }
+
+    public List<Map<String,String>> getClustersByDsObjectIdNew(String dataStoreObjectId) throws VcenterException {
+        String listStr = "";
+        List<Map<String, String>> lists = new ArrayList<>();
+        try {
+            String serverguid = vcConnectionHelpers.objectId2Serverguid(dataStoreObjectId);
+            VmwareContext vmwareContext = vcConnectionHelpers.getServerContext(serverguid);
+            RootFsMo rootFsMo = rootVmwareMoFactory.build(vmwareContext, vmwareContext.getRootFolder());
+
+            // 取得该存储下所有已经挂载的主机ID
+            List<String> mounthostids = new ArrayList<>();
+            ManagedObjectReference dsmor = vcConnectionHelpers.objectId2Mor(dataStoreObjectId);
+            DatastoreMo dsmo = datastoreVmwareMoFactory.build(vmwareContext, dsmor);
+            if (dsmo != null) {
+                List<DatastoreHostMount> dhms = dsmo.getHostMounts();
+                if (dhms != null && dhms.size() > 0) {
+                    for (DatastoreHostMount dhm : dhms) {
+                        if (dhm.getMountInfo() != null && dhm.getMountInfo().isMounted()) {
+                            mounthostids.add(dhm.getKey().getValue());
+                        }
+                    }
+                }
+            }
+
+            /**
+             * 取得所有集群，并通过mounthostids进行过滤，过滤掉已经挂载的主机
+             * 扫描集群下所有主机，只要有一个主机没挂当前存储就要显示，只有集群下所有主机都挂载了该存储就不显示
+             */
+            List<Pair<ManagedObjectReference, String>> cls = rootFsMo.getAllClusterOnRootFs();
+            if (cls != null && cls.size() > 0) {
+                for (Pair<ManagedObjectReference, String> cl : cls) {
+                    boolean isMount = false;
+                    ClusterMo cl1 = clusterVmwareMoFactory.build(vmwareContext, cl.first());
+                    List<Pair<ManagedObjectReference, String>> hosts = cl1.getClusterHosts();
+                    if (hosts != null && hosts.size() > 0) {
+                        for (Pair<ManagedObjectReference, String> host : hosts) {
+                            HostMo host1 = hostVmwareFactory.build(vmwareContext, host.first());
+                            if (mounthostids.contains(host1.getMor().getValue())) {
+                                isMount = true;
+                                break;
+                            }
+                        }
+                    }
+                    if (isMount) {
+                        Map<String, String> map = new HashMap<>();
+                        String objectId = vcConnectionHelpers.mor2ObjectId(cl1.getMor(),
+                                vmwareContext.getServerAddress());
+                        map.put(CLUSTER_ID, objectId);
+                        map.put(CLUSTER_NAME, cl1.getName());
+                        lists.add(map);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            logger.error("getClustersByDsObjectId error:{}", e.getMessage());
+            throw new VcenterException(e.getMessage());
+        }
+        return lists;
+    }
 }
