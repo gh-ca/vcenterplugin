@@ -1141,17 +1141,18 @@
     </div>
   </clr-modal>
   <!--挂载弹窗-->
+  <div *ngIf="modalLoading" class="loadingDiv">
+          <span>
+            {{'vmfs.loadingTips' | translate}}<img src="./assets/images/loading.gif" width="20px" height="20px"
+                                                   style="margin-left: 20px;">
+          </span>
+  </div>
   <clr-modal [(clrModalOpen)]="mountShow" [clrModalClosable]="false">
     <h3 class="modal-title modelTile">{{'vmfs.mount.mount' | translate}}</h3>
     <div class="modal-body">
       <form *ngIf="rowSelected.length === 1" clrForm>
 
-        <div *ngIf="modalLoading" class="loadingDiv">
-          <span>
-            {{'vmfs.loadingTips' | translate}}<img src="./assets/images/loading.gif" width="20px" height="20px"
-              style="margin-left: 20px;">
-          </span>
-        </div>
+
         <div *ngIf="modalHandleLoading" class="loadingDiv">
           <span>
             {{'vmfs.dataHandleLoadingTips' | translate}}<img src="./assets/images/loading.gif" width="20px"
@@ -1262,17 +1263,18 @@
 
 
   <!--卸载-->
+  <div *ngIf="modalLoading" class="loadingDiv">
+          <span>
+            {{'vmfs.loadingTips' | translate}}<img src="./assets/images/loading.gif" width="20px" height="20px"
+                                                   style="margin-left: 20px;">
+          </span>
+  </div>
   <clr-modal [(clrModalOpen)]="unmountShow" [clrModalSize]="'lg'" [clrModalClosable]="false">
     <h3 class="modal-title modelTile">{{'vmfs.unmount.title' | translate}}</h3>
     <div class="modal-body">
       <form clrForm>
 
-        <div *ngIf="modalLoading" class="loadingDiv">
-          <span>
-            {{'vmfs.loadingTips' | translate}}<img src="./assets/images/loading.gif" width="20px" height="20px"
-              style="margin-left: 20px;">
-          </span>
-        </div>
+
         <div *ngIf="modalHandleLoading" class="loadingDiv">
           <span>
             {{'vmfs.dataHandleLoadingTips' | translate}}<img src="./assets/images/loading.gif" width="20px"
