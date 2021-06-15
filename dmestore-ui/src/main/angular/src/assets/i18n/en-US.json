@@ -267,7 +267,7 @@
     "startTime": "Start Time",
     "endTime": "End Time",
     "timeInputTips": "Please enter start-end time！",
-    "capacityTips": "If the version is VMFS5, the minimum capacity is 1G, if the version is VMFS6, the minimum capacity is 2G, and the capacity must be a positive integer in G, and the quantity must be a positive integer and must lower than 100!",
+    "capacityTips": "If the version is VMFS5, the minimum capacity is 1G, if the version is VMFS6, the minimum capacity is 2G, and the capacity must be a positive integer in G, and the quantity must be a positive integer and must lower than 200!",
     "serviceLevelCantBeNull": "The DME Storage Strategy is a must, and you can only choose the DME Storage Strategy whose capacity is not 0!",
     "expandTips": "Expansion capacity can only be a positive integer of GB",
     "expandTipsMax": "After expansion, the total capacity cannot exceed 256TB.",

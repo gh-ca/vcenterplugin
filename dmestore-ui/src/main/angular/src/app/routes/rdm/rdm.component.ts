@@ -5,6 +5,9 @@ import { GlobalsService } from '../../shared/globals.service';
 import { ClrWizard, ClrWizardPage } from '@clr/angular';
 import { TranslatePipe } from '@ngx-translate/core';
 import { getQosCheckTipsTagInfo } from 'app/app.helpers';
+import { isMockData, mockData } from 'mock/mock';
+import { handlerResponseErrorSimple } from './../../app.helpers';
+import { DATASTORE_ON_HOST } from './../../../mock/DATASTORE_ON_HOST';
 
 @Component({
   selector: 'app-rdm',
@@ -103,33 +106,36 @@ export class RdmComponent implements OnInit {
   // 刷新服务等级列表
   tierFresh() {
     this.tierLoading = true;
-    this.http.post('servicelevel/listservicelevel', {}).subscribe(
-      (response: any) => {
-        this.tierLoading = false;
-        if (response.code == '200') {
-          this.serviceLevelsRes = this.recursiveNullDelete(response.data);
-          this.serviceLevelsRes = this.serviceLevelsRes.filter(item => item.totalCapacity !== 0);
-          for (const i of this.serviceLevelsRes) {
-            if (i.totalCapacity == 0) {
-              i.usedRate = 0.0;
-            } else {
-              i.usedRate = ((i.usedCapacity / i.totalCapacity) * 100).toFixed(2);
-            }
-            i.usedCapacity = (i.usedCapacity / 1024).toFixed(2);
-            i.totalCapacity = (i.totalCapacity / 1024).toFixed(2);
-            i.freeCapacity = (i.freeCapacity / 1024).toFixed(2);
-
-            if (!i.capabilities) {
-              i.capabilities = {};
-            }
+    const handlerListservicelevelSuccess = (response: any) => {
+      this.tierLoading = false;
+      if (response.code == '200') {
+        this.serviceLevelsRes = this.recursiveNullDelete(response.data);
+        this.serviceLevelsRes = this.serviceLevelsRes.filter(item => item.totalCapacity !== 0);
+        for (const i of this.serviceLevelsRes) {
+          if (i.totalCapacity == 0) {
+            i.usedRate = 0.0;
+          } else {
+            i.usedRate = ((i.usedCapacity / i.totalCapacity) * 100).toFixed(2);
           }
-          this.search();
+         /*  i.usedCapacity = (i.usedCapacity / 1024).toFixed(2);
+          i.totalCapacity = (i.totalCapacity / 1024).toFixed(2);
+          i.freeCapacity = (i.freeCapacity / 1024).toFixed(2); */
+
+          if (!i.capabilities) {
+            i.capabilities = {};
+          }
         }
-      },
-      err => {
-        console.error('ERROR', err);
+        this.search();
       }
-    );
+    };
+
+    if (isMockData) {
+      handlerListservicelevelSuccess(mockData.SERVICELEVEL_LISTSERVICELEVEL);
+    } else {
+      this.http
+        .post('servicelevel/listservicelevel', {})
+        .subscribe(handlerListservicelevelSuccess, handlerResponseErrorSimple);
+    }
   }
 
   serviceLevelClick(id: string) {
@@ -333,43 +339,43 @@ export class RdmComponent implements OnInit {
 
   loadDataStore() {
     this.dsLoading = true;
-    this.http
-      .get('v1/vmrdm/vCenter/datastoreOnHost', { params: { vmObjectId: this.vmObjectId } })
-      .subscribe(
-        (result: any) => {
-          this.dsLoading = false;
-          let dataStores;
-          if (result.code === '200') {
-            dataStores = JSON.parse(result.data);
+    const handlerDatastoreOnHostSuccess = (result: any) => {
+      this.dsLoading = false;
+      let dataStores;
+      if (result.code === '200') {
+        dataStores = JSON.parse(result.data);
+      } else {
+        dataStores = [];
+      }
+      if (dataStores.filter(item => item.vmRootpath).length >= 1) {
+        const selectData = dataStores.filter(item => item.vmRootpath)[0];
+        this.dataStoreObjectId = selectData.objectId;
+        this.defaultStoreObjectId = selectData.objectId;
+      }
+      if (dataStores.length > 0) {
+        this.dataStores = dataStores.filter(item => !item.vmRootpath);
+      } else {
+        this.dataStores = [];
+      }
+      if (this.dataStores.length > 0) {
+        this.dataStores.forEach(item => {
+          if (item.name.length >= 15) {
+            item.shortName = item.name.substring(0, 13) + '...';
           } else {
-            dataStores = [];
+            item.shortName = item.name;
           }
-          if (dataStores.filter(item => item.vmRootpath).length >= 1) {
-            const selectData = dataStores.filter(item => item.vmRootpath)[0];
-            this.dataStoreObjectId = selectData.objectId;
-            this.defaultStoreObjectId = selectData.objectId;
-          }
-          if (dataStores.length > 0) {
-            this.dataStores = dataStores.filter(item => !item.vmRootpath);
-          } else {
-            this.dataStores = [];
-          }
-          if (this.dataStores.length > 0) {
-            this.dataStores.forEach(item => {
-              if (item.name.length >= 15) {
-                item.shortName = item.name.substring(0, 13) + '...';
-              } else {
-                item.shortName = item.name;
-              }
-            });
-          }
+        });
+      }
 
-          this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
-        },
-        err => {
-          console.error('ERROR', err);
-        }
-      );
+      this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
+    };
+    if (isMockData) {
+      handlerDatastoreOnHostSuccess(DATASTORE_ON_HOST);
+    } else {
+      this.http
+        .get('v1/vmrdm/vCenter/datastoreOnHost', { params: { vmObjectId: this.vmObjectId } })
+        .subscribe(handlerDatastoreOnHostSuccess, handlerResponseErrorSimple);
+    }
   }
 
   /**

@@ -217,12 +217,16 @@ export function isStringLengthByteOutRange(nameString, limit = 27, name = 'byte'
 
 export function formatCapacity(c: number, isGB: boolean) {
   let cNum;
-  if (c < 1024) {
-    cNum = isGB ? c.toFixed(3) + 'GB' : c.toFixed(3) + 'MB';
-  } else if (c >= 1024 && c < 1048576) {
-    cNum = isGB ? (c / 1024).toFixed(3) + 'TB' : (c / 1024).toFixed(3) + 'GB';
-  } else if (c >= 1048576) {
-    cNum = isGB ? (c / 1024 / 1024).toFixed(3) + 'PB' : (c / 1024 / 1024).toFixed(3) + 'TB';
+  try {
+    if (c < 1024) {
+      cNum = isGB ? c.toFixed(3) + 'GB' : c.toFixed(3) + 'MB';
+    } else if (c >= 1024 && c < 1048576) {
+      cNum = isGB ? (c / 1024).toFixed(3) + 'TB' : (c / 1024).toFixed(3) + 'GB';
+    } else if (c >= 1048576) {
+      cNum = isGB ? (c / 1024 / 1024).toFixed(3) + 'PB' : (c / 1024 / 1024).toFixed(3) + 'TB';
+    }
+  } catch (error) {
+    console.error(error)
   }
   return cNum;
 }

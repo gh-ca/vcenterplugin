@@ -17,3 +17,11 @@
 <pre>form.value{{helper.print(form.value)}}</pre>
 <div>form.valid=>{{form.valid}}</div>
 <app-vmfs-create-faild-tips [partSuccessData]="partSuccessData"></app-vmfs-create-faild-tips>
+<div>
+  <div><input [(ngModel)]="firstData"></div>
+  <div><input [(ngModel)]="secondData"></div>
+  <div><input [(ngModel)]="thirdData"></div>
+</div>
+
+<!--<button [attr.disabled]="buttonDisableOrNot===false" (click)="log111">是否可以点击当前button</button>-->
+<button [disabled]="changeButtonAttr()">是否可以点击当前button</button>
