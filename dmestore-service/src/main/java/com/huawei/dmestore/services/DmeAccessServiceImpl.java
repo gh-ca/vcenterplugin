@@ -627,6 +627,8 @@ public class DmeAccessServiceImpl implements DmeAccessService {
                         hostgroupmap.put(ID_FIELD, ToolUtils.jsonToStr(jsonObject.get(ID_FIELD)));
                         hostgroupmap.put(NAME_FIELD, ToolUtils.jsonToStr(jsonObject.get(NAME_FIELD)));
                     }
+                }else {
+                    throw new DmeException("create hostgroup error,the DME return"+responseEntity);
                 }
             }
         } catch (DmeException e) {
