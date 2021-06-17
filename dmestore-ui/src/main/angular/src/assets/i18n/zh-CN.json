@@ -732,6 +732,7 @@
     "rdmSuccessMsg": "创建RDM成功!",
     "addTips": "注：当您需要在存储上创建新LUN，并用该LUN给虚拟机创建RDM盘时，使用该方式。如果想使用已有LUN创建，可直接在虚拟机硬件编辑中选择添加RDM磁盘。",
     "defaultStorage": "与虚拟机存储在同一目录中",
+    "storageStrategyNull":"步骤1（卷设置）所选择的位置数据（vmfs）未查询到可以用的DME存储策略，请选择存储/存储池方式创建RDM！",
     "compatibilityMode": {
       "name": "兼容模式",
       "virtualMode": "虚拟",
