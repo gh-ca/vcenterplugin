@@ -91,7 +91,7 @@ export class RdmComponent implements OnInit {
   ngOnInit(): void {
     this.loadStorageDevice();
     // this.loadHosts();
-    this.tierFresh();
+    // this.tierFresh();
     const ctx = this.gs.getClientSdk().app.getContextObjects();
     console.log(ctx);
     if (ctx != null) {
@@ -130,10 +130,11 @@ export class RdmComponent implements OnInit {
     };
 
     if (isMockData) {
-      handlerListservicelevelSuccess(mockData.SERVICELEVEL_LISTSERVICELEVEL);
+      // handlerListservicelevelSuccess(mockData.SERVICELEVEL_LISTSERVICELEVEL);
+      handlerListservicelevelSuccess([]);
     } else {
       this.http
-        .post('servicelevel/listservicelevel', {})
+        .get('servicelevel/listservicelevelByVmfs', {params:{dataStoreId:this.dataStoreObjectId}})
         .subscribe(handlerListservicelevelSuccess, handlerResponseErrorSimple);
     }
   }
@@ -152,6 +153,32 @@ export class RdmComponent implements OnInit {
     } else {
       this.serviceLevels = this.serviceLevelsRes;
     }
+  }
+
+  // 当前服务列表是否有数据
+  getStorageStrategy(){
+    if (this.serviceLevels.length===0){
+      return false
+    }else {
+      return true
+    }
+  }
+
+  //检查第二页是否可以进行下一步
+  checkTabs(valid){
+    if(this.levelCheck==='storage'){
+      return !valid
+    }else {
+      if(this.serviceLevels.length===0){
+        return valid
+      }else if(this.serviceLevelId===''){
+        return valid
+      }else {
+        return !valid
+      }
+    }
+
+
   }
 
   submit(): void {
@@ -399,6 +426,8 @@ export class RdmComponent implements OnInit {
    * add 下一页
    */
   addNextPage() {
+    // console.log(this.dataStoreObjectId)
+    this.tierFresh();
     this.wizard.next();
   }
 
@@ -867,10 +896,10 @@ export class RdmComponent implements OnInit {
           this.bandwidthLimitErr = bandwidthLimitErr;
           this.iopsLimitErr = iopsLimitErr;
 
-          /* 
-          
-          
-          
+          /*
+
+
+
           const qosTag = chooseStorage.storageTypeShow.qosTag
           if (qosTag == 1) {
             if (this.configModel.flagInfo.minBandwidthChoose && this.configModel.flagInfo.maxBandwidthChoose) {
@@ -907,8 +936,8 @@ export class RdmComponent implements OnInit {
           if (this.configModel.flagInfo.control_policyLower == undefined) {
             this.bandwidthLimitErr = false;
           }
-        
-        
+
+
           */
         }
       }

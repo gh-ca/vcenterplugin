@@ -732,6 +732,7 @@
     "rdmSuccessMsg": "Create RDM Success!",
     "addTips": "Note: Use this method when you need to create a new LUN on the storage and use the LUN to create an RDM disk for the virtual machine. If you want to use an existing LUN to create, you can directly choose to add RDM disks in the virtual machine hardware editor.",
     "defaultStorage": "Store with the virtual machine",
+    "storageStrategyNull": "The location data (vmfs) selected in step 1 (volume settings) has not been queried for available DME storage strategies, please select storage/storage pool method to create RDM!",
     "compatibilityMode": {
       "name": "Compatibility Mode",
       "virtualMode": "Virtual Mode",
