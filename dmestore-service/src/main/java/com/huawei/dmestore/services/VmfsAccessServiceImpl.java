@@ -4652,7 +4652,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                         for (String hostId : hostIds) {
                             Map<String, Object> dsmap = new HashMap<>();
                             dsmap.put(NAME_FIELD, dataStorageMap.get(dataStoreObjectId).get("dataStoreName"));
-                            vcsdkUtils.mountVmfsOnCluster(gson.toJson(dsmap), null, hostId);
+                            vcsdkUtils.mountVmfsOnClusterNew(gson.toJson(dsmap), null, hostId);
                         }
                     } catch (Exception e) {
                         //如果抛出异常，需要解除映射
@@ -4687,7 +4687,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                             try {
                                 Map<String, Object> dsmap = new HashMap<>();
                                 dsmap.put(NAME_FIELD, dataStorageMap.get(dataStoreObjectId).get("dataStoreName"));
-                                vcsdkUtils.mountVmfsOnCluster(gson.toJson(dsmap), null, hostid);
+                                vcsdkUtils.mountVmfsOnClusterNew(gson.toJson(dsmap), null, hostid);
                             } catch (Exception e) {
                                 //添加成功后挂载异常需要将主机移除主机组
                                 boolean flag = removeHostFromHostgroupNew(hostGroupId, Arrays.asList(hostid));
@@ -4716,7 +4716,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                             for (String hostId : independentHosts) {
                                 Map<String, Object> dsmap = new HashMap<>();
                                 dsmap.put(NAME_FIELD, dataStorageMap.get(dataStoreObjectId).get("dataStoreName"));
-                                vcsdkUtils.mountVmfsOnCluster(gson.toJson(dsmap), null, hostId);
+                                vcsdkUtils.mountVmfsOnClusterNew(gson.toJson(dsmap), null, hostId);
                             }
                         } catch (Exception e) {
                             //如果抛出异常，需要解除映射
@@ -4758,7 +4758,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                     Map<String, Object> dsmap = new HashMap<>();
                     dsmap.put(NAME_FIELD, dataStorageMap.get(dataStoreObjectId).get("dataStoreName"));
                     for (String cluster : clusterIds) {
-                        vcsdkUtils.mountVmfsOnCluster(gson.toJson(dsmap), cluster, null);
+                        vcsdkUtils.mountVmfsOnClusterNew(gson.toJson(dsmap), cluster, null);
                     }
                 }
             }
@@ -4789,7 +4789,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                             try {
                                 Map<String, Object> dsmap = new HashMap<>();
                                 dsmap.put(NAME_FIELD, dataStorageMap.get(dataStoreObjectId).get("dataStoreName"));
-                                vcsdkUtils.mountVmfsOnCluster(gson.toJson(dsmap), null, hostid);
+                                vcsdkUtils.mountVmfsOnClusterNew(gson.toJson(dsmap), null, hostid);
                             } catch (Exception e) {
                                 //添加成功后挂载异常需要将主机移除主机组
                                 boolean flag = removeHostFromHostgroupNew(hostGroupId, Arrays.asList(hostid));
@@ -4816,7 +4816,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                             for (String hostId : independentHosts) {
                                 Map<String, Object> dsmap = new HashMap<>();
                                 dsmap.put(NAME_FIELD, dataStorageMap.get(dataStoreObjectId).get("dataStoreName"));
-                                vcsdkUtils.mountVmfsOnCluster(gson.toJson(dsmap), null, hostId);
+                                vcsdkUtils.mountVmfsOnClusterNew(gson.toJson(dsmap), null, hostId);
                             }
                         } catch (Exception e) {
                             //如果抛出异常，需要解除映射
@@ -4849,7 +4849,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                     Map<String, Object> dsmap = new HashMap<>();
                     dsmap.put(NAME_FIELD, dataStorageMap.get(dataStoreObjectId).get("dataStoreName"));
                     for (String cluster : clusterIds) {
-                        vcsdkUtils.mountVmfsOnCluster(gson.toJson(dsmap), cluster, null);
+                        vcsdkUtils.mountVmfsOnClusterNew(gson.toJson(dsmap), cluster, null);
                     }
                 }
 
