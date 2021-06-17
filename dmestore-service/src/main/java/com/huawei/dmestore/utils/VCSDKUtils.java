@@ -2023,6 +2023,74 @@ public class VCSDKUtils {
             throw new VcenterException(e.getMessage());
         }
     }
+    public void mountVmfsOnClusterNew(String datastoreStr, String clusterObjectId, String hostObjectId)
+            throws VcenterException {
+        if (StringUtils.isEmpty(datastoreStr)) {
+            logger.info("datastoreStr is null");
+            return;
+        }
+        if (StringUtils.isEmpty(hostObjectId) && StringUtils.isEmpty(clusterObjectId)) {
+            logger.info("host:{} and cluster:{} is null", hostObjectId, clusterObjectId);
+            return;
+        }
+        Map<String, Object> dsmap = gson.fromJson(datastoreStr, new TypeToken<Map<String, Object>>() { }.getType());
+        String objHostName = "";
+        String objDataStoreName = "";
+        if (dsmap != null) {
+            objHostName = ToolUtils.getStr(dsmap.get(HOST_NAME));
+            objHostName = objHostName == null ? "" : objHostName;
+            objDataStoreName = ToolUtils.getStr(dsmap.get(NAME));
+        }
+        try {
+            String serverguid = null;
+            if (!StringUtils.isEmpty(clusterObjectId)) {
+                serverguid = vcConnectionHelpers.objectId2Serverguid(clusterObjectId);
+            } else if (!StringUtils.isEmpty(hostObjectId)) {
+                serverguid = vcConnectionHelpers.objectId2Serverguid(hostObjectId);
+            }
+            if (StringUtils.isEmpty(serverguid)) {
+                logger.error("mountVmfsOnCluster serverguid is null");
+                throw new VcenterException("mount vmfs on cluster error!serverguid is null");
+            }
+            VmwareContext vmwareContext = vcConnectionHelpers.getServerContext(serverguid);
+            if (!StringUtils.isEmpty(clusterObjectId)) {
+                logger.info("mount Vmfs to Cluster begin");
+                // 集群下的所有主机
+                List<Pair<ManagedObjectReference, String>> hosts = getHostsOnCluster(clusterObjectId, hostObjectId);
+                if (hosts != null && hosts.size() > 0) {
+                    for (Pair<ManagedObjectReference, String> host : hosts) {
+                        try {
+                            HostMo host1 = hostVmwareFactory.build(vmwareContext, host.first());
+                            logger.info("Host under Cluster: {}", host1.getName());
+
+                            // 只挂载其它的主机
+                            if (host1 != null && !objHostName.equals(host1.getName())) {
+                                mountVmfsNew(objDataStoreName, host1);
+                            }
+                        } catch (Exception e) {
+                            logger.error("mount Vmfs On Cluster error:{}", e.getMessage());
+                        }
+                    }
+                }
+            } else if (!StringUtils.isEmpty(hostObjectId)) {
+                try {
+                    logger.info("mount Vmfs to host begin");
+                    ManagedObjectReference objmor = vcConnectionHelpers.objectId2Mor(hostObjectId);
+                    HostMo hostmo = hostVmwareFactory.build(vmwareContext, objmor);
+
+                    // 只挂载其它的主机
+                    if (hostmo != null && !objHostName.equals(hostmo.getName())) {
+                        mountVmfsNew(objDataStoreName, hostmo);
+                    }
+                } catch (Exception e) {
+                    logger.error("mount Vmfs On Cluster error:{}", e.getMessage());
+                }
+            }
+        } catch (Exception e) {
+            logger.error("mount Vmfs On Cluster error:", e);
+            throw new VcenterException(e.getMessage());
+        }
+    }
 
     /**
      * 将vmfs从主机或集群上卸载
@@ -2135,6 +2203,42 @@ public class VCSDKUtils {
             // 挂载后重新扫描datastore
             logger.info("refreshStorageSystem after mount Vmfs!");
             hostMo.getHostStorageSystemMo().refreshStorageSystem();*/
+        } catch (Exception e) {
+            logger.error(" mount vmfs volume error!datastoreName={},error:{}", datastoreName, e.getMessage());
+        }
+    }
+
+    public void mountVmfsNew(String datastoreName, HostMo hostMo) {
+        try {
+            if (StringUtils.isEmpty(datastoreName)) {
+                logger.info("datastore Name is null");
+                return;
+            }
+            if (hostMo == null) {
+                logger.info("host info is null");
+                return;
+            }
+
+            // 挂载前重新扫描datastore
+            logger.info("refreshStorageSystem before mount Vmfs!");
+            hostMo.getHostStorageSystemMo().refreshStorageSystem();
+
+            // 查询目前未挂载的卷
+            for (HostFileSystemMountInfo mount : hostMo.getHostStorageSystemMo()
+                .getHostFileSystemVolumeInfo()
+                .getMountInfo()) {
+                if (mount.getVolume() instanceof HostVmfsVolume && datastoreName.equals(mount.getVolume().getName())) {
+                    HostVmfsVolume volume = (HostVmfsVolume) mount.getVolume();
+
+                    // 挂载卷
+                    hostMo.getHostStorageSystemMo().mountVmfsVolume(volume.getUuid());
+                    logger.info("mount Vmfs success!");
+                }
+            }
+
+            // 挂载后重新扫描datastore
+            logger.info("refreshStorageSystem after mount Vmfs!");
+            hostMo.getHostStorageSystemMo().refreshStorageSystem();
         } catch (Exception e) {
             logger.error(" mount vmfs volume error!datastoreName={},error:{}", datastoreName, e.getMessage());
         }
