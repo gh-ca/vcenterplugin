@@ -51,6 +51,21 @@ public class ServiceLevelController extends BaseController {
     }
 
     /**
+     * listServiceLevel
+     *
+     * @param dataStoreId dataStoreId
+     * @return ResponseBodyBean
+     */
+    @RequestMapping(value = "/listservicelevelByVmfs", method = RequestMethod.POST)
+    public ResponseBodyBean listServiceLevelByVmfs(@RequestParam String dataStoreId) {
+        try {
+            return success(serviceLevelService.listServiceLevelByVmfs(dataStoreId));
+        } catch (DmeException e) {
+            return failure(e.getMessage());
+        }
+    }
+
+    /**
      * listStoragePoolsByServiceLevelId
      *
      * @param serviceLevelId serviceLevelId
