@@ -56,7 +56,7 @@ public class ServiceLevelController extends BaseController {
      * @param dataStoreId dataStoreId
      * @return ResponseBodyBean
      */
-    @RequestMapping(value = "/listservicelevelByVmfs", method = RequestMethod.POST)
+    @RequestMapping(value = "/listservicelevelByVmfs", method = RequestMethod.GET)
     public ResponseBodyBean listServiceLevelByVmfs(@RequestParam String dataStoreId) {
         try {
             return success(serviceLevelService.listServiceLevelByVmfs(dataStoreId));
