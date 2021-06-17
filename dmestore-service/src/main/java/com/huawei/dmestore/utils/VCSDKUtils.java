@@ -1277,25 +1277,23 @@ public class VCSDKUtils {
             if (host1 != null && hdsMo != null && hostStorageSystemMo != null) {
                 ManagedObjectReference dataStoreMor = vcConnectionHelpers.objectId2Mor(storeObjectId);
                 DatastoreMo dsMo = datastoreVmwareMoFactory.build(vmwareContext, dataStoreMor);
+                //vmfs存储所在的设备名称
+                VmfsDatastoreInfo vmfsDatastoreInfo = dsMo.getVmfsDatastoreInfo();
+                HostScsiDiskPartition extent = vmfsDatastoreInfo.getVmfs().getExtent().get(0);
+                String deviceName = DISK_BASE_PATH + extent.getDiskName();
+                //vmfs当前容量分区信息
+                List<String> deviceNames = new ArrayList<>();
+                deviceNames.add(deviceName);
+                HostDiskPartitionInfo hostDiskPartitionInfo = hostStorageSystemMo.retrieveDiskPartitionInfo(deviceNames).get(0);
+                long currentEndSector = hostDiskPartitionInfo.getSpec().getPartition().get(0).getEndSector();
+                sectors.put(ToolUtils.CURRENT_END_SECTOR, currentEndSector);
                 List<VmfsDatastoreOption> vmfsDatastoreOptions = hdsMo.queryVmfsDatastoreExpandOptions(dsMo);
                 if (vmfsDatastoreOptions != null && vmfsDatastoreOptions.size() > 0) {
-                    //vmfs存储所在的设备名称
-                    VmfsDatastoreInfo vmfsDatastoreInfo = dsMo.getVmfsDatastoreInfo();
-                    HostScsiDiskPartition extent = vmfsDatastoreInfo.getVmfs().getExtent().get(0);
-                    String deviceName = DISK_BASE_PATH + extent.getDiskName();
-                    //vmfs当前容量分区信息
-                    List<String> deviceNames = new ArrayList<>();
-                    deviceNames.add(deviceName);
-                    HostDiskPartitionInfo hostDiskPartitionInfo = hostStorageSystemMo.retrieveDiskPartitionInfo(deviceNames).get(0);
-                    long currentEndSector = hostDiskPartitionInfo.getSpec().getPartition().get(0).getEndSector();
                     //vmfs所在设备总分区信息
                     VmfsDatastoreOption vmfsDatastoreOption = vmfsDatastoreOptions.get(0);
                     VmfsDatastoreExpandSpec spec = (VmfsDatastoreExpandSpec) vmfsDatastoreOption.getSpec();
                     long totalEndSector = spec.getPartition().getPartition().get(0).getEndSector();
-                    sectors.put(ToolUtils.CURRENT_END_SECTOR, currentEndSector);
                     sectors.put(ToolUtils.TOTAL_END_SECTOR, totalEndSector);
-                } else {
-                    logger.error("query vmfs Datastore Options error!{}", vmfsDatastoreOptions.size());
                 }
             } else {
                 logger.info("host1 is null:{}, hdsMo is null:{}", host1 == null, hdsMo == null);
