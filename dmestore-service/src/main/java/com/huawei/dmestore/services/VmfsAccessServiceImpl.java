@@ -4713,6 +4713,9 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                     List<String> unmappingAndNomalHostids = getUnmappingAndNomalHost(hostGroupVolumid,objHostIds);
                     Map<String, List<String>> mappingResult1 = lunMappingToHostOrHostgroupNew(Arrays.asList(hostGroupVolumid), unmappingAndNomalHostids, null);
                     List<String> mappedHostid = mappingResult1.get("hostMapped");
+                    if(!CollectionUtils.isEmpty(objHostIds) && CollectionUtils.isEmpty(unmappingAndNomalHostids)){
+                        mappedHostid = objHostIds;
+                    }
                     if (!CollectionUtils.isEmpty(mappedHostid)) {
                         try {
                             for (String hostId : independentHosts) {
@@ -4868,7 +4871,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         if (!CollectionUtils.isEmpty(attachmentList)){
             for (Attachment attach : attachmentList) {
                 if (!StringUtils.isEmpty(StringUtil.dealQuotationMarks(attach.getHostId()))) {
-                    mappedHostid.add(attach.getHostId());
+                    mappedHostid.add(StringUtil.dealQuotationMarks(attach.getHostId()));
                 }
             }
         }
