@@ -95,6 +95,10 @@
       <!-- 1、选择 服务等级-->
       <ng-container *ngIf="levelCheck==='level'">
         <div [hidden]="dmeStrategy" class="errorTips" readonly><clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{'rdm.storageStrategyNull' | translate}}</div>
+        <div [hidden]="dmeStrategy" class="noData" readonly>
+          <div class="noDataSvg"></div>
+          <span>{{'tips.noData'|translate}}</span>
+        </div>
         <clr-accordion>
           <clr-accordion-panel  (click)="serviceLevelClick(item.id);" *ngFor="let item of serviceLevels;" style="margin-top: 20px;" >
             <clr-accordion-title  style="height: 50px; line-height: 50px;color: #333;font-size:16px;">{{item.name}}</clr-accordion-title>

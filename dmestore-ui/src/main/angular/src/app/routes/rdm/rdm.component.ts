@@ -133,7 +133,7 @@ export class RdmComponent implements OnInit {
     };
 
     if (isMockData) {
-      handlerListservicelevelSuccess(mockData.SERVICELEVEL_LISTSERVICELEVEL);
+      // handlerListservicelevelSuccess(mockData.SERVICELEVEL_LISTSERVICELEVEL);
       handlerListservicelevelSuccess({code:'200',data:[]});
     } else {
       this.http
