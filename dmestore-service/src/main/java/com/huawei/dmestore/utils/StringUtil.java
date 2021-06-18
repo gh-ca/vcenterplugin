@@ -1,5 +1,7 @@
 package com.huawei.dmestore.utils;
 
+import org.springframework.util.StringUtils;
+
 import java.nio.charset.Charset;
 
 
@@ -43,5 +45,13 @@ public class StringUtil {
 
     public static boolean isNotBlank(String str) {
         return !isBlank(str);
+    }
+
+    public static String  dealQuotationMarks(String str){
+        String result = null;
+        if (!StringUtils.isEmpty(str) && str.startsWith("\"") && str.endsWith("\"")){
+            result = str.substring(1, str.length() - 1);
+        }
+        return result;
     }
 }
