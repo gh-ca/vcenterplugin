@@ -282,7 +282,7 @@ public class VmfsAccessController extends BaseController {
             CreateVmfsResponse result = vmfsAccessService.createVmfsNew(params);
             if (result.getSuccessNo() == 0) {
                 return failure("create vmfs failure!",result);
-            }else if (result.getFailNo() != 0){
+            }else if (result.getFailNo() != 0 || !CollectionUtils.isEmpty(result.getConnectionResult())){
                 return partialSuccess(result,"create vmfs partial success!");
             }else {
                 return success(result, "create vmfs success");
