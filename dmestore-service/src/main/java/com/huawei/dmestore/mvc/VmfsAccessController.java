@@ -142,7 +142,6 @@ public class VmfsAccessController extends BaseController {
             vmfsAccessService.unmountVmfs(params);
             return success(null, "unmount vmfs success");
         } catch (DmeException e) {
-            LOG.error("unmount vmfs failure:", e);
             failureStr = "unmount vmfs failure:" + e.getMessage();
         }
         return failure(failureStr);
