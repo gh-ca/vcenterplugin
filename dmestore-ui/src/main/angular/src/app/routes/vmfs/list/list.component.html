@@ -1222,6 +1222,7 @@
               [resType]="'mount'"
               [mountType]="selectMountType"
               [tree]="deviceList"
+              [vmfsMount]=true
               (valueChange)="handleChooseDeviceChange(this.addForm,'chooseDevice',$event)"> </app-gh-tree-checkbox>
 <!--            <app-error-tips [isShow]="!this.addForm.controls.chooseDevice.valid"-->
 <!--              [tips]="'validations.required' | translate"> </app-error-tips>-->
