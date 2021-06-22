@@ -320,6 +320,41 @@ public class VCSDKUtils {
         return listStr;
     }
 
+    /**
+     * 得到所有主机的ID与name
+     *
+     * @return String
+     * @throws VcenterException VcenterException
+     */
+    public List<Map<String,String>> getAllHosts2() throws VcenterException {
+        logger.info("get all hosts start");
+        List<Map<String, String>> lists = new ArrayList<>();
+        try {
+            VmwareContext[] vmwareContexts = vcConnectionHelpers.getAllContext();
+            for (VmwareContext context : vmwareContexts) {
+                RootFsMo rootFsMo = rootVmwareMoFactory.build(context, context.getRootFolder());
+                List<Pair<ManagedObjectReference, String>> hosts = rootFsMo.getAllHostOnRootFs();
+                if (hosts != null && hosts.size() > 0) {
+                    for (Pair<ManagedObjectReference, String> host : hosts) {
+                        HostMo host1 = hostVmwareFactory.build(context, host.first());
+                        Map<String, String> map = new HashMap<>();
+                        String objectId = vcConnectionHelpers.mor2ObjectId(host1.getMor(), context.getServerAddress());
+                        map.put(HOST_ID, objectId);
+                        map.put(OBJECT_ID, objectId);
+                        map.put(HOST_NAME, host1.getName());
+                        lists.add(map);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            logger.error("getAllHosts error:{}", e.getMessage());
+            throw new VcenterException(e.getLocalizedMessage());
+        }
+        logger.info("get all hosts end");
+        return lists;
+    }
+
+
     public String findHostById(String objectId) throws VcenterException {
         String hostlist = "";
         try {
