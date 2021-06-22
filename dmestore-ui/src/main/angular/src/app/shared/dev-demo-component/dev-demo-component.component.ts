@@ -73,11 +73,11 @@ export class DevDemoComponentComponent implements OnInit {
   initForm() {
     //模拟返回数据
     this.partSuccessData={
-      code:"-99999",
+      code:"206",
       data:{
         successNo:2,
         failNo:1,
-        connectionResult:["10.12.22.167"],
+        connectionResult:["10.12.22.167","10.13.23.123"],
         descriptionEN:"loream....",
         descriptionCN:"这里有一段内容"
       }
@@ -149,7 +149,8 @@ export class DevDemoComponentComponent implements OnInit {
     this.form.patchValue({ [prop]: val });
   }
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+  }
   // ngDoCheck() {
   //   this.changeButtonAttr()
   // }

@@ -306,6 +306,7 @@
       "success": "Successfully mounted!"
     },
     "del": {
+      "warning": "Dangerous operation: the association relationship between the storage and the host will be removed, and the mapping relationship between the volume and the host will be removed at the same time!",
       "title": "Tips",
       "content": "Are you sure to delete?",
       "success": "successfully deleted!"
@@ -892,7 +893,10 @@
     "cantChangeServiceLevel": "This device is a Custom type and does not support DME Storage Strategy change operation!",
     "iposMaxMinTips": "Can only be an integer from 1 to 999999999.",
     "nfsSecurityTips": "To use Kerberos authentication, each host that mounts this datastore has to be a part of an Active Directory domain and its NFS authentication credentials need to be set. This is done on the Authentication Services page on each host.",
-    "errorDetailMessage": "Number of successful additions：{{partSuccess}}, Number of failed additions：{{partFail}}.",
+    "errorDetailMessage": "Part of the storage is added successfully：{{partSuccess}}",
+    "errorDetailFailMessage": "Part of the storage failed to add：",
+    "errorDescription": "Description of failure reason：",
+    "HostConnectionFail": "Launcher is not online!",
     "connectionFailMessage": "The following are the hosts that failed to connect to the host："
   },
   "page": {

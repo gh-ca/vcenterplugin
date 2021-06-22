@@ -3,6 +3,7 @@ import { ClrSelectedState } from '@clr/angular';
 import { ValidatorFn } from '@angular/forms';
 import { FormControl, ValidationErrors } from '@angular/forms';
 import { getLodash } from './shared/lib';
+import {host} from "@angular-devkit/build-angular/src/test-utils";
 
 export const _ = getLodash();
 
@@ -270,6 +271,56 @@ export type VMFS_CLUSTER_NODE = {
   selected?: number;
 };
 
+export function vmfsGetSelectedFromTree(clusterArray: VMFS_CLUSTER_NODE[]){
+  let result = [];
+  let selectedCluster: any = false;
+  let count=0
+  /* 一旦选择一个集群，只能该集权 */
+  /* 一旦选择一个主机，只能该主机所在集群 */
+  for (const clusterNode of clusterArray) {
+
+      if (String(clusterNode.selected) === String(ClrSelectedState.SELECTED)) {
+        for (let hostNode of clusterNode.children){
+          if (String(hostNode.flag)==='false'){
+            // const _node=clusterNode
+            // if (!selectedCluster) {
+            //   selectedCluster = clusterNode;
+            //
+            count++
+          }
+        }
+        if (count===0){
+          const _node = _.omit(clusterNode, ['children']);
+          // _node['deviceType'] = 'cluster';
+          result.push(_node);
+          // console.log(result)
+          if (!selectedCluster) {
+            selectedCluster = clusterNode;
+          }
+          continue;
+        }
+      }
+
+    if (clusterNode.children && clusterNode.children.length > 0) {
+      for (const hostNode of clusterNode.children) {
+        if (String(hostNode.selected) === String(ClrSelectedState.SELECTED)) {
+          if(hostNode.flag!==false){
+            const _node = _.omit(hostNode, ['children']);
+            // _node['deviceType'] = 'host';
+            if (!selectedCluster) {
+              selectedCluster = clusterNode;
+            }
+            result.push(_node);
+          }
+
+          // console.log(result)
+        }
+      }
+    }
+  }
+  return result
+}
+
 /**
  * @Description vmfs 集群 主机 树 第一层是集群 第二层是主机
  * 选了集群只传集群，
@@ -306,6 +357,7 @@ export function getSelectedFromTree(clusterArray: VMFS_CLUSTER_NODE[], resType =
         continue;
       }
     }
+
 
     if (clusterNode.children && clusterNode.children.length > 0) {
       for (const hostNode of clusterNode.children) {
