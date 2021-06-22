@@ -4652,7 +4652,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                         for (String hostId : hostIds) {
                             Map<String, Object> dsmap = new HashMap<>();
                             dsmap.put(NAME_FIELD, dataStorageMap.get(dataStoreObjectId).get("dataStoreName"));
-                            vcsdkUtils.mountVmfsOnCluster(gson.toJson(dsmap), null, hostId);
+                            vcsdkUtils.mountVmfsOnClusterNew(gson.toJson(dsmap), null, hostId);
                         }
                     } catch (Exception e) {
                         //如果抛出异常，需要解除映射
@@ -4687,7 +4687,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                             try {
                                 Map<String, Object> dsmap = new HashMap<>();
                                 dsmap.put(NAME_FIELD, dataStorageMap.get(dataStoreObjectId).get("dataStoreName"));
-                                vcsdkUtils.mountVmfsOnCluster(gson.toJson(dsmap), null, hostid);
+                                vcsdkUtils.mountVmfsOnClusterNew(gson.toJson(dsmap), null, hostid);
                             } catch (Exception e) {
                                 //添加成功后挂载异常需要将主机移除主机组
                                 boolean flag = removeHostFromHostgroupNew(hostGroupId, Arrays.asList(hostid));
@@ -4709,14 +4709,19 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                     paraMap.put(STORAGE_ID, dataStorageMap.get(dataStoreObjectId).get("storageId"));
                     Map<String, List<String>> hostStatusMap1 = checkHostNewNoCheckCluster(paraMap, allinitionators, chooseDeviceNew);
                     List<String> objHostIds = hostStatusMap1.get("nomalHost");
-                    Map<String, List<String>> mappingResult1 = lunMappingToHostOrHostgroupNew(Arrays.asList(hostGroupVolumid), objHostIds, null);
+                    //增加查询lun对应的已经映射的主机，映射之前从连通性正常的主机组中移除已经映射的主机
+                    List<String> unmappingAndNomalHostids = getUnmappingAndNomalHost(hostGroupVolumid,objHostIds);
+                    Map<String, List<String>> mappingResult1 = lunMappingToHostOrHostgroupNew(Arrays.asList(hostGroupVolumid), unmappingAndNomalHostids, null);
                     List<String> mappedHostid = mappingResult1.get("hostMapped");
+                    if(!CollectionUtils.isEmpty(objHostIds) && CollectionUtils.isEmpty(unmappingAndNomalHostids)){
+                        mappedHostid = objHostIds;
+                    }
                     if (!CollectionUtils.isEmpty(mappedHostid)) {
                         try {
                             for (String hostId : independentHosts) {
                                 Map<String, Object> dsmap = new HashMap<>();
                                 dsmap.put(NAME_FIELD, dataStorageMap.get(dataStoreObjectId).get("dataStoreName"));
-                                vcsdkUtils.mountVmfsOnCluster(gson.toJson(dsmap), null, hostId);
+                                vcsdkUtils.mountVmfsOnClusterNew(gson.toJson(dsmap), null, hostId);
                             }
                         } catch (Exception e) {
                             //如果抛出异常，需要解除映射
@@ -4758,7 +4763,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                     Map<String, Object> dsmap = new HashMap<>();
                     dsmap.put(NAME_FIELD, dataStorageMap.get(dataStoreObjectId).get("dataStoreName"));
                     for (String cluster : clusterIds) {
-                        vcsdkUtils.mountVmfsOnCluster(gson.toJson(dsmap), cluster, null);
+                        vcsdkUtils.mountVmfsOnClusterNew(gson.toJson(dsmap), cluster, null);
                     }
                 }
             }
@@ -4789,7 +4794,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                             try {
                                 Map<String, Object> dsmap = new HashMap<>();
                                 dsmap.put(NAME_FIELD, dataStorageMap.get(dataStoreObjectId).get("dataStoreName"));
-                                vcsdkUtils.mountVmfsOnCluster(gson.toJson(dsmap), null, hostid);
+                                vcsdkUtils.mountVmfsOnClusterNew(gson.toJson(dsmap), null, hostid);
                             } catch (Exception e) {
                                 //添加成功后挂载异常需要将主机移除主机组
                                 boolean flag = removeHostFromHostgroupNew(hostGroupId, Arrays.asList(hostid));
@@ -4816,7 +4821,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                             for (String hostId : independentHosts) {
                                 Map<String, Object> dsmap = new HashMap<>();
                                 dsmap.put(NAME_FIELD, dataStorageMap.get(dataStoreObjectId).get("dataStoreName"));
-                                vcsdkUtils.mountVmfsOnCluster(gson.toJson(dsmap), null, hostId);
+                                vcsdkUtils.mountVmfsOnClusterNew(gson.toJson(dsmap), null, hostId);
                             }
                         } catch (Exception e) {
                             //如果抛出异常，需要解除映射
@@ -4849,7 +4854,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                     Map<String, Object> dsmap = new HashMap<>();
                     dsmap.put(NAME_FIELD, dataStorageMap.get(dataStoreObjectId).get("dataStoreName"));
                     for (String cluster : clusterIds) {
-                        vcsdkUtils.mountVmfsOnCluster(gson.toJson(dsmap), cluster, null);
+                        vcsdkUtils.mountVmfsOnClusterNew(gson.toJson(dsmap), cluster, null);
                     }
                 }
 
@@ -4857,6 +4862,33 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         }
         return null;
     }
+
+
+    private List<String> getUnmappingAndNomalHost(String hostGroupVolumid, List<String> objHostIds) throws DmeException {
+        //首选根据卷id查询卷已经隐射的主机id
+        List<Attachment> attachmentList = findMappedHostsAndClusters(hostGroupVolumid);
+        List<String> mappedHostid = new ArrayList<>();
+        if (!CollectionUtils.isEmpty(attachmentList)){
+            for (Attachment attach : attachmentList) {
+                if (!StringUtils.isEmpty(StringUtil.dealQuotationMarks(attach.getHostId()))) {
+                    mappedHostid.add(StringUtil.dealQuotationMarks(attach.getHostId()));
+                }
+            }
+        }
+        List<String> unMappedAndNomalHostIds = new ArrayList<>();
+        if (!CollectionUtils.isEmpty(mappedHostid)){
+            //将已经映射的主机id从主机中剔除
+            for (String hostId : objHostIds) {
+                if (!mappedHostid.contains(hostId)){
+                    unMappedAndNomalHostIds.add(hostId);
+                }
+            }
+        }else {
+            unMappedAndNomalHostIds = objHostIds;
+        }
+        return  unMappedAndNomalHostIds;
+    }
+
 
     private List<String> getIndependentHosts(List<String> hostIds, List<String> nonIndependentHosts) {
         List<String> independentHosts = new ArrayList<>();
