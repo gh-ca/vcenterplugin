@@ -909,7 +909,7 @@ public class VCSDKUtils {
                 }
             }
         } catch (Exception ex) {
-            logger.error("vmware  getMountDataStore by slusterObjI derror:{}", ex.getMessage());
+            logger.error("vmware getMountDataStore by slusterObjI derror:{}", ex.getMessage());
             throw ex;
         }
         return listStr;

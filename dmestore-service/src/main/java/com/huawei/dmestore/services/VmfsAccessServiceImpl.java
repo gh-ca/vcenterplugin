@@ -2279,16 +2279,18 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             if (dataStoreObjectIds.size() > 0) {
                 List<String> dataStoreNames = new ArrayList<>();
                 //Map<String, String> storeToHost = new HashMap<>();
+                List<String> bounds = new ArrayList<>();
                 for (String dsObjectId : dataStoreObjectIds) {
-                    boolean isFoundVm = vcsdkUtils.hasVmOnDatastore(dsObjectId);
-                    if (isFoundVm) {
-                        LOG.info("vmfs unmount,the vmfs:{} contain vm,can not unmount!!!", dsObjectId);
-                        continue;
-                    }
                     DmeVmwareRelation dvr = dmeVmwareRalationDao.getDmeVmwareRelationByDsId(dsObjectId);
                     if (dvr == null) {
                         scanVmfs();
                         dvr = dmeVmwareRalationDao.getDmeVmwareRelationByDsId(dsObjectId);
+                    }
+                    boolean isFoundVm = vcsdkUtils.hasVmOnDatastore(dsObjectId);
+                    if (isFoundVm) {
+                        bounds.add(dvr.getStoreName());
+                        LOG.error("vmfs unmount,the vmfs:{} contain vm,can not unmount!!!", dsObjectId);
+                        continue;
                     }
                     if (dvr != null) {
                         volumeIds.add(dvr.getVolumeId());
@@ -2299,10 +2301,10 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                     params.put(VOLUMEIDS, volumeIds);
                     params.put(DATASTORE_NAMES, dataStoreNames);
                 } else {
-                    throw new DmeException("query datastore relation table,volume ids is null: {" + dataStoreObjectIds + "}");
+                    throw new DmeException("the vmfs:"+bounds+" contain virtual machine,can not unmount!");
                 }
             } else {
-                throw new DmeException("unmount volume params dataStoreObjectIds is null!");
+                throw new DmeException("unmount volume params datastore ids is null!");
             }
         }
         List<String> dmeHostIds = new ArrayList<>();
@@ -2361,22 +2363,19 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             }
         }
         // 获取卸载的任务完成后的状态,默认超时时间10分钟
-        boolean isUnmounted = false;
+        boolean isUnmounted = true;
         if (taskIds.size() > 0) {
             isUnmounted = taskService.checkTaskStatus(taskIds);
-        } else {
-            isUnmounted = true;
         }
+        // 若卸载vmfs上的全部主机或集群 最后重新扫描 此步会自动删除vmfs
         if (!isUnmounted) {
             throw new DmeException(
                     "unmount volume precondition unmount host and hostGroup error(task status),taskIds:(" + gson.toJson(
                             taskIds) + ")!");
-        } else {
-            // 若卸载vmfs上的全部主机或集群 最后重新扫描 此步会自动删除vmfs
-            if (!CollectionUtils.isEmpty(hostObjIds)) {
-                for (String hostId : hostObjIds) {
-                    vcsdkUtils.scanDataStore(null, hostId);
-                }
+        }
+        if (isUnmounted && !CollectionUtils.isEmpty(hostObjIds)) {
+            for (String hostId : hostObjIds) {
+                vcsdkUtils.scanDataStore(null, hostId);
             }
         }
     }
@@ -2943,13 +2942,8 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             if (!CollectionUtils.isEmpty(dataStoreObjectIds)) {
                 List<String> volumeIds = new ArrayList<>();
                 List<String> dataStoreNames = new ArrayList<>();
+                List<String> bounds = new ArrayList<>();
                 for (String dsObjectId : dataStoreObjectIds) {
-                    // 如果dsObject包含虚拟机 则不能删除
-                    boolean isFoundVm = vcsdkUtils.hasVmOnDatastore(dsObjectId);
-                    if (isFoundVm) {
-                        LOG.info("vmfs delete,the vmfs:{} contain vm,can not delete!!!", dsObjectId);
-                        continue;
-                    }
                     DmeVmwareRelation dvr = null;
                     try {
                         dvr = dmeVmwareRalationDao.getDmeVmwareRelationByDsId(dsObjectId);
@@ -2960,22 +2954,26 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                         scanVmfs();
                         dvr = dmeVmwareRalationDao.getDmeVmwareRelationByDsId(dsObjectId);
                     }
+                    // 如果dsObject包含虚拟机 则不能删除
+                    boolean isFoundVm = vcsdkUtils.hasVmOnDatastore(dsObjectId);
+                    if (isFoundVm) {
+                        bounds.add(dvr.getStoreName());
+                        LOG.info("vmfs delete,the vmfs:{} contain vm,can not delete!!!", dsObjectId);
+                        continue;
+                    }
+
                     if (dvr != null) {
                         volumeIds.add(dvr.getVolumeId());
                         dataStoreNames.add(dvr.getStoreName());
                         dataStorageIds.add(dsObjectId);
                     }
                 }
-                if (volumeIds.size() > 0) {
+                if (!CollectionUtils.isEmpty(volumeIds)) {
                     params.put(VOLUMEIDS, volumeIds);
                     params.put(DATASTORE_NAMES, dataStoreNames);
-                }
-                // 没有满足条件的datastore 直接返回taskids(size=0)
-                if (dataStorageIds.size() == 0) {
-                    LOG.info("vmfs delete,all vmfs contain vm,can not delete!!!");
-                    return taskIds;
-                } else {
                     params.put(DATASTORE_OBJECT_IDS, dataStorageIds);
+                }else {
+                    throw new DmeException("the vmfs:" + bounds + " contain virtual machine,can not unmount!");
                 }
             }
             // dme 侧解除关联
@@ -2997,7 +2995,6 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 taskService.checkTaskStatus(unmountTaskIds);
             }
         } catch (DmeException | InterruptedException e) {
-            LOG.error("delete volume precondition unmapping host and hostGroup error!");
             throw new DmeException(e.getMessage());
         }
 
