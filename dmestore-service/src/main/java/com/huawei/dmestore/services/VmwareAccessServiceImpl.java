@@ -324,6 +324,23 @@ public class VmwareAccessServiceImpl implements VmwareAccessService {
         return clusterTreeList;
     }
 
+    public List<ClusterTree> getMountableHostList(List<Map<String, String>> vmwarehostlists,List<String> mountedHostId ) {
+        List<ClusterTree> clusterTreeList = new ArrayList<>();
+        if (!CollectionUtils.isEmpty(vmwarehostlists)){
+            for (Map<String, String> map : vmwarehostlists) {
+                ClusterTree clusterTree = new ClusterTree();
+                clusterTree.setClusterId(map.get("hostId"));
+                clusterTree.setClusterName(map.get("hostName"));
+                if (!CollectionUtils.isEmpty(mountedHostId) && mountedHostId.contains(map.get("hostId"))) {
+                    clusterTree.setFlag(false);
+                }else {
+                    clusterTree.setFlag(true);
+                }
+                clusterTreeList.add(clusterTree);
+            }
+        }
+        return clusterTreeList;
+    }
     /**
      * @Description: 挂载页面查询可挂载的主机和集群
      * @Param @param null
@@ -335,7 +352,7 @@ public class VmwareAccessServiceImpl implements VmwareAccessService {
     @Override
     public List<ClusterTree> getClustersAndHostsByDsObjectIdNew(String dataStoreObjectId) throws DmeException {
         List<String> mountedHostId = null;
-        List<String> clusteridList = null;
+        List<String> clusteridList = new ArrayList<>();
         List<Map<String, String>> hostList = new ArrayList<>();
         List<Map<String, String>> clusterList = new ArrayList<>();
         List<ClusterTree> treeList = new ArrayList<>();
@@ -346,7 +363,6 @@ public class VmwareAccessServiceImpl implements VmwareAccessService {
             //3.获取所有集群
             // 取得vcenter中的所有host。
             String hostListStr = vcsdkUtils.getAllHosts();
-            clusteridList = vcsdkUtils.getAllClusterIds();
             if (!StringUtils.isEmpty(hostListStr)) {
                 hostList = gson.fromJson(hostListStr, new TypeToken<List<Map<String, String>>>() {
                 }.getType());
@@ -355,6 +371,11 @@ public class VmwareAccessServiceImpl implements VmwareAccessService {
             if (!StringUtils.isEmpty(clusterListStr)) {
                 clusterList = gson.fromJson(clusterListStr, new TypeToken<List<Map<String, String>>>() {
                 }.getType());
+                if (!CollectionUtils.isEmpty(clusterList)){
+                    for (Map<String, String> map : clusterList) {
+                        clusteridList.add(map.get("clusterId"));
+                    }
+                }
             }
         } catch (Exception e) {
             LOG.error("get all mountable hosts and clusters by  datastoreobjectid error:", e);
@@ -369,8 +390,8 @@ public class VmwareAccessServiceImpl implements VmwareAccessService {
                 if (!CollectionUtils.isEmpty(clusteridList)) {
                     for (String clusterid : clusteridList) {
                         List<String> hosts = vcsdkUtils.getHostidsOnCluster(clusterid);
-                        if ((!CollectionUtils.isEmpty(hosts) && hosts.contains(hostidMap.get(HOST_ID)))
-                                || (!CollectionUtils.isEmpty(mountedHostId) && mountedHostId.contains(hostidMap.get(HOST_ID)))) {
+                        if (!CollectionUtils.isEmpty(hosts) && hosts.contains(hostidMap.get(HOST_ID))){
+                               // || (!CollectionUtils.isEmpty(mountedHostId) && mountedHostId.contains(hostidMap.get(HOST_ID)))) {
                             temp.remove(hostidMap.get(HOST_ID));
                         }
                     }
@@ -382,6 +403,11 @@ public class VmwareAccessServiceImpl implements VmwareAccessService {
                 ClusterTree clusterTree = new ClusterTree();
                 clusterTree.setClusterId(temp.get(key).get(HOST_ID));
                 clusterTree.setClusterName(temp.get(key).get(HOST_NAME));
+                if(!CollectionUtils.isEmpty(mountedHostId) && mountedHostId.contains(temp.get(key).get(HOST_ID))) {
+                    clusterTree.setFlag(false);
+                }else {
+                    clusterTree.setFlag(true);
+                }
                 treeList.add(clusterTree);
             }
         }
@@ -398,17 +424,20 @@ public class VmwareAccessServiceImpl implements VmwareAccessService {
                 }
                 if (!CollectionUtils.isEmpty(vmwarehostlists)) {
                     temp = getHostTempList(vmwarehostlists);
-                    for (Map<String, String> hostMap : vmwarehostlists) {
+                   /* for (Map<String, String> hostMap : vmwarehostlists) {
                         if (!CollectionUtils.isEmpty(mountedHostId) && mountedHostId.contains(hostMap.get(HOST_ID))) {
                             temp.remove(hostMap.get(HOST_ID));
                         }
-                    }
+                    }*/
                     List<Map<String, String>> tempHostInfo = new ArrayList<>(temp.values());
-                    List<ClusterTree> hostListTmp = getHostList(tempHostInfo);
+                    List<ClusterTree> hostListTmp = getMountableHostList(tempHostInfo,mountedHostId);
                     if (!CollectionUtils.isEmpty(hostListTmp)) {
                         clusterTree.setClusterId(map.get("clusterId"));
                         clusterTree.setClusterName(map.get("clusterName"));
                         clusterTree.setChildren(hostListTmp);
+                        boolean flag = getFlag(hostListTmp);
+                        clusterTree.setFlag(flag);
+
                     }
                     if (!StringUtils.isEmpty(clusterTree.getClusterId())) {
                         treeList.add(clusterTree);
@@ -419,6 +448,19 @@ public class VmwareAccessServiceImpl implements VmwareAccessService {
 
         return treeList;
     }
+
+    private boolean getFlag(List<ClusterTree> hostListTmp) {
+        boolean flag = false;
+        if (!CollectionUtils.isEmpty(hostListTmp)){
+            for (ClusterTree clusterTree : hostListTmp) {
+               if( clusterTree.isFlag()){
+                    return  true;
+                }
+            }
+        }
+        return flag;
+    }
+
     /**
       * @Description: 获取可挂载的主机数据
       * @Param @param null
