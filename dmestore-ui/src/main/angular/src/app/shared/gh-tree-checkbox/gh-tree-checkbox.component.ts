@@ -7,7 +7,7 @@ import {
   ChangeDetectorRef,
   SimpleChange,
 } from '@angular/core';
-import { getSelectedFromTree, helper, VMFS_CLUSTER_NODE } from 'app/app.helpers';
+import { getSelectedFromTree, helper, VMFS_CLUSTER_NODE ,vmfsGetSelectedFromTree} from 'app/app.helpers';
 import debounce from 'just-debounce';
 import { getLodash } from '@shared/lib';
 import { getVmfsCreateTreeFilterBySelect, getSelectedFromList } from './../../app.helpers';
@@ -25,6 +25,7 @@ export class GhTreeCheckboxComponent implements OnInit {
   @Input() isCreate: boolean;
   @Input() resType: string = 'normal';
   @Input() mountType:string;
+  @Input() vmfsMount:boolean;
   @Output() valueChange: EventEmitter<any>;
   treeValue;
   resValue;
@@ -55,7 +56,8 @@ export class GhTreeCheckboxComponent implements OnInit {
       this.resValue=this.resValue.map(i=>({
         ...i,
         deviceId:i.clusterId,
-        deviceName:i.clusterName
+        deviceName:i.clusterName,
+
       }));
       this.valueChange.emit(this.resValue);
     }, 300);
@@ -88,12 +90,20 @@ export class GhTreeCheckboxComponent implements OnInit {
       //   this.selectedHost = false;
       //   res = _.concat(res, listRes);
       // }
-
-      if (this.isTree) {
-        const treeRes = getSelectedFromTree(this.tree, this.resType,this.mountType);
-        this.selectedCluster = false;
-        res = _.concat(res, treeRes);
+      if (this.vmfsMount===true){
+        if (this.isTree) {
+          const treeRes = vmfsGetSelectedFromTree(this.tree);
+          this.selectedCluster = false;
+          res = _.concat(res, treeRes);
+        }
+      }else {
+        if (this.isTree) {
+          const treeRes = getSelectedFromTree(this.tree, this.resType,this.mountType);
+          this.selectedCluster = false;
+          res = _.concat(res, treeRes);
+        }
       }
+
 
       return res;
     } else {
@@ -118,4 +128,5 @@ export class GhTreeCheckboxComponent implements OnInit {
     this.cdr.detectChanges();
     return [];
   }
+
 }

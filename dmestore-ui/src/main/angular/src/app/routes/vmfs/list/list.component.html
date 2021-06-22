@@ -1222,6 +1222,7 @@
               [resType]="'mount'"
               [mountType]="selectMountType"
               [tree]="deviceList"
+              [vmfsMount]=true
               (valueChange)="handleChooseDeviceChange(this.addForm,'chooseDevice',$event)"> </app-gh-tree-checkbox>
 <!--            <app-error-tips [isShow]="!this.addForm.controls.chooseDevice.valid"-->
 <!--              [tips]="'validations.required' | translate"> </app-error-tips>-->
@@ -1251,6 +1252,7 @@
         {{'errorMsg.deleteError' | translate}}
       </div>
       <h3 class="modal-title modelTile">{{'vmfs.del.title' | translate}}</h3>
+      <div class="errorTips" readonly><clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{'vmfs.del.warning'|translate}}</div>
       <p>{{'vmfs.del.content' | translate}}</p>
     </div>
 

@@ -13,6 +13,7 @@ public class ClusterTree implements Serializable {
     private static final long serialVersionUID = 6756705875820791027L;
     private String clusterId;
     private String clusterName;
+    private boolean flag = true;
     private List<ClusterTree> children;
 
     public ClusterTree(String clusterId, String clusterName, List<ClusterTree> children) {
@@ -47,6 +48,14 @@ public class ClusterTree implements Serializable {
 
     public void setChildren(List<ClusterTree> children) {
         this.children = children;
+    }
+
+    public boolean isFlag() {
+        return flag;
+    }
+
+    public void setFlag(boolean flag) {
+        this.flag = flag;
     }
 
     @Override

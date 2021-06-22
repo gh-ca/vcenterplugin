@@ -306,6 +306,7 @@
       "success": "挂载成功！"
     },
     "del": {
+      "warning": "危险操作：将解除存储和主机之间的关联关系，同时解除卷和主机之间的映射关系!",
       "title": "提示",
       "content": "确认要删除吗?",
       "success": "删除成功！"
@@ -892,7 +893,10 @@
     "cantChangeServiceLevel": "该设备为自定义类型，不支持DME存储策略变更操作！",
     "iposMaxMinTips": "只能为1到999999999的整数。",
     "nfsSecurityTips": "要使用 Kerberos 身份验证，挂载此数据存储的每个主机都必须包含在 Active Directory 域中，并需要设置其 NFS 身份验证凭据。该过程在每个主机的“身份验证服务”页上完成。",
-    "errorDetailMessage": "添加成功个数：{{partSuccess}}，添加失败个数：{{partFail}}。",
+    "errorDetailMessage": "部分存储添加成功：{{partSuccess}}个",
+    "errorDetailFailMessage": "部分存储添加失败：",
+    "errorDescription": "失败原因描述：",
+    "HostConnectionFail": "启动器不在线!",
     "connectionFailMessage": "以下是主机连通失败的主机："
   },
   "page": {
