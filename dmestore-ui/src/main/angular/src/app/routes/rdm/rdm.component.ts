@@ -55,6 +55,8 @@ export class RdmComponent implements OnInit {
   submitLoading = false;
   rdmSuccess = false;
   rdmError = false;
+  //是否查询到DME存储设置
+  dmeStrategy=true;
 
   // 归属控制器 true 支持 false 不支持
   ownershipController = false;
@@ -126,12 +128,13 @@ export class RdmComponent implements OnInit {
           }
         }
         this.search();
+        this.getStorageStrategy()
       }
     };
 
     if (isMockData) {
       // handlerListservicelevelSuccess(mockData.SERVICELEVEL_LISTSERVICELEVEL);
-      handlerListservicelevelSuccess([]);
+      handlerListservicelevelSuccess({code:'200',data:[]});
     } else {
       this.http
         .get('servicelevel/listservicelevelByVmfs', {params:{dataStoreId:this.dataStoreObjectId}})
@@ -158,9 +161,9 @@ export class RdmComponent implements OnInit {
   // 当前服务列表是否有数据
   getStorageStrategy(){
     if (this.serviceLevels.length===0){
-      return false
+      this.dmeStrategy=false;
     }else {
-      return true
+      this.dmeStrategy=true;
     }
   }
 
