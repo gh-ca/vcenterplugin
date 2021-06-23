@@ -82,6 +82,7 @@ export class GhTreeCheckboxComponent implements OnInit {
 
   checkSelectedAndSetDisable() {
     /* 挂载可以跨集群 */
+    // debugger
     if (this.resType === 'mount') {
       let res = [];
 
@@ -92,7 +93,7 @@ export class GhTreeCheckboxComponent implements OnInit {
       // }
       if (this.vmfsMount===true){
         if (this.isTree) {
-          const treeRes = vmfsGetSelectedFromTree(this.tree);
+          const treeRes = vmfsGetSelectedFromTree(this.tree,this.mountType);
           this.selectedCluster = false;
           res = _.concat(res, treeRes);
         }
