@@ -12,6 +12,7 @@ const _ = getLodash();
 
 
 function isSingleHost(node) {
+  /* 没有children或者children length为0 */
   if (!node.children) return true;
   if (_.isArray(node.children) && node.children.length === 0) return true;
   return false;
@@ -161,7 +162,7 @@ zh:'一年' ,range:'LAST_1_YEAR',   interval:  "DAY"
 
         if (res.code === '200') {
           for( let firstNode of res.data){
-            if(!firstNode.children){
+            if(isSingleHost(firstNode)){
               firstNode.deviceType="host"
             }else{
               firstNode.deviceType="cluster"
