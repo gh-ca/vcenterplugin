@@ -11,7 +11,7 @@
 <clr-tree *ngIf="isTree">
   <clr-tree-node
     *clrRecursiveFor="let device of tree; getChildren: getChildren"
-    [class]="(selectedHost||!device.flag)?'disabled':''"
+    [class]="(selectedHost||!device.flag||device.isDisabled)?'disabled':''"
     (clrSelectedChange)="emitValueChange()"
     [(clrSelected)]="device.selected">
     <clr-icon [attr.shape]="device.deviceType==='host'?'host':'host-group'"></clr-icon>
