@@ -2634,7 +2634,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 List<String> hostgroupIds = new ArrayList<>();
                 for (Map<String, String> hostGroup : volumeRientedHost) {
                     String hostgroupId = hostGroup.get("attached_host_group");
-                    if (!StringUtils.isEmpty(hostgroupId)) {
+                    if (!StringUtils.isEmpty(hostgroupId) && !hostgroupIds.contains(hostgroupId)) {
                         hostgroupIds.add(hostgroupId);
                     }
                 }
@@ -2693,8 +2693,8 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
 
     private List<String> unMappingLunToHostGroup(List<String> taskIds, Map<String, List<String>> volumeMappedHostgroup, String storageId) throws DmeException, InterruptedException {
         Map<String, List<String>> unmappingParams = convertMap(volumeMappedHostgroup);
-        Map<String, Object> map = new HashMap<>();
         for (Map.Entry<String, List<String>> entry : unmappingParams.entrySet()) {
+            Map<String, Object> map = new HashMap<>();
             map.put(HOST_GROUP_ID1, entry.getKey());
             map.put(VOLUMEIDS, entry.getValue());
             if (!CollectionUtils.isEmpty(map)) {
@@ -2707,7 +2707,6 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 if (taskService.checkTaskStatus(taskIds) && isDelete) {
                     removeHostgroupGetTaskId(map);
                 }
-                map.clear();
             }
         }
         return taskIds;
