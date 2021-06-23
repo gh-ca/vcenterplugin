@@ -77,7 +77,7 @@ export class DevDemoComponentComponent implements OnInit {
       data:{
         successNo:2,
         failNo:1,
-        connectionResult:["10.12.22.167","10.13.23.123"],
+        connectionResult:[],
         descriptionEN:"loream....",
         descriptionCN:"这里有一段内容"
       }

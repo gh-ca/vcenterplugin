@@ -271,52 +271,75 @@ export type VMFS_CLUSTER_NODE = {
   selected?: number;
 };
 
-export function vmfsGetSelectedFromTree(clusterArray: VMFS_CLUSTER_NODE[]){
+export function vmfsGetSelectedFromTree(clusterArray: VMFS_CLUSTER_NODE[],mountType=''){
+  // debugger
   let result = [];
   let selectedCluster: any = false;
-  let count=0
+
   /* 一旦选择一个集群，只能该集权 */
   /* 一旦选择一个主机，只能该主机所在集群 */
   for (const clusterNode of clusterArray) {
-
+    let count=0;
+    let _node=clusterNode;
+    if (clusterNode.children && clusterNode.children.length > 0) {
       if (String(clusterNode.selected) === String(ClrSelectedState.SELECTED)) {
-        for (let hostNode of clusterNode.children){
-          if (String(hostNode.flag)==='false'){
-            // const _node=clusterNode
-            // if (!selectedCluster) {
-            //   selectedCluster = clusterNode;
-            //
+        for(let hostNode of clusterNode.children) {
+          if (String(hostNode.flag) === 'false') {
             count++
           }
         }
-        if (count===0){
-          const _node = _.omit(clusterNode, ['children']);
-          // _node['deviceType'] = 'cluster';
-          result.push(_node);
-          // console.log(result)
-          if (!selectedCluster) {
-            selectedCluster = clusterNode;
+        // debugger
+        if(mountType==='host'){
+           (_node as any)=clusterNode
+        }else {
+          if(count===0){
+             (_node as any) = _.omit(clusterNode, ['children']);
+                // (_node as any)['deviceType'] = 'cluster';
+                result.push((_node));
+          }else {
+             (_node as any)=clusterNode
           }
-          continue;
         }
+        //   for (let hostNode of clusterNode.children) {
+        //     if (String(hostNode.flag) === 'false') {
+        //       // const _node=clusterNode
+        //       // if (!selectedCluster) {
+        //       //   selectedCluster = clusterNode;
+        //       //
+        //       count++
+        //     }
+        //   }
+        //   if (count === 0) {
+        //     const _node = _.omit(clusterNode, ['children']);
+        //     // _node['deviceType'] = 'cluster';
+        //     result.push(_node);
+        //     // console.log(result)
+        //     if (!selectedCluster) {
+        //       selectedCluster = clusterNode;
+        //     }
+        //     continue;
+        //   }
       }
-
-    if (clusterNode.children && clusterNode.children.length > 0) {
-      for (const hostNode of clusterNode.children) {
-        if (String(hostNode.selected) === String(ClrSelectedState.SELECTED)) {
-          if(hostNode.flag!==false){
-            const _node = _.omit(hostNode, ['children']);
-            // _node['deviceType'] = 'host';
-            if (!selectedCluster) {
-              selectedCluster = clusterNode;
+      if (_node.children && _node.children.length > 0) {
+        for (const hostNode of _node.children) {
+          if (String(hostNode.selected) === String(ClrSelectedState.SELECTED)) {
+            if(hostNode.flag!==false){
+              const _node = _.omit(hostNode, ['children']);
+              // _node['deviceType'] = 'host';
+              if (!selectedCluster) {
+                selectedCluster = clusterNode;
+              }
+              result.push(_node);
             }
-            result.push(_node);
-          }
 
-          // console.log(result)
+            // console.log(result)
+          }
         }
       }
     }
+
+
+
   }
   return result
 }
