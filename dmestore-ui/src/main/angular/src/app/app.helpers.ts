@@ -338,9 +338,10 @@ export function getSelectedFromTree(
   for (const clusterNode of clusterArray) {
     if (mountType === 'host') {
       if (String(clusterNode.selected) === String(ClrSelectedState.SELECTED)) {
-        const _node = clusterNode;
-        // _node['deviceType'] = 'cluster';
-
+        if ((clusterNode as any).deviceType === 'host') {
+          result.push(_.omit(clusterNode, ['children']));
+        }
+        
         if (!selectedCluster) {
           selectedCluster = clusterNode;
         }
