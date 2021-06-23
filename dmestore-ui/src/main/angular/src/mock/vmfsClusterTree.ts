@@ -2,7 +2,7 @@ export const vmfsClusterTreeData = [
   {
     clusterId: 'urn:vmomi:ClusterComputeResource:domain-c1087:674908e5-ab21-4079-9cb1-596358ee5dd1',
     clusterName: 'baa',
-    deviceType:'cluster',
+    deviceType:'host',
     children: [],
     flag:true
   },

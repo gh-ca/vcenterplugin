@@ -3,7 +3,7 @@ import { ClrSelectedState } from '@clr/angular';
 import { ValidatorFn } from '@angular/forms';
 import { FormControl, ValidationErrors } from '@angular/forms';
 import { getLodash } from './shared/lib';
-import {host} from "@angular-devkit/build-angular/src/test-utils";
+import { host } from '@angular-devkit/build-angular/src/test-utils';
 
 export const _ = getLodash();
 
@@ -227,7 +227,7 @@ export function formatCapacity(c: number, isGB: boolean) {
       cNum = isGB ? (c / 1024 / 1024).toFixed(3) + 'PB' : (c / 1024 / 1024).toFixed(3) + 'TB';
     }
   } catch (error) {
-    console.error(error)
+    console.error(error);
   }
   return cNum;
 }
@@ -271,77 +271,51 @@ export type VMFS_CLUSTER_NODE = {
   selected?: number;
 };
 
-export function vmfsGetSelectedFromTree(clusterArray: VMFS_CLUSTER_NODE[],mountType=''){
-  // debugger
+export function vmfsGetSelectedFromTree(clusterArray: VMFS_CLUSTER_NODE[], mountType = '') {
   let result = [];
   let selectedCluster: any = false;
-
   /* 一旦选择一个集群，只能该集权 */
   /* 一旦选择一个主机，只能该主机所在集群 */
   for (const clusterNode of clusterArray) {
-    let count=0;
-    let _node=clusterNode;
-    if (clusterNode.children && clusterNode.children.length > 0) {
-      if (String(clusterNode.selected) === String(ClrSelectedState.SELECTED)) {
-        for(let hostNode of clusterNode.children) {
-          if (String(hostNode.flag) === 'false') {
-            count++
-          }
-        }
-        // debugger
-        if(mountType==='host'){
-           (_node as any)=clusterNode
-        }else {
-          if(count===0){
-             (_node as any) = _.omit(clusterNode, ['children']);
-                // (_node as any)['deviceType'] = 'cluster';
-                result.push((_node));
-          }else {
-             (_node as any)=clusterNode
-          }
-        }
-        //   for (let hostNode of clusterNode.children) {
-        //     if (String(hostNode.flag) === 'false') {
-        //       // const _node=clusterNode
-        //       // if (!selectedCluster) {
-        //       //   selectedCluster = clusterNode;
-        //       //
-        //       count++
-        //     }
-        //   }
-        //   if (count === 0) {
-        //     const _node = _.omit(clusterNode, ['children']);
-        //     // _node['deviceType'] = 'cluster';
-        //     result.push(_node);
-        //     // console.log(result)
-        //     if (!selectedCluster) {
-        //       selectedCluster = clusterNode;
-        //     }
-        //     continue;
-        //   }
-      }
-      if (_node.children && _node.children.length > 0) {
-        for (const hostNode of _node.children) {
-          if (String(hostNode.selected) === String(ClrSelectedState.SELECTED)) {
-            if(hostNode.flag!==false){
-              const _node = _.omit(hostNode, ['children']);
-              // _node['deviceType'] = 'host';
-              if (!selectedCluster) {
-                selectedCluster = clusterNode;
-              }
-              result.push(_node);
-            }
+    let _node: any = {};
 
-            // console.log(result)
-          }
+    if (String(clusterNode.selected) === String(ClrSelectedState.SELECTED)) {
+      /* 第一层本身是host */
+      if ((clusterNode as any).deviceType === 'host') {
+        (_node as any) = _.omit(clusterNode, ['children']);
+        result.push(_node);
+      } else if (mountType === 'host') {
+        /* 创建方式是host */
+        (_node as any) = clusterNode;
+      } else {
+        /* 创建方式是集群 */
+        /* 集群下有主机是false，以主机方式 */
+        const someFalse = _.some( clusterNode?.children, hostNode => String(hostNode.flag) === 'false' );
+        if (someFalse) {
+          (_node as any) = _.omit(clusterNode, ['children']);
+          result.push(_node);
+        } else {
+          (_node as any) = clusterNode;
         }
       }
     }
 
-
-
+    /* 通过控制children来限制是否传主机 */
+    if (_node.children && _node.children.length > 0) {
+      for (const hostNode of _node.children) {
+        if (String(hostNode.selected) === String(ClrSelectedState.SELECTED)) {
+          if (hostNode.flag !== false) {
+            const _node = _.omit(hostNode, ['children']);
+            if (!selectedCluster) {
+              selectedCluster = clusterNode;
+            }
+            result.push(_node);
+          }
+        }
+      }
+    }
   }
-  return result
+  return result;
 }
 
 /**
@@ -352,13 +326,17 @@ export function vmfsGetSelectedFromTree(clusterArray: VMFS_CLUSTER_NODE[],mountT
  * @param {any} clusterArray:VMFS_CLUSTER_NODE[]
  * @returns {any}
  */
-export function getSelectedFromTree(clusterArray: VMFS_CLUSTER_NODE[], resType = '',mountType='') {
+export function getSelectedFromTree(
+  clusterArray: VMFS_CLUSTER_NODE[],
+  resType = '',
+  mountType = ''
+) {
   let result = [];
   let selectedCluster: any = false;
   /* 一旦选择一个集群，只能该集权 */
   /* 一旦选择一个主机，只能该主机所在集群 */
   for (const clusterNode of clusterArray) {
-    if(mountType==='host'){
+    if (mountType === 'host') {
       if (String(clusterNode.selected) === String(ClrSelectedState.SELECTED)) {
         const _node = clusterNode;
         // _node['deviceType'] = 'cluster';
@@ -367,9 +345,8 @@ export function getSelectedFromTree(clusterArray: VMFS_CLUSTER_NODE[], resType =
           selectedCluster = clusterNode;
         }
       }
-    }else{
+    } else {
       if (String(clusterNode.selected) === String(ClrSelectedState.SELECTED)) {
-
         const _node = _.omit(clusterNode, ['children']);
         // _node['deviceType'] = 'cluster';
         result.push(_node);
@@ -380,7 +357,6 @@ export function getSelectedFromTree(clusterArray: VMFS_CLUSTER_NODE[], resType =
         continue;
       }
     }
-
 
     if (clusterNode.children && clusterNode.children.length > 0) {
       for (const hostNode of clusterNode.children) {

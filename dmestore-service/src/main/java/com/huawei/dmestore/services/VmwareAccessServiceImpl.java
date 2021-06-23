@@ -434,7 +434,7 @@ public class VmwareAccessServiceImpl implements VmwareAccessService {
                     if (!CollectionUtils.isEmpty(hostListTmp)) {
                         clusterTree.setClusterId(map.get("clusterId"));
                         clusterTree.setClusterName(map.get("clusterName"));
-                        clusterTree.setChildren(hostListTmp);
+                        clusterTree.setChildren(CollectionUtils.isEmpty(hostListTmp) ? null : hostListTmp);
                         boolean flag = getFlag(hostListTmp);
                         clusterTree.setFlag(flag);
 
