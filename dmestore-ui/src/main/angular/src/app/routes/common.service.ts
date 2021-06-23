@@ -7,16 +7,15 @@ import { vmfsClusterTreeData } from './../../mock/vmfsClusterTree';
 import { HttpClient } from '@angular/common/http';
 import { getLodash } from '@shared/lib';
 import { mockServerData } from './../app.helpers';
-import {rejects} from "assert";
+import { rejects } from 'assert';
 const _ = getLodash();
-
 
 function isSingleHost(node) {
   /* 没有children或者children length为0 */
   if (!node.children) return true;
   if (_.isArray(node.children) && node.children.length === 0) return true;
   return false;
-};
+}
 
 function getSelectedDateFn(label) {
   return (minuteName, exp) => {
@@ -157,25 +156,26 @@ zh:'一年' ,range:'LAST_1_YEAR',   interval:  "DAY"
         data = await mockServerData(vmfsClusterTreeData);
       } else {
         const res: any = await new Promise((resolve, reject) => {
-          this.http.get('accessvmware/listHostsAndClusterReturnTree', {}).subscribe(resolve, reject);
+          this.http
+            .get('accessvmware/listHostsAndClusterReturnTree', {})
+            .subscribe(resolve, reject);
         });
 
         if (res.code === '200') {
-          for( let firstNode of res.data){
-            if(isSingleHost(firstNode)){
-              firstNode.deviceType="host"
-            }else{
-              firstNode.deviceType="cluster"
-              if(firstNode&&firstNode.children.length>0){
-                for(let secondNode of firstNode.children){
-                  if(!secondNode.children){
-                    secondNode.deviceType="host"
-                  }else {
-                    secondNode.deviceType = "cluster"
+          for (let firstNode of res.data) {
+            if (isSingleHost(firstNode)) {
+              firstNode.deviceType = 'host';
+            } else {
+              firstNode.deviceType = 'cluster';
+              if (firstNode && firstNode.children.length > 0) {
+                for (let secondNode of firstNode.children) {
+                  if (!secondNode.children) {
+                    secondNode.deviceType = 'host';
+                  } else {
+                    secondNode.deviceType = 'cluster';
                   }
                 }
               }
-
             }
           }
           data = res.data;
@@ -199,15 +199,15 @@ zh:'一年' ,range:'LAST_1_YEAR',   interval:  "DAY"
     if (isMockData) {
       // console.log(params);
       return {
-        code:"-99999",
-        data:{
-          successNo:2,
-          failNo:1,
-          connectionResult:["10.12.22.167"],
-          descriptionEN:"loream....",
-          descriptionCN:"这里有一段内容"
-        }
-        };
+        code: '-99999',
+        data: {
+          successNo: 2,
+          failNo: 1,
+          connectionResult: ['10.12.22.167'],
+          descriptionEN: 'loream....',
+          descriptionCN: '这里有一段内容',
+        },
+      };
     } else {
       try {
         const res: any = await new Promise((resolve, reject) => {
@@ -280,21 +280,20 @@ zh:'一年' ,range:'LAST_1_YEAR',   interval:  "DAY"
             .subscribe(resolve, reject);
         });
         if (res.code === '200') {
-          for( let firstNode of res.data){
-            if(isSingleHost(firstNode)){
-              firstNode.deviceType="host"
-            }else{
-              firstNode.deviceType="cluster"
-              if(firstNode&&firstNode.children.length>0){
-                for(let secondNode of firstNode.children){
-                  if(!secondNode.children){
-                    secondNode.deviceType="host"
-                  }else {
-                    secondNode.deviceType = "cluster"
+          for (let firstNode of res.data) {
+            if (isSingleHost(firstNode)) {
+              firstNode.deviceType = 'host';
+            } else {
+              firstNode.deviceType = 'cluster';
+              if (firstNode && firstNode.children.length > 0) {
+                for (let secondNode of firstNode.children) {
+                  if (!secondNode.children) {
+                    secondNode.deviceType = 'host';
+                  } else {
+                    secondNode.deviceType = 'cluster';
                   }
                 }
               }
-
             }
           }
           data = res.data;
@@ -318,6 +317,22 @@ zh:'一年' ,range:'LAST_1_YEAR',   interval:  "DAY"
             .subscribe(resolve, reject);
         });
         if (res.code === '200') {
+          for (let firstNode of res.data) {
+            if (isSingleHost(firstNode)) {
+              firstNode.deviceType = 'host';
+            } else {
+              firstNode.deviceType = 'cluster';
+              if (firstNode && firstNode.children.length > 0) {
+                for (let secondNode of firstNode.children) {
+                  if (!secondNode.children) {
+                    secondNode.deviceType = 'host';
+                  } else {
+                    secondNode.deviceType = 'cluster';
+                  }
+                }
+              }
+            }
+          }
           data = res.data;
         }
       }
@@ -333,27 +348,25 @@ zh:'一年' ,range:'LAST_1_YEAR',   interval:  "DAY"
    * @param {any} id
    * @returns {string}
    */
-  async getMountTypeBySeletedId(id){
-    let data:string=""
-    try{
-      if(isMockData){
+  async getMountTypeBySeletedId(id) {
+    let data: string = '';
+    try {
+      if (isMockData) {
         // console.log(id);
-        data="host"
-      }else{
-        const res : any= await new Promise((resolve, reject)=>{
+        data = 'host';
+      } else {
+        const res: any = await new Promise((resolve, reject) => {
           this.http
             .get(`accessvmfs/queryCreationMethodByDatastore?dataStoreObjectId=${id}`)
             .subscribe(resolve, reject);
         });
-        if (res.code==='200'){
-          data=res.data;
+        if (res.code === '200') {
+          data = res.data;
         }
       }
-    }
-    catch(error) {
-      console.log('vmfs获取选中挂载类型',error)
-    }
-    finally {
+    } catch (error) {
+      console.log('vmfs获取选中挂载类型', error);
+    } finally {
       return data;
     }
   }
