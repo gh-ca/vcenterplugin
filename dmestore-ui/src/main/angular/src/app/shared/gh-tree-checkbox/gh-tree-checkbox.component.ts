@@ -82,7 +82,6 @@ export class GhTreeCheckboxComponent implements OnInit {
 
   checkSelectedAndSetDisable() {
     /* 挂载可以跨集群 */
-    // debugger
     if (this.resType === 'mount') {
       let res = [];
 

@@ -1429,8 +1429,8 @@ wwn: "67c1cf110058934511ba6e5a00000344"
 
   // 挂载提交
   async mountSubmit() {
-    console.log('this.chooseHost', this.chooseHost);
     const chooseDevice = this.addForm.value.chooseDevice;
+    console.log('chooseDevice', chooseDevice);
 
     if (_.isArray(chooseDevice) && chooseDevice.length > 0) {
       // if (this.chooseHost || this.chooseCluster) {
