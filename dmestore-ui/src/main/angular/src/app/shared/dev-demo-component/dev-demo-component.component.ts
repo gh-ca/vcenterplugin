@@ -7,6 +7,8 @@ import {
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { CustomValidatorFaild, helper } from '../../app.helpers';
 import { regExpCollection } from 'app/app.helpers';
+import { vmfsClusterTreeData } from './../../../mock/vmfsClusterTree';
+import { mockServerData } from './../../app.helpers';
 
 @Component({
   selector: 'app-dev-demo-component',
@@ -18,23 +20,76 @@ export class DevDemoComponentComponent implements OnInit {
   form: FormGroup;
   value;
   helper = helper;
+  vmfsTree;
+  vmfsList;
+  partSuccessData;
+  serviceItem;
+  firstData;
+  secondData;
+  thirdData;
+  buttonDisableOrNot:boolean=true;
 
   constructor() {
     this.initForm();
+
+    this.serviceItem = {
+      "capabilities": {
+        "resourceType": null,
+        "compression": null,
+        "deduplication": null,
+        "smarttier": null,
+        "iopriority": null,
+        "qos": {
+          "smartQos": null,
+          "qosParam": {
+            "enabled": null,
+            "latency": 0,
+            "latencyUnit": "ms",
+            "minBandWidth": 0,
+            "minIOPS": 0,
+            "maxBandWidth": 200,
+            "maxIOPS": 500,
+            "smartQos": null
+          },
+          "enabled": true
+        }
+      },
+      "id": "292ae048-486d-4b1b-822b-0c84a99be342",
+      "name": "zg_610",
+      "description": "block service-level for dj",
+      "type": "BLOCK",
+      "protocol": null,
+      "totalCapacity": 2208768.0,
+      "freeCapacity": 2064064.0,
+      "usedCapacity": 144704.0
+    };
+
+    (async () => {
+      this.vmfsTree = await mockServerData(vmfsClusterTreeData);
+      this.vmfsList = await mockServerData(vmfsClusterTreeData,1000);
+    })();
   }
 
   initForm() {
+    //模拟返回数据
+    this.partSuccessData={
+      code:"206",
+      data:{
+        successNo:2,
+        failNo:1,
+        connectionResult:[],
+        descriptionEN:"loream....",
+        descriptionCN:"这里有一段内容"
+      }
+    }
     /*初始化和校验规则*/
     this.form = new FormGroup({
       brave: new FormControl('', Validators.required),
+      tree: new FormControl('', Validators.required),
       firstName: new FormControl('', Validators.required),
       emailAddress: new FormControl('', [
         Validators.required,
-        CustomValidatorFaild(value => {
-          const res = regExpCollection.integer().test(value);
-          console.log('🚀DevDemoComponentComponent ', value, res);
-          return res;
-        }),
+        CustomValidatorFaild(value => regExpCollection.integer().test(value)),
       ]),
     });
 
@@ -67,7 +122,7 @@ export class DevDemoComponentComponent implements OnInit {
         validTips_i18n: ['validations.required_vmfs_name', { length: 27 }],
       }),
     ];
-    /*  
+    /*
       let firstName = 0;
       setInterval(() => {
         this.form.patchValue({firstName: ++firstName});
@@ -90,5 +145,24 @@ export class DevDemoComponentComponent implements OnInit {
     this.value = value;
   }
 
-  ngOnInit(): void {}
+  handleTreeValueChange(prop, val) {
+    this.form.patchValue({ [prop]: val });
+  }
+
+  ngOnInit(): void {
+  }
+  // ngDoCheck() {
+  //   this.changeButtonAttr()
+  // }
+
+  changeButtonAttr(){
+
+    if(this.firstData&&this.secondData&&this.thirdData){
+      return false
+    }else {
+      return true
+    }
+  }
 }
+
+

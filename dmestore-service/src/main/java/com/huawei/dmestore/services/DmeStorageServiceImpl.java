@@ -368,30 +368,30 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         String params = ToolUtils.getRequsetParams("nativeId", serviceLevelId, false, true);
         ResponseEntity<String> responseEntity = dmeAccessService.accessByJson(url, HttpMethod.GET, params);
         int code = responseEntity.getStatusCodeValue();
-        if (code != HttpStatus.OK.value()) {
+        JsonArray objList = gson.fromJson(responseEntity.getBody(), JsonObject.class).getAsJsonArray(OBJ_LIST);
+        if (code != HttpStatus.OK.value() || null == objList || objList.size() ==0) {
             return null;
         }
-        JsonArray objList = gson.fromJson(responseEntity.getBody(), JsonObject.class).getAsJsonArray(OBJ_LIST);
         String resId = objList.get(0).getAsJsonObject().get(RES_ID).getAsString();
         String relationName = "M_DjTierContainsStoragePool";
         url = DmeConstants.LIST_RELATION_URL.replace("{relationName}", relationName) + CONDITION;
         params = ToolUtils.getRequsetParams("source_Instance_Id", resId, false, false);
         responseEntity = dmeAccessService.accessByJson(url, HttpMethod.GET, params);
         code = responseEntity.getStatusCodeValue();
-        if (code != HttpStatus.OK.value()) {
+        objList = gson.fromJson(responseEntity.getBody(), JsonObject.class).getAsJsonArray(OBJ_LIST);
+        if (code != HttpStatus.OK.value() || null == objList || objList.size() ==0) {
             return null;
         }
-        objList = gson.fromJson(responseEntity.getBody(), JsonObject.class).getAsJsonArray(OBJ_LIST);
         String poolId = objList.get(0).getAsJsonObject().get("target_Instance_Id").getAsString();
         className = "SYS_StoragePool";
         url = String.format(DmeConstants.DME_RESOURCE_INSTANCE_LIST, className) + CONDITION;
         params = ToolUtils.getRequsetParams("resId", poolId, true, true);
         responseEntity = dmeAccessService.accessByJson(url, HttpMethod.GET, params);
         code = responseEntity.getStatusCodeValue();
-        if (code != HttpStatus.OK.value()) {
+        objList = gson.fromJson(responseEntity.getBody(), JsonObject.class).getAsJsonArray(OBJ_LIST);
+        if (code != HttpStatus.OK.value() || null == objList || objList.size() ==0) {
             return null;
         }
-        objList = gson.fromJson(responseEntity.getBody(), JsonObject.class).getAsJsonArray(OBJ_LIST);
         String storageDeviceId = objList.get(0).getAsJsonObject().get("storageDeviceId").getAsString();
         url = DmeConstants.API_STORAGES;
         responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);

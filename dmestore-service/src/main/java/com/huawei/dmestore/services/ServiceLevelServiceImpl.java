@@ -39,6 +39,10 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
 
     private static final String CODE_503 = "503";
 
+    private static final String VOLUME_ID = "volume_id";
+
+    private static final String HOST_ID = "host_id";
+
     private DmeAccessService dmeAccessService;
 
     private DmeRelationInstanceService dmeRelationInstanceService;
@@ -128,6 +132,93 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
             throw new DmeException(CODE_503, e.getMessage());
         }
         return slis;
+    }
+
+    @Override
+    public List<SimpleServiceLevel> listServiceLevelByVmfs(String datastoreId) throws DmeException {
+        // 通过storeobjId 查volumeId
+        DmeVmwareRelation dvr = dmeVmwareRalationDao.getDmeVmwareRelationByDsId(datastoreId);
+        if (dvr == null) {
+            log.error("query service Level error, query dme vmware ralation table is error!{}", datastoreId);
+            throw new DmeException("query service Level error, query dme vmware ralation table is error!{}",datastoreId);
+        }
+
+        String volumeId = dvr.getVolumeId();
+        if (StringUtils.isEmpty(volumeId)) {
+            log.error("query service Level error, volumeId is NULL!{}", datastoreId);
+            throw new DmeException("query service Level error, volumeId is NULL!{}",datastoreId);
+        }
+
+        Volume volume = findOrientedVolumeMapping(volumeId);
+        // 通过poolrawId和storageId查询存储池、
+        StoragePool pool = new StoragePool();
+        List<StoragePool> pools = dmeStorageService.getStoragePools(volume.getStorageId(), "all");
+        for (StoragePool storagePool : pools) {
+            String poolId = storagePool.getPoolId();
+            if (poolId.equalsIgnoreCase(volume.getPoolRawId())) {
+                pool = storagePool;
+                break;
+            }
+        }
+
+        List<SimpleServiceLevel> serviceLevels = listServiceLevel(null);
+        // 通过volumeid查存储池或者所属服务等级Id
+        if (CollectionUtils.isEmpty(serviceLevels)) {
+            log.error("query service Level error, service level list is NULL!");
+            throw new DmeException("query service Level error, service level list is NULL!");
+        }
+
+        List<SimpleServiceLevel> serverLevels = new ArrayList<>();
+        List<StoragePool> storagePools = new ArrayList<>();
+        for (SimpleServiceLevel serviceLevel : serviceLevels) {
+            String serviceLevelId = serviceLevel.getId();
+            if (!StringUtils.isEmpty(serviceLevelId)) {
+                storagePools = getStoragePoolInfosByServiceLevelId(serviceLevelId);
+            }
+            if (!CollectionUtils.isEmpty(storagePools)) {
+                for (StoragePool storagePool : storagePools) {
+                    String poolId = pool.getPoolId();
+                    String id = pool.getId();
+                    String storageId = pool.getStorageId();
+                    if (!StringUtils.isEmpty(poolId) && !StringUtils.isEmpty(id) && !StringUtils.isEmpty(storageId)) {
+                        if (storagePool.getPoolId().equalsIgnoreCase(poolId) &&
+                                storagePool.getId().equals(id) &&
+                                storagePool.getStorageId().equalsIgnoreCase(storageId)) {
+                            serverLevels.add(serviceLevel);
+                            break;
+                        }
+                    } else {
+                        log.error("query service Level error, storage pool is NULL!");
+                        throw new DmeException("query service Level error, storage pool list is NULL!");
+                    }
+                }
+            }
+        }
+        return serverLevels;
+    }
+
+    private Volume findOrientedVolumeMapping(String volumeId) throws DmeException {
+        Volume volume = new Volume();
+        String url = DmeConstants.DME_QUERY_ONE_VOLUME.replace("{volume_id}", volumeId);
+        ResponseEntity<String> entity = dmeAccessService.access(url, HttpMethod.GET, null);
+        if (entity.getStatusCodeValue() == HttpStatus.OK.value()) {
+            String body = entity.getBody();
+
+            if (StringUtils.isEmpty(body)) {
+                throw new DmeException("query oriented volume is null!{}", volumeId);
+            }
+            JsonObject volumeObj = new JsonParser().parse(entity.getBody()).getAsJsonObject().get("volume").getAsJsonObject();
+            log.info("query oriented volume ,{}", volumeObj);
+            boolean attached = ToolUtils.jsonToBoo(volumeObj.get("attached"));
+            if (!attached) {
+                throw new DmeException("query oriented volume attached status is unmapping!{}", volumeId);
+            }
+            volume.setStorageId(ToolUtils.jsonToStr(volumeObj.get("storage_id")));
+            volume.setId(ToolUtils.jsonToStr(volumeObj.get("id")));
+            volume.setServiceLevelName(ToolUtils.jsonToStr(volumeObj.get("service_level_name")));
+            volume.setPoolRawId(ToolUtils.jsonToStr(volumeObj.get("pool_raw_id")));
+        }
+        return volume;
     }
 
     @Override

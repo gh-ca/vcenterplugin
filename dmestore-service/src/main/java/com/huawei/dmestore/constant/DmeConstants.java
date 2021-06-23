@@ -14,10 +14,13 @@ public class DmeConstants {
      *  POST
      *  estimate connectivity of host or hostgroup on dme
      *  old
-     *  public static final String DME_ESTIMATE_CONNECTIVITY = "/rest/vmmgmt/v1/connectivity/host-storage";
      */
-    //public static final String DME_ESTIMATE_CONNECTIVITY = "/rest/vmmgmt/v1/connectivity/host-storage";
     public static final String DME_ESTIMATE_CONNECTIVITY = "/rest/hostmgmt/v1/connectivity/host-and-storage";
+    /**
+     * query oriented volume
+     * /rest/blockservice/v1/volumes/{volume_id}
+     */
+    public static final String DME_QUERY_ONE_VOLUME = "/rest/blockservice/v1/volumes/{volume_id}";
     /**
      * nfs share detail
      **/
@@ -157,6 +160,12 @@ public class DmeConstants {
      * hostgroup mapping
      **/
     public static final String MOUNT_VOLUME_TO_HOSTGROUP_URL = "/rest/blockservice/v1/volumes/hostgroup-mapping";
+
+    /**
+     * hostgroup mapping view query
+     * post
+     **/
+    public static final String QUERY_HOSTGROUP_MAPPING_VIEW_URL = "/rest/blockservice/v1/volumes/mapping-view/query";
 
     /**
      * volume expand

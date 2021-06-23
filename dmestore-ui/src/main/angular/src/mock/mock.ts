@@ -43,6 +43,7 @@ export const isMockData = false;
 
 export const mockData = {
   ACCESSVMFS_LISTVMFSPERFORMANCE,
+  /*  */
   ACCESSNFS_LISTNFS,
   /* vmfs list */
   ACCESSVMFS_LISTVMFS,
@@ -114,6 +115,4 @@ export const mockData = {
   /* atastorestatistichistrory/storageDevice */
   ATASTORESTATISTICHISTRORY_STORAGE_DEVICE,
   /* datastorestatistichistrory/vmfs */
-
-
 };

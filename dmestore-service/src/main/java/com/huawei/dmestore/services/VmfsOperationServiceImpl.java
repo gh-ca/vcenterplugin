@@ -1,5 +1,6 @@
 package com.huawei.dmestore.services;
 
+import com.google.gson.reflect.TypeToken;
 import com.huawei.dmestore.constant.DmeConstants;
 import com.huawei.dmestore.constant.DpSqlFileConstants;
 import com.huawei.dmestore.dao.DmeVmwareRalationDao;
@@ -31,7 +32,7 @@ import java.util.*;
 /**
  * VmfsOperationService
  *
- * @author lianqiang
+ * @author lianqiangN
  * @since 2020-09-09
  **/
 public class VmfsOperationServiceImpl implements VmfsOperationService {
@@ -41,8 +42,6 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
 
     private static final String CODE_403 = "403";
 
-    private static final String CODE_20883 = "20883";
-
     private static final String CODE_503 = "503";
 
     private static final String TASK_ID = "task_id";
@@ -50,6 +49,8 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
     private static final String CHANGE_SECTOR = "changedSector";
 
     private static final String LUN_ADD_CAPACITY = "lunAddCapacity";
+
+    private static final String HOSTID = "hostId";
 
     private DmeAccessService dmeAccessService;
     @Autowired
@@ -269,9 +270,13 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
         try {
             //扩容条件判断。
             Map<String, Long> sectors = compareCapacityForExpandLun(addCapacity, datastoreobjid);
+            if (CollectionUtils.isEmpty(sectors)) {
+                LOG.error("get current vmfs datastore capacity failed!{}", datastoreobjid);
+                throw new DmeException("get current vmfs datastore capacity failed!{}", datastoreobjid);
+            }
             Long changedSector = sectors.get(CHANGE_SECTOR);
             Long addcapacity = sectors.get(LUN_ADD_CAPACITY);
-            if (addcapacity != null && changedSector != null) {
+            if (addcapacity != null) {
                 String lunAddCapacity = ToolUtils.getStr(addcapacity);
                 //DME Lun当前容量不满足扩容vmfs存储条件，扩容Lun
                 volumemap.put("vo_add_capacity", lunAddCapacity);
@@ -289,10 +294,22 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
                 if (!taskService.checkTaskStatus(taskIds)) {
                     throw new DmeException(CODE_503, "expand volume failed !");
                 }
+                /*String listStr = vcsdkUtils.getHostsByDsObjectId(datastoreobjid, true);
+                if (!StringUtils.isEmpty(listStr)) {
+                    List<Map<String, String>> hosts = gson.fromJson(listStr,
+                            new TypeToken<List<Map<String, String>>>() {
+                            }.getType());
+                    for (Map<String, String> host : hosts) {
+                        String hostId = ToolUtils.getStr(host.get(HOSTID));
+                        vcsdkUtils.scanDataStore(null, hostId);
+                    }
+                }*/
             }
-            String result = vcsdkUtils.expandVmfsDatastore2(changedSector, datastoreobjid);
-            if ("failed".equals(result)) {
-                throw new DmeException(CODE_403, "expand vmfsDatastore failed !");
+            if (changedSector != null) {
+                String result = vcsdkUtils.expandVmfsDatastore2(changedSector, datastoreobjid);
+                if ("failed".equals(result)) {
+                    throw new DmeException(CODE_403, "expand vmfsDatastore failed !");
+                }
             }
             // 刷新vCenter存储
             vcsdkUtils.refreshDatastore(datastoreobjid);
@@ -331,18 +348,20 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
             Long totalCurrentSector = sectors.get(ToolUtils.TOTAL_END_SECTOR);
             Long changedSector = addSector + currentEndSector;
             int lunAddCapacity = addCapacity;
-            if (Long.compare(totalCurrentSector, changedSector) != -1) {
-                sectors.put(CHANGE_SECTOR, changedSector);
-            } else if (Long.compare(totalCurrentSector, changedSector) == -1 && Long.compare(totalCurrentSector, currentEndSector) != -1) {
-                int available = (int)Math.floor((totalCurrentSector - currentEndSector) * ToolUtils.DISK_SECTOR_SIZE / ToolUtils.GI);
-                if (Long.compare(available, 1) != -1) {
-                    lunAddCapacity -= available;
+            if (totalCurrentSector != null) {
+                if (Long.compare(totalCurrentSector, changedSector) != -1) {
                     sectors.put(CHANGE_SECTOR, changedSector);
-                    sectors.put(LUN_ADD_CAPACITY, Long.valueOf(lunAddCapacity));
-                } else {
+                } else if (Long.compare(totalCurrentSector, changedSector) == -1 && Long.compare(totalCurrentSector, currentEndSector) != -1) {
+                    int available = (int) Math.floor((totalCurrentSector - currentEndSector) * ToolUtils.DISK_SECTOR_SIZE / ToolUtils.GI);
+                    if (Long.compare(available, 1) != -1) {
+                        lunAddCapacity -= available;
+                    }
                     sectors.put(CHANGE_SECTOR, changedSector);
                     sectors.put(LUN_ADD_CAPACITY, Long.valueOf(lunAddCapacity));
                 }
+            } else {
+                sectors.put(CHANGE_SECTOR, changedSector);
+                sectors.put(LUN_ADD_CAPACITY, Long.valueOf(lunAddCapacity));
             }
         }
         return sectors;

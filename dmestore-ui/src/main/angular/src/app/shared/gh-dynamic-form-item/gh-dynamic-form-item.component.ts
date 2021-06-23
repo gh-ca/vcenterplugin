@@ -66,8 +66,8 @@ export class GhDynamicFormItemComponent implements OnInit {
     viewContainerRef.clear();
     const componentRef = viewContainerRef.createComponent<any>(componentFactory);
   }
-
   */
+  
   ngOnInit(): void {
     /* this.loadComponent(); */
     this.form?.controls[this.configs.prop].valueChanges.subscribe(value => {

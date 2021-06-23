@@ -43,6 +43,7 @@ const DEFAULT_ITEM = {
 export class ServiceLevelTableComponent implements OnInit {
   changes;
   @Input() item;
+  @Input() isGB;
   _item;
   print;
 
@@ -64,6 +65,20 @@ export class ServiceLevelTableComponent implements OnInit {
         this._item = DEFAULT_ITEM;
       }
     }
+  }
+
+  check(prop) {
+    return (
+      this.item.capabilities  &&
+      this.item.capabilities.qos  &&
+      this.item.capabilities.qos.qosParam  &&
+      this.item.capabilities.qos.qosParam[prop] &&
+      this.item.capabilities.qos.qosParam[prop] !== "NaN"
+    );
+  }
+
+  getValue(prop) {
+    return this.item.capabilities.qos?.qosParam[prop];
   }
 
   ngOnChanges(changes: { [propKey: string]: SimpleChange }) {

@@ -1,5 +1,36 @@
-<app-gh-dynamic-form [formInfo]='formItemInfos' [form]='form' (onPayLoadChange)='handlePayLoadChange($event)'> </app-gh-dynamic-form>
+<div>
+  <div class="s" style="margin:auto;width:600px;">
+    <app-service-level-table [item]="serviceItem"></app-service-level-table>
+  </div>
+</div>
+<app-gh-dynamic-form [formInfo]='formItemInfos' [form]='form' (onPayLoadChange)='handlePayLoadChange($event)'>
+</app-gh-dynamic-form>
+<app-gh-tree-checkbox
+  [resType]="'mount'"
+  (valueChange)="handleTreeValueChange('tree',$event)"
+  [tree]="vmfsTree"
+  [vmfsMount]="true"
+  [isCreate]="true">
+</app-gh-tree-checkbox>
+<!-- <pre>{{helper.print(vmfsTree)}}</pre> -->
 <div>{{helper.print(value)}}</div>
 <div>form.errors{{helper.print(form.errors)}}</div>
-<div>form.value{{helper.print(form.value)}}</div>
+<pre>form.value{{helper.print(form.value)}}</pre>
 <div>form.valid=>{{form.valid}}</div>
+<app-vmfs-create-faild-tips [partSuccessData]="partSuccessData"></app-vmfs-create-faild-tips>
+<div>
+  <div><input [(ngModel)]="firstData"></div>
+  <div><input [(ngModel)]="secondData"></div>
+  <div><input [(ngModel)]="thirdData"></div>
+</div>
+
+<!--<button [attr.disabled]="buttonDisableOrNot===false" (click)="log111">是否可以点击当前button</button>-->
+<button [disabled]="changeButtonAttr()">是否可以点击当前button</button>
+
+
+<!--<div *ngIf="changeButtonAttr()" class="loadingDiv">-->
+<!--          <span style="color: black">-->
+<!--            {{'vmfs.dataHandleLoadingTips' | translate}}<img src="./assets/images/loading.gif" width="20px"-->
+<!--                                                             height="20px" style="margin-left: 20px;">-->
+<!--          </span>-->
+<!--</div>-->

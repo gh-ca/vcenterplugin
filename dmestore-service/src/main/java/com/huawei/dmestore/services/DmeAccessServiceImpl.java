@@ -550,7 +550,7 @@ public class DmeAccessServiceImpl implements DmeAccessService {
                     map.put(ID_FIELD, ToolUtils.jsonToStr(object.get(ID_FIELD)));
                     // 主机名称
                     map.put(NAME_FIELD, ToolUtils.jsonToStr(object.get(NAME_FIELD)));
-                    map.put(HOST_COUNT, ToolUtils.jsonToInt(object.get(IP_FIELD), 0));
+                    map.put(HOST_COUNT, ToolUtils.jsonToInt(object.get(HOST_COUNT), 0));
                     map.put("source_type", ToolUtils.jsonToStr(object.get("source_type")));
                     map.put(MANAGED_STATUS_FIELD, ToolUtils.jsonToStr(object.get(MANAGED_STATUS_FIELD)));
                     map.put(PROJECT_ID_FIELD, ToolUtils.jsonToStr(object.get(PROJECT_ID_FIELD)));
@@ -627,6 +627,8 @@ public class DmeAccessServiceImpl implements DmeAccessService {
                         hostgroupmap.put(ID_FIELD, ToolUtils.jsonToStr(jsonObject.get(ID_FIELD)));
                         hostgroupmap.put(NAME_FIELD, ToolUtils.jsonToStr(jsonObject.get(NAME_FIELD)));
                     }
+                }else {
+                    throw new DmeException("create hostgroup error,the DME return"+responseEntity);
                 }
             }
         } catch (DmeException e) {

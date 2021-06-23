@@ -211,3 +211,27 @@ input::-ms-clear{
 ::ng-deep .datagrid {
   -ms-overflow-style:scrollbar;
 }
+.noData{
+  width: 100%;
+  height: 400px;
+  text-align: center;
+  font-size: 1.6rem;
+  font-weight: 500;
+  color: #555555;
+  display: flex;
+  flex-flow: column nowrap;
+  align-content: center;
+  justify-content: flex-start;
+  margin-top: 15%;
+}
+.noDataSvg{
+  height: 5rem;
+  width: 5rem;
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: 50%;
+  background-image: url('noData.svg');
+  margin: 0 auto;
+  margin-bottom: .6rem;
+}
+

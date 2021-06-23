@@ -185,7 +185,7 @@
 }
 
 ::ng-deep .modal-dialog .modal-content{
-  box-shadow: none;
+  box-shadow: 0 0.1rem 0.3rem 0.3rem white;
 }
 ::ng-deep .datagrid-table .datagrid-column .datagrid-filter-toggle{
   margin: auto;

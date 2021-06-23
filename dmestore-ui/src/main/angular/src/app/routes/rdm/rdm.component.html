@@ -62,8 +62,9 @@
     </ng-template>
   </clr-wizard-page>
   <!--Page2 储存库设置-->
-  <clr-wizard-page #addPageTwo [clrWizardPageNextDisabled]="!formPageTwo.valid" >
+  <clr-wizard-page #addPageTwo [clrWizardPageNextDisabled]="checkTabs(formPageTwo.valid)" >
     <ng-template clrPageNavTitle>
+<!--      {{formPageTwo.valid}}-->
       {{'rdm.storeSet' | translate}}
     </ng-template>
     <ng-template clrPageTitle>
@@ -87,17 +88,23 @@
 
 
     <form clrForm #formPageTwo="ngForm">
-      <span style="color: red">{{'rdm.addTips' | translate}}</span>
+<!--      <span *ngIf="getStorageStrategy()" style="color: #ff0000">{{'rdm.addTips' | translate}}</span>-->
       <!-- 1、选择 服务等级-->
       <div [hidden]="!serviceLevelIsNull" class="errorTips" readonly ><clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{'rdm.selectOneSer' | translate}}</div>
       <div [hidden]="!isOperationErr"  class="errorTips" readonly ><clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{'rdm.createRdmError' | translate}}</div>
       <!-- 1、选择 服务等级-->
       <ng-container *ngIf="levelCheck==='level'">
+        <div [hidden]="dmeStrategy" class="errorTips" readonly><clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{'rdm.storageStrategyNull' | translate}}</div>
+        <div [hidden]="dmeStrategy" class="noData" readonly>
+          <div class="noDataSvg"></div>
+          <span>{{'tips.noData'|translate}}</span>
+        </div>
         <clr-accordion>
           <clr-accordion-panel  (click)="serviceLevelClick(item.id);" *ngFor="let item of serviceLevels;" style="margin-top: 20px;" >
             <clr-accordion-title  style="height: 50px; line-height: 50px;color: #333;font-size:16px;">{{item.name}}</clr-accordion-title>
             <clr-accordion-content>
-              <table class="table table-vertical table-noborder table-compact">
+              <app-service-level-table [item]="item"></app-service-level-table>
+<!--               <table class="table table-vertical table-noborder table-compact">
                 <tbody>
                 <tr>
                   <th hidden></th>
@@ -150,7 +157,7 @@
                   </th>
                 </tr>
                 </tbody>
-              </table>
+              </table> -->
             </clr-accordion-content>
             <img src="./assets/images/selectDown.svg" style="position: absolute;right: 0px;bottom: 0px;" width="40px" height="40px">
           </clr-accordion-panel>
@@ -380,6 +387,7 @@
       <clr-wizard-button [type]="'cancel'" (click)="closeWin();">{{'menu.cancel' | translate}}</clr-wizard-button>
       <clr-wizard-button [type]="'previous'">{{'menu.previous' | translate}}</clr-wizard-button>
       <clr-wizard-button [type]="'custom-finish'" (click)="submit();">{{'menu.ok' | translate}}</clr-wizard-button>
+<!--      <button *ngIf="!getStorageStrategy()" [disabled]="!getStorageStrategy()"  (click)="submit();">{{'menu.ok' | translate}}</button>-->
     </ng-template>
   </clr-wizard-page>
 

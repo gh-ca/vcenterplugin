@@ -1,6 +1,7 @@
 <div class="alert alert-danger" role="alert">
-  <div class="alert-items">
-    <div class="alert-item static flex vertical">
+  <div class="alert-items" *ngIf="failStatus===1">
+    <div class="alert-item static flex horizon">
+      <div class="flex1">
       <div class="alert-icon-wrapper">
         <clr-icon class="alert-icon" shape="exclamation-circle"></clr-icon>
         <span class="alert-text">
@@ -9,6 +10,62 @@
       </div>
       <div style="text-indent: 16px;">
         {{'vmfs.creatfailtips'| translate}}
+      </div>
+      </div>
+      <div class="create-fail-description"  *ngIf="detailShow">
+        <clr-signpost>
+          <button class="btn btn-link"
+                  clrSignpostTrigger>
+            {{'tips.details'|translate}}
+          </button>
+          <clr-signpost-content  [clrPosition]="'bottom-left'" *clrIfOpen>
+            <div>{{descriptionContent}}</div>
+            <div *ngIf="connectionResult&&connectionResult.length>0">
+              <h6>{{'errorMsg.connectionFailMessage'|translate}}</h6>
+              <ul class="list-unstyled">
+              <li *ngFor="let item of connectionResult">{{item}}</li>
+            </ul>
+            </div>
+          </clr-signpost-content>
+        </clr-signpost>
+      </div>
+    </div>
+  </div>
+  <div class="alert-items" *ngIf="failStatus===0">
+    <div class="alert-item static flex horizon">
+      <div class="flex1">
+      <div class="alert-icon-wrapper">
+        <clr-icon class="alert-icon" shape="exclamation-circle"></clr-icon>
+        <span class="alert-text">
+          {{'errorMsg.addPartError' | translate}}
+        </span>
+      </div>
+      </div>
+<!--      <div style="text-indent: 16px;">-->
+<!--        {{'errorMsg.errorDetailMessage'| translate:'{partSuccess:'+partSuccess+',partFail:'+partFail+'}'}}-->
+<!--      </div>-->
+      <div class="create-fail-description">
+      <clr-signpost>
+        <button class="btn btn-link"
+                clrSignpostTrigger>
+          {{'tips.details'|translate}}
+        </button>
+        <clr-signpost-content  [clrPosition]="'bottom-left'" *clrIfOpen >
+<!--          <div>{{descriptionContent}}</div>-->
+<!--          <div *ngIf="connectionResult&&connectionResult.length>0">-->
+<!--            <h6>{{'errorMsg.connectionFailMessage'|translate}}</h6>-->
+<!--            <ul class="list-unstyled">-->
+<!--              <li *ngFor="let item of connectionResult">{{item}}</li>-->
+<!--            </ul>-->
+<!--          </div>-->
+          {{'errorMsg.errorDetailMessage'| translate:'{partSuccess:'+partSuccess+'}'}}
+          <div>{{'errorMsg.errorDetailFailMessage'|translate}}</div>
+          <div *ngIf="connectionResult&&connectionResult.length>0">
+          <div *ngFor="let item of connectionResult">{{item}}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{'errorMsg.HostConnectionFail'|translate}}</div>
+          </div>
+          <div *ngIf="connectionResult&&connectionResult.length===0">{{'errorMsg.errorDescription'|translate}}{{descriptionContent}}</div>
+        </clr-signpost-content>
+      </clr-signpost>
       </div>
     </div>
   </div>

@@ -267,7 +267,7 @@
     "startTime": "Start Time",
     "endTime": "End Time",
     "timeInputTips": "Please enter start-end time！",
-    "capacityTips": "If the version is VMFS5, the minimum capacity is 1G, if the version is VMFS6, the minimum capacity is 2G, and the capacity must be a positive integer in G, and the quantity must be a positive integer and must lower than 100!",
+    "capacityTips": "If the version is VMFS5, the minimum capacity is 1G, if the version is VMFS6, the minimum capacity is 2G, and the capacity must be a positive integer in G, and the quantity must be a positive integer and must lower than 200!",
     "serviceLevelCantBeNull": "The DME Storage Strategy is a must, and you can only choose the DME Storage Strategy whose capacity is not 0!",
     "expandTips": "Expansion capacity can only be a positive integer of GB",
     "expandTipsMax": "After expansion, the total capacity cannot exceed 256TB.",
@@ -306,6 +306,7 @@
       "success": "Successfully mounted!"
     },
     "del": {
+      "warning": "Dangerous operation: the association relationship between the storage and the host will be removed, and the mapping relationship between the volume and the host will be removed at the same time!",
       "title": "Tips",
       "content": "Are you sure to delete?",
       "success": "successfully deleted!"
@@ -732,6 +733,7 @@
     "rdmSuccessMsg": "Create RDM Success!",
     "addTips": "Note: Use this method when you need to create a new LUN on the storage and use the LUN to create an RDM disk for the virtual machine. If you want to use an existing LUN to create, you can directly choose to add RDM disks in the virtual machine hardware editor.",
     "defaultStorage": "Store with the virtual machine",
+    "storageStrategyNull": "The location data (vmfs) selected in step 1 (volume settings) has not been queried for available DME storage strategies, please select storage/storage pool method to create RDM!",
     "compatibilityMode": {
       "name": "Compatibility Mode",
       "virtualMode": "Virtual Mode",
@@ -875,6 +877,7 @@
     "reduceError": "Reduce failed!Please contact management!",
     "deleteError": "Delete failed!Please contact management!",
     "addError": "Add failed!Please contact management!",
+    "addPartError": "Add part successfully! Please contact the administrator!",
     "modifyError": "Modification failed!Please contact management!",
     "reclaimError": "Space reclamation failed! Please contact the administrator!",
     "serviceLevelError": "DME Storage Strategy change failed! Please contact the administrator!",
@@ -889,7 +892,12 @@
     "getDataFailed": "Failed to get data!",
     "cantChangeServiceLevel": "This device is a Custom type and does not support DME Storage Strategy change operation!",
     "iposMaxMinTips": "Can only be an integer from 1 to 999999999.",
-    "nfsSecurityTips": "To use Kerberos authentication, each host that mounts this datastore has to be a part of an Active Directory domain and its NFS authentication credentials need to be set. This is done on the Authentication Services page on each host."
+    "nfsSecurityTips": "To use Kerberos authentication, each host that mounts this datastore has to be a part of an Active Directory domain and its NFS authentication credentials need to be set. This is done on the Authentication Services page on each host.",
+    "errorDetailMessage": "Part of the storage is added successfully：{{partSuccess}}",
+    "errorDetailFailMessage": "Part of the storage failed to add：",
+    "errorDescription": "Description of failure reason：",
+    "HostConnectionFail": "Launcher is not online!",
+    "connectionFailMessage": "The following are the hosts that failed to connect to the host："
   },
   "page": {
     "perPage": "Per Page",
