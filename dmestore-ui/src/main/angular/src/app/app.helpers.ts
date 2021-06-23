@@ -277,7 +277,7 @@ export function vmfsGetSelectedFromTree(clusterArray: VMFS_CLUSTER_NODE[], mount
   /* 一旦选择一个集群，只能该集权 */
   /* 一旦选择一个主机，只能该主机所在集群 */
   for (const clusterNode of clusterArray) {
-    let _node: any = {};
+    let _node: any = clusterNode;
 
     if (String(clusterNode.selected) === String(ClrSelectedState.SELECTED)) {
       /* 第一层本身是host */
@@ -341,7 +341,7 @@ export function getSelectedFromTree(
         if ((clusterNode as any).deviceType === 'host') {
           result.push(_.omit(clusterNode, ['children']));
         }
-        
+
         if (!selectedCluster) {
           selectedCluster = clusterNode;
         }
