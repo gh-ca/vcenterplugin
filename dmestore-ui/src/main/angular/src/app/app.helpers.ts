@@ -277,25 +277,25 @@ export function vmfsGetSelectedFromTree(clusterArray: VMFS_CLUSTER_NODE[], mount
   /* 一旦选择一个集群，只能该集权 */
   /* 一旦选择一个主机，只能该主机所在集群 */
   for (const clusterNode of clusterArray) {
-    let _node: any = {};
+    let _node: any = clusterNode;
 
     if (String(clusterNode.selected) === String(ClrSelectedState.SELECTED)) {
       /* 第一层本身是host */
       if ((clusterNode as any).deviceType === 'host') {
-        (_node as any) = _.omit(clusterNode, ['children']);
+        _node = _.omit(clusterNode, ['children']);
         result.push(_node);
       } else if (mountType === 'host') {
         /* 创建方式是host */
-        (_node as any) = clusterNode;
+        _node = clusterNode;
       } else {
         /* 创建方式是集群 */
         /* 集群下有主机是false，以主机方式 */
         const someFalse = _.some( clusterNode?.children, hostNode => String(hostNode.flag) === 'false' );
         if (someFalse) {
-          (_node as any) = _.omit(clusterNode, ['children']);
+          _node = _.omit(clusterNode, ['children']);
           result.push(_node);
         } else {
-          (_node as any) = clusterNode;
+          _node = clusterNode;
         }
       }
     }

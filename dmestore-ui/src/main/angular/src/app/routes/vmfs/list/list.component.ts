@@ -1429,6 +1429,7 @@ wwn: "67c1cf110058934511ba6e5a00000344"
 
   // 挂载提交
   async mountSubmit() {
+    if (this.isDisableMountSubmit()) return;
     const chooseDevice = this.addForm.value.chooseDevice;
     console.log('chooseDevice', chooseDevice);
 
@@ -1602,6 +1603,7 @@ wwn: "67c1cf110058934511ba6e5a00000344"
 
   // 卸载确认
   unMountConfirm() {
+    if (this.isDisableMountSubmit()) return;
     this.unmountTipsShow = true;
   }
 
