@@ -455,10 +455,22 @@ export class MountComponent implements OnInit {
     }
   }
 
+
+  isDisableMountSubmit() {
+    return this.chooseDevice?.length===0
+  }
+  
+    // 卸载确认
+    unMountConfirm() {
+      if (this.isDisableMountSubmit()) return;
+      this.unmountTipsShow = true;
+  }
+  
   /**
    * 表单提交（挂载/卸载）
    */
-  mountOrUnmountFunc() {
+  mountOrUnmountFunc(isReturn=false) {
+    if (isReturn) return;
     if (this.resource === 'others') {
       /* 列表保持原样 */
       if (this.operationType === 'unmount') {

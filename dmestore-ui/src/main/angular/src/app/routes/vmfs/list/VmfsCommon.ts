@@ -52,6 +52,10 @@ export class VmfsCommon {
     form.patchValue({ [prop]: val });
   }
 
+  isDisableMountSubmit() {
+    return this.addForm?.value?.chooseDevice?.length===0
+  }
+
   handleChooseDeviceChangePatchToValue(prop: string, val: any) {
     this[prop] = val;
   }

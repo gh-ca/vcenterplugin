@@ -171,7 +171,7 @@
     </div>
     <div class="modal-footer">
       <button type="button" class="btn btn-outline" (click)="cancel();">{{'menu.cancel' | translate}}</button>
-      <button type="submit" class="btn btn-primary" (click)="mountOrUnmountFunc()">{{'menu.ok' | translate}}</button>
+      <button type="submit" class="btn btn-primary" [class.submit-disabled]='isDisableMountSubmit()' (click)="mountOrUnmountFunc(isDisableMountSubmit())">{{'menu.ok' | translate}}</button>
     </div>
   </clr-modal>
 
@@ -269,7 +269,7 @@
     </div>
     <div class="modal-footer">
       <button type="button" class="btn btn-outline" (click)="cancel();">{{'menu.cancel' | translate}}</button>
-      <button type="submit" class="btn btn-primary" (click)="unmountTipsShow = true;">{{'menu.ok' | translate}}</button>
+      <button type="submit" class="btn btn-primary" [class.submit-disabled]='isDisableMountSubmit()' (click)="unMountConfirm()">{{'menu.ok' | translate}}</button>
     </div>
   </clr-modal>
 </div>
