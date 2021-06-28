@@ -485,6 +485,38 @@ public class TaskServiceImpl implements TaskService {
         }
     }
 
+    /**
+     * @Description: 根据任务号查询任务结果，并且分组统计
+     * @Param @param null
+     * @return @return
+     * @throws
+     * @author yc
+     * @Date 2021/5/21 15:16
+     */
+    private List<TaskDetailInfoNew> queryTaskByIdNewReturnTaskInfos(String taskId) throws DmeException {
+        String url = DmeConstants.QUERY_TASK_URL.replace("{task_id}", taskId);
+        ResponseEntity<String> responseEntity;
+        List<TaskDetailInfoNew> taskInfos;
+        try {
+            //调用接口查询任务状态
+            responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
+            if (responseEntity.getStatusCodeValue() != HttpStatus.OK.value() || StringUtils.isEmpty(responseEntity.getBody())) {
+                LOG.error("queryTaskById failed!taskId={},errorMsg:{}", taskId, responseEntity.getBody());
+                return null;
+            }
+            // 解析返回结果，返回任务状态和成功或者失败的
+            taskInfos = analyzeTaskRequestResult(responseEntity.getBody());
+        } catch (DmeException ex) {
+            LOG.error("queryTaskById error, errorMsg:{}", ex.getMessage());
+            throw new DmeException("queryTaskById error, errorMsg:{}", ex.getMessage());
+        }
+            if (CollectionUtils.isEmpty(taskInfos)) {
+                return null;
+            }
+            return taskInfos;
+
+    }
+
 
     /**
       * @Description: 获取任务对应的子任务集合
@@ -512,13 +544,14 @@ public class TaskServiceImpl implements TaskService {
             TaskDetailInfoNew taskDetailInfo = new TaskDetailInfoNew();
             JsonObject jsonObject = item.getAsJsonObject();
             taskDetailInfo.setId(ToolUtils.jsonToStr(jsonObject.get("id")));
+            taskDetailInfo.setParentId(ToolUtils.jsonToStr(jsonObject.get("parent_id")));
             taskDetailInfo.setNameCn(ToolUtils.jsonToStr(jsonObject.get("name_cn")));
             taskDetailInfo.setNameEn(ToolUtils.jsonToStr(jsonObject.get("name_en")));
             taskDetailInfo.setStatus(ToolUtils.jsonToInt(jsonObject.get("status")));
             taskDetailInfo.setProgress(ToolUtils.jsonToInt(jsonObject.get("progress")));
             taskDetailInfo.setOwnerName(ToolUtils.jsonToStr(jsonObject.get("owner_name")));
             taskDetailInfo.setOwnerId(ToolUtils.jsonToStr(jsonObject.get("owner_id")));
-            taskDetailInfo.setStartTime(ToolUtils.getLong(jsonObject.get("create_time")));
+            taskDetailInfo.setStartTime(ToolUtils.getLong(jsonObject.get("start_time")));
             taskDetailInfo.setCreateTime(ToolUtils.getLong(jsonObject.get("create_time")));
             taskDetailInfo.setEndTime(ToolUtils.getLong(jsonObject.get("end_time")));
             taskDetailInfo.setDetailEn(ToolUtils.jsonToStr(jsonObject.get("detail_en")));
@@ -601,6 +634,39 @@ public class TaskServiceImpl implements TaskService {
 
     }
 
+    @Override
+    public List<TaskDetailInfoNew> getTaskInfo(String taskId, long longTaskTimeOut) throws DmeException {
+        //首先进行参数判断
+        if(StringUtils.isEmpty(taskId)){
+            return new ArrayList<>();
+        }
+        //设置方法的默认超时时间为3分钟
+        long overTime  = 3*60*1000;
+        if (0!= longTaskTimeOut){
+            overTime = longTaskTimeOut;
+        }
+        long currentmilitions=System.currentTimeMillis();
+        //TasksResultObject result = new TasksResultObject();
+        List<TaskDetailInfoNew> taskInfos;
+        do{
+            try {
+                //程序每次进入等待2秒
+                TimeUnit.SECONDS.sleep(2);
+            } catch (InterruptedException e) {
+                LOG.info("===wait one secend error==={}", e.getMessage());
+            }
+            //首先根据任务号查询任务状态
+            taskInfos = queryTaskByIdNewReturnTaskInfos(taskId);
+            TasksResultObject resultMap = analyzeTaskDetailInfo(taskId,taskInfos);
+            if (StringUtils.isEmpty(resultMap)){
+                return null;
+            }else if (resultMap.isStatus()){
+                return taskInfos;
+            }
+        }while (System.currentTimeMillis()-overTime < currentmilitions);
+        return taskInfos;
+    }
+
     /**
      * @return TaskDetailInfoNew
      * @Description: 获取任务集合中的住任务状态
@@ -608,7 +674,7 @@ public class TaskServiceImpl implements TaskService {
      * @author yc
      * @Date 2021/5/31 15:02
      */
-    private TaskDetailInfoNew getMainTaskInfo(String taskId, List<TaskDetailInfoNew> taskInfos) {
+    public TaskDetailInfoNew getMainTaskInfo(String taskId, List<TaskDetailInfoNew> taskInfos) {
         //首先判断任务集合是否为空
         if (CollectionUtils.isEmpty(taskInfos)) {
             return null;
