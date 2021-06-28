@@ -278,13 +278,16 @@ public class VmfsAccessController extends BaseController {
         LOG.info("accessvmfs/createvmfsnew=={}", gson.toJson(params));
         String failureStr = "";
         try {
-            CreateVmfsResponse result = vmfsAccessService.createVmfsNew(params);
-            if (result.getSuccessNo() == 0) {
-                return failure("create vmfs failure!",result);
-            }else if (result.getFailNo() != 0 || !CollectionUtils.isEmpty(result.getConnectionResult())){
-                return partialSuccess(result,"create vmfs partial success!");
-            }else {
+            //CreateVmfsResponse result = vmfsAccessService.createVmfsNew(params);
+
+            CreateVmfsResponse02 result = vmfsAccessService.createVmfsNew1(params);
+            if (result.getSuccessNo() != 0 && result.getFailNo()==0 && result.getPartialSuccess() == 0
+                    && CollectionUtils.isEmpty(result.getConnectionResult())){
                 return success(result, "create vmfs success");
+            }else if (result.getSuccessNo() == 0 && result.getPartialSuccess() == 0) {
+                return failure("create vmfs failure!",result);
+            }else {
+                return partialSuccess(result,"create vmfs partial success!");
             }
         } catch (DmeException e) {
             failureStr = "create vmfs failure:" + e.getMessage();

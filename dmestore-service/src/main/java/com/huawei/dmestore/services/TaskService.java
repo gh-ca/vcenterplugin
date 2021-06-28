@@ -85,4 +85,7 @@ public interface TaskService {
      * @return TaskDetailInfo TaskDetailInfo
      **/
     TaskDetailInfoNew queryTaskByIdReturnMainTask(String taskId, long timeout);
+
+    List<TaskDetailInfoNew> getTaskInfo(String taskId, long longTaskTimeOut) throws DmeException;
+    TaskDetailInfoNew getMainTaskInfo(String taskId, List<TaskDetailInfoNew> taskDetailInfoNewList);
 }
