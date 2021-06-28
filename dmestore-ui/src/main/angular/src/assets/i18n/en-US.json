@@ -893,8 +893,9 @@
     "cantChangeServiceLevel": "This device is a Custom type and does not support DME Storage Strategy change operation!",
     "iposMaxMinTips": "Can only be an integer from 1 to 999999999.",
     "nfsSecurityTips": "To use Kerberos authentication, each host that mounts this datastore has to be a part of an Active Directory domain and its NFS authentication credentials need to be set. This is done on the Authentication Services page on each host.",
-    "errorDetailMessage": "Part of the storage is added successfully：{{partSuccess}}",
-    "errorDetailFailMessage": "Part of the storage failed to add：",
+    "errorDetailMessage": "Partially successfully mounted data storage：",
+    "errorDetailFailMessage": "Failed to create data store：",
+    "successAll": "Mounting the data store is completely successful：",
     "errorDescription": "Description of failure reason：",
     "HostConnectionFail": "Launcher is not online!",
     "connectionFailMessage": "The following are the hosts that failed to connect to the host："

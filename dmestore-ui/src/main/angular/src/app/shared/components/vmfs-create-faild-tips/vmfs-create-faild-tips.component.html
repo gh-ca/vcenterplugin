@@ -12,20 +12,28 @@
         {{'vmfs.creatfailtips'| translate}}
       </div>
       </div>
-      <div class="create-fail-description"  *ngIf="detailShow">
+      <div class="create-fail-description">
         <clr-signpost>
           <button class="btn btn-link"
                   clrSignpostTrigger>
             {{'tips.details'|translate}}
           </button>
-          <clr-signpost-content  [clrPosition]="'bottom-left'" *clrIfOpen>
-            <div>{{descriptionContent}}</div>
+          <clr-signpost-content  [clrPosition]="'bottom-left'" *clrIfOpen >
+            <!--          <div>{{descriptionContent}}</div>-->
+            <!--          <div *ngIf="connectionResult&&connectionResult.length>0">-->
+            <!--            <h6>{{'errorMsg.connectionFailMessage'|translate}}</h6>-->
+            <!--            <ul class="list-unstyled">-->
+            <!--              <li *ngFor="let item of connectionResult">{{item}}</li>-->
+            <!--            </ul>-->
+            <!--          </div>-->
+            <div class="create-fail-detail"><span>{{'errorMsg.successAll'|translate}}</span><span style="color: #009926;font-weight: bolder">{{successNo}}</span></div>
+            <div class="create-fail-detail"><span>{{'errorMsg.errorDetailMessage'| translate}}</span><span style="color: #FF9800;font-weight: bolder">{{partSuccess}}</span></div>
+            <div class="create-fail-detail"><span>{{'errorMsg.errorDetailFailMessage'|translate}}</span><span style="color: red;font-weight: bolder">{{failNo}}</span></div>
             <div *ngIf="connectionResult&&connectionResult.length>0">
-              <h6>{{'errorMsg.connectionFailMessage'|translate}}</h6>
-              <ul class="list-unstyled">
-              <li *ngFor="let item of connectionResult">{{item}}</li>
-            </ul>
+              <div>{{"errorMsg.connectionFailMessage"|translate}}</div>
+              <div *ngFor="let item of connectionResult">{{item}}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{'errorMsg.HostConnectionFail'|translate}}</div>
             </div>
+            <div *ngIf="connectionResult&&connectionResult.length===0">{{'errorMsg.errorDescription'|translate}}{{descriptionContent}}</div>
           </clr-signpost-content>
         </clr-signpost>
       </div>
@@ -58,9 +66,11 @@
 <!--              <li *ngFor="let item of connectionResult">{{item}}</li>-->
 <!--            </ul>-->
 <!--          </div>-->
-          {{'errorMsg.errorDetailMessage'| translate:'{partSuccess:'+partSuccess+'}'}}
-          <div>{{'errorMsg.errorDetailFailMessage'|translate}}</div>
+          <div class="create-fail-detail"><span>{{'errorMsg.successAll'|translate}}</span><span style="color: #009926;font-weight: bolder">{{successNo}}</span></div>
+          <div class="create-fail-detail"><span>{{'errorMsg.errorDetailMessage'| translate}}</span><span style="color: #FF9800;font-weight: bolder">{{partSuccess}}</span></div>
+          <div class="create-fail-detail"><span>{{'errorMsg.errorDetailFailMessage'|translate}}</span><span style="color: red;font-weight: bolder">{{failNo}}</span></div>
           <div *ngIf="connectionResult&&connectionResult.length>0">
+            <div>{{"errorMsg.connectionFailMessage"|translate}}</div>
           <div *ngFor="let item of connectionResult">{{item}}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{'errorMsg.HostConnectionFail'|translate}}</div>
           </div>
           <div *ngIf="connectionResult&&connectionResult.length===0">{{'errorMsg.errorDescription'|translate}}{{descriptionContent}}</div>

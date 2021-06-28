@@ -893,8 +893,9 @@
     "cantChangeServiceLevel": "该设备为自定义类型，不支持DME存储策略变更操作！",
     "iposMaxMinTips": "只能为1到999999999的整数。",
     "nfsSecurityTips": "要使用 Kerberos 身份验证，挂载此数据存储的每个主机都必须包含在 Active Directory 域中，并需要设置其 NFS 身份验证凭据。该过程在每个主机的“身份验证服务”页上完成。",
-    "errorDetailMessage": "部分存储添加成功：{{partSuccess}}个",
-    "errorDetailFailMessage": "部分存储添加失败：",
+    "errorDetailMessage": "挂载数据存储部分成功：",
+    "errorDetailFailMessage": "创建数据存储失败：",
+    "successAll": "挂载数据存储完全成功：",
     "errorDescription": "失败原因描述：",
     "HostConnectionFail": "启动器不在线!",
     "connectionFailMessage": "以下是主机连通失败的主机："
