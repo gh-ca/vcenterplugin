@@ -11,42 +11,44 @@ export class VmfsCreateFaildTipsComponent implements OnInit ,AfterViewChecked{
   constructor(private translateService:TranslateService) { }
   failStatus:number;
   partSuccess:number;
-  partFail:number;
+  failNo:number;
+  successNo:number
   descriptionContent:string;
   connectionResult:[];
-  detailShow:boolean;
+  // detailShow:boolean;
   // detailShow:boolean=false;
   ngOnInit(): void {
       this.getFailStatus()
-      this.getDescriptionContent()
-    this.getFailDetail()
+      // this.getDescriptionContent()
+    // this.getFailDetail()
 
     // console.log(this.translateService.currentLang)
   }
   ngAfterViewChecked() {
     // console.log(this.translateService.currentLang)
-    this.getDescriptionContent()
+    // this.getDescriptionContent()
   }
 
   getFailStatus(){
       this.failStatus=this.partSuccessData.code==='206'?0:1;
-      if(this.failStatus===0) {
-        this.partSuccess = this.partSuccessData.data.successNo;
-        this.partFail = this.partSuccessData.data.failNo;
-      }
+    this.successNo = this.partSuccessData.data.successNo;
+    this.failNo = this.partSuccessData.data.failNo;
+    this.partSuccess=this.partSuccessData.data.partialSuccess;
+    this.descriptionContent=this.partSuccessData.description;
+    this.connectionResult=this.partSuccessData.data.connectionResult
   }
-  getDescriptionContent(){
-    if(this.partSuccessData && this.partSuccessData.data){
-      this.descriptionContent=this.translateService.currentLang==='en-US'?
-        this.partSuccessData.data.descriptionEN:this.partSuccessData.data.descriptionCN
-      this.connectionResult=this.partSuccessData.data.connectionResult
-    }
-  }
-  getFailDetail(){
-    if(this.partSuccessData.data.descriptionCN||this.partSuccessData.data.descriptionEN){
-      this.detailShow=true
-    }else {this.detailShow=false}
-
-  }
+  // getDescriptionContent(){
+  //   if(this.partSuccessData && this.partSuccessData.data){
+  //     this.descriptionContent=this.translateService.currentLang==='en-US'?
+  //       this.partSuccessData.data.descriptionEN:this.partSuccessData.data.descriptionCN
+  //     this.connectionResult=this.partSuccessData.data.connectionResult
+  //   }
+  // }
+  // getFailDetail(){
+  //   if(this.partSuccessData.data.descriptionCN||this.partSuccessData.data.descriptionEN){
+  //     this.detailShow=true
+  //   }else {this.detailShow=false}
+  //
+  // }
 
 }

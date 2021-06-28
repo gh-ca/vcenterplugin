@@ -69,7 +69,7 @@ export class DevDemoComponentComponent implements OnInit {
       this.vmfsList = await mockServerData(vmfsClusterTreeData,1000);
     })();
   }
-
+  // "10.12.123.1","10.23.234.1"
   initForm() {
     //模拟返回数据
     this.partSuccessData={
@@ -77,10 +77,12 @@ export class DevDemoComponentComponent implements OnInit {
       data:{
         successNo:2,
         failNo:1,
-        connectionResult:[],
-        descriptionEN:"loream....",
-        descriptionCN:"这里有一段内容"
-      }
+        connectionResult:["10.12.123.1","10.23.234.1"],
+        // descriptionEN:"loream....",
+        // descriptionCN:"这里有一段内容",
+        partialSuccess:1,
+      },
+      description: "asdsadasdasdsa"
     }
     /*初始化和校验规则*/
     this.form = new FormGroup({
