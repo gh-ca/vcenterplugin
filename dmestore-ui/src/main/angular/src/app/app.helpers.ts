@@ -292,10 +292,10 @@ export function vmfsGetSelectedFromTree(clusterArray: VMFS_CLUSTER_NODE[], mount
         /* 集群下有主机是false，以主机方式 */
         const someFalse = _.some( clusterNode?.children, hostNode => String(hostNode.flag) === 'false' );
         if (someFalse) {
+          _node = clusterNode;
+        } else {
           _node = _.omit(clusterNode, ['children']);
           result.push(_node);
-        } else {
-          _node = clusterNode;
         }
       }
     }
