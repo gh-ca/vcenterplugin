@@ -314,7 +314,10 @@ clr-dg-cell.datagrid-cell{
   div.clr-treenode-content{
     color:gray;
     opacity: 0.5;
-    margin-right:24px;
+    &::before{
+      content:" ";
+      width:22px;
+    }
   }
   input.clr-checkbox{
     display: none;
@@ -322,4 +325,17 @@ clr-dg-cell.datagrid-cell{
   label.clr-control-label {
     display:none;
   }
+}
+
+
+.submit-disabled{
+  color: #666;
+  color: var(--clr-btn-primary-disabled-color, #666666);
+  cursor: not-allowed;
+  opacity: .4;
+  background-color: #ccc;
+  background-color: var(--clr-btn-primary-disabled-bg-color, #cccccc);
+  border-color: #ccc;
+  border-color: var(--clr-btn-primary-disabled-border-color, #cccccc);
+  box-shadow: none;
 }

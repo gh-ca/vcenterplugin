@@ -189,7 +189,7 @@ public interface VmfsAccessService {
 
     Map<String,List<Map<String, Object>>> getAllInitionator() throws DmeException ;
     /**
-      * @Description:  创建Vmfs支持批量选择主机或者主机组
+      * @Description:  createVmfsNew 创建Vmfs支持批量选择主机或者主机组（循环主机和lun，优点：可以拿到每台主机每台lun的映射情况，缺点：循环调用Dme下发任务，下发任务）
       * @Param @param null
       * @return @return
       * @throws
@@ -197,6 +197,16 @@ public interface VmfsAccessService {
       * @Date 2021/5/14 10:38
      */
     CreateVmfsResponse createVmfsNew(Map<String, Object> params) throws DmeException ;
+    /**
+     * @Description:  createVmfsNew1 创建Vmfs支持批量选择主机或者主机组（循环主机和lun，优点：可以拿到每台主机每台lun的映射情况，缺点：循环调用Dme下发任务）
+     * @Param @param null
+     * @return @return
+     * @throws
+     * @author yc
+     * @Date 2021/5/14 10:38
+     */
+    CreateVmfsResponse02 createVmfsNew1(Map<String, Object> params) throws DmeException ;
+
     /**
       * @Description: vmfs挂载新方法，支持批量选择主机或者主机组
       * @Param @param null
