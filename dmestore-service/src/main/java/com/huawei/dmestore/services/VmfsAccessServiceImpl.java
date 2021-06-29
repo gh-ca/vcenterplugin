@@ -4759,11 +4759,21 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             //todo 重新改造原有方法（检查主机组连通性）
             //检查主机组是否存在，不存在就创建新的主机组
             List<String> clusters = getClusterIdList(chooseDevicelists);
+            Map<String, String> clusterMap = getClusterNameAndClusterIdList(chooseDevicelists);
             if (!CollectionUtils.isEmpty(clusters) && clusters.size() > 1) {
                 throw new DmeException("create vmfs error : params is error");
             }
+            if (!CollectionUtils.isEmpty(clusterMap) && clusterMap.size() > 1) {
+                throw new DmeException("create vmfs error : params is error");
+            }
             //校验主机组是否存在，存在，先检查连通性进行映射，不存在就创建新的主机组再进行隐射
-            HostGroupAndClusterConsistency checkResult = checkConsistencyAndGetclusterId(clusters.get(0),null);
+            //todo 20210629x修改查找主机组的方法
+           // HostGroupAndClusterConsistency checkResult = checkConsistencyAndGetclusterId(clusters.get(0),null);
+            //修改后
+            HostGroupAndClusterConsistency checkResult = getTakeCareHostGroup(clusterMap);
+            if (StringUtils.isEmpty(checkResult) || StringUtils.isEmpty(checkResult.getHostGroupId())) {
+                checkResult = checkConsistencyAndGetclusterId(clusters.get(0),null);
+            }
             String hostGroupId = null;
             if (!StringUtils.isEmpty(checkResult) && !StringUtils.isEmpty(checkResult.getHostGroupId())) {
                 hostGroupId = checkResult.getHostGroupId();
@@ -4791,6 +4801,24 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         }
         return hostIds;
     }
+
+    private HostGroupAndClusterConsistency getTakeCareHostGroup(Map<String, String> clusterMap) throws DmeException {
+        if (!CollectionUtils.isEmpty(clusterMap)) {
+            String hostGroupName = new ArrayList<>(clusterMap.keySet()).get(0);
+            List<Map<String, Object>> dmeHostGroups = dmeAccessService.getDmeHostGroups(hostGroupName);
+            if (!CollectionUtils.isEmpty(dmeHostGroups)) {
+                for (Map<String, Object> map : dmeHostGroups) {
+                    if (hostGroupName.equalsIgnoreCase(ToolUtils.getStr(map.get(NAME_FIELD)))) {
+                        String hostGroupId = ToolUtils.getStr(map.get(ID_FIELD));
+                        return new HostGroupAndClusterConsistency(true, hostGroupId);
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+
     /**
      * @return Map<String, List < String>>
      * @throws DmeException
@@ -4923,6 +4951,22 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         return clusterList;
     }
 
+    /**
+     * @Description: 获取参数中的集群名称和Id列表
+     * @Param params
+     * @author yc
+     * @Date 2021/5/12 14:37
+     */
+    private Map<String, String> getClusterNameAndClusterIdList(List<Map<String, String>> chooseDevicelists) {
+        HashMap<String, String> hostMap = new HashMap<String, String>();
+        for (Map<String, String> chooseMap : chooseDevicelists) {
+            if ("cluster".equalsIgnoreCase(StringUtils.trimAllWhitespace(chooseMap.get("deviceType")))) {
+                hostMap.put(StringUtils.trimAllWhitespace(chooseMap.get("deviceId")), StringUtils.trimAllWhitespace(chooseMap.get("deviceName")));
+            }
+        }
+        return hostMap;
+
+    }
     /**
      * @return hostIds
      * @throws DmeException
