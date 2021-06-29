@@ -6,6 +6,7 @@ import com.huawei.dmestore.model.*;
 import com.huawei.dmestore.services.VmfsAccessService;
 import com.google.gson.Gson;
 
+import com.huawei.dmestore.utils.ToolUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -277,10 +278,11 @@ public class VmfsAccessController extends BaseController {
     public ResponseBodyBean createvmfsNew(@RequestBody Map<String, Object> params) {
         LOG.info("accessvmfs/createvmfsnew=={}", gson.toJson(params));
         String failureStr = "";
+        CreateVmfsResponse02 result = new CreateVmfsResponse02();
         try {
             //CreateVmfsResponse result = vmfsAccessService.createVmfsNew(params);
 
-            CreateVmfsResponse02 result = vmfsAccessService.createVmfsNew1(params);
+             result = vmfsAccessService.createVmfsNew1(params);
             if (result.getSuccessNo() != 0 && result.getFailNo()==0 && result.getPartialSuccess() == 0
                     && CollectionUtils.isEmpty(result.getConnectionResult())){
                 return success(result, "create vmfs success");
@@ -291,8 +293,9 @@ public class VmfsAccessController extends BaseController {
             }
         } catch (DmeException e) {
             failureStr = "create vmfs failure:" + e.getMessage();
+            result.setFailNo(ToolUtils.getInt(params.get("count")));
         }
-        return failure(failureStr);
+        return failure(failureStr,result);
     }
 
     /**
