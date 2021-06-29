@@ -898,7 +898,8 @@
     "successAll": "挂载数据存储完全成功：",
     "errorDescription": "失败原因描述：",
     "HostConnectionFail": "启动器不在线!",
-    "connectionFailMessage": "以下是主机连通失败的主机："
+    "connectionFailMessage": "以下是主机连通失败的主机：",
+    "details": "详情："
   },
   "page": {
     "perPage": "每页",

@@ -898,7 +898,8 @@
     "successAll": "Mounting the data store is completely successful：",
     "errorDescription": "Description of failure reason：",
     "HostConnectionFail": "Launcher is not online!",
-    "connectionFailMessage": "The following are the hosts that failed to connect to the host："
+    "connectionFailMessage": "The following are the hosts that failed to connect to the host：",
+    "details": "Details："
   },
   "page": {
     "perPage": "Per Page",
