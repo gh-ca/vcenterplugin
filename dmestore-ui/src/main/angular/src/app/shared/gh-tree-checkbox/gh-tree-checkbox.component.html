@@ -8,17 +8,24 @@
 <!--    {{device.clusterName}}-->
 <!--  </clr-tree-node>-->
 <!--</clr-tree>-->
-<clr-tree *ngIf="isTree">
-  <clr-tree-node
-    *clrRecursiveFor="let device of tree; getChildren: getChildren"
-    [class]="(selectedHost||!device.flag||device.isDisabled)?'disabled':''"
-    (clrSelectedChange)="emitValueChange()"
-    [(clrSelected)]="device.selected">
-    <clr-icon [attr.shape]="device.deviceType==='host'?'host':'host-group'"></clr-icon>
-    {{device.clusterName}}
-  </clr-tree-node>
-</clr-tree>
-
+<div style="position: relative">
+  <clr-tree *ngIf="isTree">
+    <clr-tree-node
+      *clrRecursiveFor="let device of tree; getChildren: getChildren"
+      [class]="(selectedHost||!device.flag||device.isDisabled)?'disabled':''"
+      (clrSelectedChange)="emitValueChange()"
+      [(clrSelected)]="device.selected">
+      <clr-icon [attr.shape]="device.deviceType==='host'?'host':'host-group'"></clr-icon>
+      {{device.clusterName}}
+    </clr-tree-node>
+  </clr-tree>
+  <div *ngIf="checkTreeLength()"  class="loadingDiv" style="position: absolute;z-index: 1;background-color: #b8b8b8;width: 100%;height: 100%;top:0;left:0;" >
+          <span>
+            {{'vmfs.dataHandleLoadingTips' | translate}}<img src="./assets/images/loading.gif" width="20px"
+                                                             height="20px" style="margin-left: 20px;">
+          </span>
+  </div>
+</div>
 
 <!-- <pre>
     {{helper.print(resValue)}}
