@@ -129,4 +129,12 @@ export class GhTreeCheckboxComponent implements OnInit {
     return [];
   }
 
+//  当前树是否有长度，判断是否展示数据加载模态框
+  checkTreeLength(){
+    if(this.tree&&this.tree.length>0){
+      return false
+    }else {
+      return false
+    }
+  }
 }
