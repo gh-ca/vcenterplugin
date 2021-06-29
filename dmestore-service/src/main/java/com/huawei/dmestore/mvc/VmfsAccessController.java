@@ -6,6 +6,7 @@ import com.huawei.dmestore.model.*;
 import com.huawei.dmestore.services.VmfsAccessService;
 import com.google.gson.Gson;
 
+import com.huawei.dmestore.utils.ToolUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -292,6 +293,7 @@ public class VmfsAccessController extends BaseController {
             }
         } catch (DmeException e) {
             failureStr = "create vmfs failure:" + e.getMessage();
+            result.setFailNo(ToolUtils.getInt(params.get("count")));
         }
         return failure(failureStr,result);
     }
