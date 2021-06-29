@@ -277,10 +277,11 @@ public class VmfsAccessController extends BaseController {
     public ResponseBodyBean createvmfsNew(@RequestBody Map<String, Object> params) {
         LOG.info("accessvmfs/createvmfsnew=={}", gson.toJson(params));
         String failureStr = "";
+        CreateVmfsResponse02 result = new CreateVmfsResponse02();
         try {
             //CreateVmfsResponse result = vmfsAccessService.createVmfsNew(params);
 
-            CreateVmfsResponse02 result = vmfsAccessService.createVmfsNew1(params);
+             result = vmfsAccessService.createVmfsNew1(params);
             if (result.getSuccessNo() != 0 && result.getFailNo()==0 && result.getPartialSuccess() == 0
                     && CollectionUtils.isEmpty(result.getConnectionResult())){
                 return success(result, "create vmfs success");
@@ -292,7 +293,7 @@ public class VmfsAccessController extends BaseController {
         } catch (DmeException e) {
             failureStr = "create vmfs failure:" + e.getMessage();
         }
-        return failure(failureStr);
+        return failure(failureStr,result);
     }
 
     /**
