@@ -520,7 +520,7 @@
           "controller": "控制器",
           "status": "状态",
           "version": "版本",
-          "cpuUsage": "CPU利用率",
+          "cpuUsage": "CPU利用率(%)",
           "iops": "IOPS",
           "ops": "OPS",
           "latency": "平均I/O响应时间(ms)",
@@ -534,11 +534,11 @@
           "capacity": "容量",
           "role": "角色",
           "diskDomain": "硬盘域",
-          "rotationalSpeed": "转速",
+          "rotationalSpeed": "转速(RPM)",
           "iops": "IOPS",
           "latency": "平均I/O响应时间(ms)",
           "bandwidth": "带宽(MB/s)",
-          "usage": "使用率(%)"
+          "usage": "利用率(%)"
         },
         "ports": {
           "ports": "端口",
@@ -898,7 +898,8 @@
     "successAll": "挂载数据存储完全成功：",
     "errorDescription": "失败原因描述：",
     "HostConnectionFail": "启动器不在线!",
-    "connectionFailMessage": "以下是主机连通失败的主机："
+    "connectionFailMessage": "以下是主机连通失败的主机：",
+    "details": "详情："
   },
   "page": {
     "perPage": "每页",
