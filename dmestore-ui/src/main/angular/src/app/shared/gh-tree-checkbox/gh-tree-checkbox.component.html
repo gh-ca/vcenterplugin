@@ -8,6 +8,14 @@
 <!--    {{device.clusterName}}-->
 <!--  </clr-tree-node>-->
 <!--</clr-tree>-->
+
+<!-- 
+  1.创建
+  - 1.单主机 与 集群性质一样，选择了单主机就只能在单主机里选，其他集群置灰
+  - 2.
+  2.挂载
+  - 1."flag": true,作为置灰标识，不可选，但是要展示  
+ -->
 <div style="position: relative">
   <clr-tree *ngIf="isTree">
     <clr-tree-node

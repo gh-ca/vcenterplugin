@@ -271,6 +271,7 @@ export type VMFS_CLUSTER_NODE = {
   selected?: number;
 };
 
+/* vmfs 挂载专用 */
 export function vmfsGetSelectedFromTree(clusterArray: VMFS_CLUSTER_NODE[], mountType = '') {
   let result = [];
   let selectedCluster: any = false;
@@ -290,7 +291,10 @@ export function vmfsGetSelectedFromTree(clusterArray: VMFS_CLUSTER_NODE[], mount
       } else {
         /* 创建方式是集群 */
         /* 集群下有主机是false，以主机方式 */
-        const someFalse = _.some( clusterNode?.children, hostNode => String(hostNode.flag) === 'false' );
+        const someFalse = _.some(
+          clusterNode?.children,
+          hostNode => String(hostNode.flag) === 'false'
+        );
         if (someFalse) {
           _node = clusterNode;
         } else {
@@ -333,7 +337,9 @@ export function getSelectedFromTree(
 ) {
   let result = [];
   let selectedCluster: any = false;
-  /* 一旦选择一个集群，只能该集权 */
+  let selectedHost: any = false;
+  /* 一旦选择单主机，只能单主机 */
+  /* 一旦选择一个集群，只能该集群 */
   /* 一旦选择一个主机，只能该主机所在集群 */
   for (const clusterNode of clusterArray) {
     if (mountType === 'host') {
@@ -341,7 +347,7 @@ export function getSelectedFromTree(
         if ((clusterNode as any).deviceType === 'host') {
           result.push(_.omit(clusterNode, ['children']));
         }
-        
+
         if (!selectedCluster) {
           selectedCluster = clusterNode;
         }
@@ -349,6 +355,9 @@ export function getSelectedFromTree(
     } else {
       if (String(clusterNode.selected) === String(ClrSelectedState.SELECTED)) {
         const _node = _.omit(clusterNode, ['children']);
+        if (_node.deviceType === 'host') {
+          selectedHost = _node;
+        }
         // _node['deviceType'] = 'cluster';
         result.push(_node);
         // console.log(result)
@@ -377,6 +386,15 @@ export function getSelectedFromTree(
   const setDisabled = setDisabledTrue => {
     /* 需要设置disabled，部分置灰 */
     for (const clusterNode of clusterArray) {
+      
+      const setSingleHostDisabled = () => {
+        if ((clusterNode as any).deviceType === 'host') {
+          (clusterNode as any).isDisabled = false;
+        } else {
+          (clusterNode as any).isDisabled = true;
+        }
+      };
+
       const setOtherDisabled = () => {
         (clusterNode as any).isDisabled = true;
         if (clusterNode.children && clusterNode.children.length > 0) {
@@ -405,12 +423,18 @@ export function getSelectedFromTree(
       };
 
       if (setDisabledTrue) {
-        /* 不同集群，置灰 */
-        if (clusterNode.clusterId !== selectedCluster.clusterId) {
-          setOtherDisabled();
+        if (selectedHost) {
+          /* 选择单主机，其他集群置灰 */
+          setSingleHostDisabled();
         } else {
-          /* 相同集群，可选 */
-          setEnable();
+          /* 选择集群，单主机和其他集群置灰 */
+          /* 不同集群，置灰 */
+          if (clusterNode.clusterId !== selectedCluster.clusterId) {
+            setOtherDisabled();
+          } else {
+            /* 相同集群，可选 */
+            setEnable();
+          }
         }
       } else {
         /* 全部可选 */

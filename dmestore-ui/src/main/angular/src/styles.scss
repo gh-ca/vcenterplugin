@@ -339,3 +339,12 @@ clr-dg-cell.datagrid-cell{
   border-color: var(--clr-btn-primary-disabled-border-color, #cccccc);
   box-shadow: none;
 }
+
+
+/* fix:vmfs 挂载 tree 选中后 选择框位移bug */
+.clr-tree-node.ng-star-inserted.disabled .clr-tree-node-content-container>.clr-checkbox-wrapper {
+  height: 1.62rem;
+  width: 0;
+  padding-top: .21rem;
+  padding-left: .41rem;
+}
