@@ -33,7 +33,7 @@
               <div>{{"errorMsg.connectionFailMessage"|translate}}</div>
               <div *ngFor="let item of connectionResult">{{item}}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{'errorMsg.HostConnectionFail'|translate}}</div>
             </div>
-            <div *ngIf="connectionResult&&connectionResult.length===0">{{'errorMsg.errorDescription'|translate}}{{descriptionContent}}</div>
+            <div *ngIf="connectionResult===null||connectionResult.length===0">{{'errorMsg.details'|translate}}<div style="text-indent: 2rem">{{descriptionContent}}</div></div>
           </clr-signpost-content>
         </clr-signpost>
       </div>
@@ -73,7 +73,7 @@
             <div>{{"errorMsg.connectionFailMessage"|translate}}</div>
           <div *ngFor="let item of connectionResult">{{item}}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{'errorMsg.HostConnectionFail'|translate}}</div>
           </div>
-          <div *ngIf="connectionResult&&connectionResult.length===0">{{'errorMsg.errorDescription'|translate}}{{descriptionContent}}</div>
+          <div *ngIf="connectionResult===null||connectionResult.length===0">{{'errorMsg.details'|translate}}<div style="text-indent: 2rem">{{descriptionContent}}</div></div>
         </clr-signpost-content>
       </clr-signpost>
       </div>

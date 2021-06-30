@@ -520,7 +520,7 @@
           "controller": "Controller",
           "status": "Status",
           "version": "Version",
-          "cpuUsage": "CPU Usage",
+          "cpuUsage": "CPU Usage(%)",
           "iops": "IOPS",
           "ops": "OPS",
           "latency": "Average I/O Response Time (ms)",
@@ -534,11 +534,11 @@
           "capacity": "Capacity",
           "role": "Role",
           "diskDomain": "Disk Domain",
-          "rotationalSpeed": "Rotational Speed",
+          "rotationalSpeed": "Rotational Speed(RPM)",
           "iops": "IOPS",
           "latency": "Average I/O Response Time (ms)",
           "bandwidth": "Bandwidth(MB/s)",
-          "usage": "Usage(%)"
+          "usage": "Utilization(%)"
         },
         "ports": {
           "ports": "Ports",
@@ -898,7 +898,8 @@
     "successAll": "Mounting the data store is completely successful：",
     "errorDescription": "Description of failure reason：",
     "HostConnectionFail": "Launcher is not online!",
-    "connectionFailMessage": "The following are the hosts that failed to connect to the host："
+    "connectionFailMessage": "The following are the hosts that failed to connect to the host：",
+    "details": "Details："
   },
   "page": {
     "perPage": "Per Page",
