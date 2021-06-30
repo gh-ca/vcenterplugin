@@ -623,7 +623,7 @@ public class TaskServiceImpl implements TaskService {
                 }
                 List<TaskDetailInfoNew> taskInfos = analyzeTaskRequestResult(responseEntity.getBody());
                 taskDetailInfoNew  = getMainTaskInfo(taskId, taskInfos);
-                if (!StringUtils.isEmpty(taskDetailInfoNew) && (100 == taskDetailInfoNew.getProgress() || 3 < taskDetailInfoNew.getStatus())){
+                if (!StringUtils.isEmpty(taskDetailInfoNew) && ((3 == taskDetailInfoNew.getStatus() && 100 == taskDetailInfoNew.getProgress()) || 3 < taskDetailInfoNew.getStatus())){
                     return taskDetailInfoNew;
                 }
             }while (System.currentTimeMillis()-overTime < currentmilitions);
