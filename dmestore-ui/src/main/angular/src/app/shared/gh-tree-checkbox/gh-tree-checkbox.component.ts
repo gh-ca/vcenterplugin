@@ -134,7 +134,7 @@ export class GhTreeCheckboxComponent implements OnInit {
     if(this.tree&&this.tree.length>0){
       return false
     }else {
-      return false
+      return true
     }
   }
 }
