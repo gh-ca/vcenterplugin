@@ -545,7 +545,7 @@
           "location": "位置",
           "status": "状态",
           "wwn": "WWPN",
-          "workingRate": "工作速度(Mbit/s)",
+          "workingRate": "工作速率(Mbit/s)",
           "iops": "IOPS",
           "latency": "平均I/O响应时间(ms)",
           "bandwidth": "带宽(MB/s)",
