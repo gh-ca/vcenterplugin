@@ -215,7 +215,7 @@ public interface VmfsAccessService {
       * @author yc
       * @Date 2021/5/14 10:48
      */
-    List<Map<String, String>> mountVmfsNew(Map<String, Object> params) throws DmeException;
+    Boolean mountVmfsNew(Map<String, Object> params) throws DmeException;
     /**
       * @Description: 卸载页面，以树的形式返回可卸载的主机和集群（已过滤集群下未挂载的主机信息）
       * @Param @param null
