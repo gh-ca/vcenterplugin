@@ -316,7 +316,7 @@ public class VmfsAccessController extends BaseController {
             }else if (res) {
                 return success(null, "Mount vmfs success");
             }else {
-               return partialSuccess(null,"create vmfs partial success!");
+               return partialSuccess(null,"Mount vmfs partial success!");
 
             }
         } catch (DmeException e) {
