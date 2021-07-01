@@ -4146,6 +4146,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             LOG.info(gson.toJson(volumeidMapToHostOrGroup));
 
             if (!CollectionUtils.isEmpty(volumeidMapToHostOrGroup)) {
+                LOG.info(gson.toJson(new ArrayList<>(volumeidMapToHostOrGroup.keySet())));
                 deleteFailLun02(new ArrayList<>(volumeidMapToHostOrGroup.keySet()));
             }
             successnum = successList.size();
@@ -4356,12 +4357,9 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 String dataStoreStr= null;
                 try {
                     if (HOST.equalsIgnoreCase(type)) {
-                       // dataStoreStr = createVmfsOnVmwareNew2Host(paramstemp, volumeidMapToHostOrGroup.get(volumeId), null, objid2hostId);
-
                         dataStoreStr = createVmfsOnVmwareNew02(paramstemp, volumeidMapToHostOrGroup.get(volumeId).get(0), null, objid2hostId);
                     }
                     if (CLUSTER.equalsIgnoreCase(type)) {
-                        //dataStoreStr = createVmfsOnVmwareNew2Cluster(paramstemp, null, volumeidMapToHostOrGroup.get(volumeId), objid2hostId);
                         dataStoreStr = createVmfsOnVmwareNew02(paramstemp, null, clusterid, objid2hostId);
                     }
 
@@ -4420,7 +4418,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                     hsdmap = vcsdkUtils.getLunsOnHost(objid2hostId.get(hostObjectId), capacity, existVolumeWwn);
                 }
                 if (!StringUtils.isEmpty(clusterObjectId)) {
-                    hsdmap = vcsdkUtils.getLunsOnCluster(objid2hostId.get(clusterObjectId), capacity, existVolumeWwn);
+                    hsdmap = vcsdkUtils.getLunsOnCluster(clusterObjectId, capacity, existVolumeWwn);
                 }
 
                 int vmfsMajorVersion = ToolUtils.getInt(params.get("version"));
@@ -5991,6 +5989,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 }
             }
         }
+        vcsdkUtils.refreshStorageSystem(ToolUtils.getStr(params.get(DATASTORE_OBJECT_IDS)));
         mountedLst = vcsdkUtils.getHostsByDsObjectIdNew(ToolUtils.getStr(params.get(DATASTORE_OBJECT_IDS)), true);
        if(mountedLst.size() == mounted.size()){
            return false;
