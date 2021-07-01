@@ -221,6 +221,7 @@ export class VmfsListComponent extends VmfsCommon implements OnInit {
   modalLoading = false; // 数据加载loading
   modalHandleLoading = false; // 数据处理loading
   isOperationErr = false; // 错误信息
+  isMountPartSuccess=false; //挂载部分成功
   isReclaimErr = false; // 错误信息
   nameChecking = false; // 名称校验
   capacityErr = false; // 容量错误信息
@@ -906,6 +907,7 @@ wwn: "67c1cf110058934511ba6e5a00000344"
     this.modalLoading = true;
     this.modalHandleLoading = false;
     this.isOperationErr = false;
+    this.partSuccessOrFail=false
     // 容量错误提示
     this.capacityErr = false;
     // this.gs.loading = true;
@@ -1277,6 +1279,7 @@ wwn: "67c1cf110058934511ba6e5a00000344"
       this.modalLoading = true;
       this.modalHandleLoading = false;
       this.isOperationErr = false;
+      this.isMountPartSuccess=false;
       this.mountErr = false;
 
       this.mountForm = new GetForm().getMountForm();
@@ -1475,7 +1478,10 @@ wwn: "67c1cf110058934511ba6e5a00000344"
             });
             this.connFailData = connFailDatas;
           }
-        } else {
+        }else if (result.code==='206'){
+          console.log("挂载部分成功："+result.description)
+          this.isMountPartSuccess=true
+        }else {
           console.log('挂载异常：' + result.description);
           this.isOperationErr = true;
         }

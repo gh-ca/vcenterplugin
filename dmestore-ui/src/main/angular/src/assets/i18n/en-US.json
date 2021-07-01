@@ -872,6 +872,7 @@
   },
   "errorMsg": {
     "mountError": "Mount failed!Please contact management!",
+    "mountPartError": "The mounting part was successful! Please contact the administrator!",
     "unMountError": "UnMount failed!Please contact management!",
     "expandError": "Expand failed!Please contact management!",
     "reduceError": "Reduce failed!Please contact management!",
