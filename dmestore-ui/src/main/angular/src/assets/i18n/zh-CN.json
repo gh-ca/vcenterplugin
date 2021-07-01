@@ -872,6 +872,7 @@
   },
   "errorMsg": {
     "mountError": "挂载失败！请联系管理员！",
+    "mountPartError": "挂载部分成功！请联系管理员！",
     "unMountError": "卸载失败！请联系管理员！",
     "expandError": "扩容失败！请联系管理员！",
     "reduceError": "缩容失败！请联系管理员！",

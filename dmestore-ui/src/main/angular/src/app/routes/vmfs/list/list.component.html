@@ -1166,6 +1166,9 @@
         <div *ngIf="isOperationErr" class="errorTips" readonly>
           <clr-icon shape="exclamation-circle" class="is-solid"></clr-icon> {{'errorMsg.mountError' | translate}}
         </div>
+        <div *ngIf="isMountPartSuccess" class="errorTips" readonly>
+          <clr-icon shape="exclamation-circle" class="is-solid"></clr-icon> {{'errorMsg.mountPartError' | translate}}
+        </div>
         <!--
         <clr-radio-container clrInline>
           <label class="floatleft" style="color: #9F9F9F;">{{'vmfs.hostOrCluster' | translate}}</label>
