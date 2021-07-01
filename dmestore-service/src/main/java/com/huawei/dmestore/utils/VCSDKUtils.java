@@ -1042,7 +1042,31 @@ public class VCSDKUtils {
         return listStr;
     }
 
-
+    public List<Map<String, String>> getHostsOnClusterNew(String clusterObjectId) throws VcenterException {
+        List<Map<String, String>> lists = new ArrayList<>();
+        try {
+            // 得到当前的context
+            String serverguid = vcConnectionHelpers.objectId2Serverguid(clusterObjectId);
+            VmwareContext context = vcConnectionHelpers.getServerContext(serverguid);
+            ManagedObjectReference clmor = vcConnectionHelpers.objectId2Mor(clusterObjectId);
+            ClusterMo cl1 = clusterVmwareMoFactory.build(context, clmor);
+            List<Pair<ManagedObjectReference, String>> hosts = cl1.getClusterHosts();
+            if (hosts != null && hosts.size() > 0) {
+                for (Pair<ManagedObjectReference, String> host : hosts) {
+                    HostMo host1 = hostVmwareFactory.build(context, host.first());
+                    Map<String, String> map = new HashMap<>();
+                    String objectId = vcConnectionHelpers.mor2ObjectId(host1.getMor(), context.getServerAddress());
+                    map.put(HOST_ID, objectId);
+                    map.put(HOST_NAME, host1.getName());
+                    lists.add(map);
+                }
+            }
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            throw new VcenterException(e.getMessage());
+        }
+        return lists;
+    }
     /**
      * 得到指定集群下的所有主机 20200918objectId
      *

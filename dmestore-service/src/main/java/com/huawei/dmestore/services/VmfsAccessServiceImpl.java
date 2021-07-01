@@ -5739,7 +5739,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
      * @Date 2021/5/14 10:41
      */
     @Override
-    public Boolean mountVmfsNew(Map<String, Object> params) throws DmeException {
+    public MountVmfsReturn mountVmfsNew(Map<String, Object> params) throws DmeException {
         //校验参数不能为空
         //todo 增加逻辑（如果存储设备是以主机创建，挂载时就只支持按主机挂载）
         if (CollectionUtils.isEmpty(params)) {
@@ -5793,14 +5793,42 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         Map<String, String> hostIdToIp = getHostNameAndHostIdList(chooseDevicelists);
         List<String> hostIds = new ArrayList<>(hostIdToIp.keySet());
         List<String> clusterIds = getClusterIdList(chooseDevicelists);
+        Set<String> needMountIpSet = new HashSet<>();
+
+        //获取集群下的主机数量;
+        if (!CollectionUtils.isEmpty(clusterIds)) {
+            for (String clusterid : clusterIds) {
+                List<Map<String, String>> hosts = vcsdkUtils.getHostsOnClusterNew(clusterid);
+                if (!CollectionUtils.isEmpty(hosts)){
+                    for (Map<String, String> hostinfo : hosts){
+                        if (!StringUtils.isEmpty(hostinfo.get(HOST_NAME))){
+                            needMountIpSet.add(hostinfo.get(HOST_NAME));
+                        }
+                    }
+                }
+            }
+        }
+        if (!CollectionUtils.isEmpty(hostIdToIp)) {
+            for (String hostId : hostIdToIp.keySet()) {
+                if (!StringUtils.isEmpty(hostIdToIp.get(hostId))) {
+                    needMountIpSet.add(hostIdToIp.get(hostId));
+                }
+            }
+        }
+        List<String> needMountIps = new ArrayList<>(needMountIpSet);
+        int num = needMountIps.size();
+        List<String> mountedIps = new ArrayList<>();
         //获取存储已经挂载的主机
-        List<Map<String, String>> mountedLst = new ArrayList<>();
-        List<Map<String, String>> mounted = new ArrayList<>();
-        mounted = vcsdkUtils.getHostsByDsObjectIdNew(ToolUtils.getStr(params.get(DATASTORE_OBJECT_IDS)), true);
-        int num = 0;
+        List<Map<String, String>> mounted = vcsdkUtils.getHostsByDsObjectIdNew(ToolUtils.getStr(params.get(DATASTORE_OBJECT_IDS)), true);
+        if (!CollectionUtils.isEmpty(mounted)){
+            for (Map<String, String> hostinfo : mounted){
+                if (!StringUtils.isEmpty(hostinfo.get(HOST_NAME))){
+                    mountedIps.add(hostinfo.get(HOST_NAME));
+                }
+            }
+        }
         //1.前端入参的选择的挂载方式为主机
         if (deviceTypeSet.size() == 1 && deviceTypeSet.contains(HOST)) {
-            num = chooseDevicelists.size();
             //1.1如果存储的创建方式为主机，检查主机连通性，将原有的lun映射给新的主机
             if (!StringUtils.isEmpty(hostVolumid)) {
                 Map<String, List<Map<String, Object>>> allinitionators = getAllInitionator();
@@ -5834,7 +5862,6 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 }
                 //1.2如果存储的创建方式为集群，需要判断前端入参的主机是否包含在已经映射的集群中，包含的话，将主机加入主机组，继续挂载；不包含，将主机以单主机的方式映射
             } else if (!StringUtils.isEmpty(hostGroupVolumid)) {
-
                 if (!CollectionUtils.isEmpty(hostIds)) {
                     //根据非独立出来的主机重新组装对象
                     List<Map<String, String>> chooseDeviceNew = buildChooseDevice(chooseDevicelists, hostIds);
@@ -5874,11 +5901,6 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         }
         //2.前端入参的选择的挂载方式为集群
         if (deviceTypeSet.size() == 1 && deviceTypeSet.contains(CLUSTER)) {
-            //获取集群下的主机数量;
-            for (String clusterid : clusterIds) {
-                List<String> hostsize = vcsdkUtils.getHostidsOnCluster(clusterid);
-                num+=hostsize.size();
-            }
             //2.1如果存储的创建方式为主机，直接抛出异常
             if (!StringUtils.isEmpty(hostVolumid)) {
                 throw new DmeException("vmfs was created with host not allow to mount the cluster");
@@ -5915,12 +5937,6 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         }
         //3.前端入参的选择方式为集群加主机，此时只支持以集群方式创建的数据存储。
         if (deviceTypeSet.size() > 1) {
-            //获取集群下的主机数量;
-            for (String clusterid : clusterIds) {
-                List<String> hostsize = vcsdkUtils.getHostidsOnCluster(clusterid);
-                num+=hostsize.size();
-            }
-            num+=hostIds.size();
             if (!StringUtils.isEmpty(hostVolumid)) {
                 throw new DmeException("vmfs was created with host not allow to mount the cluster");
             }
@@ -5989,14 +6005,25 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 }
             }
         }
-        vcsdkUtils.refreshStorageSystem(ToolUtils.getStr(params.get(DATASTORE_OBJECT_IDS)));
-        mountedLst = vcsdkUtils.getHostsByDsObjectIdNew(ToolUtils.getStr(params.get(DATASTORE_OBJECT_IDS)), true);
-       if(mountedLst.size() == mounted.size()){
-           return false;
-       }else if (mountedLst.size() == mounted.size()+num){
-           return true;
-       }
-           return null;
+        vcsdkUtils.refreshDatastore(dataStoreObjectId);
+        List<Map<String, String>> mountedLst = vcsdkUtils.getHostsByDsObjectIdNew(ToolUtils.getStr(params.get(DATASTORE_OBJECT_IDS)), true);
+        List<String> lstIps = new ArrayList<>();
+        if (!CollectionUtils.isEmpty(mountedLst)){
+            for (Map<String, String> hostinfo : mountedLst){
+                if (!StringUtils.isEmpty(hostinfo.get(HOST_NAME))){
+                    lstIps.add(hostinfo.get(HOST_NAME));
+                }
+            }
+        }
+        needMountIps.addAll(mountedIps);
+        needMountIps.removeAll(lstIps);
+        if (0<needMountIps.size() && needMountIps.size()< num){
+            return new MountVmfsReturn(true,needMountIps);
+        }else if (needMountIps.size() == num){
+            return new MountVmfsReturn(false);
+        }else {
+            return new MountVmfsReturn(true);
+        }
 
     }
 

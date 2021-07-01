@@ -310,13 +310,13 @@ public class VmfsAccessController extends BaseController {
         LOG.info("accessvmfs/mountvmfs=={}", gson.toJson(params));
         String failureStr = "";
         try {
-            Boolean res = vmfsAccessService.mountVmfsNew(params);
-            if (!res) {
+            MountVmfsReturn res = vmfsAccessService.mountVmfsNew(params);
+            if (!res.isFlag()) {
                 return failure("mount vmfs failure");
-            }else if (res) {
+            }else if (res.isFlag() && CollectionUtils.isEmpty(res.getFailedHost())) {
                 return success(null, "Mount vmfs success");
             }else {
-               return partialSuccess(null,"Mount vmfs partial success!");
+               return partialSuccess(res.getFailedHost(),"Mount vmfs partial success!");
 
             }
         } catch (DmeException e) {
