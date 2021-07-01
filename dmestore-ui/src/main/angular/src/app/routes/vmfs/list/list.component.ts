@@ -204,6 +204,7 @@ export class VmfsListComponent extends VmfsCommon implements OnInit {
   mountForm = new GetForm().getMountForm();
   chooseHost: HostList; // 已选择的主机
   chooseCluster: ClusterList; // 已选择的集群
+  mountFailHost:[]; //部分成功时挂载失败的主机
 
   chooseUnmountHost: HostOrCluster = null; // 已选择卸载的主机
   chooseUnmountCluster: HostOrCluster = null; // 已选择卸载的集群
@@ -1481,6 +1482,7 @@ wwn: "67c1cf110058934511ba6e5a00000344"
         }else if (result.code==='206'){
           console.log("挂载部分成功："+result.description)
           this.isMountPartSuccess=true
+          this.mountFailHost=result.data
         }else {
           console.log('挂载异常：' + result.description);
           this.isOperationErr = true;

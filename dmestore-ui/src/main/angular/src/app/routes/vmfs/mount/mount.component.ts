@@ -90,6 +90,7 @@ export class MountComponent implements OnInit {
   mountClusterData = true; // 挂载页面集群是否加载完毕 true是 false否
   clusterList: ClusterList[] = []; // 挂载页面集群列表
   chooseCluster: ClusterList; // 已选择的集群
+  mountFailHost:[]; //部分成功时挂载失败的主机
 
   // 卸载
   unmountShow = false; // 卸载窗口
@@ -558,6 +559,7 @@ export class MountComponent implements OnInit {
         }else if (result.code==='206'){
           console.log("挂载部分成功："+result.description)
           this.isMountPartSuccess=true
+          this.mountFailHost=result.data
         } else {
           console.log('挂载异常：' + result.description);
           this. isOperationErr = true;
@@ -707,6 +709,7 @@ export class MountComponent implements OnInit {
       }else if (result.code==='206'){
         console.log("挂载部分成功："+result.description)
         this.isMountPartSuccess=true
+        this.mountFailHost=result.data
       } else {
         console.log('挂载异常：' + result.description);
         this.isOperationErr = true;

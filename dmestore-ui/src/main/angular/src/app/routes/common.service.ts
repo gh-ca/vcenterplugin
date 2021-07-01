@@ -231,7 +231,7 @@ zh:'一年' ,range:'LAST_1_YEAR',   interval:  "DAY"
       console.log(params);
       return {
         "code": "206",
-        "data":null,
+        "data":["10.143.133.196","10.143.133.197"],
         "description": "mount vmfs failure"
       };
     } else {
