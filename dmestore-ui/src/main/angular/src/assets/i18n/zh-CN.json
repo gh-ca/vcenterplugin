@@ -872,6 +872,7 @@
   },
   "errorMsg": {
     "mountError": "挂载失败！请联系管理员！",
+    "mountPartError": "挂载部分成功！请联系管理员！",
     "unMountError": "卸载失败！请联系管理员！",
     "expandError": "扩容失败！请联系管理员！",
     "reduceError": "缩容失败！请联系管理员！",
@@ -899,6 +900,7 @@
     "errorDescription": "失败原因描述：",
     "HostConnectionFail": "启动器不在线!",
     "connectionFailMessage": "以下是主机连通失败的主机：",
+    "mountFailHost": "以下是挂载失败的主机：",
     "details": "详情："
   },
   "page": {

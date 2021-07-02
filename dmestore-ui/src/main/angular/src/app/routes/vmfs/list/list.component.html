@@ -1166,6 +1166,27 @@
         <div *ngIf="isOperationErr" class="errorTips" readonly>
           <clr-icon shape="exclamation-circle" class="is-solid"></clr-icon> {{'errorMsg.mountError' | translate}}
         </div>
+        <div *ngIf="isMountPartSuccess" class="alert alert-danger" readonly>
+          <div class="alert-items">
+            <div class="alert-item flex horizon">
+              <div class="alert-icon-wrapper flex1">
+                <clr-icon class="alert-icon" shape="exclamation-circle"></clr-icon> {{'errorMsg.mountPartError' | translate}}
+              </div>
+              <div>
+                <clr-signpost>
+                  <button class="btn btn-link"
+                          clrSignpostTrigger>
+                    {{'tips.details'|translate}}
+                  </button>
+                  <clr-signpost-content  [clrPosition]="'bottom-left'" *clrIfOpen >
+                    <p>{{'errorMsg.mountFailHost'|translate}}</p>
+                    <div *ngFor="let item of mountFailHost">{{item}}</div>
+                  </clr-signpost-content>
+                </clr-signpost>
+              </div>
+            </div>
+          </div>
+        </div>
         <!--
         <clr-radio-container clrInline>
           <label class="floatleft" style="color: #9F9F9F;">{{'vmfs.hostOrCluster' | translate}}</label>
@@ -1299,10 +1320,10 @@
         </div>
 
         <!-- 卸载 -->
-        <div class="flex middle clr-form-control clr-row">
-          <label style="color: #9F9F9F;" class="clr-control-label">{{'vmfs.name' | translate}}</label>
-          <div [title]="unmountForm.name" class="flex1 over_flow">{{unmountForm.name}}</div>
-        </div>
+<!--        <div class="flex middle clr-form-control clr-row">-->
+<!--          <label style="color: #9F9F9F;" class="clr-control-label">{{'vmfs.name' | translate}}</label>-->
+<!--          <div [title]="unmountForm.name" class="flex1 over_flow">{{unmountForm.name}}</div>-->
+<!--        </div>-->
         <!-- <clr-input-container>
           <label style="color: #9F9F9F;">{{'vmfs.name' | translate}}</label>
           <input clrInput readonly [(ngModel)]="unmountForm.name" [title]="unmountForm.name" name="name" #name="ngModel"

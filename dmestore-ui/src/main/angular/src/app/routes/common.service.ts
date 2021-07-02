@@ -229,7 +229,11 @@ zh:'一年' ,range:'LAST_1_YEAR',   interval:  "DAY"
   async remoteVmfs_Mount(params) {
     if (isMockData) {
       console.log(params);
-      return {};
+      return {
+        "code": "206",
+        "data":["10.143.133.196","10.143.133.197"],
+        "description": "mount vmfs failure"
+      };
     } else {
       try {
         const res: any = await new Promise((resolve, reject) => {
