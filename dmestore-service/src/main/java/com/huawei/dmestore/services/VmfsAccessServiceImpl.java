@@ -4216,6 +4216,8 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             ArrayList<String> mappedList = new ArrayList<>(volumeidMapToHostOrGroup.keySet());
             volumeIdList.removeAll(mappedList);
             return volumeIdList;
+        }else if (CollectionUtils.isEmpty(volumeidMapToHostOrGroup)){
+            return volumeIdList;
         }
         return null;
     }
