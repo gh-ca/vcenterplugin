@@ -16,9 +16,9 @@ export class ShareComponent implements OnInit ,AfterViewChecked{
   constructor(private remoteSrv: ShareService, private gs: GlobalsService,private translateService:TranslateService,private cdr:ChangeDetectorRef) { }
 
   ngOnInit(): void {
-    // const ctx = this.gs.getClientSdk().app.getContextObjects();
-    // this.getShareDetail(ctx[0].id);
-    this.getShareDetail('urn:vmomi:Datastore:datastore-12024:674908e5-ab21-4079-9cb1-596358ee5dd1');
+    const ctx = this.gs.getClientSdk().app.getContextObjects();
+    this.getShareDetail(ctx[0].id);
+    // this.getShareDetail('urn:vmomi:Datastore:datastore-12024:674908e5-ab21-4079-9cb1-596358ee5dd1');
   }
   ngAfterViewChecked(){
     this.getReadOnlyOrReadOrWrite()
