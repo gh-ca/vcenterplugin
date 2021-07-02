@@ -872,6 +872,7 @@
   },
   "errorMsg": {
     "mountError": "Mount failed!Please contact management!",
+    "mountPartError": "The mounting part was successful! Please contact the administrator!",
     "unMountError": "UnMount failed!Please contact management!",
     "expandError": "Expand failed!Please contact management!",
     "reduceError": "Reduce failed!Please contact management!",
@@ -899,6 +900,7 @@
     "errorDescription": "Description of failure reason：",
     "HostConnectionFail": "Launcher is not online!",
     "connectionFailMessage": "The following are the hosts that failed to connect to the host：",
+    "mountFailHost": "The following are the hosts that failed to mount：",
     "details": "Details："
   },
   "page": {

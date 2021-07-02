@@ -297,15 +297,17 @@
   </clr-datagrid>
 
   <!-- 弹出form提交框 添加 -->
+
+
   <clr-wizard #wizard [(clrWizardOpen)]="popListShow" [clrWizardClosable]="false">
     <!-- 创建DME数据存储 -->
     <clr-wizard-title style="font-weight: bolder">{{'table.createDmeStorage' | translate}}</clr-wizard-title>
-    <div *ngIf="modalLoading" class="loadingDiv">
-      <span>
-        {{'vmfs.loadingTips' | translate}}<img src="./assets/images/loading.gif" width="20px" height="20px"
-          style="margin-left: 20px;">
-      </span>
-    </div>
+<!--    <div *ngIf="addmodalLoading" class="loadingDiv">-->
+<!--      <span>-->
+<!--        {{'vmfs.loadingTips' | translate}}<img src="./assets/images/loading.gif" width="20px" height="20px"-->
+<!--                                               style="margin-left: 20px;">-->
+<!--      </span>-->
+<!--    </div>-->
     <div *ngIf="modalHandleLoading" class="loadingDiv">
       <span>
         {{'vmfs.dataHandleLoadingTips' | translate}}<img src="./assets/images/loading.gif" width="20px" height="20px"
@@ -1141,15 +1143,17 @@
     </div>
   </clr-modal>
   <!--挂载弹窗-->
-  <div *ngIf="modalLoading" class="loadingDiv">
-          <span>
-            {{'vmfs.loadingTips' | translate}}<img src="./assets/images/loading.gif" width="20px" height="20px"
-                                                   style="margin-left: 20px;">
-          </span>
-  </div>
+<!--  <div *ngIf="modalLoading" class="loadingDiv">-->
+<!--          <span>-->
+<!--            {{'vmfs.loadingTips' | translate}}<img src="./assets/images/loading.gif" width="20px" height="20px"-->
+<!--                                                   style="margin-left: 20px;">-->
+<!--          </span>-->
+<!--  </div>-->
   <clr-modal [(clrModalOpen)]="mountShow" [clrModalClosable]="false">
+
     <h3 class="modal-title modelTile">{{'vmfs.mount.mount' | translate}}</h3>
     <div class="modal-body">
+
       <form *ngIf="rowSelected.length === 1" clrForm>
 
 
@@ -1161,6 +1165,27 @@
         </div>
         <div *ngIf="isOperationErr" class="errorTips" readonly>
           <clr-icon shape="exclamation-circle" class="is-solid"></clr-icon> {{'errorMsg.mountError' | translate}}
+        </div>
+        <div *ngIf="isMountPartSuccess" class="alert alert-danger" readonly>
+          <div class="alert-items">
+            <div class="alert-item flex horizon">
+              <div class="alert-icon-wrapper flex1">
+                <clr-icon class="alert-icon" shape="exclamation-circle"></clr-icon> {{'errorMsg.mountPartError' | translate}}
+              </div>
+              <div>
+                <clr-signpost>
+                  <button class="btn btn-link"
+                          clrSignpostTrigger>
+                    {{'tips.details'|translate}}
+                  </button>
+                  <clr-signpost-content  [clrPosition]="'bottom-left'" *clrIfOpen >
+                    <p>{{'errorMsg.mountFailHost'|translate}}</p>
+                    <div *ngFor="let item of mountFailHost">{{item}}</div>
+                  </clr-signpost-content>
+                </clr-signpost>
+              </div>
+            </div>
+          </div>
         </div>
         <!--
         <clr-radio-container clrInline>
@@ -1264,15 +1289,16 @@
 
 
   <!--卸载-->
-  <div *ngIf="modalLoading" class="loadingDiv">
-          <span>
-            {{'vmfs.loadingTips' | translate}}<img src="./assets/images/loading.gif" width="20px" height="20px"
-                                                   style="margin-left: 20px;">
-          </span>
-  </div>
+
   <clr-modal [(clrModalOpen)]="unmountShow" [clrModalSize]="'lg'" [clrModalClosable]="false">
     <h3 class="modal-title modelTile">{{'vmfs.unmount.title' | translate}}</h3>
     <div class="modal-body">
+<!--      <div *ngIf="modalLoading" class="loadingDiv">-->
+<!--          <span>-->
+<!--            {{'vmfs.loadingTips' | translate}}<img src="./assets/images/loading.gif" width="20px" height="20px"-->
+<!--                                                   style="margin-left: 20px;">-->
+<!--          </span>-->
+<!--      </div>-->
       <form clrForm>
 
 
@@ -1294,10 +1320,10 @@
         </div>
 
         <!-- 卸载 -->
-        <div class="flex middle clr-form-control clr-row">
-          <label style="color: #9F9F9F;" class="clr-control-label">{{'vmfs.name' | translate}}</label>
-          <div [title]="unmountForm.name" class="flex1 over_flow">{{unmountForm.name}}</div>
-        </div>
+<!--        <div class="flex middle clr-form-control clr-row">-->
+<!--          <label style="color: #9F9F9F;" class="clr-control-label">{{'vmfs.name' | translate}}</label>-->
+<!--          <div [title]="unmountForm.name" class="flex1 over_flow">{{unmountForm.name}}</div>-->
+<!--        </div>-->
         <!-- <clr-input-container>
           <label style="color: #9F9F9F;">{{'vmfs.name' | translate}}</label>
           <input clrInput readonly [(ngModel)]="unmountForm.name" [title]="unmountForm.name" name="name" #name="ngModel"
@@ -1419,12 +1445,12 @@
               height="20px" style="margin-left: 20px;">
           </span>
         </div>
-        <div *ngIf="modalLoading" class="loadingDiv">
-          <span>
-            {{'vmfs.loadingTips' | translate}}<img src="./assets/images/loading.gif" width="20px" height="20px"
-              style="margin-left: 20px;">
-          </span>
-        </div>
+<!--        <div *ngIf="modalLoading" class="loadingDiv">-->
+<!--          <span>-->
+<!--            {{'vmfs.loadingTips' | translate}}<img src="./assets/images/loading.gif" width="20px" height="20px"-->
+<!--              style="margin-left: 20px;">-->
+<!--          </span>-->
+<!--        </div>-->
         <!-- 1、选择 服务等级-->
         <div *ngIf="serviceLevelIsNull" class="errorTips" readonly>
           <clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>
@@ -1633,4 +1659,10 @@
         (click)="syncSuccessTips = false;">{{'menu.ok' | translate}}</button>
     </div>
   </clr-modal>
+</div>
+<div *ngIf="modalLoading" class="loadingDiv">
+      <span>
+        {{'vmfs.loadingTips' | translate}}<img src="./assets/images/loading.gif" width="20px" height="20px"
+                                               style="margin-left: 20px;">
+      </span>
 </div>

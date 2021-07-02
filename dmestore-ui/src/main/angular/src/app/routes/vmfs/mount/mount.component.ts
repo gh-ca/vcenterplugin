@@ -90,6 +90,7 @@ export class MountComponent implements OnInit {
   mountClusterData = true; // 挂载页面集群是否加载完毕 true是 false否
   clusterList: ClusterList[] = []; // 挂载页面集群列表
   chooseCluster: ClusterList; // 已选择的集群
+  mountFailHost:[]; //部分成功时挂载失败的主机
 
   // 卸载
   unmountShow = false; // 卸载窗口
@@ -109,6 +110,7 @@ export class MountComponent implements OnInit {
   modalLoading = false; // 数据加载loading
   modalHandleLoading = false; // 数据处理loading
   isOperationErr = false; // 挂载错误信息
+  isMountPartSuccess=false; //挂载部分成功
   isUnmountOperationErr = false; // 卸载错误信息
 
   connectivityFailure = false; // 主机联通性测试失败
@@ -123,6 +125,7 @@ export class MountComponent implements OnInit {
     this.modalLoading = true;
     this.modalHandleLoading = false;
     this.isOperationErr = false;
+    this.isMountPartSuccess=false;
     this.initData();
 
   }
@@ -459,13 +462,13 @@ export class MountComponent implements OnInit {
   isDisableMountSubmit() {
     return this.chooseDevice?.length===0
   }
-  
+
     // 卸载确认
     unMountConfirm() {
       if (this.isDisableMountSubmit()) return;
       this.unmountTipsShow = true;
   }
-  
+
   /**
    * 表单提交（挂载/卸载）
    */
@@ -553,9 +556,13 @@ export class MountComponent implements OnInit {
             });
             this.connFailData = connFailDatas;
           }
+        }else if (result.code==='206'){
+          console.log("挂载部分成功："+result.description)
+          this.isMountPartSuccess=true
+          this.mountFailHost=result.data
         } else {
           console.log('挂载异常：' + result.description);
-          this.isOperationErr = true;
+          this. isOperationErr = true;
         }
         this.cdr.detectChanges();
       });
@@ -699,6 +706,10 @@ export class MountComponent implements OnInit {
           });
           this.connFailData = connFailDatas;
         }
+      }else if (result.code==='206'){
+        console.log("挂载部分成功："+result.description)
+        this.isMountPartSuccess=true
+        this.mountFailHost=result.data
       } else {
         console.log('挂载异常：' + result.description);
         this.isOperationErr = true;
