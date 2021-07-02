@@ -4131,14 +4131,12 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             Map<String, List<String>> mappingResultMapNew =  new HashMap<>();
             Map<String, List<String>> volumeidMapToHostOrGroup = new HashMap<>();
             List<String> successList = new ArrayList<>();
-            try {
-                mappingResultMapNew = lunMappingToHostOrHostgroupForCreate02(volumeIdList, null, hostGroupIds, volumelistLst);
-                //根据映射的并集去创建存储，挂载映射成功的主机
-                //准volumeid和主机的对应关系
-                volumeidMapToHostOrGroup = getVolumeidMapToHostOrGroup(mappingResultMapNew);
-                Map<String, List<String>>  info  = getLogInfo(volumeidMapToHostOrGroup,chooseDevicelists,volumelistLst,objid2hostId);
-                LOG.info(gson.toJson(info));
-            }catch (Exception e) {
+            mappingResultMapNew = lunMappingToHostOrHostgroupForCreate02(volumeIdList, null, hostGroupIds, volumelistLst);
+            volumeidMapToHostOrGroup = getVolumeidMapToHostOrGroup(mappingResultMapNew);
+            Map<String, List<String>>  info  = getLogInfo(volumeidMapToHostOrGroup,chooseDevicelists,volumelistLst,objid2hostId);
+            LOG.info(gson.toJson(info));
+            List<String> mappedFail = getFailVolumid(volumeIdList, volumeidMapToHostOrGroup);
+            if (!CollectionUtils.isEmpty(mappedFail)){
                 deleteFailLun02(volumeIdList);
             }
             Map<String,String> dataStoreStrMap = new HashMap<>();
@@ -4215,6 +4213,8 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         if (!CollectionUtils.isEmpty(volumeIdList) && !CollectionUtils.isEmpty(volumeidMapToHostOrGroup)){
             ArrayList<String> mappedList = new ArrayList<>(volumeidMapToHostOrGroup.keySet());
             volumeIdList.removeAll(mappedList);
+            return volumeIdList;
+        }else if (CollectionUtils.isEmpty(volumeidMapToHostOrGroup)){
             return volumeIdList;
         }
         return null;
