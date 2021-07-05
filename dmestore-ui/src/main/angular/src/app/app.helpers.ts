@@ -386,7 +386,7 @@ export function getSelectedFromTree(
   const setDisabled = setDisabledTrue => {
     /* 需要设置disabled，部分置灰 */
     for (const clusterNode of clusterArray) {
-      
+
       const setSingleHostDisabled = () => {
         if ((clusterNode as any).deviceType === 'host') {
           (clusterNode as any).isDisabled = false;
@@ -443,7 +443,7 @@ export function getSelectedFromTree(
     }
   };
 
-  if (resType === 'mount') {
+  if (resType === 'mount'||resType==="unMount") {
     console.log('🚀 ~ file: app.helpers.ts ~ line 353 ~ getSelectedFromTree ~ resType', resType);
   } else {
     setDisabled(result.length > 0);
