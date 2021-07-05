@@ -199,4 +199,7 @@ input::-ms-clear{
 ::ng-deep .datagrid {
   -ms-overflow-style:scrollbar;
 }
+.modal-body{
+  min-height: 10vh;
+}
 
