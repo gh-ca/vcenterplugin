@@ -585,7 +585,7 @@ public class TaskServiceImpl implements TaskService {
             return null;
         }
         String description = null;
-        if (100 == taskDeatailInfos.get(0).getProgress() || 3 < taskDeatailInfos.get(0).getStatus()){
+        if ((100 == taskDeatailInfos.get(0).getProgress() && 3==taskDeatailInfos.get(0).getStatus()) || 3 < taskDeatailInfos.get(0).getStatus()){
             TasksResultObject tasksResultObject2 = new TasksResultObject(true);
             description = taskDeatailInfos.get(0).getDetailEn();
             tasksResultObject2.setDescription(description);
