@@ -3934,7 +3934,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 });
             }
             if (CollectionUtils.isEmpty(hostStatusMap.get("nomalHost"))) {
-                throw new DmeException("all connection of hosts is lossing!");
+                return new CreateVmfsResponse02(successnum, ToolUtils.getInt(params.get("count")), connectionFailList, partsuccessnum);
             }
             //c.创建Lun
             String taskId = createLun(params);
