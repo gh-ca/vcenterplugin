@@ -184,16 +184,51 @@ public class VmwareAccessServiceImpl implements VmwareAccessService {
     @Override
     public List<Map<String, String>> getVmKernelIpByHostObjectId(String hostObjectId) throws DmeException {
         List<Map<String, String>> lists = null;
-        try {
-            // 根据存储类型，取得vcenter中的所有存储。
-            String listStr = vcsdkUtils.getVmKernelIpByHostObjectId(hostObjectId);
-            if (!StringUtils.isEmpty(listStr)) {
-                lists = gson.fromJson(listStr, new TypeToken<List<Map<String, String>>>() { }.getType());
-            }
-        } catch (VcenterException e) {
-            LOG.error("get vmkernel ip by hostobjectid error:", e);
-            throw new DmeException(e.getMessage());
+        //todo 20210705 此接口适配集群入参
+        if(StringUtils.isEmpty(hostObjectId)){
+            throw new DmeException("param is empty");
         }
+        boolean hostFlag= true;
+        try {
+            String[] temRes = hostObjectId.split(":");
+
+            String tempString = temRes[2];
+            if (tempString.contains("Host")) {
+                hostFlag = true;
+            } else if (tempString.contains("Cluster")) {
+                hostFlag = false;
+            } else {
+                throw new DmeException("param is error");
+            }
+        }catch (Exception e){
+            throw new DmeException("param is error");
+        }
+     if(hostFlag) {
+
+         try {
+             // 根据存储类型，取得vcenter中的所有存储。
+             String listStr = vcsdkUtils.getVmKernelIpByHostObjectId(hostObjectId);
+             if (!StringUtils.isEmpty(listStr)) {
+                 lists = gson.fromJson(listStr, new TypeToken<List<Map<String, String>>>() {
+                 }.getType());
+             }
+         } catch (VcenterException e) {
+             LOG.error("get vmkernel ip by hostobjectid error:", e);
+             throw new DmeException(e.getMessage());
+         }
+     }else {
+         try {
+             // 根据存储类型，取得vcenter中的所有存储。
+             String listStr = vcsdkUtils.getVmKernelIpByClusterObjectId(hostObjectId);
+             if (!StringUtils.isEmpty(listStr)) {
+                 lists = gson.fromJson(listStr, new TypeToken<List<Map<String, String>>>() {
+                 }.getType());
+             }
+         } catch (VcenterException e) {
+             LOG.error("get vmkernel ip by clusterobjectid error:", e);
+             throw new DmeException(e.getMessage());
+         }
+     }
         return lists;
     }
 

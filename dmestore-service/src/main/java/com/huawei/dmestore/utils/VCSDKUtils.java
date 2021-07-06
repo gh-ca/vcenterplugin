@@ -2686,6 +2686,8 @@ public class VCSDKUtils {
             // 取得该存储下所有已经挂载的主机ID
             ManagedObjectReference objmor = vcConnectionHelpers.objectId2Mor(hostObjectId);
             HostMo hostmo = hostVmwareFactory.build(vmwareContext, objmor);
+            String objectId = vcConnectionHelpers.mor2ObjectId(hostmo.getMor(), vmwareContext.getServerAddress());
+
             if (hostmo != null) {
                 List<VirtualNicManagerNetConfig> nics = hostmo.getHostVirtualNicManagerNetConfig();
                 if (nics == null || nics.size() == 0) {
@@ -2707,6 +2709,7 @@ public class VCSDKUtils {
                                 map.put("ipAddress", subnic.getSpec().getIp().getIpAddress());
                                 map.put("mac", subnic.getSpec().getMac());
                                 map.put("port", subnic.getPort());
+                                map.put("hostObjectId",objectId);
                                 lists.add(map);
                             }
                         }
@@ -2715,6 +2718,67 @@ public class VCSDKUtils {
                         }
                         break;
                     }
+                }
+            }
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            throw new VcenterException(e.getMessage());
+        }
+        return listStr;
+    }
+
+    /**
+     * Get host's vmKernel IP,only provisioning provisioning
+     *
+     * @param clusterObjectId clusterObjectId
+     * @return String String
+     * @throws VcenterException VcenterException
+     **/
+    public String getVmKernelIpByClusterObjectId(String clusterObjectId) throws VcenterException {
+        String listStr = "";
+        try {
+            String serverguid = vcConnectionHelpers.objectId2Serverguid(clusterObjectId);
+            VmwareContext vmwareContext = vcConnectionHelpers.getServerContext(serverguid);
+            ManagedObjectReference objmor = vcConnectionHelpers.objectId2Mor(clusterObjectId);
+            ClusterMo cl1 = clusterVmwareMoFactory.build(vmwareContext, objmor);
+            List<Pair<ManagedObjectReference, String>> hosts = cl1.getClusterHosts();
+            if (!CollectionUtils.isEmpty(hosts)) {
+                List<Map<String, Object>> lists = new ArrayList<>();
+                for (Pair<ManagedObjectReference, String> host : hosts) {
+                    HostMo hostMo = hostVmwareFactory.build(vmwareContext, host.first());
+                    String objectId = vcConnectionHelpers.mor2ObjectId(hostMo.getMor(), vmwareContext.getServerAddress());
+
+                    if (hostMo != null) {
+                        List<VirtualNicManagerNetConfig> nics = hostMo.getHostVirtualNicManagerNetConfig();
+                        if (nics == null || nics.size() == 0) {
+                            return listStr;
+                        }
+                        for (VirtualNicManagerNetConfig nic : nics) {
+                            if ("vSphereProvisioning".equals(nic.getNicType())) {
+                                List<HostVirtualNic> subnics = nic.getCandidateVnic();
+                                if (subnics == null || subnics.size() == 0) {
+                                    return listStr;
+                                }
+                                for (HostVirtualNic subnic : subnics) {
+                                    if (nic.getSelectedVnic().contains(subnic.getKey())) {
+                                        Map<String, Object> map = new HashMap<>();
+                                        map.put(DEVICE_FIELD, subnic.getDevice());
+                                        map.put("key", subnic.getKey());
+                                        map.put("portgroup", subnic.getPortgroup());
+                                        map.put("ipAddress", subnic.getSpec().getIp().getIpAddress());
+                                        map.put("mac", subnic.getSpec().getMac());
+                                        map.put("port", subnic.getPort());
+                                        map.put("hostObjectId",objectId);
+                                        lists.add(map);
+                                    }
+                                }
+                                break;
+                            }
+                        }
+                    }
+                }
+                if (lists.size() > 0) {
+                    listStr = gson.toJson(lists);
                 }
             }
         } catch (Exception e) {
