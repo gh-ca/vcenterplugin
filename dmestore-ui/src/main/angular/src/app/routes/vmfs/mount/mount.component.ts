@@ -191,6 +191,7 @@ export class MountComponent implements OnInit {
    console.log(this.selectMountType)
     // 数据初始化
     this.getDataStore();
+   this.cdr.detectChanges();
   }
 
   /**
