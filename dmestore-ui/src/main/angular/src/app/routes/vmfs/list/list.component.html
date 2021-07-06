@@ -1375,7 +1375,7 @@
           <clr-control-container *ngIf="unmountShow">
             <label style="color: #9F9F9F;">{{'vmfs.hostOrCluster' | translate}}</label>
             <app-gh-tree-checkbox
-              [resType]="'mount'"
+              [resType]="'unMount'"
               [mountType]="'host'"
               [tree]="deviceList"
               (valueChange)="handleChooseDeviceChange(this.addForm,'chooseDevice',$event)"> </app-gh-tree-checkbox>

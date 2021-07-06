@@ -5,20 +5,22 @@
 </div>
 <app-gh-dynamic-form [formInfo]='formItemInfos' [form]='form' (onPayLoadChange)='handlePayLoadChange($event)'>
 </app-gh-dynamic-form>
-<!-- <h1>mount</h1>
+<h1>mount</h1>
 <app-gh-tree-checkbox
-[resType]="'mount'"
   (valueChange)="handleTreeValueChange('tree',$event)"
   [tree]="vmfsTree"
   [vmfsMount]="true"
-  [isCreate]="true">
-</app-gh-tree-checkbox> -->
-<h1>create</h1>
-<app-gh-tree-checkbox
-  (valueChange)="handleTreeValueChange('tree',$event)"
-  [tree]="vmfsTree"
-  [isCreate]="true">
+  [isCreate]="true"
+  [mountType]="'host'"
+  [resType]="'mount'"
+>
 </app-gh-tree-checkbox>
+<!--<h1>create</h1>-->
+<!--<app-gh-tree-checkbox-->
+<!--  (valueChange)="handleTreeValueChange('tree',$event)"-->
+<!--  [tree]="vmfsTree"-->
+<!--  [isCreate]="true">-->
+<!--</app-gh-tree-checkbox>-->
 <!-- <pre>{{helper.print(vmfsTree)}}</pre> -->
 <div>{{helper.print(value)}}</div>
 <div>form.errors{{helper.print(form.errors)}}</div>
