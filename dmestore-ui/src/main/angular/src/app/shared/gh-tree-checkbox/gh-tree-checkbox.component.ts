@@ -31,6 +31,7 @@ export class GhTreeCheckboxComponent implements OnInit {
   resValue;
   selectedHost = false;
   selectedCluster = false;
+  clusterInHostMount=false;
 
   // get isList() {
   //   return _.isArray(this.list) && this.list.length > 0;
@@ -67,6 +68,7 @@ export class GhTreeCheckboxComponent implements OnInit {
 
   ngOnInit(): void {
     // console.log(this.mountType)
+    this.checkMountType()
   }
 
   // ngOnChanges(changes: { [propKey: string]: SimpleChange }) {
@@ -82,7 +84,7 @@ export class GhTreeCheckboxComponent implements OnInit {
 
   checkSelectedAndSetDisable() {
     /* 挂载可以跨集群 */
-    if (this.resType === 'mount') {
+    if (this.resType === 'mount'||this.resType==='unMount') {
       let res = [];
 
       // if (this.isList) {
@@ -137,4 +139,18 @@ export class GhTreeCheckboxComponent implements OnInit {
       return true
     }
   }
+//  挂载：当前挂载类型为主机时，集群置灰，只能选择主机进行挂载
+  checkMountType(){
+    if (this.mountType==='host'&&this.resType==='mount'){
+      // debugger
+      if(this.isTree){
+        for (let firstNode of this.tree){
+          if ((firstNode as any).deviceType==='cluster'){
+            //  设置集群置灰
+            (firstNode as any).isDisabled=true
+          }
+        }
+    }
+      }
+    }
 }
