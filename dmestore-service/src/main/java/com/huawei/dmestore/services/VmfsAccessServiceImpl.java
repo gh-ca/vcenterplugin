@@ -5786,14 +5786,14 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         Object ss = params.get(CHOOSEDEVICE);
         //校验前端选择的主机或者主机组不能为空
         if (StringUtils.isEmpty(params.get(CHOOSEDEVICE))) {
-            throw new DmeException("create vmfs the params is error");
+            throw new DmeException("mount vmfs the params is error");
         }
         List<Map<String, String>> chooseDevicelists = gson.fromJson(gson.toJsonTree(ss),
                 new TypeToken<List<Map<String, String>>>() {
                 }.getType());
 
         if (CollectionUtils.isEmpty(chooseDevicelists)) {
-            throw new DmeException("create vmfs the params is error");
+            throw new DmeException("mount vmfs the params is error");
         }
         HashSet<String> deviceTypeSet = getDeviceTypeSet2(chooseDevicelists);
         //根据前端的存储获取存储的创建方式以及每个存储所对应的卷信息
@@ -5808,10 +5808,10 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             if (!CollectionUtils.isEmpty(dataStoreObjectIds) && dataStoreObjectIds.size() == 1) {
                 dataStoreObjectId = dataStoreObjectIds.get(0);
             } else {
-                throw new DmeException("create vmfs the params is error");
+                throw new DmeException("mount vmfs the params is error");
             }
             if (StringUtils.isEmpty(dataStoreObjectId)) {
-                throw new DmeException("create vmfs the params is error");
+                throw new DmeException("mount vmfs the params is error");
             }
             getDataStorageInfo(dataStorageMap, dataStoreObjectId);
         }
