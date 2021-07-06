@@ -6043,6 +6043,11 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             }
         }
         vcsdkUtils.refreshDatastore(dataStoreObjectId);
+        try {
+            TimeUnit.SECONDS.sleep(3);
+        }catch (Exception e){
+            LOG.error("scan datastore error");
+        }
         List<Map<String, String>> mountedLst = vcsdkUtils.getHostsByDsObjectIdNew(ToolUtils.getStr(params.get(DATASTORE_OBJECT_IDS)), true);
         List<String> lstIps = new ArrayList<>();
         if (!CollectionUtils.isEmpty(mountedLst)){
