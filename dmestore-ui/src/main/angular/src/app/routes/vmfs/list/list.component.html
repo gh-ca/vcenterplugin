@@ -557,7 +557,7 @@
           <clr-accordion>
             <clr-accordion-panel *ngFor="let item of serviceLevelList;" style="margin-top: 20px;">
               <clr-accordion-title class="" (click)="item.show ? this.hidden:this.show" *ngIf="!item.show"
-                style="height: 50px; line-height: 50px;color: #333;font-size:16px;">{{item.name}}</clr-accordion-title>
+                style="height: 50px; line-height: 50px;color: #333333;font-size:16px;">{{item.name}}</clr-accordion-title>
               <clr-accordion-content [(clrIfExpanded)]="item.show">
 
                 <app-service-level-table [item]="item"></app-service-level-table>
@@ -1163,7 +1163,7 @@
               height="20px" style="margin-left: 20px;">
           </span>
         </div>
-        <div *ngIf="isOperationErr" class="errorTips" readonly>
+        <div *ngIf="isOperationErr" class="error Tips" readonly>
           <clr-icon shape="exclamation-circle" class="is-solid"></clr-icon> {{'errorMsg.mountError' | translate}}
         </div>
         <div *ngIf="isMountPartSuccess" class="alert alert-danger" readonly>
@@ -1660,7 +1660,7 @@
     </div>
   </clr-modal>
 </div>
-<div *ngIf="modalLoading" class="loadingDiv">
+<div *ngIf="modalLoading" class="modalLoadingDiv">
       <span>
         {{'vmfs.loadingTips' | translate}}<img src="./assets/images/loading.gif" width="20px" height="20px"
                                                style="margin-left: 20px;">

@@ -43,6 +43,7 @@ export class DataStore {
   capacity: string;
 }
 export class Vmkernel {
+  hostObjectId:string;
   portgroup: string;
   ipAddress: string;
   device: string;

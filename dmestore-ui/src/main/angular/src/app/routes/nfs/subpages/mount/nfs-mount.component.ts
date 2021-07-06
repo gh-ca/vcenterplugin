@@ -128,6 +128,16 @@ export class NfsMountComponent implements OnInit {
       }
     });
   }
+  //当前页面为主机或集群挂载Nfs时  获取当前选择的虚拟网卡Ip对应的hostObjectId
+  checkHostObjectId(){
+      if(this.viewPage==='mount_host'){
+        for (let item of this.vmkernelList){
+          if (item.ipAddress===this.mountForm.hostVkernelIp){
+            this.mountForm.hostObjectId=item.hostObjectId
+          }
+        }
+      }
+  }
   mountSubmit() {
     this.modalHandleLoading = true;
     this.mountService.mountNfs(this.mountForm).subscribe((result: any) => {

@@ -6,6 +6,7 @@ import {
   Input,
   ChangeDetectorRef,
   SimpleChange,
+  AfterViewChecked
 } from '@angular/core';
 import { getSelectedFromTree, helper, VMFS_CLUSTER_NODE ,vmfsGetSelectedFromTree} from 'app/app.helpers';
 import debounce from 'just-debounce';
@@ -19,7 +20,7 @@ const _ = getLodash();
   templateUrl: './gh-tree-checkbox.component.html',
   styleUrls: ['./gh-tree-checkbox.component.scss'],
 })
-export class GhTreeCheckboxComponent implements OnInit {
+export class GhTreeCheckboxComponent implements OnInit ,AfterViewChecked{
   @Input() tree: VMFS_CLUSTER_NODE[];
   // @Input() list: VMFS_CLUSTER_NODE[];
   @Input() isCreate: boolean;
@@ -68,6 +69,9 @@ export class GhTreeCheckboxComponent implements OnInit {
 
   ngOnInit(): void {
     // console.log(this.mountType)
+
+  }
+  ngAfterViewChecked() {
     this.checkMountType()
   }
 
