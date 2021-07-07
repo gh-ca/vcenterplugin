@@ -3169,7 +3169,6 @@ public class VCSDKUtils {
 
                 // 主机删除存储
                 deleteNfs(dsmo, hostmo, dataStoreObjectId);
-                break;
             }
         } catch (Exception e) {
             reValue = false;
