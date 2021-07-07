@@ -16,7 +16,7 @@ import { isMockData, mockData } from '../../../../mock/mock';
 import { FormGroup, FormControl } from '@angular/forms';
 import { AddService } from './../add/add.service';
 import { CommonService } from './../../common.service';
-import { TranslatePipe } from '@ngx-translate/core';
+import { TranslatePipe,TranslateService } from '@ngx-translate/core';
 import UI_TREE_CHILDREN_BY_OBJECT_IDS from 'mock/UI_TREE_CHILDREN_BY_OBJECT_IDS';
 import { vmfsClusterTreeData } from './../../../../mock/vmfsClusterTree';
 import { CustomValidatorFaild } from 'app/app.helpers';
@@ -38,7 +38,8 @@ export class MountComponent implements OnInit {
     private activatedRoute: ActivatedRoute,
     private cdr: ChangeDetectorRef,
     private router: Router,
-    private globalsService: GlobalsService
+    private globalsService: GlobalsService,
+    private translateService:TranslateService
   ) {
     this.chooseDevice = [];
     this.deviceList = []; // 主机AND集群
@@ -116,6 +117,10 @@ export class MountComponent implements OnInit {
   connectivityFailure = false; // 主机联通性测试失败
   connFailData: ConnFaildData[]; //  主机联通性测试失败数据
   showDetail = false; // 展示主机联通异常数据
+
+  //当前语言环境 CN为中文  EN为英文
+  language:string;
+  unmountDesc:string;//卸载失败返回信息
 
   ngOnInit(): void {
     // 初始化隐藏窗口
@@ -739,6 +744,7 @@ export class MountComponent implements OnInit {
     //   this.notChooseUnmountDevice = true;
     // } else {
     const submit=()=>{
+      this.language=this.translateService.currentLang==='en-US'?'EN':'CN'
       this.unmountForm.dataStoreObjectIds.push(this.objectId);
       if (this.unmountForm.mountType === '1') {
         this.unmountForm.hostId = this.chooseUnmountHost?.deviceId;
@@ -756,13 +762,14 @@ export class MountComponent implements OnInit {
           this.unmountSuccessShow = true;
         } else {
           console.log('unmount  fail：' + result.description);
+          this.unmountDesc=result.description
           this.isUnmountOperationErr = true;
         }
         this.cdr.detectChanges();
       };
       console.log('chooseDevice',this.chooseDevice)
       console.log('unmountForm',this.unmountForm)
-      const params = _.merge(this.unmountForm,{ hostIds: this.chooseDevice.map(i=>i.deviceId) });
+      const params = _.merge(this.unmountForm,{ hostIds: this.chooseDevice.map(i=>i.deviceId) },{language:this.language});
       // const res = await this.commonService.remoteVmfs_Unmount(params);
       // handlerUnmountVmfsSuccess(res);
       console.log(params)
