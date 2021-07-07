@@ -6,10 +6,7 @@ import com.huawei.dmestore.entity.DmeVmwareRelation;
 import com.huawei.dmestore.exception.DmeException;
 import com.huawei.dmestore.exception.VcenterException;
 import com.huawei.dmestore.exception.VcenterRuntimeException;
-import com.huawei.dmestore.model.FileSystem;
-import com.huawei.dmestore.model.LogicPorts;
-import com.huawei.dmestore.model.StorageDetail;
-import com.huawei.dmestore.model.TaskDetailInfo;
+import com.huawei.dmestore.model.*;
 import com.huawei.dmestore.utils.ToolUtils;
 import com.huawei.dmestore.utils.VCSDKUtils;
 
@@ -87,6 +84,8 @@ public class NfsOperationServiceImpl implements NfsOperationService {
     private static final String SIMPLE = "simple";
 
     private static final String AND_FIELD = "and";
+
+    private final long longTaskTimeOut = 30 * 60 * 1000;
 
     private static final int DIGIT_100 = 100;
 
@@ -599,9 +598,19 @@ public class NfsOperationServiceImpl implements NfsOperationService {
         }
         String object = responseEntity.getBody();
         JsonObject jsonObject = new JsonParser().parse(object).getAsJsonObject();
-        List<String> taskIds = new ArrayList<>(DIGIT_16);
-        taskIds.add(ToolUtils.jsonToStr(jsonObject.get(TASK_ID)));
-        return taskService.checkTaskStatus(taskIds);
+        String taskId = ToolUtils.jsonToStr(jsonObject.get(TASK_ID));
+        if (StringUtils.isEmpty(taskId)){
+            throw new DmeException("update nfs datastore error : taskid is empty!");
+        }
+        TaskDetailInfoNew taskinfo = taskService.queryTaskByIdReturnMainTask(taskId, longTaskTimeOut);
+        if (!StringUtils.isEmpty(taskinfo)){
+            if (taskinfo.getStatus() != 3){
+                throw new DmeException("update nfs datastore error :"+taskinfo.getDetailEn());
+            }
+        }else {
+            throw new DmeException("update nfs datastore error : taskinfo is empty!");
+        }
+        return true;
     }
 
     private String getFsIdByName(String fsname) throws DmeException {

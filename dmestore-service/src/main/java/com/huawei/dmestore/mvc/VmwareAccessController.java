@@ -1,19 +1,25 @@
 package com.huawei.dmestore.mvc;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.huawei.dmestore.exception.DmeException;
 import com.huawei.dmestore.exception.DmeSqlException;
 import com.huawei.dmestore.model.ClusterTree;
 import com.huawei.dmestore.model.ResponseBodyBean;
 import com.huawei.dmestore.services.VmwareAccessService;
 
+import com.huawei.dmestore.utils.VCSDKUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -30,6 +36,10 @@ public class VmwareAccessController extends BaseController {
 
     @Autowired
     private VmwareAccessService vmwareAccessService;
+    @Autowired
+    private VCSDKUtils vcsdkUtils;
+
+    private Gson gson = new Gson();
 
     /**
      * Access hosts
@@ -158,10 +168,36 @@ public class VmwareAccessController extends BaseController {
      * @throws Exception when error
      */
     @RequestMapping(value = "/getvmkernelipbyhostobjectid", method = RequestMethod.GET)
-    public ResponseBodyBean getVmKernelIpByHostObjectId(@RequestParam("hostObjectId") String hostObjectId) {
+    public ResponseBodyBean getVmKernelIpByHostObjectId(@RequestParam("hostObjectId") String hostObjectId,
+                                                        @RequestParam(value = "datastoreObjectId", defaultValue = "") String datastoreObjectId) {
         String failureStr = "";
         try {
+            List<Map<String, String>> latlists = new ArrayList<>();
             List<Map<String, String>> lists = vmwareAccessService.getVmKernelIpByHostObjectId(hostObjectId);
+            if (!StringUtils.isEmpty(datastoreObjectId)) {
+                String listStr = vcsdkUtils.getHostsByDsObjectId(datastoreObjectId, true);
+                if (!StringUtils.isEmpty(listStr)) {
+                    List<Map<String, String>> hostlists = null;
+                    if (!StringUtils.isEmpty(listStr)) {
+                        hostlists = gson.fromJson(listStr, new TypeToken<List<Map<String, String>>>() {
+                        }.getType());
+                    }
+                    if ((!CollectionUtils.isEmpty(lists)) && !CollectionUtils.isEmpty(hostlists)) {
+                        List<String> hostId = new ArrayList<>();
+                        for (Map<String, String> hostinfo : hostlists) {
+                            if (!StringUtils.isEmpty(hostinfo.get("hostId"))) {
+                                hostId.add(hostinfo.get("hostId"));
+                            }
+                        }
+                        for (Map<String, String> VmKernelIpinfo : lists) {
+                            if (!hostId.contains(VmKernelIpinfo.get("hostObjectId"))) {
+                                latlists.add(VmKernelIpinfo);
+                            }
+                        }
+                    }
+                }
+                return success(latlists);
+            }
             return success(lists);
         } catch (DmeException e) {
             LOG.error("get vmkernel ip by hostobjectid failure:", e);
