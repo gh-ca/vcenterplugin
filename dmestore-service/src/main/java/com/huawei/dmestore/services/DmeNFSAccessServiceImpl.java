@@ -26,6 +26,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.util.*;
@@ -947,15 +948,48 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
     public void unmountNfs(Map<String, Object> params) throws DmeException {
         String dataStoreObjectId = ToolUtils.getStr(params.get(DATASTOREOBJECTID));
         String hostObjId = ToolUtils.getStr(params.get("hostId"));
-        String name = vcsdkUtils.getVmKernelIpByHostObjectId(hostObjId);
+        String name;
+        boolean hostFlag= true;
+        try {
+            String[] temRes = hostObjId.split(":");
+
+            String tempString = temRes[2];
+            if (tempString.contains("Host")) {
+                hostFlag = true;
+            } else if (tempString.contains("Cluster")) {
+                hostFlag = false;
+            } else {
+                throw new DmeException("param is error");
+            }
+        }catch (Exception e){
+            throw new DmeException("param is error");
+        }
+        if(hostFlag) {
+             name = vcsdkUtils.getVmKernelIpByHostObjectId(hostObjId);
+        }else {
+             name = vcsdkUtils.getVmKernelIpByClusterObjectId(hostObjId);
+        }
+        if (StringUtils.isEmpty(name)){
+            throw new DmeException("unmountnfs vcenterhost="+name);
+        }
         LOG.info("unmountnfs vcenterhost="+name);
         DmeVmwareRelation dvr = dmeVmwareRalationDao.getDmeVmwareRelationByDsId(dataStoreObjectId);
         if (dvr == null) {
             LOG.error("unmountNfs get relation error!dataStoreObjectId={}", dataStoreObjectId);
             return;
         }
-        if (!StringUtils.isEmpty(hostObjId)) {
+        if (hostFlag) {
             unmountNfsFromHost(dataStoreObjectId, hostObjId);
+        }else {
+            ArrayList<String> hostObjIds = new ArrayList<>();
+            List<Map<String, String>> hostInfos = vcsdkUtils.getHostsOnClusterNew(hostObjId);
+            if (!CollectionUtils.isEmpty(hostInfos)){
+                for (Map<String, String> hostInfo : hostInfos){
+                    if (!StringUtils.isEmpty(hostInfo.get("hostId"))){
+                        unmountNfsFromHost(dataStoreObjectId, hostInfo.get("hostId"));
+                    }
+                }
+            }
         }
         String shareId = dvr.getShareId();
         LOG.info("unmountnfs vcenterhost shareid="+shareId);
