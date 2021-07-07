@@ -90,7 +90,7 @@ public interface VmfsAccessService {
     /**
      * delete vmfs
      *
-     * @param params include dataStoreObjectIds（list）
+     * @param params include dataStoreObjectIds（list）、language [CN 中文,EN 英文] 国际化参数 DME返回失败信息的国际化
      * @throws DmeException when error
      */
     void deleteVmfs(Map<String, Object> params) throws DmeException;

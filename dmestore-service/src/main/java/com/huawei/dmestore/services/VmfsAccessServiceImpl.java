@@ -1,5 +1,6 @@
 package com.huawei.dmestore.services;
 
+import com.google.gson.*;
 import com.huawei.dmestore.constant.DmeConstants;
 import com.huawei.dmestore.constant.DmeIndicatorConstants;
 import com.huawei.dmestore.dao.DmeVmwareRalationDao;
@@ -11,11 +12,6 @@ import com.huawei.dmestore.exception.VcenterException;
 import com.huawei.dmestore.model.*;
 import com.huawei.dmestore.utils.*;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 
 import org.apache.juli.logging.Log;
@@ -162,6 +158,10 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
     private final long longTaskTimeOut = 30 * 60 * 1000;
 
     private final String CONNECTIVITY_NORMAL = "normal";
+
+    private final String LANGUAGE_CN = "CN";
+
+    private final String LANGUAGE_EN = "EN";
 
     private ThreadPoolTaskExecutor threadPoolExecutor;
 
@@ -2324,109 +2324,116 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         List<String> volumeIds = new ArrayList<>();
         Map<String, String> volumeIdToStoreName = new HashMap<>();
         // 获取存储对应的卷Id并过滤绑掉虚拟机的存储
-        if (null != params && null != params.get(DATASTORE_OBJECT_IDS)) {
-            dataStoreObjectIds = (List<String>) params.get(DATASTORE_OBJECT_IDS);
-            if (dataStoreObjectIds.size() > 0) {
-                List<String> dataStoreNames = new ArrayList<>();
-                //Map<String, String> storeToHost = new HashMap<>();
-                List<String> bounds = new ArrayList<>();
-                for (String dsObjectId : dataStoreObjectIds) {
-                    DmeVmwareRelation dvr = dmeVmwareRalationDao.getDmeVmwareRelationByDsId(dsObjectId);
-                    if (dvr == null) {
-                        scanVmfs();
-                        dvr = dmeVmwareRalationDao.getDmeVmwareRelationByDsId(dsObjectId);
+        try {
+            if (null != params && null != params.get(DATASTORE_OBJECT_IDS)) {
+                dataStoreObjectIds = (List<String>) params.get(DATASTORE_OBJECT_IDS);
+                if (dataStoreObjectIds.size() > 0) {
+                    List<String> dataStoreNames = new ArrayList<>();
+                    //Map<String, String> storeToHost = new HashMap<>();
+                    List<String> bounds = new ArrayList<>();
+                    for (String dsObjectId : dataStoreObjectIds) {
+                        DmeVmwareRelation dvr = dmeVmwareRalationDao.getDmeVmwareRelationByDsId(dsObjectId);
+                        if (dvr == null) {
+                            scanVmfs();
+                            dvr = dmeVmwareRalationDao.getDmeVmwareRelationByDsId(dsObjectId);
+                        }
+                        boolean isFoundVm = vcsdkUtils.hasVmOnDatastore(dsObjectId);
+                        if (isFoundVm) {
+                            bounds.add(dvr.getStoreName());
+                            LOG.error("vmfs unmount,the vmfs:{} contain vm,can not unmount!!!", dsObjectId);
+                            continue;
+                        }
+                        if (dvr != null) {
+                            volumeIds.add(dvr.getVolumeId());
+                            dataStoreNames.add(dvr.getStoreName());
+                        }
                     }
-                    boolean isFoundVm = vcsdkUtils.hasVmOnDatastore(dsObjectId);
-                    if (isFoundVm) {
-                        bounds.add(dvr.getStoreName());
-                        LOG.error("vmfs unmount,the vmfs:{} contain vm,can not unmount!!!", dsObjectId);
-                        continue;
+                    if (volumeIds.size() > 0) {
+                        params.put(VOLUMEIDS, volumeIds);
+                        params.put(DATASTORE_NAMES, dataStoreNames);
+                    } else {
+                        throw new DmeException("The object has already been deleted or contain virtual machine rdm !");
                     }
-                    if (dvr != null) {
-                        volumeIds.add(dvr.getVolumeId());
-                        dataStoreNames.add(dvr.getStoreName());
-                    }
-                }
-                if (volumeIds.size() > 0) {
-                    params.put(VOLUMEIDS, volumeIds);
-                    params.put(DATASTORE_NAMES, dataStoreNames);
                 } else {
-                    throw new DmeException("the vmfs:"+bounds+" contain virtual machine,can not unmount!");
-                }
-            } else {
-                throw new DmeException("unmount volume params datastore ids is null!");
-            }
-        }
-        List<String> dmeHostIds = new ArrayList<>();
-        List<Map<String, List<String>>> needUnmapped = new ArrayList<>();
-        if (params != null && volumeIds.size() != 0) {
-            if (params.get(HOSTIDS) != null && !"".equals(params.get(HOSTIDS))) {
-                hostObjIds = (List<String>) params.get(HOSTIDS);
-            }
-            if (!StringUtils.isEmpty(ToolUtils.getStr(params.get(CLUSTER_ID)))) {
-                clusterObjId = ToolUtils.getStr(params.get(CLUSTER_ID));
-                String hosts = vcsdkUtils.getHostsOnCluster(clusterObjId);
-                if (!StringUtils.isEmpty(hosts)) {
-                    List<Map<String, String>> list = gson.fromJson(hosts, List.class);
-                    for (Map<String, String> map : list) {
-                        String hostId = map.get(HOSTID);
-                        hostObjIds.add(hostId);
-                    }
+                    throw new DmeException("The object has already been deleted or has not been completely created or contain virtual machine rdm ,please synchronize vmfs and try again later!");
                 }
             }
-        }
-        // vcenter卸载存储
-        if (params.get(DmeConstants.DATASTORENAMES) != null) {
-            List<String> dataStoreNames = (List<String>) params.get(DATASTORE_NAMES);
-            if (dataStoreNames != null && dataStoreNames.size() > 0) {
-                for (String dataStoreName : dataStoreNames) {
-                    Map<String, Object> dsmap = new HashMap<>();
-                    dsmap.put(NAME_FIELD, dataStoreName);
-                    if (!CollectionUtils.isEmpty(hostObjIds)) {
-                        for (String hostId : hostObjIds) {
-                            vcsdkUtils.unmountVmfsOnHostOrCluster(gson.toJson(dsmap), null, hostId);
+            List<String> dmeHostIds = new ArrayList<>();
+            List<Map<String, List<String>>> needUnmapped = new ArrayList<>();
+            if (params != null && volumeIds.size() != 0) {
+                if (params.get(HOSTIDS) != null && !"".equals(params.get(HOSTIDS))) {
+                    hostObjIds = (List<String>) params.get(HOSTIDS);
+                }
+                if (!StringUtils.isEmpty(ToolUtils.getStr(params.get(CLUSTER_ID)))) {
+                    clusterObjId = ToolUtils.getStr(params.get(CLUSTER_ID));
+                    String hosts = vcsdkUtils.getHostsOnCluster(clusterObjId);
+                    if (!StringUtils.isEmpty(hosts)) {
+                        List<Map<String, String>> list = gson.fromJson(hosts, List.class);
+                        for (Map<String, String> map : list) {
+                            String hostId = map.get(HOSTID);
+                            hostObjIds.add(hostId);
                         }
                     }
                 }
             }
-        }
-        if (!CollectionUtils.isEmpty(hostObjIds)) {
-            Map<String, Map<String, Object>> hostMap = getDmeHostByHostObjeId2(hostObjIds);
-            if (!CollectionUtils.isEmpty(hostMap)) {
-                for (Map.Entry<String, Map<String, Object>> entry : hostMap.entrySet()) {
-                    dmeHostIds.add(entry.getKey());
-                    // volume映射给主机 解除映射；volume映射给主机组 不解除映射
+            // vcenter卸载存储
+            if (params.get(DmeConstants.DATASTORENAMES) != null) {
+                List<String> dataStoreNames = (List<String>) params.get(DATASTORE_NAMES);
+                if (dataStoreNames != null && dataStoreNames.size() > 0) {
+                    for (String dataStoreName : dataStoreNames) {
+                        Map<String, Object> dsmap = new HashMap<>();
+                        dsmap.put(NAME_FIELD, dataStoreName);
+                        if (!CollectionUtils.isEmpty(hostObjIds)) {
+                            for (String hostId : hostObjIds) {
+                                vcsdkUtils.unmountVmfsOnHostOrCluster(gson.toJson(dsmap), null, hostId);
+                            }
+                        }
+                    }
                 }
-                needUnmapped = isNeedUnmapping(volumeIds, dmeHostIds);
             }
-        }
-        // 解除Lun映射   List<Map<String, List<String>>> needUnmapped
-        if (!CollectionUtils.isEmpty(needUnmapped)) {
-            Map<String, List<String>> unMappingVolumeParams = handleMap(needUnmapped);
-            Map<String, Object> unmap = new HashMap<>();
-            for (Map.Entry<String, List<String>> entry : unMappingVolumeParams.entrySet()) {
-                unmap.put(HOST_ID, entry.getKey());
-                unmap.put(VOLUMEIDS, entry.getValue());
-                String taskId = unmountHostGetTaskId2(unmap);
-                taskIds.add(taskId);
-                unmap.clear();
+            if (!CollectionUtils.isEmpty(hostObjIds)) {
+                Map<String, Map<String, Object>> hostMap = getDmeHostByHostObjeId2(hostObjIds);
+                if (!CollectionUtils.isEmpty(hostMap)) {
+                    for (Map.Entry<String, Map<String, Object>> entry : hostMap.entrySet()) {
+                        dmeHostIds.add(entry.getKey());
+                        // volume映射给主机 解除映射；volume映射给主机组 不解除映射
+                    }
+                    needUnmapped = isNeedUnmapping(volumeIds, dmeHostIds);
+                }
             }
-        }
-        // 获取卸载的任务完成后的状态,默认超时时间10分钟
-        boolean isUnmounted = true;
-        if (taskIds.size() > 0) {
-            isUnmounted = taskService.checkTaskStatus(taskIds);
-        }
-        // 若卸载vmfs上的全部主机或集群 最后重新扫描 此步会自动删除vmfs
-        if (!isUnmounted) {
-            throw new DmeException(
-                    "unmount volume precondition unmount host and hostGroup error(task status),taskIds:(" + gson.toJson(
-                            taskIds) + ")!");
-        }
-        if (isUnmounted && !CollectionUtils.isEmpty(hostObjIds)) {
-            for (String hostId : hostObjIds) {
-                vcsdkUtils.scanDataStore(null, hostId);
+            // 解除Lun映射   List<Map<String, List<String>>> needUnmapped
+            if (!CollectionUtils.isEmpty(needUnmapped)) {
+                Map<String, List<String>> unMappingVolumeParams = handleMap(needUnmapped);
+                Map<String, Object> unmap = new HashMap<>();
+                for (Map.Entry<String, List<String>> entry : unMappingVolumeParams.entrySet()) {
+                    unmap.put(HOST_ID, entry.getKey());
+                    unmap.put(VOLUMEIDS, entry.getValue());
+                    String taskId = unmountHostGetTaskId2(unmap);
+                    taskIds.add(taskId);
+                    unmap.clear();
+                }
             }
+            // 获取卸载的任务完成后的状态,默认超时时间10分钟
+            if (!CollectionUtils.isEmpty(taskIds)) {
+                // 检测任务等待卸载完成后再删除,不用判断是否卸载成功
+                for (String taskId : taskIds) {
+                    TaskDetailInfoNew taskDetailInfoNew = taskService.queryTaskByIdReturnMainTask(taskId, longTaskTimeOut);
+                    if (taskDetailInfoNew != null && taskDetailInfoNew.getStatus() != 3) {
+                        if (ToolUtils.getStr(params.get("language")).equals(LANGUAGE_CN)) {
+                            throw new DmeException("vcenter卸载数据存储成功!" + taskDetailInfoNew.getDetailCn());
+                        } else {
+                            throw new DmeException("vcenter unmount datastore success!" + taskDetailInfoNew.getDetailEn());
+                        }
+                    }
+                }
+            }
+            if (!CollectionUtils.isEmpty(hostObjIds)) {
+                for (String hostId : hostObjIds) {
+                    vcsdkUtils.scanDataStore(null, hostId);
+                }
+            }
+        } catch (DmeException | JsonSyntaxException e) {
+            throw new DmeException(e.getMessage());
         }
     }
 
@@ -2445,7 +2452,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             LOG.info("query oriented volume ,{}", volume);
             boolean attached = ToolUtils.jsonToBoo(volume.get("attached"));
             if (!attached) {
-                throw new DmeException("query oriented volume attached status is unmapping!{}", volumeId);
+                throw new DmeException("Lun attached status error!{}", volumeId);
             }
             JsonArray attachments = volume.get("attachments").getAsJsonArray();
             LOG.info("query oriented volume attachments,{}", attachments);
@@ -2670,8 +2677,8 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             List<String> volumeIds = new ArrayList<>();
             dvr = dmeVmwareRalationDao.getDmeVmwareRelationByDsId(dsObjId);
             if (dvr == null) {
-                LOG.error("dme vmware relation table data or store id error,can not find targeted volume id!{}", dsObjId);
-                throw new DmeException("dme vmware relation table data or store id error,can not find targeted volume id!");
+                LOG.error("dme vmware relation table data or store id error,please synchronize vmfs datastore!");
+                throw new DmeException("dme vmware relation table data or store id error,please synchronize vmfs datastore!");
             } else {
                 volumeIds.add(dvr.getVolumeId());
             }
@@ -2725,7 +2732,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         for (String storeId : dsObjIds) {
             // vcenter侧移除存储
             if (!vcsdkUtils.deleteVmfsDataStore(storeId)) {
-                LOG.info("vcenter remove vmfs datastore error!", storeId);
+                LOG.error("vcenter remove vmfs datastore error,please try again later!", storeId);
                 continue;
             }
         }
@@ -3022,7 +3029,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                     params.put(DATASTORE_NAMES, dataStoreNames);
                     params.put(DATASTORE_OBJECT_IDS, dataStorageIds);
                 }else {
-                    throw new DmeException("the vmfs:" + bounds + " contain virtual machine,can not unmount!");
+                    throw new DmeException("The object has already been deleted or has not been completely created or contain virtual machine rdm !");
                 }
             }
             // dme 侧解除关联
@@ -3034,6 +3041,11 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         return taskIds;
     }
 
+    /**
+     * language CN EN
+     * @param params include dataStoreObjectIds（list）
+     * @throws DmeException
+     */
     @Override
     public void deleteVmfs(Map<String, Object> params) throws DmeException {
         // 先调卸载的接口 卸载是卸载所有所有主机和集群(dme侧主机,主机组)
@@ -3041,7 +3053,16 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             List<String> unmountTaskIds = unmountVmfsAll(params);
             if (!CollectionUtils.isEmpty(unmountTaskIds)) {
                 // 检测任务等待卸载完成后再删除,不用判断是否卸载成功
-                taskService.checkTaskStatus(unmountTaskIds);
+                for (String taskId : unmountTaskIds) {
+                    TaskDetailInfoNew taskDetailInfoNew = taskService.queryTaskByIdReturnMainTask(taskId, longTaskTimeOut);
+                    if (taskDetailInfoNew != null && taskDetailInfoNew.getStatus() != 3) {
+                        if (ToolUtils.getStr(params.get("language")).equals(LANGUAGE_CN)) {
+                            throw new DmeException("vcenter移除数据存储成功!" + taskDetailInfoNew.getDetailCn());
+                        } else {
+                            throw new DmeException("vcenter remove datastore success!" + taskDetailInfoNew.getDetailEn());
+                        }
+                    }
+                }
             }
         } catch (DmeException | InterruptedException e) {
             throw new DmeException(e.getMessage());

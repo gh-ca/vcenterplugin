@@ -690,4 +690,21 @@ public class StoragePool {
     public void setRaidLevel(String raidLevel) {
         this.raidLevel = raidLevel;
     }
+
+    @Override
+    public String toString() {
+        return "StoragePool{" +
+                "storageName='" + storageName + '\'' +
+                ", name='" + name + '\'' +
+                ", id='" + id + '\'' +
+                ", storagePoolId='" + storagePoolId + '\'' +
+                ", storageInstanceId='" + storageInstanceId + '\'' +
+                ", storageDeviceId='" + storageDeviceId + '\'' +
+                ", mediaType='" + mediaType + '\'' +
+                ", storageId='" + storageId + '\'' +
+                ", diskPoolId='" + diskPoolId + '\'' +
+                ", poolId='" + poolId + '\'' +
+                ", serviceLevelName='" + serviceLevelName + '\'' +
+                '}';
+    }
 }

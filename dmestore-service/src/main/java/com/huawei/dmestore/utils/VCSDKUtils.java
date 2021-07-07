@@ -2022,7 +2022,6 @@ public class VCSDKUtils {
     public boolean deleteVmfsDataStore(String datastoreobjectid) throws VcenterException {
         boolean isDelete = false;
         try {
-
             String serverguid = vcConnectionHelpers.objectId2Serverguid(datastoreobjectid);
             VmwareContext vmwareContext = vcConnectionHelpers.getServerContext(serverguid);
             ManagedObjectReference dataStoreMor = vcConnectionHelpers.objectId2Mor(datastoreobjectid);
