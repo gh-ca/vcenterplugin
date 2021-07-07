@@ -214,7 +214,7 @@
           </span>
         </div>
         <div *ngIf="isUnmountOperationErr" class="errorTips" readonly>
-          <clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{'errorMsg.unMountError' | translate}}
+          <clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{unmountDesc}}
         </div>
 
         <div *ngIf="notChooseUnmountDevice" class="errorTips" readonly>
