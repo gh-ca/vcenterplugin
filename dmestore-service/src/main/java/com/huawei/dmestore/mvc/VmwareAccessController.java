@@ -36,8 +36,7 @@ public class VmwareAccessController extends BaseController {
 
     @Autowired
     private VmwareAccessService vmwareAccessService;
-    @Autowired
-    private VCSDKUtils vcsdkUtils;
+
 
     private Gson gson = new Gson();
 
@@ -172,30 +171,9 @@ public class VmwareAccessController extends BaseController {
                                                         @RequestParam(value = "datastoreObjectId", defaultValue = "") String datastoreObjectId) {
         String failureStr = "";
         try {
-            List<Map<String, String>> latlists = new ArrayList<>();
             List<Map<String, String>> lists = vmwareAccessService.getVmKernelIpByHostObjectId(hostObjectId);
             if (!StringUtils.isEmpty(datastoreObjectId)) {
-                String listStr = vcsdkUtils.getHostsByDsObjectId(datastoreObjectId, true);
-                if (!StringUtils.isEmpty(listStr)) {
-                    List<Map<String, String>> hostlists = null;
-                    if (!StringUtils.isEmpty(listStr)) {
-                        hostlists = gson.fromJson(listStr, new TypeToken<List<Map<String, String>>>() {
-                        }.getType());
-                    }
-                    if ((!CollectionUtils.isEmpty(lists)) && !CollectionUtils.isEmpty(hostlists)) {
-                        List<String> hostId = new ArrayList<>();
-                        for (Map<String, String> hostinfo : hostlists) {
-                            if (!StringUtils.isEmpty(hostinfo.get("hostId"))) {
-                                hostId.add(hostinfo.get("hostId"));
-                            }
-                        }
-                        for (Map<String, String> VmKernelIpinfo : lists) {
-                            if (!hostId.contains(VmKernelIpinfo.get("hostObjectId"))) {
-                                latlists.add(VmKernelIpinfo);
-                            }
-                        }
-                    }
-                }
+                List<Map<String, String>>  latlists = vmwareAccessService.getNoMountedHostByDsObj(lists,datastoreObjectId);
                 return success(latlists);
             }
             return success(lists);

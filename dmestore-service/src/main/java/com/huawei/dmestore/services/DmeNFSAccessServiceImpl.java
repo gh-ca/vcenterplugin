@@ -981,12 +981,31 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
         if (hostFlag) {
             unmountNfsFromHost(dataStoreObjectId, hostObjId);
         }else {
-            ArrayList<String> hostObjIds = new ArrayList<>();
             List<Map<String, String>> hostInfos = vcsdkUtils.getHostsOnClusterNew(hostObjId);
-            if (!CollectionUtils.isEmpty(hostInfos)){
-                for (Map<String, String> hostInfo : hostInfos){
-                    if (!StringUtils.isEmpty(hostInfo.get("hostId"))){
-                        unmountNfsFromHost(dataStoreObjectId, hostInfo.get("hostId"));
+            List<Map<String, String>> latlists = new ArrayList<>();
+            String listStr;
+            try {
+                listStr = vcsdkUtils.getHostsByDsObjectId(dataStoreObjectId, true);
+            }catch (VcenterException e){
+                throw new DmeException(e.getMessage());
+            }
+            if (!StringUtils.isEmpty(listStr)) {
+                List<Map<String, String>> hostlists = null;
+                if (!StringUtils.isEmpty(listStr)) {
+                    hostlists = gson.fromJson(listStr, new TypeToken<List<Map<String, String>>>() {
+                    }.getType());
+                }
+                if ((!CollectionUtils.isEmpty(hostInfos)) && !CollectionUtils.isEmpty(hostlists)) {
+                    List<String> hostId = new ArrayList<>();
+                    for (Map<String, String> hostinfo : hostlists) {
+                        if (!StringUtils.isEmpty(hostinfo.get("hostId"))) {
+                            hostId.add(hostinfo.get("hostId"));
+                        }
+                    }
+                    for (Map<String, String> Vmhostinfo : hostInfos) {
+                        if (hostId.contains(Vmhostinfo.get("hostId"))) {
+                            unmountNfsFromHost(dataStoreObjectId, Vmhostinfo.get("hostId"));
+                        }
                     }
                 }
             }
