@@ -47,7 +47,7 @@ import {VmfsCommon} from './VmfsCommon';
 import {AddService} from './../add/add.service';
 import {getLodash} from './../../../shared/lib';
 import {CommonService} from './../../common.service';
-import {TranslatePipe} from '@ngx-translate/core';
+import {TranslatePipe,TranslateService} from '@ngx-translate/core';
 
 const _ = getLodash();
 
@@ -70,7 +70,8 @@ export class VmfsListComponent extends VmfsCommon implements OnInit {
     private remoteService: VmfsListService,
     public cdr: ChangeDetectorRef,
     public gs: GlobalsService,
-    private router: Router
+    private router: Router,
+    private translateService:TranslateService
   ) {
     super();
     this.form.version = '5'; // 版本
@@ -248,6 +249,11 @@ export class VmfsListComponent extends VmfsCommon implements OnInit {
   latencyErrTips = false; // 时延错误提示
   bandwidthLimitErr = false; // v6 设备 带宽 下限大于上限
   iopsLimitErr = false; // v6 设备 IOPS 下限大于上限
+
+  //当前语言环境 CN为中文  EN为英文
+  language:string;
+  deleteDesc:string;//删除失败返回信息
+  unmountDesc:string;//卸载失败返回信息
 
   setFormValueWhenHiden(isShowInput) {
     this.isShowInput = isShowInput;
@@ -1251,8 +1257,10 @@ wwn: "67c1cf110058934511ba6e5a00000344"
   delHandleFunc() {
     const objectIds = this.rowSelected.map(item => item.objectid);
     console.log('del vmfs objectIds:' + objectIds);
+    this.language=this.translateService.currentLang==='en-US'?'EN':'CN'
     const delInfos = {
       dataStoreObjectIds: objectIds,
+      language:this.language
     };
     this.modalHandleLoading = true;
     this.remoteService.delVmfs(delInfos).subscribe((result: any) => {
@@ -1267,6 +1275,7 @@ wwn: "67c1cf110058934511ba6e5a00000344"
         this.delSuccessShow = true;
       } else {
         console.log('DEL faild: ' + result.description);
+        this.deleteDesc=result.description
         this.isOperationErr = true;
       }
       this.cdr.detectChanges();
@@ -1627,6 +1636,7 @@ wwn: "67c1cf110058934511ba6e5a00000344"
     );
 
     const submit = () => {
+      this.language=this.translateService.currentLang==='en-US'?'EN':'CN'
       this.unmountForm.dataStoreObjectIds.push(this.rowSelected[0].objectid);
       if (this.unmountForm.mountType === '1') {
         this.unmountForm.hostId = this.chooseUnmountHost?.deviceId;
@@ -1639,7 +1649,7 @@ wwn: "67c1cf110058934511ba6e5a00000344"
       this.modalHandleLoading = true;
       console.log('chooseDevice',this.addForm.value.chooseDevice)
       console.log('unmountForm',this.unmountForm)
-      this.remoteService.unmountVMFS(_.merge(this.unmountForm,{ hostIds: this.addForm.value.chooseDevice.map(i=>i.deviceId) })).subscribe((result: any) => {
+      this.remoteService.unmountVMFS(_.merge(this.unmountForm,{ hostIds: this.addForm.value.chooseDevice.map(i=>i.deviceId) },{language:this.language})).subscribe((result: any) => {
         this.modalHandleLoading = false;
         if (result.code === '200') {
           console.log('unmount ' + this.rowSelected[0].name + ' success');
@@ -1651,6 +1661,7 @@ wwn: "67c1cf110058934511ba6e5a00000344"
           this.unmountSuccessShow = true;
         } else {
           console.log('unmount ' + this.rowSelected[0].name + ' fail：' + result.description);
+          this.unmountDesc=result.description
           this.isOperationErr = true;
         }
         this.cdr.detectChanges();

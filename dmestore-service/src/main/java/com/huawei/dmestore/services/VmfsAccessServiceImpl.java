@@ -4488,7 +4488,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
 
                 // 如果创建成功，扫描集群中的其他主机
                 if (!StringUtils.isEmpty(clusterObjectId)) {
-                    vcsdkUtils.scanDataStore(objid2hostId.get(clusterObjectId), null);
+                    vcsdkUtils.scanDataStore(clusterObjectId, null);
                 }
             }
         } catch (DmeException e) {

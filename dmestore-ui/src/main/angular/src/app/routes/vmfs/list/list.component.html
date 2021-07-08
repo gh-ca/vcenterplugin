@@ -1273,7 +1273,7 @@
       </div>
       <div *ngIf="isOperationErr" class="errorTips" readonly>
         <clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>
-        {{'errorMsg.deleteError' | translate}}
+        {{deleteDesc}}
       </div>
       <h3 class="modal-title modelTile">{{'vmfs.del.title' | translate}}</h3>
       <div class="errorTips" readonly><clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{'vmfs.del.warning'|translate}}</div>
@@ -1310,7 +1310,7 @@
         </div>
         <div *ngIf="isOperationErr" class="errorTips" readonly>
           <clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>
-          {{'errorMsg.unMountError' | translate}}
+          {{unmountDesc}}
         </div>
 
 
