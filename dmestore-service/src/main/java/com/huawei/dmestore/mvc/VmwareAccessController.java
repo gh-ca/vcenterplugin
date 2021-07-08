@@ -36,8 +36,7 @@ public class VmwareAccessController extends BaseController {
 
     @Autowired
     private VmwareAccessService vmwareAccessService;
-    @Autowired
-    private VCSDKUtils vcsdkUtils;
+
 
     private Gson gson = new Gson();
 
