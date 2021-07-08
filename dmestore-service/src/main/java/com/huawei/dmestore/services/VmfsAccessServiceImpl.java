@@ -2371,7 +2371,9 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                         List<Map<String, String>> list = gson.fromJson(hosts, List.class);
                         for (Map<String, String> map : list) {
                             String hostId = map.get(HOSTID);
-                            hostObjIds.add(hostId);
+                            if (!StringUtils.isEmpty(hostId)) {
+                                hostObjIds.add(hostId);
+                            }
                         }
                     }
                 }

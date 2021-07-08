@@ -1027,9 +1027,11 @@ public class VCSDKUtils {
                     HostMo host1 = hostVmwareFactory.build(context, host.first());
                     Map<String, String> map = new HashMap<>();
                     String objectId = vcConnectionHelpers.mor2ObjectId(host1.getMor(), context.getServerAddress());
-                    map.put(HOST_ID, objectId);
-                    map.put(HOST_NAME, host1.getName());
-                    lists.add(map);
+                    if (!StringUtils.isEmpty(objectId)) {
+                        map.put(HOST_ID, objectId);
+                        map.put(HOST_NAME, host1.getName());
+                        lists.add(map);
+                    }
                 }
                 if (lists.size() > 0) {
                     listStr = gson.toJson(lists);
@@ -3199,7 +3201,7 @@ public class VCSDKUtils {
         try {
             if (StringUtils.isEmpty(hostObjectId)) {
                 logger.error("get Hba by host id error:host ObjectId is null.");
-                throw new Exception("get Hba by host id error:host ObjectId is null.");
+                throw new Exception("operation failed,please check the log for details.");
             }
             String serverguid = vcConnectionHelpers.objectId2Serverguid(hostObjectId);
             VmwareContext vmwareContext = vcConnectionHelpers.getServerContext(serverguid);
