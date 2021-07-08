@@ -609,6 +609,39 @@ public class VmwareAccessServiceImpl implements VmwareAccessService {
         }
         return treeList;
     }
+
+    @Override
+    public List<Map<String, String>> getNoMountedHostByDsObj(List<Map<String, String>> lists,String datastoreObjectId) throws DmeException {
+        List<Map<String, String>> latlists = new ArrayList<>();
+        String listStr;
+        try {
+             listStr = vcsdkUtils.getHostsByDsObjectId(datastoreObjectId, true);
+        }catch (VcenterException e){
+            throw new DmeException(e.getMessage());
+        }
+        if (!StringUtils.isEmpty(listStr)) {
+            List<Map<String, String>> hostlists = null;
+            if (!StringUtils.isEmpty(listStr)) {
+                hostlists = gson.fromJson(listStr, new TypeToken<List<Map<String, String>>>() {
+                }.getType());
+            }
+            if ((!CollectionUtils.isEmpty(lists)) && !CollectionUtils.isEmpty(hostlists)) {
+                List<String> hostId = new ArrayList<>();
+                for (Map<String, String> hostinfo : hostlists) {
+                    if (!StringUtils.isEmpty(hostinfo.get("hostId"))) {
+                        hostId.add(hostinfo.get("hostId"));
+                    }
+                }
+                for (Map<String, String> VmKernelIpinfo : lists) {
+                    if (!hostId.contains(VmKernelIpinfo.get("hostObjectId"))) {
+                        latlists.add(VmKernelIpinfo);
+                    }
+                }
+            }
+        }
+        return latlists;
+    }
+
     /**
       * @Description: 获取暂存主机集合对象
       * @Param @param null

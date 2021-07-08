@@ -3,6 +3,7 @@ package com.huawei.dmestore.services;
 import com.huawei.dmestore.entity.DmeVmwareRelation;
 import com.huawei.dmestore.exception.DmeException;
 import com.huawei.dmestore.exception.DmeSqlException;
+import com.huawei.dmestore.exception.VcenterException;
 import com.huawei.dmestore.model.ClusterTree;
 
 import java.util.List;
@@ -138,4 +139,5 @@ public interface VmwareAccessService {
      */
     List<ClusterTree>  listHostsAndClusterReturnTree() throws DmeException;
 
+    List<Map<String, String>> getNoMountedHostByDsObj(List<Map<String, String>> lists,String datastoreObjectId) throws DmeException;
 }

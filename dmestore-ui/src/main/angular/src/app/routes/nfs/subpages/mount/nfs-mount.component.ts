@@ -148,7 +148,7 @@ export class NfsMountComponent implements OnInit {
   //集群获取存储列表
   getDataStoreListByCluster(clusterObjectId:string){
     this.dataStoreList=null;
-    this.mountService.getDatastoreListByClusterObjectId(clusterObjectId,'NfS').subscribe((r:any)=>{
+    this.mountService.getDatastoreListByClusterObjectId(clusterObjectId,'NFS').subscribe((r:any)=>{
       if (isMockData){
         this.dataStoreList=[
           {
