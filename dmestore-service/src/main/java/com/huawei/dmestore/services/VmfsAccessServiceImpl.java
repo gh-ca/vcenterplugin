@@ -5393,11 +5393,11 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 String status = ToolUtils.jsonToStr(element.get("status"));
                 // 连通性异常主机结果统计
                 if (status.equalsIgnoreCase("NOT_CONNECT")) {
-                    throw new DmeException("check connectivity of hostgroup on dme failed!"+responseEntity);
+                    throw new DmeException("check connectivity of hostgroup on dme failed!"+id);
                 }
             }
         }else {
-            throw new DmeException("check connectivity of host or hostgroup on dme failed!"+responseEntity);
+            throw new DmeException("check connectivity of host or hostgroup on dme failed!"+responseEntity.getStatusCodeValue() );
         }
         return resultMapList;
     }
