@@ -4049,7 +4049,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 for (String host : vcHostIds) {
                     vcsdkUtils.scanDataStore(null, host);
                     try {
-                        TimeUnit.SECONDS.sleep(2);
+                        TimeUnit.SECONDS.sleep(4);
                     }catch (Exception e){
                         LOG.error("scan datastore error");
                     }
@@ -7168,5 +7168,16 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             throw new DmeException("query vmfs create method error");
         }
         return result;
+    }
+
+    @Override
+    public List<Map<String, String>> queryMountableVmfsByClusterId(String clusterObjectId, String dataStoreType)  throws DmeException {
+        List<Map<String, String>> rst;
+        try {
+             rst = vcsdkUtils.getNotMountedDatastorage(clusterObjectId, dataStoreType);
+        }catch (VcenterException e){
+            throw new DmeException(e.getMessage());
+        }
+        return  rst;
     }
 }

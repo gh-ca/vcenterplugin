@@ -243,4 +243,13 @@ public interface VmfsAccessService {
      * @Date 2021/6/2 15:29
      */
     String queryCreationMethodByDatastore(String dataStoreObjectId) throws DmeException;
+     /**
+       * @Description: 集群入口获取可挂载的vmfs
+       * @Param @param null
+       * @return @return
+       * @throws
+       * @author yc
+       * @Date 2021/7/8 15:53
+      */
+    List<Map<String, String>> queryMountableVmfsByClusterId(String clusterObjectId, String dataStoreType) throws DmeException;
 }

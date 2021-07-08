@@ -378,5 +378,25 @@ public class VmfsAccessController extends BaseController {
             return failure(e.getMessage());
         }
     }
-
+    /**
+     * queryVmfs
+     *
+     * @param clusterObjectId clusterObjectId
+     * @return ResponseBodyBean
+     * @throws Exception Exception
+     */
+    @RequestMapping(value = "/queryMountableVmfsByClusterId", method = RequestMethod.GET)
+    public ResponseBodyBean queryMountableVmfsByClusterId(@RequestParam("clusterObjectId") String clusterObjectId,
+                                                          @RequestParam("dataStoreType") String dataStoreType) throws Exception {
+        String failureStr = "";
+        try {
+            List<Map<String, String>> lists = vmfsAccessService.queryMountableVmfsByClusterId(clusterObjectId,dataStoreType);
+            LOG.info("listvmfs lists=={}", gson.toJson(lists));
+            return success(lists);
+        } catch (DmeException e) {
+            LOG.error("list vmfs failure:", e);
+            failureStr = "list vmfs failure:" + e.toString();
+        }
+        return failure(failureStr);
+    }
 }
