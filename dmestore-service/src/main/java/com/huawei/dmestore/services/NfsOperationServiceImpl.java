@@ -304,11 +304,13 @@ public class NfsOperationServiceImpl implements NfsOperationService {
             String dataStoreObjectId = (String) params.get("dataStoreObjectId");
             String nfsName = (String) params.get(NFS_NAME);
             if (StringUtils.isEmpty(dataStoreObjectId) || StringUtils.isEmpty(nfsName)) {
-                LOG.error("params error , please check it! dataStoreObjectId={}, nfsName={}", dataStoreObjectId,
-                        nfsName);
-                throw new DmeException(CODE_403, "params dataStoreObjectId or nfsName is null, please check it!");
+                LOG.error("params error , please check it! dataStoreObjectId={}", dataStoreObjectId);
+                throw new DmeException(CODE_403, "params dataStoreObjectId is null, please check it!");
             }
-
+            if (StringUtils.isEmpty(nfsName)){
+                LOG.error("params error , please check it! nfsName={}",nfsName);
+                throw new DmeException(CODE_403, "The name you entered is empty, please re-enter！");
+            }
             // 获取表中修改对象修改前字段值
             DmeVmwareRelation dmeVmwareRelation =
                     dmeVmwareRalationDao.getDmeVmwareRelationByDsId(dataStoreObjectId);
