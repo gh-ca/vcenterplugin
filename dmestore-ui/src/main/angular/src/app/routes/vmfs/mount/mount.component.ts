@@ -589,17 +589,19 @@ export class MountComponent implements OnInit {
       } else {
         this.unmountForm.clusterId = this.hostOrClusterId;
       }
+      this.language=this.translateService.currentLang==='en-US'?'EN':'CN'
       const unmountObjIds = this.chooseMountDataStore.map(item => item.objectId);
       this.unmountForm.dataStoreObjectIds = unmountObjIds;
       this.modalHandleLoading = true;
       console.log(this.unmountForm)
-      this.remoteSrv.unmountVMFS(_.merge(this.unmountForm,{hostIds:[this.unmountForm.hostId]})).subscribe((result: any) => {
+      this.remoteSrv.unmountVMFS(_.merge(this.unmountForm,{hostIds:[this.unmountForm.hostId]},{language:this.language})).subscribe((result: any) => {
         this.modalHandleLoading = false;
         if (result.code === '200') {
           console.log('unmount  success');
           this.unmountSuccessShow = true;
         } else {
           console.log('unmount  fail：' + result.description);
+          this.unmountDesc=result.description
           this.isUnmountOperationErr = true;
         }
         this.cdr.detectChanges();
