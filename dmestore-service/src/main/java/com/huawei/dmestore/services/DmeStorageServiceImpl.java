@@ -929,6 +929,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
             storageControllers.setBandwith(storageControllersMap.get(storageControllers.getId()).getBandwith());
             storageControllers.setIops(storageControllersMap.get(storageControllers.getId()).getIops());
             storageControllers.setCpuUsage(storageControllersMap.get(storageControllers.getId()).getCpuUsage());
+            storageControllers.setOps(storageControllersMap.get(storageControllers.getId()).getOps());
         }
         return storageControllers;
     }
@@ -1555,6 +1556,10 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                             if (statisticObject.get(DmeIndicatorConstants.COUNTER_ID_CONTROLLER_CPUUSAGE) != null) {
                                 sp.setCpuUsage(ToolUtils.jsonToFloat(
                                     statisticObject.get(DmeIndicatorConstants.COUNTER_ID_CONTROLLER_CPUUSAGE)));
+                            }
+                            if (statisticObject.get(DmeIndicatorConstants.COUNTER_ID_CONTROLLER_OPS) != null) {
+                                sp.setOps(ToolUtils.jsonToFloat(
+                                        statisticObject.get(DmeIndicatorConstants.COUNTER_ID_CONTROLLER_OPS)));
                             }
                             relists.add(sp);
                         }
