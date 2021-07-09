@@ -929,6 +929,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
             storageControllers.setBandwith(storageControllersMap.get(storageControllers.getId()).getBandwith());
             storageControllers.setIops(storageControllersMap.get(storageControllers.getId()).getIops());
             storageControllers.setCpuUsage(storageControllersMap.get(storageControllers.getId()).getCpuUsage());
+            storageControllers.setOps(storageControllersMap.get(storageControllers.getId()).getOps());
         }
         return storageControllers;
     }
