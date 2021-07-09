@@ -231,8 +231,8 @@ zh:'一年' ,range:'LAST_1_YEAR',   interval:  "DAY"
       console.log(params);
       return {
         "code": "206",
-        "data":["10.143.133.196","10.143.133.197"],
-        "description": "mount vmfs failure"
+        "data":["21.2112.12.12"],
+        "description": "error_args:[10.143.133.197],error_code:hostmgmt.0044,error_msg:The host (name: 10.143.133.197) to which a LUN has been mapped cannot be added to a host group to which a LUN has been mapped."
       };
     } else {
       try {
