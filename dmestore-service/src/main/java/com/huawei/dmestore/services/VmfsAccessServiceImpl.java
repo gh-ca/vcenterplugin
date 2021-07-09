@@ -5888,7 +5888,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 }
             }
         }
-        String desc = null;
+        String desc = "";
         //1.前端入参的选择的挂载方式为主机
         if (deviceTypeSet.size() == 1 && deviceTypeSet.contains(HOST)) {
             //1.1如果存储的创建方式为主机，检查主机连通性，将原有的lun映射给新的主机
@@ -7189,7 +7189,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
     private String addHostToHostGroup(List<String> hostIds, String hostGroupVolumid, String dataStoreObjectId, Map<String,
             String> hostIdToIp,List<String> unmappingAndNomalHostids,Map<String, List<Map<String, Object>>> allinitionators ) {
         List<Map<String, String>> clusterList = null;
-        String desc = null;
+        String desc = "";
         try {
              clusterList = vcsdkUtils.getClustersByDsObjectIdNew(dataStoreObjectId);
 
