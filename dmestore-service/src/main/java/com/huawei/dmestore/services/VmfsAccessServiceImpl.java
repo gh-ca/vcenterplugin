@@ -5888,6 +5888,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 }
             }
         }
+        String desc = null;
         //1.前端入参的选择的挂载方式为主机
         if (deviceTypeSet.size() == 1 && deviceTypeSet.contains(HOST)) {
             //1.1如果存储的创建方式为主机，检查主机连通性，将原有的lun映射给新的主机
@@ -5934,7 +5935,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                     //增加查询lun对应的已经映射的主机，映射之前从连通性正常的主机组中移除已经映射的主机
                     List<String> unmappingAndNomalHostids = getUnmappingAndNomalHost(hostGroupVolumid, objHostIds);
                     //todo 增加将主机加入主机组的操作，如果有什么问题无法处理
-                    addHostToHostGroup(hostIds,hostGroupVolumid,dataStoreObjectId,hostIdToIp,unmappingAndNomalHostids,allinitionators);
+                    desc = addHostToHostGroup(hostIds,hostGroupVolumid,dataStoreObjectId,hostIdToIp,unmappingAndNomalHostids,allinitionators);
                     Map<String, List<String>> mappingResult1 = lunMappingToHostOrHostgroupNew(Arrays.asList(hostGroupVolumid), unmappingAndNomalHostids, null);
                     List<String> mapingHostid = mappingResult1.get("hostMapped");
                     if (!CollectionUtils.isEmpty(objHostIds) && CollectionUtils.isEmpty(unmappingAndNomalHostids)) {
@@ -6014,7 +6015,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 List<String> objHostIds = hostStatusMap1.get("nomalHost");
                 //增加查询lun对应的已经映射的主机，映射之前从连通性正常的主机组中移除已经映射的主机
                 List<String> unmappingAndNomalHostids = getUnmappingAndNomalHost(hostGroupVolumid, objHostIds);
-                addHostToHostGroup(hostIds,hostGroupVolumid,dataStoreObjectId,hostIdToIp,unmappingAndNomalHostids,allinitionators);
+                desc = addHostToHostGroup(hostIds,hostGroupVolumid,dataStoreObjectId,hostIdToIp,unmappingAndNomalHostids,allinitionators);
                 Map<String, List<String>> mappingResult1 = lunMappingToHostOrHostgroupNew(Arrays.asList(hostGroupVolumid), unmappingAndNomalHostids, null);
                 List<String> mapingHostid = mappingResult1.get("hostMapped");
                 if (!CollectionUtils.isEmpty(objHostIds) && CollectionUtils.isEmpty(unmappingAndNomalHostids)) {
@@ -6087,11 +6088,11 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         needMountIps.addAll(mountedIps);
         needMountIps.removeAll(lstIps);
         if (0<needMountIps.size() && needMountIps.size()< num){
-            return new MountVmfsReturn(true,needMountIps);
+            return new MountVmfsReturn(true,needMountIps,desc);
         }else if (needMountIps.size() == num){
-            return new MountVmfsReturn(false);
+            return new MountVmfsReturn(false,desc);
         }else {
-            return new MountVmfsReturn(true);
+            return new MountVmfsReturn(true,desc);
         }
 
     }
@@ -6838,7 +6839,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             throw new DmeException("add hosts to host group error"+e.getMessage());
         }
         if (responseEntity.getStatusCodeValue() != HttpStatus.OK.value()) {
-            throw new DmeException("add hosts to host group error");
+            throw new DmeException("add hosts to host group error"+responseEntity.getBody());
         }
     }
     /**
@@ -7185,9 +7186,10 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         return  rst;
     }
 
-    private void addHostToHostGroup(List<String> hostIds, String hostGroupVolumid, String dataStoreObjectId, Map<String,
+    private String addHostToHostGroup(List<String> hostIds, String hostGroupVolumid, String dataStoreObjectId, Map<String,
             String> hostIdToIp,List<String> unmappingAndNomalHostids,Map<String, List<Map<String, Object>>> allinitionators ) {
         List<Map<String, String>> clusterList = null;
+        String desc = null;
         try {
              clusterList = vcsdkUtils.getClustersByDsObjectIdNew(dataStoreObjectId);
 
@@ -7222,7 +7224,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 }
             }
             if (CollectionUtils.isEmpty(hostToClu)) {
-                return;
+                return desc;
             }
             List<Attachment> attachmentList = findMappedHostsAndClusters(hostGroupVolumid);
             Map<String, Map<String, Object>> mappedHostgroupinfoMap = new HashMap<>();
@@ -7317,7 +7319,9 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             }
         } catch (Exception e) {
             LOG.error(e.getMessage());
+            desc = e.getMessage();
         }
+        return desc;
     }
 
 }

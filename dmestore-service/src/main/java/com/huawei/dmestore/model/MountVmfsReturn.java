@@ -13,7 +13,7 @@ public class MountVmfsReturn implements Serializable {
     private static final long serialVersionUID = -977833815757933935L;
     private boolean flag;
     private List<String> failedHost;
-
+    private String description;
     public MountVmfsReturn(boolean flag) {
         this.flag = flag;
     }
@@ -21,6 +21,17 @@ public class MountVmfsReturn implements Serializable {
     public MountVmfsReturn(boolean flag, List<String> failedHost) {
         this.flag = flag;
         this.failedHost = failedHost;
+    }
+
+    public MountVmfsReturn(boolean flag, List<String> failedHost, String description) {
+        this.flag = flag;
+        this.failedHost = failedHost;
+        this.description = description;
+    }
+
+    public MountVmfsReturn(boolean flag, String description) {
+        this.flag = flag;
+        this.description = description;
     }
 
     public boolean isFlag() {
@@ -37,5 +48,13 @@ public class MountVmfsReturn implements Serializable {
 
     public void setFailedHost(List<String> failedHost) {
         this.failedHost = failedHost;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }
