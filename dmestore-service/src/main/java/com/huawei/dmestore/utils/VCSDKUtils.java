@@ -4461,7 +4461,6 @@ public class VCSDKUtils {
             String serverguid = vcConnectionHelpers.objectId2Serverguid(hostObjectId);
             VmwareContext vmwareContext = vcConnectionHelpers.getServerContext(serverguid);
             RootFsMo rootFsMo = rootVmwareMoFactory.build(vmwareContext, vmwareContext.getRootFolder());
-            // 取得所有主机，并通过mounthostids进行过滤，过滤掉已经挂载的主机
             List<Pair<ManagedObjectReference, String>> dss = rootFsMo.getAllDatastoreOnRootFs();
             if (!CollectionUtils.isEmpty(dss)) {
                 for (Pair<ManagedObjectReference, String> ds : dss) {
@@ -4492,14 +4491,12 @@ public class VCSDKUtils {
             String serverguid = vcConnectionHelpers.objectId2Serverguid(hostObjectId);
             VmwareContext vmwareContext = vcConnectionHelpers.getServerContext(serverguid);
             RootFsMo rootFsMo = rootVmwareMoFactory.build(vmwareContext, vmwareContext.getRootFolder());
-            // 取得该存储下所有已经挂载的主机ID
             ManagedObjectReference objmor = vcConnectionHelpers.objectId2Mor(hostObjectId);
             HostMo hostmo = hostVmwareFactory.build(vmwareContext, objmor);
             String objHostId = null;
             if (hostmo != null) {
                 objHostId = hostmo.getMor().getValue();
             }
-            // 取得所有主机，并通过mounthostids进行过滤，过滤掉已经挂载的主机
             List<Pair<ManagedObjectReference, String>> dss = rootFsMo.getAllDatastoreOnRootFs();
             if (dss != null && dss.size() > 0) {
                 for (Pair<ManagedObjectReference, String> ds : dss) {
