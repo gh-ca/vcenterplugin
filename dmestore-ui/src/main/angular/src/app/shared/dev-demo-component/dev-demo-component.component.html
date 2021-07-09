@@ -5,6 +5,16 @@
 </div>
 <app-gh-dynamic-form [formInfo]='formItemInfos' [form]='form' (onPayLoadChange)='handlePayLoadChange($event)'>
 </app-gh-dynamic-form>
+<clr-select-container class="selectClass">
+  <label style="color: #9F9F9F;">修复方式</label>
+  <select  [(ngModel)]="selectedValue" clrSelect name="version" required
+           (change)="changeSelect()">
+    <option *ngFor="let item of selectedArr" value="{{item}}">{{item}}</option>
+  </select>
+  <clr-control-error>{{'validations.required' | translate}}</clr-control-error>
+</clr-select-container>
+<app-bp-repair-history-table [table]="table">
+</app-bp-repair-history-table>
 <h1>mount</h1>
 <app-gh-tree-checkbox
   (valueChange)="handleTreeValueChange('tree',$event)"

@@ -25,6 +25,7 @@ import { GhDynamicFormItemComponent } from './gh-dynamic-form-item/gh-dynamic-fo
 import { DynamicComponentDirectiveDirective } from './directives/dynamic-component-directive.directive';
 import { GhTreeCheckboxComponent } from './gh-tree-checkbox/gh-tree-checkbox.component';
 import { ErrorTipsComponent } from './error-tips/error-tips.component';
+import { BpRepairHistoryTableComponent } from './bp-repair-history-table/bp-repair-history-table.component';
 
 const THIRD_MODULES = [MaterialModule, TranslateModule];
 const COMPONENTS = [
@@ -67,7 +68,7 @@ const FILTER = [
 ];
 
 @NgModule({
-  declarations: [...COMPONENTS, ...COMPONENTS_DYNAMIC, ...DIRECTIVES, ...PIPES, ...FILTER],
+  declarations: [...COMPONENTS, ...COMPONENTS_DYNAMIC, ...DIRECTIVES, ...PIPES, ...FILTER, BpRepairHistoryTableComponent],
   imports: [CommonModule, FormsModule, RouterModule, ReactiveFormsModule, ...THIRD_MODULES],
   exports: [
     CommonModule,

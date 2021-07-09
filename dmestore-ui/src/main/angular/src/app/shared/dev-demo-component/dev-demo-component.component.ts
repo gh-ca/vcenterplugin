@@ -28,6 +28,9 @@ export class DevDemoComponentComponent implements OnInit {
   secondData;
   thirdData;
   buttonDisableOrNot:boolean=true;
+  selectedArr:any[];
+  selectedValue:string='手动'
+  table;
 
   constructor() {
     this.initForm();
@@ -71,13 +74,21 @@ export class DevDemoComponentComponent implements OnInit {
   }
   // "10.12.123.1","10.23.234.1"
   initForm() {
+    this.table=[
+      {
+
+      }
+    ]
+    this.selectedArr=[
+      "手动","自动"
+    ]
     //模拟返回数据
     this.partSuccessData={
-      "code":"-99999",
+      "code":"206",
       "data":{
         "successNo":0,
         "failNo":1,
-        "connectionResult":null,
+        "connectionResult":["10.12.123.1","10.23.234.1"],
         "partialSuccess":0
       },
       "description":"create vmfs failure:create vmfs errorFailed to perform the operation: 存储池的空闲容量不足。 请对存储池扩容后重试或者创建小于(1809)GB容量的LUN."
@@ -162,6 +173,11 @@ export class DevDemoComponentComponent implements OnInit {
     }else {
       return true
     }
+  }
+
+//  选择框value
+  changeSelect(){
+    console.log(this.selectedValue)
   }
 }
 
