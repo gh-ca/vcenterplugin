@@ -5394,7 +5394,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 String status = ToolUtils.jsonToStr(element.get("status"));
                 // 连通性异常主机结果统计
                 if (status.equalsIgnoreCase("NOT_CONNECT")) {
-                    throw new DmeException("check connectivity of hostgroup on dme failed! name ="+hostName);
+                    throw new DmeException("check connectivity of hostgroup on dme failed! name : "+hostName);
                 }
             }
         }else {
@@ -6826,7 +6826,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
     private void addHostsToHostGroupbatch(String hostGroupId, List<String> hostIds) throws DmeException {
         //校验参数
         if (StringUtils.isEmpty(hostGroupId) || CollectionUtils.isEmpty(hostIds) || hostIds.size() > 100) {
-            throw new DmeException("add hosts to host group error,the param is empty");
+            throw new DmeException("add hosts to host group error:the param is empty");
         }
 
         Map<String, List<String>> reqMap = new HashMap<>();
@@ -6836,10 +6836,10 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         try {
             responseEntity  = dmeAccessService.access(url, HttpMethod.PUT, gson.toJson(reqMap));
         }catch (Exception e){
-            throw new DmeException("add hosts to host group error"+e.getMessage());
+            throw new DmeException("add hosts to host group error:"+e.getMessage());
         }
         if (responseEntity.getStatusCodeValue() != HttpStatus.OK.value()) {
-            throw new DmeException("add hosts to host group error"+responseEntity.getBody());
+            throw new DmeException(responseEntity.getBody());
         }
     }
     /**
@@ -7319,14 +7319,12 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             }
         } catch (Exception e) {
             LOG.error(e.getMessage());
-            if (!StringUtils.isEmpty(e.getMessage()) && e.getMessage().contains("error_msg")){
-                String[] rst = e.getMessage().split("error_msg:");
-                if (!StringUtils.isEmpty(rst) && rst.length>1){
-                    desc = rst[1];
-                }
+            if (!StringUtils.isEmpty(e.getMessage())) {
+                JsonObject vjson = new JsonParser().parse(e.getMessage()).getAsJsonObject();
+                desc = StringUtil.dealQuotationMarks(ToolUtils.getStr(vjson.get("error_msg")));
             }
         }
+
         return desc;
     }
-
 }

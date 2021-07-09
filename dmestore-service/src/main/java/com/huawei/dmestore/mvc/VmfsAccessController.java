@@ -311,11 +311,11 @@ public class VmfsAccessController extends BaseController {
         try {
             MountVmfsReturn res = vmfsAccessService.mountVmfsNew(params);
             if (!res.isFlag()) {
-                return failure("mount vmfs failure"+res.getDescription());
+                return failure("mount vmfs failure : "+res.getDescription());
             }else if (res.isFlag() && CollectionUtils.isEmpty(res.getFailedHost())) {
                 return success(null, "Mount vmfs success");
             }else {
-               return partialSuccess(res.getFailedHost(),"Mount vmfs partial success!"+res.getDescription());
+               return partialSuccess(res.getFailedHost(),"Mount vmfs partial success : "+res.getDescription());
 
             }
         } catch (DmeException e) {
