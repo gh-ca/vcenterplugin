@@ -121,6 +121,7 @@ export class MountComponent implements OnInit {
   //当前语言环境 CN为中文  EN为英文
   language:string;
   unmountDesc:string;//卸载失败返回信息
+  mountFailOrPartSuccessDesc:string;//挂载失败和部分成功描述
 
   ngOnInit(): void {
     // 初始化隐藏窗口
@@ -717,9 +718,11 @@ export class MountComponent implements OnInit {
       }else if (result.code==='206'){
         console.log("挂载部分成功："+result.description)
         this.isMountPartSuccess=true
+        this.mountFailOrPartSuccessDesc=result.description
         this.mountFailHost=result.data
       } else {
         console.log('挂载异常：' + result.description);
+        this.mountFailOrPartSuccessDesc=result.description
         this.isOperationErr = true;
       }
       this.cdr.detectChanges();

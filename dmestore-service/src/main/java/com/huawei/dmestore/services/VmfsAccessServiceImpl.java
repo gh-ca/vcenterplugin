@@ -7319,7 +7319,12 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             }
         } catch (Exception e) {
             LOG.error(e.getMessage());
-            desc = e.getMessage();
+            if (!StringUtils.isEmpty(e.getMessage()) && e.getMessage().contains("error_msg")){
+                String[] rst = e.getMessage().split("error_msg:");
+                if (!StringUtils.isEmpty(rst) && rst.length>1){
+                    desc = rst[1];
+                }
+            }
         }
         return desc;
     }
