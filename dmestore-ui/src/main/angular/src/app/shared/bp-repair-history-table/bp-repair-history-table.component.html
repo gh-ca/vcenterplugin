@@ -1,21 +1,21 @@
 <clr-datagrid>
-  <clr-dg-column>User ID</clr-dg-column>
-  <clr-dg-column>Name</clr-dg-column>
-  <clr-dg-column>Creation date</clr-dg-column>
-  <clr-dg-column>Favorite color</clr-dg-column>
-  <clr-dg-column>Favorite color</clr-dg-column>
-  <clr-dg-column>Favorite color</clr-dg-column>
-  <clr-dg-column>Favorite color</clr-dg-column>
+  <clr-dg-column [clrDgField]="'objectName'"  >{{'bestPractice.repairHistory.objectName'|translate}}</clr-dg-column>
+  <clr-dg-column>{{'bestPractice.repairHistory.violationValue'|translate}}</clr-dg-column>
+  <clr-dg-column>{{'bestPractice.repairHistory.recommendedValue'|translate}}</clr-dg-column>
+  <clr-dg-column>{{'bestPractice.repairHistory.repairType'|translate}}</clr-dg-column>
+  <clr-dg-column>{{'bestPractice.repairHistory.repairTime'|translate}}</clr-dg-column>
+  <clr-dg-column>{{'bestPractice.repairHistory.repairResult'|translate}}</clr-dg-column>
+  <clr-dg-column>{{'bestPractice.repairHistory.executionLog'|translate}}</clr-dg-column>
 
-  <clr-dg-row *ngFor="let user of table">
-    <clr-dg-cell>{{user.id}}</clr-dg-cell>
-    <clr-dg-cell>{{user.name}}</clr-dg-cell>
-    <clr-dg-cell>{{user.creation | date}}</clr-dg-cell>
-    <clr-dg-cell>{{user.color}}</clr-dg-cell>
-    <clr-dg-cell>{{user.color}}</clr-dg-cell>
-    <clr-dg-cell>{{user.color}}</clr-dg-cell>
-    <clr-dg-cell>{{user.color}}</clr-dg-cell>
+  <clr-dg-row *ngFor="let item of tableData">
+    <clr-dg-cell>{{item.objectName}}</clr-dg-cell>
+    <clr-dg-cell>{{item.violationValue}}</clr-dg-cell>
+    <clr-dg-cell>{{item.recommendedValue}}</clr-dg-cell>
+    <clr-dg-cell>{{item.repairType}}</clr-dg-cell>
+    <clr-dg-cell>{{item.repairTime}}</clr-dg-cell>
+    <clr-dg-cell>{{item.repairResult}}</clr-dg-cell>
+    <clr-dg-cell>{{item.executionLog}}</clr-dg-cell>
   </clr-dg-row>
 
-  <clr-dg-footer>{{table.length}} users</clr-dg-footer>
+  <clr-dg-footer>{{tableData.length}} users</clr-dg-footer>
 </clr-datagrid>

@@ -6,7 +6,7 @@ import { Component, OnInit ,Input} from '@angular/core';
   styleUrls: ['./bp-repair-history-table.component.scss']
 })
 export class BpRepairHistoryTableComponent implements OnInit {
-@Input() table
+@Input() tableData
   constructor() { }
 
   ngOnInit(): void {

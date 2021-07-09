@@ -649,7 +649,16 @@
       "reclamation": "This item is configured to configure the automatic space reclamation policy for VMFS6 datastores.",
       "numberOfVolInDatastore": "This item is configured to limit the maximum number of volumes in a single datastore to 1. A VM cannot concurrently process multiple volumes requests in a datastore. If a datastore contains multiple volumes, request blocking of a volume will affect other volumes. Therefore, it is not recommended that a datastore contain multiple volumes."
     },
-    "applyBestPracticeTips": "There are data with 0 violations in the selected data, please select again!"
+    "applyBestPracticeTips": "There are data with 0 violations in the selected data, please select again!",
+    "repairHistory": {
+      "objectName": "Object name",
+      "violationValue": "Violation value",
+      "recommendedValue": "Recommended value",
+      "repairType": "Repair type",
+      "repairTime": "Repair time",
+      "repairResult": "Repair result",
+      "executionLog": "Execution log"
+    }
   },
   "iscsi": {
     "hostIp": "Host VmKernel IP",

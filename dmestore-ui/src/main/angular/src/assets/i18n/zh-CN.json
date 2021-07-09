@@ -649,7 +649,16 @@
       "reclamation": "实施后，将为VMFS6数据存储配置自动空间回收策略。",
       "numberOfVolInDatastore": "实施后，会将单个数据存储中卷的最大数量限制为1。这是由于虚拟机不能并发处理数据存储中多个卷的请求，当一个数据存储中包含多个卷时，某个卷的请求阻塞会影响其他卷，因此不推荐一个数据存储中包含多个卷。"
     },
-    "applyBestPracticeTips": "所选数据中有违规数为0的数据，请重新选择!"
+    "applyBestPracticeTips": "所选数据中有违规数为0的数据，请重新选择!",
+    "repairHistory": {
+      "objectName": "对象名",
+      "violationValue": "违规值",
+      "recommendedValue": "推荐值",
+      "repairType": "修复类型",
+      "repairTime": "修复时间",
+      "repairResult": "修复结果",
+      "executionLog": "执行日志"
+    }
   },
   "iscsi": {
     "hostIp": "主机VmKernel IP",
