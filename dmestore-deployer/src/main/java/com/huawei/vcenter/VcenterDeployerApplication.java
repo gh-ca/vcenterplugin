@@ -4,9 +4,12 @@ import com.huawei.vcenter.utils.KeytookUtil;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.net.Inet4Address;
 import java.net.InetAddress;
@@ -25,8 +28,14 @@ import java.util.List;
  **/
 @SpringBootApplication
 public class VcenterDeployerApplication {
+    @Value(value = "${deployer.port}")
+    private int port;
+    private static int template;
     protected static final Logger LOGGER = LoggerFactory.getLogger(VcenterDeployerApplication.class);
-
+    @PostConstruct
+    public void init() {
+        template = this.port;
+    }
     public static void main(String[] args) {
         try {
             KeytookUtil.genKey();
@@ -42,7 +51,7 @@ public class VcenterDeployerApplication {
             List<String> hosts = getLocalIp();
             StringBuffer buffer = new StringBuffer();
             for (String host : hosts) {
-                buffer.append("\r\n").append("https://").append(host).append(":8443");
+                buffer.append("\r\n").append("https://").append(host).append(":" + template);
             }
             LOGGER.info("Use either URL that vCenter can access to open page: {}", buffer.toString());
         } catch (SocketException e) {
