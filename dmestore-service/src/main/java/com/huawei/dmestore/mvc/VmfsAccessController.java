@@ -311,7 +311,7 @@ public class VmfsAccessController extends BaseController {
         try {
             MountVmfsReturn res = vmfsAccessService.mountVmfsNew(params);
             if (!res.isFlag()) {
-                return failure("mount vmfs failure");
+                return failure("mount vmfs failure,Please check the log for details");
             }else if (res.isFlag() && CollectionUtils.isEmpty(res.getFailedHost())) {
                 return success(null, "Mount vmfs success");
             }else {
