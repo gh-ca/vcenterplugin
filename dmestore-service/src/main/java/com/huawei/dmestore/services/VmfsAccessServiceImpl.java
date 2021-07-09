@@ -5390,10 +5390,11 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             for (JsonElement jsonElement : jsonArray) {
                 JsonObject element = jsonElement.getAsJsonObject();
                 String id = ToolUtils.jsonToStr(element.get("host_id"));
+                String hostName = ToolUtils.jsonToStr(element.get("host_name"));
                 String status = ToolUtils.jsonToStr(element.get("status"));
                 // 连通性异常主机结果统计
                 if (status.equalsIgnoreCase("NOT_CONNECT")) {
-                    throw new DmeException("check connectivity of hostgroup on dme failed! id="+id);
+                    throw new DmeException("check connectivity of hostgroup on dme failed! name ="+hostName);
                 }
             }
         }else {
@@ -5887,6 +5888,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 }
             }
         }
+        String desc = "";
         //1.前端入参的选择的挂载方式为主机
         if (deviceTypeSet.size() == 1 && deviceTypeSet.contains(HOST)) {
             //1.1如果存储的创建方式为主机，检查主机连通性，将原有的lun映射给新的主机
@@ -5932,6 +5934,8 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                     List<String> objHostIds = hostStatusMap1.get("nomalHost");
                     //增加查询lun对应的已经映射的主机，映射之前从连通性正常的主机组中移除已经映射的主机
                     List<String> unmappingAndNomalHostids = getUnmappingAndNomalHost(hostGroupVolumid, objHostIds);
+                    //todo 增加将主机加入主机组的操作，如果有什么问题无法处理
+                    desc = addHostToHostGroup(hostIds,hostGroupVolumid,dataStoreObjectId,hostIdToIp,unmappingAndNomalHostids,allinitionators);
                     Map<String, List<String>> mappingResult1 = lunMappingToHostOrHostgroupNew(Arrays.asList(hostGroupVolumid), unmappingAndNomalHostids, null);
                     List<String> mapingHostid = mappingResult1.get("hostMapped");
                     if (!CollectionUtils.isEmpty(objHostIds) && CollectionUtils.isEmpty(unmappingAndNomalHostids)) {
@@ -6011,6 +6015,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 List<String> objHostIds = hostStatusMap1.get("nomalHost");
                 //增加查询lun对应的已经映射的主机，映射之前从连通性正常的主机组中移除已经映射的主机
                 List<String> unmappingAndNomalHostids = getUnmappingAndNomalHost(hostGroupVolumid, objHostIds);
+                desc = addHostToHostGroup(hostIds,hostGroupVolumid,dataStoreObjectId,hostIdToIp,unmappingAndNomalHostids,allinitionators);
                 Map<String, List<String>> mappingResult1 = lunMappingToHostOrHostgroupNew(Arrays.asList(hostGroupVolumid), unmappingAndNomalHostids, null);
                 List<String> mapingHostid = mappingResult1.get("hostMapped");
                 if (!CollectionUtils.isEmpty(objHostIds) && CollectionUtils.isEmpty(unmappingAndNomalHostids)) {
@@ -6083,11 +6088,11 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         needMountIps.addAll(mountedIps);
         needMountIps.removeAll(lstIps);
         if (0<needMountIps.size() && needMountIps.size()< num){
-            return new MountVmfsReturn(true,needMountIps);
+            return new MountVmfsReturn(true,needMountIps,desc);
         }else if (needMountIps.size() == num){
-            return new MountVmfsReturn(false);
+            return new MountVmfsReturn(false,desc);
         }else {
-            return new MountVmfsReturn(true);
+            return new MountVmfsReturn(true,desc);
         }
 
     }
@@ -6798,11 +6803,11 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         for (JsonElement jsonElement1 : attachments) {
             Attachment attachment = new Attachment();
             JsonObject json1 = jsonElement1.getAsJsonObject();
-            attachment.setId(ToolUtils.getStr(json1.get(ID_FIELD)));
-            attachment.setVolumeId(ToolUtils.getStr(json1.get("volume_id")));
-            attachment.setHostId(ToolUtils.getStr(json1.get(HOST_ID)));
-            attachment.setAttachedAt(ToolUtils.getStr(json1.get("attached_at")));
-            attachment.setAttachedHostGroup(ToolUtils.getStr(json1.get("attached_host_group")));
+            attachment.setId(StringUtil.dealQuotationMarks(ToolUtils.getStr(json1.get(ID_FIELD))));
+            attachment.setVolumeId(StringUtil.dealQuotationMarks(ToolUtils.getStr(json1.get("volume_id"))));
+            attachment.setHostId(StringUtil.dealQuotationMarks(ToolUtils.getStr(json1.get(HOST_ID))));
+            attachment.setAttachedAt(StringUtil.dealQuotationMarks(ToolUtils.getStr(json1.get("attached_at"))));
+            attachment.setAttachedHostGroup(StringUtil.dealQuotationMarks(ToolUtils.getStr(json1.get("attached_host_group"))));
             attachment.setAttachedAtDate(ToolUtils.getDate(ToolUtils.getStr(json1.get("attached_at"))));
             attachmentList.add(attachment);
         }
@@ -6834,7 +6839,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             throw new DmeException("add hosts to host group error"+e.getMessage());
         }
         if (responseEntity.getStatusCodeValue() != HttpStatus.OK.value()) {
-            throw new DmeException("add hosts to host group error");
+            throw new DmeException("add hosts to host group error"+responseEntity.getBody());
         }
     }
     /**
@@ -7180,4 +7185,143 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         }
         return  rst;
     }
+
+    private String addHostToHostGroup(List<String> hostIds, String hostGroupVolumid, String dataStoreObjectId, Map<String,
+            String> hostIdToIp,List<String> unmappingAndNomalHostids,Map<String, List<Map<String, Object>>> allinitionators ) {
+        List<Map<String, String>> clusterList = null;
+        String desc = "";
+        try {
+             clusterList = vcsdkUtils.getClustersByDsObjectIdNew(dataStoreObjectId);
+
+            HashMap<String, List<String>> hostToClu = new HashMap<>();
+            if (!CollectionUtils.isEmpty(hostIds) && !CollectionUtils.isEmpty(clusterList)) {
+                for (Map<String, String> clusterinfo : clusterList) {
+                    if (!CollectionUtils.isEmpty(clusterinfo) && !StringUtils.isEmpty(clusterinfo.get(CLUSTER_ID))) {
+                        String hostInfoStr = vcsdkUtils.getHostsOnCluster(clusterinfo.get(CLUSTER_ID));
+                        List<Map<String, String>> hostInfoList = null;
+                        if (!StringUtils.isEmpty(hostInfoStr)) {
+                            hostInfoList = gson.fromJson(hostInfoStr, new TypeToken<List<Map<String, String>>>() {
+                            }.getType());
+                        }
+                        List<String> hostIdList = new ArrayList<>();
+                        if (!CollectionUtils.isEmpty(hostInfoList)) {
+                            for (Map<String, String> hostInfo : hostInfoList) {
+                                if (!CollectionUtils.isEmpty(hostInfo) && !StringUtils.isEmpty(hostInfo.get(HOSTID))) {
+                                    hostIdList.add(hostInfo.get(HOSTID));
+                                }
+                            }
+                        }
+                        Set<String> hostObjList = new HashSet<>();
+                        for (String hostObjid : hostIds) {
+                            if (!StringUtils.isEmpty(hostObjid) && hostIdList.contains(hostObjid)) {
+                                hostObjList.add(hostObjid);
+                            }
+                        }
+                        if (!CollectionUtils.isEmpty(hostObjList)) {
+                            hostToClu.put(clusterinfo.get(CLUSTER_ID), new ArrayList<>(hostObjList));
+                        }
+                    }
+                }
+            }
+            if (CollectionUtils.isEmpty(hostToClu)) {
+                return desc;
+            }
+            List<Attachment> attachmentList = findMappedHostsAndClusters(hostGroupVolumid);
+            Map<String, Map<String, Object>> mappedHostgroupinfoMap = new HashMap<>();
+            Map<String, Attachment> HostgroupnameToDataMap = new HashMap<>();
+
+            if (!CollectionUtils.isEmpty(attachmentList)) {
+                for (Attachment attach : attachmentList) {
+                    if (!StringUtils.isEmpty(attach) && !StringUtils.isEmpty(StringUtil.dealQuotationMarks(attach.getAttachedHostGroup()))) {
+                        Map<String, Object> dmeHostGroupInfo = dmeAccessService.getDmeHostGroup(StringUtil.dealQuotationMarks(attach.getAttachedHostGroup()));
+                        if (!CollectionUtils.isEmpty(dmeHostGroupInfo)) {
+                            mappedHostgroupinfoMap.put(ToolUtils.getStr(dmeHostGroupInfo.get(NAME_FIELD)), dmeHostGroupInfo);
+                            HostgroupnameToDataMap.put(ToolUtils.getStr(dmeHostGroupInfo.get(NAME_FIELD)), attach);
+                        }
+                    }
+                }
+            }
+            Map<String, List<String>> hostIdsToHostGroupId = new HashMap<>();
+            if (!CollectionUtils.isEmpty(mappedHostgroupinfoMap) && !CollectionUtils.isEmpty(HostgroupnameToDataMap)) {
+                for (String hostGrouName : mappedHostgroupinfoMap.keySet()) {
+                    for (String clusterid : hostToClu.keySet()) {
+                        if (!StringUtils.isEmpty(clusterid)) {
+                            if (hostGrouName.equals(vcsdkUtils.getClusterName(clusterid))) {
+                                hostIdsToHostGroupId.put(StringUtil.dealQuotationMarks(ToolUtils.getStr(mappedHostgroupinfoMap.get(hostGrouName).get("id"))), hostToClu.get(clusterid));
+                            } else {
+                                String prefix = vcsdkUtils.getVcConnectionHelper().objectId2Mor(clusterid).getValue();
+                                List<Attachment> HostgroupnameToDataMapnew = new ArrayList<>();
+                                for (String hostGrouName2 : HostgroupnameToDataMap.keySet()) {
+                                    if (hostGrouName2.startsWith(prefix)) {
+                                        HostgroupnameToDataMapnew.add(HostgroupnameToDataMap.get(hostGrouName2));
+                                    }
+                                    Attachment maxdatares = HostgroupnameToDataMapnew.stream().filter(attachment -> !StringUtils.isEmpty(attachment.getAttachedHostGroup())).max(Comparator.comparing(attachment1 -> attachment1.getAttachedAtDate())).get();
+                                    hostIdsToHostGroupId.put(StringUtil.dealQuotationMarks(ToolUtils.getStr(maxdatares.getAttachedHostGroup())), hostToClu.get(clusterid));
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            HashSet<String> hoss = new HashSet<String>();
+            HashMap<String, List<String>> hostIdsToHostGroupId2 = new HashMap<>();
+            if (!CollectionUtils.isEmpty(hostIdsToHostGroupId)) {
+                for (String hostgroupId : hostIdsToHostGroupId.keySet()) {
+                    List<String> hostobjids = hostIdsToHostGroupId.get(hostgroupId);
+                    if (!CollectionUtils.isEmpty(hostobjids)) {
+                        //获取各个主机的适配器集合
+                        List<String> hostIdList = new ArrayList<>();
+                        for (String hostId : hostobjids) {
+                            String objId = "";
+                            List<Map<String, Object>> hbas = vcsdkUtils.getHbasByHostObjectId(hostId);
+                            if (CollectionUtils.isEmpty(hbas)) {
+                                throw new DmeException("The" + hostId + " did not find a valid Hba");
+                            }
+                            List<String> wwniqns = new ArrayList<>();
+                            for (Map<String, Object> hba : hbas) {
+                                wwniqns.add(ToolUtils.getStr(hba.get(NAME_FIELD)));
+                            }
+                            for (String dmehostid : allinitionators.keySet()) {
+                                List<Map<String, Object>> hostinitionators = allinitionators.get(dmehostid);
+                                if (hostinitionators != null && hostinitionators.size() > 0) {
+                                    for (Map<String, Object> inimap : hostinitionators) {
+                                        String portName = ToolUtils.getStr(inimap.get(PORT_NAME));
+                                        if (wwniqns.contains(portName)) {
+                                            objId = dmehostid;
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+                            // 如果主机\不存在就创建并得到主机
+                            if (StringUtils.isEmpty(objId)) {
+                                objId = createHostOnDme(hostIdToIp.get(hostId), hostId);
+                            }
+                            if (!StringUtils.isEmpty(objId)) {
+                                hostIdList.add(objId);
+                                hoss.add(objId);
+                            }
+                        }
+                        if (!CollectionUtils.isEmpty(hostIdList))
+                            hostIdsToHostGroupId2.put(hostgroupId, hostIdList);
+                    }
+                }
+            }
+            if (!CollectionUtils.isEmpty(hoss)){
+                unmappingAndNomalHostids.removeAll(new ArrayList<>(hoss));
+            }
+            if (!CollectionUtils.isEmpty(hostIdsToHostGroupId2)) {
+                for (String Hostgroupid : hostIdsToHostGroupId2.keySet()) {
+                    if (!StringUtils.isEmpty(Hostgroupid) && !CollectionUtils.isEmpty(hostIdsToHostGroupId2.get(Hostgroupid))) {
+                        addHostsToHostGroupbatch(Hostgroupid, hostIdsToHostGroupId2.get(Hostgroupid));
+                    }
+                }
+            }
+        } catch (Exception e) {
+            LOG.error(e.getMessage());
+            desc = e.getMessage();
+        }
+        return desc;
+    }
+
 }
