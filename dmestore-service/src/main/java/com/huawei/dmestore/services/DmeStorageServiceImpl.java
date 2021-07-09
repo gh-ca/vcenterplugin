@@ -1556,6 +1556,10 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                                 sp.setCpuUsage(ToolUtils.jsonToFloat(
                                     statisticObject.get(DmeIndicatorConstants.COUNTER_ID_CONTROLLER_CPUUSAGE)));
                             }
+                            if (statisticObject.get(DmeIndicatorConstants.COUNTER_ID_CONTROLLER_OPS) != null) {
+                                sp.setOps(ToolUtils.jsonToFloat(
+                                        statisticObject.get(DmeIndicatorConstants.COUNTER_ID_CONTROLLER_OPS)));
+                            }
                             relists.add(sp);
                         }
                     }
