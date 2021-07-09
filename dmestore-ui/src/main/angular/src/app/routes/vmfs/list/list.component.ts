@@ -254,6 +254,7 @@ export class VmfsListComponent extends VmfsCommon implements OnInit {
   language:string;
   deleteDesc:string;//删除失败返回信息
   unmountDesc:string;//卸载失败返回信息
+  mountFailOrPartSuccessDesc:string;//挂载失败和部分成功描述
 
   setFormValueWhenHiden(isShowInput) {
     this.isShowInput = isShowInput;
@@ -1491,9 +1492,11 @@ wwn: "67c1cf110058934511ba6e5a00000344"
         }else if (result.code==='206'){
           console.log("挂载部分成功："+result.description)
           this.isMountPartSuccess=true
+          this.mountFailOrPartSuccessDesc=result.description
           this.mountFailHost=result.data
         }else {
           console.log('挂载异常：' + result.description);
+          this.mountFailOrPartSuccessDesc=result.description
           this.isOperationErr = true;
         }
       };

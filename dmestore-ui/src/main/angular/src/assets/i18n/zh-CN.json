@@ -901,7 +901,8 @@
     "HostConnectionFail": "启动器不在线!",
     "connectionFailMessage": "以下是主机连通失败的主机：",
     "mountFailHost": "以下是挂载失败的主机：",
-    "details": "详情："
+    "details": "详情：",
+    "detailDescription": "详情描述："
   },
   "page": {
     "perPage": "每页",
