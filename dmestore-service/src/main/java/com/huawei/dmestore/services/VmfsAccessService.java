@@ -90,7 +90,7 @@ public interface VmfsAccessService {
     /**
      * delete vmfs
      *
-     * @param params include dataStoreObjectIds（list）
+     * @param params include dataStoreObjectIds（list）、language [CN 中文,EN 英文] 国际化参数 DME返回失败信息的国际化
      * @throws DmeException when error
      */
     void deleteVmfs(Map<String, Object> params) throws DmeException;
@@ -189,7 +189,7 @@ public interface VmfsAccessService {
 
     Map<String,List<Map<String, Object>>> getAllInitionator() throws DmeException ;
     /**
-      * @Description:  创建Vmfs支持批量选择主机或者主机组
+      * @Description:  createVmfsNew 创建Vmfs支持批量选择主机或者主机组（循环主机和lun，优点：可以拿到每台主机每台lun的映射情况，缺点：循环调用Dme下发任务，下发任务）
       * @Param @param null
       * @return @return
       * @throws
@@ -198,6 +198,16 @@ public interface VmfsAccessService {
      */
     CreateVmfsResponse createVmfsNew(Map<String, Object> params) throws DmeException ;
     /**
+     * @Description:  createVmfsNew1 创建Vmfs支持批量选择主机或者主机组（循环主机和lun，优点：可以拿到每台主机每台lun的映射情况，缺点：循环调用Dme下发任务）
+     * @Param @param null
+     * @return @return
+     * @throws
+     * @author yc
+     * @Date 2021/5/14 10:38
+     */
+    CreateVmfsResponse02 createVmfsNew1(Map<String, Object> params) throws DmeException ;
+
+    /**
       * @Description: vmfs挂载新方法，支持批量选择主机或者主机组
       * @Param @param null
       * @return @return
@@ -205,7 +215,7 @@ public interface VmfsAccessService {
       * @author yc
       * @Date 2021/5/14 10:48
      */
-    List<Map<String, String>> mountVmfsNew(Map<String, Object> params) throws DmeException;
+    MountVmfsReturn mountVmfsNew(Map<String, Object> params) throws DmeException;
     /**
       * @Description: 卸载页面，以树的形式返回可卸载的主机和集群（已过滤集群下未挂载的主机信息）
       * @Param @param null
@@ -233,4 +243,13 @@ public interface VmfsAccessService {
      * @Date 2021/6/2 15:29
      */
     String queryCreationMethodByDatastore(String dataStoreObjectId) throws DmeException;
+     /**
+       * @Description: 集群入口获取可挂载的vmfs
+       * @Param @param null
+       * @return @return
+       * @throws
+       * @author yc
+       * @Date 2021/7/8 15:53
+      */
+    List<Map<String, String>> queryMountableVmfsByClusterId(String clusterObjectId, String dataStoreType) throws DmeException;
 }

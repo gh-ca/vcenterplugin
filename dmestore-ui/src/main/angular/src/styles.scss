@@ -326,6 +326,27 @@ clr-dg-cell.datagrid-cell{
     display:none;
   }
 }
+//vmfs挂载时，挂载类型为主机时，集群置灰，但其下主机可选
+.clr-tree-node.mountDisabled{
+  >div>div.clr-treenode-content{
+    color:gray;
+    opacity: 0.5;
+    &::before{
+      content:" ";
+      width:22px;
+    }
+  }
+  >div>div.clr-checkbox-wrapper {
+    input.clr-checkbox{
+      display: none;
+    }
+  }
+  >div>div.clr-checkbox-wrapper {
+    label.clr-control-label{
+      display:none;
+    }
+  }
+}
 
 
 .submit-disabled{
@@ -338,4 +359,19 @@ clr-dg-cell.datagrid-cell{
   border-color: #ccc;
   border-color: var(--clr-btn-primary-disabled-border-color, #cccccc);
   box-shadow: none;
+}
+
+
+/* fix:vmfs 挂载 tree 选中后 选择框位移bug */
+.clr-tree-node.ng-star-inserted.disabled .clr-tree-node-content-container>.clr-checkbox-wrapper {
+  height: 1.62rem;
+  width: 0;
+  padding-top: .21rem;
+  padding-left: .41rem;
+}
+.clr-tree-node.ng-star-inserted.mountDisabled>.clr-tree-node-content-container>.clr-checkbox-wrapper {
+  height: 1.62rem;
+  width: 0;
+  padding-top: .21rem;
+  padding-left: .41rem;
 }

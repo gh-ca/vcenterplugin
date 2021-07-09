@@ -47,7 +47,7 @@ import {VmfsCommon} from './VmfsCommon';
 import {AddService} from './../add/add.service';
 import {getLodash} from './../../../shared/lib';
 import {CommonService} from './../../common.service';
-import {TranslatePipe} from '@ngx-translate/core';
+import {TranslatePipe,TranslateService} from '@ngx-translate/core';
 
 const _ = getLodash();
 
@@ -70,7 +70,8 @@ export class VmfsListComponent extends VmfsCommon implements OnInit {
     private remoteService: VmfsListService,
     public cdr: ChangeDetectorRef,
     public gs: GlobalsService,
-    private router: Router
+    private router: Router,
+    private translateService:TranslateService
   ) {
     super();
     this.form.version = '5'; // 版本
@@ -204,6 +205,7 @@ export class VmfsListComponent extends VmfsCommon implements OnInit {
   mountForm = new GetForm().getMountForm();
   chooseHost: HostList; // 已选择的主机
   chooseCluster: ClusterList; // 已选择的集群
+  mountFailHost:[]; //部分成功时挂载失败的主机
 
   chooseUnmountHost: HostOrCluster = null; // 已选择卸载的主机
   chooseUnmountCluster: HostOrCluster = null; // 已选择卸载的集群
@@ -221,6 +223,7 @@ export class VmfsListComponent extends VmfsCommon implements OnInit {
   modalLoading = false; // 数据加载loading
   modalHandleLoading = false; // 数据处理loading
   isOperationErr = false; // 错误信息
+  isMountPartSuccess=false; //挂载部分成功
   isReclaimErr = false; // 错误信息
   nameChecking = false; // 名称校验
   capacityErr = false; // 容量错误信息
@@ -246,6 +249,12 @@ export class VmfsListComponent extends VmfsCommon implements OnInit {
   latencyErrTips = false; // 时延错误提示
   bandwidthLimitErr = false; // v6 设备 带宽 下限大于上限
   iopsLimitErr = false; // v6 设备 IOPS 下限大于上限
+
+  //当前语言环境 CN为中文  EN为英文
+  language:string;
+  deleteDesc:string;//删除失败返回信息
+  unmountDesc:string;//卸载失败返回信息
+  mountFailOrPartSuccessDesc:string;//挂载失败和部分成功描述
 
   setFormValueWhenHiden(isShowInput) {
     this.isShowInput = isShowInput;
@@ -906,6 +915,7 @@ wwn: "67c1cf110058934511ba6e5a00000344"
     this.modalLoading = true;
     this.modalHandleLoading = false;
     this.isOperationErr = false;
+    this.partSuccessOrFail=false
     // 容量错误提示
     this.capacityErr = false;
     // this.gs.loading = true;
@@ -1248,8 +1258,10 @@ wwn: "67c1cf110058934511ba6e5a00000344"
   delHandleFunc() {
     const objectIds = this.rowSelected.map(item => item.objectid);
     console.log('del vmfs objectIds:' + objectIds);
+    this.language=this.translateService.currentLang==='en-US'?'EN':'CN'
     const delInfos = {
       dataStoreObjectIds: objectIds,
+      language:this.language
     };
     this.modalHandleLoading = true;
     this.remoteService.delVmfs(delInfos).subscribe((result: any) => {
@@ -1264,6 +1276,7 @@ wwn: "67c1cf110058934511ba6e5a00000344"
         this.delSuccessShow = true;
       } else {
         console.log('DEL faild: ' + result.description);
+        this.deleteDesc=result.description
         this.isOperationErr = true;
       }
       this.cdr.detectChanges();
@@ -1277,6 +1290,7 @@ wwn: "67c1cf110058934511ba6e5a00000344"
       this.modalLoading = true;
       this.modalHandleLoading = false;
       this.isOperationErr = false;
+      this.isMountPartSuccess=false;
       this.mountErr = false;
 
       this.mountForm = new GetForm().getMountForm();
@@ -1475,8 +1489,14 @@ wwn: "67c1cf110058934511ba6e5a00000344"
             });
             this.connFailData = connFailDatas;
           }
-        } else {
+        }else if (result.code==='206'){
+          console.log("挂载部分成功："+result.description)
+          this.isMountPartSuccess=true
+          this.mountFailOrPartSuccessDesc=result.description
+          this.mountFailHost=result.data
+        }else {
           console.log('挂载异常：' + result.description);
+          this.mountFailOrPartSuccessDesc=result.description
           this.isOperationErr = true;
         }
       };
@@ -1619,6 +1639,7 @@ wwn: "67c1cf110058934511ba6e5a00000344"
     );
 
     const submit = () => {
+      this.language=this.translateService.currentLang==='en-US'?'EN':'CN'
       this.unmountForm.dataStoreObjectIds.push(this.rowSelected[0].objectid);
       if (this.unmountForm.mountType === '1') {
         this.unmountForm.hostId = this.chooseUnmountHost?.deviceId;
@@ -1631,7 +1652,7 @@ wwn: "67c1cf110058934511ba6e5a00000344"
       this.modalHandleLoading = true;
       console.log('chooseDevice',this.addForm.value.chooseDevice)
       console.log('unmountForm',this.unmountForm)
-      this.remoteService.unmountVMFS(_.merge(this.unmountForm,{ hostIds: this.addForm.value.chooseDevice.map(i=>i.deviceId) })).subscribe((result: any) => {
+      this.remoteService.unmountVMFS(_.merge(this.unmountForm,{ hostIds: this.addForm.value.chooseDevice.map(i=>i.deviceId) },{language:this.language})).subscribe((result: any) => {
         this.modalHandleLoading = false;
         if (result.code === '200') {
           console.log('unmount ' + this.rowSelected[0].name + ' success');
@@ -1643,6 +1664,7 @@ wwn: "67c1cf110058934511ba6e5a00000344"
           this.unmountSuccessShow = true;
         } else {
           console.log('unmount ' + this.rowSelected[0].name + ' fail：' + result.description);
+          this.unmountDesc=result.description
           this.isOperationErr = true;
         }
         this.cdr.detectChanges();

@@ -3,7 +3,7 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {DeleteService} from "../delete/delete.service";
 import {GlobalsService} from "../../../shared/globals.service";
 import {ClrModal, ClrWizard} from "@clr/angular";
-
+import {TranslateService} from '@ngx-translate/core';
 @Component({
   selector: 'app-list',
   templateUrl: './delete.component.html',
@@ -13,7 +13,7 @@ import {ClrModal, ClrWizard} from "@clr/angular";
 })
 export class DeleteComponent implements OnInit{
 
-  constructor(private remoteSrv: DeleteService, private route: ActivatedRoute, private cdr: ChangeDetectorRef, private router:Router, private globalsService: GlobalsService) {
+  constructor(private remoteSrv: DeleteService, private route: ActivatedRoute, private cdr: ChangeDetectorRef, private router:Router, private globalsService: GlobalsService,private translateService:TranslateService) {
 
   }
 
@@ -30,6 +30,10 @@ export class DeleteComponent implements OnInit{
   delSuccessShow = false; // 删除提示窗口
   modalHandleLoading = false; // 数据处理loading
   isOperationErr = false; // 错误信息
+
+  //当前语言环境 CN为中文  EN为英文
+  language:string;
+  deleteDesc:string;//删除失败返回信息
 
   ngOnInit(): void {
     this.initData();
@@ -72,8 +76,10 @@ export class DeleteComponent implements OnInit{
 
   // 删除VMFS 处理函数
   delHandleFunc() {
+    this.language=this.translateService.currentLang==='en-US'?'EN':'CN'
     const delInfos = {
-      dataStoreObjectIds: this.objectIds
+      dataStoreObjectIds: this.objectIds,
+      language:this.language
     }
     this.modalHandleLoading = true;
     this.remoteSrv.delVmfs(delInfos).subscribe((result: any) => {
@@ -85,6 +91,7 @@ export class DeleteComponent implements OnInit{
         this.delSuccessShow = true;
       } else {
         console.log('DEL faild: ' + result.description);
+        this.deleteDesc=result.description
         this.isOperationErr = true;
       }
       this.cdr.detectChanges();

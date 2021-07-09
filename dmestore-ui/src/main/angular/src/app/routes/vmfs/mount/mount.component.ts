@@ -16,7 +16,7 @@ import { isMockData, mockData } from '../../../../mock/mock';
 import { FormGroup, FormControl } from '@angular/forms';
 import { AddService } from './../add/add.service';
 import { CommonService } from './../../common.service';
-import { TranslatePipe } from '@ngx-translate/core';
+import { TranslatePipe,TranslateService } from '@ngx-translate/core';
 import UI_TREE_CHILDREN_BY_OBJECT_IDS from 'mock/UI_TREE_CHILDREN_BY_OBJECT_IDS';
 import { vmfsClusterTreeData } from './../../../../mock/vmfsClusterTree';
 import { CustomValidatorFaild } from 'app/app.helpers';
@@ -38,7 +38,8 @@ export class MountComponent implements OnInit {
     private activatedRoute: ActivatedRoute,
     private cdr: ChangeDetectorRef,
     private router: Router,
-    private globalsService: GlobalsService
+    private globalsService: GlobalsService,
+    private translateService:TranslateService
   ) {
     this.chooseDevice = [];
     this.deviceList = []; // 主机AND集群
@@ -90,6 +91,7 @@ export class MountComponent implements OnInit {
   mountClusterData = true; // 挂载页面集群是否加载完毕 true是 false否
   clusterList: ClusterList[] = []; // 挂载页面集群列表
   chooseCluster: ClusterList; // 已选择的集群
+  mountFailHost:[]; //部分成功时挂载失败的主机
 
   // 卸载
   unmountShow = false; // 卸载窗口
@@ -109,11 +111,17 @@ export class MountComponent implements OnInit {
   modalLoading = false; // 数据加载loading
   modalHandleLoading = false; // 数据处理loading
   isOperationErr = false; // 挂载错误信息
+  isMountPartSuccess=false; //挂载部分成功
   isUnmountOperationErr = false; // 卸载错误信息
 
   connectivityFailure = false; // 主机联通性测试失败
   connFailData: ConnFaildData[]; //  主机联通性测试失败数据
   showDetail = false; // 展示主机联通异常数据
+
+  //当前语言环境 CN为中文  EN为英文
+  language:string;
+  unmountDesc:string;//卸载失败返回信息
+  mountFailOrPartSuccessDesc:string;//挂载失败和部分成功描述
 
   ngOnInit(): void {
     // 初始化隐藏窗口
@@ -123,6 +131,7 @@ export class MountComponent implements OnInit {
     this.modalLoading = true;
     this.modalHandleLoading = false;
     this.isOperationErr = false;
+    this.isMountPartSuccess=false;
     this.initData();
 
   }
@@ -188,6 +197,7 @@ export class MountComponent implements OnInit {
    console.log(this.selectMountType)
     // 数据初始化
     this.getDataStore();
+   this.cdr.detectChanges();
   }
 
   /**
@@ -459,13 +469,13 @@ export class MountComponent implements OnInit {
   isDisableMountSubmit() {
     return this.chooseDevice?.length===0
   }
-  
+
     // 卸载确认
     unMountConfirm() {
       if (this.isDisableMountSubmit()) return;
       this.unmountTipsShow = true;
   }
-  
+
   /**
    * 表单提交（挂载/卸载）
    */
@@ -553,9 +563,13 @@ export class MountComponent implements OnInit {
             });
             this.connFailData = connFailDatas;
           }
+        }else if (result.code==='206'){
+          console.log("挂载部分成功："+result.description)
+          this.isMountPartSuccess=true
+          this.mountFailHost=result.data
         } else {
           console.log('挂载异常：' + result.description);
-          this.isOperationErr = true;
+          this. isOperationErr = true;
         }
         this.cdr.detectChanges();
       });
@@ -576,17 +590,19 @@ export class MountComponent implements OnInit {
       } else {
         this.unmountForm.clusterId = this.hostOrClusterId;
       }
+      this.language=this.translateService.currentLang==='en-US'?'EN':'CN'
       const unmountObjIds = this.chooseMountDataStore.map(item => item.objectId);
       this.unmountForm.dataStoreObjectIds = unmountObjIds;
       this.modalHandleLoading = true;
       console.log(this.unmountForm)
-      this.remoteSrv.unmountVMFS(_.merge(this.unmountForm,{hostIds:[this.unmountForm.hostId]})).subscribe((result: any) => {
+      this.remoteSrv.unmountVMFS(_.merge(this.unmountForm,{language:this.language})).subscribe((result: any) => {
         this.modalHandleLoading = false;
         if (result.code === '200') {
           console.log('unmount  success');
           this.unmountSuccessShow = true;
         } else {
           console.log('unmount  fail：' + result.description);
+          this.unmountDesc=result.description
           this.isUnmountOperationErr = true;
         }
         this.cdr.detectChanges();
@@ -699,8 +715,14 @@ export class MountComponent implements OnInit {
           });
           this.connFailData = connFailDatas;
         }
+      }else if (result.code==='206'){
+        console.log("挂载部分成功："+result.description)
+        this.isMountPartSuccess=true
+        this.mountFailOrPartSuccessDesc=result.description
+        this.mountFailHost=result.data
       } else {
         console.log('挂载异常：' + result.description);
+        this.mountFailOrPartSuccessDesc=result.description
         this.isOperationErr = true;
       }
       this.cdr.detectChanges();
@@ -727,6 +749,7 @@ export class MountComponent implements OnInit {
     //   this.notChooseUnmountDevice = true;
     // } else {
     const submit=()=>{
+      this.language=this.translateService.currentLang==='en-US'?'EN':'CN'
       this.unmountForm.dataStoreObjectIds.push(this.objectId);
       if (this.unmountForm.mountType === '1') {
         this.unmountForm.hostId = this.chooseUnmountHost?.deviceId;
@@ -744,13 +767,14 @@ export class MountComponent implements OnInit {
           this.unmountSuccessShow = true;
         } else {
           console.log('unmount  fail：' + result.description);
+          this.unmountDesc=result.description
           this.isUnmountOperationErr = true;
         }
         this.cdr.detectChanges();
       };
       console.log('chooseDevice',this.chooseDevice)
       console.log('unmountForm',this.unmountForm)
-      const params = _.merge(this.unmountForm,{ hostIds: this.chooseDevice.map(i=>i.deviceId) });
+      const params = _.merge(this.unmountForm,{ hostIds: this.chooseDevice.map(i=>i.deviceId) },{language:this.language});
       // const res = await this.commonService.remoteVmfs_Unmount(params);
       // handlerUnmountVmfsSuccess(res);
       console.log(params)

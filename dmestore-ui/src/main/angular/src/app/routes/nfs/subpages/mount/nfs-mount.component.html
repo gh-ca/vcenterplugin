@@ -126,20 +126,20 @@
         {{'vmfs.dataHandleLoadingTips' | translate}}<img src="./assets/images/loading.gif"  width="20px" height="20px" style="margin-left: 20px;">
       </span>
         </div>
-        <!--虚拟网卡IP-->
-        <clr-select-container class="selectClass">
-          <label>{{'nfs.vkernel' | translate}}</label>
-          <select clrSelect (ngModelOptions)="vmkernelList" required [(ngModel)]="mountForm.hostVkernelIp" name="hostVkernelIp"
-                  class="clr-select">
-            <option *ngFor="let item of vmkernelList" value="{{item.ipAddress}}">{{item.ipAddress}}</option>
-          </select>
-        </clr-select-container>
         <!--data store-->
         <clr-select-container class="selectClass">
           <label>{{'nfs.nfsStore' | translate}}</label>
           <select clrSelect (ngModelOptions)="dataStoreList" required [(ngModel)]="mountForm.dataStoreObjectId" name="dataStoreObjectId"
-                  class="clr-select">
+                  class="clr-select" (change)="checkDatastoreHost()">
             <option *ngFor="let item of dataStoreList" value="{{item.objectId}}">{{item.name}}</option>
+          </select>
+        </clr-select-container>
+        <!--虚拟网卡IP-->
+        <clr-select-container class="selectClass">
+          <label>{{'nfs.vkernel' | translate}}</label>
+          <select clrSelect (ngModelOptions)="vmkernelList" required [(ngModel)]="mountForm.hostVkernelIp" name="hostVkernelIp"
+                  class="clr-select" (change)="checkHostObjectId()">
+            <option *ngFor="let item of vmkernelList" value="{{item.ipAddress}}">{{item.ipAddress}}</option>
           </select>
         </clr-select-container>
         <clr-select-container class="selectClass">

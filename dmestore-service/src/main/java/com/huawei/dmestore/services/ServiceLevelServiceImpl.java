@@ -436,8 +436,10 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
 
         // servicLevelId对应的serviceLevelInstanceId
         Map<String, Map<String, Object>> serviceLevelMap = dmeRelationInstanceService.getServiceLevelInstance();
+        log.info("select cmdb service level resource:{}", serviceLevelMap);
         if (null != serviceLevelMap && serviceLevelMap.size() > 0) {
-            String serviceLevelInstanceId = serviceLevelMap.get(serivceLevelId).get("resId").toString();
+            String serviceLevelInstanceId = ToolUtils.getStr(serviceLevelMap.get(serivceLevelId).get("resId"));
+            log.info("extract cmdb service level resId:{}", serviceLevelInstanceId);
             if (!StringUtils.isEmpty(serviceLevelInstanceId)) {
                 id = serviceLevelInstanceId;
             }
@@ -445,12 +447,14 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
 
         // 1 获取serviceLevelId下的StoragePool实例集合
         List<String> storagePoolInstanceIds = getStoragePoolIdsByServiceLevelId(id);
+        log.info("extract cmdb storage pool instance ids:{}", storagePoolInstanceIds, "size={}", storagePoolInstanceIds.size());
 
         // 2 通过storagePoolInstanceId获取storagePoolId和storageDeviceId信息
         List<StoragePool> sps = new ArrayList<>();
         if (null != storagePoolInstanceIds && storagePoolInstanceIds.size() > 0) {
             for (String instanceId : storagePoolInstanceIds) {
                 Object object = dmeRelationInstanceService.queryInstanceByInstanceNameId("SYS_StoragePool", instanceId);
+                log.info("query cmdb SYS_StoragePool:["+instanceId+"] resource:{}",object);
                 StoragePool sp = convertInstanceToStoragePool(object);
                 sps.add(sp);
             }
@@ -479,6 +483,7 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
                     storagePools.addAll(storageDevicePools);
                 }
             }
+            log.info("query storage pools info:{}", storagePools, "size={}", storagePools.size());
         }
         return storagePools;
     }
@@ -582,6 +587,7 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
         Set<String> ids = new HashSet<>();
         List<RelationInstance> ris = dmeRelationInstanceService.queryRelationByRelationNameConditionSourceInstanceId(
             relationName, serviceLevelId);
+        log.info("query cmdb "+relationName+" resource:{}",ris);
         if (null != ris && ris.size() > 0) {
             for (RelationInstance ri : ris) {
                 ids.add(ri.getTargetInstanceId());

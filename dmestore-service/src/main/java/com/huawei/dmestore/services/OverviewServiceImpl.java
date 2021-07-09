@@ -241,7 +241,12 @@ public class OverviewServiceImpl implements OverviewService {
                 object.put(TOTAL_CAPACITY, vmfsDataInfo.getCapacity());
                 double usedCapacity = vmfsDataInfo.getCapacity() - vmfsDataInfo.getFreeSpace();
                 object.put(USED_CAPACITY, usedCapacity);
-                object.put(UTILIZATION, usedCapacity / vmfsDataInfo.getCapacity() * DOUBLE_100);
+                Double capacity = vmfsDataInfo.getCapacity();
+                if (usedCapacity != 0.0 && capacity != 0.0) {
+                    object.put(UTILIZATION, usedCapacity / capacity * DOUBLE_100);
+                } else {
+                    object.put(UTILIZATION, 0.0);
+                }
                 object.put(CAPACITY_UNIT, UNIT_GB);
 
                 maps.add(object);
@@ -264,8 +269,8 @@ public class OverviewServiceImpl implements OverviewService {
                 object.put(FREE_CAPACITY, nfsDataInfo.getFreeSpace());
                 object.put(USED_CAPACITY, usedCapacity);
                 Double capacity = nfsDataInfo.getCapacity();
-                if (capacity != 0.0) {
-                    object.put(UTILIZATION, usedCapacity / nfsDataInfo.getCapacity() * DOUBLE_100);
+                if (capacity != 0.0 && usedCapacity != 0.0) {
+                    object.put(UTILIZATION, usedCapacity / capacity * DOUBLE_100);
                 } else {
                     object.put(UTILIZATION, 0.0);
                 }

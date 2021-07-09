@@ -1066,6 +1066,7 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
             indicators.add(DmeIndicatorConstants.COUNTER_ID_CONTROLLER_BANDWIDTH);
             indicators.add(DmeIndicatorConstants.COUNTER_ID_CONTROLLER_CPUUSAGE);
             indicators.add(DmeIndicatorConstants.COUNTER_ID_CONTROLLER_RESPONSETIME);
+            indicators.add(DmeIndicatorConstants.COUNTER_ID_CONTROLLER_OPS);
         } else {
             indicators.add(DmeIndicatorConstants.COUNTER_ID_CONTROLLER_READTHROUGHPUT);
             indicators.add(DmeIndicatorConstants.COUNTER_ID_CONTROLLER_WRITETHROUGHPUT);

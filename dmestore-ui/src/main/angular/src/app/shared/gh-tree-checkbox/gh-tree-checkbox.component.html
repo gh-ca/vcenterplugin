@@ -8,17 +8,59 @@
 <!--    {{device.clusterName}}-->
 <!--  </clr-tree-node>-->
 <!--</clr-tree>-->
-<clr-tree *ngIf="isTree">
-  <clr-tree-node
-    *clrRecursiveFor="let device of tree; getChildren: getChildren"
-    [class]="(selectedHost||!device.flag||device.isDisabled)?'disabled':''"
-    (clrSelectedChange)="emitValueChange()"
-    [(clrSelected)]="device.selected">
-    <clr-icon [attr.shape]="device.deviceType==='host'?'host':'host-group'"></clr-icon>
-    {{device.clusterName}}
-  </clr-tree-node>
-</clr-tree>
 
+<!--
+  1.创建
+  - 1.单主机 与 集群性质一样，选择了单主机就只能在单主机里选，其他集群置灰
+  - 2.
+  2.挂载
+  - 1."flag": true,作为置灰标识，不可选，但是要展示
+  - 2.当前挂载类型为主机时，集群置灰不可选，但是要展示
+ -->
+<div style="position: relative">
+  <clr-tree *ngIf="isTree">
+  <template *ngIf="resType==='mount'">
+    <template *ngIf="mountType==='host'">
+      <clr-tree-node
+        *clrRecursiveFor="let device of tree; getChildren: getChildren"
+        [class]="(!device.flag||device.isDisabled)?'mountDisabled':''"
+        (clrSelectedChange)="emitValueChange()"
+        [(clrSelected)]="device.selected">
+        <clr-icon [attr.shape]="device.deviceType==='host'?'host':'host-group'"></clr-icon>
+        {{device.clusterName}}
+      </clr-tree-node>
+    </template>
+    <template *ngIf="mountType!=='host'">
+      <clr-tree-node
+        *clrRecursiveFor="let device of tree; getChildren: getChildren"
+        [class]="(selectedHost||!device.flag||device.isDisabled)?'disabled':''"
+        (clrSelectedChange)="emitValueChange()"
+        [(clrSelected)]="device.selected">
+        <clr-icon [attr.shape]="device.deviceType==='host'?'host':'host-group'"></clr-icon>
+        {{device.clusterName}}
+      </clr-tree-node>
+    </template>
+  </template>
+  <template *ngIf="resType!=='mount'">
+    <clr-tree-node
+      *clrRecursiveFor="let device of tree; getChildren: getChildren"
+      [class]="(selectedHost||!device.flag||device.isDisabled)?'disabled':''"
+      (clrSelectedChange)="emitValueChange()"
+      [(clrSelected)]="device.selected">
+      <clr-icon [attr.shape]="device.deviceType==='host'?'host':'host-group'"></clr-icon>
+      {{device.clusterName}}
+    </clr-tree-node>
+  </template>
+
+
+  </clr-tree>
+  <div *ngIf="checkTreeLength()"  class="loadingDiv" style="position: absolute;z-index: 1;background-color: #b8b8b8;width: 100%;height: 100%;top:0;left:0;" >
+          <span>
+            {{'vmfs.dataHandleLoadingTips' | translate}}<img src="./assets/images/loading.gif" width="20px"
+                                                             height="20px" style="margin-left: 20px;">
+          </span>
+  </div>
+</div>
 
 <!-- <pre>
     {{helper.print(resValue)}}

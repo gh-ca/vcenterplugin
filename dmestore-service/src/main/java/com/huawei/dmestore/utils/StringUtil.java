@@ -48,7 +48,7 @@ public class StringUtil {
     }
 
     public static String  dealQuotationMarks(String str){
-        String result = null;
+        String result = str;
         if (!StringUtils.isEmpty(str) && str.startsWith("\"") && str.endsWith("\"")){
             result = str.substring(1, str.length() - 1);
         }

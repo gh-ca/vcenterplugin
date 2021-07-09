@@ -69,18 +69,18 @@ export class DevDemoComponentComponent implements OnInit {
       this.vmfsList = await mockServerData(vmfsClusterTreeData,1000);
     })();
   }
-
+  // "10.12.123.1","10.23.234.1"
   initForm() {
     //模拟返回数据
     this.partSuccessData={
-      code:"206",
-      data:{
-        successNo:2,
-        failNo:1,
-        connectionResult:[],
-        descriptionEN:"loream....",
-        descriptionCN:"这里有一段内容"
-      }
+      "code":"-99999",
+      "data":{
+        "successNo":0,
+        "failNo":1,
+        "connectionResult":null,
+        "partialSuccess":0
+      },
+      "description":"create vmfs failure:create vmfs errorFailed to perform the operation: 存储池的空闲容量不足。 请对存储池扩容后重试或者创建小于(1809)GB容量的LUN."
     }
     /*初始化和校验规则*/
     this.form = new FormGroup({

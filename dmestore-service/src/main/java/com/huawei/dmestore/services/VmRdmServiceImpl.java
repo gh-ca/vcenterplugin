@@ -3,16 +3,7 @@ package com.huawei.dmestore.services;
 import com.huawei.dmestore.constant.DmeConstants;
 import com.huawei.dmestore.exception.DmeException;
 import com.huawei.dmestore.exception.VcenterException;
-import com.huawei.dmestore.model.CreateVolumesRequest;
-import com.huawei.dmestore.model.CustomizeVolumeTuningForCreate;
-import com.huawei.dmestore.model.CustomizeVolumes;
-import com.huawei.dmestore.model.CustomizeVolumesRequest;
-import com.huawei.dmestore.model.ServiceVolumeBasicParams;
-import com.huawei.dmestore.model.ServiceVolumeMapping;
-import com.huawei.dmestore.model.SmartQosForRdmCreate;
-import com.huawei.dmestore.model.StorageDetail;
-import com.huawei.dmestore.model.StorageTypeShow;
-import com.huawei.dmestore.model.VmRdmCreateBean;
+import com.huawei.dmestore.model.*;
 import com.huawei.dmestore.utils.StringUtil;
 import com.huawei.dmestore.utils.ToolUtils;
 import com.huawei.dmestore.utils.VCSDKUtils;
@@ -24,15 +15,17 @@ import com.google.gson.reflect.TypeToken;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * VmRdmServiceImpl
@@ -48,6 +41,11 @@ public class VmRdmServiceImpl implements VmRdmService {
     private static final int CONSTANT_1024 = 1024;
 
     private static final int THOUSAND = 1000;
+
+    /**
+     * 轮询任务状态的超值时间，这里设置超长，避免创建超多的lun超时
+     */
+    private final long longTaskTimeOut = 30 * 60 * 1000;
 
     private static final String UNITTB = "TB";
 
@@ -112,14 +110,18 @@ public class VmRdmServiceImpl implements VmRdmService {
     @Override
     public void createRdm(String dataStoreObjectId, String vmObjectId, VmRdmCreateBean createBean,
         String compatibilityMode) throws DmeException {
-        createDmeRdm(createBean);
+        String taskId = createDmeRdm(createBean);
+        List<String> lunNames = getLunNameFromCreateTask(taskId, longTaskTimeOut);
         Map<String, Object> paramMap = initParams(createBean);
         String requestVolumeName = (String) paramMap.get("requestVolumeName");
         int capacity = (int) paramMap.get(CAPACITY);
         JsonArray volumeArr = getDmeVolumeIdByName(requestVolumeName);
         List<String> volumeIds = new ArrayList<>();
         for (int index = 0; index < volumeArr.size(); index++) {
-            volumeIds.add(volumeArr.get(index).getAsJsonObject().get(ID_FIELD).getAsString());
+            if (lunNames.contains(volumeArr.get(index).getAsJsonObject().get(NAME_FIELD).getAsString())) {
+                String asString = volumeArr.get(index).getAsJsonObject().get(ID_FIELD).getAsString();
+                volumeIds.add(volumeArr.get(index).getAsJsonObject().get(ID_FIELD).getAsString());
+            }
         }
 
         // vmware上虚拟机归属的主机查询
@@ -305,7 +307,7 @@ public class VmRdmServiceImpl implements VmRdmService {
         }
     }
 
-    public void createDmeRdm(VmRdmCreateBean vmRdmCreateBean) throws DmeException {
+    public String createDmeRdm(VmRdmCreateBean vmRdmCreateBean) throws DmeException {
         String taskId;
 
         // 通过服务等级创建卷
@@ -320,6 +322,7 @@ public class VmRdmServiceImpl implements VmRdmService {
             LOG.error("The DME volume is in abnormal condition!taskDetail={}", gson.toJson(taskDetail));
             throw new DmeException(taskDetail.get("detail_cn").getAsString());
         }
+        return taskId;
     }
 
     private String createDmeVolumeByServiceLevel(CreateVolumesRequest createVolumesRequest) throws DmeException {
@@ -476,4 +479,75 @@ public class VmRdmServiceImpl implements VmRdmService {
         StorageDetail storageDetail = dmeStorageService.getStorageDetail(storageId);
         return storageDetail.getModel() + " " + storageDetail.getProductVersion();
     }
+
+    private List<String> getLunNameFromCreateTask(String taskId,Long longTaskTimeOut) throws DmeException {
+
+        //获取任务实体
+        List<TaskDetailInfoNew> taskDetailInfoNewList = taskService.getTaskInfo(taskId, longTaskTimeOut);
+        LOG.info(gson.toJson(taskDetailInfoNewList));
+
+        //获取主任务详情,获取主任务Id
+        TaskDetailInfoNew mainTask = taskService.getMainTaskInfo(taskId, taskDetailInfoNewList);
+        if (StringUtils.isEmpty(mainTask)){
+            throw new DmeException("get main task info error");
+        } else if (mainTask.getStatus() > 4) {
+            throw new DmeException(mainTask.getDetailEn());
+        }
+        String mainId = mainTask.getId();
+        if (StringUtils.isEmpty(mainId)){
+            throw new DmeException("get task info error");
+        }
+        //获取二级主任务id
+        String id = getCreateMainChildernId(mainId,taskDetailInfoNewList);
+        //获取创建Lun任务详情实体
+        List<TaskDetailInfoNew> createTaskInfo = getCreateInfos(id, taskDetailInfoNewList);
+
+        return getLunName(createTaskInfo);
+    }
+
+    private String getCreateMainChildernId(String mainId,List<TaskDetailInfoNew> taskDetailInfoNewList) throws DmeException {
+        List<TaskDetailInfoNew> mainTasks = null;
+        //首先获取主任务信息
+        if (!CollectionUtils.isEmpty(taskDetailInfoNewList)){
+            mainTasks =  taskDetailInfoNewList.stream().filter(TaskDetailInfoNew -> (!mainId.equalsIgnoreCase(TaskDetailInfoNew.getId())
+                    && mainId.equalsIgnoreCase(TaskDetailInfoNew.getParentId()) && TaskDetailInfoNew.getNameEn().contains("Create LUN"))).collect(Collectors.toList());
+        }
+        if (CollectionUtils.isEmpty(mainTasks) || mainTasks.size()>1){
+            throw new DmeException("get main task info error");
+        }
+        return mainTasks.get(0).getId();
+    }
+
+    private List<TaskDetailInfoNew> getCreateInfos(String id, List<TaskDetailInfoNew> taskDetailInfoNewList) {
+        List<TaskDetailInfoNew> createTasks = null;
+        if (!CollectionUtils.isEmpty(taskDetailInfoNewList)){
+            createTasks =  taskDetailInfoNewList.stream().filter(TaskDetailInfoNew -> (id.equalsIgnoreCase(TaskDetailInfoNew.getParentId())
+                    && TaskDetailInfoNew.getNameEn().contains("Create LUN") && TaskDetailInfoNew.getStatus() == 3)).collect(Collectors.toList());
+        }
+        return createTasks;
+    }
+
+    private List<String> getLunName(List<TaskDetailInfoNew> createTaskInfo) {
+        List<String> list = new ArrayList<>();
+        for (TaskDetailInfoNew taskinfo : createTaskInfo) {
+            String  name_en = null;
+            long create_time = 0;
+            if (!StringUtils.isEmpty(taskinfo)){
+                name_en = taskinfo.getNameEn();
+                create_time = taskinfo.getCreateTime();
+            }
+            if (!StringUtils.isEmpty(name_en)){
+                String[] rs = name_en.split(" ");
+                if (rs.length == 3){
+                    String lunName = rs[2];
+                    if (!StringUtils.isEmpty(lunName)){
+                        list.add(lunName);
+                    }
+                }
+            }
+        }
+        return list;
+    }
+
+
 }
