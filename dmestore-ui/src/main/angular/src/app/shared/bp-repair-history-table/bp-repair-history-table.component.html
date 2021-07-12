@@ -2,20 +2,38 @@
   <clr-dg-column [clrDgField]="'objectName'"  >{{'bestPractice.repairHistory.objectName'|translate}}</clr-dg-column>
   <clr-dg-column>{{'bestPractice.repairHistory.violationValue'|translate}}</clr-dg-column>
   <clr-dg-column>{{'bestPractice.repairHistory.recommendedValue'|translate}}</clr-dg-column>
-  <clr-dg-column>{{'bestPractice.repairHistory.repairType'|translate}}</clr-dg-column>
-  <clr-dg-column>{{'bestPractice.repairHistory.repairTime'|translate}}</clr-dg-column>
-  <clr-dg-column>{{'bestPractice.repairHistory.repairResult'|translate}}</clr-dg-column>
+  <clr-dg-column>
+    {{'bestPractice.repairHistory.repairType'|translate}}
+    <clr-dg-filter></clr-dg-filter>
+  </clr-dg-column>
+  <clr-dg-column #repairTime style="position: relative" class="hideFilter"
+                 [clrDgField]="'repairTime'" (clrDgSortedChange)="sortFunc($event)">
+    {{'bestPractice.repairHistory.repairTime'|translate}}
+    <clr-icon *ngIf="sortFunc(repairTime.sorted);" shape="arrow down" class="is-solid"
+              style="position: absolute;right: 1.1rem;"></clr-icon>
+  </clr-dg-column>
+  <clr-dg-column>
+    {{'bestPractice.repairHistory.repairResult'|translate}}
+    <clr-dg-filter></clr-dg-filter>
+  </clr-dg-column>
   <clr-dg-column>{{'bestPractice.repairHistory.executionLog'|translate}}</clr-dg-column>
+  <clr-dg-placeholder>{{'tips.noData'|translate}}</clr-dg-placeholder>
 
-  <clr-dg-row *ngFor="let item of tableData">
-    <clr-dg-cell>{{item.objectName}}</clr-dg-cell>
-    <clr-dg-cell>{{item.violationValue}}</clr-dg-cell>
-    <clr-dg-cell>{{item.recommendedValue}}</clr-dg-cell>
-    <clr-dg-cell>{{item.repairType}}</clr-dg-cell>
-    <clr-dg-cell>{{item.repairTime}}</clr-dg-cell>
-    <clr-dg-cell>{{item.repairResult}}</clr-dg-cell>
-    <clr-dg-cell>{{item.executionLog}}</clr-dg-cell>
+  <clr-dg-row *clrDgItems="let item of tableData">
+    <clr-dg-cell>{{item.objectName?item.objectName:'--'}}</clr-dg-cell>
+    <clr-dg-cell>{{item.violationValue?item.violationValue:'--'}}</clr-dg-cell>
+    <clr-dg-cell>{{item.recommendedValue?item.recommendedValue:'--'}}</clr-dg-cell>
+    <clr-dg-cell>{{item.repairType?item.repairType:'--'}}</clr-dg-cell>
+    <clr-dg-cell>{{item.repairTime?item.repairTime:'--'}}</clr-dg-cell>
+    <clr-dg-cell>{{item.repairResult?item.repairResult:'--'}}</clr-dg-cell>
+    <clr-dg-cell>{{item.executionLog?item.executionLog:'--'}}</clr-dg-cell>
   </clr-dg-row>
-
-  <clr-dg-footer>{{tableData.length}} users</clr-dg-footer>
+<clr-dg-footer>
+  <clr-dg-pagination #pagination [clrDgPageSize]="5" [clrDgTotalItems]="tableData.length">
+    <clr-dg-page-size [clrPageSizeOptions]="[5,10,50,100]">{{'page.perPage' | translate}}</clr-dg-page-size>
+    {{pagination.firstItem + 1}} - {{pagination.lastItem + 1}}
+    {{'page.all' | translate}}
+    {{pagination.totalItems}}
+  </clr-dg-pagination>
+  </clr-dg-footer>
 </clr-datagrid>

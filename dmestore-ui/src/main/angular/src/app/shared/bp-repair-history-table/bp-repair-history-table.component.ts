@@ -12,4 +12,7 @@ export class BpRepairHistoryTableComponent implements OnInit {
   ngOnInit(): void {
   }
 
+  sortFunc(obj: any) {
+    return !obj;
+  }
 }
