@@ -570,6 +570,7 @@ export class MountComponent implements OnInit {
         } else {
           console.log('挂载异常：' + result.description);
           this. isOperationErr = true;
+          this.mountFailOrPartSuccessDesc=result.description
         }
         this.cdr.detectChanges();
       });
