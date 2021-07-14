@@ -3560,36 +3560,40 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
     // 通过vcenter的主机ID 查询dme侧的主机信息
     private Map<String, Object> getDmeHostByHostObjeId(String hostObjId, Map<String, List<Map<String, Object>>> allinitiators) throws DmeException {
         Map<String, Object> hostInfo = new HashMap<>();
-        Map<String, Object> hbaMap = vcsdkUtils.getHbaByHostObjectId(hostObjId);
-        if (hbaMap == null || hbaMap.size() == 0) {
+        List<Map<String, Object>> hbalists = vcsdkUtils.getHbaByHostObjectId(hostObjId);
+        if (hbalists == null || hbalists.size() == 0) {
             return hostInfo;
         }
-        String initiatorName = ToolUtils.getStr(hbaMap.get(NAME_FIELD));
+        for (Map<String, Object> hbaMap:hbalists){
+            String initiatorName = ToolUtils.getStr(hbaMap.get(NAME_FIELD));
+            // 取出DME所有主机
+            List<Map<String, Object>> hostlist = dmeAccessService.getDmeHosts(null);
+            if (hostlist == null || hostlist.size() == 0) {
+                return hostInfo;
+            }
+            for (Map<String, Object> hostmap : hostlist) {
+                if (hostmap != null && hostmap.get(ID_FIELD) != null) {
+                    // 通过主机ID查到对应的主机的启动器
+                    String demHostId = ToolUtils.getStr(hostmap.get(ID_FIELD));
 
-        // 取出DME所有主机
-        List<Map<String, Object>> hostlist = dmeAccessService.getDmeHosts(null);
-        if (hostlist == null || hostlist.size() == 0) {
-            return hostInfo;
-        }
-        for (Map<String, Object> hostmap : hostlist) {
-            if (hostmap != null && hostmap.get(ID_FIELD) != null) {
-                // 通过主机ID查到对应的主机的启动器
-                String demHostId = ToolUtils.getStr(hostmap.get(ID_FIELD));
-
-                // 得到主机的启动器
-                //List<Map<String, Object>> initiators = dmeAccessService.getDmeHostInitiators(demHostId);
-                List<Map<String, Object>> initiators = allinitiators.get(demHostId);
-                if (initiators != null && initiators.size() > 0) {
-                    for (Map<String, Object> inimap : initiators) {
-                        String portName = ToolUtils.getStr(inimap.get(PORT_NAME));
-                        if (initiatorName.equals(portName)) {
-                            hostInfo = hostmap;
-                            break;
+                    // 得到主机的启动器
+                    //List<Map<String, Object>> initiators = dmeAccessService.getDmeHostInitiators(demHostId);
+                    List<Map<String, Object>> initiators = allinitiators.get(demHostId);
+                    if (initiators != null && initiators.size() > 0) {
+                        for (Map<String, Object> inimap : initiators) {
+                            String portName = ToolUtils.getStr(inimap.get(PORT_NAME));
+                            if (initiatorName.equals(portName)) {
+                                hostInfo = hostmap;
+                                break;
+                            }
                         }
                     }
                 }
+                // 如果已经找到的主机就不再循环
+                if (hostInfo.size() > 0) {
+                    break;
+                }
             }
-
             // 如果已经找到的主机就不再循环
             if (hostInfo.size() > 0) {
                 break;
@@ -3609,26 +3613,30 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             return hostMap;
         }
         for (String hostObjId : hostObjIds) {
-            Map<String, Object> hbaMap = new HashMap<>();
-            hbaMap = vcsdkUtils.getHbaByHostObjectId(hostObjId);
-            if (CollectionUtils.isEmpty(hbaMap)) {
-                LOG.error("query host hba is null!{}", hostObjId);
-                continue;
-            }
-            String initiatorName = ToolUtils.getStr(hbaMap.get(NAME_FIELD));
-            for (Map.Entry<String, List<Map<String, Object>>> entry : allinitionators.entrySet()) {
-                String dmehostId = "";
-                for (Map<String, Object> map : entry.getValue()) {
-                    String portName = ToolUtils.getStr(map.get(PORT_NAME));
-                    if (initiatorName.equalsIgnoreCase(portName)) {
-                        hostInfo = map;
-                        dmehostId = entry.getKey();
-                        LOG.info("the esxi host corresponding to vcenter was found in DME.");
+            List<Map<String, Object>> hbalists = vcsdkUtils.getHbaByHostObjectId(hostObjId);
+            for (Map<String, Object> hbaMap : hbalists) {
+                if (CollectionUtils.isEmpty(hbaMap)) {
+                    LOG.error("query host hba is null!{}", hostObjId);
+                    continue;
+                }
+                String initiatorName = ToolUtils.getStr(hbaMap.get(NAME_FIELD));
+                for (Map.Entry<String, List<Map<String, Object>>> entry : allinitionators.entrySet()) {
+                    String dmehostId = "";
+                    for (Map<String, Object> map : entry.getValue()) {
+                        String portName = ToolUtils.getStr(map.get(PORT_NAME));
+                        if (initiatorName.equalsIgnoreCase(portName)) {
+                            hostInfo = map;
+                            dmehostId = entry.getKey();
+                            LOG.info("the esxi host corresponding to vcenter was found in DME.");
+                            break;
+                        }
+                    }
+                    if (!StringUtils.isEmpty(dmehostId)) {
+                        hostMap.put(dmehostId, hostInfo);
                         break;
                     }
                 }
-                if (!StringUtils.isEmpty(dmehostId)) {
-                    hostMap.put(dmehostId, hostInfo);
+                if (!CollectionUtils.isEmpty(hostMap)) {
                     break;
                 }
             }

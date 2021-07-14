@@ -409,7 +409,7 @@ public class VmfsAccessServiceTest {
         when(dmeVmwareRalationDao.getDmeVmwareRelationByDsId(dataStoreObjectId)).thenReturn(dvr);
         Map<String, Object> hbaMap = new HashMap<>();
         hbaMap.put("name", "112");
-        when(vcsdkUtils.getHbaByHostObjectId(hostId)).thenReturn(hbaMap);
+        //when(vcsdkUtils.getHbaByHostObjectId(hostId)).thenReturn(hbaMap);
 
         String hostGroupid = "123123";
         String hostGroupName = "123123Test";

@@ -3336,7 +3336,8 @@ public class VCSDKUtils {
      * @return List
      * @throws VcenterException VcenterException
      */
-    public Map<String, Object> getHbaByHostObjectId(String hostObjectId) throws VcenterException {
+    public List<Map<String, Object>> getHbaByHostObjectId(String hostObjectId) throws VcenterException {
+        List<Map<String, Object>> list = new ArrayList<>();
         Map<String, Object> map = new HashMap<>();
         try {
             if (StringUtils.isEmpty(hostObjectId)) {
@@ -3364,12 +3365,15 @@ public class VCSDKUtils {
                         ToolUtils.normalizeWwn(fcHba.getPortWorldWideName()));
                     map.put(NAME, ToolUtils.normalizeWwn(fcHba.getPortWorldWideName()));
                 }
+                if (!CollectionUtils.isEmpty(map)) {
+                    list.add(map);
+                }
             }
         } catch (Exception e) {
             logger.error(e.getMessage());
             throw new VcenterException(e.getMessage());
         }
-        return map;
+        return list;
     }
 
     /**
