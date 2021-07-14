@@ -143,6 +143,8 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
 
     private static final String TYPE = "type";
 
+    private final String TASKTYPE = "Unmap LUN";
+
     private static final String FIEL_SEPARATOR = "/";
 
     private static final String HOST_GROUP_VIEW_TYPE = "host_group";
@@ -2336,7 +2338,8 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
     }
 
     @Override
-    public void unmountVmfs(Map<String, Object> params) throws DmeException {
+    public Map<String, Object> unmountVmfs(Map<String, Object> params) throws DmeException {
+        Map<String, Object> response = new HashMap<>();
         List<String> taskIds = new ArrayList<>();
         List<String> dataStoreObjectIds = null;
         List<String> hostObjIds = new ArrayList<>();
@@ -2349,8 +2352,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 dataStoreObjectIds = (List<String>) params.get(DATASTORE_OBJECT_IDS);
                 if (dataStoreObjectIds.size() > 0) {
                     List<String> dataStoreNames = new ArrayList<>();
-                    //Map<String, String> storeToHost = new HashMap<>();
-                    List<String> bounds = new ArrayList<>();
+                    List<Map<String, String>> boundVmfs = new ArrayList<>();
                     for (String dsObjectId : dataStoreObjectIds) {
                         DmeVmwareRelation dvr = dmeVmwareRalationDao.getDmeVmwareRelationByDsId(dsObjectId);
                         if (dvr == null) {
@@ -2359,14 +2361,19 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                         }
                         boolean isFoundVm = vcsdkUtils.hasVmOnDatastore(dsObjectId);
                         if (isFoundVm) {
-                            bounds.add(dvr.getStoreName());
-                            LOG.error("vmfs unmount,the vmfs:{} contain vm,can not unmount!!!", dsObjectId);
+                            LOG.error("vmfs unmount,the vmfs:{} contain vm,can not unmount!!!", dvr.getStoreName());
+                            Map<String, String> boundedMap = new HashMap<>();
+                            boundedMap.put(dvr.getStoreName(),"vCenter error:the vmfs contain vm,can not unmount!");
+                            boundVmfs.add(boundedMap);
                             continue;
                         }
                         if (dvr != null) {
                             volumeIds.add(dvr.getVolumeId());
                             dataStoreNames.add(dvr.getStoreName());
                         }
+                    }
+                    if (!CollectionUtils.isEmpty(boundVmfs)) {
+                        response.put("bounded", boundVmfs);
                     }
                     if (volumeIds.size() > 0) {
                         params.put(VOLUMEIDS, volumeIds);
@@ -2378,10 +2385,13 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                     throw new DmeException("The object has already been deleted or has not been completely created or contain virtual machine rdm ,please synchronize vmfs and try again later!");
                 }
             }
+
+
             List<String> dmeHostIds = new ArrayList<>();
             List<Map<String, List<String>>> needUnmapped = new ArrayList<>();
             if (params != null && volumeIds.size() != 0) {
                 if (params.get(HOSTIDS) != null && !"".equals(params.get(HOSTIDS))) {
+                    //hostObjIds.add(ToolUtils.getStr(params.get(HOSTIDS)));
                     hostObjIds = (List<String>) params.get(HOSTIDS);
                 }
                 if (!StringUtils.isEmpty(ToolUtils.getStr(params.get(CLUSTER_ID)))) {
@@ -2402,14 +2412,19 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             if (params.get(DmeConstants.DATASTORENAMES) != null) {
                 List<String> dataStoreNames = (List<String>) params.get(DATASTORE_NAMES);
                 if (dataStoreNames != null && dataStoreNames.size() > 0) {
+                    List<Map<String, String>> vcErrors = new ArrayList<>();
                     for (String dataStoreName : dataStoreNames) {
                         Map<String, Object> dsmap = new HashMap<>();
                         dsmap.put(NAME_FIELD, dataStoreName);
                         if (!CollectionUtils.isEmpty(hostObjIds)) {
-                            for (String hostId : hostObjIds) {
-                                vcsdkUtils.unmountVmfsOnHostOrCluster(gson.toJson(dsmap), null, hostId);
+                            Map<String, String> vcError = vcsdkUtils.unmountVmfsOnHost(gson.toJson(dsmap), hostObjIds);
+                            if (!CollectionUtils.isEmpty(vcError)) {
+                                vcErrors.add(vcError);
                             }
                         }
+                    }
+                    if (!CollectionUtils.isEmpty(vcErrors)) {
+                        response.put("vcError", vcErrors);
                     }
                 }
             }
@@ -2421,32 +2436,45 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                         // volume映射给主机 解除映射；volume映射给主机组 不解除映射
                     }
                     needUnmapped = isNeedUnmapping(volumeIds, dmeHostIds);
+                } else {
+                    LOG.error("the corresponding exsi host was not found in DME");
                 }
             }
             // 解除Lun映射   List<Map<String, List<String>>> needUnmapped
             if (!CollectionUtils.isEmpty(needUnmapped)) {
                 Map<String, List<String>> unMappingVolumeParams = handleMap(needUnmapped);
-                Map<String, Object> unmap = new HashMap<>();
                 for (Map.Entry<String, List<String>> entry : unMappingVolumeParams.entrySet()) {
+                    Map<String, Object> unmap = new HashMap<>();
                     unmap.put(HOST_ID, entry.getKey());
                     unmap.put(VOLUMEIDS, entry.getValue());
+                    LOG.info("start to unmap the host's lun.");
                     String taskId = unmountHostGetTaskId2(unmap);
                     taskIds.add(taskId);
-                    unmap.clear();
                 }
             }
             // 获取卸载的任务完成后的状态,默认超时时间10分钟
             if (!CollectionUtils.isEmpty(taskIds)) {
                 // 检测任务等待卸载完成后再删除,不用判断是否卸载成功
+                List<Map<String, String>> dmeErrors = new ArrayList<>();
                 for (String taskId : taskIds) {
                     TaskDetailInfoNew taskDetailInfoNew = taskService.queryTaskByIdReturnMainTask(taskId, longTaskTimeOut);
+                    Map<String, String> dmeError = new HashMap<>();
                     if (taskDetailInfoNew != null && taskDetailInfoNew.getStatus() != 3) {
-                        if (ToolUtils.getStr(params.get("language")).equals(LANGUAGE_CN)) {
-                            throw new DmeException("vcenter卸载数据存储成功!" + taskDetailInfoNew.getDetailCn());
-                        } else {
-                            throw new DmeException("vcenter unmount datastore success!" + taskDetailInfoNew.getDetailEn());
+                        // 任务部分成功/失败 取得Lun名称
+                        List<String> name = taskService.getFailNameFromCreateTask(TASKTYPE, taskId, longTaskTimeOut);
+                        if (!CollectionUtils.isEmpty(name) && ToolUtils.getStr(params.get("language")).equals(LANGUAGE_CN)) {
+                            dmeError.put(name.toString().replace("[", "").replace("]", ""), "DME 错误: " + taskDetailInfoNew.getDetailCn());
+                        }
+                        if (!CollectionUtils.isEmpty(name)&&ToolUtils.getStr(params.get("language")).equals(LANGUAGE_EN)) {
+                            dmeError.put(name.toString().replace("[", "").replace("]", ""), "DME ERROR: "+taskDetailInfoNew.getDetailEn());
                         }
                     }
+                    if (dmeError.size() != 0) {
+                        dmeErrors.add(dmeError);
+                    }
+                }
+                if (dmeErrors.size() != 0) {
+                    response.put("dmeError", dmeErrors);
                 }
             }
             if (!CollectionUtils.isEmpty(hostObjIds)) {
@@ -2457,6 +2485,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         } catch (DmeException | JsonSyntaxException e) {
             throw new DmeException(e.getMessage());
         }
+        return response;
     }
 
     private List<Map<String, String>> findOrientedVolumeMapping(String volumeId) throws DmeException {
@@ -2520,6 +2549,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 }
                 if (!CollectionUtils.isEmpty(hostIds)) {
                     // 保留需要解除映射的LunId 及对应的主机Id
+                    LOG.info("the host that needs to be unmapped was found.size={}", hostIds.size());
                     volumeMappedHost.put(volumeId, hostIds);
                 }
             }
@@ -3593,6 +3623,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                     if (initiatorName.equalsIgnoreCase(portName)) {
                         hostInfo = map;
                         dmehostId = entry.getKey();
+                        LOG.info("the esxi host corresponding to vcenter was found in DME.");
                         break;
                     }
                 }

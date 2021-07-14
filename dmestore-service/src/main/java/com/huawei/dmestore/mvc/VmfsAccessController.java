@@ -141,8 +141,12 @@ public class VmfsAccessController extends BaseController {
         LOG.info("accessvmfs/unmountvmfs=={}", gson.toJson(params));
         String failureStr = "";
         try {
-            vmfsAccessService.unmountVmfs(params);
-            return success(null, "unmount vmfs success");
+            Map<String, Object> map = vmfsAccessService.unmountVmfs(params);
+            if (map.size() == 0) {
+                return success(null, "unmount vmfs success!");
+            } else {
+                return failure(CODE_PARTIALSUCCESS,"unmount vmfs partial success!",map);
+            }
         } catch (DmeException e) {
             return failure(e.getMessage());
         }

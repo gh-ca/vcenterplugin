@@ -2281,6 +2281,55 @@ public class VCSDKUtils {
         }
     }
 
+    public Map<String, String> unmountVmfsOnHost(String datastoreStr, List<String> hostObjectIds) throws VcenterException {
+        String objDataStoreName = "";
+        Map<String, String> vcError = new HashMap<>();
+        try {
+            if (StringUtils.isEmpty(datastoreStr)) {
+                logger.error("unmountVmfs datastore datastoreStr is null");
+                return Collections.emptyMap();
+            }
+            if (CollectionUtils.isEmpty(hostObjectIds)) {
+                logger.error("unmountVmfs host hostObjectId is null");
+                return Collections.emptyMap();
+            }
+            Map<String, Object> dsmap = gson.fromJson(datastoreStr, new TypeToken<Map<String, Object>>() { }.getType());
+            String objHostName = "";
+            if (dsmap != null) {
+                objHostName = ToolUtils.getStr(dsmap.get(HOST_NAME));
+                objHostName = objHostName == null ? "" : objHostName;
+                objDataStoreName = ToolUtils.getStr(dsmap.get(NAME));
+            }
+            String serverguid = null;
+            for (String hostObjectId : hostObjectIds) {
+                if (!StringUtils.isEmpty(hostObjectId)) {
+                    serverguid = vcConnectionHelpers.objectId2Serverguid(hostObjectId);
+                }
+                if (!StringUtils.isEmpty(serverguid)) {
+                    VmwareContext vmwareContext = vcConnectionHelpers.getServerContext(serverguid);
+                    if (!StringUtils.isEmpty(hostObjectId)) {
+                        ManagedObjectReference objmor = vcConnectionHelpers.objectId2Mor(hostObjectId);
+                        HostMo hostmo = hostVmwareFactory.build(vmwareContext, objmor);
+                        // 从挂载的主机卸载
+                        if (hostmo != null) {
+                            Map<String, String> map = unmountVmfs1(objDataStoreName, hostmo);
+                            if (!CollectionUtils.isEmpty(map)) {
+                                return map;
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            logger.error("unmount vmfs on host error:", e);
+            if (!StringUtils.isEmpty(objDataStoreName)) {
+                vcError.put(objDataStoreName, e.getMessage());
+            }
+            //throw new VcenterException(e.getMessage());
+        }
+        return vcError;
+    }
+
     /**
      * 挂载存储 20200918objectId
      *
@@ -2444,6 +2493,47 @@ public class VCSDKUtils {
         } catch (Exception e) {
             logger.error("unmount Vmfs Volume:{},error:{}", datastoreName, e.getMessage());
         }
+    }
+
+    /**
+     * 卸载存储 20201016objectId
+     *
+     * @param datastoreName datastoreName
+     * @param hostMo        hostMo
+     **/
+    public Map<String, String> unmountVmfs1(String datastoreName, HostMo hostMo) throws VcenterException {
+
+        Map<String, String> vcError = new HashMap<>();
+        if (StringUtils.isEmpty(datastoreName)) {
+            logger.info("unmountVmfs datastore Name is null");
+            return Collections.emptyMap();
+        }
+
+        if (hostMo == null) {
+            logger.info("unmountVmfs host is null");
+            return Collections.emptyMap();
+        }
+        try {
+            // 卸载前重新扫描datastore  20201019 暂时屏蔽此方法。DME侧卸载后，vcenter侧调用重新扫描接口，会直接删除此vmfs 原因不详
+            hostMo.getHostStorageSystemMo().rescanVmfs();
+            for (HostFileSystemMountInfo mount : hostMo.getHostStorageSystemMo()
+                    .getHostFileSystemVolumeInfo()
+                    .getMountInfo()) {
+                if (mount.getVolume() instanceof HostVmfsVolume && datastoreName.equals(mount.getVolume().getName())) {
+                    HostVmfsVolume volume = (HostVmfsVolume) mount.getVolume();
+                    hostMo.getHostStorageSystemMo().unmountVmfsVolume(volume.getUuid());
+                    logger.info("unmount Vmfs success,volume name={},host name={}", volume.getName(), hostMo.getName());
+                }
+            }
+
+            // 重新扫描
+            logger.info("==refreshStorageSystem after unmountVmfs==");
+            hostMo.getHostStorageSystemMo().refreshStorageSystem();
+        } catch (Exception e) {
+            logger.error("unmount Vmfs Volume:{},error:{}", datastoreName, e.getMessage());
+            vcError.put(datastoreName, "vCenter error:"+e.getMessage());
+        }
+        return vcError;
     }
 
     /**

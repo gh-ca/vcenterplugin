@@ -85,7 +85,7 @@ public interface VmfsAccessService {
      * @param params include dataStoreObjectIds,host,hostId,cluster,clusterId
      * @throws DmeException when error
      */
-    void unmountVmfs(Map<String, Object> params) throws DmeException;
+    Map<String, Object> unmountVmfs(Map<String, Object> params) throws DmeException;
 
     /**
      * delete vmfs
