@@ -657,7 +657,9 @@
       "repairType": "修复类型",
       "repairTime": "修复时间",
       "repairResult": "修复结果",
-      "executionLog": "执行日志"
+      "executionLog": "执行日志",
+      "manual": "手动",
+      "automatic": "自动"
     }
   },
   "iscsi": {

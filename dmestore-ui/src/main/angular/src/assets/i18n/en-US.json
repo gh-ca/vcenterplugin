@@ -657,7 +657,9 @@
       "repairType": "Repair type",
       "repairTime": "Repair time",
       "repairResult": "Repair result",
-      "executionLog": "Execution log"
+      "executionLog": "Execution log",
+      "manual": "Manual",
+      "automatic": "Automatic"
     }
   },
   "iscsi": {
