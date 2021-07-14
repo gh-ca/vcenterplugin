@@ -562,7 +562,26 @@ public class DmeConstants {
             put("11", "RAIDTP");
         }
     };
-
+    public static final Map<String, String> TIER_DISK_TYPE = new HashMap() {
+        {
+            put("1", "SAS");
+            put("2", "SATA");
+            put("3", "SSD");
+            put("4", "NL_SAS");
+            put("5", "SLC SSD");
+            put("6", "MLC SSD");
+            put("7", "FC_SED");
+            put("8", "SAS_SED");
+            put("9", "SATA_SED");
+            put("10", "SSD_SED");
+            put("11", "NL_SAS_SED");
+            put("12", "SLC_SSD_SED");
+            put("13", "MLC_SSD_SED");
+            put("14", "NVMe_SSD");
+            put("15", "SMR_SATA");
+            put("16", "NVMe_SSD_SED");
+        }
+    };
     private DmeConstants() {
     }
 }

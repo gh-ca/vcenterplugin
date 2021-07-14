@@ -71,6 +71,7 @@ import java.util.*;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -2138,7 +2139,7 @@ public class VCSDKUtils {
             throw new VcenterException(e.getMessage());
         }
     }
-    public void mountVmfsOnClusterNew(String datastoreStr, String clusterObjectId, String hostObjectId)
+    public void mountVmfsOnClusterNew(String datastoreStr, String clusterObjectId, String hostObjectId, String dataStoreObjectId)
             throws VcenterException {
         if (StringUtils.isEmpty(datastoreStr)) {
             logger.info("datastoreStr is null");
@@ -2180,7 +2181,7 @@ public class VCSDKUtils {
 
                             // 只挂载其它的主机
                             if (host1 != null && !objHostName.equals(host1.getName())) {
-                                mountVmfsNew(objDataStoreName, host1);
+                                mountVmfsNew02(objDataStoreName, dataStoreObjectId, host1);
                             }
                         } catch (Exception e) {
                             logger.error("mount Vmfs On Cluster error:{}", e.getMessage());
@@ -2195,7 +2196,7 @@ public class VCSDKUtils {
 
                     // 只挂载其它的主机
                     if (hostmo != null && !objHostName.equals(hostmo.getName())) {
-                        mountVmfsNew(objDataStoreName, hostmo);
+                        mountVmfsNew02(objDataStoreName, dataStoreObjectId, hostmo);
                     }
                 } catch (Exception e) {
                     logger.error("mount Vmfs On Cluster error:{}", e.getMessage());
@@ -2358,7 +2359,56 @@ public class VCSDKUtils {
             logger.error(" mount vmfs volume error!datastoreName={},error:{}", datastoreName, e.getMessage());
         }
     }
+    public void mountVmfsNew02(String datastoreName,String dataStorageId, HostMo hostMo) throws Exception {
+        if (StringUtils.isEmpty(datastoreName)) {
+            logger.info("datastore Name is null");
+            return;
+        }
+        if (hostMo == null) {
+            logger.info("host info is null");
+            return;
+        }
 
+        // 挂载前重新扫描datastore
+        logger.info("refreshStorageSystem before mount Vmfs!");
+        hostMo.getHostStorageSystemMo().refreshStorageSystem();
+        try {
+            TimeUnit.SECONDS.sleep(2);
+        }catch (Exception e){
+            logger.error(e.getMessage());
+        }
+        String serverguid = vcConnectionHelpers.objectId2Serverguid(dataStorageId);
+        VmwareContext vmwareContext = vcConnectionHelpers.getServerContext(serverguid);
+        RootFsMo rootFsMo = rootVmwareMoFactory.build(vmwareContext, vmwareContext.getRootFolder());
+        ManagedObjectReference dsmor = vcConnectionHelpers.objectId2Mor(dataStorageId);
+
+        // 取得该存储下所有已经挂载的主机ID
+        List<String> mounthostids = new ArrayList<>();
+        DatastoreMo dsmo = datastoreVmwareMoFactory.build(vmwareContext, dsmor);
+        if (dsmo != null) {
+            List<DatastoreHostMount> dhms = dsmo.getHostMounts();
+            if (dhms != null && dhms.size() > 0) {
+                for (DatastoreHostMount dhm : dhms) {
+                    if (dhm.getMountInfo() != null && !dhm.getMountInfo().isMounted()) {
+                        mounthostids.add(dhm.getKey().getValue());
+                    }
+                }
+            }
+        }
+        if (mounthostids.contains( hostMo.getMor().getValue())){
+            for (HostFileSystemMountInfo mount : hostMo.getHostStorageSystemMo()
+                    .getHostFileSystemVolumeInfo().getMountInfo()) {
+                if ((mount.getVolume() instanceof HostVmfsVolume) && datastoreName.equals(mount.getVolume().getName())) {
+                    HostVmfsVolume volume = (HostVmfsVolume) mount.getVolume();
+                    hostMo.getHostStorageSystemMo().mountVmfsVolume(volume.getUuid());
+                    logger.info("mount Vmfs success!");
+                }
+            }
+        }
+        // 挂载后重新扫描datastore
+        logger.info("refreshStorageSystem after mount Vmfs!");
+        hostMo.getHostStorageSystemMo().refreshStorageSystem();
+    }
     /**
      * 卸载存储 20201016objectId
      *

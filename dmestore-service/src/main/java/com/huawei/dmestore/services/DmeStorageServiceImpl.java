@@ -1376,25 +1376,24 @@ public class DmeStorageServiceImpl implements DmeStorageService {
 
     private String getDiskType(JsonObject poolObject) throws DmeException {
         String diskType = "";
-        float tier0Capacity = ToolUtils.jsonToFloat(poolObject.get("tier0Capacity"));
-        if (tier0Capacity > 0) {
-            diskType = "SSD/";
+        if (!StringUtils.isEmpty(poolObject.get("tier0DiskType")) && !"0".equalsIgnoreCase(ToolUtils.jsonToStr(poolObject.get("tier0DiskType")))){
+            diskType = DmeConstants.TIER_DISK_TYPE.get(ToolUtils.jsonToStr(poolObject.get("tier0DiskType")));
         }
-
-        float tier1Capacity = ToolUtils.jsonToFloat(poolObject.get("tier1Capacity"));
-        if (tier1Capacity > 0) {
-            diskType += "SAS/";
+        if (!StringUtils.isEmpty(poolObject.get("tier1DiskType")) && !"0".equalsIgnoreCase(ToolUtils.jsonToStr(poolObject.get("tier1DiskType")))){
+            diskType = diskType + "/" + DmeConstants.TIER_DISK_TYPE.get(ToolUtils.jsonToStr(poolObject.get("tier1DiskType")));
         }
-
-        float tier2Capacity = ToolUtils.jsonToFloat(poolObject.get("tier2Capacity"));
-        if (tier2Capacity > 0) {
-            diskType += "NL-SAS/";
+        if (!StringUtils.isEmpty(poolObject.get("tier2DiskType")) && !"0".equalsIgnoreCase(ToolUtils.jsonToStr(poolObject.get("tier2DiskType")))){
+            diskType = diskType + "/" +DmeConstants.TIER_DISK_TYPE.get(ToolUtils.jsonToStr(poolObject.get("tier2DiskType")));
         }
-
-        if (StringUtil.isNotBlank(diskType)) {
-            diskType = diskType.substring(0, diskType.lastIndexOf("/"));
+        if (!StringUtils.isEmpty(poolObject.get("tier3DiskType")) && !"0".equalsIgnoreCase(ToolUtils.jsonToStr(poolObject.get("tier3DiskType")))){
+            diskType = diskType + "/" + DmeConstants.TIER_DISK_TYPE.get(ToolUtils.jsonToStr(poolObject.get("tier3DiskType")));
         }
-
+        if (!StringUtils.isEmpty(poolObject.get("tier4DiskType")) && !"0".equalsIgnoreCase(ToolUtils.jsonToStr(poolObject.get("tier4DiskType")))){
+            diskType = diskType + "/" +DmeConstants.TIER_DISK_TYPE.get(ToolUtils.jsonToStr(poolObject.get("tier4DiskType")));
+        }
+        if (diskType.startsWith("/")){
+            diskType = diskType.substring(1);
+        }
         return diskType;
     }
 
