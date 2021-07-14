@@ -5974,7 +5974,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                         for (String hostId : hostIds) {
                             Map<String, Object> dsmap = new HashMap<>();
                             dsmap.put(NAME_FIELD, dataStorageMap.get(dataStoreObjectId).get("dataStoreName"));
-                            vcsdkUtils.mountVmfsOnClusterNew(gson.toJson(dsmap), null, hostId);
+                            vcsdkUtils.mountVmfsOnClusterNew(gson.toJson(dsmap), null, hostId, dataStoreObjectId);
                         }
                     } catch (Exception e) {
                         //如果抛出异常，需要解除映射
@@ -6028,7 +6028,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                             for (String hostId : hostIds) {
                                 Map<String, Object> dsmap = new HashMap<>();
                                 dsmap.put(NAME_FIELD, dataStorageMap.get(dataStoreObjectId).get("dataStoreName"));
-                                vcsdkUtils.mountVmfsOnClusterNew(gson.toJson(dsmap), null, hostId);
+                                vcsdkUtils.mountVmfsOnClusterNew(gson.toJson(dsmap), null, hostId, dataStoreObjectId);
                             }
                         } catch (Exception e) {
                             //如果抛出异常，需要解除映射
@@ -6087,7 +6087,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                     dsmap.put(NAME_FIELD, dataStorageMap.get(dataStoreObjectId).get("dataStoreName"));
                     for (String cluster : clusterIds) {
                         try {
-                            vcsdkUtils.mountVmfsOnClusterNew(gson.toJson(dsmap), cluster, null);
+                            vcsdkUtils.mountVmfsOnClusterNew(gson.toJson(dsmap), cluster, null, dataStoreObjectId);
                         }catch (Exception esx){
                             LOG.error(esx.getMessage());
                         }
@@ -6137,7 +6137,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                         for (String hostId : hostIds) {
                             Map<String, Object> dsmap = new HashMap<>();
                             dsmap.put(NAME_FIELD, dataStorageMap.get(dataStoreObjectId).get("dataStoreName"));
-                            vcsdkUtils.mountVmfsOnClusterNew(gson.toJson(dsmap), null, hostId);
+                            vcsdkUtils.mountVmfsOnClusterNew(gson.toJson(dsmap), null, hostId, dataStoreObjectId);
                         }
                     } catch (Exception e) {
                         //如果抛出异常，需要解除映射
@@ -6188,7 +6188,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                     dsmap.put(NAME_FIELD, dataStorageMap.get(dataStoreObjectId).get("dataStoreName"));
                     for (String cluster : clusterIds) {
                         try {
-                            vcsdkUtils.mountVmfsOnClusterNew(gson.toJson(dsmap), cluster, null);
+                            vcsdkUtils.mountVmfsOnClusterNew(gson.toJson(dsmap), cluster, null, dataStoreObjectId);
                         }catch (Exception esx){
                             LOG.error(esx.getMessage());
                         }
@@ -6200,7 +6200,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         }
         vcsdkUtils.refreshDatastore(dataStoreObjectId);
         try {
-            TimeUnit.SECONDS.sleep(5);
+            TimeUnit.SECONDS.sleep(2);
         }catch (Exception e){
             LOG.error("scan datastore error");
         }
