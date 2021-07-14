@@ -13,6 +13,7 @@ public class MountVmfsReturn implements Serializable {
     private static final long serialVersionUID = -977833815757933935L;
     private boolean flag;
     private List<String> failedHost;
+    private List<String> connectionFail;
     private String description;
     public MountVmfsReturn(boolean flag) {
         this.flag = flag;
@@ -29,10 +30,25 @@ public class MountVmfsReturn implements Serializable {
         this.description = description;
     }
 
+    public MountVmfsReturn(boolean flag, List<String> failedHost, List<String> connectionFail, String description) {
+        this.flag = flag;
+        this.failedHost = failedHost;
+        this.connectionFail = connectionFail;
+        this.description = description;
+    }
+
+    public MountVmfsReturn(boolean flag, String description, List<String> connectionFail) {
+        this.flag = flag;
+        this.connectionFail = connectionFail;
+        this.description = description;
+    }
+
     public MountVmfsReturn(boolean flag, String description) {
         this.flag = flag;
         this.description = description;
     }
+
+
 
     public boolean isFlag() {
         return flag;
@@ -56,5 +72,13 @@ public class MountVmfsReturn implements Serializable {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public List<String> getConnectionFail() {
+        return connectionFail;
+    }
+
+    public void setConnectionFail(List<String> connectionFail) {
+        this.connectionFail = connectionFail;
     }
 }
