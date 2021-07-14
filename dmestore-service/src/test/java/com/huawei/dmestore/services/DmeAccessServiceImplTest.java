@@ -302,7 +302,7 @@ public class DmeAccessServiceImplTest {
         Map<String, Object> hbamap = new HashMap<>(16);
         hbamap.put("type", "131");
         hbamap.put("name", "tes");
-        when(vcsdkUtils.getHbaByHostObjectId(hostId)).thenReturn(hbamap);
+        //when(vcsdkUtils.getHbaByHostObjectId(hostId)).thenReturn(hbamap);
 
         Map requestbody = new HashMap<>(16);
         requestbody.put("access_mode", "NONE");
