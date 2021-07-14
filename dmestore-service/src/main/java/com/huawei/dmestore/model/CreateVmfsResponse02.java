@@ -16,6 +16,7 @@ public class CreateVmfsResponse02 implements Serializable {
     private int failNo;
     private List<String> connectionResult ;
     private int partialSuccess;
+    private List<String> desc;
 
     public CreateVmfsResponse02() {
     }
@@ -56,6 +57,14 @@ public class CreateVmfsResponse02 implements Serializable {
         this.partialSuccess = partialSuccess;
     }
 
+    public List<String> getDesc() {
+        return desc;
+    }
+
+    public void setDesc(List<String> desc) {
+        this.desc = desc;
+    }
+
     public CreateVmfsResponse02(int successNo, int failNo, List<String> connectionResult, int partialSuccess) {
         this.successNo = successNo;
         this.failNo = failNo;
@@ -63,14 +72,22 @@ public class CreateVmfsResponse02 implements Serializable {
         this.partialSuccess = partialSuccess;
     }
 
+    public CreateVmfsResponse02(int successNo, int failNo, List<String> connectionResult, int partialSuccess, List<String> desc) {
+        this.successNo = successNo;
+        this.failNo = failNo;
+        this.connectionResult = connectionResult;
+        this.partialSuccess = partialSuccess;
+        this.desc = desc;
+    }
 
     @Override
     public String toString() {
-        return "CreateVmfsResponse{" +
+        return "CreateVmfsResponse02{" +
                 "successNo=" + successNo +
                 ", failNo=" + failNo +
                 ", connectionResult=" + connectionResult +
+                ", partialSuccess=" + partialSuccess +
+                ", desc=" + desc +
                 '}';
     }
-
 }

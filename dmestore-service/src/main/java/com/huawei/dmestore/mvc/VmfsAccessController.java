@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -286,11 +287,19 @@ public class VmfsAccessController extends BaseController {
                     && CollectionUtils.isEmpty(result.getConnectionResult())){
                 return success(result, "create vmfs success");
             }else if (result.getSuccessNo() == 0 && result.getPartialSuccess() == 0) {
-                return failure("create vmfs failure!",result);
+                if (!CollectionUtils.isEmpty(result.getDesc())) {
+                    return failure("create vmfs failure: " + result.getDesc().toString(), result);
+                }else {
+                    return failure("create vmfs failure!", result);
+                }
             }else {
-                return partialSuccess(result,"create vmfs partial success!");
+                if (!CollectionUtils.isEmpty(result.getDesc())) {
+                    return partialSuccess(result,"create vmfs partial success: "+result.getDesc().toString());
+                }else {
+                    return partialSuccess(result,"create vmfs partial success!");
+                }
             }
-        } catch (DmeException e) {
+        } catch (Exception e) {
             failureStr = "create vmfs failure:" + e.getMessage();
             result.setFailNo(ToolUtils.getInt(params.get("count")));
         }
@@ -311,14 +320,21 @@ public class VmfsAccessController extends BaseController {
         try {
             MountVmfsReturn res = vmfsAccessService.mountVmfsNew(params);
             if (!res.isFlag()) {
-                return failure("mount vmfs failure : "+res.getDescription());
-            }else if (res.isFlag() && CollectionUtils.isEmpty(res.getFailedHost())) {
+                if (StringUtils.isEmpty(res.getDescription())) {
+                    return failure("mount vmfs failure!");
+                } else {
+                    return failure("mount vmfs failure : " + res.getDescription());
+                }
+            } else if (res.isFlag() && CollectionUtils.isEmpty(res.getFailedHost())) {
                 return success(null, "Mount vmfs success");
-            }else {
-               return partialSuccess(res.getFailedHost(),"Mount vmfs partial success : "+res.getDescription());
-
+            } else {
+                if (StringUtils.isEmpty(res.getDescription())) {
+                    return partialSuccess(res.getFailedHost(), "Mount vmfs partial success!");
+                } else {
+                    return partialSuccess(res.getFailedHost(), "Mount vmfs partial success : " + res.getDescription());
+                }
             }
-        } catch (DmeException e) {
+        } catch (Exception e) {
             LOG.error("mount vmfs failure:", e);
             failureStr = "mount vmfs failure:" + e.getMessage();
         }
