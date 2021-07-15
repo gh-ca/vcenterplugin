@@ -4617,8 +4617,13 @@ public class VCSDKUtils {
                                 vmwareContext.getServerAddress());
                         Map<String, String> map = new HashMap<>();
                         if(!StringUtils.isEmpty(dsmo.getName()) && !StringUtils.isEmpty(objectId)) {
+                            map.put(ID, dsmo.getMor().getValue());
                             map.put(NAME, dsmo.getName());
                             map.put(OBJECT_ID, objectId);
+                            map.put(STATUS,ToolUtils.getStr( dsmo.getSummary().isAccessible()));
+                            map.put(TYPE, dsmo.getSummary().getType());
+                            map.put(CAPACITY, ToolUtils.getStr(dsmo.getSummary().getCapacity() / (1024 * 1024 * 1024f)));
+                            map.put(FREE_SPACE, ToolUtils.getStr(dsmo.getSummary().getFreeSpace() / (1024 * 1024 * 1024f)));
                         }
                         lists.add(map);
                     }
@@ -4660,8 +4665,13 @@ public class VCSDKUtils {
                                             vmwareContext.getServerAddress());
                                     Map<String, String> map = new HashMap<>();
                                     if(!StringUtils.isEmpty(dsmo.getName()) && !StringUtils.isEmpty(objectId)) {
+                                        map.put(ID, dsmo.getMor().getValue());
                                         map.put(NAME, dsmo.getName());
                                         map.put(OBJECT_ID, objectId);
+                                        map.put(STATUS,ToolUtils.getStr( dsmo.getSummary().isAccessible()));
+                                        map.put(TYPE, dsmo.getSummary().getType());
+                                        map.put(CAPACITY, ToolUtils.getStr(dsmo.getSummary().getCapacity() / (1024 * 1024 * 1024f)));
+                                        map.put(FREE_SPACE, ToolUtils.getStr(dsmo.getSummary().getFreeSpace() / (1024 * 1024 * 1024f)));
                                     }
                                     lists.add(map);
                                 }
