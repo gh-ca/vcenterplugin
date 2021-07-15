@@ -407,7 +407,7 @@ public class VmfsAccessController extends BaseController {
      */
     @RequestMapping(value = "/queryMountableVmfsByClusterId", method = RequestMethod.GET)
     public ResponseBodyBean queryMountableVmfsByClusterId(@RequestParam("clusterObjectId") String clusterObjectId,
-                                                          @RequestParam("dataStoreType") String dataStoreType) {
+                                                          @RequestParam("dataStoreType") String dataStoreType) throws Exception {
         String failureStr = "";
         try {
             List<Map<String, String>> lists = vmfsAccessService.queryMountableVmfsByClusterId(clusterObjectId,dataStoreType);
