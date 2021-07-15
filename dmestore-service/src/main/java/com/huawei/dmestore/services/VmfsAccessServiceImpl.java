@@ -4572,10 +4572,17 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
     private void deleteFailLun02(List<String> volumelist) {
         Map<String, Object> requestbody = new HashMap<>();
         requestbody.put(VOLUME_IDS, volumelist);
+        ResponseEntity<String> responseEntity = null;
         try {
+            responseEntity = dmeAccessService.access(DmeConstants.DME_VOLUME_DELETE_URL, HttpMethod.POST, gson.toJson(requestbody));
             dmeAccessService.access(DmeConstants.DME_VOLUME_DELETE_URL, HttpMethod.POST, gson.toJson(requestbody));
         }catch (Exception e){
             LOG.error(e.getMessage());
+        }
+        if (!StringUtils.isEmpty(responseEntity) && responseEntity.getStatusCodeValue() == HttpStatus.ACCEPTED.value()) {
+            JsonObject object = new JsonParser().parse(responseEntity.getBody()).getAsJsonObject();
+            String taskId = ToolUtils.jsonToStr(object.get("task_id"));
+            taskService.checkTaskStatusNew(taskId,longTaskTimeOut);
         }
     }
 
