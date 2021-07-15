@@ -1256,11 +1256,12 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
 
     private void addHostToHosts(String hostGroupId, String hostId) throws DmeException {
 
-        Map<String, List<String>> reqMap = new HashMap<>();
+        Map<String, Object> reqMap = new HashMap<>();
         String url = DmeConstants.PUT_ADD_HOST_TO_HOSTS.replace("{hostgroup_id}", hostGroupId);
         List<String> reqbody = new ArrayList<>();
         reqbody.add(hostId);
         reqMap.put("host_ids", reqbody);
+        reqMap.put("sync_to_storage", true);
         ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.PUT, gson.toJson(reqMap));
         if (responseEntity.getStatusCodeValue() == HttpStatus.OK.value()) {
             LOG.info("add host to host group success !");
@@ -2463,10 +2464,10 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                         // 任务部分成功/失败 取得Lun名称
                         List<String> name = taskService.getFailNameFromCreateTask(TASKTYPE, taskId, longTaskTimeOut);
                         if (!CollectionUtils.isEmpty(name) && ToolUtils.getStr(params.get("language")).equals(LANGUAGE_CN)) {
-                            dmeError.put(name.toString().replace("[", "").replace("]", ""), "DME 错误: " + taskDetailInfoNew.getDetailCn());
+                            dmeError.put(name.toString(), "DME 错误: " + taskDetailInfoNew.getDetailCn());
                         }
                         if (!CollectionUtils.isEmpty(name)&&ToolUtils.getStr(params.get("language")).equals(LANGUAGE_EN)) {
-                            dmeError.put(name.toString().replace("[", "").replace("]", ""), "DME ERROR: "+taskDetailInfoNew.getDetailEn());
+                            dmeError.put(name.toString(), "DME ERROR: "+taskDetailInfoNew.getDetailEn());
                         }
                     }
                     if (dmeError.size() != 0) {
@@ -2905,7 +2906,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
     private Boolean isDeleteHostgroups(String storageId, String hostgroupId, String type) throws DmeException {
 
         Map<String, String> params = new HashMap<>();
-        params.put("type", "host_group");
+        params.put("type", type);
         params.put("request_id", hostgroupId);
         params.put("storage_id", storageId);
 
@@ -2914,6 +2915,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             throw new DmeException(String.valueOf(access.getStatusCodeValue()), "query host group mapping view failed !");
         }
         JsonArray jsonArray = new JsonParser().parse(access.getBody()).getAsJsonArray();
+        LOG.info("number of host group mapping views：{}" ,jsonArray.size());
         if (jsonArray.size() < 1) {
             return true;
         }
@@ -6999,9 +7001,10 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             throw new DmeException("add hosts to host group error:the param is empty");
         }
 
-        Map<String, List<String>> reqMap = new HashMap<>();
+        Map<String,Object> reqMap = new HashMap<>();
         String url = DmeConstants.PUT_ADD_HOST_TO_HOSTS.replace("{hostgroup_id}", StringUtil.dealQuotationMarks(hostGroupId));
         reqMap.put("host_ids", hostIds);
+        reqMap.put("sync_to_storage", true);
         ResponseEntity<String> responseEntity;
         try {
             responseEntity  = dmeAccessService.access(url, HttpMethod.PUT, gson.toJson(reqMap));
