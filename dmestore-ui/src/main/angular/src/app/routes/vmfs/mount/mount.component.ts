@@ -652,12 +652,41 @@ export class MountComponent implements OnInit {
         this.remoteSrv.unmountVMFS(_.merge(this.unmountForm,{language:this.language})).subscribe((result: any) => {
           this.modalHandleLoading = false;
           if (result.code === '200') {
-            console.log('unmount  success');
+            // console.log('unmount ' + this.rowSelected[0].name + ' success');
+            // 关闭卸载页面
+            this.unmountShow = false;
+            // 重新请求数据
+            // this.scanDataStore();
+            // 打开成功提示窗口
             this.unmountSuccessShow = true;
+          }else if(result.code==='206'){
+            let dmeError
+            let vcError
+            let bounded
+            if(result.data.dmeError&&result.data.dmeError.length>0){
+              dmeError=this.unmountPartHandleFun(result.data.dmeError)
+            }
+            if(result.data.vcError&&result.data.vcError.length>0){
+              vcError=result.data.vcError
+            }
+            if(result.data.bounded&&result.data.bounded.length>0){
+              bounded=result.data.bounded
+            }
+            this.partSuccessData=this.unmountPartDataHandleFun(dmeError.concat(vcError).concat(bounded))
+            this.description=result.description
+            this.unmountShow=false
+            this.status='partSuccess'
+            this.operatingType='vmfsUnmount'
+            this.partSuccessShow=true
           } else {
-            console.log('unmount  fail：' + result.description);
+            // console.log('unmount ' + this.rowSelected[0].name + ' fail：' + result.description);
             this.unmountDesc=result.description
-            this.isUnmountOperationErr = true;
+            // this.isOperationErr = true;
+            this.unmountShow = false;
+            this.status='error'
+            this.description=result.description
+            this.operatingType='vmfsUnmount'
+            this.errorShow=true
           }
           this.cdr.detectChanges();
         });
