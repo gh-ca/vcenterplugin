@@ -4572,10 +4572,17 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
     private void deleteFailLun02(List<String> volumelist) {
         Map<String, Object> requestbody = new HashMap<>();
         requestbody.put(VOLUME_IDS, volumelist);
+        ResponseEntity<String> responseEntity = null;
         try {
+            responseEntity = dmeAccessService.access(DmeConstants.DME_VOLUME_DELETE_URL, HttpMethod.POST, gson.toJson(requestbody));
             dmeAccessService.access(DmeConstants.DME_VOLUME_DELETE_URL, HttpMethod.POST, gson.toJson(requestbody));
         }catch (Exception e){
             LOG.error(e.getMessage());
+        }
+        if (!StringUtils.isEmpty(responseEntity) && responseEntity.getStatusCodeValue() == HttpStatus.ACCEPTED.value()) {
+            JsonObject object = new JsonParser().parse(responseEntity.getBody()).getAsJsonObject();
+            String taskId = ToolUtils.jsonToStr(object.get("task_id"));
+            taskService.checkTaskStatusNew(taskId,longTaskTimeOut);
         }
     }
 
@@ -6110,6 +6117,11 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                         connectionFail.addAll(map.get("failHostname"));
                     }
                 }
+                //增加将已经映射的主机组从主机组中移除
+                List<String> mappedHostGroupId = getMappedHostGroupIds(hostGroupVolumid);
+                if (!CollectionUtils.isEmpty(mappedHostGroupId)){
+                    hostGroupIds.removeAll(mappedHostGroupId);
+                }
                 //maps.stream().forEach(map -> hostGroupIds.addAll(map.get("nomalCluster")));
                 if (!CollectionUtils.isEmpty(hostGroupIds)) {
                     //将lun映射给主机组，然后挂载集群
@@ -6212,6 +6224,10 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                     }
                 }
                 //maps.stream().forEach(map -> hostGroupIds.addAll(map.get("nomalCluster")));
+                List<String> mappedHostGroupId = getMappedHostGroupIds(hostGroupVolumid);
+                if (!CollectionUtils.isEmpty(mappedHostGroupId)){
+                    hostGroupIds.removeAll(mappedHostGroupId);
+                }
                 if (!CollectionUtils.isEmpty(hostGroupIds)) {
                     //将lun映射给主机组，然后挂载集群
                     for (String hostGroupId : hostGroupIds) {
@@ -6293,6 +6309,20 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             unMappedAndNomalHostIds = objHostIds;
         }
         return  unMappedAndNomalHostIds;
+    }
+
+    private List<String> getMappedHostGroupIds(String hostGroupVolumid) throws DmeException {
+        //首选根据卷id查询卷已经隐射的主机id
+        List<Attachment> attachmentList = findMappedHostsAndClusters(hostGroupVolumid);
+        List<String> mappedHostid = new ArrayList<>();
+        if (!CollectionUtils.isEmpty(attachmentList)) {
+            for (Attachment attach : attachmentList) {
+                if (!StringUtils.isEmpty(StringUtil.dealQuotationMarks(attach.getAttachedHostGroup()))) {
+                    mappedHostid.add(StringUtil.dealQuotationMarks(attach.getAttachedHostGroup()));
+                }
+            }
+        }
+        return mappedHostid;
     }
 
    /* private List<String> getDmeHostIdByHostId(List<String> dependentHosts, Map<String, String> hostIdToIp) throws DmeException {
@@ -7493,8 +7523,12 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         } catch (Exception e) {
             LOG.error(e.getMessage());
             if (!StringUtils.isEmpty(e.getMessage())) {
-                JsonObject vjson = new JsonParser().parse(e.getMessage()).getAsJsonObject();
-                desc = StringUtil.dealQuotationMarks(ToolUtils.getStr(vjson.get("error_msg")));
+                try {
+                    JsonObject vjson = new JsonParser().parse(e.getMessage()).getAsJsonObject();
+                    desc = StringUtil.dealQuotationMarks(ToolUtils.getStr(vjson.get("error_msg")));
+                }catch (Exception ess){
+                    desc = e.getMessage();
+                }
             }
         }
 
