@@ -2791,7 +2791,9 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         }
         // 解除Lun映射（主机/主机组）
         if (!CollectionUtils.isEmpty(volumeMappedHostgroup)) {
+            LOG.info("The host group begins to unmap,storageId{}",dvr.getStorageDeviceId());
             unMappingLunToHostGroup(taskIds, volumeMappedHostgroup, dvr.getStorageDeviceId());
+            LOG.info("The host group end to unmap,storageId");
         }
         if (!CollectionUtils.isEmpty(volumeMappedHost)) {
             unMappingLunToHost(taskIds, volumeMappedHost);
@@ -2812,9 +2814,12 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 // 等待数据同步到存储，否则映射视图没有同步
                 Thread.sleep(2000);
                 // 满足删除主机组条件（无Lun映射）删除主机组
+                LOG.info("主机组解除Lun映射任务状态：{}", taskService.checkTaskStatus(taskIds));
                 Boolean isDelete = isDeleteHostgroups(storageId, entry.getKey(), HOST_GROUP_VIEW_TYPE);
                 if (taskService.checkTaskStatus(taskIds) && isDelete) {
+                    LOG.info("Start deleting host group:isDelete{}", isDelete);
                     removeHostgroupGetTaskId(map);
+                    LOG.info("over delete host group");
                 }
             }
         }
@@ -2910,10 +2915,12 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         params.put("request_id", hostgroupId);
         params.put("storage_id", storageId);
 
+        LOG.info("Start query host group mapping view,requset body:{}", gson.toJson(params));
         ResponseEntity<String> access = dmeAccessService.access(DmeConstants.QUERY_HOSTGROUP_MAPPING_VIEW_URL, HttpMethod.POST, gson.toJson(params));
         if (access.getStatusCodeValue() != HttpStatus.OK.value()) {
             throw new DmeException(String.valueOf(access.getStatusCodeValue()), "query host group mapping view failed !");
         }
+        LOG.info("over deleting host group,requset body:{}", access.getBody());
         JsonArray jsonArray = new JsonParser().parse(access.getBody()).getAsJsonArray();
         LOG.info("number of host group mapping views：{}" ,jsonArray.size());
         if (jsonArray.size() < 1) {
@@ -3186,8 +3193,10 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         Map<String, Object> requestbody = new HashMap<>();
         String url = DmeConstants.HOSTGROUP_REMOVE.replace("{hostgroup_id}", hostGroupId);
         requestbody.put("sync_to_storage", true);
+        LOG.info("Request the interface to delete the host group,request body:{}", gson.toJson(requestbody));
         ResponseEntity responseEntity = dmeAccessService.access(url, HttpMethod.DELETE,
                 gson.toJson(requestbody));
+        LOG.info("Delete host group interface response data:{}", responseEntity +""+responseEntity.getStatusCode());
         return responseEntity;
     }
 
@@ -3220,6 +3229,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         Map<String, Object> requestbody = new HashMap<>();
         requestbody.put(HOST_GROUP_ID1, hostGroupId);
         requestbody.put(VOLUME_IDS, volumeIds);
+        LOG.info("host group unmapping request body:{}", gson.toJson(requestbody));
         ResponseEntity responseEntity = dmeAccessService.access(DmeConstants.HOSTGROUP_UNMAPPING, HttpMethod.POST,
                 gson.toJson(requestbody));
         return responseEntity;
