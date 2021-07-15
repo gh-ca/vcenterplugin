@@ -951,5 +951,15 @@
       "lunCapacityTrends": "LUN 容量趋势",
       "storagePoolCapacityTrends": "存储池容量趋势"
     }
+  },
+  "partSuccessOrError": {
+    "createFail": "创建失败：",
+    "deleteFail": "删除失败：",
+    "unmountFail": "卸载失败：",
+    "unmountPartSuccess": "卸载部分成功：",
+    "createPartSuccess": "创建部分成功：",
+    "host": "主机",
+    "reason": "原因",
+    "storage": "存储"
   }
 }

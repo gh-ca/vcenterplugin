@@ -33,9 +33,26 @@
   <div><input [(ngModel)]="thirdData"></div>
 </div>
 
+<!--失败提示-->
+<clr-modal [(clrModalOpen)]="mountShow" [clrModalSize]="'lg'" [clrModalClosable]="true">
+  <h3 class="modal-title modelTile">{{'vmfs.reclaim.title' | translate}}</h3>
+  <div class="modal-body">
+<!--    <p *ngIf="mountShow">{{'errorMsg.mountError' | translate}}</p>-->
+<!--    <p *ngIf="mountShow">{{'errorMsg.unmountError' | translate}}</p>-->
+    <app-error-partsucess-tips
+      [status]="status"
+      [description]="description"
+      [partSuccessData]="partSuccessData"
+    [operatingType]="'vmfsCreate'"></app-error-partsucess-tips>
+  </div>
+  <div class="modal-footer">
+    <button type="submit" class="btn btn-primary"
+            (click)="mountShow = false">{{'menu.ok' | translate}}</button>
+  </div>
+</clr-modal>
 <!--<button [attr.disabled]="buttonDisableOrNot===false" (click)="log111">是否可以点击当前button</button>-->
 <button [disabled]="changeButtonAttr()">是否可以点击当前button</button>
-
+<button (click)="mountShow=true">开启模态框</button>
 
 <!--<div *ngIf="changeButtonAttr()" class="loadingDiv">-->
 <!--          <span style="color: black">-->

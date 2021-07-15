@@ -131,6 +131,14 @@ export class AddComponent extends VmfsCommon implements OnInit {
   bandwidthLimitErr = false; // v6 设备 带宽 下限大于上限
   iopsLimitErr = false; // v6 设备 IOPS 下限大于上限
 
+  //失败提示窗口与部分成功提示窗口
+  errorShow=false;
+  partSuccessShow=false;
+  status;
+  description;
+  operatingType;
+
+
   setFormValueWhenHiden(isShowInput) {
     this.isShowInput = isShowInput;
     this.form.blockSize = '1024'; // 块大小，单位KB
@@ -656,8 +664,13 @@ export class AddComponent extends VmfsCommon implements OnInit {
           this.addSuccessShow = true;
         }else if(result.code==='206'){
           // this.wizard.close();
-          this.isOperationErr=true;
+          // this.isOperationErr=true;
           this.partSuccessData=result
+          this.wizard.close()
+          this.partSuccessShow=true
+          this.description=result.description
+          this.operatingType='vmfsCreate'
+          this.status='partSuccess'
         } else if (result.code === '-60001') {
           this.connectivityFailure = true;
           this.showDetail = false;
@@ -677,6 +690,11 @@ export class AddComponent extends VmfsCommon implements OnInit {
         } else {
           console.log('创建失败：' + result.description);
           // 失败信息
+          this.wizard.close()
+          this.errorShow=true
+          this.description=result.description
+          this.operatingType='vmfsCreate'
+          this.status='error'
           this.partSuccessData=result;
           this.isOperationErr = true;
         }
