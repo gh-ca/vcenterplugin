@@ -3340,7 +3340,6 @@ public class VCSDKUtils {
      */
     public List<Map<String, Object>> getHbaByHostObjectId(String hostObjectId) throws VcenterException {
         List<Map<String, Object>> list = new ArrayList<>();
-        Map<String, Object> map = new HashMap<>();
         try {
             if (StringUtils.isEmpty(hostObjectId)) {
                 logger.error("get Hba by host id error:host ObjectId is null.");
@@ -3356,6 +3355,7 @@ public class VCSDKUtils {
             // 查找对应的iscsi适配器
             List<HostHostBusAdapter> hbas = hostmo.getHostStorageSystemMo().getStorageDeviceInfo().getHostBusAdapter();
             for (HostHostBusAdapter hba : hbas) {
+                Map<String, Object> map = new HashMap<>();
                 if (hba instanceof HostInternetScsiHba) {
                     HostInternetScsiHba iscsiHba = (HostInternetScsiHba) hba;
                     map.put(TYPE, ISCSI_TYPE);
