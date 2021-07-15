@@ -2161,8 +2161,10 @@ public class VCSDKUtils {
             String serverguid = null;
             if (!StringUtils.isEmpty(clusterObjectId)) {
                 serverguid = vcConnectionHelpers.objectId2Serverguid(clusterObjectId);
+                rescanHbaByClusterObjectId(clusterObjectId);
             } else if (!StringUtils.isEmpty(hostObjectId)) {
                 serverguid = vcConnectionHelpers.objectId2Serverguid(hostObjectId);
+                rescanHbaByHostObjectId(hostObjectId);
             }
             if (StringUtils.isEmpty(serverguid)) {
                 logger.error("mountVmfsOnCluster serverguid is null");
