@@ -6117,6 +6117,11 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                         connectionFail.addAll(map.get("failHostname"));
                     }
                 }
+                //增加将已经映射的主机组从主机组中移除
+                List<String> mappedHostGroupId = getMappedHostGroupIds(hostGroupVolumid);
+                if (!CollectionUtils.isEmpty(mappedHostGroupId)){
+                    hostGroupIds.removeAll(mappedHostGroupId);
+                }
                 //maps.stream().forEach(map -> hostGroupIds.addAll(map.get("nomalCluster")));
                 if (!CollectionUtils.isEmpty(hostGroupIds)) {
                     //将lun映射给主机组，然后挂载集群
@@ -6219,6 +6224,10 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                     }
                 }
                 //maps.stream().forEach(map -> hostGroupIds.addAll(map.get("nomalCluster")));
+                List<String> mappedHostGroupId = getMappedHostGroupIds(hostGroupVolumid);
+                if (!CollectionUtils.isEmpty(mappedHostGroupId)){
+                    hostGroupIds.removeAll(mappedHostGroupId);
+                }
                 if (!CollectionUtils.isEmpty(hostGroupIds)) {
                     //将lun映射给主机组，然后挂载集群
                     for (String hostGroupId : hostGroupIds) {
@@ -6300,6 +6309,20 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             unMappedAndNomalHostIds = objHostIds;
         }
         return  unMappedAndNomalHostIds;
+    }
+
+    private List<String> getMappedHostGroupIds(String hostGroupVolumid) throws DmeException {
+        //首选根据卷id查询卷已经隐射的主机id
+        List<Attachment> attachmentList = findMappedHostsAndClusters(hostGroupVolumid);
+        List<String> mappedHostid = new ArrayList<>();
+        if (!CollectionUtils.isEmpty(attachmentList)) {
+            for (Attachment attach : attachmentList) {
+                if (!StringUtils.isEmpty(StringUtil.dealQuotationMarks(attach.getAttachedHostGroup()))) {
+                    mappedHostid.add(StringUtil.dealQuotationMarks(attach.getAttachedHostGroup()));
+                }
+            }
+        }
+        return mappedHostid;
     }
 
    /* private List<String> getDmeHostIdByHostId(List<String> dependentHosts, Map<String, String> hostIdToIp) throws DmeException {
