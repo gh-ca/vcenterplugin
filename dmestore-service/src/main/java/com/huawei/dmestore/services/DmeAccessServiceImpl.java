@@ -587,6 +587,7 @@ public class DmeAccessServiceImpl implements DmeAccessService {
                 requestbody.put(IP_FIELD, params.get("host"));
                 requestbody.put("host_name", params.get("host"));
                 requestbody.put("initiator", initiators);
+                LOG.info("Create logical host request parameters for exsi host on DME:{}", gson.toJson(requestbody));
                 ResponseEntity responseEntity = access(createHostUrl, HttpMethod.POST, gson.toJson(requestbody));
                 if (responseEntity.getStatusCodeValue() == RestUtils.RES_STATE_I_200) {
                     JsonObject jsonObject = new JsonParser().parse(responseEntity.getBody().toString())

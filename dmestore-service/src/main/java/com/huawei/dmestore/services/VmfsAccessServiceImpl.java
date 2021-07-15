@@ -2464,10 +2464,10 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                         // 任务部分成功/失败 取得Lun名称
                         List<String> name = taskService.getFailNameFromCreateTask(TASKTYPE, taskId, longTaskTimeOut);
                         if (!CollectionUtils.isEmpty(name) && ToolUtils.getStr(params.get("language")).equals(LANGUAGE_CN)) {
-                            dmeError.put(name.toString(), "DME 错误: " + taskDetailInfoNew.getDetailCn());
+                            dmeError.put(name.toString().replace("[", "").replace("]", ""), "DME 错误: " + taskDetailInfoNew.getDetailCn());
                         }
                         if (!CollectionUtils.isEmpty(name)&&ToolUtils.getStr(params.get("language")).equals(LANGUAGE_EN)) {
-                            dmeError.put(name.toString(), "DME ERROR: "+taskDetailInfoNew.getDetailEn());
+                            dmeError.put(name.toString().replace("[", "").replace("]", ""), "DME ERROR: "+taskDetailInfoNew.getDetailEn());
                         }
                     }
                     if (dmeError.size() != 0) {
@@ -3635,6 +3635,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                     }
                     if (!StringUtils.isEmpty(dmehostId)) {
                         hostMap.put(dmehostId, hostInfo);
+                        LOG.info("the esxi host corresponding to vcenter was found in DME{}", gson.toJson(hostMap));
                         break;
                     }
                 }
