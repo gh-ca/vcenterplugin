@@ -7490,8 +7490,12 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         } catch (Exception e) {
             LOG.error(e.getMessage());
             if (!StringUtils.isEmpty(e.getMessage())) {
-                JsonObject vjson = new JsonParser().parse(e.getMessage()).getAsJsonObject();
-                desc = StringUtil.dealQuotationMarks(ToolUtils.getStr(vjson.get("error_msg")));
+                try {
+                    JsonObject vjson = new JsonParser().parse(e.getMessage()).getAsJsonObject();
+                    desc = StringUtil.dealQuotationMarks(ToolUtils.getStr(vjson.get("error_msg")));
+                }catch (Exception ess){
+                    desc = e.getMessage();
+                }
             }
         }
 
