@@ -4570,10 +4570,16 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
     private void deleteFailLun02(List<String> volumelist) {
         Map<String, Object> requestbody = new HashMap<>();
         requestbody.put(VOLUME_IDS, volumelist);
+        ResponseEntity<String> responseEntity = null;
         try {
-            dmeAccessService.access(DmeConstants.DME_VOLUME_DELETE_URL, HttpMethod.POST, gson.toJson(requestbody));
+            responseEntity = dmeAccessService.access(DmeConstants.DME_VOLUME_DELETE_URL, HttpMethod.POST, gson.toJson(requestbody));
         }catch (Exception e){
             LOG.error(e.getMessage());
+        }
+        if (!StringUtils.isEmpty(responseEntity) && responseEntity.getStatusCodeValue() == HttpStatus.ACCEPTED.value()) {
+            JsonObject object = new JsonParser().parse(responseEntity.getBody()).getAsJsonObject();
+            String taskId = ToolUtils.jsonToStr(object.get("task_id"));
+            taskService.checkTaskStatusNew(taskId,longTaskTimeOut);
         }
     }
 
@@ -4599,11 +4605,17 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                             Map<String, Object> requestParam = new HashMap<>();
                             requestParam.put(VOLUMEIDS, Arrays.asList(volume));
                             requestParam.put(HOST_ID, hostid);
+                            ResponseEntity<String>  result1 = null;
                             LOG.info("unmapping lun "+gson.toJson(requestParam));
                             try {
-                                hostUnmapping(requestParam);
+                                 result1 = hostUnmapping(requestParam);
                             } catch (Exception e) {
                                 LOG.error(e.getMessage());
+                            }
+                            if (!StringUtils.isEmpty(result1) && result1.getStatusCodeValue() == HttpStatus.ACCEPTED.value()) {
+                                JsonObject object = new JsonParser().parse(result1.getBody()).getAsJsonObject();
+                                String taskId = ToolUtils.jsonToStr(object.get("task_id"));
+                                taskService.checkTaskStatusNew(taskId,longTaskTimeOut);
                             }
                         }
                     }
@@ -4614,11 +4626,17 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                             Map<String, Object> requestParam = new HashMap<>();
                             requestParam.put(VOLUMEIDS, Arrays.asList(volume));
                             requestParam.put(HOST_GROUP_ID1, hostGroupid);
+                            ResponseEntity<String>  result2 = null;
                             LOG.info("unmapping lun "+gson.toJson(requestParam));
                             try {
-                                hostGroupUnmapping(requestParam);
+                                result2 = hostGroupUnmapping(requestParam);
                             } catch (Exception e) {
                                 LOG.error(e.getMessage());
+                            }
+                            if (!StringUtils.isEmpty(result2) && result2.getStatusCodeValue() == HttpStatus.ACCEPTED.value()) {
+                                JsonObject object = new JsonParser().parse(result2.getBody()).getAsJsonObject();
+                                String taskId = ToolUtils.jsonToStr(object.get("task_id"));
+                                taskService.checkTaskStatusNew(taskId,longTaskTimeOut);
                             }
                         }
                     }
@@ -5746,6 +5764,8 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                                 throw new DmeException("map vmfs error:get main task info error");
                             } else if (mainTask.getStatus() > 4) {
                                 throw new DmeException("map vmfs error" + mainTask.getDetailEn());
+                            } else if (mainTask.getStatus() != 3) {
+                                desc.add(mainTask.getDetailEn());
                             }
                             String mainId = mainTask.getId();
                             if (StringUtils.isEmpty(mainId)) {
@@ -5802,6 +5822,8 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                                 throw new DmeException("map vmfs error:get main task info error");
                             } else if (mainTask.getStatus() > 4) {
                                 throw new DmeException("map vmfs error" + mainTask.getDetailEn());
+                            } else if (mainTask.getStatus() != 3) {
+                                desc.add(mainTask.getDetailEn());
                             }
                             String mainId = mainTask.getId();
                             if (StringUtils.isEmpty(mainId)) {
@@ -5831,6 +5853,9 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 }
                 resultMap.put(hostId,mappedList);
             }
+        }
+        if (!CollectionUtils.isEmpty(desc) && desc.size()>1){
+            desc = Arrays.asList(desc.get(0));
         }
         return resultMap;
     }
@@ -6020,12 +6045,18 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                         HashMap<String, Object> requestParam = new HashMap<>();
                         requestParam.put(VOLUMEIDS, Arrays.asList(hostVolumid));
                         for (String dmeHostId : mappedHostid) {
+                            ResponseEntity<String> responseEntity = null;
                             requestParam.put(HOST_ID, dmeHostId);
                             try {
-                                ResponseEntity responseEntity = hostUnmapping(requestParam);
+                                responseEntity = hostUnmapping(requestParam);
                                 LOG.info("mountVmfsNew rollback:" + responseEntity);
                             }catch (Exception ex) {
                                 LOG.error("mountVmfsNew rollback:" + ex.getMessage());
+                            }
+                            if (!StringUtils.isEmpty(responseEntity) && responseEntity.getStatusCodeValue() == HttpStatus.ACCEPTED.value()) {
+                                JsonObject object = new JsonParser().parse(responseEntity.getBody()).getAsJsonObject();
+                                String taskId = ToolUtils.jsonToStr(object.get("task_id"));
+                                taskService.checkTaskStatusNew(taskId,longTaskTimeOut);
                             }
                         }
                     }
@@ -6074,12 +6105,18 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                             HashMap<String, Object> requestParam = new HashMap<>();
                             requestParam.put(VOLUMEIDS, Arrays.asList(hostGroupVolumid));
                             for (String dmeHostId : mapingHostid) {
+                                ResponseEntity<String> responseEntity1 = null;
                                 requestParam.put(HOST_ID, dmeHostId);
                                 try {
-                                    ResponseEntity responseEntity = hostUnmapping(requestParam);
-                                    LOG.info("mountVmfsNew rollback:" + responseEntity);
+                                     responseEntity1 = hostUnmapping(requestParam);
+                                    LOG.info("mountVmfsNew rollback:" + responseEntity1);
                                 }catch (Exception es){
                                     LOG.error("mountVmfsNew rollback:" + es.getMessage());
+                                }
+                                if (!StringUtils.isEmpty(responseEntity1) && responseEntity1.getStatusCodeValue() == HttpStatus.ACCEPTED.value()) {
+                                    JsonObject object = new JsonParser().parse(responseEntity1.getBody()).getAsJsonObject();
+                                    String taskId = ToolUtils.jsonToStr(object.get("task_id"));
+                                    taskService.checkTaskStatusNew(taskId,longTaskTimeOut);
                                 }
                             }
                         }
@@ -6183,12 +6220,18 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                         HashMap<String, Object> requestParam = new HashMap<>();
                         requestParam.put(VOLUMEIDS, Arrays.asList(hostGroupVolumid));
                         for (String dmeHostId : mapingHostid) {
+                            ResponseEntity<String> responseEntity2 = null;
                             requestParam.put(HOST_ID, dmeHostId);
                             try {
-                                ResponseEntity responseEntity = hostUnmapping(requestParam);
-                                LOG.info("mountVmfsNew rollback:" + responseEntity);
+                                 responseEntity2 = hostUnmapping(requestParam);
+                                LOG.info("mountVmfsNew rollback:" + responseEntity2);
                             }catch (Exception excep){
                                 LOG.error("mountVmfsNew rollback:" + excep.getMessage());
+                            }
+                            if (!StringUtils.isEmpty(responseEntity2) && responseEntity2.getStatusCodeValue() == HttpStatus.ACCEPTED.value()) {
+                                JsonObject object = new JsonParser().parse(responseEntity2.getBody()).getAsJsonObject();
+                                String taskId = ToolUtils.jsonToStr(object.get("task_id"));
+                                taskService.checkTaskStatusNew(taskId,longTaskTimeOut);
                             }
                         }
                     }
