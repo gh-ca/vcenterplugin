@@ -951,5 +951,15 @@
       "lunCapacityTrends": "LUN Capacity Trends",
       "storagePoolCapacityTrends": "Storage Pool Capacity Trends"
     }
+  },
+  "partSuccessOrError": {
+    "createFail": "Creation failed：",
+    "deleteFail": "Failed to delete：",
+    "unmountFail": "Uninstallation failed：",
+    "unmountPartSuccess": "Partially successfully uninstalled：",
+    "createPartSuccess": "Partially created successfully：",
+    "host": "Host",
+    "reason": "The reason",
+    "storage": "Storage"
   }
 }
