@@ -344,6 +344,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         if (isDorado) {
             storageObj.setFreeEffectiveCapacity(
                     totalPoolCapicity - blockFileCapacity- protectionCapacity);
+            storageObj.setUsableCapacity(totalPoolCapicity);
         } else {
             // (圈内)总容量
             storageObj.setTotalEffectiveCapacity(totalPoolCapicity);
