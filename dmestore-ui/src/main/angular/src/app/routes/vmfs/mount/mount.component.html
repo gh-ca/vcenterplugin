@@ -371,7 +371,7 @@
   </div>
 </clr-modal>
 <!--失败提示窗口-->
-<clr-modal [(clrModalOpen)]="errorShow" [clrModalSize]="'sm'" [clrModalClosable]="true">
+<clr-modal [(clrModalOpen)]="errorShow" [clrModalSize]="'sm'" [clrModalClosable]="false">
   <h3 class="modal-title modelTile">{{'vmfs.reclaim.title' | translate}}</h3>
   <div class="modal-body">
     <!--    <p *ngIf="mountShow">{{'errorMsg.mountError' | translate}}</p>-->
@@ -388,7 +388,7 @@
   </div>
 </clr-modal>
 <!--部分成功提示窗口-->
-<clr-modal [(clrModalOpen)]="partSuccessShow" [clrModalSize]="'lg'" [clrModalClosable]="true">
+<clr-modal [(clrModalOpen)]="partSuccessShow" [clrModalSize]="'lg'" [clrModalClosable]="false">
   <h3 class="modal-title modelTile">{{'vmfs.reclaim.title' | translate}}</h3>
   <div class="modal-body">
     <!--    <p *ngIf="mountShow">{{'errorMsg.mountError' | translate}}</p>-->
