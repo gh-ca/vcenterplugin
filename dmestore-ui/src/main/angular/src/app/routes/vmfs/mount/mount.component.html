@@ -346,7 +346,7 @@
   </div>
 </clr-modal>
 <!--卸载提示-->
-<clr-modal [(clrModalOpen)]="unmountTipsShow" [clrModalSize]="'sm'" [clrModalClosable]="false">
+<clr-modal [(clrModalOpen)]="unmountTipsShow" [clrModalSize]="'sm'" [clrModalClosable]="false" class="unMount-tips">
   <h3 class="modal-title modelTile">{{'vmfs.reclaim.title' | translate}}</h3>
   <div class="modal-body">
     <p>{{'vmfs.unmount.tips' | translate}}</p>

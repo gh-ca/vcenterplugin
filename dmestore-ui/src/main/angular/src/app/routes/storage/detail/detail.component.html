@@ -824,10 +824,11 @@
                     {{'storage.detail.cap.capacityUsage' | translate}}</div>
                   <div style=".data">
                     <!--可得容量 v6 场景有可得容量-->
-                    <div class="capacity-wrap" *ngIf="detail.storageTypeShow.dorado&&detail.totalEffectiveCapacity!==null">
+                    <div class="capacity-wrap" *ngIf="detail.storageTypeShow.dorado&&detail.totalEffectiveCapacity!==0.0">
                       <span class="capacity-label">{{'storage.list.tec' | translate}}</span>
                       <div class="num-bar_outer">
-                        <div class="num-bar_inner"></div>
+                        <div class="num-bar_inner total"
+                             [ngStyle]="{'width':(detail.totalEffectiveCapacity/detail.totalCapacity * 100)+'%'}"></div>
                       </div>
                       <span
                         class="capacity-span">{{detail.totalEffectiveCapacity ? formatCapacity(detail.totalEffectiveCapacity):'--'}}</span>
@@ -842,7 +843,7 @@
                         class="capacity-span">{{detail.totalCapacity ? formatCapacity(detail.totalCapacity):'--'}}</span>
                     </div>
                     <!--裸容量  v6 场景无可得容量-->
-                    <div class="capacity-wrap" *ngIf="detail.storageTypeShow.dorado&&detail.totalEffectiveCapacity===null">
+                    <div class="capacity-wrap" *ngIf="detail.storageTypeShow.dorado&&detail.totalEffectiveCapacity===0.0">
                       <span class="capacity-label">{{'storage.detail.cap.bareCapacity' | translate}}</span>
                       <div class="num-bar_outer">
                         <div class="num-bar_inner"></div>
@@ -851,10 +852,11 @@
                         class="capacity-span">{{detail.totalCapacity ? formatCapacity(detail.totalCapacity):'--'}}</span>
                     </div>
                     <!--可用容量 v6 场景无可得容量-->
-                    <div class="capacity-wrap" *ngIf="detail.storageTypeShow.dorado&&detail.totalEffectiveCapacity===null">
+                    <div class="capacity-wrap" *ngIf="detail.storageTypeShow.dorado&&detail.totalEffectiveCapacity===0.0">
                       <span class="capacity-label">{{'storage.detail.cap.usableCapacity' | translate}}</span>
                       <div class="num-bar_outer">
-                        <div class="num-bar_inner"></div>
+                        <div class="num-bar_inner total"
+                             [ngStyle]="{'width':(detail.usableCapacity/detail.totalCapacity * 100)+'%'}"></div>
                       </div>
                       <span
                         class="capacity-span">{{detail.usableCapacity ? formatCapacity(detail.usableCapacity):'--'}}</span>
@@ -874,7 +876,7 @@
                       <span class="capacity-label">{{'storage.detail.cap.useFree' | translate}}</span>
                       <div class="num-bar_outer">
                         <clr-progress-bar id="usedCapacityId"
-                          clrValue="{{detail.usedCapacity/detail.totalEffectiveCapacity * 100}}"></clr-progress-bar>
+                          clrValue="{{detail.usedCapacity/detail.freeEffectiveCapacity * 100}}"></clr-progress-bar>
                         <!--                          <div class="num-bar_inner total progress" [ngStyle]="{'width':(detail.usedCapacity/detail.totalCapacity * 100)+'%'}"></div>-->
                         <!--                          <div class="num-bar_inner free" [ngStyle]="{'width':((detail.totalEffectiveCapacity-detail.usedCapacity)/detail.totalCapacity * 100)+'%'}"></div>-->
                       </div>
@@ -883,14 +885,14 @@
                         {{getFreeCapacity(detail.totalEffectiveCapacity,detail.usedCapacity)}}</span>
                       <span *ngIf="detail.storageTypeShow.dorado"
                         class="capacity-span">{{formatCapacity(detail.usedCapacity)}} /
-                        {{formatCapacity(detail.totalEffectiveCapacity-detail.blockFileCapacity-detail.protectionCapacity)}}</span>
+                        {{formatCapacity(detail.freeEffectiveCapacity)}}</span>
                     </div>
                     <!--已订阅  所有场景-->
                     <div class="capacity-wrap">
                       <span class="capacity-label">{{'storage.detail.cap.subscribe' | translate}}</span>
                       <div class="num-bar_outer">
                         <div class="num-bar_inner total"
-                          [ngStyle]="{'width':(detail.subscriptionCapacity/detail.totalEffectiveCapacity * 100)+'%'}">
+                          [ngStyle]="{'width':(detail.subscriptionCapacity/detail.totalCapacity * 100)+'%'}">
                         </div>
                       </div>
                       <span
