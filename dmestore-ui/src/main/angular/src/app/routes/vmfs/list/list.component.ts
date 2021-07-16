@@ -1515,13 +1515,25 @@ wwn: "67c1cf110058934511ba6e5a00000344"
           }
         }else if (result.code==='206'){
           console.log("挂载部分成功："+result.description)
-          this.isMountPartSuccess=true
-          this.mountFailOrPartSuccessDesc=result.description
-          this.mountFailHost=result.data
+          // this.isMountPartSuccess=true
+          // this.mountFailOrPartSuccessDesc=result.description
+          // this.mountFailHost=result.data
+          this.mountShow=false
+          this.partSuccessShow=true
+          this.status='partSuccess'
+          this.operatingType='vmfsMount'
+          this.description=result.description
+          this.partSuccessData=result.data
         }else {
-          console.log('挂载异常：' + result.description);
-          this.mountFailOrPartSuccessDesc=result.description
-          this.isOperationErr = true;
+          // console.log('挂载异常：' + result.description);
+          // this.mountFailOrPartSuccessDesc=result.description
+          // this.isOperationErr = true;
+          this.mountShow=false
+          this.errorShow=true
+          this.status='error'
+          this.operatingType='vmfsMount'
+          this.description=result.description
+          this.partSuccessData=result.data
         }
       };
       const params = _.merge({chooseDevice}, this.mountForm);
@@ -1717,9 +1729,9 @@ wwn: "67c1cf110058934511ba6e5a00000344"
           // 打开成功提示窗口
           this.unmountSuccessShow = true;
         }else if(result.code==='206'){
-          let dmeError
-          let vcError
-          let bounded
+          let dmeError=[]
+          let vcError=[]
+          let bounded=[]
           if(result.data.dmeError&&result.data.dmeError.length>0){
             dmeError=this.unmountPartHandleFun(result.data.dmeError)
           }
@@ -1736,7 +1748,27 @@ wwn: "67c1cf110058934511ba6e5a00000344"
           this.operatingType='vmfsUnmount'
           this.partSuccessShow=true
         } else {
-          console.log('unmount ' + this.rowSelected[0].name + ' fail：' + result.description);
+          // console.log('unmount ' + this.rowSelected[0].name + ' fail：' + result.description);
+          if(result.data&&result.data.length>0){
+            let dmeError=[]
+            let vcError=[]
+            let bounded=[]
+            if(result.data.dmeError&&result.data.dmeError.length>0){
+              dmeError=this.unmountPartHandleFun(result.data.dmeError)
+            }
+            if(result.data.vcError&&result.data.vcError.length>0){
+              vcError=result.data.vcError
+            }
+            if(result.data.bounded&&result.data.bounded.length>0){
+              bounded=result.data.bounded
+            }
+            this.unmountShow=false
+            this.description=result
+            this.status='partSuccess'
+            this.operatingType='vmfsUnmountError'
+            this.partSuccessData=this.unmountPartDataHandleFun(dmeError.concat(vcError).concat(bounded))
+            this.partSuccessShow=true
+          }else {}
           this.unmountDesc=result.description
           // this.isOperationErr = true;
           this.unmountShow = false;

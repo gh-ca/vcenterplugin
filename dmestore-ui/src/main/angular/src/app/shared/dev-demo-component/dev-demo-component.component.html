@@ -34,7 +34,7 @@
 </div>
 
 <!--失败提示-->
-<clr-modal [(clrModalOpen)]="mountShow" [clrModalSize]="'lg'" [clrModalClosable]="true">
+<clr-modal [(clrModalOpen)]="mountShow" [clrModalSize]="'sm'" [clrModalClosable]="true">
   <h3 class="modal-title modelTile">{{'vmfs.reclaim.title' | translate}}</h3>
   <div class="modal-body">
 <!--    <p *ngIf="mountShow">{{'errorMsg.mountError' | translate}}</p>-->
@@ -43,7 +43,7 @@
       [status]="status"
       [description]="description"
       [partSuccessData]="partSuccessData"
-    [operatingType]="'vmfsCreate'"></app-error-partsucess-tips>
+    [operatingType]="'vmfsMount'"></app-error-partsucess-tips>
   </div>
   <div class="modal-footer">
     <button type="submit" class="btn btn-primary"

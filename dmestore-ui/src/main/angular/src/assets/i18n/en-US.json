@@ -956,10 +956,14 @@
     "createFail": "Creation failed：",
     "deleteFail": "Failed to delete：",
     "unmountFail": "Uninstallation failed：",
+    "mountFail": "Mount failed：",
+    "mountPartSuccess": "Partially mounted successfully：",
     "unmountPartSuccess": "Partially successfully uninstalled：",
     "createPartSuccess": "Partially created successfully：",
     "host": "Host",
     "reason": "The reason",
-    "storage": "Storage"
+    "storage": "Storage",
+    "currentState": "Current state",
+    "mountFailState": "Mount failed"
   }
 }
