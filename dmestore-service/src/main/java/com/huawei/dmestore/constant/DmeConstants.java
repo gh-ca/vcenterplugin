@@ -323,6 +323,11 @@ public class DmeConstants {
     public static final String DATASETS_QUERY_URL = "/rest/metrics/v1/datasets/{dataSet}?pageSize=1000";
 
     /**
+     * datasets query
+     **/
+    public static final String DATASETS_STATISTICS_QUERY_URL = "/rest/metrics/v1/datasets/{dataSet}/statistics?pageSize=1000";
+
+    /**
      * Constant definition
      */
     public static final int MAXLEN = 255;

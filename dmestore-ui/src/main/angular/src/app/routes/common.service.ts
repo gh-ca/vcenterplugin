@@ -231,7 +231,7 @@ zh:'一年' ,range:'LAST_1_YEAR',   interval:  "DAY"
     if (isMockData) {
       console.log(params);
       return {
-        "code": "200",
+        "code": "-99999",
         "data":["21.2112.12.12"],
         "description": "error_args:[10.143.133.197],error_code:hostmgmt.0044,error_msg:The host (name: 10.143.133.197) to which a LUN has been mapped cannot be added to a host group to which a LUN has been mapped."
       };

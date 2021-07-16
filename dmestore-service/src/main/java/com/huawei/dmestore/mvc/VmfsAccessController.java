@@ -296,22 +296,22 @@ public class VmfsAccessController extends BaseController {
              result = vmfsAccessService.createVmfsNew1(params);
             if (result.getSuccessNo() != 0 && result.getFailNo()==0 && result.getPartialSuccess() == 0
                     && CollectionUtils.isEmpty(result.getConnectionResult())){
-                return success(result, "create vmfs success");
+                return success(result, "");
             }else if (result.getSuccessNo() == 0 && result.getPartialSuccess() == 0) {
                 if (!CollectionUtils.isEmpty(result.getDesc())) {
-                    return failure("create vmfs failure: " + result.getDesc().toString(), result);
+                    return failure(result.getDesc().toString(), result);
                 }else {
-                    return failure("create vmfs failure!", result);
+                    return failure("", result);
                 }
             }else {
                 if (!CollectionUtils.isEmpty(result.getDesc())) {
-                    return partialSuccess(result,"create vmfs partial success: "+result.getDesc().toString());
+                    return partialSuccess(result,result.getDesc().toString());
                 }else {
-                    return partialSuccess(result,"create vmfs partial success!");
+                    return partialSuccess(result,"");
                 }
             }
         } catch (Exception e) {
-            failureStr = "create vmfs failure:" + e.getMessage();
+            failureStr = e.getMessage();
             result.setFailNo(ToolUtils.getInt(params.get("count")));
         }
         return failure(failureStr,result);
@@ -332,22 +332,22 @@ public class VmfsAccessController extends BaseController {
             MountVmfsReturn res = vmfsAccessService.mountVmfsNew(params);
             if (!res.isFlag()) {
                 if (StringUtils.isEmpty(res.getDescription())) {
-                    return failure("mount vmfs failure!");
+                    return failure("");
                 } else {
-                    return failure("mount vmfs failure : " + res.getDescription());
+                    return failure(res.getDescription());
                 }
             } else if (res.isFlag() && CollectionUtils.isEmpty(res.getFailedHost())) {
-                return success(null, "Mount vmfs success");
+                return success(null, "");
             } else {
                 if (StringUtils.isEmpty(res.getDescription())) {
-                    return partialSuccess(res.getFailedHost(), "Mount vmfs partial success!");
+                    return partialSuccess(res.getFailedHost(), "");
                 } else {
-                    return partialSuccess(res.getFailedHost(), "Mount vmfs partial success : " + res.getDescription());
+                    return partialSuccess(res.getFailedHost(), res.getDescription());
                 }
             }
         } catch (Exception e) {
             LOG.error("mount vmfs failure:", e);
-            failureStr = "mount vmfs failure:" + e.getMessage();
+            failureStr = e.getMessage();
         }
         return failure(failureStr);
 

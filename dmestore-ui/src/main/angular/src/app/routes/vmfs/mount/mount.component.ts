@@ -554,6 +554,7 @@ export class MountComponent implements OnInit {
         console.log('result:', result);
         if (result.code === '200') {
           console.log('挂载成功');
+          this.mountShow=false
           this.mountSuccessShow = true;
         } else if (result.code === '-60001') {
           this.connectivityFailure = true;
@@ -577,8 +578,13 @@ export class MountComponent implements OnInit {
           this.mountFailHost=result.data
         } else {
           console.log('挂载异常：' + result.description);
-          this. isOperationErr = true;
-          this.mountFailOrPartSuccessDesc=result.description
+          // this. isOperationErr = true;
+          // this.mountFailOrPartSuccessDesc=result.description
+          this.mountShow=false
+          this.errorShow=true
+          this.status='error'
+          this.operatingType='vmfsMount'
+          this.description=result.description
         }
         this.cdr.detectChanges();
       });
@@ -612,9 +618,9 @@ export class MountComponent implements OnInit {
             // 打开成功提示窗口
             this.unmountSuccessShow = true;
           }else if(result.code==='206'){
-            let dmeError
-            let vcError
-            let bounded
+            let dmeError=[]
+            let vcError=[]
+            let bounded=[]
             if(result.data.dmeError&&result.data.dmeError.length>0){
               dmeError=this.unmountPartHandleFun(result.data.dmeError)
             }
@@ -632,6 +638,26 @@ export class MountComponent implements OnInit {
             this.partSuccessShow=true
           } else {
             // console.log('unmount ' + this.rowSelected[0].name + ' fail：' + result.description);
+            if(result.data&&result.data.length>0){
+              let dmeError=[]
+              let vcError=[]
+              let bounded=[]
+              if(result.data.dmeError&&result.data.dmeError.length>0){
+                dmeError=this.unmountPartHandleFun(result.data.dmeError)
+              }
+              if(result.data.vcError&&result.data.vcError.length>0){
+                vcError=result.data.vcError
+              }
+              if(result.data.bounded&&result.data.bounded.length>0){
+                bounded=result.data.bounded
+              }
+              this.unmountShow=false
+              this.description=result
+              this.status='partSuccess'
+              this.operatingType='vmfsUnmountError'
+              this.partSuccessData=this.unmountPartDataHandleFun(dmeError.concat(vcError).concat(bounded))
+              this.partSuccessShow=true
+            }else {}
             this.unmountDesc=result.description
             // this.isOperationErr = true;
             this.unmountShow = false;
@@ -660,9 +686,9 @@ export class MountComponent implements OnInit {
             // 打开成功提示窗口
             this.unmountSuccessShow = true;
           }else if(result.code==='206'){
-            let dmeError
-            let vcError
-            let bounded
+            let dmeError=[]
+            let vcError=[]
+            let bounded=[]
             if(result.data.dmeError&&result.data.dmeError.length>0){
               dmeError=this.unmountPartHandleFun(result.data.dmeError)
             }
@@ -680,6 +706,26 @@ export class MountComponent implements OnInit {
             this.partSuccessShow=true
           } else {
             // console.log('unmount ' + this.rowSelected[0].name + ' fail：' + result.description);
+            if(result.data&&result.data.length>0){
+              let dmeError=[]
+              let vcError=[]
+              let bounded=[]
+              if(result.data.dmeError&&result.data.dmeError.length>0){
+                dmeError=this.unmountPartHandleFun(result.data.dmeError)
+              }
+              if(result.data.vcError&&result.data.vcError.length>0){
+                vcError=result.data.vcError
+              }
+              if(result.data.bounded&&result.data.bounded.length>0){
+                bounded=result.data.bounded
+              }
+              this.unmountShow=false
+              this.description=result
+              this.status='partSuccess'
+              this.operatingType='vmfsUnmountError'
+              this.partSuccessData=this.unmountPartDataHandleFun(dmeError.concat(vcError).concat(bounded))
+              this.partSuccessShow=true
+            }else {}
             this.unmountDesc=result.description
             // this.isOperationErr = true;
             this.unmountShow = false;
@@ -802,14 +848,26 @@ export class MountComponent implements OnInit {
           this.connFailData = connFailDatas;
         }
       }else if (result.code==='206'){
-        console.log("挂载部分成功："+result.description)
-        this.isMountPartSuccess=true
-        this.mountFailOrPartSuccessDesc=result.description
-        this.mountFailHost=result.data
+        // console.log("挂载部分成功："+result.description)
+        // this.isMountPartSuccess=true
+        // this.mountFailOrPartSuccessDesc=result.description
+        // this.mountFailHost=result.data
+        this.mountShow=false
+        this.status='partSuccess'
+        this.description=result.description
+        this.partSuccessData=result.data
+        this.operatingType='vmfsMount'
+        this.partSuccessShow=true
       } else {
-        console.log('挂载异常：' + result.description);
-        this.mountFailOrPartSuccessDesc=result.description
-        this.isOperationErr = true;
+        // console.log('挂载异常：' + result.description);
+        // this.mountFailOrPartSuccessDesc=result.description
+        // this.isOperationErr = true;
+        this.mountShow=false
+        this.status='error'
+        this.description=result.description
+        this.operatingType='vmfsMount'
+        this.partSuccessData=result.data
+        this.errorShow=true
       }
       this.cdr.detectChanges();
     };
@@ -857,9 +915,9 @@ export class MountComponent implements OnInit {
           // 打开成功提示窗口
           this.unmountSuccessShow = true;
         }else if(result.code==='206'){
-          let dmeError
-          let vcError
-          let bounded
+          let dmeError=[]
+          let vcError=[]
+          let bounded=[]
           if(result.data.dmeError&&result.data.dmeError.length>0){
             dmeError=this.unmountPartHandleFun(result.data.dmeError)
           }
@@ -877,6 +935,26 @@ export class MountComponent implements OnInit {
           this.partSuccessShow=true
         } else {
           // console.log('unmount ' + this.rowSelected[0].name + ' fail：' + result.description);
+          if(result.data&&result.data.length>0){
+            let dmeError=[]
+            let vcError=[]
+            let bounded=[]
+            if(result.data.dmeError&&result.data.dmeError.length>0){
+              dmeError=this.unmountPartHandleFun(result.data.dmeError)
+            }
+            if(result.data.vcError&&result.data.vcError.length>0){
+              vcError=result.data.vcError
+            }
+            if(result.data.bounded&&result.data.bounded.length>0){
+              bounded=result.data.bounded
+            }
+            this.unmountShow=false
+            this.description=result
+            this.status='partSuccess'
+            this.operatingType='vmfsUnmountError'
+            this.partSuccessData=this.unmountPartDataHandleFun(dmeError.concat(vcError).concat(bounded))
+            this.partSuccessShow=true
+          }else {}
           this.unmountDesc=result.description
           // this.isOperationErr = true;
           this.unmountShow = false;

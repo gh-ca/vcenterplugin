@@ -1875,7 +1875,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 LOG.info("vmware mount Vmfs end!");
             } else {
                 LOG.info("DME mount Vmfs failed!taskId={}", taskId);
-                throw new DmeException("DME mount vmfs volume error(task status)!");
+                throw new DmeException("DME mount vmfs volume error(task status)!" + mainTask.getDetailEn());
             }
         } catch (DmeException e) {
             // rollback
@@ -5438,6 +5438,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         Map<String, Object> param = new HashMap<>();
         LOG.info("check connectivity of host or horstgroup on dme ! {" + gson.toJson(requestBody) + "}");
         ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.POST, gson.toJson(requestBody));
+        LOG.info("check connectivity return : " +gson.toJson(responseEntity));
         List<String> resultMapList = new ArrayList<>();
         if (responseEntity.getStatusCodeValue() == HttpStatus.OK.value()) {
             String body = responseEntity.getBody();
@@ -6283,11 +6284,12 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         }
         vcsdkUtils.refreshDatastore(dataStoreObjectId);
         try {
-            TimeUnit.SECONDS.sleep(2);
+            TimeUnit.SECONDS.sleep(3);
         }catch (Exception e){
             LOG.error("scan datastore error");
         }
         List<Map<String, String>> mountedLst = vcsdkUtils.getHostsByDsObjectIdNew(ToolUtils.getStr(params.get(DATASTORE_OBJECT_IDS)), true);
+        LOG.info("check mounted result:" + gson.toJson(mountedLst));
         List<String> lstIps = new ArrayList<>();
         if (!CollectionUtils.isEmpty(mountedLst)){
             for (Map<String, String> hostinfo : mountedLst){
