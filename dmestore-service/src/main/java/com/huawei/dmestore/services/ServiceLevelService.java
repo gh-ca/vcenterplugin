@@ -34,4 +34,8 @@ public interface ServiceLevelService {
 
     DmeDatasetsQueryResponse storagePoolPerformanceDatasetsQuery(String serviceLevelId, String interval)
         throws DmeException;
+
+    DmeDatasetsQueryResponse lunPer(String serviceLevelId, String interval) throws DmeException;
+
+    DmeDatasetsQueryResponse poolPer(String serviceLevelId, String interval) throws DmeException;
 }

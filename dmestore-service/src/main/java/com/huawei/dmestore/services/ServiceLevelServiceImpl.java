@@ -800,4 +800,187 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
         return returnBody;
     }
 
+    public JsonObject getDatasetsStatisticsQueryBody(String serviceLevelId, String interval, String dataSetType) {
+        Map<String, Long> timeMap = parseTime(interval);
+
+        // timeRange
+        JsonObject timeRange = new JsonObject();
+        timeRange.addProperty("beginTime", timeMap.get("beginTime"));
+        timeRange.addProperty("endTime", timeMap.get("endTime"));
+        timeRange.addProperty("granularity", "30m");
+        if ("stat-lun".equals(dataSetType) || "stat-storage-pool".equals(dataSetType)) {
+        } else if ("perf-lun".equals(dataSetType) || "perf-stat-storage-pool-details".equals(
+                dataSetType)) {
+        }
+
+        // filters
+        JsonObject filters = new JsonObject();
+        JsonArray filtersDimensions = new JsonArray();
+        JsonObject filtersDimension = new JsonObject();
+        String field = "dimensions.lun.tierNativeId";
+        if("perf-storage-pool".equals(dataSetType)){
+            field = "dimensions.pool.tierNativeId";
+        }
+        filtersDimension.addProperty("field", field);
+        JsonArray values = new JsonArray();
+        values.add(new JsonPrimitive(serviceLevelId));
+        filtersDimension.add("values", values);
+        filtersDimensions.add(filtersDimension);
+        filters.add("dimensions", filtersDimensions);
+
+        // aggs
+        JsonObject rule1 = getRule("sum", "metrics.totalCapacity", "sum-totalCapacity");
+        JsonObject rule2 = getRule("sum", "metrics.throughput", "sum-throughput");
+        JsonObject rule3 = getRule("sum", "metrics.usedCapacity", "sum-usedCapacity");
+        JsonObject rule6 = getRule("max", "metrics.responseTime", "max-responseTime");
+        JsonObject rule7 = getRule("max", "metrics.bandwidth", "max-bandwidth");
+        List rules = new ArrayList();
+        rules.add(rule1);
+        rules.add(rule2);
+        rules.add(rule3);
+        rules.add(rule6);
+        rules.add(rule7);
+        JsonObject agg1 = getAggs(rules);
+
+        JsonObject rule4 = getRule("groupby", field, "tier-pool-sum-totalCapacity-perform", agg1);
+        JsonObject agg2 = getAggs(rule4);
+
+        JsonObject rule5 = getRule("date_histogram", "timestamp", "30m","+08:00","tier-pool-sum-totalCapacity-perform-30m", agg2);
+        JsonObject agg3 = getAggs(rule5);
+
+        JsonObject returnBody = new JsonObject();
+        returnBody.add("timeRange", timeRange);
+        returnBody.add("filters", filters);
+        returnBody.add("aggs", agg3);
+        log.info("数据集查询，请求body={}", returnBody.toString());
+        return returnBody;
+    }
+
+    @Override
+    public DmeDatasetsQueryResponse lunPer(String serviceLevelId, String interval)
+            throws DmeException {
+        String data = executeStatistics(serviceLevelId, interval, "perf-lun");
+        if (!StringUtils.isEmpty(data)) {
+            return gson.fromJson(data, DmeDatasetsQueryResponse.class);
+        }
+
+        return null;
+    }
+
+    @Override
+    public DmeDatasetsQueryResponse poolPer(String serviceLevelId, String interval)
+            throws DmeException {
+        String data = executeStatistics(serviceLevelId, interval, "perf-storage-pool");
+        if (!StringUtils.isEmpty(data)) {
+            return gson.fromJson(data, DmeDatasetsQueryResponse.class);
+        }
+
+        return null;
+    }
+
+    private String executeStatistics(String serviceLevelId, String interval, String dataSetType) throws DmeException {
+        // 封装查询body
+        JsonObject queryBody = getDatasetsStatisticsQueryBody(serviceLevelId, interval, dataSetType);
+        String url = DmeConstants.DATASETS_STATISTICS_QUERY_URL.replace("{dataSet}", dataSetType);
+        log.info("executeStatistics开始，url={}, post body={}", url, queryBody);
+        ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.POST, queryBody.toString());
+        if (responseEntity.getStatusCodeValue() == HttpStatus.OK.value()) {
+            String responseBody = responseEntity.getBody();
+            log.info("executeStatistics查询成功！返回信息:{}", responseBody);
+            return parseDataSetResult(responseBody);
+        }else {
+            log.info("executeStatistics查询失败！url={}", url);
+        }
+
+        return null;
+    }
+
+    private String parseDataSetResult(String result){
+        List<DmeDatasetBean> dmeDatasetBeans = new ArrayList<>();
+        try {
+            JsonObject re = parseJson(result);
+            JsonArray buckets = re.getAsJsonObject("aggregations").getAsJsonObject("tier-pool-sum-totalCapacity-perform-30m")
+                    .getAsJsonArray("buckets");
+            Iterator<JsonElement> iterator = buckets.iterator();
+            while (iterator.hasNext()){
+                JsonObject i = iterator.next().getAsJsonObject();
+                DmeDatasetBean dmeDatasetBean = new DmeDatasetBean();
+                dmeDatasetBean.setTimestamp(i.get("key").getAsLong());
+                JsonObject per = i.getAsJsonObject("tier-pool-sum-totalCapacity-perform").getAsJsonObject("buckets");
+                dmeDatasetBean.setTotalCapacity(per.getAsJsonObject("sum-totalCapacity").get("value").getAsFloat());
+                dmeDatasetBean.setUsedCapacity(per.getAsJsonObject("sum-usedCapacity").get("value").getAsFloat());
+                dmeDatasetBean.setThroughput(per.getAsJsonObject("sum-throughput").get("value").getAsFloat());
+                dmeDatasetBean.setResponseTime(per.getAsJsonObject("max-responseTime").get("value").getAsFloat());
+                dmeDatasetBean.setBandwidth(per.getAsJsonObject("max-bandwidth").get("value").getAsFloat());
+                dmeDatasetBean.setTierNativeId(per.get("key").getAsString());
+
+                dmeDatasetBeans.add(dmeDatasetBean);
+            }
+        } catch (Exception e) {
+            log.error("parseDataSetResult error！", e);
+        }
+        DmeDatasetsQueryResponse dmeDatasetsQueryResponse = new DmeDatasetsQueryResponse();
+        dmeDatasetsQueryResponse.setDatas(dmeDatasetBeans);
+        return gson.toJson(dmeDatasetsQueryResponse);
+    }
+
+
+    private JsonObject getAggs(List<JsonObject> rules){
+        JsonObject agg = new JsonObject();
+        JsonArray r = new JsonArray();
+        rules.forEach(jsonObject -> r.add(jsonObject));
+        agg.add("rules", r);
+        return agg;
+    }
+
+    private JsonObject getAggs(JsonObject rule){
+        JsonObject agg = new JsonObject();
+        JsonArray r = new JsonArray();
+        r.add(rule);
+        agg.add("rules", r);
+        return agg;
+    }
+
+    private JsonObject getRule(String aggType, String field, String ruleName){
+        JsonObject aggRuleMeta = new JsonObject();
+        aggRuleMeta.addProperty("field", field);
+        JsonObject rule = new JsonObject();
+        rule.addProperty("aggType", aggType);
+        rule.addProperty("ruleName", ruleName);
+        rule.add("aggRuleMeta", aggRuleMeta);
+
+        return rule;
+    }
+
+    private JsonObject getRule(String aggType, String field, String ruleName, JsonObject agg){
+        JsonObject aggRuleMeta = new JsonObject();
+        aggRuleMeta.addProperty("field", field);
+        JsonObject rule = new JsonObject();
+        rule.addProperty("aggType", aggType);
+        rule.addProperty("ruleName", ruleName);
+        rule.add("aggRuleMeta", aggRuleMeta);
+        rule.add("aggs", agg);
+
+        return rule;
+    }
+
+    private JsonObject getRule(String aggType, String field, String interval, String timeZone, String ruleName, JsonObject agg){
+        JsonObject aggRuleMeta = new JsonObject();
+        aggRuleMeta.addProperty("field", field);
+        aggRuleMeta.addProperty("interval", interval);
+        aggRuleMeta.addProperty("time_zone", timeZone);
+        JsonObject rule = new JsonObject();
+        rule.addProperty("aggType", aggType);
+        rule.addProperty("ruleName", ruleName);
+        rule.add("aggRuleMeta", aggRuleMeta);
+        rule.add("aggs", agg);
+        return rule;
+    }
+
+    public static JsonObject parseJson(String json){
+        JsonParser parser = new JsonParser();
+        JsonObject jsonObj = parser.parse(json).getAsJsonObject();
+        return jsonObj;
+    }
+
 }
