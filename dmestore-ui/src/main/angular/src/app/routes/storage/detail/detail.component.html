@@ -824,7 +824,7 @@
                     {{'storage.detail.cap.capacityUsage' | translate}}</div>
                   <div style=".data">
                     <!--可得容量 v6 场景有可得容量-->
-                    <div class="capacity-wrap" *ngIf="detail.storageTypeShow.dorado&&detail.totalEffectiveCapacity!==null">
+                    <div class="capacity-wrap" *ngIf="detail.storageTypeShow.dorado&&detail.totalEffectiveCapacity!==0.0">
                       <span class="capacity-label">{{'storage.list.tec' | translate}}</span>
                       <div class="num-bar_outer">
                         <div class="num-bar_inner"></div>
@@ -842,7 +842,7 @@
                         class="capacity-span">{{detail.totalCapacity ? formatCapacity(detail.totalCapacity):'--'}}</span>
                     </div>
                     <!--裸容量  v6 场景无可得容量-->
-                    <div class="capacity-wrap" *ngIf="detail.storageTypeShow.dorado&&detail.totalEffectiveCapacity===null">
+                    <div class="capacity-wrap" *ngIf="detail.storageTypeShow.dorado&&detail.totalEffectiveCapacity===0.0">
                       <span class="capacity-label">{{'storage.detail.cap.bareCapacity' | translate}}</span>
                       <div class="num-bar_outer">
                         <div class="num-bar_inner"></div>
@@ -851,7 +851,7 @@
                         class="capacity-span">{{detail.totalCapacity ? formatCapacity(detail.totalCapacity):'--'}}</span>
                     </div>
                     <!--可用容量 v6 场景无可得容量-->
-                    <div class="capacity-wrap" *ngIf="detail.storageTypeShow.dorado&&detail.totalEffectiveCapacity===null">
+                    <div class="capacity-wrap" *ngIf="detail.storageTypeShow.dorado&&detail.totalEffectiveCapacity===0.0">
                       <span class="capacity-label">{{'storage.detail.cap.usableCapacity' | translate}}</span>
                       <div class="num-bar_outer">
                         <div class="num-bar_inner"></div>
