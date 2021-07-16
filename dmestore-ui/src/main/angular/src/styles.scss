@@ -375,3 +375,22 @@ clr-dg-cell.datagrid-cell{
   padding-top: .21rem;
   padding-left: .41rem;
 }
+
+
+
+.unMount-tips{
+  .modal-dialog.ng-trigger.ng-trigger-fadeDown.modal-sm{
+    height: 237px;
+    overflow: hidden;
+    display: flex;
+    .modal-content-wrapper{
+      flex:1;
+      .modal-content{
+        height: 100%;
+        .modal-body{
+          min-height: unset;
+        }
+      }
+    }
+  }
+}
