@@ -6274,7 +6274,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             LOG.error("scan datastore error");
         }
         List<Map<String, String>> mountedLst = vcsdkUtils.getHostsByDsObjectIdNew(ToolUtils.getStr(params.get(DATASTORE_OBJECT_IDS)), true);
-        LOG.info(gson.toJson(mountedLst));
+        LOG.info("check mounted result:" + gson.toJson(mountedLst));
         List<String> lstIps = new ArrayList<>();
         if (!CollectionUtils.isEmpty(mountedLst)){
             for (Map<String, String> hostinfo : mountedLst){
