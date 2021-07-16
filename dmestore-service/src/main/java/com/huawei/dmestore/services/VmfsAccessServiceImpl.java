@@ -2347,10 +2347,16 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         String clusterObjId = "";
         List<String> volumeIds = new ArrayList<>();
         Map<String, String> volumeIdToStoreName = new HashMap<>();
+        List<String> errorStoreName = new ArrayList<>();
+        //计数操作对象数量
+        int count = 0;
+        //失败对象计数
+        int failCount = 0;
         // 获取存储对应的卷Id并过滤绑掉虚拟机的存储
         try {
             if (null != params && null != params.get(DATASTORE_OBJECT_IDS)) {
                 dataStoreObjectIds = (List<String>) params.get(DATASTORE_OBJECT_IDS);
+                count = dataStoreObjectIds.size();
                 if (dataStoreObjectIds.size() > 0) {
                     List<String> dataStoreNames = new ArrayList<>();
                     List<Map<String, String>> boundVmfs = new ArrayList<>();
@@ -2362,10 +2368,11 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                         }
                         boolean isFoundVm = vcsdkUtils.hasVmOnDatastore(dsObjectId);
                         if (isFoundVm) {
-                            LOG.error("vmfs unmount,the vmfs:{} contain vm,can not unmount!!!", dvr.getStoreName());
+                            LOG.error("the vmfs {} contain vm,can not unmount!!!", dvr.getStoreName());
                             Map<String, String> boundedMap = new HashMap<>();
                             boundedMap.put(dvr.getStoreName(),"vCenter error:the vmfs contain vm,can not unmount!");
                             boundVmfs.add(boundedMap);
+                            failCount++;
                             continue;
                         }
                         if (dvr != null) {
@@ -2421,6 +2428,8 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                             Map<String, String> vcError = vcsdkUtils.unmountVmfsOnHost(gson.toJson(dsmap), hostObjIds);
                             if (!CollectionUtils.isEmpty(vcError)) {
                                 vcErrors.add(vcError);
+                                errorStoreName.add(dataStoreName);
+                                failCount++;
                             }
                         }
                     }
@@ -2463,6 +2472,11 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                     if (taskDetailInfoNew != null && taskDetailInfoNew.getStatus() != 3) {
                         // 任务部分成功/失败 取得Lun名称
                         List<String> name = taskService.getFailNameFromCreateTask(TASKTYPE, taskId, longTaskTimeOut);
+                        for (String name1:name) {
+                            if (!CollectionUtils.isEmpty(errorStoreName)&&!errorStoreName.contains(name1)) {
+                                failCount++;
+                            }
+                        }
                         if (!CollectionUtils.isEmpty(name) && ToolUtils.getStr(params.get("language")).equals(LANGUAGE_CN)) {
                             dmeError.put(name.toString().replace("[", "").replace("]", ""), "DME 错误: " + taskDetailInfoNew.getDetailCn());
                         }
@@ -2477,6 +2491,9 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 if (dmeErrors.size() != 0) {
                     response.put("dmeError", dmeErrors);
                 }
+            }
+            if (count > failCount) {
+                params.put("success", true);
             }
             if (!CollectionUtils.isEmpty(hostObjIds)) {
                 for (String hostId : hostObjIds) {
@@ -3192,10 +3209,8 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         String hostGroupId = ToolUtils.getStr(params.get(HOST_GROUP_ID1));
         Map<String, Object> requestbody = new HashMap<>();
         String url = DmeConstants.HOSTGROUP_REMOVE.replace("{hostgroup_id}", hostGroupId);
-        requestbody.put("sync_to_storage", true);
-        LOG.info("Request the interface to delete the host group,request body:{}", gson.toJson(requestbody));
-        ResponseEntity responseEntity = dmeAccessService.access(url, HttpMethod.DELETE,
-                gson.toJson(requestbody));
+        LOG.info("Request the interface to delete the host group,request url:{}",url);
+        ResponseEntity responseEntity = dmeAccessService.access(url, HttpMethod.DELETE, null);
         LOG.info("Delete host group interface response data:{}", responseEntity +""+responseEntity.getStatusCode());
         return responseEntity;
     }
