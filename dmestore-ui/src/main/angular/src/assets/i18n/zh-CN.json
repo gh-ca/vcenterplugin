@@ -956,10 +956,14 @@
     "createFail": "创建失败：",
     "deleteFail": "删除失败：",
     "unmountFail": "卸载失败：",
+    "mountFail": "挂载失败：",
+    "mountPartSuccess": "挂载部分成功：",
     "unmountPartSuccess": "卸载部分成功：",
     "createPartSuccess": "创建部分成功：",
     "host": "主机",
     "reason": "原因",
-    "storage": "存储"
+    "storage": "存储",
+    "currentState": "状态",
+    "mountFailState": "挂载失败"
   }
 }
