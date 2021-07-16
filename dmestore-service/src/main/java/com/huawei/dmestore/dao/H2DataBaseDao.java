@@ -38,7 +38,6 @@ public class H2DataBaseDao {
 
     private static final String DB_FILE_SUFFIX = ".mv.db";
 
-    private static final String USER = "sa";
 
     private String url;
 
@@ -54,7 +53,7 @@ public class H2DataBaseDao {
         Connection con = null;
         try {
             Class.forName("org.h2.Driver");
-            con = DriverManager.getConnection(url, USER, "");
+            con = DriverManager.getConnection(url);
         } catch (SQLException e) {
             throw new DataBaseException(e.getMessage());
         } catch (ClassNotFoundException e) {

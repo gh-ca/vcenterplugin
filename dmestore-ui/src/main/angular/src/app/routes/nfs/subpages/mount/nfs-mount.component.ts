@@ -1,20 +1,21 @@
-import {ChangeDetectorRef, Component, OnInit} from "@angular/core";
-import {GlobalsService} from "../../../../shared/globals.service";
-import {DataStore, Mount, NfsMountService, Vmkernel} from "./nfs-mount.service";
-import {ActivatedRoute, Router} from "@angular/router";
-import {Host} from "../../nfs.service";
-import {LogicPort} from "../../../storage/storage.service";
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { GlobalsService } from '../../../../shared/globals.service';
+import { DataStore, Mount, NfsMountService, Vmkernel } from './nfs-mount.service';
+import { ActivatedRoute, Router } from '@angular/router';
+import { Host } from '../../nfs.service';
+import { LogicPort } from '../../../storage/storage.service';
+import {isMockData} from "../../../../../mock/mock";
 
 @Component({
   selector: 'app-mount',
   templateUrl: './nfs-mount.component.html',
   styleUrls: ['./nfs-mount.component.scss'],
-  providers: [NfsMountService]
+  providers: [NfsMountService],
 })
-export class NfsMountComponent implements OnInit{
+export class NfsMountComponent implements OnInit {
   viewPage: string;
   mountObj = '1';
-  objectId:string;
+  objectId: string;
   mountForm = new Mount();
   hostList: Host[] = [];
   dsObjectId: string;
@@ -22,148 +23,249 @@ export class NfsMountComponent implements OnInit{
   routePath: string;
   rowSelected = []; // 当前选中数据
   dataStoreList: DataStore[];
-  pluginFlag: string;//来至插件的标记
-  errorMsg:string;
+  pluginFlag: string; //来至插件的标记
+  errorMsg: string;
   modalLoading = false; // 数据加载loading
   modalHandleLoading = false; // 数据处理loading
   logicPorts: LogicPort[] = [];
-  vmkernelList: Vmkernel[]=[];
+  vmkernelList: Vmkernel[] = [];
   mountSuccessShow = false; // 挂载成功窗口
-  constructor(private mountService: NfsMountService, private cdr: ChangeDetectorRef,
-              private gs: GlobalsService,
-              private activatedRoute: ActivatedRoute,private router:Router){
-  }
+  // 设备类型 host 主机、cluster 集群
+  dataType;
+
+  constructor(
+    private mountService: NfsMountService,
+    private cdr: ChangeDetectorRef,
+    private gs: GlobalsService,
+    private activatedRoute: ActivatedRoute,
+    private router: Router
+  ) {}
+
   ngOnInit(): void {
-    this.modalHandleLoading=true;
+    this.modalHandleLoading = true;
     this.activatedRoute.url.subscribe(url => {
-      this.routePath=url[0].path;
+      this.routePath = url[0].path;
+      this.dataType=url[0].path;
     });
-    if ("dataStore"===this.routePath){
+
+    if ('dataStore' === this.routePath) {
       //入口是DataSource
-      this.viewPage='mount_plugin'
+      this.viewPage = 'mount_plugin';
       this.activatedRoute.queryParams.subscribe(queryParam => {
         this.dsObjectId = queryParam.objectId;
-        this.mountForm.dataStoreObjectId=queryParam.objectId;
-        this.pluginFlag =queryParam.flag;
+        this.mountForm.dataStoreObjectId = queryParam.objectId;
+        this.pluginFlag = queryParam.flag;
       });
-      if(this.pluginFlag==null){
+
+      if (this.pluginFlag == null) {
         //入口来至Vcenter
         const ctx = this.gs.getClientSdk().app.getContextObjects();
-        if(ctx!=null){
-          this.dsObjectId=ctx[0].id;
-          this.mountForm.dataStoreObjectId=ctx[0].id;
+        if (ctx != null) {
+          this.dsObjectId = ctx[0].id;
+          this.mountForm.dataStoreObjectId = ctx[0].id;
         }
-        this.viewPage='mount_dataStore'
+        this.viewPage = 'mount_dataStore';
       }
-      if (this.dsObjectId!=null && this.dsObjectId!=''){
+      if (this.dsObjectId != null && this.dsObjectId != '') {
         this.initHostAndClusterList();
-        this.getLogicPortByDsId(this.dsObjectId)
+        this.getLogicPortByDsId(this.dsObjectId);
       }
-      this.modalHandleLoading=false;
-    }else{
+      this.modalHandleLoading = false;
+    } else {
       //入口是主机或者集群
-      if ('host'===this.routePath || 'cluster'===this.routePath){
-        this.viewPage='mount_host';
+      if ('host' === this.routePath || 'cluster' === this.routePath) {
+        this.viewPage = 'mount_host';
         const ctx = this.gs.getClientSdk().app.getContextObjects();
-        if(ctx!=null){
-          this.hostObjectId=ctx[0].id;
-          this.getDataStoreList(this.hostObjectId);
-          this.getVmkernelListByObjectId(this.hostObjectId);
-          this.mountForm.hostObjectId=this.hostObjectId;
+        if (ctx != null) {
+          this.hostObjectId = ctx[0].id;
+          if (this.dataType==='host'){
+            this.getDataStoreList(this.hostObjectId);
+          }else {
+            this.getDataStoreListByCluster(this.hostObjectId)
+          }
+          // this.getVmkernelListByObjectId(this.hostObjectId);
+          this.mountForm.hostObjectId = this.hostObjectId;
         }
-        this.modalHandleLoading=false;
+        this.modalHandleLoading = false;
       }
-      this.modalHandleLoading=false;
+      this.modalHandleLoading = false;
     }
     this.cdr.detectChanges();
   }
-  checkHost(){
-    this.modalHandleLoading=true;
+  checkHost() {
+    this.modalHandleLoading = true;
     //选择主机后获取虚拟网卡
     this.getVmkernelListByObjectId(this.mountForm.hostObjectId);
   }
-  initHostAndClusterList(){
+  checkDatastoreHost(){
+    this.modalHandleLoading=true
+    //选择存储后获取网卡
+    this.getVmkernelListByObjectId(this.mountForm.hostObjectId,this.mountForm.dataStoreObjectId)
+  }
+  initHostAndClusterList() {
     this.mountService.getHostListByObjectId(this.dsObjectId).subscribe((r: any) => {
-      if (r.code === '200'){
+      if (r.code === '200') {
         this.hostList = r.data;
         this.cdr.detectChanges();
-        this.modalHandleLoading=false;
+        this.modalHandleLoading = false;
       }
     });
   }
-  getDataStoreList(hostObjectId: string){
-    this.dataStoreList=null;
-      this.mountService.getDatastoreListByHostObjectId(hostObjectId, "NFS").subscribe((r: any)=>{
-        if (r.code==='200'){
-          this.dataStoreList=r.data;
+  getDataStoreList(hostObjectId: string) {
+    this.dataStoreList = null;
+    this.mountService.getDatastoreListByHostObjectId(hostObjectId, 'NFS').subscribe((r: any) => {
+      if (isMockData){
+        this.dataStoreList=[
+          {
+            "freeSpace":"1.2050781",
+            "name":"zg707_2V",
+            "id":"datastore-18784",
+            "type":"NfS",
+            "objectId":"urn:vmomi:Datastore:datastore-18784:674908e5-ab21-4079-9cb1-596358ee5dd1",
+            "status":"true",
+            "capacity":"1.75"
+          },
+          {
+            "freeSpace":"1.2050781",
+            "name":"zg705_0",
+            "id":"datastore-18768",
+            "type":"NfS",
+            "objectId":"urn:vmomi:Datastore:datastore-18768:674908e5-ab21-4079-9cb1-596358ee5dd1",
+            "status":"true",
+            "capacity":"1.75"
+          }
+        ]
+      }else {
+        if (r.code === '200') {
+          this.dataStoreList = r.data;
         }
-      });
+      }
+
+    });
 
     this.cdr.detectChanges();
   }
-  getLogicPortByDsId(storagId: string){
+  //集群获取存储列表
+  getDataStoreListByCluster(clusterObjectId:string){
+    this.dataStoreList=null;
+    this.mountService.getDatastoreListByClusterObjectId(clusterObjectId,'NFS').subscribe((r:any)=>{
+      if (isMockData){
+        this.dataStoreList=[
+          {
+            "freeSpace":"1.2050781",
+            "name":"zg1111",
+            "id":"datastore-18784",
+            "type":"NfS",
+            "objectId":"urn:vmomi:Datastore:datastore-18784:674908e5-ab21-4079-9cb1-596358ee5dd1",
+            "status":"true",
+            "capacity":"1.75"
+          },
+          {
+            "freeSpace":"1.2050781",
+            "name":"zg2222",
+            "id":"datastore-18768",
+            "type":"NfS",
+            "objectId":"urn:vmomi:Datastore:datastore-18768:674908e5-ab21-4079-9cb1-596358ee5dd1",
+            "status":"true",
+            "capacity":"1.75"
+          }
+        ]
+      }else {
+        if (r.code === '200') {
+          this.dataStoreList = r.data;
+        }
+      }
+    });
+    this.cdr.detectChanges();
+  }
+  getLogicPortByDsId(storagId: string) {
     // 选择存储后逻辑端口
-    this.modalHandleLoading=true;
-    this.mountService.getLogicPortListByStorageId(storagId)
-      .subscribe((r: any) => {
-        this.modalHandleLoading=false;
-        if (r.code === '200'){
-          this.logicPorts = r.data;
-          this.cdr.detectChanges();
-        }
-      });
+    this.modalHandleLoading = true;
+    this.mountService.getLogicPortListByStorageId(storagId, false).subscribe((r: any) => {
+      this.modalHandleLoading = false;
+      if (r.code === '200') {
+        this.logicPorts = r.data;
+        this.cdr.detectChanges();
+      }
+    });
   }
-  getVmkernelListByObjectId(hostObjectId:string){
-    this.mountService.getVmkernelListByObjectId(hostObjectId)
-      .subscribe((r: any) => {
-        this.modalHandleLoading=false;
-        if (r.code === '200'){
-          this.vmkernelList = r.data;
-          this.cdr.detectChanges();
-        }
-      });
+  getVmkernelListByObjectId(hostObjectId: string,datastoreObjectId:string='') {
+    this.mountService.getVmkernelListByObjectId(hostObjectId,datastoreObjectId).subscribe((r: any) => {
+      this.modalHandleLoading = false;
+      if (r.code === '200') {
+        this.vmkernelList = r.data;
+        this.cdr.detectChanges();
+      }
+    });
   }
-  mountSubmit(){
-    this.modalHandleLoading=true;
+  //当前页面为主机或集群挂载Nfs时  获取当前选择的虚拟网卡Ip对应的hostObjectId
+  checkHostObjectId(){
+      if(this.viewPage==='mount_host'){
+        for (let item of this.vmkernelList){
+          if (item.ipAddress===this.mountForm.hostVkernelIp){
+            this.mountForm.hostObjectId=item.hostObjectId
+          }
+        }
+      }
+  }
+  mountSubmit() {
+    this.modalHandleLoading = true;
     this.mountService.mountNfs(this.mountForm).subscribe((result: any) => {
-      this.modalHandleLoading=false;
-      if (result.code  ===  '200'){
+      this.modalHandleLoading = false;
+      if (result.code === '200') {
         this.mountForm = new Mount();
         this.mountSuccessShow = true;
-      }else{
-        console.log('mount failed:',result.description);
-        this.errorMsg='1';
+      } else {
+        console.log('mount failed:', result.description);
+        this.errorMsg = '1';
       }
       this.cdr.detectChanges();
     });
   }
-  backToNfsList(){
-    this.modalHandleLoading=false;
-    this.errorMsg=null;
+  backToNfsList() {
+    this.modalHandleLoading = false;
+    this.errorMsg = null;
     this.router.navigate(['nfs']);
   }
-  closeModel(){
-    this.errorMsg=null;
+  closeModel() {
+    this.errorMsg = null;
     this.gs.getClientSdk().modal.close();
-    this.modalHandleLoading=false;
+    this.modalHandleLoading = false;
   }
-  formatCapacity(c: number){
-    if (c < 1024){
-      return c.toFixed(3)+" GB";
-    }else if(c >= 1024 && c< 1048576){
-      return (c/1024).toFixed(3) +" TB";
-    }else if(c>= 1048576){
-      return (c/1024/1024).toFixed(3)+" PB"
+  formatCapacity(c: number) {
+    if (c < 1024) {
+      return c.toFixed(3) + ' GB';
+    } else if (c >= 1024 && c < 1048576) {
+      return (c / 1024).toFixed(3) + ' TB';
+    } else if (c >= 1048576) {
+      return (c / 1024 / 1024).toFixed(3) + ' PB';
     }
   }
   /**
    * 确认操作结果并关闭窗口
    */
   confirmActResult() {
-    if (this.pluginFlag=='plugin'){
+    if (this.pluginFlag == 'plugin') {
       this.backToNfsList();
-    }else {
+    } else {
       this.closeModel();
+    }
+  }
+//  控制button是否可选 list和存储
+  changeButtonAttrDatastore(){
+    if (this.mountForm.hostObjectId&&this.mountForm.hostVkernelIp&&this.mountForm.mountType){
+      return false
+    }else {
+      return true
+    }
+  }
+
+  //控制button是否可选  主机和集群
+  changeButtonAttrHostOrCluster(){
+    if(this.mountForm.hostVkernelIp&&this.mountForm.dataStoreObjectId&&this.mountForm.mountType){
+      return false
+    }else {
+      return  true
     }
   }
 }

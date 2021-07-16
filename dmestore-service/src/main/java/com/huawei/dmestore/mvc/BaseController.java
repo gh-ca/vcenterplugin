@@ -37,6 +37,8 @@ public class BaseController {
 
     protected static final String CODE_SUCCESS = "200";
 
+    protected static final String CODE_PARTIALSUCCESS = "206";
+
     protected static final String CODE_ALL_FAILURE = "-100001";
 
     protected static final String CODE_NOTALL_FAILURE = "-100000";
@@ -155,7 +157,7 @@ public class BaseController {
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.OK)
     protected Map<String, Object> handleException(final Exception exception, final HttpServletRequest request) {
-        LOGGER.error("System Exception!{}", new Gson().toJson(exception));
+        LOGGER.error("System Exception!{}", exception);
         return generateError(request, CODE_FAILURE, exception.getMessage(), null);
     }
 
@@ -240,7 +242,19 @@ public class BaseController {
         bodyBean.setDescription(description);
         return bodyBean;
     }
-
+    /**
+     * success
+     *
+     * @param data data
+     * @param description description
+     * @return ResponseBodyBean
+     */
+    protected ResponseBodyBean partialSuccess(Object data, String description) {
+        ResponseBodyBean bodyBean = new ResponseBodyBean(CODE_PARTIALSUCCESS, null, null);
+        bodyBean.setData(data);
+        bodyBean.setDescription(description);
+        return bodyBean;
+    }
     /**
      * failure
      *

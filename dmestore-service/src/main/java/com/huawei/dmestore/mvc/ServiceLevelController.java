@@ -1,10 +1,7 @@
 package com.huawei.dmestore.mvc;
 
 import com.huawei.dmestore.exception.DmeException;
-import com.huawei.dmestore.model.DmeDatasetsQueryResponse;
-import com.huawei.dmestore.model.ResponseBodyBean;
-import com.huawei.dmestore.model.StoragePool;
-import com.huawei.dmestore.model.Volume;
+import com.huawei.dmestore.model.*;
 import com.huawei.dmestore.services.ServiceLevelService;
 
 import org.slf4j.Logger;
@@ -16,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -47,6 +45,21 @@ public class ServiceLevelController extends BaseController {
     public ResponseBodyBean listServiceLevel(@RequestBody Map<String, Object> params) {
         try {
             return success(serviceLevelService.listServiceLevel(params));
+        } catch (DmeException e) {
+            return failure(e.getMessage());
+        }
+    }
+
+    /**
+     * listServiceLevel
+     *
+     * @param dataStoreId dataStoreId
+     * @return ResponseBodyBean
+     */
+    @RequestMapping(value = "/listservicelevelByVmfs", method = RequestMethod.GET)
+    public ResponseBodyBean listServiceLevelByVmfs(@RequestParam String dataStoreId) {
+        try {
+            return success(serviceLevelService.listServiceLevelByVmfs(dataStoreId));
         } catch (DmeException e) {
             return failure(e.getMessage());
         }
@@ -181,6 +194,7 @@ public class ServiceLevelController extends BaseController {
         responseBodyBean.setDatas(responseBodyBean.getDatas()
             .stream()
             .filter(item -> item.getTierNativeId().equals(serviceLevelId))
+            .sorted(Comparator.comparing(DmeDatasetBean::getTimestamp))
             .collect(Collectors.toList()));
     }
 

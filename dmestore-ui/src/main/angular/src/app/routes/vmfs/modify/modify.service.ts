@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 
 @Injectable()
 export class ModifyService {
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   /**
    * 修改VMFS
@@ -11,7 +11,7 @@ export class ModifyService {
    * @param params
    */
   updateVmfs(volumeId: string, params = {}) {
-    return  this.http.put('operatevmfs/updatevmfs?volumeId=' + volumeId, params);
+    return this.http.put('operatevmfs/updatevmfs?volumeId=' + volumeId, params);
   }
 
   /**
@@ -19,12 +19,12 @@ export class ModifyService {
    * @param objectId
    */
   getVmfsById(objectId) {
-    return this.http.get('accessvmfs/queryvmfs?dataStoreObjectId='+objectId);
+    return this.http.get('accessvmfs/queryvmfs?dataStoreObjectId=' + objectId);
   }
 
   // 附列表数据
-  getChartData(volumeIds: string[] ) {
-    return this.http.get('accessvmfs/listvmfsperformance', {params: {volumeIds}});
+  getChartData(volumeIds: string[]) {
+    return this.http.get('accessvmfs/listvmfsperformance', { params: { volumeIds } });
   }
 
   /**
@@ -32,7 +32,7 @@ export class ModifyService {
    * @param name
    */
   checkVmfsName(name: string) {
-    return this.http.get('accessvmfs/querydatastorebyname', {params: {name}});
+    return this.http.get('accessvmfs/querydatastorebyname', { params: { name } });
   }
 
   /**
@@ -40,16 +40,17 @@ export class ModifyService {
    * @param volName
    */
   checkVolName(volName: string) {
-    return this.http.get('dmestorage/queryvolumebyname', {params: {name:volName}});
+    return this.http.get('dmestorage/queryvolumebyname', { params: { name: volName } });
   }
-  getStorageDetail(storageId: string){
-    return this.http.get('dmestorage/storage', {params: {storageId}});
+  
+  getStorageDetail(storageId: string) {
+    return this.http.get('dmestorage/storage', { params: { storageId } });
   }
   /**
    * 通过objectId 获取vmfs存储数据
    * @param objectId
    */
-  getStorageById(objectId:string) {
-    return this.http.get('accessvmware/relation?datastoreObjectId='+objectId);
+  getStorageById(objectId: string) {
+    return this.http.get('accessvmware/relation?datastoreObjectId=' + objectId);
   }
 }

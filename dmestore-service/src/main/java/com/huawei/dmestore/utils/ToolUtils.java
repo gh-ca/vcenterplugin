@@ -4,14 +4,18 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.vmware.vim25.VirtualMachineFileInfo;
+
 import com.huawei.dmestore.exception.DmeException;
 import com.huawei.dmestore.model.StorageTypeShow;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import jdk.internal.dynalink.beans.StaticClass;
 
 /**
  * ToolUtils
@@ -22,11 +26,19 @@ import java.util.*;
 public class ToolUtils {
     public static final String STORE_TYPE_NFS = "NFS";
 
+    public static final String STORE_TYPE_NFS41 = "NFS41";
+
     public static final String STORE_TYPE_ALL = "ALL";
 
     public static final int GI = 1024 * 1024 * 1024;
 
     public static final int MB = 1024 * 1024;
+
+    //vmfs分区位置
+    public static final String CURRENT_END_SECTOR = "currentEndSector";
+    public static final String TOTAL_END_SECTOR = "totalEndSector";
+    //storage device format type 512n  后期有其他类型，可以灵活更换
+    public static final int DISK_SECTOR_SIZE = 512;
 
     private static final Logger LOG = LoggerFactory.getLogger(ToolUtils.class);
 
@@ -440,5 +452,51 @@ public class ToolUtils {
         String substring1 = var1.replace("-", "").substring(0, 8);
         String substring2 = var1.replace("-", "").substring(var1.length() - 1 - 8, var1.length() - 1);
         System.out.println(substring1 + substring2);
+    }
+
+    public static String handleString (VirtualMachineFileInfo var) {
+        String subVmPathName = Arrays.stream(var.getVmPathName().split(" ")).findFirst().get();
+        return subVmPathName.substring(1, subVmPathName.length() - 1);
+    }
+    //修改从json转为浮点型的方法
+    public static Float jsonToFloat2(JsonElement obj) {
+        Float re = null;
+        try {
+            if (!StringUtils.isEmpty(obj) && !obj.isJsonNull()) {
+                re = obj.getAsFloat();
+            }
+        } catch (IllegalStateException e) {
+            LOG.error("jsonToFloat2 error:{}", e.toString());
+        }
+        return re;
+    }
+    /**
+     * @Description: 处理从接口接受的时间的格式
+     * @Param dateValue
+     * @return Date
+     * @author yc
+     * @Date 2021/6/3 9:50
+     */
+    public static Date getDate(String dateValue) {
+        //处理传入的时间字符串对多余的”“
+        String dateStr = null;
+        if (!StringUtils.isEmpty(dateValue) && dateValue.startsWith("\"") && dateValue.endsWith(("\""))){
+            dateStr = dateValue.substring(1, dateValue.length() - 1);
+        }
+        if(dateStr.contains("T")) {
+            dateStr = dateStr.replace("T"," ");
+        }
+        Date date = null;
+
+        if (StringUtils.isEmpty(dateStr)){
+            return date;
+        }
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSSSSS");
+        try {
+            date = sdf.parse(dateStr);
+        } catch (ParseException e) {
+            LOG.error("getDate error:{}", e.toString());
+        }
+        return date;
     }
 }

@@ -8,8 +8,17 @@ import com.huawei.dmestore.model.BestPracticeUpResultResponse;
 
 import org.springframework.util.StringUtils;
 
-import java.io.*;
-import java.sql.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.Reader;
+import java.io.StringReader;
+import java.sql.Clob;
+import java.sql.Connection;
+import java.sql.Date;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -26,10 +35,17 @@ public class BestPracticeCheckDao extends H2DataBaseDao {
 
     private static final String HOST_ID = "HOST_ID";
 
-    private static final int MINUS_ONE = -1;
+    private static final int PARAMETER_INDEX_1 = 1;
+
+    private static final int PARAMETER_INDEX_2 = 2;
 
     private static final int COLLECTIONS_DEFAULT_LEN = 16;
 
+    /**
+     * save
+     *
+     * @param list list
+     */
     public void save(List<BestPracticeBean> list) {
         Connection con = null;
         PreparedStatement pstm = null;
@@ -56,6 +72,7 @@ public class BestPracticeCheckDao extends H2DataBaseDao {
             pstm.executeBatch();
             con.commit();
         } catch (SQLException ex) {
+            LOGGER.error("save bestPracticeBean error!errMsg={}", ex.getMessage());
             try {
                 // 回滚
                 con.rollback();
@@ -67,6 +84,13 @@ public class BestPracticeCheckDao extends H2DataBaseDao {
         }
     }
 
+    /**
+     * getHostNameByHostsetting
+     *
+     * @param hostSetting hostSetting
+     * @return List
+     * @throws SQLException SQLException
+     */
     public List<String> getHostNameByHostsetting(String hostSetting) throws SQLException {
         List<String> lists = new ArrayList<>();
         Connection con = null;
@@ -92,6 +116,14 @@ public class BestPracticeCheckDao extends H2DataBaseDao {
         return lists;
     }
 
+    /**
+     * getAllHostIds
+     *
+     * @param pageNo pageNo
+     * @param pageSize pageSize
+     * @return Map
+     * @throws SQLException SQLException
+     */
     public Map<String, String> getAllHostIds(int pageNo, int pageSize) throws SQLException {
         Map<String, String> map = new HashMap<>(COLLECTIONS_DEFAULT_LEN);
         Connection con = null;
@@ -118,6 +150,13 @@ public class BestPracticeCheckDao extends H2DataBaseDao {
         return map;
     }
 
+    /**
+     * getByHostIds
+     *
+     * @param ids ids
+     * @return Map
+     * @throws SQLException SQLException
+     */
     public Map<String, String> getByHostIds(List<String> ids) throws SQLException {
         Map<String, String> map = new HashMap<>(COLLECTIONS_DEFAULT_LEN);
         if (ids == null || ids.size() == 0) {
@@ -154,6 +193,15 @@ public class BestPracticeCheckDao extends H2DataBaseDao {
         return map;
     }
 
+    /**
+     * getRecordByPage
+     *
+     * @param hostSetting hostSetting
+     * @param pageNo pageNo
+     * @param pageSize pageSize
+     * @return List
+     * @throws SQLException SQLException
+     */
     public List<BestPracticeBean> getRecordByPage(String hostSetting, int pageNo, int pageSize) throws SQLException {
         int offset = (pageNo - 1) * pageSize;
         List<BestPracticeBean> lists = new ArrayList<>();
@@ -189,7 +237,15 @@ public class BestPracticeCheckDao extends H2DataBaseDao {
         return lists;
     }
 
-    public List<BestPracticeBean> getRecordBeanByHostsetting(String hostSetting) throws SQLException {
+    /**
+     * getRecordBeanByHostsetting
+     *
+     * @param hostSetting hostSetting
+     * @param id id
+     * @return List
+     * @throws SQLException SQLException
+     */
+    public List<BestPracticeBean> getRecordBeanByHostsetting(String hostSetting, String id) throws SQLException {
         List<BestPracticeBean> lists = new ArrayList<>();
         Connection con = null;
         PreparedStatement ps = null;
@@ -200,9 +256,16 @@ public class BestPracticeCheckDao extends H2DataBaseDao {
                 + "AUTO_REPAIR from DP_DME_BEST_PRACTICE_CHECK where 1=1 ";
             if (!StringUtils.isEmpty(hostSetting)) {
                 sql = sql + " and HOST_SETTING=?";
+                boolean isId = !StringUtils.isEmpty(id);
+                if (isId) {
+                    sql = sql + " and HOST_ID=?";
+                }
                 ps = con.prepareStatement(sql);
-                ps.setString(1, hostSetting);
-            }else {
+                ps.setString(PARAMETER_INDEX_1, hostSetting);
+                if (isId) {
+                    ps.setString(PARAMETER_INDEX_2, id);
+                }
+            } else {
                 ps = con.prepareStatement(sql);
             }
             rs = ps.executeQuery();
@@ -229,7 +292,7 @@ public class BestPracticeCheckDao extends H2DataBaseDao {
             String acturalValue = clobToString(rs.getClob("ACTUAL_VALUE"));
             bean.setActualValue(acturalValue);
         } catch (IOException e) {
-
+            LOGGER.error(e.getMessage());
         }
         bean.setLevel(rs.getString("HINT_LEVEL"));
         bean.setNeedReboot(rs.getString("NEED_REBOOT"));
@@ -237,15 +300,23 @@ public class BestPracticeCheckDao extends H2DataBaseDao {
         return bean;
     }
 
+    /**
+     * clobToString
+     *
+     * @param clob clob
+     * @return String
+     * @throws SQLException SQLException
+     * @throws IOException IOException
+     */
     public String clobToString(Clob clob) throws SQLException, IOException {
         String reString = "";
         Reader is = clob.getCharacterStream();
         BufferedReader br = new BufferedReader(is);
-        String s = br.readLine();
+        String str = br.readLine();
         StringBuffer sb = new StringBuffer();
-        while (s != null) {
-            sb.append(s);
-            s = br.readLine();
+        while (str != null) {
+            sb.append(str);
+            str = br.readLine();
         }
         reString = sb.toString();
         if (br != null) {
@@ -257,6 +328,11 @@ public class BestPracticeCheckDao extends H2DataBaseDao {
         return reString;
     }
 
+    /**
+     * deleteBy
+     *
+     * @param list list
+     */
     public void deleteBy(List<BestPracticeUpResultResponse> list) {
         if (list == null || list.size() == 0) {
             return;
@@ -293,6 +369,11 @@ public class BestPracticeCheckDao extends H2DataBaseDao {
         }
     }
 
+    /**
+     * deleteByHostIds
+     *
+     * @param ids ids
+     */
     public void deleteByHostIds(List<String> ids) {
         if (ids == null || ids.size() == 0) {
             return;
@@ -323,6 +404,12 @@ public class BestPracticeCheckDao extends H2DataBaseDao {
         }
     }
 
+    /**
+     * deleteByHostNameAndHostsetting
+     *
+     * @param list list
+     * @param hostSetting hostSetting
+     */
     public void deleteByHostNameAndHostsetting(List<String> list, String hostSetting) {
         if (list == null || list.size() == 0) {
             return;
@@ -354,6 +441,11 @@ public class BestPracticeCheckDao extends H2DataBaseDao {
         }
     }
 
+    /**
+     * update
+     *
+     * @param list list
+     */
     public void update(List<BestPracticeBean> list) {
         Connection con = null;
         PreparedStatement pstm = null;

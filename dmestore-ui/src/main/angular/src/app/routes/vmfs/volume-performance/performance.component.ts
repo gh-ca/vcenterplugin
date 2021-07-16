@@ -1,32 +1,34 @@
-import {Component, NgZone, OnInit, ChangeDetectorRef} from '@angular/core';
+import { Component, NgZone, OnInit, ChangeDetectorRef } from '@angular/core';
 import { EChartOption } from 'echarts';
 import { VmfsPerformanceService } from './performance.service';
-import {NfsService, MakePerformance} from "../../nfs/nfs.service";
-import {VolumeInfo} from "../volume-attribute/attribute.service";
-import {FormControl, FormGroup} from "@angular/forms";
-import {GlobalsService} from "@shared/globals.service";
-import {TranslatePipe} from "@ngx-translate/core";
+import { NfsService, MakePerformance } from '../../nfs/nfs.service';
+import { VolumeInfo } from '../volume-attribute/attribute.service';
+import { FormControl, FormGroup } from '@angular/forms';
+import { GlobalsService } from '@shared/globals.service';
+import { TranslatePipe } from '@ngx-translate/core';
+import { CommonService } from './../../common.service';
 
 @Component({
   selector: 'app-performance',
   templateUrl: './performance.component.html',
   styleUrls: ['./performance.component.scss'],
-  providers: [VmfsPerformanceService, MakePerformance, NfsService, TranslatePipe],
+  providers: [CommonService, VmfsPerformanceService, MakePerformance, NfsService, TranslatePipe],
 })
-export class PerformanceComponent implements OnInit{
-
+export class PerformanceComponent implements OnInit {
   rangeTime = new FormGroup({
     start: new FormControl(),
-    end: new FormControl()
+    end: new FormControl(),
   });
   // 创建表格对象
   // IOPS+QoS上下限
   iopsChart: EChartOption = {};
+  iopsChartDataIsNull = false;
   // 带宽+QoS上下限
   bandwidthChart: EChartOption = {};
+  bandwidthChartDataIsNull = false;
   // 响应时间+QoS下限
   latencyChart: EChartOption = {};
-
+  latencyChartDataIsNull = false;
   // obj_type_id  (卷类型ID)
   objTypeId;
   // indicator_ids 获取参数指标（上下限等） 0 上限 1下限
@@ -59,18 +61,8 @@ export class PerformanceComponent implements OnInit{
   // 卷名称集合
   volNames: string[] = [];
 
-  // ranges
-  ranges = [
-    {key: 'LAST_5_MINUTE', value: this.translatePipe.transform('chart.select.last5Minute')},
-    {key: 'LAST_1_HOUR', value: this.translatePipe.transform('chart.select.last1Hour')},
-    {key: 'LAST_1_DAY', value: this.translatePipe.transform('chart.select.last1Day')},
-    {key: 'LAST_1_WEEK', value: this.translatePipe.transform('chart.select.last1Week')},
-    {key: 'LAST_1_MONTH', value: this.translatePipe.transform('chart.select.last1Month')},
-    {key: 'LAST_1_QUARTER', value: this.translatePipe.transform('chart.select.last1Quarter')},
-    {key: 'HALF_1_YEAR', value: this.translatePipe.transform('chart.select.half1Year')},
-    {key: 'LAST_1_YEAR', value: this.translatePipe.transform('chart.select.last1Year')},
-    {key: 'INVALID', value: this.translatePipe.transform('chart.select.invalid')},
-  ];
+  /* DTS202103270EB3F3P0G00 */
+  timeSelectorRanges = [];
   // select range
   selectRange;
   // startTime
@@ -79,43 +71,95 @@ export class PerformanceComponent implements OnInit{
   // endTime
   endTime = null;
 
-  constructor(private nfsService: NfsService, private makePerformance: MakePerformance,
-              private perService: VmfsPerformanceService, private ngZone: NgZone,
-              private cdr: ChangeDetectorRef, private gs: GlobalsService, private translatePipe:TranslatePipe) {
+  constructor(
+    private nfsService: NfsService,
+    private makePerformance: MakePerformance,
+    private perService: VmfsPerformanceService,
+    private ngZone: NgZone,
+    private cdr: ChangeDetectorRef,
+    private gs: GlobalsService,
+    private translatePipe: TranslatePipe,
+    private commonService: CommonService
+  ) {
+    /* DTS202103270EB3F3P0G00 */
+    this.timeSelectorRanges = this.commonService.timeSelectorRanges_type2;
   }
-
 
   ngOnInit(): void {
     // 初始化卷信息
     const ctx = this.gs.getClientSdk().app.getContextObjects();
-    // const objectId = 'urn:vmomi:Datastore:datastore-1212:674908e5-ab21-4079-9cb1-596358ee5dd1';
-    const objectId=ctx[0].id;
+    const objectId = ctx
+      ? ctx[0].id
+      : `urn:vmomi:Datastore:datastore-1212:674908e5-ab21-4079-9cb1-596358ee5dd1`;
     this.getVolumeInfoByVolID(objectId);
     this.selectRange = 'LAST_1_DAY';
   }
   // 初始化表格对象
-  initChart() {
-
-    console.log('this.rang', this.range)
-    const volIds:string[] = [];
-    volIds.push(this.selectVolume.wwn);
+  initChart(paramsInfo: typeTimeInfo = {}) {
+    console.log('this.rang', this.range);
+    const volIds: string[] = [];
+    volIds.push(this.selectVolume?.wwn || '1282FFE20AA03E4EAC9A814C687B780A');
     // volIds.push('1282FFE20AA03E4EAC9A814C687B780A');
+
     // IOPS
-    this.makePerformance.setChart(300,this.translatePipe.transform('vmfs.iops'), 'IO/s', NfsService.vmfsIOPS, volIds, this.selectRange, NfsService.vmfsUrl, this.startTime, this.endTime).then(res => {
-      this.iopsChart = res;
-      this.cdr.detectChanges();
-    });
+    this.makePerformance
+      .setChartVmfs(
+        paramsInfo,
+        300,
+        this.translatePipe.transform('vmfs.iops'),
+        'IO/s',
+        NfsService.vmfsIOPS,
+        volIds,
+        this.selectRange,
+        NfsService.vmfsUrl,
+        this.startTime,
+        this.endTime
+      )
+      .then(res => {
+        this.iopsChart = res;
+        this.iopsChartDataIsNull = res['series'][0].data.length < 1;
+        this.cdr.detectChanges();
+      });
 
     // 带宽
-    this.makePerformance.setChart(300,this.translatePipe.transform('vmfs.bandwidth'), 'MB/s', NfsService.vmfsBDWT, volIds, this.selectRange, NfsService.vmfsUrl, this.startTime, this.endTime).then(res => {
-      this.bandwidthChart = res;
-      this.cdr.detectChanges();
-    });
-    // 响应时间
-    this.makePerformance.setChart(300,this.translatePipe.transform('vmfs.latency'), 'ms', NfsService.vmfsLatency, volIds, this.selectRange, NfsService.vmfsUrl, this.startTime, this.endTime).then(res => {
-      this.latencyChart = res;
-      this.cdr.detectChanges();
-    });
+    this.makePerformance
+      .setChartVmfs(
+        paramsInfo,
+        300,
+        this.translatePipe.transform('vmfs.bandwidth'),
+        'MB/s',
+        NfsService.vmfsBDWT,
+        volIds,
+        this.selectRange,
+        NfsService.vmfsUrl,
+        this.startTime,
+        this.endTime
+      )
+      .then(res => {
+        this.bandwidthChart = res;
+        this.bandwidthChartDataIsNull = res['series'][0].data.length < 1;
+        this.cdr.detectChanges();
+      });
+
+    // 响应时间 时延
+    this.makePerformance
+      .setChartVmfs(
+        paramsInfo,
+        300,
+        this.translatePipe.transform('vmfs.latency'),
+        'ms',
+        NfsService.vmfsLatency,
+        volIds,
+        this.selectRange,
+        NfsService.vmfsUrl,
+        this.startTime,
+        this.endTime
+      )
+      .then(res => {
+        this.latencyChart = res;
+        this.latencyChartDataIsNull = res['series'][0].data.length < 1;
+        this.cdr.detectChanges();
+      });
   }
   // 切换卷函数
   changeVolFunc() {
@@ -125,16 +169,24 @@ export class PerformanceComponent implements OnInit{
         console.log('开始结束时间不能为空');
         return;
       }
-    } else { // 初始化开始结束时间
+    } else {
+      // 初始化开始结束时间
       this.startTime = null;
       this.endTime = null;
     }
     if (this.selectRange) {
+      const paramsInfo = this.commonService.getInfoFromTimeRange(this.selectRange);
+      this.startTime = paramsInfo.begin_time || '';
+      this.endTime = paramsInfo.end_time || '';
+
       console.log('this.selectVolName+this.selectRange', this.selectVolName, this.selectRange);
       // 获取已选择的卷
-      this.selectVolume = this.makePerformance.getVolByName(this.selectVolName, this.volumeInfoList);
+      this.selectVolume = this.makePerformance.getVolByName(
+        this.selectVolName,
+        this.volumeInfoList
+      );
       // 请求后台重新加载折线图
-      this.initChart();
+      this.initChart(paramsInfo);
     } else {
       console.log('未选择卷或range');
     }
@@ -144,9 +196,13 @@ export class PerformanceComponent implements OnInit{
    * 开始结束时间触发
    */
   changeDate() {
-    if (!this.rangeTime.controls.start.hasError('matStartDateInvalid')
-      && !this.rangeTime.controls.end.hasError('matEndDateInvalid')
-      && this.rangeTime.controls.start.value !== null && this.rangeTime.controls.end.value !== null) { // 需满足输入规范且不为空
+    if (
+      !this.rangeTime.controls.start.hasError('matStartDateInvalid') &&
+      !this.rangeTime.controls.end.hasError('matEndDateInvalid') &&
+      this.rangeTime.controls.start.value !== null &&
+      this.rangeTime.controls.end.value !== null
+    ) {
+      // 需满足输入规范且不为空
       this.startTime = this.rangeTime.controls.start.value._d.getTime();
       this.endTime = this.rangeTime.controls.end.value._d.getTime();
       console.log('startTime', this.startTime);
@@ -157,7 +213,7 @@ export class PerformanceComponent implements OnInit{
     }
   }
 
-  getVolumeInfoByVolID(objectId: string){
+  getVolumeInfoByVolID(objectId: string) {
     console.log('objectId: ' + objectId);
     this.perService.getData(objectId).subscribe((result: any) => {
       console.log('volumns:', result);
@@ -179,7 +235,7 @@ export class PerformanceComponent implements OnInit{
   }
   // 通过名称获取卷信息
   getVolByName(name): any {
-    const volumeInfo = this.volumeInfoList.filter(item  => item.name === name)[0];
+    const volumeInfo = this.volumeInfoList.filter(item => item.name === name)[0];
     return volumeInfo;
   }
 }

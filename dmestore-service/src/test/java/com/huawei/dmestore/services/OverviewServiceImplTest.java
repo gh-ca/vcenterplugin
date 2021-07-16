@@ -11,6 +11,7 @@ import org.mockito.MockitoAnnotations;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.when;
 
 /**
@@ -66,7 +67,7 @@ public class OverviewServiceImplTest {
         Storage storage = new Storage();
         List<Storage> storages = new ArrayList<>();
         storages.add(storage);
-        when(dmeStorageService.getStorages()).thenReturn(storages);
+        when(dmeStorageService.getStorages(anyString())).thenReturn(storages);
         overviewService.getStorageNum();
     }
 
@@ -115,7 +116,7 @@ public class OverviewServiceImplTest {
         bestPracticeCheckRecordBean.setRecommendValue("321");
         List<BestPracticeCheckRecordBean> bestPracticeCheckRecordBeans = new ArrayList<>();
         bestPracticeCheckRecordBeans.add(bestPracticeCheckRecordBean);
-        when(bestPracticeProcessService.getCheckRecord()).thenReturn(bestPracticeCheckRecordBeans);
+        when(bestPracticeProcessService.getCheckRecord(anyString(), anyString())).thenReturn(bestPracticeCheckRecordBeans);
         overviewService.getBestPracticeViolations();
 
     }

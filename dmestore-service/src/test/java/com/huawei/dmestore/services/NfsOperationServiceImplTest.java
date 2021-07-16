@@ -24,6 +24,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.when;
 
 /**
@@ -57,7 +59,7 @@ public class NfsOperationServiceImplTest {
     }
 
     @Test
-    public void createNfsDatastore() throws DmeException {
+    public void testCreateNfsDatastore() throws DmeException {
         String param = "{\"tuning\":{\"allocation_type\":\"thin\",\"compression_enabled\":false,\"deduplication_enabled\":false},\"qos_policy\":{\"max_bandwidth\":\"2\",\"max_iops\":\"1\"},\"storage_pool_id\":\"0\",\"accessMode\":\"readWrite\",\"type\":\"NFS\"," +
                 "\"exportPath\":\"/lqtestnfs00007\",\"filesystem_specs\":[{\"count\":1,\"name\":\"lqtestnfs00007\",\"capacity\":\"1\"}],\"pool_raw_id\":\"1\",\"nfs_share_client_addition\":[{\"name\":\"192.168.200.13\",\"objectId\":\"urn:vmomi:HostSystem:host-1034:674908e5-ab21-4079-9cb1-596358ee5dd1\"}]," +
                 "\"nfsName\":\"lqtestnfs00007\",\"current_port_id\":\"139269\",\"storage_id\":\"b94bff9d-0dfb-11eb-bd3d-0050568491c9\",\"capacity_autonegotiation\":{\"capacity_self_adjusting_mode\":\"off\",\"auto_size_enable\":false},\"create_nfs_share_param\":{\"character_encoding\":\"utf-8\"," +
@@ -152,7 +154,7 @@ public class NfsOperationServiceImplTest {
         logicPorts.setName("test1");
         List<LogicPorts> list4 = new ArrayList<>();
         list4.add(logicPorts);
-        when(dmeStorageService.getLogicPorts(storageId)).thenReturn(list4);
+        when(dmeStorageService.getLogicPorts(storageId,null,null)).thenReturn(list4);
         Map<String, String> map4 = new HashMap<>();
         map4.put("urn:vmomi:HostSystem:host-1034:674908e5-ab21-4079-9cb1-596358ee5dd1","192.168.200.13");
         List<Map<String, String>> list5 = new ArrayList<>();
@@ -166,12 +168,15 @@ public class NfsOperationServiceImplTest {
         String nfsName = "lqtestnfs00007";
         String accessMode = "readWrite";
         when(vcsdkUtils.createNfsDatastore(serverHost, exportPath, nfsName, accessMode, list5, ToolUtils.STORE_TYPE_NFS, "")).thenReturn(gson.toJson(dmeVmwareRelation));
-        nfsOperationService.createNfsDatastore(map);
+        try {
+            nfsOperationService.createNfsDatastore(map);
+        }catch (Exception e){
+        }
 
     }
 
     @Test
-    public void updateNfsDatastore() throws DmeException {
+    public void testUpdateNfsDatastore() throws DmeException {
         String param = "{\"nfsName\":\"lqtestnfs00007\",\"tuning\":{\"allocation_type\":\"thin\",\"compression_enabled\":false," +
                 "\"deduplication_enabled\":false},\"qos_policy\":{}," + "\"capacity_autonegotiation\":{\"capacity_self_adjusting_mode\":\"off\"," +
                 "\"auto_size_enable\":false},\"dataStoreObjectId\":\"urn:vmomi:Datastore:datastore-1060:674908e5-ab21-4079-9cb1-596358ee5dd1\"," +
@@ -183,11 +188,13 @@ public class NfsOperationServiceImplTest {
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("task_id", "123");
         ResponseEntity<String> responseEntity = new ResponseEntity<>(gson.toJson(jsonObject), null, HttpStatus.ACCEPTED);
-        when(dmeAccessService.access(url, HttpMethod.PUT, params)).thenReturn(responseEntity);
+        when(dmeAccessService.access(anyString(), any(), anyString())).thenReturn(responseEntity);
         List<String> list = new ArrayList<>();
         list.add("123");
         when(taskService.checkTaskStatus(list)).thenReturn(true);
         when(vcsdkUtils.renameDataStore("lqtestnfs00007","urn:vmomi:Datastore:datastore-1060:674908e5-ab21-4079-9cb1-596358ee5dd1")).thenReturn("success");
+        DmeVmwareRelation dmeVmwareRelation = new DmeVmwareRelation();
+        when(dmeVmwareRalationDao.getDmeVmwareRelationByDsId(any())).thenReturn(dmeVmwareRelation);
         nfsOperationService.updateNfsDatastore(map);
 
     }
@@ -262,7 +269,7 @@ public class NfsOperationServiceImplTest {
         map1.put("objList", list2);
         ResponseEntity<String> responseEntity2 = new ResponseEntity<>(gson.toJson(map1), null, HttpStatus.OK);
         String param3 = "{\"constraint\":[{\"simple\":{\"name\":\"dataStatus\",\"operator\":\"equal\",\"value\":\"normal\"}},{\"simple\":{\"name\":\"storageDeviceId\",\"operator\":\"storageDeviceId\",\"value\":\"b94bff9d-0dfb-11eb-bd3d-0050568491c9\"},\"logOp\":\"and\"},{\"simple\":{\"name\":\"storage_pool_name\",\"operator\":\"equal\",\"value\":\"fileStoragePool002\"},\"logOp\":\"and\"}]}";
-        when(dmeAccessService.accessByJson("/rest/resourcedb/v1/instances/SYS_StoragePool?condition={json}", HttpMethod.GET, param3)).thenReturn(responseEntity2);
+        when(dmeAccessService.accessByJson(anyString(),any(),anyString())).thenReturn(responseEntity2);
         String param4 = "{\"file_system_id\":\"0C9A60E0A51C3AD38567C21B6881371C\",\"capacity\":3.0}";
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("task_id", "123");
@@ -271,13 +278,32 @@ public class NfsOperationServiceImplTest {
         List<String> list = new ArrayList<>();
         list.add("123");
         when(taskService.checkTaskStatus(list)).thenReturn(true);
+        DmeVmwareRelation dmeVmwareRelation = new DmeVmwareRelation();
+        when(dmeVmwareRalationDao.getDmeVmwareRelationByDsId(any())).thenReturn(dmeVmwareRelation);
         nfsOperationService.changeNfsCapacity(map);
     }
 
     @Test
-    public void getEditNfsStore() throws DmeException {
-//        String storeObjectId = "123";
-//        when(dmeAccessService.access());
-//        nfsOperationService.getEditNfsStore(storeObjectId);
+    public void testGetEditNfsStore() throws DmeException {
+        List<String> fsIds =  new ArrayList<>();
+        fsIds.add("454");
+        when(dmeVmwareRalationDao.getFsIdsByStorageId(anyString())).thenReturn(fsIds);
+        when(dmeVmwareRalationDao.getStorageIdlByObjectId(anyString())).thenReturn("2331");
+        Map<String, Object> summaryMap  = new HashMap<>();
+        when(vcsdkUtils.getDataStoreSummaryByObjectId(anyString())).thenReturn(summaryMap);
+        when(dmeVmwareRalationDao.getShareIdByStorageId(anyString())).thenReturn("2331");
+        //模拟返回数据对象信息
+        String param = "{\"tuning\":{\"allocation_type\":\"thin\",\"compression_enabled\":false,\"deduplication_enabled\":false,\"smart_qos\":{\"45641\":\"5785646\"}},\"qos_policy\":{\"max_bandwidth\":\"2\",\"max_iops\":\"1\"},\"storage_pool_id\":\"0\",\"accessMode\":\"readWrite\",\"type\":\"NFS\"," +
+                "\"exportPath\":\"/lqtestnfs00007\",\"filesystem_specs\":[{\"count\":1,\"name\":\"lqtestnfs00007\",\"capacity\":\"1\"}],\"pool_raw_id\":\"1\",\"nfs_share_client_addition\":[{\"name\":\"192.168.200.13\",\"objectId\":\"urn:vmomi:HostSystem:host-1034:674908e5-ab21-4079-9cb1-596358ee5dd1\"}]," +
+                "\"nfsName\":\"lqtestnfs00007\",\"current_port_id\":\"139269\",\"storage_id\":\"b94bff9d-0dfb-11eb-bd3d-0050568491c9\",\"capacity_autonegotiation\":{\"capacity_self_adjusting_mode\":\"off\",\"auto_size_enable\":false},\"create_nfs_share_param\":{\"character_encoding\":\"utf-8\"," +
+                "\"name\":\"/lqtestnfs00007\",\"share_path\":\"/lqtestnfs00007/\"},\"capacity_auto_negotiation\":{\n" +
+                "\"auto_size_enable\":\"1\"}}";
+        Map<String,Object> map = gson.fromJson(param, Map.class);
+        ResponseEntity<String> responseEntity2 = new ResponseEntity<>(gson.toJson(map), null, HttpStatus.OK);
+        when(dmeAccessService.access(anyString(), any(), anyString())).thenReturn(responseEntity2);
+
+        ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
+        nfsOperationService.getEditNfsStore("B94BFF9D0DFB11EBBD3D0050568491C9");
+
     }
 }

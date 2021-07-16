@@ -63,7 +63,7 @@ public class OverviewServiceImpl implements OverviewService {
         int normal = 0;
         int abnormal = 0;
         int total;
-        List<Storage> storages = dmeStorageService.getStorages();
+        List<Storage> storages = dmeStorageService.getStorages(null);
         total = storages.size();
         for (Storage storage : storages) {
             // 运行状态 0-离线 1-正常 2-故障 9-未管理。
@@ -156,7 +156,7 @@ public class OverviewServiceImpl implements OverviewService {
             int major = 0;
             int warning = 0;
             int info = 0;
-            List<BestPracticeCheckRecordBean> rs = bestPracticeProcessService.getCheckRecord();
+            List<BestPracticeCheckRecordBean> rs = bestPracticeProcessService.getCheckRecord(null, null);
             for (BestPracticeCheckRecordBean recordBean : rs) {
                 int count = recordBean.getCount();
                 if(count == 0){
@@ -241,7 +241,12 @@ public class OverviewServiceImpl implements OverviewService {
                 object.put(TOTAL_CAPACITY, vmfsDataInfo.getCapacity());
                 double usedCapacity = vmfsDataInfo.getCapacity() - vmfsDataInfo.getFreeSpace();
                 object.put(USED_CAPACITY, usedCapacity);
-                object.put(UTILIZATION, usedCapacity / vmfsDataInfo.getCapacity() * DOUBLE_100);
+                Double capacity = vmfsDataInfo.getCapacity();
+                if (usedCapacity != 0.0 && capacity != 0.0) {
+                    object.put(UTILIZATION, usedCapacity / capacity * DOUBLE_100);
+                } else {
+                    object.put(UTILIZATION, 0.0);
+                }
                 object.put(CAPACITY_UNIT, UNIT_GB);
 
                 maps.add(object);
@@ -263,9 +268,13 @@ public class OverviewServiceImpl implements OverviewService {
                 object.put(TOTAL_CAPACITY, nfsDataInfo.getCapacity());
                 object.put(FREE_CAPACITY, nfsDataInfo.getFreeSpace());
                 object.put(USED_CAPACITY, usedCapacity);
-                object.put(UTILIZATION, usedCapacity / nfsDataInfo.getCapacity() * DOUBLE_100);
+                Double capacity = nfsDataInfo.getCapacity();
+                if (capacity != 0.0 && usedCapacity != 0.0) {
+                    object.put(UTILIZATION, usedCapacity / capacity * DOUBLE_100);
+                } else {
+                    object.put(UTILIZATION, 0.0);
+                }
                 object.put(CAPACITY_UNIT, UNIT_GB);
-
                 returnMap.add(object);
             }
         }

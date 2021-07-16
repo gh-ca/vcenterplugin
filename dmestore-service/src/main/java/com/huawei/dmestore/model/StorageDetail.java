@@ -1,6 +1,8 @@
 package com.huawei.dmestore.model;
 
 
+import com.vmware.vim25.DatastoreRemovedOnHostEvent;
+
 import java.util.Arrays;
 
 /**
@@ -75,6 +77,11 @@ public class StorageDetail {
      * 卷 .
      */
     private Double blockCapacity;
+
+    /**
+     * 块/文件容量
+     */
+    private Double blockFileCapacity;
     /**
      * 去重容量.
      **/
@@ -155,6 +162,17 @@ public class StorageDetail {
      * 维保结束时间.
      **/
     private String maintenanceOvertime;
+
+    //增加qos前端页面判断逻辑标识
+
+    private boolean qosFlag;
+    public boolean getQosFlag() {
+        return qosFlag;
+    }
+    public void setQosFlag(final boolean param) {
+        this.qosFlag = param;
+    }
+
     /**
      * 存储类型不同导致页面及属性差异对象
      */
@@ -168,6 +186,14 @@ public class StorageDetail {
         this.storageTypeShow = storageTypeShow;
     }
 
+    private SmartQos smartQos;
+    public SmartQos getSmartQos() {
+        return smartQos;
+    }
+
+    public void setSmartQos(SmartQos smartQos) {
+        this.smartQos = smartQos;
+    }
     /**
      * getPatchVersion .
      *
@@ -814,6 +840,14 @@ public class StorageDetail {
      */
     public void setOptimizeCapacity(final Double param) {
         this.optimizeCapacity = param;
+    }
+
+    public Double getBlockFileCapacity() {
+        return blockFileCapacity;
+    }
+
+    public void setBlockFileCapacity(Double blockFileCapacity) {
+        this.blockFileCapacity = blockFileCapacity;
     }
 
     @Override

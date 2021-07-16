@@ -244,3 +244,134 @@
   word-break: break-all;
   white-space: nowrap;
 }
+
+clr-dg-cell.datagrid-cell{
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+
+.flex {
+  display: flex;
+
+  &1 {
+    flex: 1;
+  }
+
+  &2 {
+    flex: 2;
+  }
+
+  &3 {
+    flex: 3;
+  }
+
+  &4 {
+    flex: 4;
+  }
+
+  &5 {
+    flex: 5;
+  }
+
+  &.vertical {
+    flex-flow: column nowrap;
+  }
+
+  &.like-float {
+    flex-flow: row wrap;
+
+    .el-button + .el-button {
+      margin-left: 0;
+    }
+  }
+
+  &.between {
+    justify-content: space-between;
+  }
+
+  &.center {
+    justify-content: center;
+  }
+
+  &.middle {
+    align-items: center;
+  }
+}
+
+.color-notice{
+  color:red;
+}
+
+
+.clr-error.clr-subtext{
+  color: #c21d00;
+  color: var(--clr-forms-invalid-color, #c21d00);
+}
+
+.clr-tree-node.disabled{
+  div.clr-treenode-content{
+    color:gray;
+    opacity: 0.5;
+    &::before{
+      content:" ";
+      width:22px;
+    }
+  }
+  input.clr-checkbox{
+    display: none;
+  }
+  label.clr-control-label {
+    display:none;
+  }
+}
+//vmfs挂载时，挂载类型为主机时，集群置灰，但其下主机可选
+.clr-tree-node.mountDisabled{
+  >div>div.clr-treenode-content{
+    color:gray;
+    opacity: 0.5;
+    &::before{
+      content:" ";
+      width:22px;
+    }
+  }
+  >div>div.clr-checkbox-wrapper {
+    input.clr-checkbox{
+      display: none;
+    }
+  }
+  >div>div.clr-checkbox-wrapper {
+    label.clr-control-label{
+      display:none;
+    }
+  }
+}
+
+
+.submit-disabled{
+  color: #666;
+  color: var(--clr-btn-primary-disabled-color, #666666);
+  cursor: not-allowed;
+  opacity: .4;
+  background-color: #ccc;
+  background-color: var(--clr-btn-primary-disabled-bg-color, #cccccc);
+  border-color: #ccc;
+  border-color: var(--clr-btn-primary-disabled-border-color, #cccccc);
+  box-shadow: none;
+}
+
+
+/* fix:vmfs 挂载 tree 选中后 选择框位移bug */
+.clr-tree-node.ng-star-inserted.disabled .clr-tree-node-content-container>.clr-checkbox-wrapper {
+  height: 1.62rem;
+  width: 0;
+  padding-top: .21rem;
+  padding-left: .41rem;
+}
+.clr-tree-node.ng-star-inserted.mountDisabled>.clr-tree-node-content-container>.clr-checkbox-wrapper {
+  height: 1.62rem;
+  width: 0;
+  padding-top: .21rem;
+  padding-left: .41rem;
+}

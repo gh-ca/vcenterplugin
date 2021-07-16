@@ -1,0 +1,14 @@
+.create-fail-description {
+  width: 60px;
+  height: 40px;
+  line-height: 40px;
+}
+
+.create-fail-detail{
+  display: flex;
+  justify-content: space-between;
+  span{
+    display: inline-block;
+  }
+}
+

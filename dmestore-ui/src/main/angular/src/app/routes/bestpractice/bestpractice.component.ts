@@ -1,45 +1,48 @@
-import {
-  Component,
-  OnInit,
-  ChangeDetectionStrategy, ChangeDetectorRef,
-} from '@angular/core';
-import {HttpClient} from '@angular/common/http';
+import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { CommonService } from '../common.service';
-import { GlobalsService }     from "../../shared/globals.service";
-import {TranslatePipe} from "@ngx-translate/core";
+import { GlobalsService } from '../../shared/globals.service';
+import { TranslatePipe } from '@ngx-translate/core';
+import { isMockData, mockData } from 'mock/mock';
+import { getTypeOf, handlerResponseErrorSimple } from 'app/app.helpers';
+
+export const MTU = 'mtu';
+export const MTU_TAG = 'Jumbo Frame (MTU)';
 
 @Component({
   selector: 'app-bestpractice',
   templateUrl: './bestpractice.component.html',
   styleUrls: ['./bestpractice.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [CommonService, TranslatePipe]
+  providers: [CommonService, TranslatePipe],
 })
 export class BestpracticeComponent implements OnInit {
-
   // ================最佳实践列表=============
   rowSelected = []; // 当前选中数据
   isLoading = true; // table数据loading
   list: Bestpractice[] = []; // 数据列表
   total = 0; // 总数据数量
 
-  query = { // 查询数据
+  query = {
+    // 查询数据
   };
   // =================END===============
 
   // ================主机列表=============
   hostModalShow = false;
+  isShowBPBtnTips: boolean;
   hostSelected = []; // 主机选中列表
   hostIsLoading = false; // table数据loading
   hostList: Host[] = []; // 数据列表
   hostTotal = 0; // 总数据数量
   currentBestpractice: Bestpractice;
+  /* MTU的panel单独处理 */
+  currentPanel;
   // ================END====================
 
   tipModal = false;
   ips = '';
   applyType = '1';
-
 
   tipModalSuccess = false;
   tipModalFail = false;
@@ -47,13 +50,15 @@ export class BestpracticeComponent implements OnInit {
   applyLoading = false;
   checkLoading = false;
 
-  applyTips = false;// 实施最佳实践提示（违规数为0时提示）
+  applyTips = false; // 实施最佳实践提示（违规数为0时提示）
 
-  constructor(private cdr: ChangeDetectorRef,
-              public gs: GlobalsService,
-              private http: HttpClient,
-              private commonService: CommonService,
-              private translatePipe:TranslatePipe) { }
+  constructor(
+    private cdr: ChangeDetectorRef,
+    public gs: GlobalsService,
+    private http: HttpClient,
+    private commonService: CommonService,
+    private translatePipe: TranslatePipe
+  ) {}
 
   ngOnInit(): void {
     this.practiceRefresh();
@@ -66,13 +71,13 @@ export class BestpracticeComponent implements OnInit {
   packApplyPracticeParams() {
     const params = [];
     this.ips = '';
-    this.rowSelected.forEach((item) => {
-      const i = {hostSetting:'', hostObjectIds: []};
+    this.rowSelected.forEach(item => {
+      const i = { hostSetting: '', hostObjectIds: [] };
       i.hostSetting = item.hostSetting;
-      item.hostList.forEach((s) => {
+      item.hostList.forEach(s => {
         i.hostObjectIds.push(s.hostObjectId);
-        if (s.needReboot == "true"){
-          this.ips += s.hostName+",";
+        if (s.needReboot == 'true') {
+          this.ips += s.hostName + ',';
         }
       });
       params.push(i);
@@ -84,15 +89,15 @@ export class BestpracticeComponent implements OnInit {
    * 主机列表实时最佳实践 参数封装
    * @returns {any[]}
    */
-  packApplyPracticeParamsByHost(){
+  packApplyPracticeParamsByHost() {
     const params = [];
-    const i = {hostSetting:'', hostObjectIds: []};
+    const i = { hostSetting: '', hostObjectIds: [] };
     i.hostSetting = this.currentBestpractice.hostSetting;
     let ips = '';
-    this.hostSelected.forEach((s) => {
+    this.hostSelected.forEach(s => {
       i.hostObjectIds.push(s.hostObjectId);
-      if (s.needReboot == "true"){
-        ips += s.hostName+",";
+      if (s.needReboot == 'true') {
+        ips += s.hostName + ',';
       }
     });
     params.push(i);
@@ -104,36 +109,39 @@ export class BestpracticeComponent implements OnInit {
    * 实时最佳实践
    * @param params
    */
-  applyPractice(params){
+  applyPractice(params) {
     this.applyLoading = true;
-    this.http.post('v1/bestpractice/update/bylist', params).subscribe((result: any) => {
-      this.applyLoading = false;
-      if (result.code == '200'){
-        this.tipModalSuccess = true;
-        if(this.applyType != '1'){
-          this.hostModalShow = false;
+    this.http.post('v1/bestpractice/update/bylist', params).subscribe(
+      (result: any) => {
+        this.applyLoading = false;
+        if (result?.code == '200') {
+          this.tipModalSuccess = true;
+          if (this.applyType != '1') {
+            this.hostModalShow = false;
+          }
+          this.practiceRefresh();
+        } else {
+          this.tipModalFail = true;
         }
-        this.practiceRefresh();
-      } else{
-        this.tipModalFail = true;
+        this.cdr.detectChanges();
+      },
+      err => {
+        console.error('ERROR', err);
       }
-      this.cdr.detectChanges();
-    }, err => {
-      console.error('ERROR', err);
-    });
+    );
   }
 
-  openTip(){
+  openTip() {
     this.tipModal = true;
   }
 
-  closeTip(){
+  closeTip() {
     this.tipModal = false;
   }
 
-  applyClick(type: string){
+  applyClick(type: string) {
     if (type == '1') {
-      this.rowSelected.forEach((item) => {
+      this.rowSelected.forEach(item => {
         if (item.count == 0) {
           this.applyTips = true;
           return;
@@ -145,22 +153,22 @@ export class BestpracticeComponent implements OnInit {
     }
     this.applyType = type;
     let params;
-    if(this.applyType == '1'){
+    if (this.applyType == '1') {
       params = this.packApplyPracticeParams();
     } else {
       params = this.packApplyPracticeParamsByHost();
     }
-    if(this.ips.length != 0){
+    if (this.ips.length != 0) {
       this.openTip();
-    } else{
+    } else {
       this.applyPractice(params);
     }
   }
 
-  tipOk(){
+  tipOk() {
     this.closeTip();
     let params;
-    if(this.applyType == '1'){
+    if (this.applyType == '1') {
       params = this.packApplyPracticeParams();
     } else {
       params = this.packApplyPracticeParamsByHost();
@@ -170,79 +178,113 @@ export class BestpracticeComponent implements OnInit {
 
   recheck() {
     this.checkLoading = true;
-    this.http.post('v1/bestpractice/check', {}).subscribe((result: any) => {
-      this.checkLoading = false;
-      if (result.code == '200'){
-        this.tipModalSuccess = true;
-        this.practiceRefresh();
-      } else{
-        this.tipModalFail = true;
+    this.http.post('v1/bestpractice/check', {}).subscribe(
+      (result: any) => {
+        this.checkLoading = false;
+        if (result.code == '200') {
+          this.tipModalSuccess = true;
+          this.practiceRefresh();
+        } else {
+          this.tipModalFail = true;
+        }
+        this.cdr.detectChanges();
+      },
+      err => {
+        console.error('ERROR', err);
       }
-      this.cdr.detectChanges();
-    }, err => {
-      console.error('ERROR', err);
-    });
+    );
   }
 
-  practiceRefresh(){
+  practiceRefresh() {
     this.isLoading = true;
-    this.http.get('v1/bestpractice/records/all', {}).subscribe((result: any) => {
-          if (result.code === '200'){
-            this.list = result.data;
-            // bug修改：列表页面级别过滤 中英文问题
-            if (this.list) {
-              this.list.forEach(item => {
-                let levelDesc;
-                let levelNum;
-                switch (item.level) {
-                  case "Critical":
-                    levelNum = 4;
-                    levelDesc = this.translatePipe.transform("overview.critical");
-                    break;
-                  case "Major":
-                    levelNum = 3;
-                    levelDesc = this.translatePipe.transform("overview.major");
-                    break;
-                  case "Warning":
-                    levelNum = 2;
-                    levelDesc = this.translatePipe.transform("overview.warning");
-                    break;
-                  case "Info":
-                    levelNum = 1;
-                    levelDesc = this.translatePipe.transform("overview.info");
-                    break;
-                  default:
-                    levelNum = 0;
-                    levelDesc = "--";
-                    break;
-                }
-                item.levelDesc = levelDesc;
-                item.levelNum = levelNum;
-                // 违规主机实际值修改
-                item.hostList.forEach(hostInfo => {
-                  hostInfo.actualObjValue = this.getTypeOf(hostInfo.actualValue);
-                });
-              });
+    const handlerGetRecordsAllSuccess = (result: any) => {
+      if (result.code === '200') {
+        this.list = result.data;
+        // bug修改：列表页面级别过滤 中英文问题
+        if (this.list && Array.isArray(this.list)) {
+          this.list = this.list.map(item => {
+            const _item = { ...item };
+            const LEVEL_MAP = {
+              Critical: [4, 'overview.critical'],
+              Major: [3, 'overview.major'],
+              Warning: [2, 'overview.warning'],
+              Info: [1, 'overview.info'],
+            };
+            let levelDesc = '--';
+            let levelNum = 0;
+            const mapLevel = LEVEL_MAP[String(item.level).trim()];
+            if (Array.isArray(mapLevel)) {
+              levelNum = mapLevel[0];
+              levelDesc = this.translatePipe.transform(mapLevel[1]) || '--';
             }
-            this.total = result.data.length;
-            this.isLoading = false;
-            this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
-          }
-    }, err => {
-      console.error('ERROR', err);
-    });
+            _item.levelDesc = levelDesc;
+            _item.levelNum = levelNum;
+
+            // 设置描述信息
+            const DESCRIPTION_MAP = {
+              'VMFS3.UseATSForHBOnVMFS5': 'bestPractice.description.vmfs5',
+              'VMFS3.HardwareAcceleratedLocking': 'bestPractice.description.locking',
+              'DataMover.HardwareAcceleratedInit': 'bestPractice.description.init',
+              'DataMover.HardwareAcceleratedMove': 'bestPractice.description.move',
+              'VMFS3.EnableBlockDelete': 'bestPractice.description.delete',
+              'Disk.SchedQuantum': 'bestPractice.description.quanTum',
+              'Disk.DiskMaxIOSize': 'bestPractice.description.diskMaxIOSize',
+              'LUN Queue Depth for Qlogic': 'bestPractice.description.depthForQlogic',
+              'LUN Queue Depth for Emulex': 'bestPractice.description.depthForEmulex',
+              'NMP path switch policy': 'bestPractice.description.pathSwitchPolicy',
+              'Jumbo Frame (MTU)': 'bestPractice.description.jumboFrame',
+              'VMFS-6 Auto-Space Reclamation': 'bestPractice.description.reclamation',
+              'Number of volumes in Datastore': 'bestPractice.description.numberOfVolInDatastore',
+            };
+            const mapDescription = DESCRIPTION_MAP[String(item.hostSetting).trim()];
+            let description = this.translatePipe.transform(mapDescription) || '--';
+            _item.description = description;
+
+            // 违规主机实际值修改
+            _item.hostList = _item.hostList.map(hostInfo => ({
+              ...hostInfo,
+              actualObjValue: getTypeOf(hostInfo.actualValue),
+            }));
+            return _item;
+          });
+        }
+        this.total = result.data.length;
+        this.isLoading = false;
+        this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
+      }
+    };
+
+    if (isMockData) {
+      handlerGetRecordsAllSuccess(mockData.BESTPRACTICE_RECORDS_ALL);
+    } else {
+      this.http
+        .get('v1/bestpractice/records/all', {})
+        .subscribe(handlerGetRecordsAllSuccess, handlerResponseErrorSimple);
+    }
   }
 
-  openHostList(bestpractice: Bestpractice){
-    this.hostModalShow = true;
+  checkBescpractice(bestpractice) {
     this.currentBestpractice = bestpractice;
+    const { hostSetting } = bestpractice;
+    this.currentPanel = hostSetting === MTU_TAG ? MTU : '';
+  }
+  openHostList(bestpractice: Bestpractice) {
+    this.hostModalShow = true;
+    this.checkBescpractice(bestpractice);
     this.hostRefresh();
   }
 
-  hostRefresh(){
-    if (this.hostModalShow === true){
+  hostRefresh() {
+    if (this.hostModalShow === true) {
       this.hostIsLoading = true;
       this.hostList = this.currentBestpractice.hostList;
+      /*根据autoRepair 判断是否禁用执行最佳实践 */
+      /*显示tips就不显示按钮*/
+      if (this.hostList.length > 0) {
+        this.isShowBPBtnTips = this.hostList[0].autoRepair === 'false' ? true : false;
+      } else {
+        this.isShowBPBtnTips = false;
+      }
       this.hostTotal = this.currentBestpractice.hostList.length;
       this.hostIsLoading = false;
       this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
@@ -253,15 +295,15 @@ export class BestpracticeComponent implements OnInit {
    * 单行实施
    * @param item
    */
-  applyOperation(item:Bestpractice){
+  applyOperation(item: Bestpractice) {
     const params = [];
     this.ips = '';
-    const i = {hostSetting:'', hostObjectIds: []};
+    const i = { hostSetting: '', hostObjectIds: [] };
     i.hostSetting = item.hostSetting;
-    item.hostList.forEach((s) => {
+    item.hostList.forEach(s => {
       i.hostObjectIds.push(s.hostObjectId);
-      if (s.needReboot == "true"){
-        this.ips += s.hostName+",";
+      if (s.needReboot == 'true') {
+        this.ips += s.hostName + ',';
       }
     });
     params.push(i);
@@ -273,8 +315,8 @@ export class BestpracticeComponent implements OnInit {
    * @param obj
    */
   getTypeOf(obj) {
-    let object:object;
-    if (typeof obj == 'string' && obj.indexOf("[{") != -1) {
+    let object: object;
+    if (typeof obj == 'string' && obj.indexOf('[{') != -1) {
       object = JSON.parse(obj);
     } else {
       object = obj;
@@ -287,7 +329,7 @@ export class BestpracticeComponent implements OnInit {
    * @param obj
    */
   isObjectValue(obj) {
-    return (typeof obj) == 'object';
+    return Array.isArray(obj) && obj.length > 0;
   }
 
   /**
@@ -297,9 +339,44 @@ export class BestpracticeComponent implements OnInit {
   getObjectTitle(obj) {
     let title = '';
     obj.forEach(item => {
-      title += item.name + " | " + item.value + '\n';
+      title += item.name + ' | ' + item.value + '\n';
     });
     return title;
+  }
+
+  sortFunc(obj: any) {
+    // let object;
+    // if (obj.target.type && obj.target.type == 'button') {
+    //   object = obj.target;
+    // } else {
+    //   if ((obj.target.attributes.shape && obj.target.attributes.shape.nodeValue == 'filter-grid')
+    //     || (obj.target.attributes.class && obj.target.attributes.class.value == 'datagrid-column ng-star-inserted')) {
+    //     return;
+    //   } else {
+    //     object = obj.target.parentElement;
+    //   }
+    // }
+    // const sortValue = object.children[1].attributes.shape.nodeValue;
+    // if (sortValue == 'arrow down' || sortValue == 'arrow') {
+    //   object.children[0].hidden = true;
+    // } else {
+    //   object.children[0].hidden = false;
+    // }
+    return !obj;
+  }
+
+  afterApply(result) {
+    this.applyLoading = false;
+    if (result?.code == '200') {
+      this.tipModalSuccess = true;
+      if (this.applyType != '1') {
+        this.hostModalShow = false;
+      }
+      this.practiceRefresh();
+    } else {
+      this.tipModalFail = true;
+    }
+    this.cdr.detectChanges();
   }
 }
 
@@ -310,16 +387,17 @@ class Bestpractice {
   levelNum: number;
   levelDesc: string;
   count: number;
+  description: string;
   hostList: Host[];
 }
 
-class Host {
+export class Host {
   hostSetting: string;
   level: string;
   hostName: string;
   recommendValue: number;
   actualValue: number;
-  actualObjValue:any;
+  actualObjValue: any;
   hostObjectId: string;
   needReboot: string;
   hostId: string;

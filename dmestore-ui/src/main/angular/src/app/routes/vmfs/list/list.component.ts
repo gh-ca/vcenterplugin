@@ -2,7 +2,9 @@ import {
   Component,
   OnInit,
   ChangeDetectionStrategy,
-  ChangeDetectorRef, ElementRef, ViewChild
+  ChangeDetectorRef,
+  ElementRef,
+  ViewChild,
 } from '@angular/core';
 import {
   VmfsListService,
@@ -11,37 +13,123 @@ import {
   StoragePoolList,
   HostList,
   ClusterList,
-  ServiceLevelList, HostOrCluster, GetForm, Workload, StoragePoolMap, ConnFaildData,
+  ServiceLevelList,
+  HostOrCluster,
+  GetForm,
+  Workload,
+  StoragePoolMap,
+  ConnFaildData,
 } from './list.service';
 import {ClrWizard, ClrWizardPage} from '@clr/angular';
 import {GlobalsService} from '../../../shared/globals.service';
-import {Router} from "@angular/router";
-import {DeviceFilter, ProtectionStatusFilter, ServiceLevelFilter, StatusFilter} from "./filter.component";
-import {FormControl, FormGroup, Validators} from "@angular/forms";
+import {Router} from '@angular/router';
+import {
+  DeviceFilter,
+  ProtectionStatusFilter,
+  ServiceLevelFilter,
+  StatusFilter,
+} from './filter.component';
+import {FormControl, FormGroup, Validators} from '@angular/forms';
+import {isMockData, mockData} from 'mock/mock';
+import {
+  getColorByType,
+  getLabelByValue,
+  getQosCheckTipsTagInfo,
+  handlerResponseErrorSimple,
+  isStringLengthByteOutRange,
+  print,
+  regExpCollection,
+} from 'app/app.helpers';
+import {getVmfsDmestorageStorageByTag} from './../../../../mock/VMFS_DMESTORAGE_STORAGE';
+import {SimpleChange} from '@angular/core';
+import {handleRes} from './../../../app.helpers';
+import {VmfsCommon} from './VmfsCommon';
+import {AddService} from './../add/add.service';
+import {getLodash} from './../../../shared/lib';
+import {CommonService} from './../../common.service';
+import {TranslatePipe,TranslateService} from '@ngx-translate/core';
 
+const _ = getLodash();
 
 @Component({
   selector: 'app-list',
   templateUrl: './list.component.html',
   styleUrls: ['./list.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [VmfsListService],
+  providers: [VmfsListService, AddService, CommonService, TranslatePipe],
 })
-export class VmfsListComponent implements OnInit {
-  get params() { // 对query进行处理
+export class VmfsListComponent extends VmfsCommon implements OnInit {
+  get params() {
+    // 对query进行处理
     const p = Object.assign({}, this.query);
     return p;
   }
 
-  constructor(private remoteSrv: VmfsListService, private cdr: ChangeDetectorRef,
-              public gs: GlobalsService, private router:Router) {}
+  constructor(
+    private commonService: CommonService,
+    private remoteService: VmfsListService,
+    public cdr: ChangeDetectorRef,
+    public gs: GlobalsService,
+    private router: Router,
+    private translateService:TranslateService
+  ) {
+    super();
+    this.form.version = '5'; // 版本
+    this.setFormValueWhenHiden(false);
+    this.getColor = getColorByType;
+    this.getLabelByValue = getLabelByValue;
+    this.print = print;
+  }
+
+  dorado = false; //是否是V6设备
+
+  getColor;
+  getLabelByValue;
+  print;
+
+  // selectedId;//当前选中设备id
+  selectMountType;//当前选中设备类型：主机或集群
+  item_test = {
+    capabilities: {
+      resourceType: 'thin',
+      compression: false,
+      deduplication: 'enabled',
+      smarttier: null,
+      iopriority: null,
+      qos: {
+        smartQos: null,
+        qosParam: {
+          enabled: null,
+          latency: 0,
+          latencyUnit: 'ms',
+          minBandWidth: 0,
+          minIOPS: 0,
+          maxBandWidth: 175,
+          maxIOPS: 145,
+          smartQos: null,
+        },
+        enabled: true,
+      },
+    },
+    id: '2784cf0f-9821-4f59-963b-836dbecbd271',
+    name: 'D这是存储DME',
+    description: 'block service-level for dj',
+    type: 'BLOCK',
+    protocol: null,
+    totalCapacity: 2244608.0,
+    freeCapacity: 292224.0,
+    usedCapacity: 1952384.0,
+  };
+
+  isShowInput: boolean;
+
   // 添加页面窗口
   @ViewChild('wizard') wizard: ClrWizard;
   @ViewChild('addPageOne') addPageOne: ClrWizardPage;
   @ViewChild('addPageTwo') addPageTwo: ClrWizardPage;
 
-  @ViewChild('statusFilter') statusFilter:StatusFilter;
-  @ViewChild('deviceFilter') deviceFilter:DeviceFilter;
+  @ViewChild('statusFilter') statusFilter: StatusFilter;
+  @ViewChild('deviceFilter') deviceFilter: DeviceFilter;
   @ViewChild('serviceLevelFilter') serviceLevelFilter: ServiceLevelFilter;
   // @ViewChild('protectionStatusFilter') protectionStatusFilter:ProtectionStatusFilter;
 
@@ -53,7 +141,8 @@ export class VmfsListComponent implements OnInit {
   isLoading = true; // table数据loading
   rowSelected = []; // 当前选中数据
   wwns = []; // wwn 用来查询chart data
-  query = { // 查询数据
+  query = {
+    // 查询数据
     q: 'user:VMware',
     sort: 'stars',
     order: 'desc',
@@ -66,36 +155,16 @@ export class VmfsListComponent implements OnInit {
 
   popListShow = false; // 添加弹出层显示
   addSuccessShow = false; // 添加成功弹窗
+  addPartSuccessShow = false; //添加部分成功弹窗
+  partSuccessData;//添加部分成功返回数据
+  partSuccessOrFail=false; //添加部分成功展示提示
   connectivityFailure = false; // 主机联通性测试失败
-  connFailData:ConnFaildData[]; //  主机联通性测试失败数据
+  connFailData: ConnFaildData[]; //  主机联通性测试失败数据
   showDetail = false; // 展示主机联通异常数据
   isAddPage = false; // true 添加页面 false 挂载页面
   // 添加表单数据
   form = new GetForm().getAddForm();
-  addForm = new FormGroup({
-    name: new FormControl('',
-      Validators.required),
-    isSameName: new FormControl(true,
-      Validators.required),
-    volumeName: new FormControl('',
-      ),
-    version: new FormControl('5',
-      Validators.required),
-    capacity: new FormControl('',
-      Validators.required),
-    capacityUnit: new FormControl('GB',
-      Validators.required),
-    count: new FormControl('',
-      Validators.required),
-    blockSize: new FormControl('',
-      Validators.required),
-    spaceReclamationGranularity: new FormControl('',
-      Validators.required),
-    spaceReclamationPriority: new FormControl('',
-      Validators.required),
-    chooseDevice: new FormControl('',
-      Validators.required)
-  });
+  addForm;
   // 编辑form提交数据
   modifyForm = new GetForm().getEditForm();
   modifyNameChanged = false;
@@ -105,20 +174,22 @@ export class VmfsListComponent implements OnInit {
   changeServiceLevelForm = new GetForm().getChangeLevelForm();
   storageList: StorageList[] = []; // 存储数据
   storagePoolList: StoragePoolList[] = []; // 存储池ID
-  storagePoolMap:StoragePoolMap[] = [];
-  storage:StorageList; // 存储详情（编辑页面使用参数）
+  storagePoolMap: StoragePoolMap[] = [];
+  storage: StorageList; // 存储详情（编辑页面使用参数）
 
-  workloads:Workload[] = []; // Workload
+  workloads: Workload[] = []; // Workload
   blockSizeOptions = []; // 块大小选择
   srgOptions = []; // 空间回收粒度初始化
   deviceList: HostOrCluster[] = []; // 主机AND集群
-  chooseDevice: HostOrCluster; // 已选择的主机/集群
+  deviceList_list: HostOrCluster[] = []; // 主机AND集群
+  chooseDevice: HostOrCluster[]; // 已选择的主机/集群
 
   serviceLevelList: ServiceLevelList[] = []; // 服务等级列表
   mountShow = false; // 挂载窗口
   mountSuccessShow = false; // 挂载成功窗口
   delShow = false; // 删除窗口
   delSuccessShow = false; // 删除成功窗口
+  syncSuccessTips = false; // 同步成功提示
   unmountShow = false; // 卸载窗口
   unmountSuccessShow = false; // 卸载窗口
   unmountTipsShow = false; // 卸载窗口
@@ -134,6 +205,7 @@ export class VmfsListComponent implements OnInit {
   mountForm = new GetForm().getMountForm();
   chooseHost: HostList; // 已选择的主机
   chooseCluster: ClusterList; // 已选择的集群
+  mountFailHost:[]; //部分成功时挂载失败的主机
 
   chooseUnmountHost: HostOrCluster = null; // 已选择卸载的主机
   chooseUnmountCluster: HostOrCluster = null; // 已选择卸载的集群
@@ -151,6 +223,7 @@ export class VmfsListComponent implements OnInit {
   modalLoading = false; // 数据加载loading
   modalHandleLoading = false; // 数据处理loading
   isOperationErr = false; // 错误信息
+  isMountPartSuccess=false; //挂载部分成功
   isReclaimErr = false; // 错误信息
   nameChecking = false; // 名称校验
   capacityErr = false; // 容量错误信息
@@ -169,26 +242,54 @@ export class VmfsListComponent implements OnInit {
 
   isFirstLoadChartData = true;
 
-  bandWidthMaxErrTips = false;// 带宽上限错误提示
-  bandWidthMinErrTips = false;// 带宽下限错误提示
-  iopsMaxErrTips = false;// IOPS上限错误提示
-  iopsMinErrTips = false;// IOPS下限错误提示
-  latencyErrTips = false;// 时延错误提示
+  bandWidthMaxErrTips = false; // 带宽上限错误提示
+  bandWidthMinErrTips = false; // 带宽下限错误提示
+  iopsMaxErrTips = false; // IOPS上限错误提示
+  iopsMinErrTips = false; // IOPS下限错误提示
+  latencyErrTips = false; // 时延错误提示
+  bandwidthLimitErr = false; // v6 设备 带宽 下限大于上限
+  iopsLimitErr = false; // v6 设备 IOPS 下限大于上限
 
+  //当前语言环境 CN为中文  EN为英文
+  language:string;
+  deleteDesc:string;//删除失败返回信息
+  unmountDesc:string;//卸载失败返回信息
+  mountFailOrPartSuccessDesc:string;//挂载失败和部分成功描述
+
+  //失败提示窗口与部分成功提示窗口
+  errorShow=false;
+  partSuccessShow=false;
+  status;
+  description;
+  operatingType;
+
+
+
+  setFormValueWhenHiden(isShowInput) {
+    this.isShowInput = isShowInput;
+    this.form.blockSize = '1024'; // 块大小，单位KB
+    this.form.spaceReclamationGranularity = '1024'; // 空间回收粒度 单位K
+    this.form.spaceReclamationPriority = 'low';
+  }
 
   ngOnInit() {
     // 列表数据
-    this.refresh();
+    this.refreshVmfs();
   }
+
   // 修改
   modifyBtnClick() {
     console.log('this.rowSelected[0]', this.rowSelected[0]);
     // 名称变化校验初始化
     this.modifyNameChanged = false;
+    // qos错误提示初始化
+    this.iopsLimitErr = false;
+    this.bandwidthLimitErr = false;
     // 初始化form
     this.modifyForm = new GetForm().getEditForm();
+
     this.initIopsErrTips(true, true);
-    console.log('this.rowSelected[0]', this.modifyForm );
+    console.log('this.rowSelected[0]', this.modifyForm);
     if (this.rowSelected.length === 1) {
       this.modalLoading = false;
       this.modalHandleLoading = false;
@@ -207,11 +308,13 @@ export class VmfsListComponent implements OnInit {
 
       // 服务等级名称： 服务等级类型只能修改卷名称 非服务等级可修改卷名称+归属控制+QOS策略等
       this.modifyForm.service_level_name = this.rowSelected[0].serviceLevelName;
-      console.log("this.rowSelected[0].serviceLevelName", !this.rowSelected[0].serviceLevelName)
-      if (this.rowSelected[0].serviceLevelName) { // vmfs为服务等级类型
+      console.log('this.rowSelected[0].serviceLevelName', !this.rowSelected[0].serviceLevelName);
+      if (this.rowSelected[0].serviceLevelName) {
+        // vmfs为服务等级类型
         this.isServiceLevelData = true;
         this.modifyForm.control_policy = null;
-      } else {// vmfs为 自定义类型
+      } else {
+        // vmfs为 自定义类型
         this.isServiceLevelData = false;
 
         this.modifyForm.max_iops = this.rowSelected[0].maxIops;
@@ -219,11 +322,17 @@ export class VmfsListComponent implements OnInit {
         this.modifyForm.min_iops = this.rowSelected[0].minIops;
         this.modifyForm.min_bandwidth = this.rowSelected[0].minBandwidth;
         this.modifyForm.latency = this.rowSelected[0].latency;
-        if (this.modifyForm.latency || this.modifyForm.min_bandwidth
-          || this.modifyForm.min_iops || this.modifyForm.max_bandwidth
-          || this.modifyForm.max_iops) {
+
+        if (
+          this.modifyForm.latency ||
+          this.modifyForm.min_bandwidth ||
+          this.modifyForm.min_iops ||
+          this.modifyForm.max_bandwidth ||
+          this.modifyForm.max_iops
+        ) {
           this.modifyForm.qosFlag = true;
         }
+
         // 默认隐藏smartTier
         this.showSmartTierFlag = false;
         // 默认隐藏下限
@@ -232,11 +341,38 @@ export class VmfsListComponent implements OnInit {
         this.latencyIsSelect = false;
 
         // 获取存储数据
-        this.modifyGetStorage(this.rowSelected[0].deviceId);
-
+        /* dmestore/rest/accessvmfs/listvmfs 返回的信息 */
+        /*
+        alarmState: "1"
+bandwidth: null
+capacity: 0
+device: "Huawei.Storage"
+deviceId: "4e3109c2-91fa-11eb-bb86-7e7d8e1bd299"
+freeSpace: 0
+iops: null
+latency: null
+maxBandwidth: null
+maxIops: null
+minBandwidth: null
+minIops: null
+name: "lq_hostgroup_remove_003"
+objectid: "urn:vmomi:Datastore:datastore-14106:674908e5-ab21-4079-9cb1-596358ee5dd1"
+readResponseTime: null
+reserveCapacity: 0
+serviceLevelName: ""
+status: "normal"
+vmfsProtected: false
+volumeId: "f3c9cee5-24ad-492b-90e1-520d5f04fe51"
+volumeName: "lq_hostgroup_remove_003"
+writeResponseTime: null
+wwn: "67c1cf110058934511ba6e5a00000344"
+ */
+        this.modifyGetStorageByObjectId(this.rowSelected[0].objectid);
       }
-      console.log("this.modifyForm.control_policy", this.modifyForm.control_policy)
+      console.log('this.modifyForm.control_policy', this.modifyForm.control_policy);
+      /* 弹出编辑窗口 */
       this.modifyShow = true;
+      this.cdr.detectChanges();
     }
   }
 
@@ -244,68 +380,123 @@ export class VmfsListComponent implements OnInit {
    * 修改页面获取存储数据
    * @param objectId
    */
-  modifyGetStorage(storageId) {
-    this.modalHandleLoading = true;
-    if (storageId) {
-      this.remoteSrv.getStorageDetail(storageId).subscribe((result: any) => {
-        this.modalHandleLoading = false;
-        if (result.code == '200') {
-          this.storage = result.data;
-          const storageTypeShow = this.storage.storageTypeShow;
-          if (storageTypeShow) {
-            // smartTier 展示与隐藏
-            const smartTierShow = storageTypeShow.smartTierShow;
-            this.showSmartTierFlag = smartTierShow;
-            // qos策略 1 支持复选(上限、下限) 2支持单选（上限或下限） 3只支持上限
-            const qosTag = storageTypeShow.qosTag;
-            if (qosTag == 3) {
-              this.showLowerFlag = true;
-            } else {
-              this.showLowerFlag = false;
-            }
-            const upperObj = document.getElementById('editControl_policyUpper') as HTMLInputElement;
-            const lowerObj = document.getElementById('editControl_policyLower') as HTMLInputElement;
-            if (this.modifyForm.max_iops || this.modifyForm.max_bandwidth) {
-              if (this.modifyForm.max_iops) {
-                this.modifyForm.maxiopsChoose = true;
-              }
-              if (this.modifyForm.max_bandwidth) {
-                this.modifyForm.maxbandwidthChoose = true;
-              }
-              upperObj.checked = true;
-              this.controlPolicyChangeFunc('editControl_policyUpper', 'editControl_policyLower', true, this.modifyForm, true);
-            }
-            if (this.modifyForm.min_iops || this.modifyForm.min_bandwidth || this.modifyForm.latency) {
-              if (this.modifyForm.min_iops) {
-                this.modifyForm.miniopsChoose = true;
-              }
-              if (this.modifyForm.min_bandwidth) {
-                this.modifyForm.minbandwidthChoose = true;
-              }
-              if (this.modifyForm.latency) {
-                this.modifyForm.latencyChoose = true;
-              }
-              lowerObj.checked = true;
-              this.controlPolicyChangeFunc('editControl_policyUpper', 'editControl_policyLower', true, this.modifyForm, false);
-            }
-            if (smartTierShow) {
-              if (this.rowSelected[0].smartTier) {
-                this.modifyForm.smartTierFlag = true;
-                this.modifyForm.smartTier = this.rowSelected[0].smartTier;
-              }
-            }
-            this.latencyIsSelect = qosTag == 1;
+  async modifyGetStorageByObjectId(objectid) {
+    /*  */
+    const handlerGetStorageDetailSuccess = (result: any) => {
+      this.modalHandleLoading = false;
+      if (result.code == '200') {
+        this.storage = result.data;
+        const storageTypeShow = this.storage.storageTypeShow;
+        /* 是否打开qos switch qosFlog */
+        this.modifyForm.qosFlag = this.storage.qosFlag;
+        if (storageTypeShow) {
+          // smartTier 展示与隐藏
+          const smartTierShow = storageTypeShow.smartTierShow;
+          this.showSmartTierFlag = smartTierShow;
+          // qos策略 1 支持复选(上限、下限) 2支持单选（上限或下限） 3只支持上限
+          const qosTag = storageTypeShow.qosTag;
+
+          if (qosTag == 3) {
+            this.showLowerFlag = true;
+          } else {
+            this.showLowerFlag = false;
           }
+
+          this.modifyForm.isCheckedUpper = false;
+          this.modifyForm.isCheckedlower = false;
+          const upperObj = document.getElementById('editControl_policyUpper') as HTMLInputElement;
+          const lowerObj = document.getElementById('editControl_policyLower') as HTMLInputElement;
+
+          /* 根据返回的数据判断是否需要展示 */
+          const smartQos = this.storage.smartQos || {};
+          const {latency, maxbandwidth, maxiops, minbandwidth, miniops} = smartQos as any;
+
+          this.modifyForm.max_iops = maxiops;
+          this.modifyForm.max_bandwidth = maxbandwidth;
+          this.modifyForm.min_iops = miniops;
+          this.modifyForm.min_bandwidth = minbandwidth;
+          this.modifyForm.latency = latency;
+
+          if (this.modifyForm.max_iops || this.modifyForm.max_bandwidth) {
+            if (this.modifyForm.max_iops) {
+              this.modifyForm.maxiopsChoose = true;
+            }
+            if (this.modifyForm.max_bandwidth) {
+              this.modifyForm.maxbandwidthChoose = true;
+            }
+
+            this.modifyForm.isCheckedUpper = true;
+            if (upperObj) {
+              upperObj.checked = true;
+            }
+            this.handleModifyControlPolicyChange(true, this.modifyForm, true);
+          }
+
+          if (
+            this.modifyForm.min_iops ||
+            this.modifyForm.min_bandwidth ||
+            this.modifyForm.latency
+          ) {
+            if (this.modifyForm.min_iops) {
+              this.modifyForm.miniopsChoose = true;
+            }
+            if (this.modifyForm.min_bandwidth) {
+              this.modifyForm.minbandwidthChoose = true;
+            }
+            if (this.modifyForm.latency) {
+              this.modifyForm.latencyChoose = true;
+            }
+
+            this.modifyForm.isCheckedlower = true;
+            if (lowerObj) {
+              lowerObj.checked = true;
+            }
+
+            this.handleModifyControlPolicyChange(true, this.modifyForm, false);
+          }
+          if (smartTierShow) {
+            if (this.rowSelected[0].smartTier) {
+              this.modifyForm.smartTierFlag = true;
+              this.modifyForm.smartTier = this.rowSelected[0].smartTier;
+            }
+          }
+          this.latencyIsSelect = qosTag == 1;
         }
-        this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
-      });
+      }
+      this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
+    };
+
+    this.modalHandleLoading = true;
+    if (objectid) {
+      if (isMockData) {
+        const a: any = this.modifyGetStorageByObjectId;
+        a.count = a.count || 1;
+        const count = a.count++ % 4;
+        const res = getVmfsDmestorageStorageByTag(count);
+        console.log(res);
+        handlerGetStorageDetailSuccess(res);
+      } else {
+        // this.remoteSrv.getStorageDetail(storageId).subscribe(handlerGetStorageDetailSuccess, handlerResponseErrorSimple);
+        /* 20210419134040  */
+        try {
+          const res = await this.remoteService.asyncGetStoragesVmfsInfo(objectid);
+          handlerGetStorageDetailSuccess(res);
+        } catch (error) {
+          handlerResponseErrorSimple(error);
+        }
+      }
     }
   }
 
   // 修改 处理
   modifyHandleFunc() {
-    if (this.bandWidthMaxErrTips || this.iopsMaxErrTips
-      || this.bandWidthMinErrTips || this.iopsMinErrTips || this.latencyErrTips) {
+    if (
+      this.bandWidthMaxErrTips ||
+      this.iopsMaxErrTips ||
+      this.bandWidthMinErrTips ||
+      this.iopsMinErrTips ||
+      this.latencyErrTips
+    ) {
       return;
     }
     // 设置修改的卷名称以及修改后的名称
@@ -318,10 +509,15 @@ export class VmfsListComponent implements OnInit {
     if (!this.isServiceLevelData) {
       // 控制策略若未选清空数据
       this.qosEditFunc(this.modifyForm);
-      console.log("this.modifyForm.control_policyUpper == '1'", this.modifyForm.control_policyUpper == '1');
-      if (this.modifyForm.control_policyUpper == '1') { // 上限+全选（上下限）
+      console.log(
+        "this.modifyForm.control_policyUpper == '1'",
+        this.modifyForm.control_policyUpper == '1'
+      );
+      if (this.modifyForm.control_policyUpper == '1') {
+        // 上限+全选（上下限）
         this.modifyForm.control_policy = '1';
-      } else if(this.modifyForm.control_policyLower == '0') {// 下限
+      } else if (this.modifyForm.control_policyLower == '0') {
+        // 下限
         this.modifyForm.control_policy = '0';
       } else {
         this.modifyForm.control_policy = null;
@@ -330,7 +526,8 @@ export class VmfsListComponent implements OnInit {
 
     this.modifyForm.newDsName = this.modifyForm.name;
     this.modalHandleLoading = true;
-    this.remoteSrv.updateVmfs(this.modifyForm.volumeId, this.modifyForm).subscribe((result: any) => {
+
+    const handlerUpdateVmfsSuccess = (result: any) => {
       this.modalHandleLoading = false;
       if (result.code === '200') {
         console.log('modify success:' + this.modifyForm.oldDsName);
@@ -345,37 +542,58 @@ export class VmfsListComponent implements OnInit {
         this.isOperationErr = true;
       }
       this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
-    });
+    };
+
+    this.remoteService
+      .updateVmfs(this.modifyForm.volumeId, this.modifyForm)
+      .subscribe(handlerUpdateVmfsSuccess);
   }
+
   // table数据处理
-  refresh() {
+  refreshVmfs() {
     this.isLoading = true;
     // 进行数据加载
-    this.remoteSrv.getData()
-        .subscribe((result: any) => {
-          if (result.code === '200' && null != result.data ) {
-            this.list = result.data;
-            if (null !== this.list) {
-              this.total = this.list.length;
-              // 获取chart 数据
-              const wwns = [];
-              this.list.forEach(item => {
-                item.usedCapacity = item.capacity - item.freeSpace;
-                item.capacityUsage = ((item.capacity - item.freeSpace)/item.capacity);
-                wwns.push(item.wwn);
-              });
-              // 设置卷ID集合
-              this.wwns = wwns;
-              if (this.radioCheck === 'chart') {
-                this.getPerformanceData();
+    const successHandler = (result: any) => {
+      if (result.code === '200' && null != result.data) {
+        this.list = result.data;
+        if (null !== this.list) {
+          if (this.list) {
+            this.total = this.list.length;
+            // 获取chart 数据
+            const wwns = [];
+            this.list.forEach(item => {
+              if (item == null) {
+                console.log(item);
               }
+              if (item) {
+                if (item.capacity && item.freeSpace) {
+                  item.usedCapacity = item.capacity - item.freeSpace;
+                  item.capacityUsage = (item.capacity - item.freeSpace) / item.capacity;
+                }
+                wwns.push(item.wwn);
+              }
+            });
+            // 设置卷ID集合
+            this.wwns = wwns;
+            if (this.radioCheck === 'chart') {
+              this.getPerformanceData();
             }
-          } else {
           }
-          this.isLoading = false;
-          this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
-        });
+        }
+      }
+      this.isLoading = false;
+      this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
+    };
+
+    /* TODO: */
+    if (isMockData) {
+      mockData.ACCESSVMFS_LISTVMFS.data.shift();
+      successHandler(mockData.ACCESSVMFS_LISTVMFS);
+    } else {
+      this.remoteService.getData().subscribe(successHandler);
+    }
   }
+
   // 点刷新那个功能是分两步，一步是刷新，然后等我们这边的扫描任务，任务完成后返回你状态，任务成功后，你再刷新列表页面。
   scanDataStore() {
     // 初始化筛选
@@ -385,9 +603,11 @@ export class VmfsListComponent implements OnInit {
     this.serviceLevelFilter.initServiceLevel();
     // this.protectionStatusFilter.initProtectionStatus();
     this.isFirstLoadChartData = true;
-    this.remoteSrv.scanVMFS(this.storageType).subscribe((res: any) => {
+    this.remoteService.scanVMFS(this.storageType).subscribe((res: any) => {
+      this.isLoading = false;
+      this.syncSuccessTips = true;
       if (res.code === '200') {
-        this.refresh();
+        // this.refresh();
         console.log('Scan success');
       } else {
         console.log('Scan faild');
@@ -419,9 +639,9 @@ export class VmfsListComponent implements OnInit {
     this.wwns = wwns;
     if (this.wwns.length > 0) {
       this.isLoading = true;
-      this.remoteSrv.getChartData(this.wwns).subscribe((chartResult: any) => {
+      this.remoteService.getChartData(this.wwns).subscribe((chartResult: any) => {
         if (chartResult.code === '200' && chartResult.data != null) {
-          const chartList: VmfsInfo [] = chartResult.data;
+          const chartList: VmfsInfo[] = chartResult.data;
           this.list.forEach(item => {
             chartList.forEach(charItem => {
               // 若属同一个卷则将chartItem的带宽、iops、读写相应时间 值赋予列表
@@ -441,19 +661,20 @@ export class VmfsListComponent implements OnInit {
       });
     }
   }
+
   // 获取所有存储数据
   getStorageList() {
-    this.remoteSrv.getStorages().subscribe((result: any) => {
+    const handlerGetstoragesSuccess = (result: any) => {
       if (result.code === '200' && result.data !== null) {
         this.storageList = result.data;
-        const allPoolMap:StoragePoolMap[] = []
+        const allPoolMap: StoragePoolMap[] = [];
 
-        result.data.forEach(item  => {
-          const poolMap:StoragePoolMap = {
-            storageId:item.id,
-            storagePoolList:null,
-            workloadList:null
-          }
+        result.data.forEach(item => {
+          const poolMap: StoragePoolMap = {
+            storageId: item.id,
+            storagePoolList: null,
+            workloadList: null,
+          };
           allPoolMap.push(poolMap);
         });
 
@@ -463,7 +684,15 @@ export class VmfsListComponent implements OnInit {
       }
       this.modalLoading = false;
       this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
-    });
+    };
+
+    if (isMockData) {
+      handlerGetstoragesSuccess(mockData.DMESTORAGE_STORAGESV6);
+    } else {
+      this.remoteService
+        .getStorages()
+        .subscribe(handlerGetstoragesSuccess, handlerResponseErrorSimple);
+    }
   }
 
   // 获取存储池数据
@@ -481,25 +710,33 @@ export class VmfsListComponent implements OnInit {
       this.addWorkLoadShowInit();
       this.addLatencyChoose();
 
-      const storagePoolMap = this.storagePoolMap.filter(item => item.storageId == this.form.storage_id);
+      const storagePoolMap = this.storagePoolMap.filter(
+        item => item.storageId == this.form.storage_id
+      );
 
       const storagePoolList = storagePoolMap[0].storagePoolList;
       const workloads = storagePoolMap[0].workloadList;
-      const storages=this.storageList.filter(item=>item.id==this.form.storage_id)[0];
+      const storages = this.storageList.filter(item => item.id == this.form.storage_id)[0];
       const dorado = storages.storageTypeShow.dorado;
       let mediaType;
-      if (dorado) { // v6设备
+      if (dorado) {
+        // v6设备
         mediaType = 'block-and-file';
-      } else { // V5设备
+      } else {
+        // V5设备
         mediaType = 'block';
       }
       // 存储池
       // if (!storagePoolList) {
-        this.remoteSrv.getStoragePoolsByStorId(this.form.storage_id, mediaType).subscribe((result: any) => {
+      this.remoteService
+        .getStoragePoolsByStorId(this.form.storage_id, mediaType)
+        .subscribe((result: any) => {
           if (result.code === '200' && result.data !== null) {
             this.storagePoolList = result.data;
 
-            this.storagePoolMap.filter(item => item.storageId == this.form.storage_id)[0].storagePoolList = result.data;
+            this.storagePoolMap.filter(
+              item => item.storageId == this.form.storage_id
+            )[0].storagePoolList = result.data;
 
             this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
           }
@@ -509,17 +746,19 @@ export class VmfsListComponent implements OnInit {
       // }
       // 获取workLoad
       if (this.showWorkLoadFlag) {
-        this.remoteSrv.getWorkLoads(this.form.storage_id).subscribe((result: any) => {
+        this.remoteService.getWorkLoads(this.form.storage_id).subscribe((result: any) => {
           if (result.code === '200' && result.data !== null) {
             this.workloads = result.data;
 
-            this.storagePoolMap.filter(item => item.storageId == this.form.storage_id)[0].workloadList = result.data;
+            this.storagePoolMap.filter(
+              item => item.storageId == this.form.storage_id
+            )[0].workloadList = result.data;
 
             this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
           }
         });
-      // } else {
-      //   this.workloads = workloads;
+        // } else {
+        //   this.workloads = workloads;
       }
     }
   }
@@ -529,12 +768,14 @@ export class VmfsListComponent implements OnInit {
     const options = [];
     const versionVal = this.form.version + '';
     if (versionVal === '6') {
-      const option1 = {key: 1024, value : '1MB'};
+      const option1 = {key: 1024, value: '1MB'};
+      this.setFormValueWhenHiden(true);
       options.push(option1);
       // const option2 = {key: 64, value : '64KB'};
       // options.push(option2);
     } else if (versionVal === '5') {
-      const option1 = {key: 1024, value : '1MB'};
+      const option1 = {key: 1024, value: '1MB'};
+      this.setFormValueWhenHiden(false);
       options.push(option1);
     }
     // 设置blockSize 可选值
@@ -544,23 +785,24 @@ export class VmfsListComponent implements OnInit {
     // 重置空间回收粒度
     this.setSrgOptions();
   }
+
   // 初始化空间回收粒度
   setSrgOptions() {
     const options = [];
     const blockValue = this.form.blockSize + '';
     const versionVal = this.form.version + '';
     if (blockValue === '1024') {
-      const option1 = {key: 1024, value : '1MB'};
+      const option1 = {key: 1024, value: '1MB'};
       options.push(option1);
-      if(versionVal === '5') {
-        const option2 = {key: 8, value : '8KB'};
+      if (versionVal === '5') {
+        const option2 = {key: 8, value: '8KB'};
         options.push(option2);
       }
     } else if (blockValue === '64') {
-      const option1 = {key: 64, value : '64KB'};
+      const option1 = {key: 64, value: '64KB'};
       options.push(option1);
       if (versionVal === '5') {
-        const option2 = {key: 8, value : '8KB'};
+        const option2 = {key: 8, value: '8KB'};
         options.push(option2);
       }
     }
@@ -575,6 +817,7 @@ export class VmfsListComponent implements OnInit {
 
   // 设置设备数据
   setDeviceList() {
+    // setDeviceList() {
     // 初始化数据
     this.deviceList = [];
     // const nullDevice =  {
@@ -598,12 +841,11 @@ export class VmfsListComponent implements OnInit {
   // 设置主机数据
   setHostDatas() {
     return new Promise((resolve, reject) => {
-      this.remoteSrv.getHostList().subscribe((result: any) => {
+      const handlerGetHostListSuccess = (result: any) => {
         let hostList: HostList[] = []; // 主机列表
         if (result.code === '200' && result.data !== null) {
           hostList = result.data;
           hostList.forEach(item => {
-
             const hostInfo = {
               deviceId: item.hostId,
               deviceName: item.hostName,
@@ -615,18 +857,50 @@ export class VmfsListComponent implements OnInit {
         this.form.hostDataloadSuccess = true;
         resolve(this.deviceList);
         this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
-      });
+      };
+      if (isMockData) {
+        handlerGetHostListSuccess(mockData.ACCESSVMWARE_LISTHOST);
+      } else {
+        this.remoteService
+          .getHostList()
+          .subscribe(handlerGetHostListSuccess, handlerResponseErrorSimple);
+      }
     });
   }
+
+  setHostDatas_new() {
+    return new Promise((resolve, reject) => {
+      const handlerSetHostDataSuccess = (result: any) => {
+        console.log('host', result);
+        if (result.code === '200' && result.data !== null) {
+          this.deviceList_list = _.map(result.data, item => {
+            return {
+              clusterId: item.hostId,
+              clusterName: item.hostName,
+              deviceType: 'host',
+            };
+          });
+        }
+        this.form.hostDataloadSuccess = true;
+        resolve(this.deviceList_list);
+      };
+
+      if (isMockData) {
+        handlerSetHostDataSuccess(mockData.ACCESSVMWARE_LISTHOST);
+      } else {
+        this.remoteService.getHostList().subscribe(handlerSetHostDataSuccess, reject);
+      }
+    });
+  }
+
   // 设置集群数据
   setClusterDatas() {
     return new Promise((resolve, reject) => {
-      this.remoteSrv.getClusterList().subscribe((result: any) => {
-        let clusterList: ClusterList [] = []; // 集群列表
+      this.remoteService.getClusterList().subscribe((result: any) => {
+        let clusterList: ClusterList[] = []; // 集群列表
         if (result.code === '200' && result.data !== null) {
           clusterList = result.data;
           clusterList.forEach(item => {
-
             const clusterInfo = {
               deviceId: item.clusterId,
               deviceName: item.clusterName,
@@ -641,12 +915,16 @@ export class VmfsListComponent implements OnInit {
       });
     });
   }
+
+  /* 添加vmfs */
+
   // 点击addBtn触发事件
   addBtnClickFunc() {
     // 展示loading
     this.modalLoading = true;
     this.modalHandleLoading = false;
     this.isOperationErr = false;
+    this.partSuccessOrFail=false
     // 容量错误提示
     this.capacityErr = false;
     // this.gs.loading = true;
@@ -664,11 +942,24 @@ export class VmfsListComponent implements OnInit {
     this.connectivityFailure = false;
     this.connFailData = [];
     this.showDetail = false;
+    // qos错误提示初始化
+    this.iopsLimitErr = false;
+    this.bandwidthLimitErr = false;
 
     // 初始化表单
     this.form = new GetForm().getAddForm();
     // 初始化form
     this.addForm.reset(this.form);
+    /* 监听名字变化 根据是否一样给剩下两个赋值 */
+    this.addForm.valueChanges.subscribe(this.handlerValueChanges.bind(this));
+
+    this.modifyFormGroup = new FormGroup({
+      name: new FormControl('', [Validators.required]),
+    });
+    this.modifyFormGroup = new FormGroup({
+      name: new FormControl('', [Validators.required]),
+    });
+
     // this.addForm.markAsTouched();
     // 添加页面显示
     this.popListShow = true;
@@ -678,7 +969,12 @@ export class VmfsListComponent implements OnInit {
     this.setBlockSizeOptions();
 
     // 设置主机/集群
-    this.setDeviceList();
+    this.setDeviceList_new(this, async () => {
+      await this.setHostDatas_new();
+      // 此方法变化检测，异步处理数据都要添加此方法
+      this.cdr.detectChanges();
+    });
+    // this.setDeviceList();
 
     // Page2默认打开服务等级也页面
     this.levelCheck = 'level';
@@ -692,8 +988,8 @@ export class VmfsListComponent implements OnInit {
     this.storagePoolList = [];
 
     this.storagePoolMap = [];
-
   }
+
   // 页面跳转
   jumpTo(page: ClrWizardPage) {
     if (page && page.completed) {
@@ -703,12 +999,13 @@ export class VmfsListComponent implements OnInit {
     }
     this.wizard.open();
   }
+
   // 获取服务等级数据
   setServiceLevelList() {
     // 初始化服务等级选择参数
     this.serviceLevelIsNull = false;
     // 获取服务等级数据
-    this.remoteSrv.getServiceLevelList().subscribe((result: any) => {
+    const HandlerGetServiceLeveListSuccess = (result: any) => {
       if (result.code === '200' && result.data !== null) {
         this.serviceLevelList = result.data.filter(item => item.totalCapacity !== 0);
       }
@@ -716,23 +1013,43 @@ export class VmfsListComponent implements OnInit {
       this.modalLoading = false;
       // this.gs.loading = false;
       this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
-    });
+    };
+    if (isMockData) {
+      HandlerGetServiceLeveListSuccess(mockData.SERVICELEVEL_LISTSERVICELEVEL);
+    } else {
+      this.remoteService
+        .getServiceLevelList()
+        .subscribe(HandlerGetServiceLeveListSuccess, handlerResponseErrorSimple);
+    }
   }
+
   // 添加vmfs 处理
-  addVmfsHanlde() {
-    if (this.bandWidthMaxErrTips || this.iopsMaxErrTips
-      || this.bandWidthMinErrTips || this.iopsMinErrTips || this.latencyErrTips) {
+  async addVmfsHanlde() {
+    if (
+      this.bandWidthMaxErrTips ||
+      this.iopsMaxErrTips ||
+      this.bandWidthMinErrTips ||
+      this.iopsMinErrTips ||
+      this.latencyErrTips ||
+      this.bandwidthLimitErr ||
+      this.iopsLimitErr
+    ) {
       return;
     }
 
     const selectResult = this.serviceLevelList.find(item => item.show === true);
-    if ((this.levelCheck === 'level' && selectResult && selectResult.totalCapacity !== 0) || this.levelCheck !== 'level') { // 选择服务等级
+    if (
+      (this.levelCheck === 'level' && selectResult && selectResult.totalCapacity !== 0) ||
+      this.levelCheck !== 'level'
+    ) {
+      // 选择服务等级
       if (selectResult) {
         this.form.service_level_id = selectResult.id;
         this.form.service_level_name = selectResult.name;
       }
       // 数据预处----卷名称
-      if (this.form.isSameName) { // 卷名称与vmfs名称相同（PS：不同时为必填）
+      if (this.form.isSameName) {
+        // 卷名称与vmfs名称相同（PS：不同时为必填）
         this.form.volumeName = this.form.name;
       }
       const addSubmitForm = new GetForm().getAddForm();
@@ -748,27 +1065,33 @@ export class VmfsListComponent implements OnInit {
         case 'KB':
           addSubmitForm.capacity = addSubmitForm.capacity / (1024 * 1024);
           break;
-        default: // 默认GB 不变
+        default:
+          // 默认GB 不变
           break;
       }
       // 主机/集群数据处理
-      if (this.chooseDevice.deviceType === 'host') {
+      this.chooseDevice = this.addForm.value.chooseDevice;
+      /* 630修改 不需要区分集群和主机 */
+      /*  if (this.chooseDevice.deviceType === 'host') {
         addSubmitForm.host = this.chooseDevice.deviceName;
         addSubmitForm.hostId = this.chooseDevice.deviceId;
       } else {
         addSubmitForm.cluster = this.chooseDevice.deviceName;
         addSubmitForm.clusterId = this.chooseDevice.deviceId;
-      }
-      if (this.levelCheck === 'customer') { // 未选择 服务等级 需要将服务等级数据设置为空
+      } */
+      if (this.levelCheck === 'customer') {
+        // 未选择 服务等级 需要将服务等级数据设置为空
         addSubmitForm.service_level_id = null;
         addSubmitForm.service_level_name = null;
       }
       // 控制策略若未选清空数据
-      if( this.levelCheck == 'customer') {
+      if (this.levelCheck == 'customer') {
         this.qosFunc(addSubmitForm);
-        if (addSubmitForm.control_policyUpper == '1') { // 上限+全选（上下限）
+        if (addSubmitForm.control_policyUpper == '1') {
+          // 上限+全选（上下限）
           addSubmitForm.control_policy = '1';
-        } else if(addSubmitForm.control_policyLower == '0') {// 下限
+        } else if (addSubmitForm.control_policyLower == '0') {
+          // 下限
           addSubmitForm.control_policy = '0';
         } else {
           addSubmitForm.control_policy = null;
@@ -782,7 +1105,15 @@ export class VmfsListComponent implements OnInit {
       // 打开 loading
       // this.gs.loading = true;
       this.modalHandleLoading = true;
-      this.remoteSrv.createVmfs(addSubmitForm).subscribe((result: any) => {
+
+      const params = _.merge(
+        {
+          chooseDevice: this.chooseDevice,
+        },
+        addSubmitForm
+      );
+
+      const handlerCreateVmfsSuccess = (result: any) => {
         // 关闭 loading
         // this.gs.loading = false;
         this.modalHandleLoading = false;
@@ -792,32 +1123,52 @@ export class VmfsListComponent implements OnInit {
           this.wizard.close();
           // 重新请求数据
           // this.scanDataStore();
-          // 打开成功提示窗口
+          // 打开成功提示窗口setServiceLevelList
           this.addSuccessShow = true;
-        } else if (result.code === '-60001'){
-            this.connectivityFailure = true;
-            this.showDetail = false;
-            this.isAddPage = true;
-            const connFailDatas:ConnFaildData[] = [];
-            if (result.data) {
-              result.data.forEach(item => {
-                for (let key in item) {
-                  const conFailData = {
-                    hostName: key,
-                    description: item[key]
-                  };
-                  connFailDatas.push(conFailData);
-                }
-              });
-              this.connFailData = connFailDatas;
-            }
+        } else if (result.code === '206') {
+          this.wizard.close();
+          // this.partSuccessOrFail = true;
+          this.description=result.description
+          this.status='partSuccess'
+          this.operatingType='vmfsCreate'
+          this.partSuccessData = result
+          this.partSuccessShow=true
+        } else if (result.code === '-60001') {
+          this.connectivityFailure = true;
+          this.showDetail = false;
+          this.isAddPage = true;
+          const connFailDatas: ConnFaildData[] = [];
+          if (result.data) {
+            result.data.forEach(item => {
+              for (const key in item) {
+                const conFailData = {
+                  hostName: key,
+                  description: item[key],
+                };
+                connFailDatas.push(conFailData);
+              }
+            });
+            this.connFailData = connFailDatas;
+          }
         } else {
+          this.wizard.close()
+          this.partSuccessData = result
           console.log('创建失败：' + result.description);
-          // 失败信息
-          this.isOperationErr = true;
+          // // 失败信息
+          // this.partSuccessOrFail = true;
+          this.status='error'
+          this.description=result.description
+          this.operatingType='vmfsCreate'
+          this.errorShow=true
+
         }
-        this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
-      });
+        // 此方法变化检测，异步处理数据都要添加此方法
+        this.cdr.detectChanges();
+      };
+      console.log(params)
+      const res = await this.commonService.remoteCreateVmfs(params);
+      handlerCreateVmfsSuccess(res);
+      // this.remoteSrv.createVmfs(params).subscribe(handlerCreateVmfsSuccess);
     } else {
       this.serviceLevelIsNull = true;
     }
@@ -825,10 +1176,11 @@ export class VmfsListComponent implements OnInit {
 
   // 容量单位转换
   capacityChange(obj: any) {
-    const objValue = obj.value.match(/\d+(\.\d{0,2})?/) ? obj.value.match(/\d+(\.\d{0,2})?/)[0] : '';
+    const objValue = obj.value.match(/\d+(\.\d{0,2})?/)
+      ? obj.value.match(/\d+(\.\d{0,2})?/)[0]
+      : '';
 
     if (objValue !== '') {
-
       let capatityG;
       // 数据预处----容量 （后端默认单位为GB）
       switch (this.form.capacityUnit) {
@@ -841,7 +1193,8 @@ export class VmfsListComponent implements OnInit {
         case 'KB':
           capatityG = objValue / (1024 * 1024);
           break;
-        default: // 默认GB 不变
+        default:
+          // 默认GB 不变
           capatityG = objValue;
           break;
       }
@@ -862,7 +1215,8 @@ export class VmfsListComponent implements OnInit {
         case 'KB':
           capatityG = capatityG * (1024 * 1024);
           break;
-        default: // 默认GB 不变
+        default:
+          // 默认GB 不变
           capatityG = capatityG;
           break;
       }
@@ -898,6 +1252,7 @@ export class VmfsListComponent implements OnInit {
 
     this.getStorageList();
   }
+
   // 选择服务等级时
   serviceLevelBtnFunc() {
     this.levelCheck = 'level';
@@ -907,13 +1262,14 @@ export class VmfsListComponent implements OnInit {
 
     this.setServiceLevelList();
   }
+
   // 页面跳转
-  navigateTo(objectid: string){
+  navigateTo(objectid: string) {
     console.log('页面跳转了');
     console.log(objectid);
     this.gs.getClientSdk().app.navigateTo({
       targetViewId: 'vsphere.core.datastore.summary',
-      objectId: objectid
+      objectId: objectid,
     });
   }
 
@@ -921,14 +1277,15 @@ export class VmfsListComponent implements OnInit {
   delHandleFunc() {
     const objectIds = this.rowSelected.map(item => item.objectid);
     console.log('del vmfs objectIds:' + objectIds);
+    this.language=this.translateService.currentLang==='en-US'?'EN':'CN'
     const delInfos = {
-      dataStoreObjectIds: objectIds
-    }
+      dataStoreObjectIds: objectIds,
+      language:this.language
+    };
     this.modalHandleLoading = true;
-    this.remoteSrv.delVmfs(delInfos).subscribe((result: any) => {
-
+    this.remoteService.delVmfs(delInfos).subscribe((result: any) => {
       this.modalHandleLoading = false;
-      if (result.code === '200'){
+      if (result.code === '200') {
         console.log('DEL success' + this.rowSelected[0].name + ' success');
         // 关闭删除页面
         this.delShow = false;
@@ -938,27 +1295,36 @@ export class VmfsListComponent implements OnInit {
         this.delSuccessShow = true;
       } else {
         console.log('DEL faild: ' + result.description);
-        this.isOperationErr = true;
+        this.delShow=false
+        this.description=result.description
+        this.operatingType='vmfsDelete'
+        this.status='error'
+        // this.deleteDesc=result.description
+        this.errorShow=true
+        // this.isOperationErr = true;
       }
       this.cdr.detectChanges();
     });
   }
 
   // 挂载按钮点击事件
-  mountBtnFunc() {
+  async mountBtnFunc() {
     // 初始化表单
     if (this.rowSelected.length === 1) {
-
       this.modalLoading = true;
       this.modalHandleLoading = false;
       this.isOperationErr = false;
+      this.isMountPartSuccess=false;
       this.mountErr = false;
 
       this.mountForm = new GetForm().getMountForm();
       const objectIds = [];
+      // this.selectedId=this.rowSelected[0].objectid;
       objectIds.push(this.rowSelected[0].objectid);
+      this.selectMountType = await this.commonService.getMountTypeBySeletedId(this.rowSelected[0].objectid)
       this.mountForm.dataStoreObjectIds = objectIds;
       console.log('this.mountForm', this.mountForm);
+      console.log("this type", this.selectMountType)
 
       // 连通性测试相关
       this.connectivityFailure = false;
@@ -966,10 +1332,8 @@ export class VmfsListComponent implements OnInit {
       this.showDetail = false;
 
       // 加载主机与集群数据
-      this.mountDeviceLoad();
-
-      // // 打开挂载页面
-      this.mountShow = true;
+      this.mountDeviceLoad_new();
+      // this.mountDeviceLoad();
       // this.jumpPage(this.rowSelected[0].objectid,"vmfs/dataStore/mount");
     }
   }
@@ -977,6 +1341,63 @@ export class VmfsListComponent implements OnInit {
   /**
    * 挂载页面 主机集群数据加载
    */
+
+  resetDeviceList() {
+    this.deviceList = [];
+    this.deviceList_list = [];
+    this.chooseDevice = [];
+  }
+
+  async mountDeviceLoad_new() {
+    this.resetDeviceList();
+    // 初始化主机
+    this.mountHostData = false;
+    this.hostList = [];
+    this.chooseHost = undefined;
+
+    // 初始化集群
+    this.mountClusterData = false;
+    this.clusterList = [];
+    this.chooseCluster = undefined;
+
+    this.modalLoading = true;
+
+    this.deviceList = await this.commonService.remoteGetVmfsDeviceListById_mount(
+      this.rowSelected[0].objectid
+    );
+
+    const loadMountHost = () => {
+      const handlerMountHostSuccess = (result: any) => {
+        if (result.code === '200' && result.data !== null) {
+          this.deviceList_list = _.map(result.data, item => {
+            return {
+              clusterId: item.hostId,
+              clusterName: item.hostName,
+              deviceType: 'host',
+            };
+          });
+        }
+        this.mountHostData = true;
+        this.cdr.detectChanges();
+      };
+
+      if (isMockData) {
+        handlerMountHostSuccess(mockData.ACCESSVMWARE_LISTHOST);
+      } else {
+        this.remoteService
+          .getHostListByObjectId(this.rowSelected[0].objectid)
+          .subscribe(handlerMountHostSuccess);
+      }
+    };
+    loadMountHost();
+    this.mountClusterData = true;
+    this.mountHostData = true;
+    // 打开挂载页面
+    this.mountShow = true;
+
+    this.modalLoading = false;
+  }
+
   mountDeviceLoad() {
     // 初始化主机
     this.mountHostData = false;
@@ -995,66 +1416,79 @@ export class VmfsListComponent implements OnInit {
     });
   }
 
-  jumpPage(objectId:string,url:string){
+  jumpPage(objectId: string, url: string) {
     const resource = 'list';
-    this.router.navigate([url],{
-      queryParams:{
-        objectId,resource
-      }
+    this.router.navigate([url], {
+      queryParams: {
+        objectId,
+        resource,
+      },
     });
   }
+
   // 挂载  集群数据初始化
   initMountCluster() {
     return new Promise((resolve, reject) => {
       // 获取集群 通过ObjectId过滤已挂载的集群
-      this.remoteSrv.getClusterListByObjectId(this.rowSelected[0].objectid).subscribe((result: any) => {
-        if (result.code === '200' && result.data !== null){
-          result.data.forEach(item => {
-            this.clusterList.push(item);
-          });
-        }
-        this.mountClusterData = true;
-        this.modalLoading = false;
-        resolve(this.clusterList);
-        this.cdr.detectChanges();
-      });
+      this.remoteService
+        .getClusterListByObjectId(this.rowSelected[0].objectid)
+        .subscribe((result: any) => {
+          if (result.code === '200' && result.data !== null) {
+            result.data.forEach(item => {
+              this.clusterList.push(item);
+            });
+          }
+          this.mountClusterData = true;
+          this.modalLoading = false;
+          resolve(this.clusterList);
+          this.cdr.detectChanges();
+        });
     });
   }
+
   // 挂载 主机数据初始化
   initMountHost() {
     return new Promise((resolve, reject) => {
       // 获取服务器 通过ObjectId过滤已挂载的服务器
-      this.remoteSrv.getHostListByObjectId(this.rowSelected[0].objectid).subscribe((result: any) => {
-        if (result.code === '200' && result.data !== null){
-          result.data.forEach(item => {
-            this.hostList.push(item);
-          });
-        }
-        this.mountHostData = true;
-        resolve(this.hostList);
-        this.cdr.detectChanges();
-      });
+      this.remoteService
+        .getHostListByObjectId(this.rowSelected[0].objectid)
+        .subscribe((result: any) => {
+          if (result.code === '200' && result.data !== null) {
+            result.data.forEach(item => {
+              this.hostList.push(item);
+            });
+          }
+          this.mountHostData = true;
+          resolve(this.hostList);
+          this.cdr.detectChanges();
+        });
     });
   }
-  // 挂载提交
-  mountSubmit(){
 
-    console.log('this.chooseHost', this.chooseHost);
-    if (this.chooseHost || this.chooseCluster) {
+  // 挂载提交
+  async mountSubmit() {
+    if (this.isDisableMountSubmit()) return;
+    const chooseDevice = this.addForm.value.chooseDevice;
+    console.log('chooseDevice', chooseDevice);
+
+    if (_.isArray(chooseDevice) && chooseDevice.length > 0) {
+      // if (this.chooseHost || this.chooseCluster) {
       this.mountErr = false;
       // 数据封装
-      if (this.mountForm.mountType === '1'){ // 服务器
-        this.mountForm.hostId = this.chooseHost.hostId;
-        this.mountForm.host = this.chooseHost.hostName;
-      }else if (this.mountForm.mountType === '2'){ // 集群
-        this.mountForm.cluster = this.chooseCluster.clusterName;
-        this.mountForm.clusterId = this.chooseCluster.clusterId;
+      if (this.mountForm.mountType === '1') {
+        // 服务器
+        this.mountForm.hostId = this.chooseHost?.hostId;
+        this.mountForm.host = this.chooseHost?.hostName;
+      } else if (this.mountForm.mountType === '2') {
+        // 集群
+        this.mountForm.cluster = this.chooseCluster?.clusterName;
+        this.mountForm.clusterId = this.chooseCluster?.clusterId;
       }
 
       this.modalHandleLoading = true;
-      this.remoteSrv.mountVmfs(this.mountForm).subscribe((result: any) => {
+      const handlerMountVmfsSuccess = (result: any) => {
         this.modalHandleLoading = false;
-        if (result.code  ===  '200'){
+        if (result.code === '200') {
           console.log('挂载成功');
           // 关闭挂载页面
           this.mountShow = false;
@@ -1062,37 +1496,62 @@ export class VmfsListComponent implements OnInit {
           // this.scanDataStore();
           // 打开成功提示窗口
           this.mountSuccessShow = true;
-        } else if(result.code === '-60001') {
+        } else if (result.code === '-60001') {
           this.connectivityFailure = true;
           this.showDetail = false;
           this.isAddPage = false;
-          const connFailDatas:ConnFaildData[] = [];
+          const connFailDatas: ConnFaildData[] = [];
           if (result.data) {
             result.data.forEach(item => {
-              for (let key in item) {
+              for (const key in item) {
                 const conFailData = {
                   hostName: key,
-                  description: item[key]
+                  description: item[key],
                 };
                 connFailDatas.push(conFailData);
               }
             });
             this.connFailData = connFailDatas;
           }
-        } else {
-          console.log('挂载异常：' + result.description);
-          this.isOperationErr = true;
+        }else if (result.code==='206'){
+          console.log("挂载部分成功："+result.description)
+          // this.isMountPartSuccess=true
+          // this.mountFailOrPartSuccessDesc=result.description
+          // this.mountFailHost=result.data
+          this.mountShow=false
+          this.partSuccessShow=true
+          this.status='partSuccess'
+          this.operatingType='vmfsMount'
+          this.description=result.description
+          this.partSuccessData=result.data
+        }else {
+          // console.log('挂载异常：' + result.description);
+          // this.mountFailOrPartSuccessDesc=result.description
+          // this.isOperationErr = true;
+          this.mountShow=false
+          this.errorShow=true
+          this.status='error'
+          this.operatingType='vmfsMount'
+          this.description=result.description
+          this.partSuccessData=result.data
         }
-        this.cdr.detectChanges();
-      });
+      };
+      const params = _.merge({chooseDevice}, this.mountForm);
+      console.log(params)
+      const res = await this.commonService.remoteVmfs_Mount(params);
+      handlerMountVmfsSuccess(res);
+      this.cdr.detectChanges();
+      // this.remoteSrv.mountVmfs(this.mountForm).subscribe();
     }
   }
+
   // 卸载按钮点击事件
-  unmountBtnFunc() {
+  async unmountBtnFunc() {
     if (this.rowSelected.length === 1) {
       this.modalLoading = true;
       this.modalHandleLoading = false;
       this.isOperationErr = false;
+      this.resetDeviceList();
 
       // 初始化卸载 页面未选择设备 提示数据展示
       this.notChooseUnmountDevice = false;
@@ -1101,118 +1560,263 @@ export class VmfsListComponent implements OnInit {
       this.chooseUnmountHost = null;
       // 获取已挂载的集群 主机数据
       this.unmountForm = new GetForm().getUnmountForm();
-      this.unmountForm.name = this.rowSelected[0].name;
+      if (isMockData) {
+        /* 检测名字过长问题  */
+        this.unmountForm.name = 'name_20210426095614_20210426095619_20210426095621';
+      } else {
+        this.unmountForm.name = this.rowSelected[0].name;
+      }
       this.mountedHost = null;
       this.mountedCluster = null;
-      // 获取主机
-      this.remoteSrv.getMountHost(this.rowSelected[0].objectid).subscribe((result: any) => {
+      this.chooseDevice = [];
+      this.deviceList = await this.commonService.remoteGetVmfsDeviceListById_unmount(
+        this.rowSelected[0].objectid
+      );
+
+      const loadUnountedHost = () => {
+        const handlerUnmountHostSuccess = (result: any) => {
+          if (result.code === '200' && result.data !== null) {
+            this.deviceList_list = _.map(result.data, item => {
+              return {
+                clusterId: item.hostId,
+                clusterName: item.hostName,
+                deviceType: 'host',
+              };
+            });
+          }
+          this.mountHostData = true;
+          this.cdr.detectChanges();
+        };
+
+        if (isMockData) {
+          /* 获取已经挂载的主机 */
+          this.remoteService
+            .getMountHost(this.rowSelected[0].objectid)
+            .subscribe(handlerUnmountHostSuccess);
+        } else {
+          handlerUnmountHostSuccess(mockData.ACCESSVMWARE_LISTHOST);
+        }
+      };
+      loadUnountedHost();
+      this.modalLoading = false;
+      this.unmountShow = true;
+      this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
+
+      /*2.*/
+      /*  const handlerGetMountClusterSuccess = (result: any) => {
+        console.log(result);
+        if (result.code === '200' && result.data !== null && result.data.length >= 1) {
+          this.unmountForm.mountType = '2';
+          const mountCluster: HostOrCluster[] = [];
+          result.data.forEach(item => {
+            const hostInfo = {
+              deviceId: item.hostGroupId,
+              deviceName: item.hostGroupName,
+              deviceType: 'cluster',
+            };
+            mountCluster.push(hostInfo);
+          });
+          this.mountedCluster = mountCluster;
+        }
+        this.modalLoading = false;
+        this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
+      }; */
+      /*1.*/
+      /*  const handlerGetMountHost = async (result: any) => {
         console.log(result);
         if (result.code === '200' && result.data !== null && result.data.length >= 1) {
           this.unmountForm.mountType = '1';
-          const mountHost: HostOrCluster [] = [];
+          const mountHost: HostOrCluster[] = [];
           result.data.forEach(item => {
             const hostInfo = {
               deviceId: item.hostId,
               deviceName: item.hostName,
-              deviceType: 'host'
+              deviceType: 'host',
             };
             mountHost.push(hostInfo);
           });
           this.mountedHost = mountHost;
           console.log('this.serviceLevelList', this.serviceLevelList);
-        }
-        // 获取集群
-        this.remoteSrv.getMountCluster(this.rowSelected[0].objectid).subscribe((result: any) => {
-          console.log(result);
-          if (result.code === '200' && result.data !== null && result.data.length >= 1) {
-            this.unmountForm.mountType = '2';
-            const mountCluster: HostOrCluster [] = [];
-            result.data.forEach(item => {
-              const hostInfo = {
-                deviceId: item.hostGroupId,
-                deviceName: item.hostGroupName,
-                deviceType: 'cluster'
-              };
-              mountCluster.push(hostInfo);
-            });
-            this.mountedCluster = mountCluster;
-          }
-          this.modalLoading = false;
-          this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
-        });
-        this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
-      });
+        } */
 
-      this.unmountShow = true;
+      // 获取集群
+      /*
+        if (isMockData) {
+          handlerGetMountClusterSuccess(mockData.ACCESSVMFS_GETHOSTGROUPSBYSTORAGEID);
+        } else {
+          // this.remoteSrv.getMountCluster(this.rowSelected[0].objectid).subscribe(handlerGetMountClusterSuccess);
+        }
+        */
     }
+
+    /* // 获取主机
+      if (isMockData) {
+        handlerGetMountHost(mockData.ACCESSVMFS_GETHOSTSBYSTORAGEID);
+      } else {
+        this.remoteSrv.getMountHost(this.rowSelected[0].objectid).subscribe(handlerGetMountHost);
+      } */
   }
 
   // 卸载确认
   unMountConfirm() {
+    if (this.isDisableMountSubmit()) return;
     this.unmountTipsShow = true;
+  }
+  //卸载部分成功返回数据处理
+  unmountPartHandleFun(arr:any){
+    let obj=arr[0]
+    let str=Object.keys(obj)[0]
+    let arr1=str.split(",")
+    let arr2=[]
+    for(let item of arr1){
+      item = item.trim()
+      let temp = {}
+      temp[item] = Object.values(obj)[0]
+      arr2.push(temp)
+    }
+    return arr2
+  }
+  //卸载部分成功数据处理总和
+  unmountPartDataHandleFun(arr:any){
+    let temp = []
+    for (let item of arr) {
+      let obj = {}
+      let tempStr1 = Object.values(item)
+      let str = tempStr1.toString().trim()
+      let tempStr2 = Object.keys(item)
+      let str1 = tempStr2.toString().trim()
+      // console.log(Object.keys(item));
+      // console.log(Object.values(item));
+      obj["key"] = str1
+      obj["value"] = str
+      temp.push(obj)
+    }
+    return temp
   }
   // 卸载处理函数
   unmountHandleFunc() {
     this.unmountTipsShow = false;
     console.log('this.chooseUnmountHost', this.chooseUnmountHost);
     console.log('this.chooseUnmountCluster', this.chooseUnmountCluster);
-    console.log('this.flag', (!this.chooseUnmountHost && this.unmountForm.mountType === '1') || (!this.chooseUnmountCluster && this.unmountForm.mountType === '2'));
-    if ((!this.chooseUnmountHost && this.unmountForm.mountType === '1') || (!this.chooseUnmountCluster && this.unmountForm.mountType === '2')) {
-      this.notChooseUnmountDevice = true;
-    } else {
+    console.log(
+      'this.flag',
+      (!this.chooseUnmountHost && this.unmountForm.mountType === '1') ||
+      (!this.chooseUnmountCluster && this.unmountForm.mountType === '2')
+    );
+
+    const submit = () => {
+      this.language=this.translateService.currentLang==='en-US'?'EN':'CN'
       this.unmountForm.dataStoreObjectIds.push(this.rowSelected[0].objectid);
       if (this.unmountForm.mountType === '1') {
-        this.unmountForm.hostId = this.chooseUnmountHost.deviceId;
+        this.unmountForm.hostId = this.chooseUnmountHost?.deviceId;
       } else {
-        this.unmountForm.clusterId = this.chooseUnmountCluster.deviceId;
+        this.unmountForm.clusterId = this.chooseUnmountCluster?.deviceId;
       }
       console.log('this.unmountForm', this.unmountForm);
       this.notChooseUnmountDevice = false;
 
       this.modalHandleLoading = true;
-      this.remoteSrv.unmountVMFS(this.unmountForm).subscribe((result: any) => {
+      console.log('chooseDevice',this.addForm.value.chooseDevice)
+      console.log('unmountForm',this.unmountForm)
+      this.remoteService.unmountVMFS(_.merge(this.unmountForm,{ hostIds: this.addForm.value.chooseDevice.map(i=>i.deviceId) },{language:this.language})).subscribe((result: any) => {
         this.modalHandleLoading = false;
-        if (result.code === '200'){
-          console.log('unmount ' + this.rowSelected[0].name + ' success');
+        if (result.code === '200') {
+          // console.log('unmount ' + this.rowSelected[0].name + ' success');
           // 关闭卸载页面
           this.unmountShow = false;
           // 重新请求数据
           // this.scanDataStore();
           // 打开成功提示窗口
           this.unmountSuccessShow = true;
+        }else if(result.code==='206'){
+          let dmeError=[]
+          let vcError=[]
+          let bounded=[]
+          if(result.data.dmeError&&result.data.dmeError.length>0){
+            dmeError=this.unmountPartHandleFun(result.data.dmeError)
+          }
+          if(result.data.vcError&&result.data.vcError.length>0){
+            vcError=result.data.vcError
+          }
+          if(result.data.bounded&&result.data.bounded.length>0){
+            bounded=result.data.bounded
+          }
+          this.partSuccessData=this.unmountPartDataHandleFun(dmeError.concat(vcError).concat(bounded))
+          this.description=result.description
+          this.unmountShow=false
+          this.status='partSuccess'
+          this.operatingType='vmfsUnmount'
+          this.partSuccessShow=true
         } else {
-          console.log('unmount ' + this.rowSelected[0].name + ' fail：' + result.description);
-          this.isOperationErr = true;
+          // console.log('unmount ' + this.rowSelected[0].name + ' fail：' + result.description);
+          if(result.data&&result.data.length>0){
+            let dmeError=[]
+            let vcError=[]
+            let bounded=[]
+            if(result.data.dmeError&&result.data.dmeError.length>0){
+              dmeError=this.unmountPartHandleFun(result.data.dmeError)
+            }
+            if(result.data.vcError&&result.data.vcError.length>0){
+              vcError=result.data.vcError
+            }
+            if(result.data.bounded&&result.data.bounded.length>0){
+              bounded=result.data.bounded
+            }
+            this.unmountShow=false
+            this.description=result
+            this.status='partSuccess'
+            this.operatingType='vmfsUnmountError'
+            this.partSuccessData=this.unmountPartDataHandleFun(dmeError.concat(vcError).concat(bounded))
+            this.partSuccessShow=true
+          }else {}
+          this.unmountDesc=result.description
+          // this.isOperationErr = true;
+          this.unmountShow = false;
+          this.status='error'
+          this.description=result.description
+          this.operatingType='vmfsUnmount'
+          this.errorShow=true
         }
         this.cdr.detectChanges();
       });
     }
+if( this.form.chooseDevice.length>0 ){
+  submit();
+}
+
+
+    /* if (
+       (!this.chooseUnmountHost && this.unmountForm.mountType === '1') ||
+       (!this.chooseUnmountCluster && this.unmountForm.mountType === '2')
+     ) {
+       this.notChooseUnmountDevice = true;
+     } else */
   }
+
   // 回收空间 处理
   reclaimHandleFunc() {
     const vmfsObjectIds = this.rowSelected[0].objectid;
     this.modalHandleLoading = true;
     const reclaimIds = [];
-    reclaimIds.push(vmfsObjectIds)
-    this.remoteSrv.reclaimVmfs(reclaimIds).subscribe((result: any) => {
+    reclaimIds.push(vmfsObjectIds);
+    this.remoteService.reclaimVmfs(reclaimIds).subscribe((result: any) => {
       this.modalHandleLoading = false;
-      if (result.code === '200'){
+      if (result.code === '200') {
         // 关闭回收空间页面
         this.reclaimShow = false;
         // 空间回收完成重新请求数据
         // this.scanDataStore();
         // 打开成功提示窗口
         this.reclaimSuccessShow = true;
-      }else {
+      } else {
         this.isOperationErr = true;
       }
       this.cdr.detectChanges();
     });
-
   }
+
   // 变更服务等级 按钮点击事件
   changeServiceLevelBtnFunc() {
-
     if (this.rowSelected.length === 1) {
       this.modalLoading = true;
       this.modalHandleLoading = false;
@@ -1231,6 +1835,7 @@ export class VmfsListComponent implements OnInit {
       this.setServiceLevelList();
     }
   }
+
   // 变更服务等级 服务等级点击事件
   changeSLDataClickFunc(serviceLevId: string, serviceLevName: string) {
     this.changeServiceLevelForm.service_level_id = serviceLevId;
@@ -1247,28 +1852,31 @@ export class VmfsListComponent implements OnInit {
       this.changeServiceLevelForm.service_level_name = selectResult.name;
 
       this.modalHandleLoading = true;
-      this.remoteSrv.changeServiceLevel(this.changeServiceLevelForm).subscribe((result: any) => {
-        this.modalHandleLoading = false;
-        if (result.code === '200'){
-          console.log('change service level success:' + name);
-          // 关闭修改服务等级页面
-          this.changeServiceLevelShow = false;
-          // 重新请求数据
-          // this.scanDataStore();
-          // 打开成功提示窗口
-          this.changeServiceLevelSuccessShow = true;
-        } else {
-          console.log('change service level faild: ' + name  + ' Reason:' + result.description);
-          this.isOperationErr = true;
-        }
+      this.remoteService
+        .changeServiceLevel(this.changeServiceLevelForm)
+        .subscribe((result: any) => {
+          this.modalHandleLoading = false;
+          if (result.code === '200') {
+            console.log('change service level success:' + name);
+            // 关闭修改服务等级页面
+            this.changeServiceLevelShow = false;
+            // 重新请求数据
+            // this.scanDataStore();
+            // 打开成功提示窗口
+            this.changeServiceLevelSuccessShow = true;
+          } else {
+            console.log('change service level faild: ' + name + ' Reason:' + result.description);
+            this.isOperationErr = true;
+          }
 
-        this.cdr.detectChanges();
-      });
+          this.cdr.detectChanges();
+        });
     } else {
       this.serviceLevelIsNull = true;
       console.log('服务等级不能为空！');
     }
   }
+
   // 扩容按钮点击事件
   expandBtnFunc() {
     if (this.rowSelected.length === 1) {
@@ -1285,6 +1893,7 @@ export class VmfsListComponent implements OnInit {
       this.expandForm.obj_id = this.rowSelected[0].objectid;
     }
   }
+
   // 扩容处理
   expandHandleFunc() {
     const expandSubmitForm = new GetForm().getExpandForm();
@@ -1301,15 +1910,16 @@ export class VmfsListComponent implements OnInit {
         // case 'KB':
         //   this.expandForm.vo_add_capacity = this.expandForm.vo_add_capacity / (1024 * 1024);
         //   break;
-        default: // 默认GB 不变
+        default:
+          // 默认GB 不变
           break;
       }
       expandSubmitForm.capacityUnit = 'GB';
       this.modalHandleLoading = true;
       // 参数封装
-      this.remoteSrv.expandVMFS(expandSubmitForm).subscribe((result: any) => {
+      this.remoteService.expandVMFS(expandSubmitForm).subscribe((result: any) => {
         this.modalHandleLoading = false;
-        if (result.code === '200'){
+        if (result.code === '200') {
           console.log('expand success:' + name);
           // 隐藏扩容页面
           this.expandShow = false;
@@ -1317,8 +1927,8 @@ export class VmfsListComponent implements OnInit {
           // this.scanDataStore();
           // 打开成功提示窗口
           this.expandSuccessShow = true;
-        }else {
-          console.log('expand: ' + name  + ' Reason:' + result.description);
+        } else {
+          console.log('expand: ' + name + ' Reason:' + result.description);
           // 错误信息 展示
           this.isOperationErr = true;
         }
@@ -1338,15 +1948,18 @@ export class VmfsListComponent implements OnInit {
       if (expand > 0) {
         switch (this.expandForm.capacityUnit) {
           case 'TB':
-            if ((expand*1024).toString().indexOf(".")!==-1) { // 小数
+            if ((expand * 1024).toString().indexOf('.') !== -1) {
+              // 小数
               this.expandErr = true;
               expand = null;
             } else {
               this.expandErr = false;
             }
             break;
-          default: // 默认GB 不变
-            if (expand.toString().indexOf(".")!==-1) { // 小数
+          default:
+            // 默认GB 不变
+            if (expand.toString().indexOf('.') !== -1) {
+              // 小数
               this.expandErr = true;
               expand = null;
             } else {
@@ -1365,6 +1978,7 @@ export class VmfsListComponent implements OnInit {
     console.log('this.expandErr', this.expandErr);
     this.expandForm.vo_add_capacity = expand;
   }
+
   // 空间回收按钮点击事件
   reclaimBtnClick() {
     if (this.rowSelected.length >= 1) {
@@ -1377,7 +1991,7 @@ export class VmfsListComponent implements OnInit {
       const vmfsObjectIds = this.rowSelected[0].objectid;
 
       this.modalHandleLoading = true;
-      this.remoteSrv.reclaimVmfsJudge(vmfsObjectIds).subscribe((result:any) => {
+      this.remoteService.reclaimVmfsJudge(vmfsObjectIds).subscribe((result: any) => {
         this.modalHandleLoading = false;
         if (result.code == '200') {
           if (!result.data) {
@@ -1386,7 +2000,6 @@ export class VmfsListComponent implements OnInit {
         }
         this.cdr.detectChanges();
       });
-
     }
   }
 
@@ -1405,14 +2018,14 @@ export class VmfsListComponent implements OnInit {
    * @param c 容量值
    * @param isGB true GB、false MB
    */
-  formatCapacity(c: number, isGB:boolean){
+  formatCapacity(c: number, isGB: boolean) {
     let cNum;
-    if (c < 1024){
-      cNum = isGB ? c.toFixed(3)+'GB':c.toFixed(3)+'MB';
-    }else if(c >= 1024 && c< 1048576){
-      cNum = isGB ? (c/1024).toFixed(3) + 'TB' : (c/1024).toFixed(3) + 'GB';
-    }else if(c>= 1048576){
-      cNum = isGB ? (c/1024/1024).toFixed(3) + 'PB':(c/1024/1024).toFixed(3) + 'TB';
+    if (c < 1024) {
+      cNum = isGB ? c.toFixed(3) + 'GB' : c.toFixed(3) + 'MB';
+    } else if (c >= 1024 && c < 1048576) {
+      cNum = isGB ? (c / 1024).toFixed(3) + 'TB' : (c / 1024).toFixed(3) + 'GB';
+    } else if (c >= 1048576) {
+      cNum = isGB ? (c / 1024 / 1024).toFixed(3) + 'PB' : (c / 1024 / 1024).toFixed(3) + 'TB';
     }
     return cNum;
   }
@@ -1426,53 +2039,56 @@ export class VmfsListComponent implements OnInit {
     let capacity = this.form.capacity;
     // 标准容量 单位G
     let capacityG;
-    console.log('capacity', capacity)
+    console.log('capacity', capacity);
     if (capacity && capacity !== null && capacity !== '') {
-
       if (capacity > 0) {
         switch (this.form.capacityUnit) {
-          case "TB":
+          case 'TB':
             capacityG = capacity * 1024 + '';
             console.log('capacityG2', capacityG);
-            if (capacityG.indexOf(".")!==-1) { // 小数
+            if (capacityG.indexOf('.') !== -1) {
+              // 小数
               this.capacityErr = true;
               capacity = '';
-            } else{ // 整数
+            } else {
+              // 整数
               if (this.form.version === '5') {
-                if (capacity < 1/1024) {
+                if (capacity < 1 / 1024) {
                   capacity = '';
                   this.capacityErr = true;
                 } else {
                   this.capacityErr = false;
                 }
               } else {
-                if (capacity < 2/1024) {
+                if (capacity < 2 / 1024) {
                   capacity = '';
                   this.capacityErr = true;
-                }else {
+                } else {
                   this.capacityErr = false;
                 }
               }
             }
             break;
-          case "MB":
+          case 'MB':
             capacityG = capacity / 1024 + '';
-            if (capacityG.indexOf(".")!==-1) { // 小数
+            if (capacityG.indexOf('.') !== -1) {
+              // 小数
               this.capacityErr = true;
               capacity = '';
-            } else { // 整数
+            } else {
+              // 整数
               if (this.form.version === '5') {
-                if (capacity < 1*1024) {
+                if (capacity < 1 * 1024) {
                   capacity = '';
                   this.capacityErr = true;
-                }else {
+                } else {
                   this.capacityErr = false;
                 }
               } else {
-                if (capacity < 2*1024) {
+                if (capacity < 2 * 1024) {
                   capacity = '';
                   this.capacityErr = true;
-                }else {
+                } else {
                   this.capacityErr = false;
                 }
               }
@@ -1480,10 +2096,12 @@ export class VmfsListComponent implements OnInit {
             break;
           default:
             capacityG = capacity + '';
-            if (capacityG.indexOf(".")!==-1) { // 小数
+            if (capacityG.indexOf('.') !== -1) {
+              // 小数
               capacity = '';
               this.capacityErr = true;
-            } else {// 整数
+            } else {
+              // 整数
               if (this.form.version === '5') {
                 if (capacity < 1) {
                   capacity = '';
@@ -1499,7 +2117,6 @@ export class VmfsListComponent implements OnInit {
                   this.capacityErr = false;
                 }
               }
-
             }
             break;
         }
@@ -1521,8 +2138,9 @@ export class VmfsListComponent implements OnInit {
    */
   countBlur() {
     let count = this.form.count;
-    if (count && count !== null && count !== '') {
-      if ((count+'').indexOf(".")!==-1) { // 小数
+    /*     if (count && count !== null && count !== '') {
+      if ((count + '').indexOf('.') !== -1) {
+        // 小数
         count = '';
         this.capacityErr = true;
       } else {
@@ -1531,14 +2149,27 @@ export class VmfsListComponent implements OnInit {
     } else {
       count = '';
     }
-    this.form.count =  count;
+    this.form.count = count;
+ */
+
+    /* 且容量必须为单位为G的正整数，数量必须为正整数且不超过100 */
+    const isInteger = regExpCollection.integer().test(count);
+
+    if (!(isInteger && count > 0 && count <= 200)) {
+      this.form.count = null;
+    }
   }
 
   /**
    * add 下一页
    */
   addNextPage() {
-    if (this.form.capacity !== '' && this.form.count !== '' && this.form.capacity > 0 && this.form.count > 0) {
+    if (
+      this.form.capacity !== '' &&
+      this.form.count !== '' &&
+      this.form.capacity > 0 &&
+      this.form.count > 0
+    ) {
       this.wizard.next();
     }
   }
@@ -1549,8 +2180,7 @@ export class VmfsListComponent implements OnInit {
    * @param operationType add modify
    * @param valType
    */
-  qosBlur(type:string, operationType:string) {
-
+  qosBlur(type: string, operationType: string) {
     let objVal;
     if (type === 'add') {
       switch (operationType) {
@@ -1590,13 +2220,13 @@ export class VmfsListComponent implements OnInit {
       }
     }
     if (objVal && objVal !== '') {
-      if (objVal.toString().match( /^[1-9]\d*$/)) {
+      if (objVal.toString().match(/^[1-9]\d*$/)) {
         objVal = objVal.toString().match(/^[1-9]\d*$/)[0];
       } else {
         objVal = '';
       }
     }
-    if (objVal > 999999999){
+    if (objVal > 999999999) {
       objVal = '';
     } else if (objVal < 1) {
       objVal = '';
@@ -1641,6 +2271,9 @@ export class VmfsListComponent implements OnInit {
     }
 
     this.iopsErrTips(objVal, operationType, type);
+
+    // 下限大于上限 检测
+    this.qosV6Check(type);
   }
 
   /**
@@ -1648,42 +2281,42 @@ export class VmfsListComponent implements OnInit {
    * @param objVal
    * @param operationType
    */
-  iopsErrTips(objVal:string, operationType:string, type:string) {
+  iopsErrTips(objVal: string, operationType: string, type: string) {
     if (operationType) {
       if (type == 'add') {
         switch (operationType) {
           case 'maxbandwidth':
             if (objVal == '' && this.form.maxbandwidthChoose) {
               this.bandWidthMaxErrTips = true;
-            }else {
+            } else {
               this.bandWidthMaxErrTips = false;
             }
             break;
           case 'maxiops':
             if (objVal == '' && this.form.maxiopsChoose) {
               this.iopsMaxErrTips = true;
-            }else {
+            } else {
               this.iopsMaxErrTips = false;
             }
             break;
           case 'minbandwidth':
             if (objVal == '' && this.form.minbandwidthChoose) {
               this.bandWidthMinErrTips = true;
-            }else {
+            } else {
               this.bandWidthMinErrTips = false;
             }
             break;
           case 'miniops':
             if (objVal == '' && this.form.miniopsChoose) {
               this.iopsMinErrTips = true;
-            }else {
+            } else {
               this.iopsMinErrTips = false;
             }
             break;
           default:
             if (objVal == '' && this.form.latencyChoose) {
               this.latencyErrTips = true;
-            }else {
+            } else {
               this.latencyErrTips = false;
             }
             break;
@@ -1693,35 +2326,35 @@ export class VmfsListComponent implements OnInit {
           case 'max_bandwidth':
             if (objVal == '' && this.modifyForm.maxbandwidthChoose) {
               this.bandWidthMaxErrTips = true;
-            }else {
+            } else {
               this.bandWidthMaxErrTips = false;
             }
             break;
           case 'max_iops':
             if (objVal == '' && this.modifyForm.maxiopsChoose) {
               this.iopsMaxErrTips = true;
-            }else {
+            } else {
               this.iopsMaxErrTips = false;
             }
             break;
           case 'min_bandwidth':
             if (objVal == '' && this.modifyForm.minbandwidthChoose) {
               this.bandWidthMinErrTips = true;
-            }else {
+            } else {
               this.bandWidthMinErrTips = false;
             }
             break;
           case 'min_iops':
             if (objVal == '' && this.modifyForm.miniopsChoose) {
               this.iopsMinErrTips = true;
-            }else {
+            } else {
               this.iopsMinErrTips = false;
             }
             break;
           default:
             if (objVal == '' && this.modifyForm.latencyChoose) {
               this.latencyErrTips = true;
-            }else {
+            } else {
               this.latencyErrTips = false;
             }
             break;
@@ -1733,7 +2366,7 @@ export class VmfsListComponent implements OnInit {
   /**
    * 初始化IOPS错误提示
    */
-  initIopsErrTips(upper:boolean, lower:boolean){
+  initIopsErrTips(upper: boolean, lower: boolean) {
     if (upper) {
       this.bandWidthMaxErrTips = false;
       this.iopsMaxErrTips = false;
@@ -1758,9 +2391,11 @@ export class VmfsListComponent implements OnInit {
     this.unmountSuccessShow = false;
     this.delSuccessShow = false;
     this.isFirstLoadChartData = true;
+    this.partSuccessShow=false;
+    this.errorShow=false
     // this.backToListPage();
     // 重新请求数据
-    this.refresh();
+    this.refreshVmfs();
   }
 
   /**
@@ -1772,11 +2407,11 @@ export class VmfsListComponent implements OnInit {
     this.vmfsNameRepeatErr = false;
     this.volNameRepeatErr = false;
     this.matchErr = false;
-
-    let reg5:RegExp = new RegExp('^[0-9a-zA-Z-\u4e00-\u9fa5a"_""."]*$');
     if (isVmfs) {
       if (this.form.name) {
-        if (reg5.test(this.form.name)) {
+        /* 20210426163328 */
+        const inLimit = !isStringLengthByteOutRange(this.form.name, 27);
+        if (regExpCollection.vmfsName().test(this.form.name) && inLimit) {
           // 校验VMFS名称重复
           this.checkVmfsName(this.form.name);
           if (this.form.isSameName) {
@@ -1787,13 +2422,21 @@ export class VmfsListComponent implements OnInit {
           this.form.name = null;
         }
       } else {
-        this.matchErr = true;
+        this.form.name = null;
       }
     } else {
       if (this.form.volumeName) {
-        if (reg5.test(this.form.volumeName)) {
+        console.log(
+          '🚀 ~ file: list.component.ts ~ line 2109 ~ VmfsListComponent ~ nameCheck ~ this.form.volumeName',
+          this.form.volumeName
+        );
+        if (
+          regExpCollection.vmfsName().test(this.form.volumeName) &&
+          !isStringLengthByteOutRange(this.form.volumeName, 27)
+        ) {
           // 校验Vol名称重复
           this.checkVolName(this.form.volumeName);
+          console.log(this.checkVolName(this.form.volumeName));
         } else {
           this.matchErr = true;
           this.form.volumeName = null;
@@ -1802,21 +2445,26 @@ export class VmfsListComponent implements OnInit {
         this.matchErr = true;
       }
     }
-    console.log("this.vmfsNameRepeatErr", this.vmfsNameRepeatErr)
-    console.log("this.volNameRepeatErr", this.volNameRepeatErr)
-    console.log("this.matchErr", this.matchErr)
+    console.log('this.vmfsNameRepeatErr', this.vmfsNameRepeatErr);
+    console.log('this.volNameRepeatErr', this.volNameRepeatErr);
+    console.log('this.matchErr', this.matchErr);
   }
 
   /**
    * vmfs重名校验
    */
   checkVmfsName(name: string) {
+    if ((this as any).checkVmfsNameExist_oldName === name) return;
+    (this as any).checkVmfsNameExist_oldName = name;
     this.modalHandleLoading = true;
-    this.remoteSrv.checkVmfsName(name).subscribe((result: any) => {
+
+    this.remoteService.checkVmfsName(name).subscribe((result: any) => {
       this.modalHandleLoading = false;
-      if (result.code === '200') { // result.data true 不重复 false 重复
+      if (result.code === '200') {
+        // result.data true 不重复 false 重复
         this.vmfsNameRepeatErr = !result.data;
-        if (this.vmfsNameRepeatErr) { // 名称重复
+        if (this.vmfsNameRepeatErr) {
+          // 名称重复
           this.volNameRepeatErr = false;
           this.matchErr = false;
         } else {
@@ -1833,11 +2481,15 @@ export class VmfsListComponent implements OnInit {
    * vol重名校验
    */
   checkVolName(name: string) {
+    if ((this as any).checkVolNameExist_oldName === name) return;
+    (this as any).checkVolNameExist_oldName = name;
     this.modalHandleLoading = true;
+
     // 校验VMFS名称重复
-    this.remoteSrv.checkVolName(name).subscribe((result: any) => {
+    this.remoteService.checkVolName(name).subscribe((result: any) => {
       this.modalHandleLoading = false;
-      if (result.code === '200') { // result.data true 不重复 false 重复
+      if (result.code === '200') {
+        // result.data true 不重复 false 重复
         this.volNameRepeatErr = !result.data;
         // if (!this.vmfsNameRepeatErr && this.volNameRepeatErr) {
         //   this.form.name = null;
@@ -1848,7 +2500,7 @@ export class VmfsListComponent implements OnInit {
           this.matchErr = false;
         }
       }
-      console.log("this.modalHandleLoading", this.modalHandleLoading)
+      console.log('this.modalHandleLoading', this.modalHandleLoading);
       this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
     });
   }
@@ -1860,19 +2512,35 @@ export class VmfsListComponent implements OnInit {
     this.vmfsNameRepeatErr = false;
     this.volNameRepeatErr = false;
     this.matchErr = false;
-    let reg5:RegExp = new RegExp('^[0-9a-zA-Z-\u4e00-\u9fa5a"_""."]*$');
+    const reg5: RegExp = regExpCollection.vmfsName();
+    // const reg5: RegExp = new RegExp('^[0-9a-zA-Z-\u4e00-\u9fa5a"_""."]*$');
+    if (
+      this.bandWidthMaxErrTips ||
+      this.iopsMaxErrTips ||
+      this.bandWidthMinErrTips ||
+      this.iopsMinErrTips ||
+      this.latencyErrTips ||
+      this.bandwidthLimitErr ||
+      this.iopsLimitErr
+    ) {
+      return;
+    }
+    const inLimit = !isStringLengthByteOutRange(this.modifyForm.name, 27);
 
     if (this.modifyForm.name) {
-      if (reg5.test(this.modifyForm.name)) {
+      if (reg5.test(this.modifyForm.name) && inLimit) {
         // 校验VMFS名称重复
         // this.modalHandleLoading = true;
-        if (this.modifyNameChanged) { // 名称发生变化则进行名称校验
+        if (this.modifyNameChanged) {
+          // 名称发生变化则进行名称校验
           this.nameChecking = true;
-          this.remoteSrv.checkVmfsName(this.modifyForm.name).subscribe((result: any) => {
+          this.remoteService.checkVmfsName(this.modifyForm.name).subscribe((result: any) => {
             // this.modalHandleLoading = false;
-            if (result.code === '200') { // result.data true 不重复 false 重复
+            if (result.code === '200') {
+              // result.data true 不重复 false 重复
               this.vmfsNameRepeatErr = !result.data;
-              if (this.vmfsNameRepeatErr) { // 名称重复
+              if (this.vmfsNameRepeatErr) {
+                // 名称重复
                 this.modifyForm.name = null;
                 this.volNameRepeatErr = false;
                 this.matchErr = false;
@@ -1881,9 +2549,10 @@ export class VmfsListComponent implements OnInit {
                 if (this.modifyForm.isSameName) {
                   // this.modalHandleLoading = true;
                   // 校验VMFS名称重复
-                  this.remoteSrv.checkVolName(this.modifyForm.name).subscribe((result: any) => {
+                  this.remoteService.checkVolName(this.modifyForm.name).subscribe((result: any) => {
                     // this.modalHandleLoading = false;
-                    if (result.code === '200') { // result.data true 不重复 false 重复
+                    if (result.code === '200') {
+                      // result.data true 不重复 false 重复
                       this.volNameRepeatErr = !result.data;
                       if (!this.vmfsNameRepeatErr && this.volNameRepeatErr) {
                         this.modifyForm.name = null;
@@ -1911,12 +2580,12 @@ export class VmfsListComponent implements OnInit {
         } else {
           this.modifyHandleFunc();
         }
-
       } else {
-        this.matchErr = true;
         this.modifyForm.name = null;
+        this.matchErr = true;
       }
     } else {
+      this.modifyForm.name = null;
       this.matchErr = true;
     }
   }
@@ -1924,10 +2593,11 @@ export class VmfsListComponent implements OnInit {
   qosFunc(form) {
     // qos策略 1 支持复选(上限、下限) 2支持单选（上限或下限） 3只支持上限
     const qosTag = this.getStorageQosTag(form.storage_id);
-    if (!form.qosFlag) {// 关闭状态
+    if (!form.qosFlag) {
+      // 关闭状态
       this.initAddMinInfo(form);
       this.initAddMaxInfo(form);
-    }else {
+    } else {
       if (form.control_policyUpper == '1') {
         if (!form.maxbandwidthChoose) {
           form.maxbandwidth = null;
@@ -1942,9 +2612,9 @@ export class VmfsListComponent implements OnInit {
         this.initAddMaxInfo(form);
       }
       if (form.control_policyLower == '0') {
-        if(qosTag == 2){
+        if (qosTag == 2) {
           this.initAddMaxInfo(form);
-        }else if (qosTag == 3) {
+        } else if (qosTag == 3) {
           this.initAddMinInfo(form);
         }
         if (!form.minbandwidthChoose) {
@@ -1966,6 +2636,7 @@ export class VmfsListComponent implements OnInit {
       }
     }
   }
+
   initAddMinInfo(form) {
     form.control_policyLower = undefined;
     form.minbandwidthChoose = false;
@@ -1975,6 +2646,7 @@ export class VmfsListComponent implements OnInit {
     form.latencyChoose = false;
     form.latency = null;
   }
+
   initAddMaxInfo(form) {
     form.control_policyUpper = undefined;
     form.maxbandwidthChoose = false;
@@ -1987,8 +2659,8 @@ export class VmfsListComponent implements OnInit {
    * add qos开关
    * @param form
    */
-  qoSAddFlagChange(form){
-    if(form.qosFlag) {
+  qoSAddFlagChange(form) {
+    if (form.qosFlag) {
       form.control_policyUpper = undefined;
       form.maxbandwidthChoose = false;
       form.maxiopsChoose = false;
@@ -1999,13 +2671,15 @@ export class VmfsListComponent implements OnInit {
       form.latencyChoose = false;
     }
   }
+
   qosEditFunc(form) {
-    console.log("editform.qosFlag", form.qosFlag);
+    console.log('editform.qosFlag', form.qosFlag);
     const qosTag = this.storage.storageTypeShow.qosTag;
-    if (!form.qosFlag) {// 关闭状态
+    if (!form.qosFlag) {
+      // 关闭状态
       this.initEditMinInfo(form);
       this.initEditMaxInfo(form);
-    }else {
+    } else {
       if (form.control_policyUpper == '1') {
         if (!form.maxbandwidthChoose) {
           form.max_bandwidth = null;
@@ -2020,7 +2694,7 @@ export class VmfsListComponent implements OnInit {
         this.initEditMaxInfo(form);
       }
       if (form.control_policyLower == '0') {
-        if(qosTag == 2) {
+        if (qosTag == 2) {
           this.initEditMaxInfo(form);
         } else if (qosTag == 3) {
           this.initEditMinInfo(form);
@@ -2044,6 +2718,7 @@ export class VmfsListComponent implements OnInit {
       }
     }
   }
+
   initEditMinInfo(form) {
     form.control_policyLower = undefined;
     form.minbandwidthChoose = false;
@@ -2053,6 +2728,7 @@ export class VmfsListComponent implements OnInit {
     form.latencyChoose = false;
     form.latency = null;
   }
+
   initEditMaxInfo(form) {
     form.control_policyUpper = undefined;
     form.maxiopsChoose = false;
@@ -2065,8 +2741,8 @@ export class VmfsListComponent implements OnInit {
    * edit qos开关
    * @param form
    */
-  qoSEditFlagChange(form){
-    if(form.qosFlag) {
+  qoSEditFlagChange(form) {
+    if (form.qosFlag) {
       form.control_policyUpper = undefined;
       form.maxbandwidthChoose = false;
       form.maxiopsChoose = false;
@@ -2077,17 +2753,23 @@ export class VmfsListComponent implements OnInit {
       form.latencyChoose = false;
     }
   }
+
   /**
    * 编辑页面  名称变化Func
    */
   modifyNameChange() {
+    const inLimit = !isStringLengthByteOutRange(this.modifyForm.name, 27);
+    if (!(regExpCollection.vmfsName().test(this.modifyForm.name) && inLimit)) {
+      this.matchErr = true;
+      this.modifyForm.name = null;
+    }
     const oldName = this.rowSelected[0].volumeName;
     if (oldName !== this.modifyForm.name) {
       this.modifyNameChanged = true;
     } else {
       this.modifyNameChanged = false;
     }
-    console.log("this.modifyForm.name", this.modifyForm.name);
+    console.log('this.modifyForm.name', this.modifyForm.name);
   }
 
   /**
@@ -2099,11 +2781,19 @@ export class VmfsListComponent implements OnInit {
     const qosTag = this.getStorageQosTag(this.form.storage_id);
     this.form.control_policyLower = undefined;
     this.form.control_policyUpper = undefined;
-    const upperObj = document.getElementById("control_policyUpper") as HTMLInputElement;
-    const lowerObj = document.getElementById("control_policyLower") as HTMLInputElement;
+    const upperObj = document.getElementById('control_policyUpper') as HTMLInputElement;
+    const lowerObj = document.getElementById('control_policyLower') as HTMLInputElement;
+
+    /* todo */
     if (upperObj && upperObj.checked) {
       upperObj.checked = false;
     }
+
+    if (this.modifyForm.isCheckedUpper) {
+      this.modifyForm.isCheckedUpper = false;
+    }
+    /*  */
+
     if (lowerObj && lowerObj.checked) {
       lowerObj.checked = false;
     }
@@ -2127,7 +2817,7 @@ export class VmfsListComponent implements OnInit {
    * 获取选中的存储的 SmartTier
    * @param storageId
    */
-  getStroageSmartTierShow(storageId){
+  getStroageSmartTierShow(storageId) {
     const storageTypeShow = this.storageList.filter(item => item.id == storageId);
     // SmartTier策略 true 支持 false 不支持
     const smartTierShow = storageTypeShow[0].storageTypeShow.smartTierShow;
@@ -2199,6 +2889,7 @@ export class VmfsListComponent implements OnInit {
    * @param lowerObj
    * @param isUpper true:upper、false:lower
    */
+
   controlPolicyChangeFunc(upperId, lowerId, isEdit, form, isUpper) {
     const upperObj = document.getElementById(upperId) as HTMLInputElement;
     const lowerObj = document.getElementById(lowerId) as HTMLInputElement;
@@ -2210,10 +2901,9 @@ export class VmfsListComponent implements OnInit {
       qosTag = this.getStorageQosTag(this.form.storage_id);
     }
 
-
     let upperChecked;
-    if(upperObj) {
-      upperChecked =  upperObj.checked;
+    if (upperObj) {
+      upperChecked = upperObj.checked;
     }
     let lowerChecked;
     if (lowerObj) {
@@ -2221,24 +2911,25 @@ export class VmfsListComponent implements OnInit {
     }
     this.initIopsErrTips(upperChecked, lowerChecked);
     if (isUpper) {
-      if(upperChecked) {
+      if (upperChecked) {
         form.control_policyUpper = '1';
-      }else {
+      } else {
         form.control_policyUpper = undefined;
       }
-      if(qosTag == 2 && upperChecked) { // 单选
-        console.log("单选1", qosTag)
+      if (qosTag == 2 && upperChecked) {
+        // 单选
+        console.log('单选1', qosTag);
         form.control_policyLower = undefined;
         lowerObj.checked = false;
       }
     } else {
-      if(lowerChecked) {
-       form.control_policyLower = '0';
-      }else {
+      if (lowerChecked) {
+        form.control_policyLower = '0';
+      } else {
         form.control_policyLower = undefined;
       }
       if (lowerChecked && qosTag == 2) {
-        console.log("单选2", qosTag)
+        console.log('单选2', qosTag);
         form.control_policyUpper = undefined;
         upperObj.checked = false;
       }
@@ -2248,45 +2939,238 @@ export class VmfsListComponent implements OnInit {
     } else {
       this.form = form;
     }
-    console.log("lowerChecked", this.form)
+    if (form.control_policyUpper == undefined) {
+      form.maxbandwidthChoose = false;
+      form.maxiopsChoose = false;
+    }
+    if (form.control_policyLower == undefined) {
+      form.minbandwidthChoose = false;
+      form.miniopsChoose = false;
+      form.latencyChoose = false;
+    }
+    console.log('lowerChecked', this.form);
+    const type = isEdit ? 'edit' : 'add';
+    this.qosV6Check(type);
   }
 
-  /**
-   *
-   * 添加页面名称相同按钮点击事件
-   */
-  addSameBtnChangeFunc(obj) {
-    if (this.form.isSameName) {
-      this.form.volumeName = this.form.name
+  handleModifyControlPolicyChange(isEdit, form, isUpper) {
+    // qos策略 1 支持复选(上限、下限) 2支持单选（上限或下限） 3只支持上限
+    let qosTag;
+    if (isEdit) {
+      qosTag = this.storage.storageTypeShow.qosTag;
+    } else {
+      qosTag = this.getStorageQosTag(this.form.storage_id);
     }
+    const upperChecked = this.modifyForm.isCheckedUpper;
+    const lowerChecked = this.modifyForm.isCheckedlower;
+
+    this.initIopsErrTips(upperChecked, lowerChecked);
+    if (isUpper) {
+      if (upperChecked) {
+        form.control_policyUpper = '1';
+      } else {
+        form.control_policyUpper = undefined;
+      }
+      if (qosTag == 2 && upperChecked) {
+        // 单选
+        console.log('单选1', qosTag);
+        form.control_policyLower = undefined;
+        this.modifyForm.isCheckedlower = false;
+      }
+    } else {
+      if (lowerChecked) {
+        form.control_policyLower = '0';
+      } else {
+        form.control_policyLower = undefined;
+      }
+      if (lowerChecked && qosTag == 2) {
+        console.log('单选2', qosTag);
+        form.control_policyUpper = undefined;
+        this.modifyForm.isCheckedUpper = false;
+      }
+    }
+
+    if (isEdit) {
+      this.modifyForm = form;
+    } else {
+      this.form = form;
+    }
+
+    if (form.control_policyUpper == undefined) {
+      form.maxbandwidthChoose = false;
+      form.maxiopsChoose = false;
+    }
+    if (form.control_policyLower == undefined) {
+      form.minbandwidthChoose = false;
+      form.miniopsChoose = false;
+      form.latencyChoose = false;
+    }
+    console.log('lowerChecked', this.form);
+    const type = isEdit ? 'edit' : 'add';
+    this.qosV6Check(type);
   }
-  resetQosFlag(objValue:boolean, operationType:string) {
+
+  resetQosFlag(objValue: boolean, operationType: string) {
     switch (operationType) {
       case 'maxbandwidth':
-        if(!objValue) {
+        if (!objValue) {
           this.bandWidthMaxErrTips = false;
         }
         break;
       case 'maxiops':
-        if(!objValue) {
+        if (!objValue) {
           this.iopsMaxErrTips = false;
         }
         break;
       case 'minbandwidth':
-        if(!objValue) {
+        if (!objValue) {
           this.bandWidthMinErrTips = false;
         }
         break;
       case 'miniops':
-        if(!objValue) {
+        if (!objValue) {
           this.iopsMinErrTips = false;
         }
         break;
       default:
-        if(!objValue) {
+        if (!objValue) {
           this.latencyErrTips = false;
         }
         break;
+    }
+  }
+
+  sortFunc(obj: any) {
+    return !obj;
+  }
+
+  qosV6Check(type: string) {
+    if (type == 'add') {
+      if (this.form.storage_id) {
+        const chooseStorage = this.storageList.filter(item => item.id == this.form.storage_id)[0];
+        if (chooseStorage) {
+          const qosTag = chooseStorage.storageTypeShow.qosTag;
+          this.dorado = String(qosTag) === '1';
+          const {bandwidthLimitErr, iopsLimitErr} = getQosCheckTipsTagInfo({
+            qosTag,
+            minBandwidthChoose: this.form.minbandwidthChoose,
+            minBandwidth: this.form.minbandwidth,
+            maxBandwidthChoose: this.form.maxbandwidthChoose,
+            maxBandwidth: this.form.maxbandwidth,
+            minIopsChoose: this.form.miniopsChoose,
+            minIops: this.form.miniops,
+            maxIopsChoose: this.form.maxiopsChoose,
+            maxIops: this.form.maxiops,
+            control_policyUpper: this.form.control_policyUpper,
+            control_policyLower: this.form.control_policyLower,
+          });
+          this.bandwidthLimitErr = bandwidthLimitErr;
+          this.iopsLimitErr = iopsLimitErr;
+
+          /*
+
+
+          const qosTag = chooseStorage.storageTypeShow.qosTag;
+          if (qosTag == 1) {
+            if (this.form.minbandwidthChoose && this.form.maxbandwidthChoose) {
+              // 带宽上限小于下限
+              if (
+                this.form.minbandwidth &&
+                this.form.maxbandwidth &&
+                Number(this.form.minbandwidth) > Number(this.form.maxbandwidth)
+              ) {
+                this.bandwidthLimitErr = true;
+              } else {
+                this.bandwidthLimitErr = false;
+              }
+            } else {
+              this.bandwidthLimitErr = false;
+            }
+            if (this.form.miniopsChoose && this.form.maxiopsChoose) {
+              // iops上限小于下限
+              if (
+                this.form.miniops &&
+                this.form.maxiops &&
+                Number(this.form.miniops) > Number(this.form.maxiops)
+              ) {
+                this.iopsLimitErr = true;
+              } else {
+                this.iopsLimitErr = false;
+              }
+            } else {
+              this.iopsLimitErr = false;
+            }
+          } else {
+            this.iopsLimitErr = false;
+            this.bandwidthLimitErr = false;
+          }
+          if (this.form.maxiopsChoose && this.form.maxiops && Number(this.form.maxiops) < 100) {
+            this.iopsLimitErr = true;
+          }
+          if (this.form.control_policyUpper == undefined) {
+            this.iopsLimitErr = false;
+            this.bandwidthLimitErr = false;
+          }
+          if (this.form.control_policyLower == undefined) {
+            this.bandwidthLimitErr = false;
+          }
+
+          */
+        }
+      }
+    } else {
+      if (this.storage) {
+        const qosTag = this.storage.storageTypeShow.qosTag;
+        if (qosTag == 1) {
+          if (this.modifyForm.minbandwidthChoose && this.modifyForm.maxbandwidthChoose) {
+            // 带宽上限小于下限
+            if (
+              this.modifyForm.min_bandwidth &&
+              this.modifyForm.max_bandwidth &&
+              Number(this.modifyForm.min_bandwidth) > Number(this.modifyForm.max_bandwidth)
+            ) {
+              this.bandwidthLimitErr = true;
+            } else {
+              this.bandwidthLimitErr = false;
+            }
+          } else {
+            this.bandwidthLimitErr = false;
+          }
+          if (this.modifyForm.miniopsChoose && this.modifyForm.maxiopsChoose) {
+            // iops上限小于下限
+            if (
+              this.modifyForm.min_iops &&
+              this.modifyForm.max_iops &&
+              Number(this.modifyForm.min_iops) > Number(this.modifyForm.max_iops)
+            ) {
+              this.iopsLimitErr = true;
+            } else {
+              this.iopsLimitErr = false;
+            }
+          } else {
+            this.iopsLimitErr = false;
+          }
+        } else {
+          this.iopsLimitErr = false;
+          this.bandwidthLimitErr = false;
+        }
+
+        if (
+          this.modifyForm.maxiopsChoose &&
+          this.modifyForm.max_iops &&
+          Number(this.modifyForm.max_iops) < 100
+        ) {
+          this.iopsLimitErr = true;
+        }
+
+        if (this.modifyForm.control_policyUpper == undefined) {
+          this.iopsLimitErr = false;
+          this.bandwidthLimitErr = false;
+        }
+        if (this.modifyForm.control_policyLower == undefined) {
+          this.bandwidthLimitErr = false;
+        }
+      }
     }
   }
 }

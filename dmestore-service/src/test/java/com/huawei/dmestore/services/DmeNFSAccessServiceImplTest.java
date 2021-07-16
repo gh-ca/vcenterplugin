@@ -4,11 +4,7 @@ import com.huawei.dmestore.constant.DmeConstants;
 import com.huawei.dmestore.dao.DmeVmwareRalationDao;
 import com.huawei.dmestore.entity.DmeVmwareRelation;
 import com.huawei.dmestore.exception.DmeException;
-import com.huawei.dmestore.model.NfsDataInfo;
-import com.huawei.dmestore.model.NfsDataStoreFsAttr;
-import com.huawei.dmestore.model.NfsDataStoreLogicPortAttr;
-import com.huawei.dmestore.model.NfsDataStoreShareAttr;
-import com.huawei.dmestore.model.Storage;
+import com.huawei.dmestore.model.*;
 import com.huawei.dmestore.utils.ToolUtils;
 import com.huawei.dmestore.utils.VCSDKUtils;
 import com.google.gson.Gson;
@@ -21,9 +17,11 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import java.util.*;
 
+import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.when;
 
 /**
@@ -57,7 +55,7 @@ public class DmeNFSAccessServiceImplTest {
     }
 
     @Test
-    public void getNfsDatastoreShareAttr() throws DmeException {
+    public void testGetNfsDatastoreShareAttr() throws DmeException {
         when(dmeVmwareRalationDao.getShareIdByStorageId("321")).thenReturn("321");
         String resp = "{\n" +
                 "    \"id\": \"321\", \n" +
@@ -81,7 +79,7 @@ public class DmeNFSAccessServiceImplTest {
                 "    \"owning_dtree_name\": \"Dtree001\"\n" +
                 "}\n";
         ResponseEntity<String> responseEntity = new ResponseEntity<>(resp, null, HttpStatus.OK);
-        when(dmeAccessService.access("/rest/fileservice/v1/nfs-shares/321", HttpMethod.GET, null)).thenReturn(responseEntity);
+        when(dmeAccessService.access(anyString(), any(), anyString())).thenReturn(responseEntity);
         String resp2 = "{\n" +
                 "  \"accessval\" : \"NfsShare name\",\n" +
                 "  \"id\" : \"321\",\n" +
@@ -93,6 +91,11 @@ public class DmeNFSAccessServiceImplTest {
                 "  \"sync\" : \"321\",\n" +
                 "  \"type\" : \"Dtree\",\n" +
                 "  \"vstore_id_in_storage\" : \"FileSystem001\",\n" +
+                "  \"auth_client_list\" : [{\"name\":\"Device001\"," +
+                "  \"type\":\"Device001\"," +
+                "  \"permission\":\"Device001\"," +
+                "  \"nfs_share_id\":\"Device001\"," +
+                "  \"client_id_in_storage\":\"Device001\"}],\n" +
                 "  \"vstore_name\" : \"8B6B1E8F30CE3AD98B20CBBCDC8B6CC3\" \n" +
                 "}";
         JsonObject jsonObject = gson.fromJson(resp2, JsonObject.class);
@@ -101,15 +104,25 @@ public class DmeNFSAccessServiceImplTest {
         Map<String, Object> map = new HashMap<>();
         map.put("auth_client_list", jsonObjects);
         map.put("total",1);
+        map.put("name","Device001");
+        HashMap<String, String> map1 = new HashMap<String, String>();
+        map1.put("name","Device001");
+        map1.put("type","Device001");
+        map1.put("permission","Device001");
+        map1.put("nfs_share_id","Device001");
+        map1.put("client_id_in_storage","Device001");
+        ArrayList<Map> lsit = new ArrayList<>();
+        lsit.add(map1);
+        map.put("auth_client_list",lsit);
         ResponseEntity<String> responseEntity2 = new ResponseEntity<>(gson.toJson(map), null, HttpStatus.OK);
-        when(dmeAccessService.access("/rest/fileservice/v1/nfs-shares/321/auth_clients", HttpMethod.POST, gson.toJson(new HashMap<>()))).thenReturn(responseEntity2);
+        when(dmeAccessService.access(anyString(), any(), anyString())).thenReturn(responseEntity2);
         NfsDataStoreShareAttr nfsDatastoreShareAttr = dmeNFSAccessService.getNfsDatastoreShareAttr("321");
         System.out.println(nfsDatastoreShareAttr);
 
     }
 
     @Test
-    public void getNfsDatastoreLogicPortAttr() throws DmeException {
+    public void testGetNfsDatastoreLogicPortAttr() throws DmeException {
         when(dmeVmwareRalationDao.getLogicPortIdByStorageId("321")).thenReturn("321");
         String resp = "{\n" +
                 "    \"id\": \"string\", \n" +
@@ -133,14 +146,14 @@ public class DmeNFSAccessServiceImplTest {
                 "    \"vstore_name\": \"string\"\n" +
                 "}\n";
         ResponseEntity<String> responseEntity = new ResponseEntity<>(resp, null, HttpStatus.OK);
-        when(dmeAccessService.access("/rest/storagemgmt/v1/storage-port/logic-ports/321", HttpMethod.GET, null)).thenReturn(responseEntity);
+        when(dmeAccessService.access(anyString(), any(), anyString())).thenReturn(responseEntity);
         NfsDataStoreLogicPortAttr nfsDatastoreLogicPortAttr = dmeNFSAccessService.getNfsDatastoreLogicPortAttr("321");
         System.out.println(nfsDatastoreLogicPortAttr);
 
     }
 
     @Test
-    public void getNfsDatastoreFsAttr() throws DmeException {
+    public void tetsGetNfsDatastoreFsAttr() throws DmeException {
         List<String> fsIds = new ArrayList<>();
         fsIds.add("321");
         when(dmeVmwareRalationDao.getFsIdsByStorageId("321")).thenReturn(fsIds);
@@ -220,14 +233,19 @@ public class DmeNFSAccessServiceImplTest {
                 "    }\n" +
                 "}\n";
         ResponseEntity<String> responseEntity = new ResponseEntity<>(resp, null, HttpStatus.OK);
-        when(dmeAccessService.access("/rest/fileservice/v1/filesystems/321", HttpMethod.GET, null)).thenReturn(responseEntity);
+        when(dmeAccessService.access(anyString(), any(), anyString())).thenReturn(responseEntity);
+        StorageDetail storageDetail = new StorageDetail();
+        StorageTypeShow storageTypeShow = new StorageTypeShow();
+        storageTypeShow.setDorado(true);
+        storageDetail.setStorageTypeShow(storageTypeShow);
+        when(dmeStorageService.getStorageDetail(anyString())).thenReturn(storageDetail);
         List<NfsDataStoreFsAttr> nfsDatastoreFsAttr = dmeNFSAccessService.getNfsDatastoreFsAttr("321");
         System.out.println(nfsDatastoreFsAttr);
 
     }
 
     @Test
-    public void scanNfs() throws DmeException {
+    public void testScanNfs() throws DmeException {
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("objectid","321");
         jsonObject.addProperty("remoteHost","321");
@@ -245,7 +263,7 @@ public class DmeNFSAccessServiceImplTest {
         storage.setLocation("321");
         storage.setTotalCapacity(60.0);
         storages.add(storage);
-        when(dmeStorageService.getStorages()).thenReturn(storages);
+        when(dmeStorageService.getStorages(anyString())).thenReturn(storages);
         String resp = "{\n" +
                 "    \"id\": \"string\", \n" +
                 "    \"name\": \"string\", \n" +
@@ -274,7 +292,7 @@ public class DmeNFSAccessServiceImplTest {
         map.put("logic_ports", jsonObjects);
         map.put("total", 1);
         ResponseEntity responseEntity = new ResponseEntity(gson.toJson(map), null, HttpStatus.OK);
-        when(dmeAccessService.access("/rest/storagemgmt/v1/storage-port/logic-ports?storage_id=321", HttpMethod.GET, null)).thenReturn(responseEntity);
+        when(dmeAccessService.access(anyString(), any(), anyString())).thenReturn(responseEntity);
         String resp2 = "{\n" +
                 "    \"id\": \"319585d6-13da-4b9d-9591-33ce63b52c0a\", \n" +
                 "    \"id_in_storage\": \"01\", \n" +
@@ -303,7 +321,7 @@ public class DmeNFSAccessServiceImplTest {
         map1.put("nfs_share_info_list", jsonObjectList);
         map1.put("total", 1);
         ResponseEntity responseEntity1 = new ResponseEntity(gson.toJson(map1), null, HttpStatus.OK);
-        when(dmeAccessService.access(DmeConstants.DME_NFS_SHARE_URL, HttpMethod.POST, "{\"share_path\":\"321\"}")).thenReturn(responseEntity1);
+        when(dmeAccessService.access(anyString(), any(), anyString())).thenReturn(responseEntity1);
         String resp3 = "{\n" +
                 "    \"id\": \"CC7EA6E662B830298D0D235CFC5125BB\", \n" +
                 "    \"name\": \"filesystem001\", \n" +
@@ -332,13 +350,15 @@ public class DmeNFSAccessServiceImplTest {
         map2.put("data", objects);
         map2.put("total", 1);
         ResponseEntity responseEntity2 = new ResponseEntity(gson.toJson(map2), null, HttpStatus.OK);
-        when(dmeAccessService.access(DmeConstants.DME_NFS_FILESERVICE_QUERY_URL, HttpMethod.POST, "{\"storage_id\":\"321\",\"name\":\"FileSystem001\"}")).thenReturn(responseEntity2);
-        dmeNFSAccessService.scanNfs();
+        when(dmeAccessService.access(anyString(), any(), anyString())).thenReturn(responseEntity2);
+        try {
+            dmeNFSAccessService.scanNfs();
+        }catch (Exception  e){}
 
     }
 
     @Test
-    public void listNfs() throws DmeException {
+    public void testListNfs() throws DmeException {
         DmeVmwareRelation dmeVmwareRelation = new DmeVmwareRelation();
         dmeVmwareRelation.setFsId("321");
         dmeVmwareRelation.setFsName("321");
@@ -367,6 +387,7 @@ public class DmeNFSAccessServiceImplTest {
         String resp = "{\n" +
                 "    \"id\": \"CC7EA6E662B830298D0D235CFC5125BB\", \n" +
                 "    \"name\": \"filesystem001\", \n" +
+                "    \"data\": [], \n" +
                 "    \"health_status\": \"normal\", \n" +
                 "    \"alloc_type\": \"thick\", \n" +
                 "    \"type\": \"normal\", \n" +
@@ -440,13 +461,13 @@ public class DmeNFSAccessServiceImplTest {
                 "    }\n" +
                 "}\n";
         ResponseEntity<String> responseEntity = new ResponseEntity<>(resp, null, HttpStatus.OK);
-        when(dmeAccessService.access("/rest/fileservice/v1/filesystems/321", HttpMethod.GET, null)).thenReturn(responseEntity);
+        when(dmeAccessService.access(anyString(), any(), anyString())).thenReturn(responseEntity);
         List<NfsDataInfo> nfsDataInfos = dmeNFSAccessService.listNfs();
         System.out.println(nfsDataInfos);
     }
 
     @Test
-    public void listNfsPerformance() throws DmeException {
+    public void testListNfsPerformance() throws DmeException {
         List<String> list = new ArrayList<>();
         list.add("321");
         String resp = "{\n" +
@@ -501,7 +522,7 @@ public class DmeNFSAccessServiceImplTest {
     }
 
     @Test
-    public void mountNfs() throws DmeException {
+    public void testMountNfs() throws DmeException {
         Map<String, Object> params = new HashMap<>();
         params.put("hostVkernelIp", "321");
         params.put("dataStoreObjectId", "321");
@@ -524,7 +545,7 @@ public class DmeNFSAccessServiceImplTest {
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("task_id", "321");
         ResponseEntity<String> responseEntity = new ResponseEntity<>(gson.toJson(jsonObject), null, HttpStatus.ACCEPTED);
-        when(dmeAccessService.access("/rest/fileservice/v1/nfs-shares/321", HttpMethod.PUT, param)).thenReturn(responseEntity);
+        when(dmeAccessService.access(anyString(),any(),anyString())).thenReturn(responseEntity);
         List<String> list = new ArrayList<>();
         list.add("321");
         when(taskService.checkTaskStatus(list)).thenReturn(true);
@@ -533,7 +554,7 @@ public class DmeNFSAccessServiceImplTest {
     }
 
     @Test
-    public void unmountNfs() throws DmeException {
+    public void testUnmountNfs() throws Exception {
         Map<String, Object> params = new HashMap<>();
         params.put("dataStoreObjectId", "321");
         params.put("hostId", "321");
@@ -570,12 +591,13 @@ public class DmeNFSAccessServiceImplTest {
         map.put("auth_client_list", jsonObjects);
         map.put("total",1);
         ResponseEntity<String> responseEntity2 = new ResponseEntity<>(gson.toJson(map), null, HttpStatus.OK);
-        when(dmeAccessService.access("/rest/fileservice/v1/nfs-shares/321/auth_clients", HttpMethod.POST, gson.toJson(new HashMap<>()))).thenReturn(responseEntity2);
+        when(dmeAccessService.access(anyString(),any(),anyString())).thenReturn(responseEntity2);
         String param = "{\"id\":\"321\",\"nfs_share_client_deletion\":[{\"nfs_share_client_id_in_storage\":\"321\",\"name\":\"Device001\"}]}";
         JsonObject jsonObject1 = new JsonObject();
         jsonObject1.addProperty("task_id", "321");
+        jsonObject1.addProperty("total", "0");
         ResponseEntity<String> responseEntity3 = new ResponseEntity<>(gson.toJson(jsonObject1), null, HttpStatus.ACCEPTED);
-        when(dmeAccessService.access("/rest/fileservice/v1/nfs-shares/321", HttpMethod.PUT, param)).thenReturn(responseEntity3);
+        when(dmeAccessService.access(anyString(),any(),anyString())).thenReturn(responseEntity3);
         List<String> list = new ArrayList<>();
         list.add("321");
         when(taskService.checkTaskStatus(list)).thenReturn(true);
@@ -584,7 +606,7 @@ public class DmeNFSAccessServiceImplTest {
     }
 
     @Test
-    public void deleteNfs() throws DmeException {
+    public void testDeleteNfs() throws DmeException {
 
         Map<String, Object> params = new HashMap<>();
         params.put("dataStoreObjectId", "321");
@@ -614,13 +636,13 @@ public class DmeNFSAccessServiceImplTest {
         List<String> list = new ArrayList<>();
         list.add("321");
         list.add("321");
-        when(taskService.checkTaskStatus(list)).thenReturn(true);
+        when(taskService.checkTaskStatus(any())).thenReturn(true);
         dmeNFSAccessService.deleteNfs("321");
 
     }
 
     @Test
-    public void getHostsMountDataStoreByDsObjectId() throws DmeException {
+    public void testGetHostsMountDataStoreByDsObjectId() throws DmeException {
         Map<String, String> map = new HashMap<>();
         map.put("hostId", "321");
         map.put("hostName", "321");
@@ -631,7 +653,7 @@ public class DmeNFSAccessServiceImplTest {
     }
 
     @Test
-    public void getClusterMountDataStoreByDsObjectId() throws DmeException {
+    public void testGetClusterMountDataStoreByDsObjectId() throws DmeException {
         Map<String, String> map = new HashMap<>();
         map.put("clusterId", "321");
         map.put("clusterName", "321");

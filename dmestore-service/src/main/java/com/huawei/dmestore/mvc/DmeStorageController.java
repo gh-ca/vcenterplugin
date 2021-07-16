@@ -35,9 +35,9 @@ public class DmeStorageController extends BaseController {
      * @return ResponseBodyBean
      */
     @GetMapping("/storages")
-    public ResponseBodyBean getStorages() {
+    public ResponseBodyBean getStorages(@RequestParam(defaultValue = "") String flag) {
         try {
-            return success(dmeStorageService.getStorages());
+            return success(dmeStorageService.getStorages(flag));
         } catch (DmeException e) {
             return failure(e.getMessage());
         }
@@ -98,9 +98,11 @@ public class DmeStorageController extends BaseController {
      */
     @GetMapping("/logicports")
     @ResponseBody
-    public ResponseBodyBean getLogicPorts(@RequestParam(name = "storageId") String storageId) {
+    public ResponseBodyBean getLogicPorts(@RequestParam(name = "storageId") String storageId,
+                                          @RequestParam(name = "flag" ,defaultValue = "") String flag,
+                                          @RequestParam(name = "supportProtocol",required = false,defaultValue = "all") String supportProtocol) {
         try {
-            return success(dmeStorageService.getLogicPorts(storageId));
+            return success(dmeStorageService.getLogicPorts(storageId,supportProtocol,flag));
         } catch (DmeException e) {
             return failure(e.getMessage());
         }

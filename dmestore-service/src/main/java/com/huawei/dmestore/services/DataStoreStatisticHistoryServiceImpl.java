@@ -1,30 +1,26 @@
 package com.huawei.dmestore.services;
 
+import com.google.gson.*;
 import com.huawei.dmestore.constant.DmeConstants;
 import com.huawei.dmestore.constant.DmeIndicatorConstants;
+import com.huawei.dmestore.dao.DmeVmwareRalationDao;
 import com.huawei.dmestore.exception.DmeException;
+import com.huawei.dmestore.exception.DmeSqlException;
 import com.huawei.dmestore.model.RelationInstance;
 import com.huawei.dmestore.utils.ToolUtils;
-
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cglib.beans.BeanMap;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.lang.reflect.Field;
+import java.util.*;
 
 /**
  * DataStoreStatisticHistoryService
@@ -53,6 +49,8 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
 
     private static final String RANGE = "range";
 
+    private static final String CODE_503 = "503";
+
     private static final long TWENTY_FOUR_HOURS = 24 * 60 * 60 * 1000;
 
     private static final int MAX_OBJ_INDICATOR = 50;
@@ -63,6 +61,11 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
 
     private static final String INTERVAL = "interval";
 
+    private static final int DIGIT_100 = 100;
+
+    private static final int DIGIT_2 = 2;
+
+
     private Gson gson = new Gson();
 
     @Autowired
@@ -70,6 +73,8 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
 
     @Autowired
     private DmeRelationInstanceService dmeRelationInstanceService;
+    @Autowired
+    private DmeVmwareRalationDao dmeVmwareRalationDao;
 
     @Override
     public Map<String, Object> queryVmfsStatistic(Map<String, Object> params) throws DmeException {
@@ -127,6 +132,8 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
 
     @Override
     public Map<String, Object> queryVolumeStatistic(Map<String, Object> params) throws DmeException {
+        log.info("性能-queryVolumeStatistic：{}");
+        params.put("objids",params.get("obj_ids"));
         Map<String, String> idInstancdIdMap = initParamVolume(params, false);
         return queryHistoryStatistic(VOLUME_INSTANCE, params, idInstancdIdMap);
     }
@@ -151,6 +158,7 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
 
     @Override
     public Map<String, Object> queryFsStatistic(Map<String, Object> params) throws DmeException {
+        params.put("objids",params.get("obj_ids"));
         Map<String, String> idInstancdIdMap = initParamFs(params, false);
         return queryHistoryStatistic("storageFileSystem", params, idInstancdIdMap);
     }
@@ -282,7 +290,8 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
 
     @Override
     public Map<String, Object> queryHistoryStatistic(String relationOrInstance, Map<String, Object> params)
-        throws DmeException {
+            throws DmeException {
+        log.info("性能-queryHistoryStatistic：{}", relationOrInstance);
         Map<String, Object> resultMap = new HashMap<>(DmeConstants.COLLECTION_CAPACITY_16);
         if (!StringUtils.isEmpty(relationOrInstance)) {
             switch (relationOrInstance) {
@@ -319,43 +328,250 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
     }
 
     private Map<String, Object> queryHistoryStatistic(String relationOrInstance, Map<String, Object> params,
-        Map<String, String> idInstanceIdMap) throws DmeException {
+                                                      Map<String, String> idInstanceIdMap) throws DmeException {
         Map<String, Object> resultmap = new HashMap<>(DmeConstants.COLLECTION_CAPACITY_16);
         ResponseEntity responseEntity;
         JsonElement statisticElement;
+        Map<String, Object> objectMap = new HashMap<>();
         List<List<String>> objIdGroup = groupObjIds(params);
-        if (null != objIdGroup && objIdGroup.size() > 0) {
-            for (List<String> objids : objIdGroup) {
-                params.put(OBJ_IDS_FIELD, objids);
-                try {
-                    responseEntity = queryStatistic(params);
-                    if (null != responseEntity
-                        && DmeConstants.HTTPS_STATUS_SUCCESS_200 == responseEntity.getStatusCodeValue()) {
-                        Object body = responseEntity.getBody();
-                        String bodyStr = replace(body.toString(), idInstanceIdMap);
-                        JsonObject bodyJson = new JsonParser().parse(bodyStr).getAsJsonObject();
-                        statisticElement = bodyJson.get("data");
-                        if (ToolUtils.jsonIsNull(statisticElement)) {
-                            continue;
+        try {
+            if (null != objIdGroup && objIdGroup.size() > 0) {
+                for (List<String> objids : objIdGroup) {
+                    params.put(OBJ_IDS_FIELD, objids);
+                    try {
+                        responseEntity = queryStatistic(params);
+                        if (null != responseEntity
+                                && DmeConstants.HTTPS_STATUS_SUCCESS_200 == responseEntity.getStatusCodeValue()) {
+                            Object body = responseEntity.getBody();
+                            String bodyStr = replace(body.toString(), idInstanceIdMap);
+                            JsonObject bodyJson = new JsonParser().parse(bodyStr).getAsJsonObject();
+                            statisticElement = bodyJson.get("data");
+                            if (ToolUtils.jsonIsNull(statisticElement)) {
+                                continue;
+                            }
+                            objectMap = convertMap(statisticElement);
+                            resultmap.putAll(objectMap);
+                        } else {
+                            log.error("{} statistic error,the params is:{}", relationOrInstance, gson.toJson(params));
+                            throw new DmeException("503", relationOrInstance + " statistic error,the params is:{}");
                         }
-                        Map<String, Object> objectMap = convertMap(statisticElement);
-                        resultmap.putAll(objectMap);
-                    } else {
-                        log.error("{} statistic error,the params is:{}", relationOrInstance, gson.toJson(params));
-                        throw new DmeException("503", relationOrInstance + " statistic error,the params is:{}");
+                    } catch (DmeException e) {
+                        log.error("{} statistic exception.{}", relationOrInstance, e);
+                        throw new DmeException("503", e.getMessage());
                     }
-                } catch (DmeException e) {
-                    log.error("{} statistic exception.{}", relationOrInstance, e);
-                    throw new DmeException("503", e.getMessage());
                 }
             }
+            //调用获取qos策略控制的方法
+            //根据入参来判断是调用vmfs还是nfs
+            Object indicatorIds = params.get(INDICATOR_IDS_FIELD);
+            List<String> indicatorlist = new ArrayList<>();
+            Map<String, Object> map = new HashMap<>();
+            if (!StringUtils.isEmpty(indicatorIds)) {
+                indicatorlist = getObjIds(indicatorIds);
+            }
+            if (indicatorlist.contains(DmeIndicatorConstants.COUNTER_ID_VOLUME_READTHROUGHPUT)
+                    || indicatorlist.contains(DmeIndicatorConstants.COUNTER_ID_VOLUME_WRITETHROUGHPUT)
+                    || indicatorlist.contains(DmeIndicatorConstants.COUNTER_ID_VOLUME_READBANDWIDTH)
+                    || indicatorlist.contains(DmeIndicatorConstants.COUNTER_ID_VOLUME_WRITEBANDWIDTH)
+                    || indicatorlist.contains(DmeIndicatorConstants.COUNTER_ID_VOLUME_READRESPONSETIME)
+                    || indicatorlist.contains(DmeIndicatorConstants.COUNTER_ID_VOLUME_WRITERESPONSETIME)
+            ) {
+                map = queryVfmsQosInfo(params);
+            } else if (
+                    indicatorlist.contains(DmeIndicatorConstants.COUNTER_ID_FS_THROUGHPUT)
+                            || indicatorlist.contains(DmeIndicatorConstants.COUNTER_ID_FS_BANDWIDTH)
+                            || indicatorlist.contains(DmeIndicatorConstants.COUNTER_ID_FS_READRESPONSETIME)
+                            || indicatorlist.contains(DmeIndicatorConstants.COUNTER_ID_FS_WRITERESPONSETIME)
+            ) {
+                map = queryNfsQosInfo(params);
+            }
+            Object objIds = params.get("objids");
+            if (!StringUtils.isEmpty(objIds) && !CollectionUtils.isEmpty(getObjIds(objIds))) {
+                if (null != objIds) {
+                    JsonArray objIdJsonArray = new JsonParser().parse(ToolUtils.getStr(objIds)).getAsJsonArray();
+                    for (JsonElement element : objIdJsonArray) {
+                        String id = ToolUtils.jsonToStr(element);
+                        Map<String, Object> tempMap = (Map<String,Object>)resultmap.get(id);
+                        if (!CollectionUtils.isEmpty(tempMap)) {
+                            tempMap.put("upper", ToolUtils.getStr(((Map<String, Object>) map.get(id)).get("upper")));
+                            tempMap.put("lower", ToolUtils.getStr(((Map<String, Object>) map.get(id)).get("lower")));
+                        }
+                        resultmap.put(id,tempMap);
+                    }
+                }
+            }
+        }catch (Exception e){
+            log.error("{} statistic exception.{}", relationOrInstance, e);
+            throw new DmeException("503", e.getMessage());
         }
         return resultmap;
     }
 
+    private Map<String, Object> queryNfsQosInfo (Map<String, Object> params) throws DmeException {
+        HashMap<String, Object> resMap = new HashMap<String, Object>();
+        HashMap<String, Object> resultMap = new HashMap<String, Object>();
+        Object objIds = params.get("objids");
+        if (!StringUtils.isEmpty(objIds) && !CollectionUtils.isEmpty(getObjIds(objIds))) {
+            if (null != objIds) {
+                JsonArray objIdJsonArray = new JsonParser().parse(ToolUtils.getStr(objIds)).getAsJsonArray();
+                for (JsonElement element : objIdJsonArray) {
+                    String id = ToolUtils.jsonToStr(element);
+                    String volumeId = paseVolumeId(id);
+                    if (!StringUtils.isEmpty(volumeId)) {
+                        String url = DmeConstants.DME_NFS_FILESERVICE_DETAIL_URL.replace("{file_system_id}", volumeId.toLowerCase());
+                        try {
+                            ResponseEntity<String> responseTuning = dmeAccessService.access(url, HttpMethod.GET, null);
+                            if (responseTuning.getStatusCodeValue() / DIGIT_100 == DIGIT_2) {
+                                JsonObject object = new JsonParser().parse(responseTuning.getBody()).getAsJsonObject();
+                                JsonObject tuning = object.get("tuning").getAsJsonObject();
+                                JsonObject smartQos = tuning.get("smart_qos").getAsJsonObject();
+                                if (!StringUtils.isEmpty(smartQos)) {
+                                    resMap.put("maxbandwidth", smartQos.get("max_bandwidth"));
+                                    resMap.put("maxiops", smartQos.get("max_iops"));
+                                    resMap.put("minbandwidth", smartQos.get("min_bandwidth"));
+                                    resMap.put("miniops", smartQos.get("min_iops"));
+                                    resMap.put("latency", smartQos.get("latency"));
+                                }
+                            }
+                        } catch (Exception e) {
+                            log.error("get volume's info  error", e);
+                            throw new DmeException(CODE_503, e.getMessage());
+                        }
+                        Object indicatorIds = params.get(INDICATOR_IDS_FIELD);
+                        Map<String,Object> tempMap = new HashMap<>();
+                        List<String> indicatorlist = new ArrayList<>();
+                        if (!StringUtils.isEmpty(indicatorIds)) {
+                            indicatorlist = getObjIds(indicatorIds);
+                            if (indicatorlist.contains(DmeIndicatorConstants.COUNTER_ID_VOLUME_READTHROUGHPUT)
+                                    || indicatorlist.contains(DmeIndicatorConstants.COUNTER_ID_VOLUME_WRITETHROUGHPUT)) {
+                                tempMap.put("upper", resMap.get("maxiops"));
+                                tempMap.put("lower", resMap.get("miniops"));
+                            } else if (indicatorlist.contains(DmeIndicatorConstants.COUNTER_ID_VOLUME_READBANDWIDTH)
+                                    || indicatorlist.contains(DmeIndicatorConstants.COUNTER_ID_VOLUME_WRITEBANDWIDTH)) {
+                                tempMap.put("upper", resMap.get("maxbandwidth"));
+                                tempMap.put("lower", resMap.get("minbandwidth"));
+                            } else if (indicatorlist.contains(DmeIndicatorConstants.COUNTER_ID_VOLUME_READRESPONSETIME)
+                                    || indicatorlist.contains(DmeIndicatorConstants.COUNTER_ID_VOLUME_WRITERESPONSETIME)) {
+                                tempMap.put("upper", resMap.get("latency"));
+                                tempMap.put("lower", "");
+                            }
+                        }
+                        resultMap.put(id, tempMap);
+                    }
+                }
+            }
+
+        }
+
+        return resultMap;
+    }
+
+    private Map<String, Object> queryVfmsQosInfo(Map<String, Object> params) throws DmeException {
+        HashMap<String, Object> resMap = new HashMap<String, Object>();
+        HashMap<String, Object> resultMap = new HashMap<String, Object>();
+        Object objIds = params.get("objids");
+        if (!StringUtils.isEmpty(objIds) && !CollectionUtils.isEmpty(getObjIds(objIds))) {
+            if (null != objIds) {
+                JsonArray objIdJsonArray = new JsonParser().parse(ToolUtils.getStr(objIds)).getAsJsonArray();
+                for (JsonElement element : objIdJsonArray) {
+                    String id = ToolUtils.jsonToStr(element);
+                    String volumeId = getVolumnIds(id);
+                    String url = DmeConstants.DME_VOLUME_BASE_URL + "/" + volumeId;
+                    try {
+                        ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET,
+                                null);
+                        int code = responseEntity.getStatusCodeValue();
+                        if (code != HttpStatus.OK.value()) {
+                            throw new DmeException(CODE_503, "get volume error !");
+                        }
+                        Object object = responseEntity.getBody();
+                        if (object != null) {
+                            JsonObject jsonObject = new JsonParser().parse(object.toString()).getAsJsonObject();
+                            JsonElement volume = jsonObject.get("volume");
+                            JsonObject volumeJson = new JsonParser().parse(volume.toString()).getAsJsonObject();
+                            JsonElement tuning = volumeJson.get("tuning");
+                            JsonObject tuningJson = new JsonParser().parse(tuning.toString()).getAsJsonObject();
+                            JsonElement smartqos = tuningJson.get("smartqos");
+                            if(smartqos!=null && !smartqos.isJsonNull()) {
+                                JsonObject smartqosObj = new JsonParser().parse(smartqos.toString()).getAsJsonObject();
+                                if (!StringUtils.isEmpty(smartqosObj)) {
+                                    resMap.put("maxbandwidth", smartqosObj.get("maxbandwidth"));
+                                    resMap.put("maxiops", smartqosObj.get("maxiops"));
+                                    resMap.put("minbandwidth", smartqosObj.get("minbandwidth"));
+                                    resMap.put("miniops", smartqosObj.get("miniops"));
+                                    resMap.put("latency", smartqosObj.get("latency"));
+                                }
+                            }
+                        }
+                    } catch (DmeException e) {
+                        log.error("get volume's info  error", e);
+                        throw new DmeException(CODE_503, e.getMessage());
+                    }
+                    Object indicatorIds = params.get(INDICATOR_IDS_FIELD);
+                    List<String> indicatorlist = new ArrayList<>();
+                    Map<String,Object> tempMap = new HashMap<>();
+                    if (!StringUtils.isEmpty(indicatorIds)) {
+                        indicatorlist = getObjIds(indicatorIds);
+                        if (indicatorlist.contains(DmeIndicatorConstants.COUNTER_ID_VOLUME_READTHROUGHPUT)
+                                || indicatorlist.contains(DmeIndicatorConstants.COUNTER_ID_VOLUME_WRITETHROUGHPUT)) {
+                            tempMap.put("upper", resMap.get("maxiops"));
+                            tempMap.put("lower", resMap.get("miniops"));
+                        } else if (indicatorlist.contains(DmeIndicatorConstants.COUNTER_ID_VOLUME_READBANDWIDTH)
+                                || indicatorlist.contains(DmeIndicatorConstants.COUNTER_ID_VOLUME_WRITEBANDWIDTH)) {
+                            tempMap.put("upper", resMap.get("maxbandwidth"));
+                            tempMap.put("lower", resMap.get("minbandwidth"));
+                        } else if (indicatorlist.contains(DmeIndicatorConstants.COUNTER_ID_VOLUME_READRESPONSETIME)
+                                || indicatorlist.contains(DmeIndicatorConstants.COUNTER_ID_VOLUME_WRITERESPONSETIME)) {
+                            tempMap.put("upper", resMap.get("latency"));
+                            tempMap.put("lower", "");
+                        }
+                    }
+                    resultMap.put(id,tempMap);
+                }
+            }
+
+        }
+
+        return resultMap;
+    }
+
+    private String getVolumnIds(String objId) throws DmeSqlException {
+        String volumeid = null;
+        if(!StringUtils.isEmpty(objId)){
+            volumeid =  dmeVmwareRalationDao.getVolumeIdBywwn(objId);
+        }
+        return volumeid;
+    }
+
+    private String paseVolumeId(String s) {
+        String resultl = null;
+        if (!StringUtils.isEmpty(s)) {
+            resultl = s.substring(0, 8) + "-" + s.substring(8, 12) + "-" + s.substring(12, 16) + "-" + s.substring(16, 20) + "-" + s.substring(20);
+        }
+        return resultl;
+    }
+
+
+    //Object转Map
+    private static Map<String, Object> getObjectToMap(Object obj) throws IllegalAccessException {
+        Map<String, Object> map = new LinkedHashMap<String, Object>();
+        Class<?> clazz = obj.getClass();
+        System.out.println(clazz);
+        for (Field field : clazz.getDeclaredFields()) {
+            field.setAccessible(true);
+            String fieldName = field.getName();
+            Object value = field.get(obj);
+            if (value == null){
+                value = "";
+            }
+            map.put(fieldName, value);
+        }
+        return map;
+    }
+
     @Override
     public Map<String, Object> queryCurrentStatistic(String relationOrInstance, Map<String, Object> params)
-        throws DmeException {
+            throws DmeException {
         Map<String, Object> resultMap = new HashMap<>(DmeConstants.COLLECTION_CAPACITY_16);
         if (!StringUtils.isEmpty(relationOrInstance)) {
             switch (relationOrInstance) {
@@ -386,9 +602,9 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
                 default:
                     resultMap.put("code", Integer.valueOf(DmeConstants.ERROR_CODE_503));
                     resultMap.put("message",
-                        relationOrInstance + " current statistic error, non-supported relation and instance!");
+                            relationOrInstance + " current statistic error, non-supported relation and instance!");
                     log.error("{} current statistic error, non-supported relation and instance.the params is:{}",
-                        relationOrInstance, gson.toJson(params));
+                            relationOrInstance, gson.toJson(params));
                     throw new DmeException(gson.toJson(resultMap));
             }
         }
@@ -396,7 +612,7 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
     }
 
     private Map<String, Object> queryCurrentStatistic(String relationOrInstance, Map<String, Object> params,
-        Map<String, String> idInstanceIdMap) {
+                                                      Map<String, String> idInstanceIdMap) {
         Map<String, Object> resultmap = new HashMap<>();
         String label = MAX_LABEL;
         ResponseEntity responseEntity;
@@ -408,27 +624,27 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
                 try {
                     responseEntity = queryStatistic(params);
                     if (null != responseEntity
-                        && DmeConstants.HTTPS_STATUS_SUCCESS_200 == responseEntity.getStatusCodeValue()) {
+                            && DmeConstants.HTTPS_STATUS_SUCCESS_200 == responseEntity.getStatusCodeValue()) {
                         Object body = responseEntity.getBody();
-                        String bodyStr = body.toString();
+                        String bodyStr = ToolUtils.getStr(body);
                         bodyStr = replace(bodyStr, idInstanceIdMap);
                         JsonObject bodyJson = new JsonParser().parse(bodyStr).getAsJsonObject();
                         statisticElement = bodyJson.get("data");
                         if (ToolUtils.jsonIsNull(statisticElement)) {
                             log.error(
-                                relationOrInstance + "objid: " + gson.toJson(objids) + "currentStatistic is null:",
-                                bodyJson.get(ERROR_MSG).getAsString());
+                                    relationOrInstance + "objid: " + gson.toJson(objids) + "currentStatistic is null:",
+                                    bodyJson.get(ERROR_MSG).getAsString());
                             continue;
                         }
                         Map<String, Object> objectMap = convertMap(statisticElement, label);
                         resultmap.putAll(objectMap);
                         if (null == objectMap || objectMap.size() == 0) {
                             log.error("{} current statistic error:{}", relationOrInstance,
-                                bodyJson.get(ERROR_MSG).getAsString());
+                                    bodyJson.get(ERROR_MSG).getAsString());
                         }
                     } else {
                         log.error("{} current statistic error,the params is:{}", relationOrInstance,
-                            gson.toJson(params));
+                                gson.toJson(params));
                     }
                 } catch (DmeException e) {
                     log.error("{} current statistic exception.{}", relationOrInstance, e);
@@ -449,10 +665,13 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
         Object indicatorIds = params.get(INDICATOR_IDS_FIELD);
         Map<String, Map<String, Object>> instanceMap = dmeRelationInstanceService.getStorageDeviceInstance();
         for (String id : ids) {
-            String instanceId = instanceMap.get(id).get(RESID_FIELD).toString();
-            if (!StringUtils.isEmpty(instanceId)) {
-                idInstancdIdMap.put(id, instanceId);
-                instanceIds.add(instanceId);
+            Map<String, Object> map = instanceMap.get(id);
+            if (map != null && map.size() != 0) {
+                String instanceId = map.get(RESID_FIELD).toString();
+                if (!StringUtils.isEmpty(instanceId)) {
+                    idInstancdIdMap.put(id, instanceId);
+                    instanceIds.add(instanceId);
+                }
             }
         }
         if (instanceIds.size() > 0) {
@@ -479,10 +698,13 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
         Object indicatorIds = params.get(INDICATOR_IDS_FIELD);
         Map<String, Map<String, Object>> sysLunMap = dmeRelationInstanceService.getStoragePoolInstance();
         for (String id : ids) {
-            String instanceId = sysLunMap.get(id).get(RESID_FIELD).toString();
-            if (!StringUtils.isEmpty(instanceId)) {
-                idInstancdIdMap.put(id, instanceId);
-                instanceIds.add(instanceId);
+            Map<String, Object> map = sysLunMap.get(id);
+            if (map != null && map.size() != 0) {
+                String instanceId = ToolUtils.getStr(map.get(RESID_FIELD));
+                if (!StringUtils.isEmpty(instanceId)) {
+                    idInstancdIdMap.put(id, instanceId);
+                    instanceIds.add(instanceId);
+                }
             }
         }
         if (instanceIds.size() > 0) {
@@ -506,29 +728,31 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
         }
         Map<String, String> idInstancdIdMap = new HashMap<>(DmeConstants.COLLECTION_CAPACITY_16);
         List<String> instanceIds = new ArrayList<>();
-        Object indicatorIds = params.get(INDICATOR_IDS_FIELD);
         Object objIds = params.get(OBJ_IDS_FIELD);
         List<String> ids = getObjIds(objIds);
+        Object indicatorIds = params.get(INDICATOR_IDS_FIELD);
         if (ids.size() > 0) {
             // ids若为wwn的集合则转换为对应的instanceId集合,也有可能ids直接就是volume的instanceId集合
             Map<String, Map<String, Object>> sysLunMap = dmeRelationInstanceService.getLunInstance();
-            for (String id : ids) {
-                if (sysLunMap.size() != 0) {
-                    String instanceId = ToolUtils.getStr(sysLunMap.get(id));
-                    if (!StringUtils.isEmpty(instanceId)) {
-                        idInstancdIdMap.put(id, instanceId);
-                        instanceIds.add(instanceId);
+            if (sysLunMap != null && sysLunMap.size() > 0) {
+                for (String id : ids) {
+                    Map<String, Object> map = sysLunMap.get(id);
+                    if (map != null && map.size() != 0) {
+                        String instanceId = ToolUtils.getStr(map.get(RESID_FIELD));
+                        if (!StringUtils.isEmpty(instanceId)) {
+                            idInstancdIdMap.put(id, instanceId);
+                            instanceIds.add(instanceId);
+                        }
                     }
                 }
-            }
-            if (instanceIds.size() > 0) {
-                params.put(OBJ_IDS_FIELD, instanceIds);
+                if (instanceIds.size() > 0) {
+                    params.put(OBJ_IDS_FIELD, instanceIds);
+                }
             }
         }
 
         // SYS_Lun
-        String objTypeId = SYS_LUN_OBJTYPEID;
-        params.put(OBJ_TYPE_ID_FIELD, objTypeId);
+        params.put(OBJ_TYPE_ID_FIELD, SYS_LUN_OBJTYPEID);
         if (null == indicatorIds) {
             indicatorIds = initVolumeIndicator(isCurrent);
             params.put(INDICATOR_IDS_FIELD, indicatorIds);
@@ -606,8 +830,8 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
         RelationInstance relationInstance = null;
         try {
             List<RelationInstance> instances
-                = dmeRelationInstanceService.queryRelationByRelationNameConditionSourceInstanceId(relationName,
-                sourceId);
+                    = dmeRelationInstanceService.queryRelationByRelationNameConditionSourceInstanceId(relationName,
+                    sourceId);
             if (instances.size() > 0) {
                 relationInstance = instances.get(0);
             }
@@ -644,9 +868,9 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
     private List<String> getObjIds(Object objIds) {
         List<String> objectIds = new ArrayList<>();
         if (null != objIds) {
-            JsonArray objIdJsonArray = new JsonParser().parse(objIds.toString()).getAsJsonArray();
+            JsonArray objIdJsonArray = new JsonParser().parse(ToolUtils.getStr(objIds)).getAsJsonArray();
             for (JsonElement element : objIdJsonArray) {
-                String id = element.getAsString();
+                String id = ToolUtils.jsonToStr(element);
                 objectIds.add(id);
             }
         }
@@ -675,7 +899,7 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
         }
         log.info("query history performance params={}", gson.toJson(requestbody));
         ResponseEntity responseEntity = dmeAccessService.access(DmeConstants.STATISTIC_QUERY, HttpMethod.POST,
-            gson.toJson(requestbody));
+                gson.toJson(requestbody));
         return responseEntity;
     }
 
@@ -830,6 +1054,7 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
         indicators.add(DmeIndicatorConstants.COUNTER_ID_STORDEVICE_READBANDWIDTH);
         indicators.add(DmeIndicatorConstants.COUNTER_ID_STORDEVICE_WRITEBANDWIDTH);
         indicators.add(DmeIndicatorConstants.COUNTER_ID_STORDEVICE_THROUGHPUT);
+        indicators.add(DmeIndicatorConstants.COUNTER_ID_STORDEVICE_OPS);
         return indicators;
     }
 
@@ -841,6 +1066,7 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
             indicators.add(DmeIndicatorConstants.COUNTER_ID_CONTROLLER_BANDWIDTH);
             indicators.add(DmeIndicatorConstants.COUNTER_ID_CONTROLLER_CPUUSAGE);
             indicators.add(DmeIndicatorConstants.COUNTER_ID_CONTROLLER_RESPONSETIME);
+            indicators.add(DmeIndicatorConstants.COUNTER_ID_CONTROLLER_OPS);
         } else {
             indicators.add(DmeIndicatorConstants.COUNTER_ID_CONTROLLER_READTHROUGHPUT);
             indicators.add(DmeIndicatorConstants.COUNTER_ID_CONTROLLER_WRITETHROUGHPUT);
@@ -878,6 +1104,7 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
             indicators.add(DmeIndicatorConstants.COUNTER_ID_STORAGEDISK_READTHROUGHPUT);
             indicators.add(DmeIndicatorConstants.COUNTER_ID_STORAGEDISK_BANDWIDTH);
             indicators.add(DmeIndicatorConstants.COUNTER_ID_STORAGEDISK_UTILITY);
+            indicators.add(DmeIndicatorConstants.COUNTER_ID_STORAGEDISK_THROUGHPUT);
         } else {
             indicators.add(DmeIndicatorConstants.COUNTER_ID_STORAGEDISK_READTHROUGHPUT);
             indicators.add(DmeIndicatorConstants.COUNTER_ID_STORAGEDISK_WRITETHROUGHPUT);
@@ -1026,6 +1253,7 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
     }
 
     private List<List<String>> groupObjIds(Map<String, Object> params) {
+        log.info("性能-groupObjIds:{}");
         int maxObjIndicator = MAX_OBJ_INDICATOR;
         List<List<String>> objGroup = new ArrayList<>();
         List<String> objIds = (List<String>) params.get(OBJ_IDS_FIELD);
