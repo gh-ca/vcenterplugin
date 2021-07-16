@@ -154,7 +154,7 @@ public class DmeConstants {
     /**
      * hostgroup remove
      **/
-    public static final String HOSTGROUP_REMOVE = "/rest/hostmgmt/v1/hostgroups/{hostgroup_id}";
+    public static final String HOSTGROUP_REMOVE = "/rest/hostmgmt/v1/hostgroups/{hostgroup_id}?sync_to_storage=true";
 
     /**
      * hostgroup mapping

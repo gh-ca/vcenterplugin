@@ -41,6 +41,8 @@ public class VmfsAccessController extends BaseController {
 
     private Gson gson = new Gson();
 
+    private Boolean PARTIAL_SUCCESS = false;
+
     @Autowired
     private VmfsAccessService vmfsAccessService;
 
@@ -141,11 +143,23 @@ public class VmfsAccessController extends BaseController {
         LOG.info("accessvmfs/unmountvmfs=={}", gson.toJson(params));
         String failureStr = "";
         try {
+            //用于衡量部分成功情况返回结果
+            params.put("success", PARTIAL_SUCCESS);
             Map<String, Object> map = vmfsAccessService.unmountVmfs(params);
             if (map.size() == 0) {
                 return success(null, "unmount vmfs success!");
+            } else if (Boolean.valueOf(params.get("success").toString())) {
+                return failure(CODE_PARTIALSUCCESS, "unmount vmfs partial success!", map);
             } else {
-                return failure(CODE_PARTIALSUCCESS,"unmount vmfs partial success!",map);
+                String msg = "unmount vmfs fail,";
+                for (Map.Entry<String, Object> entry : map.entrySet()) {
+                    for (Map<String, Object> map1 : (List<Map<String, Object>>) entry.getValue()) {
+                        for (Map.Entry<String, Object> entry1 : map1.entrySet()) {
+                            msg += entry1.getKey() + " " + entry1.getValue() + " ";
+                        }
+                    }
+                }
+                return failure(msg);
             }
         } catch (DmeException e) {
             return failure(e.getMessage());
