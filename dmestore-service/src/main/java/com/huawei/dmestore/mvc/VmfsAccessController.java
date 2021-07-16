@@ -151,15 +151,8 @@ public class VmfsAccessController extends BaseController {
             } else if (Boolean.valueOf(params.get("success").toString())) {
                 return failure(CODE_PARTIALSUCCESS, "unmount vmfs partial success!", map);
             } else {
-                String msg = "unmount vmfs fail,";
-                for (Map.Entry<String, Object> entry : map.entrySet()) {
-                    for (Map<String, Object> map1 : (List<Map<String, Object>>) entry.getValue()) {
-                        for (Map.Entry<String, Object> entry1 : map1.entrySet()) {
-                            msg += entry1.getKey() + " " + entry1.getValue() + " ";
-                        }
-                    }
-                }
-                return failure(msg);
+                String msg = "unmount vmfs failed.";
+                return failure(msg,map);
             }
         } catch (DmeException e) {
             return failure(e.getMessage());
