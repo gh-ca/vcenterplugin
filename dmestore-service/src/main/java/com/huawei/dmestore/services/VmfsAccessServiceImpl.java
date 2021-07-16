@@ -2029,7 +2029,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 if (responseEntity.getStatusCodeValue() / DIVISOR_100 == HTTP_SUCCESS) {
                     JsonObject storeageDetail = gson.fromJson(responseEntity.getBody(), JsonObject.class);
                     volumeDetail.setStorage(storeageDetail.get(NAME_FIELD).getAsString());
-                    version = ToolUtils.jsonToStr(storeageDetail.get("version"));
+                    version = ToolUtils.jsonToStr(storeageDetail.get("product_version"));
                     model = ToolUtils.jsonToStr(storeageDetail.get("model"));
                 }
             }

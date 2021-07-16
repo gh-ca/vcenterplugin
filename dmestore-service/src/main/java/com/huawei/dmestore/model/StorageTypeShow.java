@@ -146,4 +146,21 @@ public class StorageTypeShow {
     public void setOwnershipController(Boolean ownershipController) {
         this.ownershipController = ownershipController;
     }
+
+    @Override
+    public String toString() {
+        return "StorageTypeShow{" +
+                "isDorado=" + isDorado +
+                ", qosTag=" + qosTag +
+                ", workLoadShow=" + workLoadShow +
+                ", ownershipController=" + ownershipController +
+                ", allocationTypeShow=" + allocationTypeShow +
+                ", deduplicationShow=" + deduplicationShow +
+                ", compressionShow=" + compressionShow +
+                ", capacityInitialAllocation=" + capacityInitialAllocation +
+                ", smartTierShow=" + smartTierShow +
+                ", prefetchStrategyShow=" + prefetchStrategyShow +
+                ", storageDetailTag=" + storageDetailTag +
+                '}';
+    }
 }
