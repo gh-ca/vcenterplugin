@@ -42,6 +42,8 @@ public class VmRdmServiceImpl implements VmRdmService {
 
     private static final int THOUSAND = 1000;
 
+    private final String TASKTYPE = "Create LUN";
+
     /**
      * 轮询任务状态的超值时间，这里设置超长，避免创建超多的lun超时
      */
@@ -111,7 +113,7 @@ public class VmRdmServiceImpl implements VmRdmService {
     public void createRdm(String dataStoreObjectId, String vmObjectId, VmRdmCreateBean createBean,
         String compatibilityMode) throws DmeException {
         String taskId = createDmeRdm(createBean);
-        List<String> lunNames = getLunNameFromCreateTask(taskId, longTaskTimeOut);
+        List<String> lunNames = taskService.getSuccessNameFromCreateTask(TASKTYPE,taskId, longTaskTimeOut);
         Map<String, Object> paramMap = initParams(createBean);
         String requestVolumeName = (String) paramMap.get("requestVolumeName");
         int capacity = (int) paramMap.get(CAPACITY);
@@ -479,75 +481,4 @@ public class VmRdmServiceImpl implements VmRdmService {
         StorageDetail storageDetail = dmeStorageService.getStorageDetail(storageId);
         return storageDetail.getModel() + " " + storageDetail.getProductVersion();
     }
-
-    private List<String> getLunNameFromCreateTask(String taskId,Long longTaskTimeOut) throws DmeException {
-
-        //获取任务实体
-        List<TaskDetailInfoNew> taskDetailInfoNewList = taskService.getTaskInfo(taskId, longTaskTimeOut);
-        LOG.info(gson.toJson(taskDetailInfoNewList));
-
-        //获取主任务详情,获取主任务Id
-        TaskDetailInfoNew mainTask = taskService.getMainTaskInfo(taskId, taskDetailInfoNewList);
-        if (StringUtils.isEmpty(mainTask)){
-            throw new DmeException("get main task info error");
-        } else if (mainTask.getStatus() > 4) {
-            throw new DmeException(mainTask.getDetailEn());
-        }
-        String mainId = mainTask.getId();
-        if (StringUtils.isEmpty(mainId)){
-            throw new DmeException("get task info error");
-        }
-        //获取二级主任务id
-        String id = getCreateMainChildernId(mainId,taskDetailInfoNewList);
-        //获取创建Lun任务详情实体
-        List<TaskDetailInfoNew> createTaskInfo = getCreateInfos(id, taskDetailInfoNewList);
-
-        return getLunName(createTaskInfo);
-    }
-
-    private String getCreateMainChildernId(String mainId,List<TaskDetailInfoNew> taskDetailInfoNewList) throws DmeException {
-        List<TaskDetailInfoNew> mainTasks = null;
-        //首先获取主任务信息
-        if (!CollectionUtils.isEmpty(taskDetailInfoNewList)){
-            mainTasks =  taskDetailInfoNewList.stream().filter(TaskDetailInfoNew -> (!mainId.equalsIgnoreCase(TaskDetailInfoNew.getId())
-                    && mainId.equalsIgnoreCase(TaskDetailInfoNew.getParentId()) && TaskDetailInfoNew.getNameEn().contains("Create LUN"))).collect(Collectors.toList());
-        }
-        if (CollectionUtils.isEmpty(mainTasks) || mainTasks.size()>1){
-            throw new DmeException("get main task info error");
-        }
-        return mainTasks.get(0).getId();
-    }
-
-    private List<TaskDetailInfoNew> getCreateInfos(String id, List<TaskDetailInfoNew> taskDetailInfoNewList) {
-        List<TaskDetailInfoNew> createTasks = null;
-        if (!CollectionUtils.isEmpty(taskDetailInfoNewList)){
-            createTasks =  taskDetailInfoNewList.stream().filter(TaskDetailInfoNew -> (id.equalsIgnoreCase(TaskDetailInfoNew.getParentId())
-                    && TaskDetailInfoNew.getNameEn().contains("Create LUN") && TaskDetailInfoNew.getStatus() == 3)).collect(Collectors.toList());
-        }
-        return createTasks;
-    }
-
-    private List<String> getLunName(List<TaskDetailInfoNew> createTaskInfo) {
-        List<String> list = new ArrayList<>();
-        for (TaskDetailInfoNew taskinfo : createTaskInfo) {
-            String  name_en = null;
-            long create_time = 0;
-            if (!StringUtils.isEmpty(taskinfo)){
-                name_en = taskinfo.getNameEn();
-                create_time = taskinfo.getCreateTime();
-            }
-            if (!StringUtils.isEmpty(name_en)){
-                String[] rs = name_en.split(" ");
-                if (rs.length == 3){
-                    String lunName = rs[2];
-                    if (!StringUtils.isEmpty(lunName)){
-                        list.add(lunName);
-                    }
-                }
-            }
-        }
-        return list;
-    }
-
-
 }

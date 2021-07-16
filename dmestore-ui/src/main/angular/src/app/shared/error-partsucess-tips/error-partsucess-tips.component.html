@@ -1,0 +1,102 @@
+<div>
+    <div *ngIf="errorOrPartSucess===0">
+      <div *ngIf="operatingType==='vmfsCreate'">
+        <span>{{'partSuccessOrError.createFail'|translate}}</span><span>{{description}}</span>
+      </div>
+      <div *ngIf="operatingType==='vmfsDelete'">
+        <span>{{'partSuccessOrError.deleteFail'|translate}}</span><span>{{description}}</span>
+      </div>
+      <div *ngIf="operatingType==='vmfsUnmount'">
+        <span>{{'partSuccessOrError.unmountFail'|translate}}</span><span>{{description}}</span>
+      </div>
+      <div *ngIf="operatingType==='vmfsMount'">
+        <div *ngIf="partSuccessData===null||partSuccessData.length===0"><span>{{'partSuccessOrError.mountFail'|translate}}</span><span>{{description}}</span></div>
+        <div *ngIf="partSuccessData&&partSuccessData.length>0">
+          <span>{{'partSuccessOrError.mountFail'|translate}}</span><span>{{description}}</span>
+          <clr-datagrid>
+            <clr-dg-column>{{'partSuccessOrError.host'|translate}}</clr-dg-column>
+            <clr-dg-column>{{'partSuccessOrError.currentState'|translate}}</clr-dg-column>
+
+            <clr-dg-row *ngFor="let item of partSuccessData">
+              <clr-dg-cell>{{item}}</clr-dg-cell>
+              <clr-dg-cell>{{'partSuccessOrError.mountFailState'|translate}}</clr-dg-cell>
+            </clr-dg-row>
+          </clr-datagrid>
+        </div>
+      </div>
+<!--      <div><span>挂载失败:</span><span>{{description}}</span></div>-->
+<!--      <div><span>卸载失败:</span><span>{{description}}</span></div>-->
+<!--      <div><span>删除失败:</span><span>{{description}}</span></div>-->
+    </div>
+  <div *ngIf="errorOrPartSucess===1">
+    <div *ngIf="operatingType==='vmfsCreate'">
+      <div class="item-flex">
+        <div class="create-fail-detail "><span>{{'errorMsg.successAll'|translate}}</span><span style="color: #009926;font-weight: bolder">{{partSuccessData?.data?.successNo}}</span></div>
+        <div class="create-fail-detail "><span>{{'errorMsg.errorDetailMessage'| translate}}</span><span style="color: #FF9800;font-weight: bolder">{{partSuccessData?.data?.partialSuccess}}</span></div>
+        <div class="create-fail-detail "><span>{{'errorMsg.errorDetailFailMessage'|translate}}</span><span style="color: red;font-weight: bolder">{{partSuccessData?.data?.failNo}}</span></div>
+      </div>
+      <div>
+        <span>{{'partSuccessOrError.createPartSuccess'|translate}}</span><span>{{description}}</span>
+      </div>
+      <div *ngIf="partSuccessData?.data.connectionResult&&partSuccessData?.data.connectionResult.length>0">
+        <clr-datagrid>
+          <clr-dg-column>{{'partSuccessOrError.host'|translate}}</clr-dg-column>
+          <clr-dg-column>{{'partSuccessOrError.reason'|translate}}</clr-dg-column>
+
+          <clr-dg-row *ngFor="let item of partSuccessData.data.connectionResult">
+            <clr-dg-cell>{{item}}</clr-dg-cell>
+            <clr-dg-cell>{{'errorMsg.HostConnectionFail'|translate}}</clr-dg-cell>
+          </clr-dg-row>
+        </clr-datagrid>
+      </div>
+    </div>
+    <div *ngIf="operatingType==='vmfsUnmount'">
+      <div>
+        <span>{{'partSuccessOrError.unmountPartSuccess'|translate}}</span><span>{{description}}</span>
+      </div>
+      <div *ngIf="partSuccessData&&partSuccessData.length>0">
+        <clr-datagrid>
+          <clr-dg-column>{{'partSuccessOrError.storage'|translate}}</clr-dg-column>
+          <clr-dg-column>{{'partSuccessOrError.reason'|translate}}</clr-dg-column>
+
+          <clr-dg-row *ngFor="let item of partSuccessData">
+            <clr-dg-cell>{{item.key}}</clr-dg-cell>
+            <clr-dg-cell>{{item.value}}</clr-dg-cell>
+          </clr-dg-row>
+        </clr-datagrid>
+      </div>
+    </div>
+    <div *ngIf="operatingType==='vmfsUnmountError'">
+      <div>
+        <span>{{'partSuccessOrError.unmountFail'|translate}}</span><span>{{description}}</span>
+      </div>
+      <div *ngIf="partSuccessData&&partSuccessData.length>0">
+        <clr-datagrid>
+          <clr-dg-column>{{'partSuccessOrError.storage'|translate}}</clr-dg-column>
+          <clr-dg-column>{{'partSuccessOrError.reason'|translate}}</clr-dg-column>
+
+          <clr-dg-row *ngFor="let item of partSuccessData">
+            <clr-dg-cell>{{item.key}}</clr-dg-cell>
+            <clr-dg-cell>{{item.value}}</clr-dg-cell>
+          </clr-dg-row>
+        </clr-datagrid>
+      </div>
+    </div>
+    <div *ngIf="operatingType==='vmfsMount'">
+      <div>
+        <span>{{'partSuccessOrError.mountPartSuccess'|translate}}</span><span>{{description}}</span>
+      </div>
+      <div *ngIf="partSuccessData&&partSuccessData.length>0">
+        <clr-datagrid>
+          <clr-dg-column>{{'partSuccessOrError.storage'|translate}}</clr-dg-column>
+          <clr-dg-column>{{'partSuccessOrError.currentState'|translate}}</clr-dg-column>
+
+          <clr-dg-row *ngFor="let item of partSuccessData">
+            <clr-dg-cell>{{item}}</clr-dg-cell>
+            <clr-dg-cell>{{'partSuccessOrError.mountFailState'|translate}}</clr-dg-cell>
+          </clr-dg-row>
+        </clr-datagrid>
+      </div>
+    </div>
+  </div>
+</div>

@@ -573,18 +573,21 @@ public class DmeAccessServiceImpl implements DmeAccessService {
         try {
             if (params != null && params.get(DmeConstants.HOST) != null) {
                 // 得到主机的hba信息
-                Map<String, Object> hbamap = vcsdkUtils.getHbaByHostObjectId(ToolUtils.getStr(params.get("hostId")));
                 List<Map<String, Object>> initiators = new ArrayList<>();
-                Map<String, Object> initiator = new HashMap<>(DmeConstants.COLLECTION_CAPACITY_16);
-                initiator.put(PROTOCOL, ToolUtils.getStr(hbamap.get(TYPE_FIELD)));
-                initiator.put(PORT_NAME, ToolUtils.getStr(hbamap.get(NAME_FIELD)));
-                initiators.add(initiator);
+                List<Map<String, Object>> hbalists = vcsdkUtils.getHbaByHostObjectId(ToolUtils.getStr(params.get("hostId")));
+                for (Map<String, Object> hbamap : hbalists) {
+                    Map<String, Object> initiator = new HashMap<>(DmeConstants.COLLECTION_CAPACITY_16);
+                    initiator.put(PROTOCOL, ToolUtils.getStr(hbamap.get(TYPE_FIELD)));
+                    initiator.put(PORT_NAME, ToolUtils.getStr(hbamap.get(NAME_FIELD)));
+                    initiators.add(initiator);
+                }
                 Map<String, Object> requestbody = new HashMap<>(DmeConstants.COLLECTION_CAPACITY_16);
                 requestbody.put(ACCESS_MODE_FIELD, "NONE");
                 requestbody.put(TYPE_FIELD, "VMWAREESX");
                 requestbody.put(IP_FIELD, params.get("host"));
                 requestbody.put("host_name", params.get("host"));
                 requestbody.put("initiator", initiators);
+                LOG.info("Create logical host request parameters for exsi host on DME:{}", gson.toJson(requestbody));
                 ResponseEntity responseEntity = access(createHostUrl, HttpMethod.POST, gson.toJson(requestbody));
                 if (responseEntity.getStatusCodeValue() == RestUtils.RES_STATE_I_200) {
                     JsonObject jsonObject = new JsonParser().parse(responseEntity.getBody().toString())

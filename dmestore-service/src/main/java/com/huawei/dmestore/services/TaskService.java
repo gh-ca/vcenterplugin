@@ -89,4 +89,24 @@ public interface TaskService {
     List<TaskDetailInfoNew> getTaskInfo(String taskId, long longTaskTimeOut) throws DmeException;
 
     TaskDetailInfoNew getMainTaskInfo(String taskId, List<TaskDetailInfoNew> taskDetailInfoNewList);
+
+    /**
+     * 获取成功的任务的子任务Lun名称
+     * @param taskType 任务类型名称 如 Create Lun
+     * @param taskId 任务id
+     * @param longTaskTimeOut 超时时间
+     * @return
+     * @throws DmeException
+     */
+    List<String> getSuccessNameFromCreateTask(String taskType, String taskId, Long longTaskTimeOut) throws DmeException;
+
+    /**
+     *  获取失败的任务的子任务Lun名称
+     * @param taskType 任务类型名称 如 Create Lun
+     * @param taskId 任务id
+     * @param longTaskTimeOut 超时时间
+     * @return
+     * @throws DmeException
+     */
+    List<String> getFailNameFromCreateTask(String taskType, String taskId, Long longTaskTimeOut) throws DmeException;
 }

@@ -155,11 +155,47 @@ public class ServiceLevelController extends BaseController {
     }
 
     /**
-     * perf-stat-lun-details
+     * perf-lun
      *
      * @return ResponseBodyBean
      */
     @RequestMapping(value = "/performance/perf-stat-lun-details", method = RequestMethod.GET)
+    public ResponseBodyBean lunPer(@RequestParam String serviceLevelId,
+                                   @RequestParam String interval) {
+        try {
+            DmeDatasetsQueryResponse responseBodyBean = serviceLevelService.lunPer(serviceLevelId,
+                    interval);
+            filtration(responseBodyBean, serviceLevelId);
+            return success(responseBodyBean);
+        } catch (DmeException e) {
+            return failure(e.getMessage());
+        }
+    }
+
+    /**
+     * perf-storage-pool
+     *
+     * @return ResponseBodyBean
+     */
+    @RequestMapping(value = "/performance/perf-stat-storage-pool-details", method = RequestMethod.GET)
+    public ResponseBodyBean poolPer(@RequestParam String serviceLevelId,
+                                    @RequestParam String interval) {
+        try {
+            DmeDatasetsQueryResponse responseBodyBean = serviceLevelService.poolPer(serviceLevelId,
+                    interval);
+            filtration(responseBodyBean, serviceLevelId);
+            return success(responseBodyBean);
+        } catch (DmeException e) {
+            return failure(e.getMessage());
+        }
+    }
+
+    /**
+     * perf-stat-lun-details
+     *
+     * @return ResponseBodyBean
+     */
+    //@RequestMapping(value = "/performance/perf-stat-lun-details", method = RequestMethod.GET)
     public ResponseBodyBean lunPerformanceDatasetsQuery(@RequestParam String serviceLevelId,
         @RequestParam String interval) {
         try {
@@ -177,7 +213,7 @@ public class ServiceLevelController extends BaseController {
      *
      * @return ResponseBodyBean
      */
-    @RequestMapping(value = "/performance/perf-stat-storage-pool-details", method = RequestMethod.GET)
+    //@RequestMapping(value = "/performance/perf-stat-storage-pool-details", method = RequestMethod.GET)
     public ResponseBodyBean storagePoolPerformanceDatasetsQuery(@RequestParam String serviceLevelId,
         @RequestParam String interval) {
         try {

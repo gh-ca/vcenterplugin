@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -39,6 +40,8 @@ public class VmfsAccessController extends BaseController {
     public static final Logger LOG = LoggerFactory.getLogger(VmfsAccessController.class);
 
     private Gson gson = new Gson();
+
+    private Boolean PARTIAL_SUCCESS = false;
 
     @Autowired
     private VmfsAccessService vmfsAccessService;
@@ -140,8 +143,17 @@ public class VmfsAccessController extends BaseController {
         LOG.info("accessvmfs/unmountvmfs=={}", gson.toJson(params));
         String failureStr = "";
         try {
-            vmfsAccessService.unmountVmfs(params);
-            return success(null, "unmount vmfs success");
+            //用于衡量部分成功情况返回结果
+            params.put("success", PARTIAL_SUCCESS);
+            Map<String, Object> map = vmfsAccessService.unmountVmfs(params);
+            if (map.size() == 0) {
+                return success(null, "unmount vmfs success!");
+            } else if (Boolean.valueOf(params.get("success").toString())) {
+                return failure(CODE_PARTIALSUCCESS, "unmount vmfs partial success!", map);
+            } else {
+                String msg = "unmount vmfs failed.";
+                return failure(msg,map);
+            }
         } catch (DmeException e) {
             return failure(e.getMessage());
         }
@@ -284,14 +296,22 @@ public class VmfsAccessController extends BaseController {
              result = vmfsAccessService.createVmfsNew1(params);
             if (result.getSuccessNo() != 0 && result.getFailNo()==0 && result.getPartialSuccess() == 0
                     && CollectionUtils.isEmpty(result.getConnectionResult())){
-                return success(result, "create vmfs success");
+                return success(result, "");
             }else if (result.getSuccessNo() == 0 && result.getPartialSuccess() == 0) {
-                return failure("create vmfs failure!",result);
+                if (!CollectionUtils.isEmpty(result.getDesc())) {
+                    return failure(result.getDesc().toString(), result);
+                }else {
+                    return failure("", result);
+                }
             }else {
-                return partialSuccess(result,"create vmfs partial success!");
+                if (!CollectionUtils.isEmpty(result.getDesc())) {
+                    return partialSuccess(result,result.getDesc().toString());
+                }else {
+                    return partialSuccess(result,"");
+                }
             }
-        } catch (DmeException e) {
-            failureStr = "create vmfs failure:" + e.getMessage();
+        } catch (Exception e) {
+            failureStr = e.getMessage();
             result.setFailNo(ToolUtils.getInt(params.get("count")));
         }
         return failure(failureStr,result);
@@ -311,16 +331,23 @@ public class VmfsAccessController extends BaseController {
         try {
             MountVmfsReturn res = vmfsAccessService.mountVmfsNew(params);
             if (!res.isFlag()) {
-                return failure("mount vmfs failure : "+res.getDescription());
-            }else if (res.isFlag() && CollectionUtils.isEmpty(res.getFailedHost())) {
-                return success(null, "Mount vmfs success");
-            }else {
-               return partialSuccess(res.getFailedHost(),"Mount vmfs partial success : "+res.getDescription());
-
+                if (StringUtils.isEmpty(res.getDescription())) {
+                    return failure("");
+                } else {
+                    return failure(res.getDescription());
+                }
+            } else if (res.isFlag() && CollectionUtils.isEmpty(res.getFailedHost())) {
+                return success(null, "");
+            } else {
+                if (StringUtils.isEmpty(res.getDescription())) {
+                    return partialSuccess(res.getFailedHost(), "");
+                } else {
+                    return partialSuccess(res.getFailedHost(), res.getDescription());
+                }
             }
-        } catch (DmeException e) {
+        } catch (Exception e) {
             LOG.error("mount vmfs failure:", e);
-            failureStr = "mount vmfs failure:" + e.getMessage();
+            failureStr = e.getMessage();
         }
         return failure(failureStr);
 
@@ -387,7 +414,7 @@ public class VmfsAccessController extends BaseController {
      */
     @RequestMapping(value = "/queryMountableVmfsByClusterId", method = RequestMethod.GET)
     public ResponseBodyBean queryMountableVmfsByClusterId(@RequestParam("clusterObjectId") String clusterObjectId,
-                                                          @RequestParam("dataStoreType") String dataStoreType) throws Exception {
+                                                          @RequestParam("dataStoreType") String dataStoreType) {
         String failureStr = "";
         try {
             List<Map<String, String>> lists = vmfsAccessService.queryMountableVmfsByClusterId(clusterObjectId,dataStoreType);

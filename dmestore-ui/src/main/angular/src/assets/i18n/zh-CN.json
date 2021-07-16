@@ -424,6 +424,7 @@
         "totalCapacity": "总容量",
         "useFree": "已使用|空闲",
         "subscribe": "已订阅",
+        "usableCapacity": "可用容量",
         "storagePool": "存储池列表",
         "used": "已用:",
         "capacitySavings": "容量节省率",
@@ -641,10 +642,10 @@
       "move": "实施后可利用VAAI硬件加速VMFS数据移动，使数据移动卸载到存储侧进行，从而提高性能。",
       "delete": "实施后，使用VMFS5的虚拟机可通过执行unmap命令实现空间回收。如果要成功执行unmap命令，虚拟盘使用的数据存储的“精简制备”功能必须为“受支持”状态。",
       "quanTum": "实施后会将虚拟盘的队列深度配置为64。队列过小的话，会导致请求阻塞。",
-      "diskMaxIOSize": "实施后会将虚拟盘的最大磁盘读/写I/O设置为当前版本ESXi的适用值。在特定版本ESXi中，I/O值设置过大可能会引起Windows EFI boot issue，最佳实践会自动使用为较小的值。",
+      "diskMaxIOSize": "实施后会将虚拟盘的最大磁盘读/写I/O设置为当前版本ESXi的适用值。在特定版本ESXi中，I/O值设置过大可能会引起Windows EFI boot issue，最佳实践会自动使用为较小的值。ESXI6.7 Update 1 Release以前版本，推荐改为1024；ESXI6.7 Update 1 Release及以后版本，推荐使用默认值32767。",
       "depthForQlogic": "实施后会将Qlogic HBA卡队列深度设置为512，增加ESXI主机的吞吐量。",
       "depthForEmulex": "实施后会将Emulex HBA卡队列深度设置为512，增加ESXI主机的吞吐量。",
-      "pathSwitchPolicy": "实施后将自动为存储设备配置多路径选路策略，提高存储设备的可用性和性能。",
+      "pathSwitchPolicy": "实施后将自动为存储设备配置多路径选路策略，提高存储设备的可用性和性能。用户已创建的数据存储需要重启主机生效。",
       "jumboFrame": "实施后会启用巨型帧配置，ESXi Vmkernel适配器的MTU会设置为9000。推荐存储网络使用巨型帧。该配置需ESXi主机、存储设备和数据包链路上的所有物理网络设备均支持巨型帧，且上述设备的MTU都设置为9000。",
       "reclamation": "实施后，将为VMFS6数据存储配置自动空间回收策略。",
       "numberOfVolInDatastore": "实施后，会将单个数据存储中卷的最大数量限制为1。这是由于虚拟机不能并发处理数据存储中多个卷的请求，当一个数据存储中包含多个卷时，某个卷的请求阻塞会影响其他卷，因此不推荐一个数据存储中包含多个卷。"
@@ -951,5 +952,19 @@
       "lunCapacityTrends": "LUN 容量趋势",
       "storagePoolCapacityTrends": "存储池容量趋势"
     }
+  },
+  "partSuccessOrError": {
+    "createFail": "创建失败！",
+    "deleteFail": "删除失败！",
+    "unmountFail": "卸载失败！",
+    "mountFail": "挂载失败！",
+    "mountPartSuccess": "挂载部分成功！",
+    "unmountPartSuccess": "卸载部分成功！",
+    "createPartSuccess": "创建部分成功！",
+    "host": "主机",
+    "reason": "原因",
+    "storage": "存储",
+    "currentState": "状态",
+    "mountFailState": "挂载失败"
   }
 }
