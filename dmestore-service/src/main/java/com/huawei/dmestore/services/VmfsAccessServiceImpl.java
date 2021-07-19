@@ -1999,6 +1999,8 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         List<String> volumeIds = dmeVmwareRalationDao.getVolumeIdsByStorageId(storageObjectId);
         LOG.error("get volume detail! volumeIds={}", gson.toJson(volumeIds));
         String storageId = "";
+        String version = "";
+        String model = "";
         for (String volumeId : volumeIds) {
             // 调用DME接口获取卷详情
             String url = DmeConstants.DME_VOLUME_BASE_URL + FIEL_SEPARATOR + volumeId;
@@ -2027,7 +2029,14 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 if (responseEntity.getStatusCodeValue() / DIVISOR_100 == HTTP_SUCCESS) {
                     JsonObject storeageDetail = gson.fromJson(responseEntity.getBody(), JsonObject.class);
                     volumeDetail.setStorage(storeageDetail.get(NAME_FIELD).getAsString());
+                    version = ToolUtils.jsonToStr(storeageDetail.get("product_version"));
+                    model = ToolUtils.jsonToStr(storeageDetail.get("model"));
                 }
+            }
+            String storageType = model + " " + version;
+            StorageTypeShow storageTypeShow = new StorageTypeShow();
+            if (!StringUtils.isEmpty(model)&& !StringUtils.isEmpty(version)) {
+                storageTypeShow = ToolUtils.getStorageTypeShow(storageType);
             }
 
             if (!volume.get(POOL_RAW_ID).isJsonNull()) {
@@ -2036,7 +2045,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
 
             JsonObject tuning = volume.getAsJsonObject(TUNING);
             if (!tuning.isJsonNull()) {
-                parseVolumeTuning(volumeDetail, tuning);
+                parseVolumeTuning(volumeDetail, tuning,storageTypeShow);
             }
             // 存储应用类型
             if (!StringUtils.isEmpty(volumeDetail.getApplicationType())) {
@@ -2104,7 +2113,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         volumeDetail.setStoragePool(poolName);
     }
 
-    private void parseVolumeTuning(VmfsDatastoreVolumeDetail volumeDetail, JsonObject tuning) {
+    private void parseVolumeTuning(VmfsDatastoreVolumeDetail volumeDetail, JsonObject tuning,StorageTypeShow storageTypeShow) {
         // SmartTier
         volumeDetail.setSmartTier(ToolUtils.jsonToStr(tuning.get("smarttier")));
 
@@ -2122,7 +2131,8 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             SmartQos smartQos = new SmartQos();
             Integer maxbandwidth = ToolUtils.jsonToInt(smartqos.get("maxbandwidth"), 0);
             Integer minbandwidth = ToolUtils.jsonToInt(smartqos.get("minbandwidth"), 0);
-            if (maxbandwidth != 0 && minbandwidth != 0) {
+            LOG.info("storage type param{}",storageTypeShow);
+            if (storageTypeShow.getDorado()) {
                 // 2表示保护上限 和  保护下线
                 smartQos.setControlPolicy("2");
                 volumeDetail.setControlPolicy("2");

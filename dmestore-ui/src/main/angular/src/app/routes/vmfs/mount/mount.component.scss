@@ -185,7 +185,7 @@
 }
 
 ::ng-deep .modal-dialog .modal-content{
-  box-shadow: 0 0.1rem 0.3rem 0.3rem white;
+  box-shadow: 0 0 0 0 ;
 }
 ::ng-deep .datagrid-table .datagrid-column .datagrid-filter-toggle{
   margin: auto;
@@ -202,4 +202,5 @@ input::-ms-clear{
 .modal-body{
   min-height: 128px;
 }
+
 
