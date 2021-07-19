@@ -31,6 +31,7 @@ export class DevDemoComponentComponent implements OnInit {
   selectedArr:any[];
   selectedValue:string='手动'
   table;
+  recommendedValue:number=80
 
   constructor() {
     this.initForm();
@@ -76,24 +77,25 @@ export class DevDemoComponentComponent implements OnInit {
   initForm() {
     this.table=[
       {
-        "code":"200",
-        "objectName":"VMFS_0101",
-        "violationValue":"01",
-        "recommendedValue":"01",
-        "repairType":"手动",
-        "repairTime":"2020-07-12 14:01:23",
-        "repairResult":"成功",
-        "executionLog":"成功修复",
+          "objectName":"VMFS_0101",
+          "violationValue":"01",
+          "recommendedValue":"01",
+          "repairType":"手动",
+          "repairTime":"2020-07-12 14:01:23",
+          "repairResult":"成功",
+          "executionLog":"成功修复"
+
       },
       {
-        "code":"200",
-        "objectName":"VMFS_0202",
-        "violationValue":"01",
-        "recommendedValue":"01",
-        "repairType":"自动",
-        "repairTime":"2020-07-11 05:01:11",
-        "repairResult":"失败",
-        "executionLog":"修复失败",
+
+          "objectName":"VMFS_0202",
+          "violationValue":"01",
+          "recommendedValue":"01",
+          "repairType":"自动",
+          "repairTime":"2020-07-11 05:01:11",
+          "repairResult":"失败",
+          "executionLog":"修复失败"
+
       }
     ]
     this.selectedArr=[
@@ -195,6 +197,12 @@ export class DevDemoComponentComponent implements OnInit {
 //  选择框value
   changeSelect(){
     console.log(this.selectedValue)
+  }
+
+//  推荐值大小判断,取值范围为75%~90%
+  checkRecommendedValue(){
+    let count=this.recommendedValue
+
   }
 }
 

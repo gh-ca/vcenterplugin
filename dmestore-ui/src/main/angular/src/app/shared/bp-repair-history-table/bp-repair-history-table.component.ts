@@ -16,3 +16,12 @@ export class BpRepairHistoryTableComponent implements OnInit {
     return !obj;
   }
 }
+export interface bpTableData{
+  "objectName":string,
+  "violationValue":string,
+  "recommendedValue":string,
+  "repairType":string,
+  "repairTime":string,
+  "repairResult":string,
+  "executionLog":string
+}

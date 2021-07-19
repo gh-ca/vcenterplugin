@@ -1,7 +1,7 @@
-import {Component, OnInit,Input} from "@angular/core";
+import {Component} from "@angular/core";
 import {ClrDatagridFilterInterface} from "@clr/angular";
-import {VmfsInfo} from "../../routes/vmfs/list/list.service";
 import {Subject} from "rxjs";
+import {bpTableData} from './bp-repair-history-table.component'
 
 @Component({
   selector:"repair-type-filter",
@@ -11,7 +11,7 @@ import {Subject} from "rxjs";
         clrRadio
         [(ngModel)]="options"
         type="radio"
-        name="type"
+        name="repairType"
         (change)="changeFunc($event)"
         value="">
       <label>{{ 'vmfs.filter.all' | translate }}</label>
@@ -21,7 +21,7 @@ import {Subject} from "rxjs";
         clrRadio
         [(ngModel)]="options"
         type="radio"
-        name="type"
+        name="repairType"
         (change)="changeFunc($event)"
         value="手动">
       <label>{{'bestPractice.repairHistory.manual'|translate}}</label>
@@ -31,27 +31,23 @@ import {Subject} from "rxjs";
         clrRadio
         [(ngModel)]="options"
         type="radio"
-        name="type"
+        name="repairType"
         (change)="changeFunc($event)"
         value="自动">
       <label>{{'bestPractice.repairHistory.automatic'|translate}}</label>
     </clr-radio-wrapper>
   </clr-radio-container>`
 })
-export class RepairTypeFilter implements ClrDatagridFilterInterface<VmfsInfo>{
+export class RepairTypeFilter implements ClrDatagridFilterInterface<bpTableData>{
   options
   // repairType
   changes = new Subject<any>();
-  /* 从 list 中 取的字段 */
-  @Input() prop;
-  /* 传入的list 与 datagrid row数据一致 */
-  @Input() list;
 
-  accepts(item: VmfsInfo): boolean {
+  accepts(item: bpTableData): boolean {
     if (!this.options){
       return true
     }
-    const capital=item[this.prop]
+    const capital=item.repairType
     if(this.options===''){
       return true
     }else {
@@ -70,5 +66,71 @@ export class RepairTypeFilter implements ClrDatagridFilterInterface<VmfsInfo>{
   initrepairType() {
     this.options=undefined
     this.changeFunc(this.options)
+  }
+}
+
+@Component({
+  selector:"repair-result-filter",
+  template:`<clr-radio-container style="margin-top: 0">
+    <clr-radio-wrapper>
+      <input
+        clrRadio
+        [(ngModel)]="repairResult"
+        type="radio"
+        name="repairResult"
+        (change)="changeFunc($event)"
+        value="">
+      <label>{{ 'vmfs.filter.all' | translate }}</label>
+    </clr-radio-wrapper>
+    <clr-radio-wrapper>
+      <input
+        clrRadio
+        [(ngModel)]="repairResult"
+        type="radio"
+        name="repairResult"
+        (change)="changeFunc($event)"
+        value="成功">
+      <label>{{'bestPractice.repairHistory.success'|translate}}</label>
+    </clr-radio-wrapper>
+    <clr-radio-wrapper>
+      <input
+        clrRadio
+        [(ngModel)]="repairResult"
+        type="radio"
+        name="repairResult"
+        (change)="changeFunc($event)"
+        value="失败">
+      <label>{{'bestPractice.repairHistory.fail'|translate}}</label>
+    </clr-radio-wrapper>
+  </clr-radio-container>`
+})
+export class RepairResultFilter implements ClrDatagridFilterInterface<bpTableData>{
+  // options
+  repairResult
+  changes = new Subject<any>();
+
+  accepts(item: bpTableData): boolean {
+    if (!this.repairResult){
+      return true
+    }
+    const capital=item.repairResult
+    if(this.repairResult===''){
+      return true
+    }else {
+      return this.repairResult===capital
+    }
+  }
+
+  isActive(): boolean {
+    return true;
+  }
+
+  changeFunc(value: any) {
+    this.changes.next()
+  }
+
+  initrepairType() {
+    this.repairResult=undefined
+    this.changeFunc(this.repairResult)
   }
 }

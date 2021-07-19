@@ -659,7 +659,9 @@
       "repairResult": "Repair result",
       "executionLog": "Execution log",
       "manual": "Manual",
-      "automatic": "Automatic"
+      "automatic": "Automatic",
+      "success": "Success",
+      "fail": "Fail"
     }
   },
   "iscsi": {

@@ -659,7 +659,9 @@
       "repairResult": "修复结果",
       "executionLog": "执行日志",
       "manual": "手动",
-      "automatic": "自动"
+      "automatic": "自动",
+      "success": "成功",
+      "fail": "失败"
     }
   },
   "iscsi": {

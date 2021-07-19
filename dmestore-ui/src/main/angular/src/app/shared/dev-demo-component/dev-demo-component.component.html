@@ -15,6 +15,19 @@
 </clr-select-container>
 <app-bp-repair-history-table [tableData]="table">
 </app-bp-repair-history-table>
+<clr-input-container>
+  <input
+    clrInput
+    type="number"
+    value=80
+    name="recommendedValue"
+    [(ngModel)]="recommendedValue"
+    class="input40persent"
+    formControlName="recommendedValue"
+    (blur)="checkRecommendedValue()"
+    />
+  <label>%</label>
+</clr-input-container>
 <h1>mount</h1>
 <app-gh-tree-checkbox
   (valueChange)="handleTreeValueChange('tree',$event)"

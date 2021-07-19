@@ -4,8 +4,8 @@
   <clr-dg-column>{{'bestPractice.repairHistory.recommendedValue'|translate}}</clr-dg-column>
   <clr-dg-column>
     {{'bestPractice.repairHistory.repairType'|translate}}
-    <clr-dg-filter>
-      <repair-type-filter></repair-type-filter>
+    <clr-dg-filter [clrDgFilter]="repairTypeFilter">
+      <repair-type-filter #repairTypeFilter></repair-type-filter>
     </clr-dg-filter>
   </clr-dg-column>
   <clr-dg-column #repairTime style="position: relative" class="hideFilter"
@@ -16,7 +16,9 @@
   </clr-dg-column>
   <clr-dg-column>
     {{'bestPractice.repairHistory.repairResult'|translate}}
-    <clr-dg-filter></clr-dg-filter>
+    <clr-dg-filter [clrDgFilter]="repairResultFilter">
+      <repair-result-filter #repairResultFilter></repair-result-filter>
+    </clr-dg-filter>
   </clr-dg-column>
   <clr-dg-column>{{'bestPractice.repairHistory.executionLog'|translate}}</clr-dg-column>
   <clr-dg-placeholder>{{'tips.noData'|translate}}</clr-dg-placeholder>
