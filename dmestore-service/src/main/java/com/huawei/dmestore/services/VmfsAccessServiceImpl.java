@@ -4611,7 +4611,6 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         ResponseEntity<String> responseEntity = null;
         try {
             responseEntity = dmeAccessService.access(DmeConstants.DME_VOLUME_DELETE_URL, HttpMethod.POST, gson.toJson(requestbody));
-            dmeAccessService.access(DmeConstants.DME_VOLUME_DELETE_URL, HttpMethod.POST, gson.toJson(requestbody));
         }catch (Exception e){
             LOG.error(e.getMessage());
         }

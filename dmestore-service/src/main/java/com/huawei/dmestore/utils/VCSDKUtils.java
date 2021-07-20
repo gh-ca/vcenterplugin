@@ -2184,6 +2184,7 @@ public class VCSDKUtils {
                             // 只挂载其它的主机
                             if (host1 != null && !objHostName.equals(host1.getName())) {
                                 mountVmfsNew02(objDataStoreName, dataStoreObjectId, host1);
+                                hostRescanVmfs(host1.getName());
                             }
                         } catch (Exception e) {
                             logger.error("mount Vmfs On Cluster error:{}", e.getMessage());
@@ -2199,6 +2200,7 @@ public class VCSDKUtils {
                     // 只挂载其它的主机
                     if (hostmo != null && !objHostName.equals(hostmo.getName())) {
                         mountVmfsNew02(objDataStoreName, dataStoreObjectId, hostmo);
+                        hostRescanVmfs(hostmo.getName());
                     }
                 } catch (Exception e) {
                     logger.error("mount Vmfs On Cluster error:{}", e.getMessage());
