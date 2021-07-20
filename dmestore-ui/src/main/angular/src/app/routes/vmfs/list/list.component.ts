@@ -275,6 +275,15 @@ export class VmfsListComponent extends VmfsCommon implements OnInit {
   ngOnInit() {
     // 列表数据
     this.refreshVmfs();
+    this.checkDmeConnect()
+  }
+  //判断进入当前页面是否自动同步
+  checkDmeConnect(){
+    let scan=localStorage.getItem("SynchronizeVmfs")
+    if (scan==='true'){
+      this.scanDataStore()
+      localStorage.setItem("SynchronizeVmfs","false")
+    }
   }
 
   // 修改
@@ -1302,6 +1311,7 @@ wwn: "67c1cf110058934511ba6e5a00000344"
         // this.deleteDesc=result.description
         this.errorShow=true
         // this.isOperationErr = true;
+        this.refreshVmfs()
       }
       this.cdr.detectChanges();
     });

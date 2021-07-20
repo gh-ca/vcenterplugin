@@ -152,7 +152,17 @@ export class NfsComponent extends NfsComponentCommon implements OnInit {
   ngOnInit(): void {
     this.process();
     this.getNfsList();
+    this.checkDmeConnect()
   }
+  //判断进入当前页面是否自动同步
+  checkDmeConnect(){
+    let scan=localStorage.getItem("SynchronizeNfs")
+    if (scan==='true'){
+      this.scanDataStore()
+      localStorage.setItem("SynchronizeNfs","false")
+    }
+  }
+
   // 获取nfs列表
   getNfsList() {
     this.isLoading = true;
@@ -1242,9 +1252,9 @@ export class NfsComponent extends NfsComponentCommon implements OnInit {
           this.bandwidthLimitErr = bandwidthLimitErr;
           this.iopsLimitErr = iopsLimitErr;
 
-          /* 
-          
-          
+          /*
+
+
           const qosTag = chooseStorage.storageTypeShow.qosTag;
           if (qosTag == 1) {
             if (this.addForm.minBandwidthChoose && this.addForm.maxBandwidthChoose) {
@@ -1293,7 +1303,7 @@ export class NfsComponent extends NfsComponentCommon implements OnInit {
           if (this.addForm.control_policyLower == undefined) {
             this.bandwidthLimitErr = false;
           }
-        
+
           */
         }
       }
