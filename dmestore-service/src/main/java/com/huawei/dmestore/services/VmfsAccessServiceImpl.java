@@ -3145,9 +3145,9 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                     TaskDetailInfoNew taskDetailInfoNew = taskService.queryTaskByIdReturnMainTask(taskId, longTaskTimeOut);
                     if (taskDetailInfoNew != null && taskDetailInfoNew.getStatus() != 3) {
                         if (ToolUtils.getStr(params.get("language")).equals(LANGUAGE_CN)) {
-                            throw new DmeException("vcenter移除数据存储成功!" + taskDetailInfoNew.getDetailCn());
+                            throw new DmeException("vcenter移除数据存储成功,DME任务：" + taskDetailInfoNew.getDetailCn());
                         } else {
-                            throw new DmeException("vcenter remove datastore success!" + taskDetailInfoNew.getDetailEn());
+                            throw new DmeException("vcenter remove datastore success，DME task:" + taskDetailInfoNew.getDetailEn());
                         }
                     }
                 }
