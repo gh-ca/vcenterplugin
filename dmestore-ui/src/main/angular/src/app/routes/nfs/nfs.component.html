@@ -66,25 +66,25 @@
         style="position: relative" (clrDgSortedChange)="sortFunc($event);">
         {{'nfs.totalCapacity' | translate}}
         <clr-icon *ngIf="sortFunc(capacity.sorted);" shape="arrow down" class="is-solid"
-          style="position: absolute;right: 1.1rem;"></clr-icon>
+          style="position: absolute;right: 0.1rem;"></clr-icon>
       </clr-dg-column>
       <clr-dg-column #freeSpace [hidden]="radioCheck!=='list'" class="hideFilter" [clrDgField]="'freeSpace'"
         style="position: relative" (clrDgSortedChange)="sortFunc($event);">
         {{'nfs.freeCapacity' | translate}}
         <clr-icon *ngIf="sortFunc(freeSpace.sorted);" shape="arrow down" class="is-solid"
-          style="position: absolute;right: 1.1rem;"></clr-icon>
+          style="position: absolute;right: 0.1rem;"></clr-icon>
       </clr-dg-column>
       <clr-dg-column #capacityUsage [hidden]="radioCheck!=='list'" class="hideFilter" [clrDgField]="'capacityUsage'"
         style="min-width:11rem;position: relative" (clrDgSortedChange)="sortFunc($event);">
         {{'nfs.capacityUsage' | translate}}
         <clr-icon *ngIf="sortFunc(capacityUsage.sorted);" shape="arrow down" class="is-solid"
-          style="position: absolute;right: 1.1rem;"></clr-icon>
+          style="position: absolute;right: 0.1rem;"></clr-icon>
       </clr-dg-column>
       <clr-dg-column #reserveCapacity [hidden]="radioCheck!=='list'" class="hideFilter" [clrDgField]="'reserveCapacity'"
         style="position: relative" (clrDgSortedChange)="sortFunc($event);">
         {{'nfs.provisioningCapacity' | translate}}
         <clr-icon *ngIf="sortFunc(reserveCapacity.sorted);" shape="arrow down" class="is-solid"
-          style="position: absolute;right: 1.1rem;"></clr-icon>
+          style="position: absolute;right: 0.1rem;"></clr-icon>
       </clr-dg-column>
       <clr-dg-column [hidden]="radioCheck!=='list'" [clrDgField]="'device'">
         {{'nfs.device' | translate}}
