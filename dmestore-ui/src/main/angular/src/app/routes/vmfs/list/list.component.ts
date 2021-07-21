@@ -1804,14 +1804,17 @@ wwn: "67c1cf110058934511ba6e5a00000344"
             this.operatingType='vmfsUnmountError'
             this.partSuccessData=this.unmountPartDataHandleFun(dmeError.concat(vcError).concat(bounded))
             this.partSuccessShow=true
-          }else {}
-          this.unmountDesc=result.description
-          // this.isOperationErr = true;
-          this.unmountShow = false;
-          this.status='error'
-          this.description=result.description
-          this.operatingType='vmfsUnmount'
-          this.errorShow=true
+          }else {
+            this.unmountDesc=result.description
+            // this.isOperationErr = true;
+            this.unmountShow = false;
+            this.status='error'
+            this.partSuccessData=[]
+            this.description=result.description
+            this.operatingType='vmfsUnmount'
+            this.errorShow=true
+          }
+          this.refreshVmfs()
         }
         this.cdr.detectChanges();
       });
