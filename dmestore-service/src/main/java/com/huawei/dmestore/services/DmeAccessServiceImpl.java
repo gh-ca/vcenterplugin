@@ -5,6 +5,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.huawei.dmestore.utils.StringUtil;
 import com.vmware.vim.binding.vmodl.list;
 import com.vmware.vim.binding.vmodl.map;
 
@@ -631,7 +632,18 @@ public class DmeAccessServiceImpl implements DmeAccessService {
                         hostgroupmap.put(NAME_FIELD, ToolUtils.jsonToStr(jsonObject.get(NAME_FIELD)));
                     }
                 }else {
-                    throw new DmeException("create hostgroup error,the DME return "+responseEntity.getStatusCode());
+                    String desc = "";
+                    try {
+                        JsonObject vjson = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonObject();
+                        desc = StringUtil.dealQuotationMarks(ToolUtils.getStr(vjson.get("error_msg")));
+                    }catch (Exception ess){
+                        desc = "";
+                    }
+                    if (!StringUtils.isEmpty(desc)) {
+                        throw new DmeException("create hostgroup error,the DME return " + responseEntity.getStatusCode() + "," + desc);
+                    }else {
+                        throw new DmeException("create hostgroup error,the DME return " + responseEntity.getStatusCode());
+                    }
                 }
             }
         } catch (DmeException e) {
