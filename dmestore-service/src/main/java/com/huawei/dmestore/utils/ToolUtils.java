@@ -482,6 +482,8 @@ public class ToolUtils {
         String dateStr = null;
         if (!StringUtils.isEmpty(dateValue) && dateValue.startsWith("\"") && dateValue.endsWith(("\""))){
             dateStr = dateValue.substring(1, dateValue.length() - 1);
+        }else {
+            dateStr = dateValue;
         }
         if(dateStr.contains("T")) {
             dateStr = dateStr.replace("T"," ");
