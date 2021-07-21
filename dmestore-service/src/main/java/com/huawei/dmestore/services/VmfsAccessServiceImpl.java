@@ -6315,7 +6315,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         } else if (needMountIps.size() == num) {
             try {
                 TimeUnit.SECONDS.sleep(3);
-            }catch (Exception e){
+            } catch (Exception e) {
                 LOG.error("scan datastore error");
             }
             List<Map<String, String>> mountedLst1 = vcsdkUtils.getHostsByDsObjectIdNew(ToolUtils.getStr(params.get(DATASTORE_OBJECT_IDS)), true);
@@ -6333,7 +6333,30 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             if (0 < needMountIps.size() && needMountIps.size() < num) {
                 return new MountVmfsReturn(true, needMountIps, connectionFail, desc);
             } else if (needMountIps.size() == num) {
-                return new MountVmfsReturn(false, null, connectionFail, desc);
+                try {
+                    TimeUnit.SECONDS.sleep(3);
+                } catch (Exception e) {
+                    LOG.error("scan datastore error");
+                }
+                List<Map<String, String>> mountedLst2 = vcsdkUtils.getHostsByDsObjectIdNew(ToolUtils.getStr(params.get(DATASTORE_OBJECT_IDS)), true);
+                LOG.info("check mounted result:" + gson.toJson(mountedLst2));
+                List<String> lstIps2 = new ArrayList<>();
+                if (!CollectionUtils.isEmpty(mountedLst2)) {
+                    for (Map<String, String> hostinfo : mountedLst2) {
+                        if (!StringUtils.isEmpty(hostinfo.get(HOST_NAME))) {
+                            lstIps2.add(hostinfo.get(HOST_NAME));
+                        }
+                    }
+                }
+                needMountIps.addAll(mountedIps);
+                needMountIps.removeAll(lstIps2);
+                if (0 < needMountIps.size() && needMountIps.size() < num) {
+                    return new MountVmfsReturn(true, needMountIps, connectionFail, desc);
+                } else if (needMountIps.size() == num) {
+                    return new MountVmfsReturn(false, null, connectionFail, desc);
+                } else {
+                    return new MountVmfsReturn(true, null, connectionFail, desc);
+                }
             } else {
                 return new MountVmfsReturn(true, null, connectionFail, desc);
             }
