@@ -31,6 +31,7 @@ export class DevDemoComponentComponent implements OnInit {
   mountShow:boolean=false;
   status:string
   description:string
+  checkbox:boolean=false
 
   constructor() {
     this.initForm();
