@@ -6,6 +6,7 @@ import {
   OnInit,
   Optional,
   ViewChild,
+  AfterViewInit
 } from '@angular/core';
 import { Host, List, NfsService, UpdateNfs, URLS_NFS } from './nfs.service';
 import { GlobalsService } from '../../shared/globals.service';
@@ -39,7 +40,7 @@ import { NfsMountService } from './subpages/mount/nfs-mount.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [NfsService, StorageService, VmfsListService, NfsAddService, NfsMountService],
 })
-export class NfsComponent extends NfsComponentCommon implements OnInit {
+export class NfsComponent extends NfsComponentCommon implements OnInit ,AfterViewInit{
   getColor;
   getLabelByValue;
   isAddPageOneNextDisabled: boolean;
@@ -128,6 +129,9 @@ export class NfsComponent extends NfsComponentCommon implements OnInit {
   bandwidthLimitErr = false; // v6 设备 带宽 下限大于上限
   iopsLimitErr = false; // v6 设备 IOPS 下限大于上限
 
+  isCheckUpper:boolean;
+  isCheckLower:boolean;
+
   constructor(
     private mountService: NfsMountService,
     private addService: NfsAddService,
@@ -151,15 +155,40 @@ export class NfsComponent extends NfsComponentCommon implements OnInit {
 
   ngOnInit(): void {
     this.process();
-    this.getNfsList();
+    // this.getNfsList();
     this.checkDmeConnect()
   }
+  ngAfterViewInit() {
+
+  }
+
   //判断进入当前页面是否自动同步
   checkDmeConnect(){
     let scan=localStorage.getItem("SynchronizeNfs")
     if (scan==='true'){
-      this.scanDataStore()
-      localStorage.setItem("SynchronizeNfs","false")
+      this.isLoading = true;
+      this.vmfsListService.scanVMFS('nfs').subscribe((res: any) => {
+        this.isLoading = false;
+        // this.syncSuccessTips = true;
+        localStorage.setItem("SynchronizeNfs","false")
+        this.getNfsList()
+        if (res.code === '200') {
+          // this.getNfsList();
+          console.log('Scan success');
+          this.router.navigate(['nfs'], {
+            queryParams: { t: new Date().getTime() },
+          });
+        } else {
+          console.log('Scan faild');
+          this.router.navigate(['nfs'], {
+            queryParams: { t: new Date().getTime() },
+          });
+        }
+        this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
+      });
+    }
+    else {
+      this.getNfsList()
     }
   }
 
@@ -1074,9 +1103,11 @@ export class NfsComponent extends NfsComponentCommon implements OnInit {
    */
   qoSFlagChange(form) {
     if (form.qosFlag) {
-      form.control_policyUpper = undefined;
-      form.maxBandwidthChoose = false;
-      form.maxIopsChoose = false;
+      form.control_policyUpper = '1';
+      this.isCheckUpper=true
+      this.isCheckLower=false
+      form.maxBandwidthChoose = true;
+      form.maxIopsChoose = true;
 
       form.control_policyLower = undefined;
       form.minBandwidthChoose = false;
@@ -1138,10 +1169,17 @@ export class NfsComponent extends NfsComponentCommon implements OnInit {
     if (form.control_policyUpper == undefined) {
       form.maxBandwidthChoose = false;
       form.maxIopsChoose = false;
+    }else {
+      form.maxBandwidthChoose = true;
+      form.maxIopsChoose = true;
     }
     if (form.control_policyLower == undefined) {
       form.minBandwidthChoose = false;
       form.minIopsChoose = false;
+      form.latencyChoose = false;
+    }else {
+      form.minBandwidthChoose = true;
+      form.minIopsChoose = true;
       form.latencyChoose = false;
     }
     this.qosV6Check('add');
