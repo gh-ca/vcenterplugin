@@ -2402,19 +2402,20 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                         Map<String, String> map = vcsdkUtils.hasVmOnDatastore2(dsObjectId);
                         if (!CollectionUtils.isEmpty(map)) {
                             for (Map.Entry<String, String> entry : map.entrySet()) {
-                                LOG.error("the vmfs {} contain vm,can not unmount!!!", dvr.getStoreName());
-                                Map<String, String> boundedMap = new HashMap<>();
-                                boundedMap.put(dvr.getStoreName(), "The object which mounted "+entry.getKey()+" is being used by the virtual machine !");
-                                boundVmfs.add(boundedMap);
-                                temp.remove(entry.getValue());
-                                if (!CollectionUtils.isEmpty(temp)) {
-                                    storeNameHostids.put(dvr.getStoreName(), temp);
-                                    volumeidHostids.put(dvr.getVolumeId(), temp);
+                                if (temp.contains(entry.getValue())) {
+                                    LOG.error("the vmfs {} contain vm,can not unmount!!!", dvr.getStoreName());
+                                    Map<String, String> boundedMap = new HashMap<>();
+                                    boundedMap.put(dvr.getStoreName(), "The object which mounted "+entry.getKey()+" is being used by the virtual machine !");
+                                    boundVmfs.add(boundedMap);
+                                    temp.remove(entry.getValue());
+                                    if (!CollectionUtils.isEmpty(temp)) {
+                                        storeNameHostids.put(dvr.getStoreName(), temp);
+                                        volumeidHostids.put(dvr.getVolumeId(), temp);
+                                    }
+                                    failCount++;
+                                    continue;
                                 }
                             }
-                            //失败统计
-                            failCount++;
-                            continue;
                         }
                         if (dvr != null && !CollectionUtils.isEmpty(temp)) {
                             volumeidHostids.put(dvr.getVolumeId(), temp);
@@ -2550,9 +2551,9 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             JsonObject volume = new JsonParser().parse(entity.getBody()).getAsJsonObject().get("volume").getAsJsonObject();
             LOG.info("query oriented volume ,{}", volume);
             boolean attached = ToolUtils.jsonToBoo(volume.get("attached"));
-            if (!attached) {
-                throw new DmeException("Lun attached status error!{}", volumeId);
-            }
+            /*if (!attached) {
+                throw new DmeException("Lun is currently in an unmapped state!");
+            }*/
             JsonArray attachments = volume.get("attachments").getAsJsonArray();
             LOG.info("query oriented volume attachments,{}", attachments);
             if (attachments.size() < 1) {
