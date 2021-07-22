@@ -1785,7 +1785,7 @@ wwn: "67c1cf110058934511ba6e5a00000344"
           this.partSuccessShow=true
         } else {
           // console.log('unmount ' + this.rowSelected[0].name + ' fail：' + result.description);
-          if(result.data&&result.data.length>0){
+          if(result.data&&Object.keys(result.data).length>0){
             let dmeError=[]
             let vcError=[]
             let bounded=[]
@@ -1799,7 +1799,7 @@ wwn: "67c1cf110058934511ba6e5a00000344"
               bounded=result.data.bounded
             }
             this.unmountShow=false
-            this.description=result
+            this.description=result.description
             this.status='partSuccess'
             this.operatingType='vmfsUnmountError'
             this.partSuccessData=this.unmountPartDataHandleFun(dmeError.concat(vcError).concat(bounded))

@@ -824,7 +824,7 @@
                     {{'storage.detail.cap.capacityUsage' | translate}}</div>
                   <div style=".data">
 <!--                    v5场景展示-->
-                    <div class="card" *ngIf="!detail.storageTypeShow.dorado">
+                    <div *ngIf="!detail.storageTypeShow.dorado">
                       <!--裸容量  v5-->
                       <div class="capacity-wrap">
                         <span class="capacity-label">{{'storage.detail.cap.bareCapacity' | translate}}</span>
@@ -873,7 +873,7 @@
                       </div>
                     </div>
 <!--                    v6所有场景-->
-                    <div class="card" *ngIf="detail.storageTypeShow.dorado">
+                    <div *ngIf="detail.storageTypeShow.dorado">
                       <!--裸容量  v6-->
                       <div class="capacity-wrap">
                         <span class="capacity-label">{{'storage.detail.cap.bareCapacity' | translate}}</span>
@@ -924,7 +924,7 @@
                   </div>
                   <div style=".data">
                     <!--v6场景且有可得容量-->
-                    <div class="card" *ngIf="detail.storageTypeShow.dorado&&detail.totalEffectiveCapacity!==0.0">
+                    <div class="card-detail-v6" *ngIf="detail.storageTypeShow.dorado&&detail.totalEffectiveCapacity!==0.0">
                       <!--可得容量 v6 场景有可得容量-->
                       <div class="capacity-wrap" *ngIf="detail.storageTypeShow.dorado&&detail.totalEffectiveCapacity!==0.0">
                         <span class="capacity-label">{{'storage.list.tec' | translate}}</span>
