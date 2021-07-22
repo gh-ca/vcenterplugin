@@ -2490,6 +2490,12 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                     String taskId = unmountHostGetTaskId2(unmap);
                     taskIds.add(taskId);
                 }
+                // 解除映射之后，刷新vcenter主机
+                if (!CollectionUtils.isEmpty(hostObjIds)) {
+                    for (String hostId : hostObjIds) {
+                        vcsdkUtils.scanDataStore(null, hostId);
+                    }
+                }
             }
             // 获取卸载的任务完成后的状态,默认超时时间10分钟
             if (!CollectionUtils.isEmpty(taskIds)) {
@@ -2523,11 +2529,6 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             }
             if (count > failCount) {
                 params.put("success", true);
-            }
-            if (!CollectionUtils.isEmpty(hostObjIds)) {
-                for (String hostId : hostObjIds) {
-                    vcsdkUtils.scanDataStore(null, hostId);
-                }
             }
         } catch (DmeException | JsonSyntaxException e) {
             throw new DmeException(e.getMessage());
