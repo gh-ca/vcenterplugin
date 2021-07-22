@@ -1784,7 +1784,6 @@ wwn: "67c1cf110058934511ba6e5a00000344"
           this.operatingType='vmfsUnmount'
           this.partSuccessShow=true
         } else {
-          debugger
           // console.log('unmount ' + this.rowSelected[0].name + ' fail：' + result.description);
           if(result.data&&Object.keys(result.data).length>0){
             let dmeError=[]
