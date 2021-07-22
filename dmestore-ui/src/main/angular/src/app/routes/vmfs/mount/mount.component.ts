@@ -657,14 +657,16 @@ export class MountComponent implements OnInit {
               this.operatingType='vmfsUnmountError'
               this.partSuccessData=this.unmountPartDataHandleFun(dmeError.concat(vcError).concat(bounded))
               this.partSuccessShow=true
-            }else {}
-            this.unmountDesc=result.description
-            // this.isOperationErr = true;
-            this.unmountShow = false;
-            this.status='error'
-            this.description=result.description
-            this.operatingType='vmfsUnmount'
-            this.errorShow=true
+            }else {
+              this.unmountDesc=result.description
+              // this.isOperationErr = true;
+              this.unmountShow = false;
+              this.status='error'
+              this.partSuccessData=[]
+              this.description=result.description
+              this.operatingType='vmfsUnmount'
+              this.errorShow=true
+            }
           }
           this.cdr.detectChanges();
         });
@@ -725,14 +727,17 @@ export class MountComponent implements OnInit {
               this.operatingType='vmfsUnmountError'
               this.partSuccessData=this.unmountPartDataHandleFun(dmeError.concat(vcError).concat(bounded))
               this.partSuccessShow=true
-            }else {}
-            this.unmountDesc=result.description
-            // this.isOperationErr = true;
-            this.unmountShow = false;
-            this.status='error'
-            this.description=result.description
-            this.operatingType='vmfsUnmount'
-            this.errorShow=true
+            }else {
+              this.unmountDesc=result.description
+              // this.isOperationErr = true;
+              this.unmountShow = false;
+              this.status='error'
+              this.description=result.description
+              this.operatingType='vmfsUnmount'
+              this.errorShow=true
+              this.partSuccessData=[]
+            }
+
           }
           this.cdr.detectChanges();
         });
@@ -954,14 +959,17 @@ export class MountComponent implements OnInit {
             this.operatingType='vmfsUnmountError'
             this.partSuccessData=this.unmountPartDataHandleFun(dmeError.concat(vcError).concat(bounded))
             this.partSuccessShow=true
-          }else {}
-          this.unmountDesc=result.description
-          // this.isOperationErr = true;
-          this.unmountShow = false;
-          this.status='error'
-          this.description=result.description
-          this.operatingType='vmfsUnmount'
-          this.errorShow=true
+          }else {
+            this.unmountDesc=result.description
+            // this.isOperationErr = true;
+            this.unmountShow = false;
+            this.status='error'
+            this.description=result.description
+            this.operatingType='vmfsUnmount'
+            this.errorShow=true
+            this.partSuccessData=[]
+          }
+
         }
         this.cdr.detectChanges();
       };
