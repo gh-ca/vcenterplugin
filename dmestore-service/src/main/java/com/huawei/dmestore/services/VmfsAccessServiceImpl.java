@@ -4097,8 +4097,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                     volumInfo = volumelist.get(0);
                 }else if (!CollectionUtils.isEmpty(volumelist) && volumelist.size() > 1){
                     for (Map<String, Object> map : volumelist) {
-                        if(!CollectionUtils.isEmpty(map) &&
-                                ToolUtils.getDate(ToolUtils.getStr(lunNameAndTimeMap.get(lunName))).compareTo(ToolUtils.getDate(ToolUtils.getStr( map.get("created_at"))))==0){
+                        if(!CollectionUtils.isEmpty(map) && lunName.equalsIgnoreCase(ToolUtils.getStr( map.get("volume_name")))){
                             volumInfo = map;
                         }
                     }
@@ -4611,7 +4610,6 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         ResponseEntity<String> responseEntity = null;
         try {
             responseEntity = dmeAccessService.access(DmeConstants.DME_VOLUME_DELETE_URL, HttpMethod.POST, gson.toJson(requestbody));
-            dmeAccessService.access(DmeConstants.DME_VOLUME_DELETE_URL, HttpMethod.POST, gson.toJson(requestbody));
         }catch (Exception e){
             LOG.error(e.getMessage());
         }
@@ -6292,7 +6290,6 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 }
             }
         }
-        vcsdkUtils.refreshDatastore(dataStoreObjectId);
         try {
             TimeUnit.SECONDS.sleep(3);
         }catch (Exception e){
@@ -6313,14 +6310,59 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         if (CollectionUtils.isEmpty(connectionFail)){
             connectionFail = null;
         }
-        if (0<needMountIps.size() && needMountIps.size()< num){
-            return new MountVmfsReturn(true,needMountIps,connectionFail,desc);
-        }else if (needMountIps.size() == num){
-            return new MountVmfsReturn(false,null,connectionFail,desc);
-        }else {
-            return new MountVmfsReturn(true,null,connectionFail,desc);
+        if (0 < needMountIps.size() && needMountIps.size() < num) {
+            return new MountVmfsReturn(true, needMountIps, connectionFail, desc);
+        } else if (needMountIps.size() == num) {
+            try {
+                TimeUnit.SECONDS.sleep(3);
+            } catch (Exception e) {
+                LOG.error("scan datastore error");
+            }
+            List<Map<String, String>> mountedLst1 = vcsdkUtils.getHostsByDsObjectIdNew(ToolUtils.getStr(params.get(DATASTORE_OBJECT_IDS)), true);
+            LOG.info("check mounted result:" + gson.toJson(mountedLst1));
+            List<String> lstIps1 = new ArrayList<>();
+            if (!CollectionUtils.isEmpty(mountedLst1)) {
+                for (Map<String, String> hostinfo : mountedLst1) {
+                    if (!StringUtils.isEmpty(hostinfo.get(HOST_NAME))) {
+                        lstIps1.add(hostinfo.get(HOST_NAME));
+                    }
+                }
+            }
+            needMountIps.addAll(mountedIps);
+            needMountIps.removeAll(lstIps1);
+            if (0 < needMountIps.size() && needMountIps.size() < num) {
+                return new MountVmfsReturn(true, needMountIps, connectionFail, desc);
+            } else if (needMountIps.size() == num) {
+                try {
+                    TimeUnit.SECONDS.sleep(3);
+                } catch (Exception e) {
+                    LOG.error("scan datastore error");
+                }
+                List<Map<String, String>> mountedLst2 = vcsdkUtils.getHostsByDsObjectIdNew(ToolUtils.getStr(params.get(DATASTORE_OBJECT_IDS)), true);
+                LOG.info("check mounted result:" + gson.toJson(mountedLst2));
+                List<String> lstIps2 = new ArrayList<>();
+                if (!CollectionUtils.isEmpty(mountedLst2)) {
+                    for (Map<String, String> hostinfo : mountedLst2) {
+                        if (!StringUtils.isEmpty(hostinfo.get(HOST_NAME))) {
+                            lstIps2.add(hostinfo.get(HOST_NAME));
+                        }
+                    }
+                }
+                needMountIps.addAll(mountedIps);
+                needMountIps.removeAll(lstIps2);
+                if (0 < needMountIps.size() && needMountIps.size() < num) {
+                    return new MountVmfsReturn(true, needMountIps, connectionFail, desc);
+                } else if (needMountIps.size() == num) {
+                    return new MountVmfsReturn(false, null, connectionFail, desc);
+                } else {
+                    return new MountVmfsReturn(true, null, connectionFail, desc);
+                }
+            } else {
+                return new MountVmfsReturn(true, null, connectionFail, desc);
+            }
+        } else {
+            return new MountVmfsReturn(true, null, connectionFail, desc);
         }
-
     }
 
 

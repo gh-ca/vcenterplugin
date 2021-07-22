@@ -153,9 +153,9 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
           utilization: item.utilization.toFixed(2),
         }));
       }
-      
+
     };
-    
+
     this.top5dataStoreName = this.translateService.instant(name);
     this.top5ShowLoading = true;
 
@@ -305,6 +305,8 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
           this.refresh();
           this.connectAlertSuccess = true;
           this.popShow = false;
+          localStorage.setItem("SynchronizeVmfs",'true')
+          localStorage.setItem("SynchronizeNfs",'true')
         } else {
           this.connectAlertFail = true;
         }

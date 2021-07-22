@@ -5,6 +5,7 @@ import {
   ChangeDetectorRef,
   ElementRef,
   ViewChild,
+  AfterViewInit
 } from '@angular/core';
 import {
   VmfsListService,
@@ -58,7 +59,7 @@ const _ = getLodash();
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [VmfsListService, AddService, CommonService, TranslatePipe],
 })
-export class VmfsListComponent extends VmfsCommon implements OnInit {
+export class VmfsListComponent extends VmfsCommon implements OnInit ,AfterViewInit{
   get params() {
     // 对query进行处理
     const p = Object.assign({}, this.query);
@@ -274,7 +275,41 @@ export class VmfsListComponent extends VmfsCommon implements OnInit {
 
   ngOnInit() {
     // 列表数据
-    this.refreshVmfs();
+    // this.refreshVmfs();
+
+  }
+  ngAfterViewInit() {
+    this.checkDmeConnect()
+  }
+
+  //判断进入当前页面是否自动同步
+  checkDmeConnect(){
+    let scan=localStorage.getItem("SynchronizeVmfs")
+    if (scan==='true'){
+      this.isLoading = true;
+      this.statusFilter.initStatus();
+      this.deviceFilter.initDevice();
+      this.serviceLevelFilter.initServiceLevel();
+      // this.protectionStatusFilter.initProtectionStatus();
+      this.isFirstLoadChartData = true;
+      this.remoteService.scanVMFS(this.storageType).subscribe((res: any) => {
+        this.isLoading = false;
+        // this.syncSuccessTips = true;
+        localStorage.setItem("SynchronizeVmfs","false")
+        this.refreshVmfs()
+        if (res.code === '200') {
+          // this.refresh();
+          console.log('Scan success');
+        } else {
+          console.log('Scan faild');
+        }
+        // this.isLoading = false;
+        this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
+      });
+
+    }else {
+      this.refreshVmfs()
+    }
   }
 
   // 修改
@@ -1302,6 +1337,7 @@ wwn: "67c1cf110058934511ba6e5a00000344"
         // this.deleteDesc=result.description
         this.errorShow=true
         // this.isOperationErr = true;
+        this.refreshVmfs()
       }
       this.cdr.detectChanges();
     });
@@ -1768,14 +1804,17 @@ wwn: "67c1cf110058934511ba6e5a00000344"
             this.operatingType='vmfsUnmountError'
             this.partSuccessData=this.unmountPartDataHandleFun(dmeError.concat(vcError).concat(bounded))
             this.partSuccessShow=true
-          }else {}
-          this.unmountDesc=result.description
-          // this.isOperationErr = true;
-          this.unmountShow = false;
-          this.status='error'
-          this.description=result.description
-          this.operatingType='vmfsUnmount'
-          this.errorShow=true
+          }else {
+            this.unmountDesc=result.description
+            // this.isOperationErr = true;
+            this.unmountShow = false;
+            this.status='error'
+            this.partSuccessData=[]
+            this.description=result.description
+            this.operatingType='vmfsUnmount'
+            this.errorShow=true
+          }
+          this.refreshVmfs()
         }
         this.cdr.detectChanges();
       });
@@ -2661,9 +2700,11 @@ if( this.form.chooseDevice.length>0 ){
    */
   qoSAddFlagChange(form) {
     if (form.qosFlag) {
-      form.control_policyUpper = undefined;
-      form.maxbandwidthChoose = false;
-      form.maxiopsChoose = false;
+      form.control_policyUpper = '1';
+      this.modifyForm.isCheckedUpper=true
+      this.modifyForm.isCheckedlower=false
+      form.maxbandwidthChoose = true;
+      form.maxiopsChoose = true;
 
       form.control_policyLower = undefined;
       form.minbandwidthChoose = false;
@@ -2999,10 +3040,17 @@ if( this.form.chooseDevice.length>0 ){
     if (form.control_policyUpper == undefined) {
       form.maxbandwidthChoose = false;
       form.maxiopsChoose = false;
+    }else {
+      form.maxbandwidthChoose = true;
+      form.maxiopsChoose = true;
     }
     if (form.control_policyLower == undefined) {
       form.minbandwidthChoose = false;
       form.miniopsChoose = false;
+      form.latencyChoose = false;
+    }else {
+      form.minbandwidthChoose = true;
+      form.miniopsChoose = true;
       form.latencyChoose = false;
     }
     console.log('lowerChecked', this.form);

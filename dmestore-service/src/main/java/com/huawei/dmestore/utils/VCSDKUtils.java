@@ -2422,6 +2422,7 @@ public class VCSDKUtils {
 
         // 挂载前重新扫描datastore
         logger.info("refreshStorageSystem before mount Vmfs!");
+        hostMo.getHostStorageSystemMo().rescanVmfs();
         hostMo.getHostStorageSystemMo().refreshStorageSystem();
         try {
             TimeUnit.SECONDS.sleep(2);
@@ -2459,6 +2460,7 @@ public class VCSDKUtils {
         // 挂载后重新扫描datastore
         logger.info("refreshStorageSystem after mount Vmfs!");
         hostMo.getHostStorageSystemMo().refreshStorageSystem();
+        hostMo.getHostStorageSystemMo().rescanVmfs();
     }
     /**
      * 卸载存储 20201016objectId
