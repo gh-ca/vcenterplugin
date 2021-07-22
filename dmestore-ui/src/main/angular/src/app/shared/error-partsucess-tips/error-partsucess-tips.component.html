@@ -24,6 +24,14 @@
           </clr-datagrid>
         </div>
       </div>
+      <div *ngIf="operatingType==='vmfsCreateNoData'">
+        <div>
+          <span>{{'partSuccessOrError.createPartSuccess'|translate}}</span><span>{{description}}</span>
+        </div>
+        <div class="create-fail-detail "><span>{{'errorMsg.successAll'|translate}}</span><span style="color: #009926;font-weight: bolder">{{partSuccessData?.data?.successNo}}</span></div>
+        <div class="create-fail-detail "><span>{{'errorMsg.errorDetailMessage'| translate}}</span><span style="color: #FF9800;font-weight: bolder">{{partSuccessData?.data?.partialSuccess}}</span></div>
+        <div class="create-fail-detail "><span>{{'errorMsg.errorDetailFailMessage'|translate}}</span><span style="color: red;font-weight: bolder">{{partSuccessData?.data?.failNo}}</span></div>
+      </div>
 <!--      <div><span>挂载失败:</span><span>{{description}}</span></div>-->
 <!--      <div><span>卸载失败:</span><span>{{description}}</span></div>-->
 <!--      <div><span>删除失败:</span><span>{{description}}</span></div>-->

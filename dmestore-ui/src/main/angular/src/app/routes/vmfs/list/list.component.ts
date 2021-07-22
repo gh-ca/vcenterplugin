@@ -1161,13 +1161,23 @@ wwn: "67c1cf110058934511ba6e5a00000344"
           // 打开成功提示窗口setServiceLevelList
           this.addSuccessShow = true;
         } else if (result.code === '206') {
-          this.wizard.close();
-          // this.partSuccessOrFail = true;
-          this.description=result.description
-          this.status='partSuccess'
-          this.operatingType='vmfsCreate'
-          this.partSuccessData = result
-          this.partSuccessShow=true
+          if(result.data.connectionResult&&result.data.connectionResult.length>0){
+            this.wizard.close();
+            // this.partSuccessOrFail = true;
+            this.description=result.description
+            this.status='partSuccess'
+            this.operatingType='vmfsCreate'
+            this.partSuccessData = result
+            this.partSuccessShow=true
+          } else {
+            this.wizard.close();
+            this.description=result.description
+            this.status='error'
+            this.operatingType='vmfsCreateNoData'
+            this.partSuccessData=result
+            this.errorShow=true
+            this.refreshVmfs()
+          }
         } else if (result.code === '-60001') {
           this.connectivityFailure = true;
           this.showDetail = false;
