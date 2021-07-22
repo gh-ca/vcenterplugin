@@ -669,13 +669,23 @@ export class AddComponent extends VmfsCommon implements OnInit {
         }else if(result.code==='206'){
           // this.wizard.close();
           // this.isOperationErr=true;
-          this.partSuccessData=result
-          this.wizard.close()
-          this.partSuccessShow=true
-          this.description=result.description
-          this.operatingType='vmfsCreate'
-          this.status='partSuccess'
-        } else if (result.code === '-60001') {
+          if (result.data.connectionResult&&result.data.connectionResult.length>0){
+            this.partSuccessData=result
+            this.wizard.close()
+            this.partSuccessShow=true
+            this.description=result.description
+            this.operatingType='vmfsCreate'
+            this.status='partSuccess'
+          }else {
+            this.wizard.close()
+            this.description=result.description
+            this.operatingType='vmfsCreateNoData'
+            this.status='error'
+            this.errorShow=true
+            this.partSuccessData=result
+          }
+        }
+         else if (result.code === '-60001') {
           this.connectivityFailure = true;
           this.showDetail = false;
           const connFailDatas: ConnFaildData[] = [];
