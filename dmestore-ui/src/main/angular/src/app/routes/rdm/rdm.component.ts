@@ -445,11 +445,11 @@ export class RdmComponent implements OnInit {
    * qos开关change时间
    */
   qosChange(form) {
-    if (!this.policyEnable.qosPolicy) {
+    if (this.policyEnable.qosPolicy) {
       form.flagInfo.control_policyLower = undefined;
       form.flagInfo.control_policyUpper = '1';
       this.isCheckUpper=true;
-      this.isCheckLower=false
+      this.isCheckLower=false;
       form.flagInfo.maxBandwidthChoose = true;
       form.flagInfo.maxIopsChoose = true;
       form.flagInfo.minBandwidthChoose = false;
