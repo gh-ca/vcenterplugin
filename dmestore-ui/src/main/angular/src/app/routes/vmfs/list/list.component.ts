@@ -1756,32 +1756,6 @@ wwn: "67c1cf110058934511ba6e5a00000344"
       console.log('unmountForm',this.unmountForm)
       this.remoteService.unmountVMFS(_.merge(this.unmountForm,{ hostIds: this.addForm.value.chooseDevice.map(i=>i.deviceId) },{language:this.language})).subscribe((result: any) => {
         this.modalHandleLoading = false;
-        if (isMockData){
-          result={
-            "code":"-99999",
-            "data":{
-              "dmeError":[　　
-					{
-            "LQ_071419180002, LQ_071419180000, zg709_0, LQ_071419180001":"DME ERROR: The LUN is not mapped to the specified host or host group."
-          }
-        ],
-          "vcError":[　　
-					{
-            "LQ_071419180000":"vCenter error:The operation is not allowed in the current state."
-          },
-          {
-            "zg709_4v":"vCenter error:The operation is not allowed in the current state."
-          }
-        ],
-          "bounded":[
-					{
-            "zg708_11V":"vCenter error:the vmfs contain vm,can not unmount!"
-          }
-        ]
-        },
-          "description":"unmount vmfs partial success"
-          }
-        }
         if (result.code === '200') {
           // console.log('unmount ' + this.rowSelected[0].name + ' success');
           // 关闭卸载页面
