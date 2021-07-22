@@ -38,10 +38,7 @@ import com.vmware.pbm.PbmProfileResourceType;
 import com.vmware.pbm.PbmServiceInstanceContent;
 import com.vmware.pbm.RuntimeFaultFaultMsg;
 import com.vmware.vapi.std.DynamicID;
-import com.vmware.vim.binding.vim.HostSystem;
-import com.vmware.vim.binding.vim.ServiceInstance;
-import com.vmware.vim.binding.vim.ServiceInstanceContent;
-import com.vmware.vim.binding.vim.SessionManager;
+import com.vmware.vim.binding.vim.*;
 import com.vmware.vim.binding.vim.version.version10;
 import com.vmware.vim.binding.vmodl.reflect.ManagedMethodExecuter;
 import com.vmware.vim.vmomi.client.Client;
@@ -3793,6 +3790,31 @@ public class VCSDKUtils {
             logger.error("hasVmOnDatastore error:{}", e.getMessage());
         }
         return false;
+    }
+
+    /**
+     * 判断数据存储中是否有注册的虚拟机，有则返回true，没有返回false
+     *
+     * @param objectid 数据存储的objectid
+     * @return boolean boolean
+     */
+    public Map<String,String> hasVmOnDatastore2(String objectid) {
+        Map<String, String> map = new HashMap<>();
+        String serverguid = vcConnectionHelpers.objectId2Serverguid(objectid);
+        try {
+            VmwareContext vmwareContext = vcConnectionHelpers.getServerContext(serverguid);
+            DatastoreMo ds1 = datastoreVmwareMoFactory.build(vmwareContext, vcConnectionHelpers.objectId2Mor(objectid));
+            List<ManagedObjectReference> vms = ds1.getVm();
+            if (!CollectionUtils.isEmpty(vms)) {
+                VirtualMachineMo virtualMachineMo = new VirtualMachineMo(vmwareContext, vms.get(0));
+                HostMo runningHost = virtualMachineMo.getRunningHost();
+                map.put(runningHost.getHostName(), vcConnectionHelpers.mor2ObjectId(runningHost.getMor(), runningHost.getContext().getServerAddress()));
+                return map;
+            }
+        } catch (Exception e) {
+            logger.error("hasVmOnDatastore error:{}", e.getMessage());
+        }
+        return map;
     }
 
     // 通过hostObjId获取名称
