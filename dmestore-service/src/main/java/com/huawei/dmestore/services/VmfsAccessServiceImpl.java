@@ -2551,9 +2551,9 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             JsonObject volume = new JsonParser().parse(entity.getBody()).getAsJsonObject().get("volume").getAsJsonObject();
             LOG.info("query oriented volume ,{}", volume);
             boolean attached = ToolUtils.jsonToBoo(volume.get("attached"));
-            if (!attached) {
+            /*if (!attached) {
                 throw new DmeException("Lun is currently in an unmapped state!");
-            }
+            }*/
             JsonArray attachments = volume.get("attachments").getAsJsonArray();
             LOG.info("query oriented volume attachments,{}", attachments);
             if (attachments.size() < 1) {
