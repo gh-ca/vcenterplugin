@@ -807,7 +807,7 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
         JsonObject timeRange = new JsonObject();
         timeRange.addProperty("beginTime", timeMap.get("beginTime"));
         timeRange.addProperty("endTime", timeMap.get("endTime"));
-        timeRange.addProperty("granularity", "30m");
+        timeRange.addProperty("granularity", "30min");
         if ("stat-lun".equals(dataSetType) || "stat-storage-pool".equals(dataSetType)) {
         } else if ("perf-lun".equals(dataSetType) || "perf-stat-storage-pool-details".equals(
                 dataSetType)) {
