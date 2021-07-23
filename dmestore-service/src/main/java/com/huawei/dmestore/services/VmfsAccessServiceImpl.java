@@ -6315,7 +6315,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             LOG.error("scan datastore error");
         }
         List<Map<String, String>> mountedLst = vcsdkUtils.getHostsByDsObjectIdNew(ToolUtils.getStr(params.get(DATASTORE_OBJECT_IDS)), true);
-        LOG.info("check mounted result:" + gson.toJson(mountedLst));
+        LOG.info("first check : check mounted result:" + gson.toJson(mountedLst));
         List<String> lstIps = new ArrayList<>();
         if (!CollectionUtils.isEmpty(mountedLst)){
             for (Map<String, String> hostinfo : mountedLst){
@@ -6338,7 +6338,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 LOG.error("scan datastore error");
             }
             List<Map<String, String>> mountedLst1 = vcsdkUtils.getHostsByDsObjectIdNew(ToolUtils.getStr(params.get(DATASTORE_OBJECT_IDS)), true);
-            LOG.info("check mounted result:" + gson.toJson(mountedLst1));
+            LOG.info("second check : check mounted result:" + gson.toJson(mountedLst1));
             List<String> lstIps1 = new ArrayList<>();
             if (!CollectionUtils.isEmpty(mountedLst1)) {
                 for (Map<String, String> hostinfo : mountedLst1) {
@@ -6358,7 +6358,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                     LOG.error("scan datastore error");
                 }
                 List<Map<String, String>> mountedLst2 = vcsdkUtils.getHostsByDsObjectIdNew(ToolUtils.getStr(params.get(DATASTORE_OBJECT_IDS)), true);
-                LOG.info("check mounted result:" + gson.toJson(mountedLst2));
+                LOG.info("third check : check mounted result:" + gson.toJson(mountedLst2));
                 List<String> lstIps2 = new ArrayList<>();
                 if (!CollectionUtils.isEmpty(mountedLst2)) {
                     for (Map<String, String> hostinfo : mountedLst2) {
