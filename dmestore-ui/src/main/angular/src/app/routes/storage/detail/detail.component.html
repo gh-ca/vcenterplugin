@@ -837,25 +837,25 @@
                       <!--可用容量  v5-->
                       <div class="capacity-wrap">
                         <span class="capacity-label">{{'storage.detail.cap.usableCapacity' | translate}}</span>
-                        <div class="num-bar_outer">
+                        <div class="num-bar_outer" *ngIf="detail.totalEffectiveCapacity">
                           <div class="num-bar_inner total"
-                               [ngStyle]="{'width':(detail.usableCapacity/detail.totalCapacity * 100)+'%'}"></div>
+                               [ngStyle]="{'width':(detail.totalEffectiveCapacity/detail.totalCapacity * 100)+'%'}"></div>
                         </div>
                         <span
-                          class="capacity-span">{{detail.usableCapacity ? formatCapacity(detail.usableCapacity):'--'}}</span>
+                          class="capacity-span">{{detail.totalEffectiveCapacity ? formatCapacity(detail.totalEffectiveCapacity):'--'}}</span>
                       </div>
                       <!--已使用|空闲 v5-->
                       <div class="capacity-wrap">
                         <span class="capacity-label">{{'storage.detail.cap.useFree' | translate}}</span>
                         <div class="num-bar_outer">
                           <clr-progress-bar id="v5UsedCapacityId"
-                                            clrValue="{{detail.usedCapacity/detail.freeEffectiveCapacity * 100}}"></clr-progress-bar>
+                                            clrValue="{{detail.totalEffectiveCapacity/detail.freeEffectiveCapacity * 100}}"></clr-progress-bar>
                           <!--                          <div class="num-bar_inner total progress" [ngStyle]="{'width':(detail.usedCapacity/detail.totalCapacity * 100)+'%'}"></div>-->
                           <!--                          <div class="num-bar_inner free" [ngStyle]="{'width':((detail.totalEffectiveCapacity-detail.usedCapacity)/detail.totalCapacity * 100)+'%'}"></div>-->
                         </div>
                         <span *ngIf="!detail.storageTypeShow.dorado"
                               class="capacity-span">{{formatCapacity(detail.usedCapacity)}} /
-                          {{getFreeCapacity(detail.usableCapacity,detail.usedCapacity)}}</span>
+                          {{getFreeCapacity(detail.totalEffectiveCapacity,detail.usedCapacity)}}</span>
                         <span *ngIf="detail.storageTypeShow.dorado"
                               class="capacity-span">{{formatCapacity(detail.usedCapacity)}} /
                           {{formatCapacity(detail.freeEffectiveCapacity)}}</span>
