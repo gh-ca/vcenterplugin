@@ -400,8 +400,8 @@ export class DetailComponent implements OnInit, AfterViewInit {
               "model": "OceanStor Dorado 5500 V6",
               "usedCapacity": 103.83991956640625,
               "usableCapacity": 7575.153,
-              "totalCapacity": 14305.11474609375,
-              "totalEffectiveCapacity": 0.0,
+              "totalCapacity": 0,
+              "totalEffectiveCapacity": 14305.11474609375,
               "freeEffectiveCapacity": 7471.313,
               "subscriptionCapacity": 3450.0,
               "protectionCapacity": 0.0,
@@ -1189,7 +1189,7 @@ export class DetailComponent implements OnInit, AfterViewInit {
       /*  */
       this.cd.freeCapacity = this.formatCapacityV6(freeCapacity);
       title =
-        this.formatCapacityV6(this.detail.totalEffectiveCapacity) +
+        this.formatCapacityV6(this.detail.usableCapacity) +
         '\n' +
         this.translatePipe.transform('storage.chart.total');
     };
@@ -1272,6 +1272,15 @@ export class DetailComponent implements OnInit, AfterViewInit {
       return this.formatCapacity(t);
     }
     return this.formatCapacity(t - u);
+  }
+  getFreeCapacityV6(t: number, u: number) {
+    if (t == null || t == 0) {
+      return this.formatCapacityV6(0);
+    }
+    if (u == null || u == 0) {
+      return this.formatCapacityV6(t);
+    }
+    return this.formatCapacityV6(t - u);
   }
 
   /**

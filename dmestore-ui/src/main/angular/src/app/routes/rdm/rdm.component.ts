@@ -83,6 +83,9 @@ export class RdmComponent implements OnInit {
   bandwidthLimitErr = false; // v6 设备 带宽 下限大于上限
   iopsLimitErr = false; // v6 设备 IOPS 下限大于上限
 
+  isCheckUpper:boolean;
+  isCheckLower:boolean;
+
   constructor(
     private cdr: ChangeDetectorRef,
     private http: HttpClient,
@@ -442,11 +445,13 @@ export class RdmComponent implements OnInit {
    * qos开关change时间
    */
   qosChange(form) {
-    if (!this.policyEnable.qosPolicy) {
+    if (this.policyEnable.qosPolicy) {
       form.flagInfo.control_policyLower = undefined;
-      form.flagInfo.control_policyUpper = undefined;
-      form.flagInfo.maxBandwidthChoose = false;
-      form.flagInfo.maxIopsChoose = false;
+      form.flagInfo.control_policyUpper = '1';
+      this.isCheckUpper=true;
+      this.isCheckLower=false;
+      form.flagInfo.maxBandwidthChoose = true;
+      form.flagInfo.maxIopsChoose = true;
       form.flagInfo.minBandwidthChoose = false;
       form.flagInfo.minIopsChoose = false;
       form.flagInfo.latencyChoose = false;
@@ -493,10 +498,17 @@ export class RdmComponent implements OnInit {
     if (form.flagInfo.control_policyUpper == undefined) {
       form.flagInfo.maxBandwidthChoose = false;
       form.flagInfo.maxIopsChoose = false;
+    }else {
+      form.flagInfo.maxBandwidthChoose = true;
+      form.flagInfo.maxIopsChoose = true;
     }
     if (form.flagInfo.control_policyLower == undefined) {
       form.flagInfo.minBandwidthChoose = false;
       form.flagInfo.minIopsChoose = false;
+      form.flagInfo.latencyChoose = false;
+    }else {
+      form.flagInfo.minBandwidthChoose = true;
+      form.flagInfo.minIopsChoose = true;
       form.flagInfo.latencyChoose = false;
     }
     this.qosV6Check('add');
