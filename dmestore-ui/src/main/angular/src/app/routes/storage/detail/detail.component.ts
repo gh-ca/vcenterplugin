@@ -388,63 +388,65 @@ export class DetailComponent implements OnInit, AfterViewInit {
         this.detailLoading = false;
         if(isMockData){
           r={
-            "code": "200",
-            "data": {
-              "id": "846e11d2-0a03-4c01-9db7-e67e4e13afa8",
-              "name": "DoradoV6_191.65",
-              "ip": "8.46.191.65",
-              "status": "1",
-              "synStatus": "2",
-              "sn": "2102353GSY10L4000001",
-              "vendor": "Huawei",
-              "model": "OceanStor Dorado 5500 V6",
-              "usedCapacity": 103.83991956640625,
-              "usableCapacity": 7575.153,
-              "totalCapacity": 0,
-              "totalEffectiveCapacity": 14305.11474609375,
-              "freeEffectiveCapacity": 7471.313,
-              "subscriptionCapacity": 3450.0,
-              "protectionCapacity": 0.0,
-              "fileCapacity": 0.0,
-              "blockCapacity": 0.0,
-              "blockFileCapacity": 103.84,
-              "dedupedCapacity": 60.21,
-              "compressedCapacity": 68.99,
-              "optimizeCapacity": -25.360080433593744,
-              "azIds": ["1550B81EE73A33E3A4BF81FCD4A45BB2"],
-              "storagePool": null,
-              "volume": null,
-              "fileSystem": null,
-              "dTrees": null,
-              "nfsShares": null,
-              "bandPorts": null,
-              "logicPorts": null,
-              "storageControllers": null,
-              "storageDisks": null,
-              "productVersion": "6.1.2",
-              "warning": null,
-              "event": null,
-              "location": "Chengdu_L2",
-              "patchVersion": null,
-              "maintenanceStart": null,
-              "maintenanceOvertime": null,
-              "qosFlag": false,
-              "storageTypeShow": {
-                "qosTag": 1,
-                "workLoadShow": 1,
-                "ownershipController": false,
-                "allocationTypeShow": 2,
-                "deduplicationShow": false,
-                "compressionShow": false,
-                "capacityInitialAllocation": false,
-                "smartTierShow": false,
-                "prefetchStrategyShow": false,
-                "storageDetailTag": 2,
-                "dorado": true
+            "code":"200",
+            "data":{
+              "id":"40ed4f57-0d98-4592-884e-3c044a64172f",
+              "name":"Dorado5600-203",
+              "ip":"51.10.132.203",
+              "status":"1",
+              "synStatus":"2",
+              "sn":"2102353GTG10L6000003",
+              "vendor":"Huawei",
+              "model":"OceanStor Dorado 5600 V6",
+              "usedCapacity":399.1181640625,
+              "usableCapacity":44584.928,
+              "totalCapacity":0,
+              "totalEffectiveCapacity":209715200,
+              "freeEffectiveCapacity":170003.94434,
+              "subscriptionCapacity":22317,
+              "protectionCapacity":0.08,
+              "fileCapacity":0,
+              "blockCapacity":0,
+              "blockFileCapacity":399.109,
+              "dedupedCapacity":1263.04,
+              "compressedCapacity":30.020000000000003,
+              "optimizeCapacity":-893.9418359375,
+              "azIds":[
+
+              ],
+              "storagePool":null,
+              "volume":null,
+              "fileSystem":null,
+              "dTrees":null,
+              "nfsShares":null,
+              "bandPorts":null,
+              "logicPorts":null,
+              "storageControllers":null,
+              "storageDisks":null,
+              "productVersion":"6.1.0.SPH2",
+              "warning":null,
+              "event":null,
+              "location":"Q",
+              "patchVersion":"SPH2",
+              "maintenanceStart":null,
+              "maintenanceOvertime":null,
+              "qosFlag":false,
+              "storageTypeShow":{
+                "qosTag":1,
+                "workLoadShow":1,
+                "ownershipController":false,
+                "allocationTypeShow":2,
+                "deduplicationShow":false,
+                "compressionShow":false,
+                "capacityInitialAllocation":false,
+                "smartTierShow":false,
+                "prefetchStrategyShow":false,
+                "storageDetailTag":2,
+                "dorado":true
               },
-              "smartQos": null
+              "smartQos":null
             },
-            "description": null
+            "description":null
           }
         }
         if (r.code === '200') {
@@ -1185,11 +1187,11 @@ export class DetailComponent implements OnInit, AfterViewInit {
       /* 总容量-保护容量-块/文件容量 */
       // freeCapacity = (this.detail.totalEffectiveCapacity - this.detail.protectionCapacity - this.detail.blockFileCapacity).toFixed(3);
       /* FIX: v6直接使用提供的字段 */
-      freeCapacity = this.detail.freeEffectiveCapacity;
+      freeCapacity = this.detail.usableCapacity-this.detail.usedCapacity;
       /*  */
-      this.cd.freeCapacity = this.formatCapacityV6(freeCapacity);
+      this.cd.freeCapacity = this.formatCapacity(freeCapacity);
       title =
-        this.formatCapacityV6(this.detail.usableCapacity) +
+        this.formatCapacity(this.detail.usableCapacity) +
         '\n' +
         this.translatePipe.transform('storage.chart.total');
     };
