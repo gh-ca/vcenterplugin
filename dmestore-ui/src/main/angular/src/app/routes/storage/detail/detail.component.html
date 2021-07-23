@@ -891,7 +891,7 @@
                                [ngStyle]="{'width':(detail.usableCapacity/detail.totalCapacity * 100)+'%'}"></div>
                         </div>
                         <span
-                          class="capacity-span">{{detail.usableCapacity ? formatCapacity(detail.usableCapacity):'--'}}</span>
+                          class="capacity-span">{{detail.usableCapacity ? formatCapacityV6(detail.usableCapacity):'--'}}</span>
                       </div>
                       <!--已使用|空闲 v6无可得-->
                       <div class="capacity-wrap">
@@ -903,8 +903,8 @@
                           <!--                          <div class="num-bar_inner free" [ngStyle]="{'width':((detail.totalEffectiveCapacity-detail.usedCapacity)/detail.totalCapacity * 100)+'%'}"></div>-->
                         </div>
                         <span
-                              class="capacity-span">{{formatCapacity(detail.usedCapacity)}} /
-                          {{getFreeCapacity(detail.usableCapacity,detail.usedCapacity)}}</span>
+                              class="capacity-span">{{formatCapacityV6(detail.usedCapacity)}} /
+                          {{getFreeCapacityV6(detail.usableCapacity,detail.usedCapacity)}}</span>
                       </div>
                       <!--已订阅  所有场景-->
                       <div class="capacity-wrap">
@@ -942,7 +942,7 @@
                           <!--                          <div class="num-bar_inner free" [ngStyle]="{'width':((detail.totalEffectiveCapacity-detail.usedCapacity)/detail.totalCapacity * 100)+'%'}"></div>-->
                         </div>
                         <span
-                              class="capacity-span">{{getFreeCapacity(detail.totalEffectiveCapacity,detail.freeEffectiveCapacity)}}/{{formatCapacity(detail.freeEffectiveCapacity)}}
+                              class="capacity-span">{{getFreeCapacityV6(detail.totalEffectiveCapacity,detail.freeEffectiveCapacity)}}/{{formatCapacityV6(detail.freeEffectiveCapacity)}}
                           </span>
                       </div>
                       <!--已订阅  v6-->
