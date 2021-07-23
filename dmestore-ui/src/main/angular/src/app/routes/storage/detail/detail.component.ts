@@ -388,65 +388,63 @@ export class DetailComponent implements OnInit, AfterViewInit {
         this.detailLoading = false;
         if(isMockData){
           r={
-            "code":"200",
-            "data":{
-              "id":"713afc5b-d498-4a9a-ad53-dcd45bb71e4a",
-              "name":"Huawei.Storage",
-              "ip":"10.143.133.201",
-              "status":"1",
-              "synStatus":"2",
-              "sn":"2102351QLH9WK5800028",
-              "vendor":"Huawei",
-              "model":"5300 V5",
-              "usedCapacity":819.875,
-              "usableCapacity":5427.693389892578,
-              "totalCapacity":6542.693389892578,
-              "totalEffectiveCapacity":3266,
-              "freeEffectiveCapacity":2446.125,
-              "subscriptionCapacity":6277.78,
-              "protectionCapacity":0,
-              "fileCapacity":27,
-              "blockCapacity":792.875,
-              "blockFileCapacity":0,
-              "dedupedCapacity":0,
-              "compressedCapacity":0,
-              "optimizeCapacity":819.875,
-              "azIds":[
-
-              ],
-              "storagePool":null,
-              "volume":null,
-              "fileSystem":null,
-              "dTrees":null,
-              "nfsShares":null,
-              "bandPorts":null,
-              "logicPorts":null,
-              "storageControllers":null,
-              "storageDisks":null,
-              "productVersion":"V500R007C10",
-              "warning":null,
-              "event":null,
-              "location":"aaaa",
-              "patchVersion":"SPH013",
-              "maintenanceStart":null,
-              "maintenanceOvertime":null,
-              "qosFlag":false,
-              "storageTypeShow":{
-                "qosTag":2,
-                "workLoadShow":2,
-                "ownershipController":true,
-                "allocationTypeShow":1,
-                "deduplicationShow":true,
-                "compressionShow":true,
-                "capacityInitialAllocation":true,
-                "smartTierShow":true,
-                "prefetchStrategyShow":true,
-                "storageDetailTag":2,
-                "dorado":false
+            "code": "200",
+            "data": {
+              "id": "846e11d2-0a03-4c01-9db7-e67e4e13afa8",
+              "name": "DoradoV6_191.65",
+              "ip": "8.46.191.65",
+              "status": "1",
+              "synStatus": "2",
+              "sn": "2102353GSY10L4000001",
+              "vendor": "Huawei",
+              "model": "OceanStor Dorado 5500 V6",
+              "usedCapacity": 103.83991956640625,
+              "usableCapacity": 7575.153,
+              "totalCapacity": 0,
+              "totalEffectiveCapacity": 14305.11474609375,
+              "freeEffectiveCapacity": 7471.313,
+              "subscriptionCapacity": 3450.0,
+              "protectionCapacity": 0.0,
+              "fileCapacity": 0.0,
+              "blockCapacity": 0.0,
+              "blockFileCapacity": 103.84,
+              "dedupedCapacity": 60.21,
+              "compressedCapacity": 68.99,
+              "optimizeCapacity": -25.360080433593744,
+              "azIds": ["1550B81EE73A33E3A4BF81FCD4A45BB2"],
+              "storagePool": null,
+              "volume": null,
+              "fileSystem": null,
+              "dTrees": null,
+              "nfsShares": null,
+              "bandPorts": null,
+              "logicPorts": null,
+              "storageControllers": null,
+              "storageDisks": null,
+              "productVersion": "6.1.2",
+              "warning": null,
+              "event": null,
+              "location": "Chengdu_L2",
+              "patchVersion": null,
+              "maintenanceStart": null,
+              "maintenanceOvertime": null,
+              "qosFlag": false,
+              "storageTypeShow": {
+                "qosTag": 1,
+                "workLoadShow": 1,
+                "ownershipController": false,
+                "allocationTypeShow": 2,
+                "deduplicationShow": false,
+                "compressionShow": false,
+                "capacityInitialAllocation": false,
+                "smartTierShow": false,
+                "prefetchStrategyShow": false,
+                "storageDetailTag": 2,
+                "dorado": true
               },
-              "smartQos":null
+              "smartQos": null
             },
-            "description":null
+            "description": null
           }
         }
         if (r.code === '200') {
@@ -1191,7 +1189,7 @@ export class DetailComponent implements OnInit, AfterViewInit {
       /*  */
       this.cd.freeCapacity = this.formatCapacityV6(freeCapacity);
       title =
-        this.formatCapacityV6(this.detail.totalEffectiveCapacity) +
+        this.formatCapacityV6(this.detail.usableCapacity) +
         '\n' +
         this.translatePipe.transform('storage.chart.total');
     };
@@ -1274,6 +1272,15 @@ export class DetailComponent implements OnInit, AfterViewInit {
       return this.formatCapacity(t);
     }
     return this.formatCapacity(t - u);
+  }
+  getFreeCapacityV6(t: number, u: number) {
+    if (t == null || t == 0) {
+      return this.formatCapacityV6(0);
+    }
+    if (u == null || u == 0) {
+      return this.formatCapacityV6(t);
+    }
+    return this.formatCapacityV6(t - u);
   }
 
   /**
