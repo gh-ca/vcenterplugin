@@ -837,7 +837,7 @@
                       <!--可用容量  v5-->
                       <div class="capacity-wrap">
                         <span class="capacity-label">{{'storage.detail.cap.usableCapacity' | translate}}</span>
-                        <div class="num-bar_outer">
+                        <div class="num-bar_outer" *ngIf="detail.totalEffectiveCapacity">
                           <div class="num-bar_inner total"
                                [ngStyle]="{'width':(detail.totalEffectiveCapacity/detail.totalCapacity * 100)+'%'}"></div>
                         </div>
