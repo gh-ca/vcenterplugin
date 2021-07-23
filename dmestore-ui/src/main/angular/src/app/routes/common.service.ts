@@ -207,7 +207,7 @@ zh:'一年' ,range:'LAST_1_YEAR',   interval:  "DAY"
           "partialSuccess": 0,
           "desc": null
         },
-        "description": "create vmfs failure:LUN names yctest0715003-10004,yctest0715003-10005,yctest0715003-10006,yctest0715003-10007,yctest0715003-10016,yctest0715003-10017,yctest0715003-10019 already exist on the specified storage device."
+        "description": ""
       };
     } else {
       try {

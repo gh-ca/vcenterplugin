@@ -31,6 +31,7 @@ export class DevDemoComponentComponent implements OnInit {
   mountShow:boolean=false;
   status:string
   description:string
+  checkbox:boolean=false
 
   constructor() {
     this.initForm();
@@ -74,10 +75,17 @@ export class DevDemoComponentComponent implements OnInit {
   }
   // "10.12.123.1","10.23.234.1"
   initForm() {
-    this.status='error'
-    this.description='Mount vmfs partial success : The host (name: 10.143.133.197) to which a LUN has been mapped cannot be added to a host group to which a LUN has been mapped.'
+    this.status='PartSuccess'
+    this.description='Unmount vmfs failed .'
     //模拟返回数据
-    this.partSuccessData=null;
+    this.partSuccessData=[
+     {key: "LQ_071419180000", value: "vCenter error:The operation is not allowed in the current state."},
+    {key: "zg709_4v", value: "vCenter error:The operation is not allowed in the current state."},
+     {key: "LQ_071419180000", value: "vCenter error:The operation is not allowed in the current state."},
+     {key: "zg709_4v", value: "vCenter error:The operation is not allowed in the current state."},
+    {key: "LQ_071419180000", value: "vCenter error:The operation is not allowed in the current state."},
+    {key: "zg709_4v", value: "vCenter error:The operation is not allowed in the current state."}
+    ];
 // ["10.143.133.196", "10.143.133.197"]
     /*初始化和校验规则*/
     this.form = new FormGroup({

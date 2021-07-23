@@ -34,7 +34,7 @@
 </div>
 
 <!--失败提示-->
-<clr-modal [(clrModalOpen)]="mountShow" [clrModalSize]="'sm'" [clrModalClosable]="true">
+<clr-modal [(clrModalOpen)]="mountShow" [clrModalSize]="'lg'" [clrModalClosable]="true">
   <h3 class="modal-title modelTile">{{'vmfs.reclaim.title' | translate}}</h3>
   <div class="modal-body">
 <!--    <p *ngIf="mountShow">{{'errorMsg.mountError' | translate}}</p>-->
@@ -43,7 +43,7 @@
       [status]="status"
       [description]="description"
       [partSuccessData]="partSuccessData"
-    [operatingType]="'vmfsMount'"></app-error-partsucess-tips>
+    [operatingType]="'vmfsUnmountError'"></app-error-partsucess-tips>
   </div>
   <div class="modal-footer">
     <button type="submit" class="btn btn-primary"
@@ -53,6 +53,9 @@
 <!--<button [attr.disabled]="buttonDisableOrNot===false" (click)="log111">是否可以点击当前button</button>-->
 <button [disabled]="changeButtonAttr()">是否可以点击当前button</button>
 <button (click)="mountShow=true">开启模态框</button>
+
+<input type="checkbox" clrCheckbox [(ngModel)]="checkbox" />
+<label>是否选中</label>
 
 <!--<div *ngIf="changeButtonAttr()" class="loadingDiv">-->
 <!--          <span style="color: black">-->

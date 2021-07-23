@@ -365,13 +365,13 @@
             <label style="color: #9F9F9F;">{{'vmfs.controlPolicy' | translate}}</label>
             <!--上限-->
             <clr-checkbox-wrapper>
-              <input type="checkbox" id="control_policyUpper" clrCheckbox (change)="controlPolicyChangeFunc(true);"
+              <input type="checkbox" [(ngModel)]="isCheckUpper" id="control_policyUpper" clrCheckbox (change)="controlPolicyChangeFunc(true);"
                 name="control_policyUpper" />
               <label>{{'vmfs.upperLimitControl' | translate}}</label>
             </clr-checkbox-wrapper>
             <!--下限-->
             <clr-checkbox-wrapper *ngIf="!showLowerFlag">
-              <input type="checkbox" id="control_policyLower" clrCheckbox (change)="controlPolicyChangeFunc(false);"
+              <input type="checkbox" [(ngModel)]="isCheckLower" id="control_policyLower" clrCheckbox (change)="controlPolicyChangeFunc(false);"
                 name="control_policyLower" />
               <label>{{'vmfs.lowerLimitControl' | translate}}</label>
             </clr-checkbox-wrapper>
@@ -584,6 +584,7 @@
     <app-error-partsucess-tips
       [status]="status"
       [description]="description"
+      [partSuccessData]="partSuccessData"
       [operatingType]="operatingType"></app-error-partsucess-tips>
   </div>
   <div class="modal-footer">
