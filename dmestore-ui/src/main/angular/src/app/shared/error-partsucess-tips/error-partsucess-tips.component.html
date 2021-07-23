@@ -10,9 +10,8 @@
         <span>{{'partSuccessOrError.unmountFail'|translate}}</span><span>{{description}}</span>
       </div>
       <div *ngIf="operatingType==='vmfsMount'">
-        <div *ngIf="partSuccessData===null||partSuccessData.length===0"><span>{{'partSuccessOrError.mountFail'|translate}}</span><span>{{description}}</span></div>
+        <span>{{'partSuccessOrError.mountFail'|translate}}</span><span>{{description}}</span>
         <div *ngIf="partSuccessData&&partSuccessData.length>0">
-          <span>{{'partSuccessOrError.mountFail'|translate}}</span><span>{{description}}</span>
           <clr-datagrid>
             <clr-dg-column>{{'partSuccessOrError.host'|translate}}</clr-dg-column>
             <clr-dg-column>{{'partSuccessOrError.currentState'|translate}}</clr-dg-column>
