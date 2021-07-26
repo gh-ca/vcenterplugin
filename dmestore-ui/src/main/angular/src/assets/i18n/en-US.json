@@ -267,7 +267,7 @@
     "startTime": "Start Time",
     "endTime": "End Time",
     "timeInputTips": "Please enter start-end time！",
-    "capacityTips": "If the version is VMFS5, the minimum capacity is 1G, if the version is VMFS6, the minimum capacity is 2G, and the capacity must be a positive integer in G, and the quantity must be a positive integer and must lower than 100!",
+    "capacityTips": "If the version is VMFS5, the minimum capacity is 1G, if the version is VMFS6, the minimum capacity is 2G, and the capacity must be a positive integer in G, and the quantity must be a positive integer and must lower than 200!",
     "serviceLevelCantBeNull": "The DME Storage Strategy is a must, and you can only choose the DME Storage Strategy whose capacity is not 0!",
     "expandTips": "Expansion capacity can only be a positive integer of GB",
     "expandTipsMax": "After expansion, the total capacity cannot exceed 256TB.",
@@ -306,6 +306,7 @@
       "success": "Successfully mounted!"
     },
     "del": {
+      "warning": "Dangerous operation: the association relationship between the storage and the host will be removed, and the mapping relationship between the volume and the host will be removed at the same time!",
       "title": "Tips",
       "content": "Are you sure to delete?",
       "success": "successfully deleted!"
@@ -423,6 +424,7 @@
         "totalCapacity": "Total Capacity",
         "useFree": "Use|Free",
         "subscribe": "Subscribed",
+        "usableCapacity": "Usable capacity",
         "storagePool": "Storage Pool List",
         "used": "Used:",
         "capacitySavings": "Capacity Saving",
@@ -519,7 +521,7 @@
           "controller": "Controller",
           "status": "Status",
           "version": "Version",
-          "cpuUsage": "CPU Usage",
+          "cpuUsage": "CPU Usage(%)",
           "iops": "IOPS",
           "ops": "OPS",
           "latency": "Average I/O Response Time (ms)",
@@ -533,22 +535,22 @@
           "capacity": "Capacity",
           "role": "Role",
           "diskDomain": "Disk Domain",
-          "rotationalSpeed": "Rotational Speed",
+          "rotationalSpeed": "Rotational Speed(RPM)",
           "iops": "IOPS",
           "latency": "Average I/O Response Time (ms)",
           "bandwidth": "Bandwidth(MB/s)",
-          "usage": "Usage(%)"
+          "usage": "Utilization(%)"
         },
         "ports": {
           "ports": "Ports",
           "location": "Location",
           "status": "Status",
-          "wwn": "WWN",
-          "workingRate": "Working Rate(Mbps)",
+          "wwn": "WWPN",
+          "workingRate": "Working Rate(Mbit/s)",
           "iops": "IOPS",
           "latency": "Average I/O Response Time (ms)",
           "bandwidth": "Bandwidth(MB/s)",
-          "usage": "Usage(%)",
+          "usage": "Utilization(%)",
           "name": "Name",
           "healthStatus": "Health Status",
           "runningStatus": "Running Status",
@@ -562,7 +564,7 @@
           "role": "Role",
           "dynamicDns": "Dynamic DNS",
           "dataProtocol": "Data Protocol",
-          "manageAccess": "Manage Access",
+          "manageAccess": "Management Access Method",
           "vStoreName": "VStore Name",
           "type": "Type",
           "fc": "FC Port",
@@ -640,10 +642,10 @@
       "move": "This item is configured to use VAAI to accelerate VMFS data movement and offload data movement to storage devices to improve performance.",
       "delete": " This item is configured to reclaim the space of VMs that use VMFS5 by running the unmap command.To execute the unmap command successfully, the datastore used by virtual disks must support thin provisioning.",
       "quanTum": "This item is configured to set the queue depth of virtual disks to 64. If the queue depth is set to a too small value, requests will be blocked.",
-      "diskMaxIOSize": "This item is configured to set the maximum number of I/Os for virtual disks to the applicable value of ESXi of the current version. In specific ESXi versions, if the number is set to a large value, Windows EFI boot issues may occur. A small value is automatically used in the best practice.",
+      "diskMaxIOSize": "This item is configured to set the maximum number of I/Os for virtual disks to the applicable value of ESXi of the current version. In specific ESXi versions, if the number is set to a large value, Windows EFI boot issues may occur. A small value is automatically used in the best practice.For previous versions of ESXI6.7 Update 1 Release, it is recommended to change to 1024; for ESXI6.7 Update 1 Release and later versions, it is recommended to use the default value of 32767.",
       "depthForQlogic": "This item is configured to set the QLogic HBA queue depth to 512 and increase the throughput of ESXi hosts.",
       "depthForEmulex": "This item is configured to set the Emulex HBA queue depth to 512 and increase the throughput of ESXi hosts.",
-      "pathSwitchPolicy": "his item is configured to automatically configure the multipathing policy for storage devices to improve their availability and performance.",
+      "pathSwitchPolicy": "his item is configured to automatically configure the multipathing policy for storage devices to improve their availability and performance.The data storage created by the user needs to restart the host to take effect.",
       "jumboFrame": "This item is configured to enable jumbo frame configuration and the MTU value of ESXi vmkernel adapters is set to 9000. Jumbo frames are recommended for the storage network.\nThis configuration requires that ESXi hosts, storage devices, and all physical network devices in the data packet link support jumbo frames, and their MTU values are set to 9000.",
       "reclamation": "This item is configured to configure the automatic space reclamation policy for VMFS6 datastores.",
       "numberOfVolInDatastore": "This item is configured to limit the maximum number of volumes in a single datastore to 1. A VM cannot concurrently process multiple volumes requests in a datastore. If a datastore contains multiple volumes, request blocking of a volume will affect other volumes. Therefore, it is not recommended that a datastore contain multiple volumes."
@@ -732,6 +734,7 @@
     "rdmSuccessMsg": "Create RDM Success!",
     "addTips": "Note: Use this method when you need to create a new LUN on the storage and use the LUN to create an RDM disk for the virtual machine. If you want to use an existing LUN to create, you can directly choose to add RDM disks in the virtual machine hardware editor.",
     "defaultStorage": "Store with the virtual machine",
+    "storageStrategyNull": "The location data (vmfs) selected in step 1 (volume settings) has not been queried for available DME storage strategies, please select storage/storage pool method to create RDM!",
     "compatibilityMode": {
       "name": "Compatibility Mode",
       "virtualMode": "Virtual Mode",
@@ -870,11 +873,13 @@
   },
   "errorMsg": {
     "mountError": "Mount failed!Please contact management!",
+    "mountPartError": "The mounting part was successful! Please contact the administrator!",
     "unMountError": "UnMount failed!Please contact management!",
     "expandError": "Expand failed!Please contact management!",
     "reduceError": "Reduce failed!Please contact management!",
     "deleteError": "Delete failed!Please contact management!",
     "addError": "Add failed!Please contact management!",
+    "addPartError": "Add part successfully! Please contact the administrator!",
     "modifyError": "Modification failed!Please contact management!",
     "reclaimError": "Space reclamation failed! Please contact the administrator!",
     "serviceLevelError": "DME Storage Strategy change failed! Please contact the administrator!",
@@ -889,7 +894,16 @@
     "getDataFailed": "Failed to get data!",
     "cantChangeServiceLevel": "This device is a Custom type and does not support DME Storage Strategy change operation!",
     "iposMaxMinTips": "Can only be an integer from 1 to 999999999.",
-    "nfsSecurityTips": "To use Kerberos authentication, each host that mounts this datastore has to be a part of an Active Directory domain and its NFS authentication credentials need to be set. This is done on the Authentication Services page on each host."
+    "nfsSecurityTips": "To use Kerberos authentication, each host that mounts this datastore has to be a part of an Active Directory domain and its NFS authentication credentials need to be set. This is done on the Authentication Services page on each host.",
+    "errorDetailMessage": "Partially successfully mounted data storage：",
+    "errorDetailFailMessage": "Failed to create data store：",
+    "successAll": "Mounting the data store is completely successful：",
+    "errorDescription": "Description of failure reason：",
+    "HostConnectionFail": "Launcher is not online!",
+    "connectionFailMessage": "The following are the hosts that failed to connect to the host：",
+    "mountFailHost": "The following are the hosts that failed to mount：",
+    "details": "Details：",
+    "detailDescription": "Detailed description："
   },
   "page": {
     "perPage": "Per Page",
@@ -938,5 +952,19 @@
       "lunCapacityTrends": "LUN Capacity Trends",
       "storagePoolCapacityTrends": "Storage Pool Capacity Trends"
     }
+  },
+  "partSuccessOrError": {
+    "createFail": "Creation failed！",
+    "deleteFail": "Failed to delete！",
+    "unmountFail": "Uninstallation failed！",
+    "mountFail": "Mount failed！",
+    "mountPartSuccess": "Partially mounted successfully！",
+    "unmountPartSuccess": "Partially successfully uninstalled！",
+    "createPartSuccess": "Partially created successfully！",
+    "host": "Host",
+    "reason": "The reason",
+    "storage": "Storage",
+    "currentState": "Current state",
+    "mountFailState": "Mount failed"
   }
 }

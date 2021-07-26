@@ -100,6 +100,9 @@ export class NfsAddComponent extends NfsComponentCommon implements OnInit {
   bandwidthLimitErr = false; // v6 设备 带宽 下限大于上限
   iopsLimitErr = false; // v6 设备 IOPS 下限大于上限
 
+  isCheckUpper:boolean;
+  isCheckLower:boolean;
+
   // 添加页面窗口
   @ViewChild('wizard') wizard: ClrWizard;
   @ViewChild('addPageOne') addPageOne: ClrWizardPage;
@@ -750,9 +753,11 @@ export class NfsAddComponent extends NfsComponentCommon implements OnInit {
    */
   qoSFlagChange(form) {
     if (form.qosFlag) {
-      form.control_policyUpper = undefined;
-      form.maxBandwidthChoose = false;
-      form.maxIopsChoose = false;
+      form.control_policyUpper = '1';
+      this.isCheckUpper=true;
+      this.isCheckLower=false;
+      form.maxBandwidthChoose = true;
+      form.maxIopsChoose = true;
 
       form.control_policyLower = undefined;
       form.minBandwidthChoose = false;
@@ -816,11 +821,18 @@ export class NfsAddComponent extends NfsComponentCommon implements OnInit {
     if (form.control_policyUpper == undefined) {
       form.maxBandwidthChoose = false;
       form.maxIopsChoose = false;
+    }else {
+      form.maxBandwidthChoose=true;
+      form.maxIopsChoose=true;
     }
     if (form.control_policyLower == undefined) {
       form.minBandwidthChoose = false;
       form.minIopsChoose = false;
       form.latencyChoose = false;
+    }else {
+      form.minBandwidthChoose=true;
+      form.minIopsChoose=true;
+      form.latencyChoose=false
     }
     this.qosV6Check('add');
   }

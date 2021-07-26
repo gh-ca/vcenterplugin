@@ -2,14 +2,7 @@ package com.huawei.vmware.mo;
 
 import com.huawei.vmware.util.VmwareContext;
 
-import com.vmware.vim25.HostConfigFaultFaultMsg;
-import com.vmware.vim25.HostFileSystemVolumeInfo;
-import com.vmware.vim25.HostInternetScsiHbaSendTarget;
-import com.vmware.vim25.HostMultipathInfoLogicalUnitPolicy;
-import com.vmware.vim25.HostStorageDeviceInfo;
-import com.vmware.vim25.ManagedObjectReference;
-import com.vmware.vim25.NotFoundFaultMsg;
-import com.vmware.vim25.RuntimeFaultFaultMsg;
+import com.vmware.vim25.*;
 
 import java.util.List;
 
@@ -145,5 +138,9 @@ public class HostStorageSystemMo extends BaseMo {
      */
     public void updateVmfsUnmapPriority(String vmfsUuid, String unmapPriority) throws RuntimeFaultFaultMsg {
         context.getService().updateVmfsUnmapPriority(mor, vmfsUuid, unmapPriority);
+    }
+
+    public List<HostDiskPartitionInfo> retrieveDiskPartitionInfo(List<String> uids) throws Exception {
+        return context.getService().retrieveDiskPartitionInfo(mor, uids);
     }
 }

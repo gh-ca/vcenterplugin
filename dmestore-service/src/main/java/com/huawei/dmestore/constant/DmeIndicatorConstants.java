@@ -253,6 +253,11 @@ public class DmeIndicatorConstants {
     public static final String COUNTER_ID_CONTROLLER_RESPONSETIME = "1125908496842762";
 
     /**
+     * FILE SYSTEM CONTROLLER OPS
+     */
+    public static final String COUNTER_ID_CONTROLLER_OPS = "1125908496842773";
+
+    /**
      * IOPS
      */
     public static final String COUNTER_ID_CONTROLLER_THROUGHPUT = "1125908496842763";

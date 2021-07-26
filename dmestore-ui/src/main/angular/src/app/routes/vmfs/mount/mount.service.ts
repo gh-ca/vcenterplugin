@@ -20,7 +20,7 @@ export class MountService {
    * @param dataStoreType
    */
   getDataStoreByClusterId(clusterObjectId:string, dataStoreType:string) {
-    return this.http.get('accessvmware/getdatastoresbyclusterobjectid?clusterObjectId=' + clusterObjectId + '&dataStoreType=' + dataStoreType);
+    return this.http.get('accessvmfs/queryMountableVmfsByClusterId?clusterObjectId='+ clusterObjectId + '&dataStoreType=' + dataStoreType);
   }
 
   /**

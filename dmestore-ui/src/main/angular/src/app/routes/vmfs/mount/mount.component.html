@@ -1,3 +1,4 @@
+<!-- 此文件有三个入口 -->
 <div>
   <!--以主机或集群为入口 挂载/卸载-->
   <clr-modal class="add-wizard-wrap" [clrModalSize]="'lg'" [(clrModalOpen)]="hostMountShow" [clrModalClosable]="false">
@@ -16,10 +17,10 @@
           </span>
         </div>
         <div *ngIf="isOperationErr" class="errorTips" readonly>
-          <clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{'errorMsg.mountError' | translate}}
+          <clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{mountFailOrPartSuccessDesc}}
         </div>
         <div *ngIf="isUnmountOperationErr" class="errorTips" readonly>
-          <clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{'errorMsg.unMountError' | translate}}
+          <clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{unmountDesc}}
         </div>
 
         <div *ngIf="notChooseMountDevice" class="errorTips" readonly>
@@ -75,7 +76,6 @@
   <clr-modal class="add-wizard-wrap" [(clrModalOpen)]="mountShow" [clrModalClosable]="false">
     <div class="modal-body">
       <form clrForm>
-
         <div *ngIf="modalLoading" class="loadingDiv">
           <span>
             {{'vmfs.loadingTips' | translate}}<img src="./assets/images/loading.gif" width="20px" height="20px"
@@ -88,22 +88,70 @@
               height="20px" style="margin-left: 20px;">
           </span>
         </div>
-        <div *ngIf="isOperationErr" class="errorTips" readonly>
-          <clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{'errorMsg.mountError' | translate}}
+        <div *ngIf="isOperationErr" class="alert alert-danger" readonly>
+          <div class="alert-items">
+            <div class="alert-item flex horizon">
+              <div class="alert-icon-wrapper flex1">
+                <clr-icon class="alert-icon" shape="exclamation-circle"></clr-icon> {{'errorMsg.mountError' | translate}}
+              </div>
+              <div>
+                <clr-signpost>
+                  <button class="btn btn-link"
+                          clrSignpostTrigger>
+                    {{'tips.details'|translate}}
+                  </button>
+                  <clr-signpost-content  [clrPosition]="'bottom-left'" *clrIfOpen >
+                    <div>
+                      <p>{{'errorMsg.detailDescription'|translate}}</p>
+                      {{mountFailOrPartSuccessDesc}}
+                    </div>
+                  </clr-signpost-content>
+                </clr-signpost>
+              </div>
+            </div>
+          </div>
         </div>
-
+        <div *ngIf="isMountPartSuccess" class="alert alert-danger" readonly>
+          <div class="alert-items">
+            <div class="alert-item flex horizon">
+              <div class="alert-icon-wrapper flex1">
+                <clr-icon class="alert-icon" shape="exclamation-circle"></clr-icon> {{'errorMsg.mountPartError' | translate}}
+              </div>
+              <div>
+                <clr-signpost>
+                  <button class="btn btn-link"
+                          clrSignpostTrigger>
+                    {{'tips.details'|translate}}
+                  </button>
+                  <clr-signpost-content  [clrPosition]="'bottom-left'" *clrIfOpen >
+                    <div *ngIf="mountFailHost&&mountFailHost.length>0">
+                      <p>{{'errorMsg.mountFailHost'|translate}}</p>
+                      <div *ngFor="let item of mountFailHost">{{item}}</div>
+                    </div>
+                    <div>
+                      <p>{{'errorMsg.detailDescription'|translate}}</p>
+                      {{mountFailOrPartSuccessDesc}}
+                    </div>
+                  </clr-signpost-content>
+                </clr-signpost>
+              </div>
+            </div>
+          </div>
+        </div>
         <!-- 卸载 -->
-        <div class="flex middle clr-form-control clr-row">
-          <label style="color: #9F9F9F;" class="clr-control-label">{{'vmfs.name' | translate}}</label>
-          <div [title]="vmfsInfo.name" class="flex1 over_flow">{{vmfsInfo.name}}</div>
-        </div>
-        <!--  <clr-input-container>
+<!--        <div class="flex middle clr-form-control clr-row">-->
+<!--          <label style="color: #9F9F9F;" class="clr-control-label">{{'vmfs.name' | translate}}</label>-->
+<!--          <div [title]="vmfsInfo?.name" class="flex1 over_flow">{{vmfsInfo?.name}}</div>-->
+<!--        </div>-->
+        <!--
+        <clr-input-container>
           <label style="color: #9F9F9F;">{{'vmfs.name' | translate}}</label>
-          <input clrInput readonly [(ngModel)]="vmfsInfo.name" name="name" #name="ngModel" required /><br>
+          <input clrInput readonly [(ngModel)]="vmfsInfo?.name" name="name" #name="ngModel" required /><br>
           <clr-control-error>{{'validations.required' | translate}}</clr-control-error>
-        </clr-input-container> -->
+        </clr-input-container>
+        -->
         <!-- 主机、集群列表切换 -->
-        <clr-radio-container clrInline>
+        <!-- <clr-radio-container clrInline>
           <label class="floatleft" style="color: #9F9F9F;">{{'vmfs.hostOrCluster' | translate}}</label>
           <clr-radio-wrapper>
             <input type="radio" clrRadio name="controlPolicy" value="1" [(ngModel)]="mountForm.mountType"
@@ -114,9 +162,9 @@
             <input type="radio" clrRadio name="controlPolicy" value="2" [(ngModel)]="mountForm.mountType" />
             <label>{{'vmfs.mount.cluster' | translate}}</label>
           </clr-radio-wrapper>
-        </clr-radio-container>
+        </clr-radio-container> -->
         <!-- 显示主机 -->
-        <clr-combobox-container *ngIf="mountForm.mountType==='1'">
+        <!--  <clr-combobox-container *ngIf="mountForm.mountType==='1'">
           <label style="color: #9F9F9F;">{{'vmfs.mount.host' | translate}}</label>
           <clr-combobox [(ngModel)]="chooseHost" name="chooseHost" required>
             <clr-options style="max-height: 6.5rem;overflow: auto" *ngIf="mountHostData">
@@ -131,10 +179,10 @@
           </clr-control-helper>
           <clr-control-error>{{'validations.required' | translate}}：{{'vmfs.mount.mountErr' | translate}}
           </clr-control-error>
-        </clr-combobox-container>
+        </clr-combobox-container> -->
 
         <!-- 显示集群 -->
-        <clr-combobox-container *ngIf="mountForm.mountType==='2'">
+        <!-- <clr-combobox-container *ngIf="mountForm.mountType==='2'">
           <label style="color: #9F9F9F;">{{'vmfs.mount.cluster' | translate}}</label>
           <clr-combobox [(ngModel)]="chooseCluster" name="chooseCluster" required>
             <clr-options style="max-height: 6.5rem;overflow: auto" *ngIf="mountClusterData">
@@ -149,13 +197,27 @@
           </clr-control-helper>
           <clr-control-error>{{'validations.required' | translate}}：{{'vmfs.mount.mountErr' | translate}}
           </clr-control-error>
-        </clr-combobox-container>
+        </clr-combobox-container> -->
+        <clr-control-container *ngIf="mountShow">
+          <label style="color: #9F9F9F;">{{'vmfs.hostOrCluster' | translate}}</label>
+          <app-gh-tree-checkbox
+            [resType]="'mount'"
+            [mountType]="selectMountType"
+            [tree]="deviceList"
+            [vmfsMount]=true
+            (valueChange)="handleChooseDeviceChange('chooseDevice',$event)">
+          </app-gh-tree-checkbox>
+<!--          <app-error-tips-->
+<!--            [isShow]="!deviceForm?.controls.chooseDevice.valid"-->
+<!--            [tips]="'validations.required' | translate">-->
+<!--          </app-error-tips>-->
+        </clr-control-container>
 
       </form>
     </div>
     <div class="modal-footer">
       <button type="button" class="btn btn-outline" (click)="cancel();">{{'menu.cancel' | translate}}</button>
-      <button type="submit" class="btn btn-primary" (click)="mountOrUnmountFunc()">{{'menu.ok' | translate}}</button>
+      <button type="submit" class="btn btn-primary" [class.submit-disabled]='isDisableMountSubmit()' (click)="mountOrUnmountFunc(isDisableMountSubmit())">{{'menu.ok' | translate}}</button>
     </div>
   </clr-modal>
 
@@ -178,7 +240,7 @@
           </span>
         </div>
         <div *ngIf="isUnmountOperationErr" class="errorTips" readonly>
-          <clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{'errorMsg.unMountError' | translate}}
+          <clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{unmountDesc}}
         </div>
 
         <div *ngIf="notChooseUnmountDevice" class="errorTips" readonly>
@@ -187,17 +249,17 @@
         </div>
         <!-- 卸载 -->
 
-        <div class="flex middle clr-form-control clr-row">
-          <label style="color: #9F9F9F;" class="clr-control-label">{{'vmfs.name' | translate}}</label>
-          <div [title]="vmfsInfo.name" class="flex1 over_flow">{{vmfsInfo.name}}</div>
-        </div>
-        <!--  <clr-input-container>
+<!--        <div class="flex middle clr-form-control clr-row">-->
+<!--          <label style="color: #9F9F9F;" class="clr-control-label">{{'vmfs.name' | translate}}</label>-->
+<!--          <div [title]="vmfsInfo?.name" class="flex1 over_flow">{{vmfsInfo?.name}}</div>-->
+<!--        </div>-->
+        <!-- <clr-input-container>
           <label style="color: #9F9F9F;">{{'vmfs.name' | translate}}</label>
-          <input clrInput readonly [(ngModel)]="vmfsInfo.name"  [title]="vmfsInfo.name"  name="name" #name="ngModel" required/><br>
+          <input clrInput readonly [(ngModel)]="vmfsInfo?.name"  [title]="vmfsInfo?.name"  name="name" #name="ngModel" required/><br>
           <clr-control-error>{{'validations.required' | translate}}</clr-control-error>
         </clr-input-container> -->
         <!-- 主机、集群列表切换 -->
-        <clr-radio-container clrInline>
+        <!-- <clr-radio-container clrInline >
           <label class="floatleft" style="color: #9F9F9F;">{{'vmfs.hostOrCluster' | translate}}</label>
           <clr-radio-wrapper>
             <input type="radio" clrRadio name="hostControlPolicy" value="1" [(ngModel)]="unmountForm.mountType"
@@ -208,10 +270,25 @@
             <input type="radio" clrRadio name="clusterControlPolicy" value="2" [(ngModel)]="unmountForm.mountType" />
             <label>{{'vmfs.mount.cluster' | translate}}</label>
           </clr-radio-wrapper>
-        </clr-radio-container>
+        </clr-radio-container> -->
+
+        <!-- 20210514164837 -->
+        <clr-control-container *ngIf="unmountShow">
+          <label class="floatleft" style="color: #9F9F9F;">{{'vmfs.hostOrCluster' | translate}}</label>
+          <app-gh-tree-checkbox
+            [resType]="'unMount'"
+            [mountType]="'host'"
+            [tree]="deviceList"
+            (valueChange)="handleChooseDeviceChange('chooseDevice',$event)">
+          </app-gh-tree-checkbox>
+<!--          <app-error-tips-->
+<!--            [isShow]="!chooseDevice"-->
+<!--            [tips]="'validations.required' | translate">-->
+<!--          </app-error-tips>-->
+        </clr-control-container>
 
         <!-- 主机列表 -->
-        <clr-datagrid *ngIf="unmountForm.mountType === '1'"
+        <!--  <clr-datagrid *ngIf="unmountForm.mountType === '1'"
           [(clrDgSingleSelected)]="chooseUnmountHost" [clrDgLoading]="isLoading">
           <clr-dg-column hidden></clr-dg-column>
           <clr-dg-column [clrDgField]="'deviceName'">{{'vmfs.name' | translate}}</clr-dg-column>
@@ -221,9 +298,9 @@
             <clr-dg-cell>{{item.deviceName}}</clr-dg-cell>
             <clr-dg-cell>{{'vmfs.host' | translate}}</clr-dg-cell>
           </clr-dg-row>
-        </clr-datagrid>
+        </clr-datagrid> -->
         <!-- 集群列表 -->
-        <clr-datagrid *ngIf="unmountForm.mountType === '2'"
+        <!-- <clr-datagrid *ngIf="unmountForm.mountType === '2'"
           [(clrDgSingleSelected)]="chooseUnmountCluster" [clrDgLoading]="isLoading">
           <clr-dg-column hidden></clr-dg-column>
           <clr-dg-column [clrDgField]="'deviceName'">{{'vmfs.name' | translate}}</clr-dg-column>
@@ -233,12 +310,12 @@
             <clr-dg-cell>{{item.deviceName}}</clr-dg-cell>
             <clr-dg-cell>{{'vmfs.cluster' | translate}}</clr-dg-cell>
           </clr-dg-row>
-        </clr-datagrid>
+        </clr-datagrid> -->
       </form>
     </div>
     <div class="modal-footer">
       <button type="button" class="btn btn-outline" (click)="cancel();">{{'menu.cancel' | translate}}</button>
-      <button type="submit" class="btn btn-primary" (click)="unmountTipsShow = true;">{{'menu.ok' | translate}}</button>
+      <button type="submit" class="btn btn-primary" [class.submit-disabled]='isDisableMountSubmit()' (click)="unMountConfirm()">{{'menu.ok' | translate}}</button>
     </div>
   </clr-modal>
 </div>
@@ -269,7 +346,7 @@
   </div>
 </clr-modal>
 <!--卸载提示-->
-<clr-modal [(clrModalOpen)]="unmountTipsShow" [clrModalSize]="'sm'" [clrModalClosable]="false">
+<clr-modal [(clrModalOpen)]="unmountTipsShow" [clrModalSize]="'sm'" [clrModalClosable]="false" class="unMount-tips">
   <h3 class="modal-title modelTile">{{'vmfs.reclaim.title' | translate}}</h3>
   <div class="modal-body">
     <p>{{'vmfs.unmount.tips' | translate}}</p>
@@ -291,5 +368,39 @@
   <div class="modal-footer">
     <button type="submit" class="btn btn-primary"
       (click)="mountSuccessShow = false;unmountSuccessShow = false;confirmActResult();">{{'menu.ok' | translate}}</button>
+  </div>
+</clr-modal>
+<!--失败提示窗口-->
+<clr-modal [(clrModalOpen)]="errorShow" [clrModalSize]="'sm'" [clrModalClosable]="false">
+  <h3 class="modal-title modelTile">{{'vmfs.reclaim.title' | translate}}</h3>
+  <div class="modal-body">
+    <!--    <p *ngIf="mountShow">{{'errorMsg.mountError' | translate}}</p>-->
+    <!--    <p *ngIf="mountShow">{{'errorMsg.unmountError' | translate}}</p>-->
+    <app-error-partsucess-tips
+      [status]="status"
+      [description]="description"
+      [partSuccessData]="partSuccessData"
+      [operatingType]="operatingType"></app-error-partsucess-tips>
+  </div>
+  <div class="modal-footer">
+    <button type="submit" class="btn btn-primary"
+            (click)="errorShow = false;confirmActResult()">{{'menu.ok' | translate}}</button>
+  </div>
+</clr-modal>
+<!--部分成功提示窗口-->
+<clr-modal [(clrModalOpen)]="partSuccessShow" [clrModalSize]="'lg'" [clrModalClosable]="false">
+  <h3 class="modal-title modelTile">{{'vmfs.reclaim.title' | translate}}</h3>
+  <div class="modal-body">
+    <!--    <p *ngIf="mountShow">{{'errorMsg.mountError' | translate}}</p>-->
+    <!--    <p *ngIf="mountShow">{{'errorMsg.unmountError' | translate}}</p>-->
+    <app-error-partsucess-tips
+      [status]="status"
+      [description]="description"
+      [partSuccessData]="partSuccessData"
+      [operatingType]="operatingType"></app-error-partsucess-tips>
+  </div>
+  <div class="modal-footer">
+    <button type="submit" class="btn btn-primary"
+            (click)="partSuccessShow = false;confirmActResult()">{{'menu.ok' | translate}}</button>
   </div>
 </clr-modal>

@@ -1,47 +1,28 @@
 package com.huawei.dmestore.services;
 
+import com.google.gson.*;
 import com.huawei.dmestore.constant.DmeConstants;
+import com.huawei.dmestore.dao.DmeVmwareRalationDao;
+import com.huawei.dmestore.entity.DmeVmwareRelation;
 import com.huawei.dmestore.entity.VCenterInfo;
 import com.huawei.dmestore.exception.DmeException;
 import com.huawei.dmestore.exception.VcenterException;
-import com.huawei.dmestore.model.CapabilitiesIopriority;
-import com.huawei.dmestore.model.CapabilitiesQos;
-import com.huawei.dmestore.model.CapabilitiesSmarttier;
-import com.huawei.dmestore.model.DmeDatasetsQueryResponse;
-import com.huawei.dmestore.model.QosParam;
-import com.huawei.dmestore.model.RelationInstance;
-import com.huawei.dmestore.model.SimpleCapabilities;
-import com.huawei.dmestore.model.SimpleServiceLevel;
-import com.huawei.dmestore.model.StoragePool;
-import com.huawei.dmestore.model.Volume;
+import com.huawei.dmestore.model.*;
 import com.huawei.dmestore.utils.CipherUtils;
 import com.huawei.dmestore.utils.ToolUtils;
 import com.huawei.dmestore.utils.VCSDKUtils;
 import com.huawei.vmware.autosdk.SessionHelper;
-
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import com.google.gson.JsonPrimitive;
 import com.vmware.cis.tagging.TagModel;
 import com.vmware.pbm.PbmProfile;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * ServiceLevelService
@@ -58,11 +39,17 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
 
     private static final String CODE_503 = "503";
 
+    private static final String VOLUME_ID = "volume_id";
+
+    private static final String HOST_ID = "host_id";
+
     private DmeAccessService dmeAccessService;
 
     private DmeRelationInstanceService dmeRelationInstanceService;
 
     private DmeStorageService dmeStorageService;
+
+    private DmeVmwareRalationDao dmeVmwareRalationDao;
 
     private VCenterInfoService vcenterinfoservice;
 
@@ -71,6 +58,14 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
     private CipherUtils cipherUtils;
 
     private Gson gson = new Gson();
+
+    public DmeVmwareRalationDao getDmeVmwareRalationDao() {
+        return dmeVmwareRalationDao;
+    }
+
+    public void setDmeVmwareRalationDao(DmeVmwareRalationDao dmeVmwareRalationDao) {
+        this.dmeVmwareRalationDao = dmeVmwareRalationDao;
+    }
 
     public CipherUtils getCipherUtils() {
         return cipherUtils;
@@ -140,6 +135,93 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
     }
 
     @Override
+    public List<SimpleServiceLevel> listServiceLevelByVmfs(String datastoreId) throws DmeException {
+        // 通过storeobjId 查volumeId
+        DmeVmwareRelation dvr = dmeVmwareRalationDao.getDmeVmwareRelationByDsId(datastoreId);
+        if (dvr == null) {
+            log.error("query service Level error, query dme vmware ralation table is error!{}", datastoreId);
+            throw new DmeException("query service Level error, query dme vmware ralation table is error!{}",datastoreId);
+        }
+
+        String volumeId = dvr.getVolumeId();
+        if (StringUtils.isEmpty(volumeId)) {
+            log.error("query service Level error, volumeId is NULL!{}", datastoreId);
+            throw new DmeException("query service Level error, volumeId is NULL!{}",datastoreId);
+        }
+
+        Volume volume = findOrientedVolumeMapping(volumeId);
+        // 通过poolrawId和storageId查询存储池、
+        StoragePool pool = new StoragePool();
+        List<StoragePool> pools = dmeStorageService.getStoragePools(volume.getStorageId(), "all");
+        for (StoragePool storagePool : pools) {
+            String poolId = storagePool.getPoolId();
+            if (poolId.equalsIgnoreCase(volume.getPoolRawId())) {
+                pool = storagePool;
+                break;
+            }
+        }
+
+        List<SimpleServiceLevel> serviceLevels = listServiceLevel(null);
+        // 通过volumeid查存储池或者所属服务等级Id
+        if (CollectionUtils.isEmpty(serviceLevels)) {
+            log.error("query service Level error, service level list is NULL!");
+            throw new DmeException("query service Level error, service level list is NULL!");
+        }
+
+        List<SimpleServiceLevel> serverLevels = new ArrayList<>();
+        List<StoragePool> storagePools = new ArrayList<>();
+        for (SimpleServiceLevel serviceLevel : serviceLevels) {
+            String serviceLevelId = serviceLevel.getId();
+            if (!StringUtils.isEmpty(serviceLevelId)) {
+                storagePools = getStoragePoolInfosByServiceLevelId(serviceLevelId);
+            }
+            if (!CollectionUtils.isEmpty(storagePools)) {
+                for (StoragePool storagePool : storagePools) {
+                    String poolId = pool.getPoolId();
+                    String id = pool.getId();
+                    String storageId = pool.getStorageId();
+                    if (!StringUtils.isEmpty(poolId) && !StringUtils.isEmpty(id) && !StringUtils.isEmpty(storageId)) {
+                        if (storagePool.getPoolId().equalsIgnoreCase(poolId) &&
+                                storagePool.getId().equals(id) &&
+                                storagePool.getStorageId().equalsIgnoreCase(storageId)) {
+                            serverLevels.add(serviceLevel);
+                            break;
+                        }
+                    } else {
+                        log.error("query service Level error, storage pool is NULL!");
+                        throw new DmeException("query service Level error, storage pool list is NULL!");
+                    }
+                }
+            }
+        }
+        return serverLevels;
+    }
+
+    private Volume findOrientedVolumeMapping(String volumeId) throws DmeException {
+        Volume volume = new Volume();
+        String url = DmeConstants.DME_QUERY_ONE_VOLUME.replace("{volume_id}", volumeId);
+        ResponseEntity<String> entity = dmeAccessService.access(url, HttpMethod.GET, null);
+        if (entity.getStatusCodeValue() == HttpStatus.OK.value()) {
+            String body = entity.getBody();
+
+            if (StringUtils.isEmpty(body)) {
+                throw new DmeException("query oriented volume is null!{}", volumeId);
+            }
+            JsonObject volumeObj = new JsonParser().parse(entity.getBody()).getAsJsonObject().get("volume").getAsJsonObject();
+            log.info("query oriented volume ,{}", volumeObj);
+            boolean attached = ToolUtils.jsonToBoo(volumeObj.get("attached"));
+            if (!attached) {
+                throw new DmeException("query oriented volume attached status is unmapping!{}", volumeId);
+            }
+            volume.setStorageId(ToolUtils.jsonToStr(volumeObj.get("storage_id")));
+            volume.setId(ToolUtils.jsonToStr(volumeObj.get("id")));
+            volume.setServiceLevelName(ToolUtils.jsonToStr(volumeObj.get("service_level_name")));
+            volume.setPoolRawId(ToolUtils.jsonToStr(volumeObj.get("pool_raw_id")));
+        }
+        return volume;
+    }
+
+    @Override
     public void updateVmwarePolicy() throws DmeException {
         try {
             VCenterInfo vcenterInfo = vcenterinfoservice.getVcenterInfo();
@@ -156,12 +238,37 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
                 List<PbmProfile> pbmProfiles = vcsdkUtils.getAllSelfPolicyInallcontext();
                 ResponseEntity responseEntity = dmeAccessService.access(DmeConstants.LIST_SERVICE_LEVEL_URL,
                     HttpMethod.GET, null);
+                // 从关系表中取得DME卷与vcenter存储的对应关系
+                List<DmeVmwareRelation> dvrlist = dmeVmwareRalationDao.getDmeVmwareRelation(DmeConstants.STORE_TYPE_VMFS);
+                if (dvrlist == null || dvrlist.size() == 0) {
+                    return;
+                }
+                List<String> volids = new ArrayList<>();
+                for (DmeVmwareRelation relation : dvrlist) {
+                    volids.add(relation.getVolumeId());
+                }
+
                 Object object = responseEntity.getBody();
                 JsonObject jsonObject = new JsonParser().parse(object.toString()).getAsJsonObject();
                 JsonArray jsonArray = jsonObject.get("service-levels").getAsJsonArray();
+
+                JsonArray updates = new JsonArray();
+                for (JsonElement jsonElement : jsonArray) {
+                    JsonObject object1 = new JsonParser().parse(jsonElement.toString()).getAsJsonObject();
+                    List<Volume> volumes = this.getVolumeInfosByServiceLevelId(object1.get(ID_FIELD).getAsString());
+                    if (!CollectionUtils.isEmpty(volumes)){
+                        for (Volume volume : volumes){
+                            if (volids.contains(volume.getId())){
+                                updates.add(jsonElement);
+                                break;
+                            }
+                        }
+                    }
+                }
+
                 List<TagModel> alreadyhasList = new ArrayList<>();
                 List<PbmProfile> alreadyhasPolicyList = new ArrayList<>();
-                for (JsonElement jsonElement : jsonArray) {
+                for (JsonElement jsonElement : updates) {
                     JsonObject object1 = new JsonParser().parse(jsonElement.toString()).getAsJsonObject();
                     String name = object1.get(NAME_FIELD).getAsString();
                     boolean alreadyhas = false;
@@ -200,6 +307,17 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
         } catch (Exception exception) {
             log.error(exception.getMessage());
         }
+    }
+
+
+    private Map<String, JsonElement> parseTiers(JsonArray jsonArray){
+        Map<String, JsonElement> ret = new HashMap<>(16);
+        for (JsonElement jsonElement : jsonArray) {
+            JsonObject object1 = new JsonParser().parse(jsonElement.toString()).getAsJsonObject();
+            String name = object1.get(NAME_FIELD).getAsString();
+            ret.put(name, jsonElement);
+        }
+        return ret;
     }
 
     /**
@@ -318,8 +436,10 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
 
         // servicLevelId对应的serviceLevelInstanceId
         Map<String, Map<String, Object>> serviceLevelMap = dmeRelationInstanceService.getServiceLevelInstance();
+        log.info("select cmdb service level resource:{}", serviceLevelMap);
         if (null != serviceLevelMap && serviceLevelMap.size() > 0) {
-            String serviceLevelInstanceId = serviceLevelMap.get(serivceLevelId).get("resId").toString();
+            String serviceLevelInstanceId = ToolUtils.getStr(serviceLevelMap.get(serivceLevelId).get("resId"));
+            log.info("extract cmdb service level resId:{}", serviceLevelInstanceId);
             if (!StringUtils.isEmpty(serviceLevelInstanceId)) {
                 id = serviceLevelInstanceId;
             }
@@ -327,12 +447,14 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
 
         // 1 获取serviceLevelId下的StoragePool实例集合
         List<String> storagePoolInstanceIds = getStoragePoolIdsByServiceLevelId(id);
+        log.info("extract cmdb storage pool instance ids:{}", storagePoolInstanceIds, "size={}", storagePoolInstanceIds.size());
 
         // 2 通过storagePoolInstanceId获取storagePoolId和storageDeviceId信息
         List<StoragePool> sps = new ArrayList<>();
         if (null != storagePoolInstanceIds && storagePoolInstanceIds.size() > 0) {
             for (String instanceId : storagePoolInstanceIds) {
                 Object object = dmeRelationInstanceService.queryInstanceByInstanceNameId("SYS_StoragePool", instanceId);
+                log.info("query cmdb SYS_StoragePool:["+instanceId+"] resource:{}",object);
                 StoragePool sp = convertInstanceToStoragePool(object);
                 sps.add(sp);
             }
@@ -361,6 +483,7 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
                     storagePools.addAll(storageDevicePools);
                 }
             }
+            log.info("query storage pools info:{}", storagePools, "size={}", storagePools.size());
         }
         return storagePools;
     }
@@ -464,6 +587,7 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
         Set<String> ids = new HashSet<>();
         List<RelationInstance> ris = dmeRelationInstanceService.queryRelationByRelationNameConditionSourceInstanceId(
             relationName, serviceLevelId);
+        log.info("query cmdb "+relationName+" resource:{}",ris);
         if (null != ris && ris.size() > 0) {
             for (RelationInstance ri : ris) {
                 ids.add(ri.getTargetInstanceId());
@@ -674,6 +798,189 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
         returnBody.add("metrics", metrics);
         log.info("数据集查询，请求body={}", returnBody.toString());
         return returnBody;
+    }
+
+    public JsonObject getDatasetsStatisticsQueryBody(String serviceLevelId, String interval, String dataSetType) {
+        Map<String, Long> timeMap = parseTime(interval);
+
+        // timeRange
+        JsonObject timeRange = new JsonObject();
+        timeRange.addProperty("beginTime", timeMap.get("beginTime"));
+        timeRange.addProperty("endTime", timeMap.get("endTime"));
+        timeRange.addProperty("granularity", "30min");
+        if ("stat-lun".equals(dataSetType) || "stat-storage-pool".equals(dataSetType)) {
+        } else if ("perf-lun".equals(dataSetType) || "perf-stat-storage-pool-details".equals(
+                dataSetType)) {
+        }
+
+        // filters
+        JsonObject filters = new JsonObject();
+        JsonArray filtersDimensions = new JsonArray();
+        JsonObject filtersDimension = new JsonObject();
+        String field = "dimensions.lun.tierNativeId";
+        if("perf-storage-pool".equals(dataSetType)){
+            field = "dimensions.pool.tierNativeId";
+        }
+        filtersDimension.addProperty("field", field);
+        JsonArray values = new JsonArray();
+        values.add(new JsonPrimitive(serviceLevelId));
+        filtersDimension.add("values", values);
+        filtersDimensions.add(filtersDimension);
+        filters.add("dimensions", filtersDimensions);
+
+        // aggs
+        JsonObject rule1 = getRule("sum", "metrics.totalCapacity", "sum-totalCapacity");
+        JsonObject rule2 = getRule("sum", "metrics.throughput", "sum-throughput");
+        JsonObject rule3 = getRule("sum", "metrics.usedCapacity", "sum-usedCapacity");
+        JsonObject rule6 = getRule("max", "metrics.responseTime", "max-responseTime");
+        JsonObject rule7 = getRule("max", "metrics.bandwidth", "max-bandwidth");
+        List rules = new ArrayList();
+        rules.add(rule1);
+        rules.add(rule2);
+        rules.add(rule3);
+        rules.add(rule6);
+        rules.add(rule7);
+        JsonObject agg1 = getAggs(rules);
+
+        JsonObject rule4 = getRule("groupby", field, "tier-pool-sum-totalCapacity-perform", agg1);
+        JsonObject agg2 = getAggs(rule4);
+
+        JsonObject rule5 = getRule("date_histogram", "timestamp", "30m","+08:00","tier-pool-sum-totalCapacity-perform-30m", agg2);
+        JsonObject agg3 = getAggs(rule5);
+
+        JsonObject returnBody = new JsonObject();
+        returnBody.add("timeRange", timeRange);
+        returnBody.add("filters", filters);
+        returnBody.add("aggs", agg3);
+        log.info("数据集查询，请求body={}", returnBody.toString());
+        return returnBody;
+    }
+
+    @Override
+    public DmeDatasetsQueryResponse lunPer(String serviceLevelId, String interval)
+            throws DmeException {
+        String data = executeStatistics(serviceLevelId, interval, "perf-lun");
+        if (!StringUtils.isEmpty(data)) {
+            return gson.fromJson(data, DmeDatasetsQueryResponse.class);
+        }
+
+        return null;
+    }
+
+    @Override
+    public DmeDatasetsQueryResponse poolPer(String serviceLevelId, String interval)
+            throws DmeException {
+        String data = executeStatistics(serviceLevelId, interval, "perf-storage-pool");
+        if (!StringUtils.isEmpty(data)) {
+            return gson.fromJson(data, DmeDatasetsQueryResponse.class);
+        }
+
+        return null;
+    }
+
+    private String executeStatistics(String serviceLevelId, String interval, String dataSetType) throws DmeException {
+        // 封装查询body
+        JsonObject queryBody = getDatasetsStatisticsQueryBody(serviceLevelId, interval, dataSetType);
+        String url = DmeConstants.DATASETS_STATISTICS_QUERY_URL.replace("{dataSet}", dataSetType);
+        log.info("executeStatistics开始，url={}, post body={}", url, queryBody);
+        ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.POST, queryBody.toString());
+        if (responseEntity.getStatusCodeValue() == HttpStatus.OK.value()) {
+            String responseBody = responseEntity.getBody();
+            log.info("executeStatistics查询成功！返回信息:{}", responseBody);
+            return parseDataSetResult(responseBody);
+        }else {
+            log.info("executeStatistics查询失败！url={}", url);
+        }
+
+        return null;
+    }
+
+    private String parseDataSetResult(String result){
+        List<DmeDatasetBean> dmeDatasetBeans = new ArrayList<>();
+        try {
+            JsonObject re = parseJson(result);
+            JsonArray buckets = re.getAsJsonObject("aggregations").getAsJsonObject("tier-pool-sum-totalCapacity-perform-30m")
+                    .getAsJsonArray("buckets");
+            Iterator<JsonElement> iterator = buckets.iterator();
+            while (iterator.hasNext()){
+                JsonObject i = iterator.next().getAsJsonObject();
+                DmeDatasetBean dmeDatasetBean = new DmeDatasetBean();
+                dmeDatasetBean.setTimestamp(i.get("key").getAsLong());
+                JsonObject per = i.getAsJsonObject("tier-pool-sum-totalCapacity-perform").getAsJsonArray("buckets").get(0).getAsJsonObject();
+                dmeDatasetBean.setTotalCapacity(per.getAsJsonObject("sum-totalCapacity").get("value").getAsFloat());
+                dmeDatasetBean.setUsedCapacity(per.getAsJsonObject("sum-usedCapacity").get("value").getAsFloat());
+                dmeDatasetBean.setThroughput(per.getAsJsonObject("sum-throughput").get("value").getAsFloat());
+                dmeDatasetBean.setResponseTime(per.getAsJsonObject("max-responseTime").get("value").getAsFloat());
+                dmeDatasetBean.setBandwidth(per.getAsJsonObject("max-bandwidth").get("value").getAsFloat());
+                dmeDatasetBean.setTierNativeId(per.get("key").getAsString());
+
+                dmeDatasetBeans.add(dmeDatasetBean);
+            }
+        } catch (Exception e) {
+            log.error("parseDataSetResult error！", e);
+        }
+        DmeDatasetsQueryResponse dmeDatasetsQueryResponse = new DmeDatasetsQueryResponse();
+        dmeDatasetsQueryResponse.setDatas(dmeDatasetBeans);
+        return gson.toJson(dmeDatasetsQueryResponse);
+    }
+
+
+    private JsonObject getAggs(List<JsonObject> rules){
+        JsonObject agg = new JsonObject();
+        JsonArray r = new JsonArray();
+        rules.forEach(jsonObject -> r.add(jsonObject));
+        agg.add("rules", r);
+        return agg;
+    }
+
+    private JsonObject getAggs(JsonObject rule){
+        JsonObject agg = new JsonObject();
+        JsonArray r = new JsonArray();
+        r.add(rule);
+        agg.add("rules", r);
+        return agg;
+    }
+
+    private JsonObject getRule(String aggType, String field, String ruleName){
+        JsonObject aggRuleMeta = new JsonObject();
+        aggRuleMeta.addProperty("field", field);
+        JsonObject rule = new JsonObject();
+        rule.addProperty("aggType", aggType);
+        rule.addProperty("ruleName", ruleName);
+        rule.add("aggRuleMeta", aggRuleMeta);
+
+        return rule;
+    }
+
+    private JsonObject getRule(String aggType, String field, String ruleName, JsonObject agg){
+        JsonObject aggRuleMeta = new JsonObject();
+        aggRuleMeta.addProperty("field", field);
+        JsonObject rule = new JsonObject();
+        rule.addProperty("aggType", aggType);
+        rule.addProperty("ruleName", ruleName);
+        rule.add("aggRuleMeta", aggRuleMeta);
+        rule.add("aggs", agg);
+
+        return rule;
+    }
+
+    private JsonObject getRule(String aggType, String field, String interval, String timeZone, String ruleName, JsonObject agg){
+        JsonObject aggRuleMeta = new JsonObject();
+        aggRuleMeta.addProperty("field", field);
+        aggRuleMeta.addProperty("interval", interval);
+        aggRuleMeta.addProperty("time_zone", timeZone);
+        JsonObject rule = new JsonObject();
+        rule.addProperty("aggType", aggType);
+        rule.addProperty("ruleName", ruleName);
+        rule.add("aggRuleMeta", aggRuleMeta);
+        rule.add("aggs", agg);
+        return rule;
+    }
+
+    public static JsonObject parseJson(String json){
+        JsonParser parser = new JsonParser();
+        JsonObject jsonObj = parser.parse(json).getAsJsonObject();
+        return jsonObj;
     }
 
 }

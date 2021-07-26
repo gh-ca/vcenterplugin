@@ -5,6 +5,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.huawei.dmestore.utils.StringUtil;
 import com.vmware.vim.binding.vmodl.list;
 import com.vmware.vim.binding.vmodl.map;
 
@@ -550,7 +551,7 @@ public class DmeAccessServiceImpl implements DmeAccessService {
                     map.put(ID_FIELD, ToolUtils.jsonToStr(object.get(ID_FIELD)));
                     // 主机名称
                     map.put(NAME_FIELD, ToolUtils.jsonToStr(object.get(NAME_FIELD)));
-                    map.put(HOST_COUNT, ToolUtils.jsonToInt(object.get(IP_FIELD), 0));
+                    map.put(HOST_COUNT, ToolUtils.jsonToInt(object.get(HOST_COUNT), 0));
                     map.put("source_type", ToolUtils.jsonToStr(object.get("source_type")));
                     map.put(MANAGED_STATUS_FIELD, ToolUtils.jsonToStr(object.get(MANAGED_STATUS_FIELD)));
                     map.put(PROJECT_ID_FIELD, ToolUtils.jsonToStr(object.get(PROJECT_ID_FIELD)));
@@ -573,18 +574,21 @@ public class DmeAccessServiceImpl implements DmeAccessService {
         try {
             if (params != null && params.get(DmeConstants.HOST) != null) {
                 // 得到主机的hba信息
-                Map<String, Object> hbamap = vcsdkUtils.getHbaByHostObjectId(ToolUtils.getStr(params.get("hostId")));
                 List<Map<String, Object>> initiators = new ArrayList<>();
-                Map<String, Object> initiator = new HashMap<>(DmeConstants.COLLECTION_CAPACITY_16);
-                initiator.put(PROTOCOL, ToolUtils.getStr(hbamap.get(TYPE_FIELD)));
-                initiator.put(PORT_NAME, ToolUtils.getStr(hbamap.get(NAME_FIELD)));
-                initiators.add(initiator);
+                List<Map<String, Object>> hbalists = vcsdkUtils.getHbaByHostObjectId(ToolUtils.getStr(params.get("hostId")));
+                for (Map<String, Object> hbamap : hbalists) {
+                    Map<String, Object> initiator = new HashMap<>(DmeConstants.COLLECTION_CAPACITY_16);
+                    initiator.put(PROTOCOL, ToolUtils.getStr(hbamap.get(TYPE_FIELD)));
+                    initiator.put(PORT_NAME, ToolUtils.getStr(hbamap.get(NAME_FIELD)));
+                    initiators.add(initiator);
+                }
                 Map<String, Object> requestbody = new HashMap<>(DmeConstants.COLLECTION_CAPACITY_16);
                 requestbody.put(ACCESS_MODE_FIELD, "NONE");
                 requestbody.put(TYPE_FIELD, "VMWAREESX");
                 requestbody.put(IP_FIELD, params.get("host"));
                 requestbody.put("host_name", params.get("host"));
                 requestbody.put("initiator", initiators);
+                LOG.info("Create logical host request parameters for exsi host on DME:{}", gson.toJson(requestbody));
                 ResponseEntity responseEntity = access(createHostUrl, HttpMethod.POST, gson.toJson(requestbody));
                 if (responseEntity.getStatusCodeValue() == RestUtils.RES_STATE_I_200) {
                     JsonObject jsonObject = new JsonParser().parse(responseEntity.getBody().toString())
@@ -626,6 +630,19 @@ public class DmeAccessServiceImpl implements DmeAccessService {
                         hostgroupmap = new HashMap<>(DmeConstants.COLLECTION_CAPACITY_16);
                         hostgroupmap.put(ID_FIELD, ToolUtils.jsonToStr(jsonObject.get(ID_FIELD)));
                         hostgroupmap.put(NAME_FIELD, ToolUtils.jsonToStr(jsonObject.get(NAME_FIELD)));
+                    }
+                }else {
+                    String desc = "";
+                    try {
+                        JsonObject vjson = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonObject();
+                        desc = StringUtil.dealQuotationMarks(ToolUtils.getStr(vjson.get("error_msg")));
+                    }catch (Exception ess){
+                        desc = "";
+                    }
+                    if (!StringUtils.isEmpty(desc)) {
+                        throw new DmeException("create hostgroup error,the DME return " + responseEntity.getStatusCode() + "," + desc);
+                    }else {
+                        throw new DmeException("create hostgroup error,the DME return " + responseEntity.getStatusCode());
                     }
                 }
             }

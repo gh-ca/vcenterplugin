@@ -3,6 +3,8 @@ package com.huawei.dmestore.services;
 import com.huawei.dmestore.exception.DmeException;
 import com.huawei.dmestore.model.TaskDetailInfo;
 import com.google.gson.JsonObject;
+import com.huawei.dmestore.model.TaskDetailInfoNew;
+import com.huawei.dmestore.model.TasksResultObject;
 
 import java.util.List;
 import java.util.Map;
@@ -69,4 +71,42 @@ public interface TaskService {
      * @throws DmeException DmeException
      **/
     JsonObject queryTaskByIdUntilFinish(String taskId) throws DmeException;
+    /**
+     * checkTaskStatusNew
+     *
+     * @param taskId timeout
+     * @return TasksResultObject
+     **/
+    TasksResultObject checkTaskStatusNew(String taskId, long timeout);
+    /**
+     * get task by id
+     *
+     * @param taskId taskId
+     * @return TaskDetailInfo TaskDetailInfo
+     **/
+    TaskDetailInfoNew queryTaskByIdReturnMainTask(String taskId, long timeout);
+
+    List<TaskDetailInfoNew> getTaskInfo(String taskId, long longTaskTimeOut) throws DmeException;
+
+    TaskDetailInfoNew getMainTaskInfo(String taskId, List<TaskDetailInfoNew> taskDetailInfoNewList);
+
+    /**
+     * 获取成功的任务的子任务Lun名称
+     * @param taskType 任务类型名称 如 Create Lun
+     * @param taskId 任务id
+     * @param longTaskTimeOut 超时时间
+     * @return
+     * @throws DmeException
+     */
+    List<String> getSuccessNameFromCreateTask(String taskType, String taskId, Long longTaskTimeOut) throws DmeException;
+
+    /**
+     *  获取失败的任务的子任务Lun名称
+     * @param taskType 任务类型名称 如 Create Lun
+     * @param taskId 任务id
+     * @param longTaskTimeOut 超时时间
+     * @return
+     * @throws DmeException
+     */
+    List<String> getFailNameFromCreateTask(String taskType, String taskId, Long longTaskTimeOut) throws DmeException;
 }

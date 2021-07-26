@@ -198,8 +198,6 @@ export class BestpracticeComponent implements OnInit {
   practiceRefresh() {
     this.isLoading = true;
     const handlerGetRecordsAllSuccess = (result: any) => {
-      /*TODO: 这个地方有问题：在中途切换语言的，翻译不会响应。不过不作妖应该还行。 */
-      /* 最简单方案，监听语言切换，再次调用 刷新*/
       if (result.code === '200') {
         this.list = result.data;
         // bug修改：列表页面级别过滤 中英文问题

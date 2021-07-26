@@ -1,18 +1,25 @@
 package com.huawei.dmestore.mvc;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.huawei.dmestore.exception.DmeException;
 import com.huawei.dmestore.exception.DmeSqlException;
+import com.huawei.dmestore.model.ClusterTree;
 import com.huawei.dmestore.model.ResponseBodyBean;
 import com.huawei.dmestore.services.VmwareAccessService;
 
+import com.huawei.dmestore.utils.VCSDKUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -29,6 +36,9 @@ public class VmwareAccessController extends BaseController {
 
     @Autowired
     private VmwareAccessService vmwareAccessService;
+
+
+    private Gson gson = new Gson();
 
     /**
      * Access hosts
@@ -157,10 +167,15 @@ public class VmwareAccessController extends BaseController {
      * @throws Exception when error
      */
     @RequestMapping(value = "/getvmkernelipbyhostobjectid", method = RequestMethod.GET)
-    public ResponseBodyBean getVmKernelIpByHostObjectId(@RequestParam("hostObjectId") String hostObjectId) {
+    public ResponseBodyBean getVmKernelIpByHostObjectId(@RequestParam("hostObjectId") String hostObjectId,
+                                                        @RequestParam(value = "datastoreObjectId", defaultValue = "") String datastoreObjectId) {
         String failureStr = "";
         try {
             List<Map<String, String>> lists = vmwareAccessService.getVmKernelIpByHostObjectId(hostObjectId);
+            if (!StringUtils.isEmpty(datastoreObjectId)) {
+                List<Map<String, String>>  latlists = vmwareAccessService.getNoMountedHostByDsObj(lists,datastoreObjectId);
+                return success(latlists);
+            }
             return success(lists);
         } catch (DmeException e) {
             LOG.error("get vmkernel ip by hostobjectid failure:", e);
@@ -229,5 +244,61 @@ public class VmwareAccessController extends BaseController {
         } catch (DmeSqlException e) {
             return failure("get dme volume by datastore failed!" + e.toString());
         }
+    }
+    /**
+     * Access clusters
+     *
+     * @return ResponseBodyBean
+     */
+    @RequestMapping(value = "/listclusters", method = RequestMethod.GET)
+    public ResponseBodyBean listclustersReturnTree() {
+        String failureStr = "";
+        try {
+            List<ClusterTree> lists = vmwareAccessService.listclustersReturnTree();
+            return success(lists);
+        } catch (DmeException e) {
+            failureStr = "list vmware cluster failure:" + e.toString();
+        }
+        return failure(failureStr);
+    }
+
+    /**
+     * @Description: 挂载vmfs，以树的方式展示可挂载的主机和集群
+     * @Param @param null
+     * @return @return
+     * @throws
+     * @author yc
+     * @Date 2021/6/7 17:29
+     */
+    @RequestMapping(value = "/getClustersAndHostsByDsobjectIdReturnTree", method = RequestMethod.GET)
+    public ResponseBodyBean getClustersByDsObjectIdNew(@RequestParam("dataStoreObjectId") String dataStoreObjectId) {
+        String failureStr = "";
+        try {
+            List<ClusterTree> lists = vmwareAccessService.getClustersAndHostsByDsObjectIdNew(dataStoreObjectId);
+            return success(lists);
+        } catch (DmeException e) {
+            LOG.error("getClustersByDsObjectId vmware host failure:", e);
+            failureStr = e.getMessage();
+        }
+        return failure(failureStr);
+    }
+    /**
+      * @Description: 创建vmfs，以树的方式展示可用的主机和集群
+      * @Param @param null
+      * @return @return 
+      * @throws 
+      * @author yc
+      * @Date 2021/6/7 17:29
+     */
+    @RequestMapping(value = "/listHostsAndClusterReturnTree", method = RequestMethod.GET)
+    public ResponseBodyBean listIndependenceHosts() {
+        String failureStr = "";
+        try {
+            return success(vmwareAccessService.listHostsAndClusterReturnTree());
+        } catch (DmeException e) {
+            LOG.error("list vmware host failure:", e);
+            failureStr = "list vmware host failure:" + e.toString();
+        }
+        return failure(failureStr);
     }
 }
