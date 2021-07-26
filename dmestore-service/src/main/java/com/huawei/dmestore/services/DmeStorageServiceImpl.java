@@ -370,7 +370,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         ResponseEntity<String> responseEntity = dmeAccessService.accessByJson(url, HttpMethod.GET, params);
         int code = responseEntity.getStatusCodeValue();
         JsonArray objList = gson.fromJson(responseEntity.getBody(), JsonObject.class).getAsJsonArray(OBJ_LIST);
-        if (code != HttpStatus.OK.value() || null == objList || objList.size() ==0) {
+        if (code != HttpStatus.OK.value() || null == objList || objList.size() == 0) {
             return null;
         }
         String resId = objList.get(0).getAsJsonObject().get(RES_ID).getAsString();
@@ -380,7 +380,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         responseEntity = dmeAccessService.accessByJson(url, HttpMethod.GET, params);
         code = responseEntity.getStatusCodeValue();
         objList = gson.fromJson(responseEntity.getBody(), JsonObject.class).getAsJsonArray(OBJ_LIST);
-        if (code != HttpStatus.OK.value() || null == objList || objList.size() ==0) {
+        if ( HttpStatus.OK.value() != code || null == objList || objList.size() ==0) {
             return null;
         }
         String poolId = objList.get(0).getAsJsonObject().get("target_Instance_Id").getAsString();
@@ -390,7 +390,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         responseEntity = dmeAccessService.accessByJson(url, HttpMethod.GET, params);
         code = responseEntity.getStatusCodeValue();
         objList = gson.fromJson(responseEntity.getBody(), JsonObject.class).getAsJsonArray(OBJ_LIST);
-        if (code != HttpStatus.OK.value() || null == objList || objList.size() ==0) {
+        if (HttpStatus.OK.value() != code || null == objList || objList.size() ==0) {
             return null;
         }
         String storageDeviceId = objList.get(0).getAsJsonObject().get("storageDeviceId").getAsString();
