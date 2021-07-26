@@ -906,15 +906,18 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
                 JsonObject i = iterator.next().getAsJsonObject();
                 DmeDatasetBean dmeDatasetBean = new DmeDatasetBean();
                 dmeDatasetBean.setTimestamp(i.get("key").getAsLong());
-                JsonObject per = i.getAsJsonObject("tier-pool-sum-totalCapacity-perform").getAsJsonArray("buckets").get(0).getAsJsonObject();
-                dmeDatasetBean.setTotalCapacity(per.getAsJsonObject("sum-totalCapacity").get("value").getAsFloat());
-                dmeDatasetBean.setUsedCapacity(per.getAsJsonObject("sum-usedCapacity").get("value").getAsFloat());
-                dmeDatasetBean.setThroughput(per.getAsJsonObject("sum-throughput").get("value").getAsFloat());
-                dmeDatasetBean.setResponseTime(per.getAsJsonObject("max-responseTime").get("value").getAsFloat());
-                dmeDatasetBean.setBandwidth(per.getAsJsonObject("max-bandwidth").get("value").getAsFloat());
-                dmeDatasetBean.setTierNativeId(per.get("key").getAsString());
+                JsonArray pers = i.getAsJsonObject("tier-pool-sum-totalCapacity-perform").getAsJsonArray("buckets");
+                if (pers != null && pers.size() > 0) {
+                    JsonObject per = pers.get(0).getAsJsonObject();
+                    dmeDatasetBean.setTotalCapacity(per.getAsJsonObject("sum-totalCapacity").get("value").getAsFloat());
+                    dmeDatasetBean.setUsedCapacity(per.getAsJsonObject("sum-usedCapacity").get("value").getAsFloat());
+                    dmeDatasetBean.setThroughput(per.getAsJsonObject("sum-throughput").get("value").getAsFloat());
+                    dmeDatasetBean.setResponseTime(per.getAsJsonObject("max-responseTime").get("value").getAsFloat());
+                    dmeDatasetBean.setBandwidth(per.getAsJsonObject("max-bandwidth").get("value").getAsFloat());
+                    dmeDatasetBean.setTierNativeId(per.get("key").getAsString());
 
-                dmeDatasetBeans.add(dmeDatasetBean);
+                    dmeDatasetBeans.add(dmeDatasetBean);
+                }
             }
         } catch (Exception e) {
             log.error("parseDataSetResult error！", e);
