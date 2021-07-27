@@ -585,7 +585,7 @@ public class DmeAccessServiceImpl implements DmeAccessService {
                 Map<String, Object> requestbody = new HashMap<>(DmeConstants.COLLECTION_CAPACITY_16);
                 requestbody.put(ACCESS_MODE_FIELD, "NONE");
                 requestbody.put(TYPE_FIELD, "VMWAREESX");
-                requestbody.put(IP_FIELD, params.get("host"));
+                //requestbody.put(IP_FIELD, params.get("host"));
                 requestbody.put("host_name", params.get("host"));
                 requestbody.put("initiator", initiators);
                 //接入主机三方路径配置，需要配套参数。path_type 优选路径 ，failover_mode 通用ALUA
