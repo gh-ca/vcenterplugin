@@ -937,12 +937,12 @@
                         <span class="capacity-label">{{'storage.detail.cap.useFree' | translate}}</span>
                         <div class="num-bar_outer">
                           <clr-progress-bar id="v6UsedCapacityId"
-                                            clrValue="{{(detail.totalEffectiveCapacity-(detail.freeEffectiveCapacity*1024))/(detail.freeEffectiveCapacity*1024)* 100}}"></clr-progress-bar>
+                                            clrValue="{{(detail.totalEffectiveCapacity-detail.freeEffectiveCapacity)/detail.freeEffectiveCapacity* 100}}"></clr-progress-bar>
                           <!--                          <div class="num-bar_inner total progress" [ngStyle]="{'width':(detail.usedCapacity/detail.totalCapacity * 100)+'%'}"></div>-->
                           <!--                          <div class="num-bar_inner free" [ngStyle]="{'width':((detail.totalEffectiveCapacity-detail.usedCapacity)/detail.totalCapacity * 100)+'%'}"></div>-->
                         </div>
                         <span
-                              class="capacity-span">{{getFreeCapacityV6(detail.totalEffectiveCapacity,(detail.freeEffectiveCapacity*1024))}}/{{formatCapacity(detail.freeEffectiveCapacity)}}
+                              class="capacity-span">{{getFreeCapacityV6(detail.totalEffectiveCapacity,detail.freeEffectiveCapacity)}}/{{formatCapacityV6(detail.freeEffectiveCapacity)}}
                           </span>
                       </div>
                       <!--已订阅  v6-->
