@@ -842,6 +842,15 @@ export class RdmComponent implements OnInit {
       }
     }
   }
+  /**
+   *  数量变化
+   */
+  countBlur(){
+    let count=this.configModel.volumeSpecs[0].count
+    if(!(count>0&&count<=20)){
+      this.configModel.volumeSpecs[0].count=1
+    }
+  }
 
   /**
    * 初始化IOPS错误提示
