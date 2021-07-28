@@ -818,7 +818,7 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
         JsonArray filtersDimensions = new JsonArray();
         JsonObject filtersDimension = new JsonObject();
         String field = "dimensions.lun.tierNativeId";
-        if("perf-storage-pool".equals(dataSetType)){
+        if("perf-stat-storage-pool-details".equals(dataSetType)){
             field = "dimensions.pool.tierNativeId";
         }
         filtersDimension.addProperty("field", field);
