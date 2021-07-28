@@ -28,8 +28,15 @@ import java.util.List;
  **/
 @SpringBootApplication
 public class VcenterDeployerApplication {
+    /**
+     * 获取配置文件端口信息
+     */
     @Value(value = "${deployer.port}")
     private int port;
+    
+    /**
+     * 临时转换非静态变量
+     */
     private static int template;
     protected static final Logger LOGGER = LoggerFactory.getLogger(VcenterDeployerApplication.class);
     @PostConstruct
@@ -51,7 +58,7 @@ public class VcenterDeployerApplication {
             List<String> hosts = getLocalIp();
             StringBuffer buffer = new StringBuffer();
             for (String host : hosts) {
-                buffer.append("\r\n").append("https://").append(host).append(":" + template);
+                buffer.append("\r\n").append("https://").append(host).append(":").append(template);
             }
             LOGGER.info("Use either URL that vCenter can access to open page: {}", buffer.toString());
         } catch (SocketException e) {

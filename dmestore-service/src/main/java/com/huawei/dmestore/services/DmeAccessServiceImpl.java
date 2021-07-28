@@ -585,9 +585,16 @@ public class DmeAccessServiceImpl implements DmeAccessService {
                 Map<String, Object> requestbody = new HashMap<>(DmeConstants.COLLECTION_CAPACITY_16);
                 requestbody.put(ACCESS_MODE_FIELD, "NONE");
                 requestbody.put(TYPE_FIELD, "VMWAREESX");
-                requestbody.put(IP_FIELD, params.get("host"));
+                //requestbody.put(IP_FIELD, params.get("host"));
                 requestbody.put("host_name", params.get("host"));
                 requestbody.put("initiator", initiators);
+                //接入主机三方路径配置，需要配套参数。path_type 优选路径 ，failover_mode 通用ALUA
+                // v5配置多路径参数有效，V6设备自适应设置参数无效。
+                requestbody.put("multipath_type", "third_party");
+                // 优选路径
+                requestbody.put("path_type", "optimal_path");
+                // 通用ALUA
+                requestbody.put("failover_mode", "common_alua");
                 LOG.info("Create logical host request parameters for exsi host on DME:{}", gson.toJson(requestbody));
                 ResponseEntity responseEntity = access(createHostUrl, HttpMethod.POST, gson.toJson(requestbody));
                 if (responseEntity.getStatusCodeValue() == RestUtils.RES_STATE_I_200) {
