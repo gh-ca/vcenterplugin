@@ -920,7 +920,7 @@ export class AddComponent extends VmfsCommon implements OnInit {
     const isInteger = regExpCollection.integer().test(count);
     // console.log("🚀 ~ file: add.component.ts ~ line 810 ~ AddComponent ~ countBlur ~ isInteger", isInteger);
 
-    if (!(isInteger && count > 0 && count <= 100)) {
+    if (!(isInteger && count > 0 && count <= 20)) {
       this.form.count = null;
     }
   }

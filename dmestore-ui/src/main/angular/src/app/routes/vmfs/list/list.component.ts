@@ -2201,10 +2201,10 @@ if( this.form.chooseDevice.length>0 ){
     this.form.count = count;
  */
 
-    /* 且容量必须为单位为G的正整数，数量必须为正整数且不超过100 */
+    /* 且容量必须为单位为G的正整数，数量必须为正整数且不超过20 */
     const isInteger = regExpCollection.integer().test(count);
 
-    if (!(isInteger && count > 0 && count <= 200)) {
+    if (!(isInteger && count > 0 && count <= 20)) {
       this.form.count = null;
     }
   }
