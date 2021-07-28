@@ -1088,12 +1088,14 @@ export class DetailComponent implements OnInit, AfterViewInit {
   }
 
   formatCapacity(c: number) {
-    if (c < 1024) {
+    if ((c < 1024&&c>1)||c===0) {
       return c.toFixed(3) + ' GB';
     } else if (c >= 1024 && c < 1048576) {
       return (c / 1024).toFixed(3) + ' TB';
     } else if (c >= 1048576) {
       return (c / 1024 / 1024).toFixed(3) + ' PB';
+    }else if(c<1&&c>0){
+      return (c*1024).toFixed(3)+'MB'
     }
   }
 
