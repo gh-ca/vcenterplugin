@@ -845,7 +845,8 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
         JsonObject rule4 = getRule("groupby", field, "tier-pool-sum-totalCapacity-perform", agg1);
         JsonObject agg2 = getAggs(rule4);
 
-        JsonObject rule5 = getRule("date_histogram", "timestamp", "30m","+08:00","tier-pool-sum-totalCapacity-perform-30m", agg2);
+        String timeZoneId = TimeZone.getDefault().getID();
+        JsonObject rule5 = getRule("date_histogram", "timestamp", "30m",timeZoneId,"tier-pool-sum-totalCapacity-perform-30m", agg2);
         JsonObject agg3 = getAggs(rule5);
 
         JsonObject returnBody = new JsonObject();
@@ -859,7 +860,7 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
     @Override
     public DmeDatasetsQueryResponse lunPer(String serviceLevelId, String interval)
             throws DmeException {
-        String data = executeStatistics(serviceLevelId, interval, "perf-lun");
+        String data = executeStatistics(serviceLevelId, interval, "perf-stat-lun-details");
         if (!StringUtils.isEmpty(data)) {
             return gson.fromJson(data, DmeDatasetsQueryResponse.class);
         }
@@ -867,10 +868,11 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
         return null;
     }
 
+
     @Override
     public DmeDatasetsQueryResponse poolPer(String serviceLevelId, String interval)
             throws DmeException {
-        String data = executeStatistics(serviceLevelId, interval, "perf-storage-pool");
+        String data = executeStatistics(serviceLevelId, interval, "perf-stat-storage-pool-details");
         if (!StringUtils.isEmpty(data)) {
             return gson.fromJson(data, DmeDatasetsQueryResponse.class);
         }
