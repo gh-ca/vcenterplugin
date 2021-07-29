@@ -94,6 +94,18 @@ public class DmeAccessServiceImpl implements DmeAccessService {
 
     private static final String ACCESS_MODE_FIELD = "access_mode";
 
+    private static final String MULTIPATH_TYPE = "multipath_type";
+
+    private static final String THIRD_PARTY = "third_party";
+
+    private static final String PATH_TYPE = "path_type";
+
+    private static final String OPTIMAL_PATH = "optimal_path";
+
+    private static final String FAILOVER_MODE = "failover_mode";
+
+    private static final String COMMON_ALUA = "common_alua";
+
     private static String dmeToken;
 
     private static String dmeHostUrl;
@@ -590,11 +602,11 @@ public class DmeAccessServiceImpl implements DmeAccessService {
                 requestbody.put("initiator", initiators);
                 //接入主机三方路径配置，需要配套参数。path_type 优选路径 ，failover_mode 通用ALUA
                 // v5配置多路径参数有效，V6设备自适应设置参数无效。
-                requestbody.put("multipath_type", "third_party");
+                requestbody.put(MULTIPATH_TYPE, THIRD_PARTY);
                 // 优选路径
-                requestbody.put("path_type", "optimal_path");
+                requestbody.put(PATH_TYPE, OPTIMAL_PATH);
                 // 通用ALUA
-                requestbody.put("failover_mode", "common_alua");
+                requestbody.put(FAILOVER_MODE, COMMON_ALUA);
                 LOG.info("Create logical host request parameters for exsi host on DME:{}", gson.toJson(requestbody));
                 ResponseEntity responseEntity = access(createHostUrl, HttpMethod.POST, gson.toJson(requestbody));
                 if (responseEntity.getStatusCodeValue() == RestUtils.RES_STATE_I_200) {
