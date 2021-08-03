@@ -3400,6 +3400,7 @@ public class VCSDKUtils {
 
             // 查找对应的iscsi适配器
             List<HostHostBusAdapter> hbas = hostmo.getHostStorageSystemMo().getStorageDeviceInfo().getHostBusAdapter();
+            List<String> fchbas = new ArrayList<>();
             for (HostHostBusAdapter hba : hbas) {
                 if (hba instanceof HostInternetScsiHba) {
                     Map<String, Object> map = new HashMap<>();
@@ -3408,13 +3409,16 @@ public class VCSDKUtils {
                     map.put(NAME, iscsiHba.getIScsiName());
                     hbalist.add(map);
                 } else if (hba instanceof HostFibreChannelHba) {
-                    Map<String, Object> map = new HashMap<>();
                     HostFibreChannelHba fcHba = (HostFibreChannelHba) hba;
-                    map.put(TYPE, FC_TYPE);
                     logger.info("host = {},fc hba long = {}", hostObjectId,
                         ToolUtils.normalizeWwn(fcHba.getPortWorldWideName()));
-                    map.put(NAME, ToolUtils.normalizeWwn(fcHba.getPortWorldWideName()));
-                    hbalist.add(map);
+                    if (!fchbas.contains(ToolUtils.normalizeWwn(fcHba.getPortWorldWideName()))) {
+                        Map<String, Object> map = new HashMap<>();
+                        fchbas.add(ToolUtils.normalizeWwn(fcHba.getPortWorldWideName()));
+                        map.put(TYPE, FC_TYPE);
+                        map.put(NAME, ToolUtils.normalizeWwn(fcHba.getPortWorldWideName()));
+                        hbalist.add(map);
+                    }
                 }
             }
         } catch (Exception e) {
