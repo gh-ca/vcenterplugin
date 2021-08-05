@@ -550,25 +550,6 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
         }
         return resultl;
     }
-
-
-    //Object转Map
-    private static Map<String, Object> getObjectToMap(Object obj) throws IllegalAccessException {
-        Map<String, Object> map = new LinkedHashMap<String, Object>();
-        Class<?> clazz = obj.getClass();
-        System.out.println(clazz);
-        for (Field field : clazz.getDeclaredFields()) {
-            field.setAccessible(true);
-            String fieldName = field.getName();
-            Object value = field.get(obj);
-            if (value == null){
-                value = "";
-            }
-            map.put(fieldName, value);
-        }
-        return map;
-    }
-
     @Override
     public Map<String, Object> queryCurrentStatistic(String relationOrInstance, Map<String, Object> params)
             throws DmeException {

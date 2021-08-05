@@ -1409,30 +1409,6 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         return diskType;
     }
 
-    private String getDiskType(String storageDeviceId, String diskPoolId) throws DmeException {
-        String replace = storageDeviceId.replace(SPLIT_CHAR, "");
-        String result = "";
-        String className = "SYS_StorageDisk";
-        String url = String.format(DmeConstants.DME_RESOURCE_INSTANCE_LIST, className) + CONDITION;
-        String params = ToolUtils.getRequsetParams(STORAGE_DEVICE_ID, replace);
-        ResponseEntity<String> responseEntity = dmeAccessService.accessByJson(url, HttpMethod.GET, params);
-        int code = responseEntity.getStatusCodeValue();
-        if (code == HttpStatus.OK.value()) {
-            String object = responseEntity.getBody();
-            JsonObject jsonObject = new JsonParser().parse(object).getAsJsonObject();
-            JsonArray jsonArray = jsonObject.get(OBJ_LIST).getAsJsonArray();
-            for (JsonElement jsonElement : jsonArray) {
-                JsonObject element = jsonElement.getAsJsonObject();
-                String diskId = ToolUtils.jsonToStr(element.get("diskId"));
-                if (diskPoolId.equals(diskId)) {
-                    result = ToolUtils.jsonToStr(element.get("physicalType"));
-                    break;
-                }
-            }
-        }
-        return result;
-    }
-
     private void volumeAttachments(JsonArray array, Volume volume) {
         if (array != null && array.size() > 0) {
             List<String> hostIds = new ArrayList<>();
