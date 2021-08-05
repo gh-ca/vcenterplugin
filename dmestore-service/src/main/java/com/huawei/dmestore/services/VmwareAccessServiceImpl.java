@@ -497,39 +497,6 @@ public class VmwareAccessServiceImpl implements VmwareAccessService {
     }
 
     /**
-      * @Description: 获取可挂载的主机数据
-      * @Param @param null
-      * @return @return
-      * @throws
-      * @author yc
-      * @Date 2021/6/8 10:21
-     */
-    private List<ClusterTree> getMountableHostsByDsObjectId (String dataStoreObjectId) throws DmeException {
-        List<ClusterTree> clusterTreeList = new ArrayList<>();
-        List<Map<String, String>> lists = null;
-        try {
-            String listStr = vcsdkUtils.getHostsByDsObjectId(dataStoreObjectId);
-            if (!StringUtils.isEmpty(listStr)) {
-                lists = gson.fromJson(listStr, new TypeToken<List<Map<String, String>>>() { }.getType());
-            }
-        } catch (VcenterException e) {
-            LOG.error("get Hosts By DsObjectId error:", e);
-            throw new DmeException(e.getMessage());
-        }
-        if (CollectionUtils.isEmpty(lists)){
-            throw new DmeException("get Hosts By DsObjectId error");
-        }
-        for (Map<String,String> hostMap :  lists) {
-            ClusterTree clusterTree = new ClusterTree();
-            clusterTree.setClusterId(hostMap.get(HOST_ID));
-            clusterTree.setClusterName(hostMap.get(HOST_NAME));
-            if (!StringUtils.isEmpty(clusterTree.getClusterId())){
-                clusterTreeList.add(clusterTree);
-            }
-        }
-        return clusterTreeList;
-    }
-    /**
       * @Description: 创建vmfs时，以树的方式返回可用的主机和集群
       * @Param @param null
       * @return @return 
