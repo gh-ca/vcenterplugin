@@ -432,26 +432,6 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
         return relationList;
     }
 
-    private boolean getLogicPort(String nfsDatastoreIp, String storageId, DmeVmwareRelation relation)
-        throws DmeException {
-        boolean isFound = false;
-        List<Map<String, Object>> logicPortInfos = queryLogicPortInfo(storageId);
-        if (null != logicPortInfos && logicPortInfos.size() > 0) {
-            for (Map<String, Object> logicPortInfo : logicPortInfos) {
-                String id = ToolUtils.getStr(logicPortInfo.get(ID_FIELD));
-                String name = ToolUtils.getStr(logicPortInfo.get(HOME_PORT_NAME));
-                String mgmtIp = ToolUtils.getStr(logicPortInfo.get(MGMT_IP));
-                if (nfsDatastoreIp.equals(mgmtIp)) {
-                    relation.setLogicPortId(id);
-                    relation.setLogicPortName(name);
-                    isFound = true;
-                    break;
-                }
-            }
-        }
-        return isFound;
-    }
-
     private boolean dmeVmWareRelationDbProcess(List<DmeVmwareRelation> relationList, String storeType)
         throws DmeSqlException {
         // 本地全量查询NFS
@@ -522,15 +502,6 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
         return shareList;
     }
 
-    private ResponseEntity<String> listShares() throws DmeException {
-        Map<String, Object> requestbody = new HashMap<>();
-        //requestbody.put("name", shareName);
-        //requestbody.put(STORAGE_ID, storageId);
-        requestbody.put("page_size",PAGE_SIZE_1000);
-        String url = DmeConstants.DME_NFS_SHARE_URL;
-        return dmeAccessService.access(url, HttpMethod.POST, gson.toJson(requestbody));
-    }
-
     private List<Map<String, Object>> converShare(String object) {
         List<Map<String, Object>> shareList = new ArrayList<>();
         if (object.contains(TOTAL) && object.contains("nfs_share_info_list")) {
@@ -578,18 +549,6 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
             pageno++;
         }
         return fsList;
-    }
-
-    private ResponseEntity listFs() throws DmeException {
-        Map<String, Object> requestbody = new HashMap<>();
-        //requestbody.put(STORAGE_ID, storageId);
-       /* if (!StringUtils.isEmpty(fsName)) {
-            requestbody.put(NAME_FIELD, fsName);
-        }*/
-        requestbody.put("page_size",PAGE_SIZE_1000);
-        ResponseEntity responseEntity = dmeAccessService.access(DmeConstants.DME_NFS_FILESERVICE_QUERY_URL,
-            HttpMethod.POST, gson.toJson(requestbody));
-        return responseEntity;
     }
 
     private List<Map<String, Object>> converFs(Object object) {
