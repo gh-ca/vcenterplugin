@@ -365,13 +365,13 @@
             <label style="color: #9F9F9F;">{{'vmfs.controlPolicy' | translate}}</label>
             <!--上限-->
             <clr-checkbox-wrapper>
-              <input type="checkbox" id="control_policyUpper" clrCheckbox (change)="controlPolicyChangeFunc(true);"
+              <input type="checkbox" [(ngModel)]="isCheckUpper" id="control_policyUpper" clrCheckbox (change)="controlPolicyChangeFunc(true);"
                 name="control_policyUpper" />
               <label>{{'vmfs.upperLimitControl' | translate}}</label>
             </clr-checkbox-wrapper>
             <!--下限-->
             <clr-checkbox-wrapper *ngIf="!showLowerFlag">
-              <input type="checkbox" id="control_policyLower" clrCheckbox (change)="controlPolicyChangeFunc(false);"
+              <input type="checkbox" [(ngModel)]="isCheckLower" id="control_policyLower" clrCheckbox (change)="controlPolicyChangeFunc(false);"
                 name="control_policyLower" />
               <label>{{'vmfs.lowerLimitControl' | translate}}</label>
             </clr-checkbox-wrapper>
@@ -573,5 +573,39 @@
   <div class="modal-footer">
     <button type="submit" class="btn btn-primary"
       (click)="addSuccessShow = false;confirmActResult();">{{'menu.ok' | translate}}</button>
+  </div>
+</clr-modal>
+<!--失败提示窗口-->
+<clr-modal [(clrModalOpen)]="errorShow" [clrModalSize]="'sm'" [clrModalClosable]="false">
+  <h3 class="modal-title modelTile">{{'vmfs.reclaim.title' | translate}}</h3>
+  <div class="modal-body">
+    <!--    <p *ngIf="mountShow">{{'errorMsg.mountError' | translate}}</p>-->
+    <!--    <p *ngIf="mountShow">{{'errorMsg.unmountError' | translate}}</p>-->
+    <app-error-partsucess-tips
+      [status]="status"
+      [description]="description"
+      [partSuccessData]="partSuccessData"
+      [operatingType]="operatingType"></app-error-partsucess-tips>
+  </div>
+  <div class="modal-footer">
+    <button type="submit" class="btn btn-primary"
+            (click)="errorShow = false;confirmActResult()">{{'menu.ok' | translate}}</button>
+  </div>
+</clr-modal>
+<!--部分成功提示窗口-->
+<clr-modal [(clrModalOpen)]="partSuccessShow" [clrModalSize]="'lg'" [clrModalClosable]="false">
+  <h3 class="modal-title modelTile">{{'vmfs.reclaim.title' | translate}}</h3>
+  <div class="modal-body">
+    <!--    <p *ngIf="mountShow">{{'errorMsg.mountError' | translate}}</p>-->
+    <!--    <p *ngIf="mountShow">{{'errorMsg.unmountError' | translate}}</p>-->
+    <app-error-partsucess-tips
+      [status]="status"
+      [description]="description"
+      [partSuccessData]="partSuccessData"
+      [operatingType]="operatingType"></app-error-partsucess-tips>
+  </div>
+  <div class="modal-footer">
+    <button type="submit" class="btn btn-primary"
+            (click)="partSuccessShow = false;confirmActResult()">{{'menu.ok' | translate}}</button>
   </div>
 </clr-modal>

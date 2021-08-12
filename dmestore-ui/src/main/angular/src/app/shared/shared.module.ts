@@ -27,6 +27,7 @@ import { GhTreeCheckboxComponent } from './gh-tree-checkbox/gh-tree-checkbox.com
 import { ErrorTipsComponent } from './error-tips/error-tips.component';
 import { BpRepairHistoryTableComponent } from './bp-repair-history-table/bp-repair-history-table.component';
 import {RepairTypeFilter,RepairResultFilter} from './bp-repair-history-table/bp-filtercomponent'
+import { ErrorPartsucessTipsComponent } from './error-partsucess-tips/error-partsucess-tips.component';
 
 const THIRD_MODULES = [MaterialModule, TranslateModule];
 const COMPONENTS = [
@@ -69,7 +70,7 @@ const FILTER = [
 ];
 
 @NgModule({
-  declarations: [...COMPONENTS, ...COMPONENTS_DYNAMIC, ...DIRECTIVES, ...PIPES, ...FILTER, BpRepairHistoryTableComponent,RepairTypeFilter,RepairResultFilter],
+  declarations: [...COMPONENTS, ...COMPONENTS_DYNAMIC, ...DIRECTIVES, ...PIPES, ...FILTER],
   imports: [CommonModule, FormsModule, RouterModule, ReactiveFormsModule, ...THIRD_MODULES],
   exports: [
     CommonModule,

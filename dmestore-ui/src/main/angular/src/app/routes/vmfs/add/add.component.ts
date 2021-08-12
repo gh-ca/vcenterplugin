@@ -131,6 +131,18 @@ export class AddComponent extends VmfsCommon implements OnInit {
   bandwidthLimitErr = false; // v6 设备 带宽 下限大于上限
   iopsLimitErr = false; // v6 设备 IOPS 下限大于上限
 
+  //失败提示窗口与部分成功提示窗口
+  errorShow=false;
+  partSuccessShow=false;
+  status;
+  description;
+  operatingType;
+
+  //Qos策略上限，下限选择控制
+  isCheckUpper:boolean;
+  isCheckLower:boolean;
+
+
   setFormValueWhenHiden(isShowInput) {
     this.isShowInput = isShowInput;
     this.form.blockSize = '1024'; // 块大小，单位KB
@@ -656,9 +668,24 @@ export class AddComponent extends VmfsCommon implements OnInit {
           this.addSuccessShow = true;
         }else if(result.code==='206'){
           // this.wizard.close();
-          this.isOperationErr=true;
-          this.partSuccessData=result
-        } else if (result.code === '-60001') {
+          // this.isOperationErr=true;
+          if (result.data.connectionResult&&result.data.connectionResult.length>0){
+            this.partSuccessData=result
+            this.wizard.close()
+            this.partSuccessShow=true
+            this.description=result.description
+            this.operatingType='vmfsCreate'
+            this.status='partSuccess'
+          }else {
+            this.wizard.close()
+            this.description=result.description
+            this.operatingType='vmfsCreateNoData'
+            this.status='error'
+            this.errorShow=true
+            this.partSuccessData=result
+          }
+        }
+         else if (result.code === '-60001') {
           this.connectivityFailure = true;
           this.showDetail = false;
           const connFailDatas: ConnFaildData[] = [];
@@ -677,6 +704,11 @@ export class AddComponent extends VmfsCommon implements OnInit {
         } else {
           console.log('创建失败：' + result.description);
           // 失败信息
+          this.wizard.close()
+          this.errorShow=true
+          this.description=result.description
+          this.operatingType='vmfsCreate'
+          this.status='error'
           this.partSuccessData=result;
           this.isOperationErr = true;
         }
@@ -888,7 +920,7 @@ export class AddComponent extends VmfsCommon implements OnInit {
     const isInteger = regExpCollection.integer().test(count);
     // console.log("🚀 ~ file: add.component.ts ~ line 810 ~ AddComponent ~ countBlur ~ isInteger", isInteger);
 
-    if (!(isInteger && count > 0 && count <= 100)) {
+    if (!(isInteger && count > 0 && count <= 20)) {
       this.form.count = null;
     }
   }
@@ -1139,9 +1171,11 @@ export class AddComponent extends VmfsCommon implements OnInit {
    */
   qoSFlagChange(form) {
     if (form.qosFlag) {
-      form.control_policyUpper = undefined;
-      form.maxbandwidthChoose = false;
-      form.maxiopsChoose = false;
+      form.control_policyUpper = '1';
+      this.isCheckUpper=true
+      this.isCheckLower=false
+      form.maxbandwidthChoose = true;
+      form.maxiopsChoose = true;
 
       form.control_policyLower = undefined;
       form.minbandwidthChoose = false;
@@ -1264,7 +1298,6 @@ export class AddComponent extends VmfsCommon implements OnInit {
     const lowerObj = document.getElementById('control_policyLower') as HTMLInputElement;
     // qos策略 1 支持复选(上限、下限) 2支持单选（上限或下限） 3只支持上限
     const qosTag = this.getStorageQosTag(this.form.storage_id);
-
     let upperChecked;
     if (upperObj) {
       upperChecked = upperObj.checked;
@@ -1301,10 +1334,17 @@ export class AddComponent extends VmfsCommon implements OnInit {
     if (this.form.control_policyUpper == undefined) {
       this.form.maxbandwidthChoose = false;
       this.form.maxiopsChoose = false;
+    }else {
+      this.form.maxbandwidthChoose = true;
+      this.form.maxiopsChoose = true;
     }
     if (this.form.control_policyLower == undefined) {
       this.form.minbandwidthChoose = false;
       this.form.miniopsChoose = false;
+      this.form.latencyChoose = false;
+    }else {
+      this.form.minbandwidthChoose = true;
+      this.form.miniopsChoose = true;
       this.form.latencyChoose = false;
     }
     console.log('lowerChecked', this.form);

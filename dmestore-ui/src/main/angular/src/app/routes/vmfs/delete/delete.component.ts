@@ -35,6 +35,13 @@ export class DeleteComponent implements OnInit{
   language:string;
   deleteDesc:string;//删除失败返回信息
 
+  //失败提示窗口与部分成功提示窗口
+  errorShow=false;
+  partSuccessShow=false;
+  status;
+  description;
+  operatingType;
+
   ngOnInit(): void {
     this.initData();
   }
@@ -87,12 +94,18 @@ export class DeleteComponent implements OnInit{
       this.modalHandleLoading = false;
       if (result.code === '200'){
         console.log('DEL success');
+        this.delShow=false
         // 删除成功提示
         this.delSuccessShow = true;
       } else {
         console.log('DEL faild: ' + result.description);
-        this.deleteDesc=result.description
-        this.isOperationErr = true;
+        // this.deleteDesc=result.description
+        // this.isOperationErr = true;
+        this.delShow=false
+        this.errorShow=true
+        this.operatingType='vmfsDelete'
+        this.description=result.description
+        this.status='error'
       }
       this.cdr.detectChanges();
     });

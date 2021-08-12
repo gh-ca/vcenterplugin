@@ -96,6 +96,7 @@ export class StorageDetail{
   vendor: string;
   volume: string;
   warning: number;
+  usableCapacity:number;
   storageTypeShow:StorageTypeShow;
 }
 

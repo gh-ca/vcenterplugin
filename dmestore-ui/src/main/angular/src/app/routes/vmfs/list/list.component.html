@@ -1163,8 +1163,29 @@
               height="20px" style="margin-left: 20px;">
           </span>
         </div>
-        <div *ngIf="isOperationErr" class="errorTips" readonly>
-          <clr-icon shape="exclamation-circle" class="is-solid"></clr-icon> {{'errorMsg.mountError' | translate}}
+        <div *ngIf="isOperationErr" class="alert alert-danger" readonly>
+
+          <div class="alert-items">
+            <div class="alert-item flex horizon">
+              <div class="alert-icon-wrapper flex1">
+                <clr-icon class="alert-icon" shape="exclamation-circle"></clr-icon> {{'errorMsg.mountError' | translate}}
+              </div>
+              <div>
+                <clr-signpost>
+                  <button class="btn btn-link"
+                          clrSignpostTrigger>
+                    {{'tips.details'|translate}}
+                  </button>
+                  <clr-signpost-content  [clrPosition]="'bottom-left'" *clrIfOpen >
+                    <div>
+                      <p>{{'errorMsg.detailDescription'|translate}}</p>
+                      {{mountFailOrPartSuccessDesc}}
+                    </div>
+                  </clr-signpost-content>
+                </clr-signpost>
+              </div>
+            </div>
+          </div>
         </div>
         <div *ngIf="isMountPartSuccess" class="alert alert-danger" readonly>
           <div class="alert-items">
@@ -1179,8 +1200,14 @@
                     {{'tips.details'|translate}}
                   </button>
                   <clr-signpost-content  [clrPosition]="'bottom-left'" *clrIfOpen >
-                    <p>{{'errorMsg.mountFailHost'|translate}}</p>
-                    <div *ngFor="let item of mountFailHost">{{item}}</div>
+                    <div *ngIf="mountFailHost&&mountFailHost.length>0">
+                      <p>{{'errorMsg.mountFailHost'|translate}}</p>
+                      <div *ngFor="let item of mountFailHost">{{item}}</div>
+                    </div>
+                    <div>
+                      <p>{{'errorMsg.detailDescription'|translate}}</p>
+                      {{mountFailOrPartSuccessDesc}}
+                    </div>
                   </clr-signpost-content>
                 </clr-signpost>
               </div>
@@ -1462,76 +1489,77 @@
               <clr-accordion-title class="accordion-title"
                 style="height: 50px; line-height: 50px;color: #333;font-size:16px;">{{item.name}}</clr-accordion-title>
               <clr-accordion-content [(clrIfExpanded)]="item.show">
-                <table class="table table-vertical table-noborder table-compact">
-                  <tbody>
-                    <tr>
-                      <th hidden></th>
-                      <th>
-                        {{item.name}}
-                      </th>
-                    </tr>
-                    <tr>
-                      <th hidden></th>
-                      <td>{{'vmfs.capacityUsage' | translate}}</td>
-                      <td>{{'vmfs.qos' | translate}}</td>
-                      <td>{{'vmfs.protection' | translate}}</td>
-                    </tr>
-                    <tr>
-                      <th hidden></th>
-                      <th>
-                        <div class="progress-block">
-                          <clr-progress-bar clrValue="{{(item.usedCapacity/item.totalCapacity * 100 || 0).toFixed(2)}}"
-                            clrSuccess></clr-progress-bar>
-                          <span>{{(item.usedCapacity / item.totalCapacity * 100 || 0).toFixed(2)}}%</span>
-                        </div>
+                <app-service-level-table [item]="item"></app-service-level-table>
+<!--                <table class="table table-vertical table-noborder table-compact">-->
+<!--                  <tbody>-->
+<!--                    <tr>-->
+<!--                      <th hidden></th>-->
+<!--                      <th>-->
+<!--                        {{item.name}}-->
+<!--                      </th>-->
+<!--                    </tr>-->
+<!--                    <tr>-->
+<!--                      <th hidden></th>-->
+<!--                      <td>{{'vmfs.capacityUsage' | translate}}</td>-->
+<!--                      <td>{{'vmfs.qos' | translate}}</td>-->
+<!--                      <td>{{'vmfs.protection' | translate}}</td>-->
+<!--                    </tr>-->
+<!--                    <tr>-->
+<!--                      <th hidden></th>-->
+<!--                      <th>-->
+<!--                        <div class="progress-block">-->
+<!--                          <clr-progress-bar clrValue="{{(item.usedCapacity/item.totalCapacity * 100 || 0).toFixed(2)}}"-->
+<!--                            clrSuccess></clr-progress-bar>-->
+<!--                          <span>{{(item.usedCapacity / item.totalCapacity * 100 || 0).toFixed(2)}}%</span>-->
+<!--                        </div>-->
 
-                      </th>
-                      <th *ngIf="item.capabilities !== null && item.capabilities.qos !== null
-                        && item.capabilities.qos?.qosParam !== null
-                        && item.capabilities.qos?.qosParam.maxBandWidth !== 0">{{'vmfs.bandwidth' | translate}} <=
-                          {{item.capabilities.qos?.qosParam.maxBandWidth}}MBPS/TB
-                          </th>
-                          <th *ngIf="item.capabilities !== null && item.capabilities.qos !== null
-                        && item.capabilities.qos?.qosParam !== null
-                        && item.capabilities.qos?.qosParam.minBandWidth !== 0">{{'vmfs.bandwidth' | translate}} >=
-                          {{item.capabilities.qos?.qosParam.minBandWidth}}MBPS/TB
-                      </th>
-                      <th *ngIf="item.capabilities !== null && item.capabilities.qos !== null
-                        && item.capabilities.qos?.qosParam !== null
-                        && item.capabilities.qos?.qosParam.maxIOPS !== 0">{{'vmfs.iops' | translate}} <=
-                          {{item.capabilities.qos?.qosParam.maxIOPS}}IOPS/TB
-                          </th>
-                          <th *ngIf="item.capabilities !== null && item.capabilities.qos !== null
-                        && item.capabilities.qos?.qosParam !== null
-                        && item.capabilities.qos?.qosParam.minIOPS !== 0 ">{{'vmfs.iops' | translate}} >=
-                          {{item.capabilities.qos?.qosParam.minIOPS}}IOPS/TB
-                      </th>
-                      <th
-                        *ngIf="item.capabilities === null || item.capabilities.qos === null || item.capabilities.qos?.qosParam === null
-                        || (item.capabilities.qos?.qosParam.maxBandWidth === 0 && item.capabilities.qos?.qosParam.minBandWidth === 0)">
-                        --
-                      </th>
-                      <th
-                        *ngIf="item.capabilities === null || item.capabilities.qos === null || item.capabilities.qos?.qosParam === null
-                        || (item.capabilities.qos?.qosParam.minIOPS === 0 && item.capabilities.qos?.qosParam.maxIOPS === 0)">
-                        --
-                      </th>
-                    </tr>
-                    <tr>
-                      <th hidden></th>
-                      <th>{{formatCapacity(item.usedCapacity, false)}} /{{formatCapacity(item.totalCapacity, false)}}
-                      </th>
-                      <th *ngIf="item.capabilities !== null && item.capabilities.qos !== null
-                        && item.capabilities.qos?.qosParam !== null
-                        && item.capabilities.qos?.qosParam.latency !== 0 ">{{'rdm.latency' | translate}}<=
-                          {{item.capabilities.qos?.qosParam.latency + item.capabilities.qos?.qosParam.latencyUnit}}</th>
-                          <th
-                          *ngIf="item.capabilities === null || item.capabilities.qos === null || item.capabilities.qos?.qosParam === null || item.capabilities.qos?.qosParam.latency === 0">
-                          --
-                      </th>
-                    </tr>
-                  </tbody>
-                </table>
+<!--                      </th>-->
+<!--                      <th *ngIf="item.capabilities !== null && item.capabilities.qos !== null-->
+<!--                        && item.capabilities.qos?.qosParam !== null-->
+<!--                        && item.capabilities.qos?.qosParam.maxBandWidth !== 0">{{'vmfs.bandwidth' | translate}} <=-->
+<!--                          {{item.capabilities.qos?.qosParam.maxBandWidth}}MBPS/TB-->
+<!--                          </th>-->
+<!--                          <th *ngIf="item.capabilities !== null && item.capabilities.qos !== null-->
+<!--                        && item.capabilities.qos?.qosParam !== null-->
+<!--                        && item.capabilities.qos?.qosParam.minBandWidth !== 0">{{'vmfs.bandwidth' | translate}} >=-->
+<!--                          {{item.capabilities.qos?.qosParam.minBandWidth}}MBPS/TB-->
+<!--                      </th>-->
+<!--                      <th *ngIf="item.capabilities !== null && item.capabilities.qos !== null-->
+<!--                        && item.capabilities.qos?.qosParam !== null-->
+<!--                        && item.capabilities.qos?.qosParam.maxIOPS !== 0">{{'vmfs.iops' | translate}} <=-->
+<!--                          {{item.capabilities.qos?.qosParam.maxIOPS}}IOPS/TB-->
+<!--                          </th>-->
+<!--                          <th *ngIf="item.capabilities !== null && item.capabilities.qos !== null-->
+<!--                        && item.capabilities.qos?.qosParam !== null-->
+<!--                        && item.capabilities.qos?.qosParam.minIOPS !== 0 ">{{'vmfs.iops' | translate}} >=-->
+<!--                          {{item.capabilities.qos?.qosParam.minIOPS}}IOPS/TB-->
+<!--                      </th>-->
+<!--                      <th-->
+<!--                        *ngIf="item.capabilities === null || item.capabilities.qos === null || item.capabilities.qos?.qosParam === null-->
+<!--                        || (item.capabilities.qos?.qosParam.maxBandWidth === 0 && item.capabilities.qos?.qosParam.minBandWidth === 0)">-->
+<!--                        &#45;&#45;-->
+<!--                      </th>-->
+<!--                      <th-->
+<!--                        *ngIf="item.capabilities === null || item.capabilities.qos === null || item.capabilities.qos?.qosParam === null-->
+<!--                        || (item.capabilities.qos?.qosParam.minIOPS === 0 && item.capabilities.qos?.qosParam.maxIOPS === 0)">-->
+<!--                        &#45;&#45;-->
+<!--                      </th>-->
+<!--                    </tr>-->
+<!--                    <tr>-->
+<!--                      <th hidden></th>-->
+<!--                      <th>{{formatCapacity(item.usedCapacity, false)}} /{{formatCapacity(item.totalCapacity, false)}}-->
+<!--                      </th>-->
+<!--                      <th *ngIf="item.capabilities !== null && item.capabilities.qos !== null-->
+<!--                        && item.capabilities.qos?.qosParam !== null-->
+<!--                        && item.capabilities.qos?.qosParam.latency !== 0 ">{{'rdm.latency' | translate}}<=-->
+<!--                          {{item.capabilities.qos?.qosParam.latency + item.capabilities.qos?.qosParam.latencyUnit}}</th>-->
+<!--                          <th-->
+<!--                          *ngIf="item.capabilities === null || item.capabilities.qos === null || item.capabilities.qos?.qosParam === null || item.capabilities.qos?.qosParam.latency === 0">-->
+<!--                          &#45;&#45;-->
+<!--                      </th>-->
+<!--                    </tr>-->
+<!--                  </tbody>-->
+<!--                </table>-->
               </clr-accordion-content>
               <img src="./assets/images/selectDown.svg" style="position: absolute;right: 0px;bottom: 0px;" width="40px"
                 height="40px">
@@ -1666,3 +1694,37 @@
                                                style="margin-left: 20px;">
       </span>
 </div>
+<!--失败提示窗口-->
+<clr-modal [(clrModalOpen)]="errorShow" [clrModalSize]="'sm'" [clrModalClosable]="false">
+  <h3 class="modal-title modelTile">{{'vmfs.reclaim.title' | translate}}</h3>
+  <div class="modal-body">
+    <!--    <p *ngIf="mountShow">{{'errorMsg.mountError' | translate}}</p>-->
+    <!--    <p *ngIf="mountShow">{{'errorMsg.unmountError' | translate}}</p>-->
+    <app-error-partsucess-tips
+      [status]="status"
+      [description]="description"
+      [partSuccessData]="partSuccessData"
+      [operatingType]="operatingType"></app-error-partsucess-tips>
+  </div>
+  <div class="modal-footer">
+    <button type="submit" class="btn btn-primary"
+            (click)="errorShow = false">{{'menu.ok' | translate}}</button>
+  </div>
+</clr-modal>
+<!--部分成功提示窗口-->
+<clr-modal [(clrModalOpen)]="partSuccessShow" [clrModalSize]="'lg'" [clrModalClosable]="false">
+  <h3 class="modal-title modelTile">{{'vmfs.reclaim.title' | translate}}</h3>
+  <div class="modal-body">
+    <!--    <p *ngIf="mountShow">{{'errorMsg.mountError' | translate}}</p>-->
+    <!--    <p *ngIf="mountShow">{{'errorMsg.unmountError' | translate}}</p>-->
+    <app-error-partsucess-tips
+      [status]="status"
+      [description]="description"
+      [partSuccessData]="partSuccessData"
+      [operatingType]="operatingType"></app-error-partsucess-tips>
+  </div>
+  <div class="modal-footer">
+    <button type="submit" class="btn btn-primary"
+            (click)="partSuccessShow = false;closeSuccessTips()">{{'menu.ok' | translate}}</button>
+  </div>
+</clr-modal>
