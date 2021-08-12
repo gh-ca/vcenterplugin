@@ -34,6 +34,8 @@
     </clr-dg-column>
     <clr-dg-column style="width: 11rem;">{{'bestPractice.description.name'|translate}}</clr-dg-column>
     <clr-dg-column>{{'bestPractice.operation'|translate}}</clr-dg-column>
+    <clr-dg-column>{{'bestPractice.repairAction'|translate}}</clr-dg-column>
+    <clr-dg-column>{{'bestPractice.repairHistoryBtn'|translate}}</clr-dg-column>
     <clr-dg-placeholder>{{'tips.noData' | translate}}</clr-dg-placeholder>
     <!--autorepare 实施最佳实践 -->
     <clr-dg-row *clrDgItems="let item of list"
@@ -44,6 +46,7 @@
       <clr-dg-cell>
         <!-- {{item.recommendValue}} -->
         <app-bp-cell-mul-row [items]="item.recommendValue"></app-bp-cell-mul-row>
+
       </clr-dg-cell>
       <clr-dg-cell>
         <span [hidden]="item.level != 'Critical'">
@@ -68,6 +71,20 @@
         <span *ngIf="item.count > 0" (click)="openHostList(item)"
           style="color:#00F;cursor:pointer">{{'bestPractice.implementation'|translate}}</span>
         <span *ngIf="item.count == 0" style="color:#9F9F9F;">{{'bestPractice.implementation'|translate}}</span>
+      </clr-dg-cell>
+<!--      修复动作与修复历史-->
+      <clr-dg-cell>
+<!--        <clr-select-container>-->
+<!--          <select  [(ngModel)]="selectedValue" clrSelect name="version" required-->
+<!--                   (change)="changeSelect(item)">-->
+<!--            <option *ngFor="let i of selectedArr" value="{{i}}">{{i}}</option>-->
+<!--          </select>-->
+<!--          <clr-control-error>{{'validations.required' | translate}}</clr-control-error>-->
+<!--        </clr-select-container>-->
+      </clr-dg-cell>
+      <clr-dg-cell>
+        <span  (click)="openRepairHistoryList(item.hostSetting)"
+              style="color:#00F;cursor:pointer">{{'bestPractice.log'|translate}}</span>
       </clr-dg-cell>
     </clr-dg-row>
 
@@ -160,6 +177,17 @@
   </div>
 </div>
 
+<clr-modal [(clrModalOpen)]="repairLogsShow" [clrModalSize]="'lg'">
+  <div class="modal-title">
+    {{'bestPractice.repairHistoryBtn'|translate}}
+  </div>
+  <div class="modal-body">
+    <app-bp-repair-history-table [tableData]="repairLogs"></app-bp-repair-history-table>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-success" (click)="repairLogsShow=false">{{'menu.ok'|translate}}</button>
+  </div>
+</clr-modal>
 
 <clr-modal [(clrModalOpen)]="tipModal" [clrModalSize]="'sm'">
   <h3 class="modal-title">{{'menu.tip'|translate}}</h3>

@@ -158,6 +158,7 @@ export class DevDemoComponentComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.table=[{},{}]
   }
   // ngDoCheck() {
   //   this.changeButtonAttr()
@@ -171,6 +172,10 @@ export class DevDemoComponentComponent implements OnInit {
       return true
     }
   }
+
+  checkRecommendedValue(){}
+  changeSelect(){}
+
 }
 
 

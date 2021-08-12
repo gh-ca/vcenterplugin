@@ -22,6 +22,6 @@ export interface bpTableData{
   "recommendedValue":string,
   "repairType":string,
   "repairTime":string,
-  "repairResult":string,
+  "repairResult":boolean,
   "executionLog":string
 }

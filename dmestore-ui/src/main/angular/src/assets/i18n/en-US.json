@@ -634,6 +634,9 @@
     "exeFail": "Execute Failed",
     "operation": "Operation",
     "implementation": "Apply",
+    "repairHistoryBtn": "Repair History",
+    "repairAction": "Repair Action",
+    "log": "Log",
     "description": {
       "name": "Description",
       "vmfs5": "This item is configured to enable VAAI ATS heartbeat. In versions earlier than ESXi 6.5, connections to the datastores corresponding to VMFS3 and VMFS5 may be lost and you are advised to disable this function. For other versions, you are advised to enable this function.",

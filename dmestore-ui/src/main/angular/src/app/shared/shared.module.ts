@@ -60,6 +60,7 @@ const COMPONENTS = [
   GhTreeCheckboxComponent,
   /* 错误提示 */
   ErrorTipsComponent,
+  ErrorPartsucessTipsComponent
 ];
 const COMPONENTS_DYNAMIC = [];
 const DIRECTIVES = [DynamicComponentDirectiveDirective];
@@ -70,7 +71,7 @@ const FILTER = [
 ];
 
 @NgModule({
-  declarations: [...COMPONENTS, ...COMPONENTS_DYNAMIC, ...DIRECTIVES, ...PIPES, ...FILTER],
+  declarations: [...COMPONENTS, ...COMPONENTS_DYNAMIC, ...DIRECTIVES, ...PIPES, ...FILTER, BpRepairHistoryTableComponent,RepairTypeFilter,RepairResultFilter],
   imports: [CommonModule, FormsModule, RouterModule, ReactiveFormsModule, ...THIRD_MODULES],
   exports: [
     CommonModule,
@@ -82,6 +83,7 @@ const FILTER = [
     ...FILTER,
     ...DIRECTIVES,
     ...PIPES,
+    BpRepairHistoryTableComponent,
   ],
   entryComponents: COMPONENTS_DYNAMIC,
 })

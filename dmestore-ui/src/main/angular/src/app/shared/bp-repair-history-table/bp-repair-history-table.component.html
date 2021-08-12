@@ -26,11 +26,11 @@
   <clr-dg-row *clrDgItems="let item of tableData">
     <clr-dg-cell>{{item.objectName?item.objectName:'--'}}</clr-dg-cell>
     <clr-dg-cell>{{item.violationValue?item.violationValue:'--'}}</clr-dg-cell>
-    <clr-dg-cell>{{item.recommendedValue?item.recommendedValue:'--'}}</clr-dg-cell>
-    <clr-dg-cell>{{item.repairType?item.repairType:'--'}}</clr-dg-cell>
+    <clr-dg-cell>{{item.recommandValue?item.recommandValue:'--'}}</clr-dg-cell>
+    <clr-dg-cell>{{item.repairType?item.repairType==='0'?'手动':'自动':'--'}}</clr-dg-cell>
     <clr-dg-cell>{{item.repairTime?item.repairTime:'--'}}</clr-dg-cell>
-    <clr-dg-cell>{{item.repairResult?item.repairResult:'--'}}</clr-dg-cell>
-    <clr-dg-cell>{{item.executionLog?item.executionLog:'--'}}</clr-dg-cell>
+    <clr-dg-cell>{{item.repairResult?'成功':'失败'}}</clr-dg-cell>
+    <clr-dg-cell>{{item.message?item.message:'--'}}</clr-dg-cell>
   </clr-dg-row>
 <clr-dg-footer>
   <clr-dg-pagination #pagination [clrDgPageSize]="5" [clrDgTotalItems]="tableData.length">

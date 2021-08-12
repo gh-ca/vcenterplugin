@@ -634,6 +634,9 @@
     "exeFail": "执行失败",
     "operation": "操作",
     "implementation": "实施",
+    "repairHistoryBtn": "修复历史",
+    "repairAction": "修复动作",
+    "log": "日志",
     "description": {
       "name": "描述",
       "vmfs5": "实施后将会启用VAAI ATS Heartbeat功能。在ESXi6.5以前版本可能会导致VMFS3、VMFS5对应的数据存储丢失连接，建议关闭，其他版本推荐开启。",

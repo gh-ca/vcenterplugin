@@ -23,7 +23,7 @@ import {bpTableData} from './bp-repair-history-table.component'
         type="radio"
         name="repairType"
         (change)="changeFunc($event)"
-        value="手动">
+        value="0">
       <label>{{'bestPractice.repairHistory.manual'|translate}}</label>
     </clr-radio-wrapper>
     <clr-radio-wrapper>
@@ -33,7 +33,7 @@ import {bpTableData} from './bp-repair-history-table.component'
         type="radio"
         name="repairType"
         (change)="changeFunc($event)"
-        value="自动">
+        value="1">
       <label>{{'bestPractice.repairHistory.automatic'|translate}}</label>
     </clr-radio-wrapper>
   </clr-radio-container>`
@@ -89,7 +89,7 @@ export class RepairTypeFilter implements ClrDatagridFilterInterface<bpTableData>
         type="radio"
         name="repairResult"
         (change)="changeFunc($event)"
-        value="成功">
+        value="true">
       <label>{{'bestPractice.repairHistory.success'|translate}}</label>
     </clr-radio-wrapper>
     <clr-radio-wrapper>
@@ -99,7 +99,7 @@ export class RepairTypeFilter implements ClrDatagridFilterInterface<bpTableData>
         type="radio"
         name="repairResult"
         (change)="changeFunc($event)"
-        value="失败">
+        value="false">
       <label>{{'bestPractice.repairHistory.fail'|translate}}</label>
     </clr-radio-wrapper>
   </clr-radio-container>`
@@ -117,7 +117,7 @@ export class RepairResultFilter implements ClrDatagridFilterInterface<bpTableDat
     if(this.repairResult===''){
       return true
     }else {
-      return this.repairResult===capital
+      return this.repairResult===String(capital)
     }
   }
 

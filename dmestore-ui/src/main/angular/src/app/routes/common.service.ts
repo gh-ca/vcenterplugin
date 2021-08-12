@@ -375,7 +375,89 @@ zh:'一年' ,range:'LAST_1_YEAR',   interval:  "DAY"
       return data;
     }
   }
+  /**
+   * @Description 最佳实践 查询修复日志
+   * @param {any} hostSetting
+   * @returns {Array}
+   */
+  async getBestpracticeRepairLogs(hostSetting){
+    let data=[]
+    try {
+      if (isMockData){
+        data=[
+          {
+            "hostsetting": "VMFS Datastore Space Utilization",
+            "message": "执行成功",
+            "objectId": "12321421421",
+            "objectName": "main",
+            "recommandValue": "80%",
+            "repairResult": true,
+            "repairTime": "2021-08-12 07:53:48",
+            "repairType": "0",
+            "violationValue": "90%"
+          },
+          {
+            "hostsetting": "VMFS Datastore Space Utilization",
+            "message": "",
+            "objectId": "12321421421",
+            "objectName": "test",
+            "recommandValue": "80%",
+            "repairResult": true,
+            "repairTime": "2021-08-11 07:53:48",
+            "repairType": "0",
+            "violationValue": "90%"
+          },{
+            "hostsetting": "VMFS Datastore Space Utilization",
+            "message": "",
+            "objectId": "12321421421",
+            "objectName": "test",
+            "recommandValue": "80%",
+            "repairResult": false,
+            "repairTime": "2021-08-10 07:53:48",
+            "repairType": "0",
+            "violationValue": "90%"
+          },
+          {
+            "hostsetting": "VMFS Datastore Space Utilization",
+            "message": "",
+            "objectId": "12321421421",
+            "objectName": "test",
+            "recommandValue": "80%",
+            "repairResult": true,
+            "repairTime": "2021-08-12 07:53:48",
+            "repairType": "1",
+            "violationValue": "90%"
+          },
+          {
+            "hostsetting": "VMFS Datastore Space Utilization",
+            "message": "",
+            "objectId": "12321421421",
+            "objectName": "test",
+            "recommandValue": "80%",
+            "repairResult": false,
+            "repairTime": "2021-08-12 07:53:48",
+            "repairType": "1",
+            "violationValue": "90%"
+          }
+        ]
+      }else {
+        const res:any=await new Promise((resolve,reject)=>{
+          this.http
+            .get(`v1/bestpractice/logs?hostsetting=${hostSetting}`)
+            .subscribe(resolve,reject)
+        });
+        if (res.code==='200'){
+          data=res.data
+        }
+      }
+    }catch (error){
+      console.log('查询修复日志',error)
+    }finally {
+      return data
+    }
+  }
 }
+
 
 /*
 async function getAccessvmwareListclusters(instance) {

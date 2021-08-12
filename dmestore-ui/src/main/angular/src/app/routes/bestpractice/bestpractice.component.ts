@@ -30,6 +30,8 @@ export class BestpracticeComponent implements OnInit {
 
   // ================主机列表=============
   hostModalShow = false;
+  repairLogsShow=false;
+  repairLogs=[]//修复日志
   isShowBPBtnTips: boolean;
   hostSelected = []; // 主机选中列表
   hostIsLoading = false; // table数据loading
@@ -272,6 +274,11 @@ export class BestpracticeComponent implements OnInit {
     this.hostModalShow = true;
     this.checkBescpractice(bestpractice);
     this.hostRefresh();
+  }
+  async openRepairHistoryList(hostSetting){
+    this.repairLogs=await this.commonService.getBestpracticeRepairLogs(hostSetting)
+    console.log(this.repairLogs)
+    this.repairLogsShow=true
   }
 
   hostRefresh() {
