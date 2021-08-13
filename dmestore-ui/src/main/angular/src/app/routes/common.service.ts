@@ -8,6 +8,7 @@ import { HttpClient } from '@angular/common/http';
 import { getLodash } from '@shared/lib';
 import { mockServerData } from './../app.helpers';
 import { rejects } from 'assert';
+import {logger} from "codelyzer/util/logger";
 const _ = getLodash();
 
 function isSingleHost(node) {
@@ -380,7 +381,7 @@ zh:'一年' ,range:'LAST_1_YEAR',   interval:  "DAY"
    * @param {any} hostSetting
    * @returns {Array}
    */
-  async getBestpracticeRepairLogs(hostSetting){
+  async getBestpracticeRepairLogs(hostSetting:string){
     let data=[]
     try {
       if (isMockData){
@@ -454,6 +455,66 @@ zh:'一年' ,range:'LAST_1_YEAR',   interval:  "DAY"
       console.log('查询修复日志',error)
     }finally {
       return data
+    }
+  }
+  /**
+   * @Description 最佳实践 查询期望值与修复方式
+   * @param {any} hostSetting
+   * @returns {Object}
+   */
+  async getBestpracticeRecommand(hostSetting:string){
+    let data={}
+    try {
+      if(isMockData){
+        data={
+          "id": "12",
+          "hostsetting": "VMFS Datastore Space Utilization",
+          "recommandValue": "80%",
+          "repairAction": "0",
+          "createTime": "2021-08-02 16:29:20",
+          "updateRecommendTime": "2021-08-02 16:29:20",
+          "updateRepairTime": "2021-08-02 16:29:20"
+        }
+      }else {
+        const res:any=await new Promise((resolve,reject)=>{
+          this.http
+            .get(`v1/bestpractice/recommand?hostsetting=${hostSetting}`)
+            .subscribe(resolve,reject)
+        });
+        if (res.code==='200'){
+          data=res.data
+        }
+      }
+    }catch (error){
+      console.log('查询期望值与修复方式',error)
+    }finally {
+      return data
+    }
+  }
+
+  /**
+   * @Description 最佳实践 修改期望值与修复方式
+   * @param {any} id
+   * @param {any} params:{recommandValue,repairAction}
+   * @returns {Object}
+   */
+  async changeBestpracticeRecommand(id:string,params:object){
+    let code=''
+    try {
+      if (isMockData){
+        code='200'
+      }else {
+        const res:any=await new Promise((resolve, reject)=>{
+          this.http
+            .put(`v1/bestpractice/recommand/${id}`,params)
+            .subscribe(resolve,reject)
+        })
+        code=res.code
+      }
+    }catch (error){
+      console.log('修改期望值与修复方式',error)
+    }finally {
+      return code
     }
   }
 }

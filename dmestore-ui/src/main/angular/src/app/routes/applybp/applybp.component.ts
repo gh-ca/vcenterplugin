@@ -110,6 +110,14 @@ export class ApplybpComponent implements OnInit {
   // ================主机列表=============
   hostModalShow = false;
   isShowBPBtnTips: boolean;
+  repairLogsShow=false;
+  repairLogs=[];//修复日志
+  reviseRecommendValueShow=false
+  recommand={};
+  recommandId:string='';//id
+  recommandValue:string=''; //原期望值
+  newRecommandValue:number //新期望值
+  repairAction:string=''; //修复方式
   hostSelected = []; // 主机选中列表
   hostIsLoading = false; // table数据loading
   hostList: Host[] = []; // 数据列表
@@ -122,6 +130,7 @@ export class ApplybpComponent implements OnInit {
   tipModal = false;
   ips = '';
   applyType = '1';
+  selectedArr=['手动','自动']
 
   tipModalSuccess = false;
   tipModalFail = false;
@@ -394,6 +403,45 @@ export class ApplybpComponent implements OnInit {
     this.hostModalShow = true;
     this.checkBescpractice(bestpractice);
     this.hostRefresh();
+  }
+
+  async openRepairHistoryList(hostSetting){
+    this.repairLogs=await this.commonService.getBestpracticeRepairLogs(hostSetting)
+    this.repairLogsShow=true
+  }
+  async openRevise(hostSetting){
+    this.recommand=await this.commonService.getBestpracticeRecommand(hostSetting)
+    // console.log('recommand',this.recommand)
+    this.recommandValue=(this.recommand as any).recommandValue
+    this.recommandId=(this.recommand as any).id
+    this.reviseRecommendValueShow=true
+  }
+  async modifyExpectations(){
+    let code=await this.commonService.changeBestpracticeRecommand(this.recommandId,{'recommandValue':this.newRecommandValue+'%'})
+    if (code==='200'){
+      //  修改成功
+      console.log('修改成功')
+    }else {
+      //  修改失败
+    }
+    this.reviseRecommendValueShow=false
+  }
+  newExpectations(){
+    let value=this.newRecommandValue
+    if (value<75||value>90){
+      this.newRecommandValue=null
+    }
+  }
+  async changeRepairAction(item){
+    console.log(item)
+    let temp:any=await this.commonService.getBestpracticeRecommand(item.hostSetting)
+    let id=temp.id
+    let code=await this.commonService.changeBestpracticeRecommand(id,{'repairAction':item.repairAction})
+    if (code==='200'){
+      //  修改成功
+    }else {
+      //  修改失败
+    }
   }
 
   hostRefresh() {

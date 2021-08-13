@@ -35,6 +35,8 @@
       </clr-dg-column>
       <clr-dg-column style="width: 11rem;">{{'bestPractice.description.name'|translate}}</clr-dg-column>
       <clr-dg-column>{{'bestPractice.operation'|translate}}</clr-dg-column>
+      <clr-dg-column>{{'bestPractice.repairAction'|translate}}</clr-dg-column>
+      <clr-dg-column>{{'bestPractice.repairHistoryBtn'|translate}}</clr-dg-column>
       <clr-dg-placeholder>{{'tips.noData' | translate}}</clr-dg-placeholder>
       <!--autorepare 实施最佳实践 -->
       <clr-dg-row *clrDgItems="let item of list"
@@ -42,9 +44,11 @@
         [clrDgSelectable]="item.hostSetting!=='Jumbo Frame (MTU)'&&item.hostList&&item.hostList.length>0&&item.hostList[0].autoRepair==='true'">
         <!-- MTU 单独处理 -->
         <clr-dg-cell>{{item.hostSetting}}</clr-dg-cell>
-        <clr-dg-cell>
+        <clr-dg-cell style="display: flex;justify-content: space-between">
           <!-- {{item.recommendValue}} -->
           <app-bp-cell-mul-row [items]="item.recommendValue"></app-bp-cell-mul-row>
+          <span  (click)="openRevise(item.hostSetting)"
+                 style="color:#00F;cursor:pointer">{{'bestPractice.repair'|translate}}</span>
         </clr-dg-cell>
         <clr-dg-cell>
           <span [hidden]="item.level != 'Critical'">
@@ -69,6 +73,19 @@
           <span *ngIf="item.count > 0" (click)="openHostList(item)"
             style="color:#00F;cursor:pointer">{{'bestPractice.implementation'|translate}}</span>
           <span *ngIf="item.count == 0" style="color:#9F9F9F;">{{'bestPractice.implementation'|translate}}</span>
+        </clr-dg-cell>
+        <!--      修复动作与修复历史-->
+        <clr-dg-cell class="bestpracticeRepairAction">
+          <clr-select-container>
+            <select  [(ngModel)]="item.repairAction" clrSelect name="version" required
+                     (change)="changeRepairAction(item)">
+              <option *ngFor="let i of selectedArr" value="{{i}}">{{i}}</option>
+            </select>
+          </clr-select-container>
+        </clr-dg-cell>
+        <clr-dg-cell>
+        <span  (click)="openRepairHistoryList(item.hostSetting)"
+               style="color:#00F;cursor:pointer">{{'bestPractice.log'|translate}}</span>
         </clr-dg-cell>
       </clr-dg-row>
 
@@ -157,6 +174,40 @@
       <clr-spinner class="spinner spinner-md">Loading</clr-spinner>
     </div>
   </div>
+  <!--修复日志-->
+  <clr-modal [(clrModalOpen)]="repairLogsShow" [clrModalSize]="'lg'">
+    <div class="modal-title">
+      {{'bestPractice.repairHistoryBtn'|translate}}
+    </div>
+    <div class="modal-body">
+      <app-bp-repair-history-table [tableData]="repairLogs"></app-bp-repair-history-table>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-primary" (click)="repairLogsShow=false">{{'menu.ok'|translate}}</button>
+    </div>
+  </clr-modal>
+
+  <!--修改期望值-->
+  <clr-modal [(clrModalOpen)]="reviseRecommendValueShow" [clrModalSize]="'sm'" class="reviseExpectedValue">
+    <div class="modal-title">
+      {{'bestPractice.reviseRecommandValue'|translate}}
+    </div>
+    <div class="modal-body">
+      <clr-input-container>
+        <label for="recommandValue">{{'bestPractice.originalExpectedValue'|translate}}</label>
+        <input style="width: 60%"  clrInput [value]="recommandValue"  id="recommandValue"  disabled/>
+      </clr-input-container>
+      <clr-input-container style="display: flex">
+        <label for="newRecommandValue">{{'bestPractice.newExpectations'|translate}}</label>
+        <input style="width: 60%" type="number" min="75" (blur)="newExpectations()" clrInput [(ngModel)]="newRecommandValue" id="newRecommandValue" name="newRecommandValue" required/>
+        <clr-control-error>{{'bestPractice.expectationsError'|translate}}</clr-control-error>
+      </clr-input-container>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-primary" (click)="reviseRecommendValueShow=false">{{'menu.close'|translate}}</button>
+      <button type="button" class="btn btn-primary" [disabled]="newRecommandValue?false:true" (click)="modifyExpectations()">{{'menu.ok'|translate}}</button>
+    </div>
+  </clr-modal>
 
 
   <clr-modal [(clrModalOpen)]="tipModal" [clrModalSize]="'sm'">

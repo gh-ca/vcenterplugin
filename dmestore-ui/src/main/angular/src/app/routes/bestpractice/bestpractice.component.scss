@@ -21,4 +21,13 @@ input::-ms-clear{
 ::ng-deep .datagrid {
   -ms-overflow-style:scrollbar;
 }
+// 隐藏input标签箭头
+input[type=number] {
 
+  &::-webkit-outer-spin-button,
+  &::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+  }
+
+  -moz-appearance: textfield;
+}

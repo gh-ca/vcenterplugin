@@ -5,6 +5,7 @@ import { GlobalsService } from '../../shared/globals.service';
 import { TranslatePipe } from '@ngx-translate/core';
 import { isMockData, mockData } from 'mock/mock';
 import { getTypeOf, handlerResponseErrorSimple } from 'app/app.helpers';
+import {element} from "protractor";
 
 export const MTU = 'mtu';
 export const MTU_TAG = 'Jumbo Frame (MTU)';
@@ -31,7 +32,13 @@ export class BestpracticeComponent implements OnInit {
   // ================主机列表=============
   hostModalShow = false;
   repairLogsShow=false;
-  repairLogs=[]//修复日志
+  repairLogs=[];//修复日志
+  reviseRecommendValueShow=false
+  recommand={};
+  recommandId:string='';//id
+  recommandValue:string=''; //原期望值
+  newRecommandValue:number //新期望值
+  repairAction:string=''; //修复方式
   isShowBPBtnTips: boolean;
   hostSelected = []; // 主机选中列表
   hostIsLoading = false; // table数据loading
@@ -51,6 +58,7 @@ export class BestpracticeComponent implements OnInit {
 
   applyLoading = false;
   checkLoading = false;
+  selectedArr=[{value:'手动',selected:'selected'},{value:'自动',selected:''}]
 
   applyTips = false; // 实施最佳实践提示（违规数为0时提示）
 
@@ -277,10 +285,42 @@ export class BestpracticeComponent implements OnInit {
   }
   async openRepairHistoryList(hostSetting){
     this.repairLogs=await this.commonService.getBestpracticeRepairLogs(hostSetting)
-    console.log(this.repairLogs)
     this.repairLogsShow=true
   }
-
+  async openRevise(hostSetting){
+    this.recommand=await this.commonService.getBestpracticeRecommand(hostSetting)
+    // console.log('recommand',this.recommand)
+    this.recommandValue=(this.recommand as any).recommandValue
+    this.recommandId=(this.recommand as any).id
+    this.reviseRecommendValueShow=true
+  }
+ async modifyExpectations(){
+    let code=await this.commonService.changeBestpracticeRecommand(this.recommandId,{'recommandValue':this.newRecommandValue+'%'})
+   if (code==='200'){
+   //  修改成功
+     console.log('修改成功')
+   }else {
+   //  修改失败
+   }
+    this.reviseRecommendValueShow=false
+  }
+  newExpectations(){
+    let value=this.newRecommandValue
+    if (value<75||value>90){
+      this.newRecommandValue=null
+    }
+  }
+  async changeRepairAction(item){
+    console.log(item)
+    let temp:any=await this.commonService.getBestpracticeRecommand(item.hostSetting)
+    let id=temp.id
+    let code=await this.commonService.changeBestpracticeRecommand(id,{'repairAction':item.repairAction})
+    if (code==='200'){
+    //  修改成功
+    }else {
+    //  修改失败
+    }
+  }
   hostRefresh() {
     if (this.hostModalShow === true) {
       this.hostIsLoading = true;

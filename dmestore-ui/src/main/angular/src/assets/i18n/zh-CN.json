@@ -637,6 +637,11 @@
     "repairHistoryBtn": "修复历史",
     "repairAction": "修复动作",
     "log": "日志",
+    "repair": "修改",
+    "reviseRecommandValue": "修改期望值",
+    "originalExpectedValue": "原期望值：",
+    "newExpectations": "新期望值：",
+    "expectationsError": "请填写75~90之间的期望值数值",
     "description": {
       "name": "描述",
       "vmfs5": "实施后将会启用VAAI ATS Heartbeat功能。在ESXi6.5以前版本可能会导致VMFS3、VMFS5对应的数据存储丢失连接，建议关闭，其他版本推荐开启。",
