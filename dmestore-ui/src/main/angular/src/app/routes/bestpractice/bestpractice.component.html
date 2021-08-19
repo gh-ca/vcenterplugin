@@ -76,9 +76,9 @@
 <!--      修复动作与修复历史-->
       <clr-dg-cell class="bestpracticeRepairAction">
         <clr-select-container>
-          <select   [(ngModel)]="item.repairAction" clrSelect name="version"
+          <select class="repairAction-select" [(ngModel)]="item.repairAction" clrSelect name="repairAction"
                    (change)="changeRepairAction(item)">
-            <option *ngFor="let i of selectedArr" value="{{i.value}}" [selected]="i.selected">{{i.value}}</option>
+            <option *ngFor="let i of selectedArr" value="{{i.value}}" >{{i.label|translate}}</option>
           </select>
         </clr-select-container>
       </clr-dg-cell>

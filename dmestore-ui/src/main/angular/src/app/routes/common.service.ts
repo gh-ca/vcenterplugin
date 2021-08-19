@@ -239,7 +239,7 @@ zh:'一年' ,range:'LAST_1_YEAR',   interval:  "DAY"
     } else {
       try {
         const res: any = await new Promise((resolve, reject) => {
-          this.http.post('/accessvmfs/mountvmfsnew', params).subscribe(resolve, reject);
+          this.http.post('accessvmfs/mountvmfsnew', params).subscribe(resolve, reject);
         });
         return res;
       } catch (error) {

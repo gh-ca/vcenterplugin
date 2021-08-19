@@ -27,9 +27,11 @@
     <clr-dg-cell>{{item.objectName?item.objectName:'--'}}</clr-dg-cell>
     <clr-dg-cell>{{item.violationValue?item.violationValue:'--'}}</clr-dg-cell>
     <clr-dg-cell>{{item.recommandValue?item.recommandValue:'--'}}</clr-dg-cell>
-    <clr-dg-cell>{{item.repairType?item.repairType==='0'?'手动':'自动':'--'}}</clr-dg-cell>
+    <clr-dg-cell *ngIf="item.repairType==='0'">{{'bestPractice.repairHistory.manual'|translate}}</clr-dg-cell>
+    <clr-dg-cell *ngIf="item.repairType==='1'">{{'bestPractice.repairHistory.automatic'|translate}}</clr-dg-cell>
     <clr-dg-cell>{{item.repairTime?item.repairTime:'--'}}</clr-dg-cell>
-    <clr-dg-cell>{{item.repairResult?'成功':'失败'}}</clr-dg-cell>
+    <clr-dg-cell *ngIf="item.repairResult">{{'bestPractice.repairHistory.success'|translate}}</clr-dg-cell>
+    <clr-dg-cell *ngIf="!item.repairResult">{{'bestPractice.repairHistory.fail'|translate}}</clr-dg-cell>
     <clr-dg-cell>{{item.message?item.message:'--'}}</clr-dg-cell>
   </clr-dg-row>
 <clr-dg-footer>

@@ -407,5 +407,15 @@ clr-dg-cell.datagrid-cell{
     margin-top: unset;
   }
 }
+.repairAction-select{
+  flex:1;
+  width: 60%;
+  .clr-select-wrapper{
+    width: 100%;
+  }
+  .clr-select-wrapper select, .clr-multiselect-wrapper select{
+    width: 100%;
+  }
+}
 
 

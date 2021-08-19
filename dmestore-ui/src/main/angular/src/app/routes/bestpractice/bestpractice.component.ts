@@ -2,7 +2,7 @@ import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef } from '@
 import { HttpClient } from '@angular/common/http';
 import { CommonService } from '../common.service';
 import { GlobalsService } from '../../shared/globals.service';
-import { TranslatePipe } from '@ngx-translate/core';
+import { TranslatePipe ,TranslateService} from '@ngx-translate/core';
 import { isMockData, mockData } from 'mock/mock';
 import { getTypeOf, handlerResponseErrorSimple } from 'app/app.helpers';
 import {element} from "protractor";
@@ -58,7 +58,7 @@ export class BestpracticeComponent implements OnInit {
 
   applyLoading = false;
   checkLoading = false;
-  selectedArr=[{value:'手动',selected:'selected'},{value:'自动',selected:''}]
+  selectedArr=[{value:'0',label:'bestPractice.repairHistory.manual'},{value:'1',label: 'bestPractice.repairHistory.automatic'}]
 
   applyTips = false; // 实施最佳实践提示（违规数为0时提示）
 
@@ -67,7 +67,8 @@ export class BestpracticeComponent implements OnInit {
     public gs: GlobalsService,
     private http: HttpClient,
     private commonService: CommonService,
-    private translatePipe: TranslatePipe
+    private translatePipe: TranslatePipe,
+    private translateService:TranslateService
   ) {}
 
   ngOnInit(): void {
@@ -255,6 +256,9 @@ export class BestpracticeComponent implements OnInit {
               ...hostInfo,
               actualObjValue: getTypeOf(hostInfo.actualValue),
             }));
+            //修复动作
+              _item.repairAction=item.repairAction
+            // console.log(item.repairAction,_item.repairAction)
             return _item;
           });
         }
@@ -294,6 +298,7 @@ export class BestpracticeComponent implements OnInit {
     this.recommandId=(this.recommand as any).id
     this.reviseRecommendValueShow=true
   }
+ // 修改期望值
  async modifyExpectations(){
     let code=await this.commonService.changeBestpracticeRecommand(this.recommandId,{'recommandValue':this.newRecommandValue+'%'})
    if (code==='200'){
@@ -303,6 +308,7 @@ export class BestpracticeComponent implements OnInit {
    //  修改失败
    }
     this.reviseRecommendValueShow=false
+   this.practiceRefresh()
   }
   newExpectations(){
     let value=this.newRecommandValue
@@ -434,6 +440,7 @@ class Bestpractice {
   levelNum: number;
   levelDesc: string;
   count: number;
+  repairAction:string;
   description: string;
   hostList: Host[];
 }

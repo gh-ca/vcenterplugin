@@ -8,7 +8,6 @@ import { Component, OnInit ,Input} from '@angular/core';
 export class BpRepairHistoryTableComponent implements OnInit {
 @Input() tableData
   constructor() { }
-
   ngOnInit(): void {
   }
 

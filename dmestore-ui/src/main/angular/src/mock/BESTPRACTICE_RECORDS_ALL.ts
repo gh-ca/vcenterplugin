@@ -6,6 +6,7 @@ export default {
       recommendValue: '1',
       level: 'Info',
       count: 1,
+      repairAction: "0",
       hostList: [
         {
           hostSetting: 'VMFS3.EnableBlockDelete',
@@ -24,6 +25,7 @@ export default {
       recommendValue: '1',
       level: 'Warning',
       count: 2,
+      repairAction: "0",
       hostList: [
         {
           hostSetting: 'VMFS3.HardwareAcceleratedLocking',
@@ -52,6 +54,7 @@ export default {
       recommendValue: '0|1',
       level: 'Critical',
       count: 3,
+      repairAction: "0",
       hostList: [
         {
           hostSetting: 'VMFS3.UseATSForHBOnVMFS5',
@@ -90,6 +93,7 @@ export default {
       recommendValue: '64',
       level: 'Warning',
       count: 3,
+      repairAction: "0",
       hostList: [
         {
           hostSetting: 'Disk.SchedQuantum',
@@ -128,6 +132,7 @@ export default {
       recommendValue: '1024|32767',
       level: 'Major',
       count: 1,
+      repairAction: "0",
       hostList: [
         {
           hostSetting: 'Disk.DiskMaxIOSize',
@@ -146,6 +151,7 @@ export default {
       recommendValue: '1',
       level: 'Warning',
       count: 2,
+      repairAction: "0",
       hostList: [
         {
           hostSetting: 'DataMover.HardwareAcceleratedInit',
@@ -174,6 +180,7 @@ export default {
       recommendValue: '1',
       level: 'Warning',
       count: 2,
+      repairAction: "0",
       hostList: [
         {
           hostSetting: 'DataMover.HardwareAcceleratedMove',
@@ -202,6 +209,7 @@ export default {
       recommendValue: '512',
       level: 'Warning',
       count: 2,
+      repairAction: "0",
       hostList: [
         {
           hostSetting: 'LUN Queue Depth for Emulex',
@@ -230,6 +238,7 @@ export default {
       recommendValue: '512',
       level: 'Warning',
       count: 0,
+      repairAction: "0",
       hostList: [],
     },
     /* 特殊处理 MTU panel 不一样 */
@@ -238,6 +247,7 @@ export default {
       recommendValue: '9000',
       level: 'Info',
       count: 2,
+      repairAction: "0",
       hostList: [
         {
           hostSetting: 'LUN Queue Depth for Emulex',
@@ -266,6 +276,7 @@ export default {
       recommendValue: '1',
       level: 'Info',
       count: 2,
+      repairAction: "0",
       hostList: [
         {
           hostSetting: 'Number of volumes in Datastore',
@@ -294,6 +305,7 @@ export default {
       recommendValue: 'low',
       level: 'Info',
       count: 0,
+      repairAction: "0",
       hostList: [],
     },
     {
@@ -301,6 +313,7 @@ export default {
       recommendValue: 'VMW_SATP_ALUA/VMW_PSP_RR$$VMW_SATP_DEFAULT_AA/VMW_PSP_RR',
       level: 'Major',
       count: 1,
+      repairAction: "0",
       hostList: [
         {
           hostSetting: 'NMP path switch policy',
