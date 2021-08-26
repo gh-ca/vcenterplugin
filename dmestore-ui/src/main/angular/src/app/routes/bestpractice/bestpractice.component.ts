@@ -246,6 +246,7 @@ export class BestpracticeComponent implements OnInit {
               'Jumbo Frame (MTU)': 'bestPractice.description.jumboFrame',
               'VMFS-6 Auto-Space Reclamation': 'bestPractice.description.reclamation',
               'Number of volumes in Datastore': 'bestPractice.description.numberOfVolInDatastore',
+              'VMFS Datastore Space Utilization':'bestPractice.description.spaceUtilization'
             };
             const mapDescription = DESCRIPTION_MAP[String(item.hostSetting).trim()];
             let description = this.translatePipe.transform(mapDescription) || '--';
@@ -289,6 +290,9 @@ export class BestpracticeComponent implements OnInit {
   }
   async openRepairHistoryList(hostSetting){
     this.repairLogs=await this.commonService.getBestpracticeRepairLogs(hostSetting)
+    this.repairLogs.forEach(i=>{
+      i.repairTime=this.transFormatOfDate(i.repairTime)
+    })
     this.repairLogsShow=true
   }
   async openRevise(hostSetting){
@@ -297,6 +301,16 @@ export class BestpracticeComponent implements OnInit {
     this.recommandValue=(this.recommand as any).recommandValue
     this.recommandId=(this.recommand as any).id
     this.reviseRecommendValueShow=true
+  }
+  transFormatOfDate(date){
+    const year=new Date(date).getFullYear()
+    const month=(new Date(date).getMonth()+1)<10?'0'+(new Date(date).getMonth()+1):new Date(date).getMonth()+1
+    const day=new Date(date).getDate()<10?'0'+new Date(date).getDate():new Date(date).getDate()
+    const hour=new Date(date).getHours()<10?'0'+new Date(date).getHours():new Date(date).getHours()
+    const min=new Date(date).getMinutes()<10?'0'+new Date(date).getMinutes():new Date(date).getMinutes()
+    const second=new Date(date).getSeconds()<10?'0'+new Date(date).getSeconds():new Date(date).getSeconds()
+    const str=year+'-'+month+'-'+day+' '+hour+':'+min+':'+second
+    return str
   }
  // 修改期望值
  async modifyExpectations(){
@@ -314,6 +328,13 @@ export class BestpracticeComponent implements OnInit {
     let value=this.newRecommandValue
     if (value<75||value>90){
       this.newRecommandValue=null
+    }
+  }
+  changeNewRecommandValueBtn(){
+    if (this.newRecommandValue<91&&this.newRecommandValue>74){
+      return false
+    }else {
+      return true
     }
   }
   async changeRepairAction(item){

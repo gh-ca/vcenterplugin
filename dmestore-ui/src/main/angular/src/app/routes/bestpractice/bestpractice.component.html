@@ -46,7 +46,7 @@
       <clr-dg-cell style="display: flex;justify-content: space-between">
         <!-- {{item.recommendValue}} -->
         <app-bp-cell-mul-row [items]="item.recommendValue"></app-bp-cell-mul-row>
-        <span  (click)="openRevise(item.hostSetting)"
+        <span *ngIf="item.hostSetting==='VMFS Datastore Space Utilization'"  (click)="openRevise(item.hostSetting)"
                style="color:#00F;cursor:pointer">{{'bestPractice.repair'|translate}}</span>
       </clr-dg-cell>
       <clr-dg-cell>
@@ -77,7 +77,7 @@
       <clr-dg-cell class="bestpracticeRepairAction">
         <clr-select-container>
           <select class="repairAction-select" [(ngModel)]="item.repairAction" clrSelect name="repairAction"
-                   (change)="changeRepairAction(item)">
+                   (change)="changeRepairAction(item)" [disabled]="item.hostSetting!=='VMFS Datastore Space Utilization'">
             <option *ngFor="let i of selectedArr" value="{{i.value}}" >{{i.label|translate}}</option>
           </select>
         </clr-select-container>
@@ -201,13 +201,13 @@
     </clr-input-container>
       <clr-input-container style="display: flex">
       <label for="newRecommandValue">{{'bestPractice.newExpectations'|translate}}</label>
-      <input style="width: 60%" type="number" min="75" (blur)="newExpectations()" clrInput [(ngModel)]="newRecommandValue" id="newRecommandValue" name="newRecommandValue" required/>
+      <input style="width: 60%" type="number" (blur)="newExpectations()" clrInput [(ngModel)]="newRecommandValue" id="newRecommandValue" name="newRecommandValue" required/>
         <clr-control-error>{{'bestPractice.expectationsError'|translate}}</clr-control-error>
     </clr-input-container>
   </div>
   <div class="modal-footer">
     <button type="button" class="btn btn-primary" (click)="reviseRecommendValueShow=false">{{'menu.close'|translate}}</button>
-    <button type="button" class="btn btn-primary" [disabled]="newRecommandValue?false:true" (click)="modifyExpectations()">{{'menu.ok'|translate}}</button>
+    <button type="button" class="btn btn-primary" [disabled]="changeNewRecommandValueBtn()" (click)="modifyExpectations()">{{'menu.ok'|translate}}</button>
   </div>
 </clr-modal>
 
