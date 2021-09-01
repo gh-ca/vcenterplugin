@@ -657,7 +657,7 @@
       "jumboFrame": "This item is configured to enable jumbo frame configuration and the MTU value of ESXi vmkernel adapters is set to 9000. Jumbo frames are recommended for the storage network.\nThis configuration requires that ESXi hosts, storage devices, and all physical network devices in the data packet link support jumbo frames, and their MTU values are set to 9000.",
       "reclamation": "This item is configured to configure the automatic space reclamation policy for VMFS6 datastores.",
       "numberOfVolInDatastore": "This item is configured to limit the maximum number of volumes in a single datastore to 1. A VM cannot concurrently process multiple volumes requests in a datastore. If a datastore contains multiple volumes, request blocking of a volume will affect other volumes. Therefore, it is not recommended that a datastore contain multiple volumes.",
-      "spaceUtilization": "After implementation, the total data storage capacity of which the VMFS storage usage rate is higher than the expected value will be automatically expanded, and the expansion ratio will be 10% of the original total capacity."
+      "spaceUtilization": "After implementation, the total data storage capacity of which the VMFS storage capacity utilization rate is higher than the expected value will be automatically expanded, and the expansion ratio shall be at least 10% of the original total capacity and rounded up."
     },
     "applyBestPracticeTips": "There are data with 0 violations in the selected data, please select again!",
     "repairHistory": {
