@@ -289,8 +289,8 @@ export class BestpracticeComponent implements OnInit {
     this.currentPanel = hostSetting === MTU_TAG ? MTU : '';
   }
   openHostList(bestpractice: Bestpractice) {
-    this.hostModalShow = true;
     this.checkBescpractice(bestpractice);
+    this.hostModalShow = true;
     this.hostRefresh();
   }
   async openRepairHistoryList(hostSetting){
@@ -331,12 +331,12 @@ export class BestpracticeComponent implements OnInit {
   }
   newExpectations(){
     let value=this.newRecommandValue
-    if (value<75||value>90){
+    if (value<1||value>90){
       this.newRecommandValue=null
     }
   }
   changeNewRecommandValueBtn(){
-    if ((this.newRecommandValue<90||this.newRecommandValue===90)&&(this.newRecommandValue>75||this.newRecommandValue===75)){
+    if ((this.newRecommandValue<90||this.newRecommandValue===90)&&(this.newRecommandValue>1||this.newRecommandValue===1)){
       return false
     }else {
       return true
