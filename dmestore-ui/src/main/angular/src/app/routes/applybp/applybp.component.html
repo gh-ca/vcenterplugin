@@ -47,7 +47,7 @@
         <clr-dg-cell style="display: flex;justify-content: space-between">
           <!-- {{item.recommendValue}} -->
           <app-bp-cell-mul-row [items]="item.recommendValue"></app-bp-cell-mul-row>
-          <span  (click)="openRevise(item.hostSetting)"
+          <span *ngIf="item.hostSetting==='VMFS Datastore Space Utilization'" (click)="openRevise(item.hostSetting)"
                  style="color:#00F;cursor:pointer">{{'bestPractice.repair'|translate}}</span>
         </clr-dg-cell>
         <clr-dg-cell>
