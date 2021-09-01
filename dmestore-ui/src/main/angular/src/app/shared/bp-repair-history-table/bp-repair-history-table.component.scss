@@ -1,3 +1,8 @@
 .hideFilter ::ng-deep clr-dg-string-filter{
   display: none;
 }
+clr-dg-cell.datagrid-cell{
+  overflow: hidden;
+  text-overflow: unset;
+  white-space: nowrap;
+}

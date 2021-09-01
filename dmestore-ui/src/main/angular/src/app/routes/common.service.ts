@@ -388,7 +388,7 @@ zh:'一年' ,range:'LAST_1_YEAR',   interval:  "DAY"
         data=[
           {
             "hostsetting": "VMFS Datastore Space Utilization",
-            "message": "执行成功",
+            "message": "VMFS Datastore Space Utilization多少撒发的撒的湿答答阿三",
             "objectId": "12321421421",
             "objectName": "main",
             "recommandValue": "80%",

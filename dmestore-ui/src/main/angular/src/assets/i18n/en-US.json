@@ -620,7 +620,7 @@
     "recommend": "Recommend Value",
     "level": "Level",
     "violation": "Violation",
-    "non-compliant": "Non-compliant Host",
+    "non-compliant": "Non-compliant Storage",
     "actual": "actual Value",
     "host": "Storage name",
     "critical": "Critical",

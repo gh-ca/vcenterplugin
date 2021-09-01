@@ -331,7 +331,7 @@ export class BestpracticeComponent implements OnInit {
     }
   }
   changeNewRecommandValueBtn(){
-    if (this.newRecommandValue<91&&this.newRecommandValue>74){
+    if ((this.newRecommandValue<90||this.newRecommandValue===90)&&(this.newRecommandValue>75||this.newRecommandValue===75)){
       return false
     }else {
       return true

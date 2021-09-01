@@ -205,7 +205,7 @@
     </div>
     <div class="modal-footer">
       <button type="button" class="btn btn-primary" (click)="reviseRecommendValueShow=false">{{'menu.close'|translate}}</button>
-      <button type="button" class="btn btn-primary" [disabled]="newRecommandValue?false:true" (click)="modifyExpectations()">{{'menu.ok'|translate}}</button>
+      <button type="button" class="btn btn-primary" [disabled]="changeNewRecommandValueBtn()" (click)="modifyExpectations()">{{'menu.ok'|translate}}</button>
     </div>
   </clr-modal>
 

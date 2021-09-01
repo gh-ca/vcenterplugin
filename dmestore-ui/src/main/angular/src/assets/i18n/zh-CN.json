@@ -620,7 +620,7 @@
     "recommend": "期望值",
     "level": "级别",
     "violation": "违规数",
-    "non-compliant": "违规主机",
+    "non-compliant": "违规存储",
     "actual": "实际值",
     "host": "存储名称",
     "critical": "紧急",

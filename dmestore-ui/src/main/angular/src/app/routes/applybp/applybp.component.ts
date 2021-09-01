@@ -432,6 +432,13 @@ export class ApplybpComponent implements OnInit {
       this.newRecommandValue=null
     }
   }
+  changeNewRecommandValueBtn(){
+    if ((this.newRecommandValue<90||this.newRecommandValue===90)&&(this.newRecommandValue>75||this.newRecommandValue===75)){
+      return false
+    }else {
+      return true
+    }
+  }
   async changeRepairAction(item){
     console.log(item)
     let temp:any=await this.commonService.getBestpracticeRecommand(item.hostSetting)
