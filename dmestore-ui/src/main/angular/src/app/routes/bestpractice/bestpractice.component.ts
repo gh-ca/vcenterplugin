@@ -278,20 +278,20 @@ export class BestpracticeComponent implements OnInit {
     }
   }
 
- async checkBescpractice(bestpractice) {
-    this.recommand=await this.commonService.getBestpracticeRecommand(bestpractice.hostSetting)
-    this.recommandValue=(this.recommand as any).recommandValue
+  checkBescpractice(bestpractice) {
     this.currentBestpractice = bestpractice;
     this.currentBestpractice.hostList.forEach(i=>{
-      i.recommendValue=this.recommandValue
+      i.recommendValue=this.currentBestpractice.recommendValue
     })
     const { hostSetting } = bestpractice;
     this.currentPanel = hostSetting === MTU_TAG ? MTU : '';
+    this.cdr.detectChanges()
   }
   openHostList(bestpractice: Bestpractice) {
-    this.checkBescpractice(bestpractice);
     this.hostModalShow = true;
+    this.checkBescpractice(bestpractice);
     this.hostRefresh();
+    // console.log(bestpractice)
   }
   async openRepairHistoryList(hostSetting){
     this.repairLogs=await this.commonService.getBestpracticeRepairLogs(hostSetting)
@@ -475,7 +475,7 @@ export class Host {
   hostSetting: string;
   level: string;
   hostName: string;
-  recommendValue: string;
+  recommendValue: number;
   actualValue: number;
   actualObjValue: any;
   hostObjectId: string;

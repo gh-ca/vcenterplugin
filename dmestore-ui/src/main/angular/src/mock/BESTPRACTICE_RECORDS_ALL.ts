@@ -328,6 +328,25 @@ export default {
         },
       ],
     },
+    {
+      "hostSetting":"VMFS Datastore Space Utilization",
+      "recommendValue":"40%",
+      "level":"Warning",
+      "count":1,
+      "repairAction":"0",
+      "hostList":[
+        {
+          "hostSetting":"VMFS Datastore Space Utilization",
+          "recommendValue":"3%",
+          "level":"Warning",
+          "actualValue":"95.35%",
+          "needReboot":"false",
+          "hostObjectId":"urn:vmomi:Datastore:datastore-20004:674908e5-ab21-4079-9cb1-596358ee5dd1",
+          "hostName":"lxhvmfs083102",
+          "autoRepair":"true"
+        }
+      ]
+    }
   ],
   description: null,
 };
