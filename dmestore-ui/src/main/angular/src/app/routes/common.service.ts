@@ -517,6 +517,34 @@ zh:'一年' ,range:'LAST_1_YEAR',   interval:  "DAY"
       return code
     }
   }
+
+  /**
+   * @description 检查最新最佳实践项
+   * @param ids
+   */
+  async checkVmfsBestpractice(ids){
+    let data={}
+    try {
+      if (isMockData){
+        data={
+          "code": "200",
+          "data": null,
+          "description": null
+        }
+      }else {
+        const res:any=await new Promise((resolve, reject)=>{
+          this.http
+            .post(`v1/bestpractice/check/vmfs`,ids)
+            .subscribe(resolve,reject)
+        })
+        data=res
+      }
+    }catch (error){
+      console.log('检查最新最佳实践项',error)
+    }finally {
+      return data
+    }
+  }
 }
 
 

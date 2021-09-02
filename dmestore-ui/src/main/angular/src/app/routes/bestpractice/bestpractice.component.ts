@@ -327,13 +327,12 @@ export class BestpracticeComponent implements OnInit {
  async modifyExpectations(){
     this.dataLoading=true
     let code=await this.commonService.changeBestpracticeRecommand(this.recommandId,{'recommandValue':this.newRecommandValue+'%'})
-   if (code==='200'){
-   //  修改成功
-     console.log('修改成功')
+    let resData:any= await this.commonService.checkVmfsBestpractice([])
+    if (code==='200'&&resData.code==='200'){
+     this.dataLoading=false
+     this.reviseRecommendValueShow=false
+     this.practiceRefresh()
    }
-   this.dataLoading=false
-    this.reviseRecommendValueShow=false
-   this.practiceRefresh()
   }
   newExpectations(){
     let value=this.newRecommandValue
@@ -362,13 +361,7 @@ export class BestpracticeComponent implements OnInit {
   hostRefresh() {
     if (this.hostModalShow === true) {
       this.hostIsLoading = true;
-      if (this.currentBestpractice.hostSetting==='VMFS Datastore Space Utilization'){
-        this.hostList = this.currentBestpractice.hostList.filter(i => {
-          return parseFloat(i.actualValue.substr(0, i.actualValue.length - 1)) < parseFloat(i.recommendValue.substr(0, i.recommendValue.length - 1))
-        })
-      }else {
-        this.hostList=this.currentBestpractice.hostList
-      }
+      this.hostList=this.currentBestpractice.hostList
       console.log(this.hostList)
       /*根据autoRepair 判断是否禁用执行最佳实践 */
       /*显示tips就不显示按钮*/
