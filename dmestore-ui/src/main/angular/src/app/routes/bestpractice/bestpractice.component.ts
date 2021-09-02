@@ -47,6 +47,7 @@ export class BestpracticeComponent implements OnInit {
   currentBestpractice: Bestpractice;
   /* MTU的panel单独处理 */
   currentPanel;
+  dataLoading=false;
   // ================END====================
 
   tipModal = false;
@@ -281,7 +282,7 @@ export class BestpracticeComponent implements OnInit {
   checkBescpractice(bestpractice) {
     this.currentBestpractice = bestpractice;
     this.currentBestpractice.hostList.forEach(i=>{
-      i.recommendValue=this.currentBestpractice.recommendValue
+      i.recommendValue=this.currentBestpractice.recommendValue+''
     })
     const { hostSetting } = bestpractice;
     this.currentPanel = hostSetting === MTU_TAG ? MTU : '';
@@ -294,18 +295,23 @@ export class BestpracticeComponent implements OnInit {
     // console.log(bestpractice)
   }
   async openRepairHistoryList(hostSetting){
+    this.dataLoading=true
     this.repairLogs=await this.commonService.getBestpracticeRepairLogs(hostSetting)
     this.repairLogs.forEach(i=>{
       i.repairTime=this.transFormatOfDate(i.repairTime)
     })
     this.repairLogsShow=true
+    this.dataLoading=false
   }
   async openRevise(hostSetting){
+    this.dataLoading=true
+    this.reviseRecommendValueShow=true
     this.recommand=await this.commonService.getBestpracticeRecommand(hostSetting)
     // console.log('recommand',this.recommand)
     this.recommandValue=(this.recommand as any).recommandValue
     this.recommandId=(this.recommand as any).id
-    this.reviseRecommendValueShow=true
+    this.newRecommandValue=null
+    this.dataLoading=false
   }
   transFormatOfDate(date){
     const year=new Date(date).getFullYear()
@@ -319,13 +325,13 @@ export class BestpracticeComponent implements OnInit {
   }
  // 修改期望值
  async modifyExpectations(){
+    this.dataLoading=true
     let code=await this.commonService.changeBestpracticeRecommand(this.recommandId,{'recommandValue':this.newRecommandValue+'%'})
    if (code==='200'){
    //  修改成功
      console.log('修改成功')
-   }else {
-   //  修改失败
    }
+   this.dataLoading=false
     this.reviseRecommendValueShow=false
    this.practiceRefresh()
   }
@@ -356,7 +362,14 @@ export class BestpracticeComponent implements OnInit {
   hostRefresh() {
     if (this.hostModalShow === true) {
       this.hostIsLoading = true;
-      this.hostList = this.currentBestpractice.hostList;
+      if (this.currentBestpractice.hostSetting==='VMFS Datastore Space Utilization'){
+        this.hostList = this.currentBestpractice.hostList.filter(i => {
+          return parseFloat(i.actualValue.substr(0, i.actualValue.length - 1)) < parseFloat(i.recommendValue.substr(0, i.recommendValue.length - 1))
+        })
+      }else {
+        this.hostList=this.currentBestpractice.hostList
+      }
+      console.log(this.hostList)
       /*根据autoRepair 判断是否禁用执行最佳实践 */
       /*显示tips就不显示按钮*/
       if (this.hostList.length > 0) {
@@ -475,8 +488,8 @@ export class Host {
   hostSetting: string;
   level: string;
   hostName: string;
-  recommendValue: number;
-  actualValue: number;
+  recommendValue: string;
+  actualValue: string;
   actualObjValue: any;
   hostObjectId: string;
   needReboot: string;

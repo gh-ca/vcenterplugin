@@ -344,6 +344,16 @@ export default {
           "hostObjectId":"urn:vmomi:Datastore:datastore-20004:674908e5-ab21-4079-9cb1-596358ee5dd1",
           "hostName":"lxhvmfs083102",
           "autoRepair":"true"
+        },
+        {
+          "hostSetting":"VMFS Datastore Space Utilization",
+          "recommendValue":"3%",
+          "level":"Warning",
+          "actualValue":"20%",
+          "needReboot":"false",
+          "hostObjectId":"urn:vmomi:Datastore:datastore-20004:674908e5-ab21-4079-9cb1-596358ee5dd1",
+          "hostName":"test111",
+          "autoRepair":"true"
         }
       ]
     }

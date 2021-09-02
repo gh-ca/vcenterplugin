@@ -125,6 +125,8 @@ export class ApplybpComponent implements OnInit {
   currentBestpractice: Bestpractice;
   /* MTU的panel单独处理 */
   currentPanel;
+
+  dataLoading=false;
   // ================END====================
 
   tipModal = false;
@@ -396,7 +398,7 @@ export class ApplybpComponent implements OnInit {
   checkBescpractice(bestpractice) {
     this.currentBestpractice = bestpractice;
     this.currentBestpractice.hostList.forEach(i=>{
-      i.recommendValue=this.currentBestpractice.recommendValue
+      i.recommendValue=this.currentBestpractice.recommendValue+''
     })
     const { hostSetting } = bestpractice;
     this.currentPanel = hostSetting === MTU_TAG ? MTU : '';
@@ -410,17 +412,36 @@ export class ApplybpComponent implements OnInit {
   }
 
   async openRepairHistoryList(hostSetting){
+    this.dataLoading=true
     this.repairLogs=await this.commonService.getBestpracticeRepairLogs(hostSetting)
+    this.repairLogs.forEach(i=>{
+      i.repairTime=this.transFormatOfDate(i.repairTime)
+    })
     this.repairLogsShow=true
+    this.dataLoading=false
   }
   async openRevise(hostSetting){
+    this.dataLoading=true
+    this.reviseRecommendValueShow=true
     this.recommand=await this.commonService.getBestpracticeRecommand(hostSetting)
     // console.log('recommand',this.recommand)
     this.recommandValue=(this.recommand as any).recommandValue
     this.recommandId=(this.recommand as any).id
-    this.reviseRecommendValueShow=true
+    this.newRecommandValue=null
+    this.dataLoading=false
+  }
+  transFormatOfDate(date){
+    const year=new Date(date).getFullYear()
+    const month=(new Date(date).getMonth()+1)<10?'0'+(new Date(date).getMonth()+1):new Date(date).getMonth()+1
+    const day=new Date(date).getDate()<10?'0'+new Date(date).getDate():new Date(date).getDate()
+    const hour=new Date(date).getHours()<10?'0'+new Date(date).getHours():new Date(date).getHours()
+    const min=new Date(date).getMinutes()<10?'0'+new Date(date).getMinutes():new Date(date).getMinutes()
+    const second=new Date(date).getSeconds()<10?'0'+new Date(date).getSeconds():new Date(date).getSeconds()
+    const str=year+'-'+month+'-'+day+' '+hour+':'+min+':'+second
+    return str
   }
   async modifyExpectations(){
+    this.dataLoading=true
     let code=await this.commonService.changeBestpracticeRecommand(this.recommandId,{'recommandValue':this.newRecommandValue+'%'})
     if (code==='200'){
       //  修改成功
@@ -428,7 +449,9 @@ export class ApplybpComponent implements OnInit {
     }else {
       //  修改失败
     }
+    this.dataLoading=false
     this.reviseRecommendValueShow=false
+    this.practiceRefresh()
   }
   newExpectations(){
     let value=this.newRecommandValue
@@ -458,7 +481,14 @@ export class ApplybpComponent implements OnInit {
   hostRefresh() {
     if (this.hostModalShow === true) {
       this.hostIsLoading = true;
-      this.hostList = this.currentBestpractice.hostList;
+      if (this.currentBestpractice.hostSetting==='VMFS Datastore Space Utilization'){
+        this.hostList = this.currentBestpractice.hostList.filter(i => {
+          return parseFloat(i.actualValue.substr(0, i.actualValue.length - 1)) < parseFloat(i.recommendValue.substr(0, i.recommendValue.length - 1))
+        })
+      }else {
+        this.hostList=this.currentBestpractice.hostList
+      }
+      console.log(this.hostList)
       /*根据autoRepair 判断是否禁用执行最佳实践 */
       /*显示tips就不显示按钮*/
       if (this.hostList.length > 0) {
@@ -576,8 +606,8 @@ export class Host {
   hostSetting: string;
   level: string;
   hostName: string;
-  recommendValue: number;
-  actualValue: number;
+  recommendValue: string;
+  actualValue: string;
   actualObjValue: any;
   hostObjectId: string;
   needReboot: string;
