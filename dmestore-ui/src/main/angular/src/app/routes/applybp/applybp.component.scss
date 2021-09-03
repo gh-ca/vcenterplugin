@@ -10,7 +10,7 @@
 .loadingDiv span{
   display: inline-block;
   text-align: center;
-  top: 160px;
+  top: 45%;
   vertical-align: middle;
   width: 100%;
   position: absolute;
@@ -18,4 +18,14 @@
   font-size: .8rem;
   color: white;
   font-weight: bolder;
+}
+// 隐藏input标签箭头
+input[type=number] {
+
+  &::-webkit-outer-spin-button,
+  &::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+  }
+
+  -moz-appearance: textfield;
 }

@@ -1,4 +1,4 @@
-<div style="height: 150px;">
+<div style="position: relative">
   <div style="height: 100%;">
     <!-- 头部按钮组 -->
     <div>
@@ -253,11 +253,12 @@
       <button type="button" class="btn btn-danger" (click)="applyTips=false">{{'menu.ok'|translate}}</button>
     </div>
   </clr-modal>
-  <div *ngIf="dataLoading" class="loadingDiv">
+
+
+</div>
+<div *ngIf="dataLoading" class="loadingDiv">
         <span>
           {{'vmfs.dataHandleLoadingTips' | translate}}<img src="./assets/images/loading.gif" width="20px" height="20px"
                                                            style="margin-left: 20px;">
         </span>
-  </div>
-
 </div>
