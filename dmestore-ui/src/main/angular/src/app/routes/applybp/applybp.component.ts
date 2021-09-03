@@ -132,7 +132,7 @@ export class ApplybpComponent implements OnInit {
   tipModal = false;
   ips = '';
   applyType = '1';
-  selectedArr=['手动','自动']
+  selectedArr=[{value:'0',label:'bestPractice.repairHistory.manual'},{value:'1',label: 'bestPractice.repairHistory.automatic'}]
 
   tipModalSuccess = false;
   tipModalFail = false;
@@ -371,6 +371,11 @@ export class ApplybpComponent implements OnInit {
                   'bestPractice.description.numberOfVolInDatastore'
                 );
                 break;
+              case 'VMFS Datastore Space Utilization':
+                item.description = this.translatePipe.transform(
+                  'bestPractice.description.spaceUtilization'
+                );
+                break;
               default:
                 item.description = '--';
             }
@@ -412,14 +417,17 @@ export class ApplybpComponent implements OnInit {
   }
 
   async openRepairHistoryList(hostSetting){
+    this.dataLoading=true
     this.repairLogs=await this.commonService.getBestpracticeRepairLogs(hostSetting)
     this.repairLogs.forEach(i=>{
       i.repairTime=this.transFormatOfDate(i.repairTime)
     })
     this.repairLogsShow=true
     this.cdr.detectChanges()
+    this.dataLoading=false
   }
   async openRevise(hostSetting){
+    this.dataLoading=true
     this.recommand=await this.commonService.getBestpracticeRecommand(hostSetting)
     // console.log('recommand',this.recommand)
     this.recommandValue=(this.recommand as any).recommandValue
@@ -427,6 +435,7 @@ export class ApplybpComponent implements OnInit {
     this.newRecommandValue=null
     this.reviseRecommendValueShow=true;
     this.cdr.detectChanges();
+    this.dataLoading=false
   }
   transFormatOfDate(date){
     const year=new Date(date).getFullYear()
@@ -588,6 +597,7 @@ class Bestpractice {
   levelNum: number;
   levelDesc: string;
   count: number;
+  repairAction:string;
   description: string;
   hostList: Host[];
 }

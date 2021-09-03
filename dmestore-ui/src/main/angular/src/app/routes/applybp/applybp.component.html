@@ -77,9 +77,9 @@
         <!--      修复动作与修复历史-->
         <clr-dg-cell class="bestpracticeRepairAction">
           <clr-select-container>
-            <select  [(ngModel)]="item.repairAction" clrSelect name="version" required
-                     (change)="changeRepairAction(item)">
-              <option *ngFor="let i of selectedArr" value="{{i}}">{{i}}</option>
+            <select class="repairAction-select" [(ngModel)]="item.repairAction" clrSelect name="repairAction"
+                    (change)="changeRepairAction(item)" [disabled]="item.hostSetting!=='VMFS Datastore Space Utilization'">
+              <option *ngFor="let i of selectedArr" value="{{i.value}}" >{{i.label|translate}}</option>
             </select>
           </clr-select-container>
         </clr-dg-cell>
@@ -180,12 +180,7 @@
       {{'bestPractice.repairHistoryBtn'|translate}}
     </div>
     <div class="modal-body">
-      <div *ngIf="dataLoading" class="loadingDiv">
-        <span>
-          {{'vmfs.dataHandleLoadingTips' | translate}}<img src="./assets/images/loading.gif" width="20px" height="20px"
-                                                           style="margin-left: 20px;">
-        </span>
-      </div>
+
       <app-bp-repair-history-table [tableData]="repairLogs"></app-bp-repair-history-table>
     </div>
     <div class="modal-footer">
@@ -199,12 +194,7 @@
       {{'bestPractice.reviseRecommandValue'|translate}}
     </div>
     <div class="modal-body">
-      <div *ngIf="dataLoading" class="loadingDiv">
-        <span>
-          {{'vmfs.dataHandleLoadingTips' | translate}}<img src="./assets/images/loading.gif" width="20px" height="20px"
-                                                           style="margin-left: 20px;">
-        </span>
-      </div>
+
       <clr-input-container>
         <label for="recommandValue">{{'bestPractice.originalExpectedValue'|translate}}</label>
         <input style="width: 60%"  clrInput [value]="recommandValue"  id="recommandValue"  disabled/>
@@ -263,5 +253,11 @@
       <button type="button" class="btn btn-danger" (click)="applyTips=false">{{'menu.ok'|translate}}</button>
     </div>
   </clr-modal>
+  <div *ngIf="dataLoading" class="loadingDiv">
+        <span>
+          {{'vmfs.dataHandleLoadingTips' | translate}}<img src="./assets/images/loading.gif" width="20px" height="20px"
+                                                           style="margin-left: 20px;">
+        </span>
+  </div>
 
 </div>
