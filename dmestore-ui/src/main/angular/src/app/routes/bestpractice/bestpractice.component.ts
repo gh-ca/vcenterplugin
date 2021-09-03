@@ -295,23 +295,23 @@ export class BestpracticeComponent implements OnInit {
     // console.log(bestpractice)
   }
   async openRepairHistoryList(hostSetting){
-    this.dataLoading=true
+    // this.dataLoading=true
     this.repairLogs=await this.commonService.getBestpracticeRepairLogs(hostSetting)
     this.repairLogs.forEach(i=>{
       i.repairTime=this.transFormatOfDate(i.repairTime)
     })
     this.repairLogsShow=true
-    this.dataLoading=false
+    this.cdr.detectChanges()
+    // this.dataLoading=false
   }
   async openRevise(hostSetting){
-    this.dataLoading=true
-    this.reviseRecommendValueShow=true
     this.recommand=await this.commonService.getBestpracticeRecommand(hostSetting)
     // console.log('recommand',this.recommand)
     this.recommandValue=(this.recommand as any).recommandValue
     this.recommandId=(this.recommand as any).id
     this.newRecommandValue=null
-    this.dataLoading=false
+    this.reviseRecommendValueShow=true;
+    this.cdr.detectChanges();
   }
   transFormatOfDate(date){
     const year=new Date(date).getFullYear()
@@ -333,6 +333,7 @@ export class BestpracticeComponent implements OnInit {
      this.reviseRecommendValueShow=false
      this.practiceRefresh()
    }
+   this.cdr.detectChanges()
   }
   newExpectations(){
     let value=this.newRecommandValue
@@ -362,7 +363,7 @@ export class BestpracticeComponent implements OnInit {
     if (this.hostModalShow === true) {
       this.hostIsLoading = true;
       this.hostList=this.currentBestpractice.hostList
-      console.log(this.hostList)
+      // console.log(this.hostList)
       /*根据autoRepair 判断是否禁用执行最佳实践 */
       /*显示tips就不显示按钮*/
       if (this.hostList.length > 0) {

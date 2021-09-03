@@ -466,15 +466,18 @@ zh:'一年' ,range:'LAST_1_YEAR',   interval:  "DAY"
     let data={}
     try {
       if(isMockData){
-        data={
-          "id": "12",
-          "hostsetting": "VMFS Datastore Space Utilization",
-          "recommandValue": "80%",
-          "repairAction": "0",
-          "createTime": "2021-08-02 16:29:20",
-          "updateRecommendTime": "2021-08-02 16:29:20",
-          "updateRepairTime": "2021-08-02 16:29:20"
-        }
+        await new Promise(r=>{
+          data={
+            "id": "12",
+            "hostsetting": "VMFS Datastore Space Utilization",
+            "recommandValue": "80%",
+            "repairAction": "0",
+            "createTime": "2021-08-02 16:29:20",
+            "updateRecommendTime": "2021-08-02 16:29:20",
+            "updateRepairTime": "2021-08-02 16:29:20"
+          }
+          r();
+        })
       }else {
         const res:any=await new Promise((resolve,reject)=>{
           this.http
