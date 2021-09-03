@@ -6,6 +6,7 @@ import { TranslatePipe ,TranslateService} from '@ngx-translate/core';
 import { isMockData, mockData } from 'mock/mock';
 import { getTypeOf, handlerResponseErrorSimple } from 'app/app.helpers';
 import {element} from "protractor";
+import set = Reflect.set;
 
 export const MTU = 'mtu';
 export const MTU_TAG = 'Jumbo Frame (MTU)';
@@ -295,16 +296,17 @@ export class BestpracticeComponent implements OnInit {
     // console.log(bestpractice)
   }
   async openRepairHistoryList(hostSetting){
-    // this.dataLoading=true
+    this.dataLoading=true
     this.repairLogs=await this.commonService.getBestpracticeRepairLogs(hostSetting)
     this.repairLogs.forEach(i=>{
       i.repairTime=this.transFormatOfDate(i.repairTime)
     })
     this.repairLogsShow=true
     this.cdr.detectChanges()
-    // this.dataLoading=false
+    this.dataLoading=false
   }
   async openRevise(hostSetting){
+    this.dataLoading=true
     this.recommand=await this.commonService.getBestpracticeRecommand(hostSetting)
     // console.log('recommand',this.recommand)
     this.recommandValue=(this.recommand as any).recommandValue
@@ -312,6 +314,7 @@ export class BestpracticeComponent implements OnInit {
     this.newRecommandValue=null
     this.reviseRecommendValueShow=true;
     this.cdr.detectChanges();
+    this.dataLoading=false
   }
   transFormatOfDate(date){
     const year=new Date(date).getFullYear()
