@@ -342,8 +342,9 @@ public class DmeStorageServiceImpl implements DmeStorageService {
             compressedCapacity += storagePool.getCompressedCapacity();
         }
         if (isDorado) {
-            storageObj.setFreeEffectiveCapacity(
-                    totalPoolCapicity - blockFileCapacity- protectionCapacity);
+//            storageObj.setFreeEffectiveCapacity(
+//                    totalPoolCapicity - blockFileCapacity- protectionCapacity);
+            storageObj.setUsableCapacity(totalPoolCapicity);
         } else {
             // (圈内)总容量
             storageObj.setTotalEffectiveCapacity(totalPoolCapicity);
@@ -369,7 +370,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         ResponseEntity<String> responseEntity = dmeAccessService.accessByJson(url, HttpMethod.GET, params);
         int code = responseEntity.getStatusCodeValue();
         JsonArray objList = gson.fromJson(responseEntity.getBody(), JsonObject.class).getAsJsonArray(OBJ_LIST);
-        if (code != HttpStatus.OK.value() || null == objList || objList.size() ==0) {
+        if (code != HttpStatus.OK.value() || null == objList || objList.size() == 0) {
             return null;
         }
         String resId = objList.get(0).getAsJsonObject().get(RES_ID).getAsString();
@@ -379,7 +380,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         responseEntity = dmeAccessService.accessByJson(url, HttpMethod.GET, params);
         code = responseEntity.getStatusCodeValue();
         objList = gson.fromJson(responseEntity.getBody(), JsonObject.class).getAsJsonArray(OBJ_LIST);
-        if (code != HttpStatus.OK.value() || null == objList || objList.size() ==0) {
+        if ( HttpStatus.OK.value() != code || null == objList || objList.size() ==0) {
             return null;
         }
         String poolId = objList.get(0).getAsJsonObject().get("target_Instance_Id").getAsString();
@@ -389,7 +390,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         responseEntity = dmeAccessService.accessByJson(url, HttpMethod.GET, params);
         code = responseEntity.getStatusCodeValue();
         objList = gson.fromJson(responseEntity.getBody(), JsonObject.class).getAsJsonArray(OBJ_LIST);
-        if (code != HttpStatus.OK.value() || null == objList || objList.size() ==0) {
+        if (HttpStatus.OK.value() != code || null == objList || objList.size() ==0) {
             return null;
         }
         String storageDeviceId = objList.get(0).getAsJsonObject().get("storageDeviceId").getAsString();
@@ -430,6 +431,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         }
         try {
             ResponseEntity<String> responseEntity = dmeAccessService.accessByJson(url, HttpMethod.GET, params);
+            LOG.info(gson.toJson(responseEntity));
             int code = responseEntity.getStatusCodeValue();
             if (code != HttpStatus.OK.value()) {
                 throw new DmeException(CODE_503, "search oriented storage pool error");
@@ -929,6 +931,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
             storageControllers.setBandwith(storageControllersMap.get(storageControllers.getId()).getBandwith());
             storageControllers.setIops(storageControllersMap.get(storageControllers.getId()).getIops());
             storageControllers.setCpuUsage(storageControllersMap.get(storageControllers.getId()).getCpuUsage());
+            storageControllers.setOps(storageControllersMap.get(storageControllers.getId()).getOps());
         }
         return storageControllers;
     }
@@ -1375,50 +1378,35 @@ public class DmeStorageServiceImpl implements DmeStorageService {
 
     private String getDiskType(JsonObject poolObject) throws DmeException {
         String diskType = "";
-        float tier0Capacity = ToolUtils.jsonToFloat(poolObject.get("tier0Capacity"));
-        if (tier0Capacity > 0) {
-            diskType = "SSD/";
-        }
-
-        float tier1Capacity = ToolUtils.jsonToFloat(poolObject.get("tier1Capacity"));
-        if (tier1Capacity > 0) {
-            diskType += "SAS/";
-        }
-
-        float tier2Capacity = ToolUtils.jsonToFloat(poolObject.get("tier2Capacity"));
-        if (tier2Capacity > 0) {
-            diskType += "NL-SAS/";
-        }
-
-        if (StringUtil.isNotBlank(diskType)) {
-            diskType = diskType.substring(0, diskType.lastIndexOf("/"));
-        }
-
-        return diskType;
-    }
-
-    private String getDiskType(String storageDeviceId, String diskPoolId) throws DmeException {
-        String replace = storageDeviceId.replace(SPLIT_CHAR, "");
-        String result = "";
-        String className = "SYS_StorageDisk";
-        String url = String.format(DmeConstants.DME_RESOURCE_INSTANCE_LIST, className) + CONDITION;
-        String params = ToolUtils.getRequsetParams(STORAGE_DEVICE_ID, replace);
-        ResponseEntity<String> responseEntity = dmeAccessService.accessByJson(url, HttpMethod.GET, params);
-        int code = responseEntity.getStatusCodeValue();
-        if (code == HttpStatus.OK.value()) {
-            String object = responseEntity.getBody();
-            JsonObject jsonObject = new JsonParser().parse(object).getAsJsonObject();
-            JsonArray jsonArray = jsonObject.get(OBJ_LIST).getAsJsonArray();
-            for (JsonElement jsonElement : jsonArray) {
-                JsonObject element = jsonElement.getAsJsonObject();
-                String diskId = ToolUtils.jsonToStr(element.get("diskId"));
-                if (diskPoolId.equals(diskId)) {
-                    result = ToolUtils.jsonToStr(element.get("physicalType"));
-                    break;
-                }
+        if (!StringUtils.isEmpty(ToolUtils.jsonToStr(poolObject.get("tier0DiskType"))) && !"0".equalsIgnoreCase(ToolUtils.jsonToStr(poolObject.get("tier0DiskType")))){
+            if (!StringUtils.isEmpty(DmeConstants.TIER_DISK_TYPE.get(ToolUtils.jsonToStr(poolObject.get("tier0DiskType"))))) {
+                diskType = DmeConstants.TIER_DISK_TYPE.get(ToolUtils.jsonToStr(poolObject.get("tier0DiskType")));
             }
         }
-        return result;
+        if (!StringUtils.isEmpty(ToolUtils.jsonToStr(poolObject.get("tier1DiskType"))) && !"0".equalsIgnoreCase(ToolUtils.jsonToStr(poolObject.get("tier1DiskType")))){
+            if (!StringUtils.isEmpty(DmeConstants.TIER_DISK_TYPE.get(ToolUtils.jsonToStr(poolObject.get("tier1DiskType"))))) {
+                diskType = diskType + "/" + DmeConstants.TIER_DISK_TYPE.get(ToolUtils.jsonToStr(poolObject.get("tier1DiskType")));
+            }
+        }
+        if (!StringUtils.isEmpty(ToolUtils.jsonToStr(poolObject.get("tier2DiskType"))) && !"0".equalsIgnoreCase(ToolUtils.jsonToStr(poolObject.get("tier2DiskType")))){
+            if (!StringUtils.isEmpty(DmeConstants.TIER_DISK_TYPE.get(ToolUtils.jsonToStr(poolObject.get("tier2DiskType"))))) {
+                diskType = diskType + "/" + DmeConstants.TIER_DISK_TYPE.get(ToolUtils.jsonToStr(poolObject.get("tier2DiskType")));
+            }
+        }
+        if (!StringUtils.isEmpty(ToolUtils.jsonToStr(poolObject.get("tier3DiskType"))) && !"0".equalsIgnoreCase(ToolUtils.jsonToStr(poolObject.get("tier3DiskType")))){
+            if (!StringUtils.isEmpty(DmeConstants.TIER_DISK_TYPE.get(ToolUtils.jsonToStr(poolObject.get("tier3DiskType"))))) {
+                diskType = diskType + "/" + DmeConstants.TIER_DISK_TYPE.get(ToolUtils.jsonToStr(poolObject.get("tier3DiskType")));
+            }
+        }
+        if (!StringUtils.isEmpty(ToolUtils.jsonToStr(poolObject.get("tier4DiskType"))) && !"0".equalsIgnoreCase(ToolUtils.jsonToStr(poolObject.get("tier4DiskType")))){
+            if (!StringUtils.isEmpty(DmeConstants.TIER_DISK_TYPE.get(ToolUtils.jsonToStr(poolObject.get("tier4DiskType"))))) {
+                diskType = diskType + "/" + DmeConstants.TIER_DISK_TYPE.get(ToolUtils.jsonToStr(poolObject.get("tier4DiskType")));
+            }
+        }
+        if (diskType.startsWith("/")){
+            diskType = diskType.substring(1);
+        }
+        return diskType;
     }
 
     private void volumeAttachments(JsonArray array, Volume volume) {
@@ -1555,6 +1543,10 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                             if (statisticObject.get(DmeIndicatorConstants.COUNTER_ID_CONTROLLER_CPUUSAGE) != null) {
                                 sp.setCpuUsage(ToolUtils.jsonToFloat(
                                     statisticObject.get(DmeIndicatorConstants.COUNTER_ID_CONTROLLER_CPUUSAGE)));
+                            }
+                            if (statisticObject.get(DmeIndicatorConstants.COUNTER_ID_CONTROLLER_OPS) != null) {
+                                sp.setOps(ToolUtils.jsonToFloat(
+                                        statisticObject.get(DmeIndicatorConstants.COUNTER_ID_CONTROLLER_OPS)));
                             }
                             relists.add(sp);
                         }

@@ -9,7 +9,7 @@
    type: keep "html" for this plugin to be deployed in the vSphere HTML client.
    name: short name displayed in the Administration < Client plugins view
 -->
-<pluginPackage id="com.huawei.dmestore" version="1.0.0" type="html" name="Huawei DME Plugin"
+<pluginPackage id="com.huawei.dmestore" version="1.1.0" type="html" name="Huawei DME Plugin"
       description="Huawei DME Plugin" vendor="Add vendor">
 
    <dependencies>

@@ -49,6 +49,12 @@ public class StorageDetail {
      * 已用容量 （单位:MB） .
      */
     private Double usedCapacity;
+
+    /**
+     * 可用容量 （单位:MB） .
+     */
+    private Double usableCapacity;
+
     /**
      * 裸容量（单位:MB）.
      */
@@ -171,6 +177,14 @@ public class StorageDetail {
     }
     public void setQosFlag(final boolean param) {
         this.qosFlag = param;
+    }
+
+    public Double getUsableCapacity() {
+        return usableCapacity;
+    }
+
+    public void setUsableCapacity(Double usableCapacity) {
+        this.usableCapacity = usableCapacity;
     }
 
     /**
