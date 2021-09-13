@@ -431,7 +431,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         }
         try {
             ResponseEntity<String> responseEntity = dmeAccessService.accessByJson(url, HttpMethod.GET, params);
-            LOG.info(gson.toJson(responseEntity));
+            LOG.debug(gson.toJson(responseEntity));
             int code = responseEntity.getStatusCodeValue();
             if (code != HttpStatus.OK.value()) {
                 throw new DmeException(CODE_503, "search oriented storage pool error");
