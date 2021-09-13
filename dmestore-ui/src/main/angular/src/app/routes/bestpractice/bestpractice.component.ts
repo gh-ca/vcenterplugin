@@ -2,9 +2,11 @@ import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef } from '@
 import { HttpClient } from '@angular/common/http';
 import { CommonService } from '../common.service';
 import { GlobalsService } from '../../shared/globals.service';
-import { TranslatePipe } from '@ngx-translate/core';
+import { TranslatePipe ,TranslateService} from '@ngx-translate/core';
 import { isMockData, mockData } from 'mock/mock';
 import { getTypeOf, handlerResponseErrorSimple } from 'app/app.helpers';
+import {element} from "protractor";
+import set = Reflect.set;
 
 export const MTU = 'mtu';
 export const MTU_TAG = 'Jumbo Frame (MTU)';
@@ -30,6 +32,14 @@ export class BestpracticeComponent implements OnInit {
 
   // ================主机列表=============
   hostModalShow = false;
+  repairLogsShow=false;
+  repairLogs=[];//修复日志
+  reviseRecommendValueShow=false
+  recommand={};
+  recommandId:string='';//id
+  recommandValue:string=''; //原期望值
+  newRecommandValue:number //新期望值
+  repairAction:string=''; //修复方式
   isShowBPBtnTips: boolean;
   hostSelected = []; // 主机选中列表
   hostIsLoading = false; // table数据loading
@@ -38,6 +48,7 @@ export class BestpracticeComponent implements OnInit {
   currentBestpractice: Bestpractice;
   /* MTU的panel单独处理 */
   currentPanel;
+  dataLoading=false;
   // ================END====================
 
   tipModal = false;
@@ -49,6 +60,7 @@ export class BestpracticeComponent implements OnInit {
 
   applyLoading = false;
   checkLoading = false;
+  selectedArr=[{value:'0',label:'bestPractice.repairHistory.manual'},{value:'1',label: 'bestPractice.repairHistory.automatic'}]
 
   applyTips = false; // 实施最佳实践提示（违规数为0时提示）
 
@@ -57,7 +69,8 @@ export class BestpracticeComponent implements OnInit {
     public gs: GlobalsService,
     private http: HttpClient,
     private commonService: CommonService,
-    private translatePipe: TranslatePipe
+    private translatePipe: TranslatePipe,
+    private translateService:TranslateService
   ) {}
 
   ngOnInit(): void {
@@ -235,6 +248,7 @@ export class BestpracticeComponent implements OnInit {
               'Jumbo Frame (MTU)': 'bestPractice.description.jumboFrame',
               'VMFS-6 Auto-Space Reclamation': 'bestPractice.description.reclamation',
               'Number of volumes in Datastore': 'bestPractice.description.numberOfVolInDatastore',
+              'VMFS Datastore Space Utilization':'bestPractice.description.spaceUtilization'
             };
             const mapDescription = DESCRIPTION_MAP[String(item.hostSetting).trim()];
             let description = this.translatePipe.transform(mapDescription) || '--';
@@ -245,6 +259,9 @@ export class BestpracticeComponent implements OnInit {
               ...hostInfo,
               actualObjValue: getTypeOf(hostInfo.actualValue),
             }));
+            //修复动作
+              _item.repairAction=item.repairAction
+            // console.log(item.repairAction,_item.repairAction)
             return _item;
           });
         }
@@ -265,19 +282,91 @@ export class BestpracticeComponent implements OnInit {
 
   checkBescpractice(bestpractice) {
     this.currentBestpractice = bestpractice;
+    this.currentBestpractice.hostList.forEach(i=>{
+      i.recommendValue=this.currentBestpractice.recommendValue+''
+    })
     const { hostSetting } = bestpractice;
     this.currentPanel = hostSetting === MTU_TAG ? MTU : '';
+    this.cdr.detectChanges()
   }
   openHostList(bestpractice: Bestpractice) {
     this.hostModalShow = true;
     this.checkBescpractice(bestpractice);
     this.hostRefresh();
+    // console.log(bestpractice)
   }
-
+  async openRepairHistoryList(hostSetting){
+    this.dataLoading=true
+    this.repairLogs=await this.commonService.getBestpracticeRepairLogs(hostSetting)
+    this.repairLogs.forEach(i=>{
+      i.repairTime=this.transFormatOfDate(i.repairTime)
+    })
+    this.repairLogsShow=true
+    this.cdr.detectChanges()
+    this.dataLoading=false
+  }
+  async openRevise(hostSetting){
+    this.dataLoading=true
+    this.recommand=await this.commonService.getBestpracticeRecommand(hostSetting)
+    // console.log('recommand',this.recommand)
+    this.recommandValue=(this.recommand as any).recommandValue
+    this.recommandId=(this.recommand as any).id
+    this.newRecommandValue=null
+    this.reviseRecommendValueShow=true;
+    this.cdr.detectChanges();
+    this.dataLoading=false
+  }
+  transFormatOfDate(date){
+    const year=new Date(date).getFullYear()
+    const month=(new Date(date).getMonth()+1)<10?'0'+(new Date(date).getMonth()+1):new Date(date).getMonth()+1
+    const day=new Date(date).getDate()<10?'0'+new Date(date).getDate():new Date(date).getDate()
+    const hour=new Date(date).getHours()<10?'0'+new Date(date).getHours():new Date(date).getHours()
+    const min=new Date(date).getMinutes()<10?'0'+new Date(date).getMinutes():new Date(date).getMinutes()
+    const second=new Date(date).getSeconds()<10?'0'+new Date(date).getSeconds():new Date(date).getSeconds()
+    const str=year+'-'+month+'-'+day+' '+hour+':'+min+':'+second
+    return str
+  }
+ // 修改期望值
+ async modifyExpectations(){
+    this.dataLoading=true
+    let code=await this.commonService.changeBestpracticeRecommand(this.recommandId,{'recommandValue':this.newRecommandValue+'%'})
+    let resData:any= await this.commonService.checkVmfsBestpractice([])
+    if (code==='200'&&resData.code==='200'){
+     this.dataLoading=false
+     this.reviseRecommendValueShow=false
+     this.practiceRefresh()
+   }
+   this.cdr.detectChanges()
+  }
+  newExpectations(){
+    let value=this.newRecommandValue
+    if (value<75||value>90){
+      this.newRecommandValue=null
+    }
+  }
+  changeNewRecommandValueBtn(){
+    if ((this.newRecommandValue<90||this.newRecommandValue===90)&&(this.newRecommandValue>75||this.newRecommandValue===75)){
+      return false
+    }else {
+      return true
+    }
+  }
+  async changeRepairAction(item){
+    console.log(item)
+    let temp:any=await this.commonService.getBestpracticeRecommand(item.hostSetting)
+    let id=temp.id
+    let code=await this.commonService.changeBestpracticeRecommand(id,{'repairAction':item.repairAction})
+    if (code==='200'){
+    //  修改成功
+    }else {
+    //  修改失败
+    }
+  }
   hostRefresh() {
     if (this.hostModalShow === true) {
       this.hostIsLoading = true;
-      this.hostList = this.currentBestpractice.hostList;
+      this.hostList=this.currentBestpractice.hostList
+      // console.log(this.hostList)
       /*根据autoRepair 判断是否禁用执行最佳实践 */
       /*显示tips就不显示按钮*/
       if (this.hostList.length > 0) {
@@ -387,6 +476,7 @@ class Bestpractice {
   levelNum: number;
   levelDesc: string;
   count: number;
+  repairAction:string;
   description: string;
   hostList: Host[];
 }
@@ -395,8 +485,8 @@ export class Host {
   hostSetting: string;
   level: string;
   hostName: string;
-  recommendValue: number;
-  actualValue: number;
+  recommendValue: string;
+  actualValue: string;
   actualObjValue: any;
   hostObjectId: string;
   needReboot: string;
