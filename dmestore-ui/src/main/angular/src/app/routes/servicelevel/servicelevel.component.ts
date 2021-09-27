@@ -428,35 +428,48 @@ export class ServicelevelComponent implements OnInit, AfterViewInit, OnDestroy {
   // 比较函数
   compare(prop: any, sort: string) {
     return (obj1: any, obj2: any) => {
-      let val1 = this.recursivePropertyies(prop, obj1);
-      let val2 = this.recursivePropertyies(prop, obj2);
-      if (val1 === undefined) {
-        val1 = '';
-      }
-      if (val2 === undefined) {
-        val2 = '';
-      }
-      if (parseFloat(val1).toString() != 'NaN') {
-        val1 = parseFloat(val1);
-      }
-      if (parseFloat(val2).toString() != 'NaN') {
-        val2 = parseFloat(val2);
-      }
-      if (val1 < val2) {
-        if (sort === 'asc') {
-          return -1;
-        } else {
-          return 1;
-        }
-      } else if (val1 > val2) {
-        if (sort === 'asc') {
-          return 1;
-        } else {
-          return -1;
-        }
-      } else {
-        return 0;
-      }
+     if(prop==='name'){
+       let val1=this.recursivePropertyies(prop, obj1)
+       let val2=this.recursivePropertyies(prop, obj2)
+         if (sort==='asc'){
+           let res=val1.localeCompare(val2)*-1
+           return res
+         }else {
+           let res=val1.localeCompare(val2)
+           return res
+         }
+
+     }else {
+       let val1 = this.recursivePropertyies(prop, obj1);
+       let val2 = this.recursivePropertyies(prop, obj2);
+       if (val1 === undefined) {
+         val1 = '';
+       }
+       if (val2 === undefined) {
+         val2 = '';
+       }
+       if (parseFloat(val1).toString() != 'NaN') {
+         val1 = parseFloat(val1);
+       }
+       if (parseFloat(val2).toString() != 'NaN') {
+         val2 = parseFloat(val2);
+       }
+       if (val1 < val2) {
+         if (sort === 'asc') {
+           return -1;
+         } else {
+           return 1;
+         }
+       } else if (val1 > val2) {
+         if (sort === 'asc') {
+           return 1;
+         } else {
+           return -1;
+         }
+       } else {
+         return 0;
+       }
+     }
     };
   }
 
