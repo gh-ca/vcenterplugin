@@ -313,7 +313,6 @@ export class RdmComponent implements OnInit {
         console.error('ERROR', err);
       }
     );
-    this.dsDeviceLoading = false;
   }
 
   loadStoragePool(storageId: string) {
