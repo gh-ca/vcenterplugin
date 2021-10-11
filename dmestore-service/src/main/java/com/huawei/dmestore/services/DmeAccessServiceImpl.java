@@ -854,7 +854,7 @@ public class DmeAccessServiceImpl implements DmeAccessService {
         if (taskDetail.get(DmeConstants.TASK_DETAIL_STATUS_FILE).getAsInt() != DmeConstants.TASK_SUCCESS) {
             // 错误信息构建
             String errMessage = DmeConstants.LANGUAGE_CN.equals(language)?
-                task.get(DmeConstants.TASK_DETAIL_CN).getAsString():task.get(DmeConstants.TASK_DETAIL_EN).getAsString();
+                taskDetail.get(DmeConstants.TASK_DETAIL_CN).getAsString():taskDetail.get(DmeConstants.TASK_DETAIL_EN).getAsString();
             LOG.error("host mapping failed!task status={},errMsg:{}", task.get(STATUS).getAsInt(), errMessage);
             throw new DmeException(errMessage);
         }
