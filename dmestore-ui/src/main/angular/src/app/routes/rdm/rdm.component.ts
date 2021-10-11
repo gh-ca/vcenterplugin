@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { CommonService } from '../common.service';
 import { GlobalsService } from '../../shared/globals.service';
 import { ClrWizard, ClrWizardPage } from '@clr/angular';
-import { TranslatePipe } from '@ngx-translate/core';
+import { TranslatePipe ,TranslateService} from '@ngx-translate/core';
 import { getQosCheckTipsTagInfo } from 'app/app.helpers';
 import { isMockData, mockData } from 'mock/mock';
 import { handlerResponseErrorSimple } from './../../app.helpers';
@@ -58,6 +58,9 @@ export class RdmComponent implements OnInit {
   //是否查询到DME存储设置
   dmeStrategy=true;
 
+  createRdmErrorDesc='';
+  language='';
+
   // 归属控制器 true 支持 false 不支持
   ownershipController = false;
   capacityInitShow = false; // 容量初始分配策略 true 支持 false 不支持
@@ -90,7 +93,8 @@ export class RdmComponent implements OnInit {
     private cdr: ChangeDetectorRef,
     private http: HttpClient,
     private commonService: CommonService,
-    private gs: GlobalsService
+    private gs: GlobalsService,
+    private translateService:TranslateService
   ) {}
 
   ngOnInit(): void {
@@ -199,6 +203,7 @@ export class RdmComponent implements OnInit {
     ) {
       return;
     }
+    this.language=this.translateService.currentLang==='en-US'?'EN':'CN'
     if (!this.ownershipController) {
       this.configModel.ownerController = '0';
     }
@@ -231,6 +236,7 @@ export class RdmComponent implements OnInit {
           customizeVolumes: submitForm,
         },
         compatibilityMode: this.compatibilityMode,
+        language:this.language
       };
     }
     if (submitForm.storageType == '1') {
@@ -244,6 +250,7 @@ export class RdmComponent implements OnInit {
           volumes: submitForm.volumeSpecs,
         },
         compatibilityMode: this.compatibilityMode,
+        language:this.language
       };
     }
     this.submitLoading = true;
@@ -262,6 +269,7 @@ export class RdmComponent implements OnInit {
             this.rdmSuccess = true;
           } else {
             this.rdmError = true;
+            this.createRdmErrorDesc=result.description
           }
         },
         err => {

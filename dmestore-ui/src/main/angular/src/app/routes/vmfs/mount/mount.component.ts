@@ -21,6 +21,7 @@ import UI_TREE_CHILDREN_BY_OBJECT_IDS from 'mock/UI_TREE_CHILDREN_BY_OBJECT_IDS'
 import { vmfsClusterTreeData } from './../../../../mock/vmfsClusterTree';
 import { CustomValidatorFaild } from 'app/app.helpers';
 import { getLodash } from '@shared/lib';
+import {ClrDatagridComparatorInterface} from "@clr/angular";
 const _ = getLodash();
 
 @Component({
@@ -44,10 +45,13 @@ export class MountComponent implements OnInit {
     this.chooseDevice = [];
     this.deviceList = []; // 主机AND集群
   }
+  public capacityComparator = new CapacityComparator();
+  public freeSpaceComparator=new FreeSpaceComparator()
   deviceList: HostOrCluster[]; // 主机AND集群
   deviceList_list: HostOrCluster[]; // 单主机
   deviceForm;
 
+  checkNullData=false
   //当前挂载类型：主机或集群
   selectMountType;
 
@@ -302,6 +306,9 @@ export class MountComponent implements OnInit {
         let isShowHostList = false;
         console.log('isShowHostList', isShowHostList);
         this.deviceList = await this.commonService.remoteGetVmfsDeviceListById_unmount(this.objectId);
+        if(this.deviceList.length===0){
+          this.checkNullData=true
+        }
 
         const loadUnmountHost = () => {
           const setDeviceList = (result: any) => {
@@ -1044,5 +1051,15 @@ export class MountComponent implements OnInit {
 
   sortFunc(obj: any) {
     return !obj;
+  }
+}
+class CapacityComparator implements ClrDatagridComparatorInterface<DataStore>{
+  compare(a: DataStore, b: DataStore) {
+    return a.capacity - b.capacity;
+  }
+}
+class FreeSpaceComparator implements ClrDatagridComparatorInterface<DataStore>{
+  compare(a: DataStore, b: DataStore) {
+    return a.freeSpace - b.freeSpace;
   }
 }

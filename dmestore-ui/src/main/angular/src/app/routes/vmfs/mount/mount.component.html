@@ -37,13 +37,13 @@
           <clr-dg-column [clrDgField]="'name'">{{'vmfs.name' | translate}}</clr-dg-column>
           <clr-dg-column>{{'vmfs.type' | translate}}</clr-dg-column>
           <clr-dg-column #capacity class="hideFilter" [clrDgField]="'capacity'" style="position: relative"
-            (clrDgSortedChange)="sortFunc($event);">
+            (clrDgSortedChange)="sortFunc($event);" [clrDgSortBy]="capacityComparator">
             {{'vmfs.capacity' | translate}}
             <clr-icon *ngIf="sortFunc(capacity.sorted);" shape="arrow down" class="is-solid"
               style="position: absolute;right: 1.1rem;"></clr-icon>
           </clr-dg-column>
           <clr-dg-column #freeSpace class="hideFilter" [clrDgField]="'freeSpace'" style="position: relative"
-            (clrDgSortedChange)="sortFunc($event);">
+            (clrDgSortedChange)="sortFunc($event);" [clrDgSortBy]="freeSpaceComparator">
             {{'vmfs.freeSpace' | translate}}
             <clr-icon *ngIf="sortFunc(freeSpace.sorted);" shape="arrow down" class="is-solid"
               style="position: absolute;right: 1.1rem;"></clr-icon>
@@ -279,6 +279,7 @@
             [resType]="'unMount'"
             [mountType]="'host'"
             [tree]="deviceList"
+            [checkNullData]="checkNullData"
             (valueChange)="handleChooseDeviceChange('chooseDevice',$event)">
           </app-gh-tree-checkbox>
 <!--          <app-error-tips-->

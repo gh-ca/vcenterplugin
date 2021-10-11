@@ -54,11 +54,15 @@
 
 
   </clr-tree>
-  <div *ngIf="checkTreeLength()"  class="loadingDiv" style="position: absolute;z-index: 1;background-color: #b8b8b8;width: 100%;height: 100%;top:0;left:0;" >
+  <div *ngIf="treeLoading"  class="loadingDiv" style="position: absolute;z-index: 1;background-color: #b8b8b8;width: 100%;height: 100%;top:0;left:0;" >
           <span>
             {{'vmfs.dataHandleLoadingTips' | translate}}<img src="./assets/images/loading.gif" width="20px"
                                                              height="20px" style="margin-left: 20px;">
           </span>
+  </div>
+  <div *ngIf="nullData" class="noData">
+      <div class="noDataSvg"></div>
+      <span>{{'tips.noData'|translate}}</span>
   </div>
 </div>
 
