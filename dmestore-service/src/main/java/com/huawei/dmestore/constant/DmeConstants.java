@@ -587,6 +587,15 @@ public class DmeConstants {
             put("16", "NVMe_SSD_SED");
         }
     };
+
+    public static final String LANGUAGE_CN = "CN";
+
+    public static final String LANGUAGE_EN = "EN";
+
+    public static final String TASK_DETAIL_CN = "detail_cn";
+
+    public static final String TASK_DETAIL_EN = "detail_en";
+
     private DmeConstants() {
     }
 }
