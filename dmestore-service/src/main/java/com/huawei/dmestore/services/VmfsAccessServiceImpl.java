@@ -1463,7 +1463,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                     hostGroupId = checkResult.getHostGroupId();
                 } else {
                     //需要创建主机组
-                    List<String> objIds = createHostGroupIdNew(Arrays.asList(ToolUtils.getStr(params.get(STORAGE_ID))), ToolUtils.getStr(params.get(VOLUME_ID)));
+                    List<String> objIds = createHostGroupIdNew(Arrays.asList(ToolUtils.getStr(params.get(CLUSTER_ID))), ToolUtils.getStr(params.get(VOLUME_ID)));
                     if (!CollectionUtils.isEmpty(objIds)) {
                         hostGroupId = objIds.get(0);
                     }
@@ -1746,6 +1746,9 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
 
             // 将卷挂载到集群DME
             dmeHostgroupId = objhostid;
+            if (StringUtils.isEmpty(dmeHostgroupId)) {
+                throw new DmeException("DME mount vmfs volume error(host group id is null)!");
+            }
             ArrayList<String> needMapVolumeIds = new ArrayList<>();
             if (params != null && params.get(DmeConstants.VOLUMEIDS) != null) {
                 List<String> volumeIds = (List<String>) params.get(VOLUMEIDS);
