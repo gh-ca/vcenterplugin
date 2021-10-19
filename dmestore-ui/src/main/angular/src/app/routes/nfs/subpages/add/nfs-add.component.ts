@@ -392,18 +392,26 @@ export class NfsAddComponent extends NfsComponentCommon implements OnInit {
     this.gs.getClientSdk().modal.close();
   }
   checkSize(){
+    this.overSizeGB=false
+    this.overSizeTB=false
     if (this.unit==='GB'){
       if (this.addForm.size>16777216){
         this.overSizeGB=true
         this.addForm.size=null
-      }else {
+      }else if (!this.addForm.size){
+        this.overSizeGB=true
+      }
+      else {
         this.overSizeGB=false
       }
     }else if (this.unit==='TB'){
       if (this.addForm.size>16384){
         this.overSizeTB=true
         this.addForm.size=null
-      }else {
+      }else if (!this.addForm.size){
+        this.overSizeTB=true
+      }
+      else {
         this.overSizeTB=false
       }
     }
