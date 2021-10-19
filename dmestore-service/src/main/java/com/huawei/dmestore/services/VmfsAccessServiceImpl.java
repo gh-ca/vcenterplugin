@@ -1470,7 +1470,9 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 }
 
                 objId = hostGroupId;
-                hostIds = estimateConnectivityOfHostOrHostgroup(ToolUtils.getStr(params.get(STORAGE_ID)), null, objId);
+                if (!"A".equals(objId)) {
+                    hostIds = estimateConnectivityOfHostOrHostgroup(ToolUtils.getStr(params.get(STORAGE_ID)), null, objId);
+                }
             }
 
             // 连通性正常的主机或者主机组id
@@ -1749,23 +1751,25 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             if (StringUtils.isEmpty(dmeHostgroupId)) {
                 throw new DmeException("DME mount vmfs volume error(host group id is null)!");
             }
-            ArrayList<String> needMapVolumeIds = new ArrayList<>();
-            if (params != null && params.get(DmeConstants.VOLUMEIDS) != null) {
-                List<String> volumeIds = (List<String>) params.get(VOLUMEIDS);
-                for (String volumeid : volumeIds) {
-                    List<String> mappedHostGroupId = getMappedHostGroupIds(volumeid);
-                    if (CollectionUtils.isEmpty(mappedHostGroupId) || !mappedHostGroupId.contains(dmeHostgroupId)) {
-                        needMapVolumeIds.add(volumeid);
+            if(!"A".equals(dmeHostgroupId)) {
+                ArrayList<String> needMapVolumeIds = new ArrayList<>();
+                if (params != null && params.get(DmeConstants.VOLUMEIDS) != null) {
+                    List<String> volumeIds = (List<String>) params.get(VOLUMEIDS);
+                    for (String volumeid : volumeIds) {
+                        List<String> mappedHostGroupId = getMappedHostGroupIds(volumeid);
+                        if (CollectionUtils.isEmpty(mappedHostGroupId) || !mappedHostGroupId.contains(dmeHostgroupId)) {
+                            needMapVolumeIds.add(volumeid);
+                        }
                     }
+                    params.put(VOLUMEIDS, needMapVolumeIds);
                 }
-                params.put(VOLUMEIDS, needMapVolumeIds);
-            }
-            if (!CollectionUtils.isEmpty(needMapVolumeIds)) {
-                LOG.info("mount Vmfs to host group begin!");
-                taskId = mountVmfsToHostGroup(params, dmeHostgroupId);
-                LOG.info("mount Vmfs to host group end!taskId={}", taskId);
-                if (StringUtils.isEmpty(taskId)) {
-                    throw new DmeException("DME mount vmfs volume error(task is null)!");
+                if (!CollectionUtils.isEmpty(needMapVolumeIds)) {
+                    LOG.info("mount Vmfs to host group begin!");
+                    taskId = mountVmfsToHostGroup(params, dmeHostgroupId);
+                    LOG.info("mount Vmfs to host group end!taskId={}", taskId);
+                    if (StringUtils.isEmpty(taskId)) {
+                        throw new DmeException("DME mount vmfs volume error(task is null)!");
+                    }
                 }
             }
         }
@@ -4952,7 +4956,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         String radomStr = new SimpleDateFormat("yyMMddHHmmssSSS").format(new Date(System.currentTimeMillis())).toString();
         // 取得集群下的所有主机
         for (String clusterObjectId : clusterIdList) {
-            String objId = "";
+            String objId = "A";
             String vmwarehosts = vcsdkUtils.getHostsOnCluster(clusterObjectId);
             if (StringUtils.isEmpty(vmwarehosts)) {
                 throw new DmeException("the cluster has no host");
