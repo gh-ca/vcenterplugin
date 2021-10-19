@@ -76,6 +76,8 @@
     "storagePool": "Storage Pool",
     "datastoreName": "Datastore Name",
     "size": "Size",
+    "overSizeGB": "The capacity cannot exceed 16777216GB",
+    "overSizeTB": "Capacity cannot exceed 16384TB",
     "nfsProtocol": "NFS Protocol",
     "securityType": "Security Type",
     "authSys": "Do not use Kerberos authentication.",

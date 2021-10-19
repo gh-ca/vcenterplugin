@@ -75,6 +75,8 @@
     "storagePool": "存储池",
     "datastoreName": "数据存储名称",
     "size": "容量",
+    "overSizeGB": "容量不能超过16777216GB",
+    "overSizeTB": "容量不能超过16384TB",
     "nfsProtocol": "NFS协议",
     "securityType": "安全级别",
     "authSys": "请勿使用Kerberos身份认证",
