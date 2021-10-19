@@ -263,7 +263,7 @@ export class VmfsListComponent extends VmfsCommon implements OnInit ,AfterViewIn
   status;
   description;
   operatingType;
-
+  checkNullData=false
 
 
   setFormValueWhenHiden(isShowInput) {
@@ -1618,6 +1618,9 @@ wwn: "67c1cf110058934511ba6e5a00000344"
       this.deviceList = await this.commonService.remoteGetVmfsDeviceListById_unmount(
         this.rowSelected[0].objectid
       );
+      if(this.deviceList.length===0){
+        this.checkNullData=true
+      }
 
       const loadUnountedHost = () => {
         const handlerUnmountHostSuccess = (result: any) => {
