@@ -5,71 +5,77 @@ import { List } from './nfs.service';
 import { StorageList, StorageService } from '../storage/storage.service';
 import { isMockData, mockData } from './../../../mock/mock';
 import { getList as genDemStorageList } from 'mock/URLS_STORAGE/DMESTORAGE_STORAGES';
+import {VmfsInfo, VmfsListService} from "../vmfs/list/list.service";
 
 @Component({
   selector: 'device-filter',
   template: `
     <div class="over_flow" style="max-height: 500px;overflow: auto">
-      <clr-radio-container style="margin-top: 0px;">
+      <clr-radio-container style="margin-top: 0px; ">
         <clr-radio-wrapper>
           <input
             type="radio"
             clrRadio
-            name="options"
+            name="device"
             (change)="changeFunc($event)"
-            [(ngModel)]="options"
+            [(ngModel)]="device"
             value=""
           />
-          <label>{{ 'enum.status.all' | translate }}</label>
+          <label>{{ 'vmfs.filter.all' | translate }}</label>
         </clr-radio-wrapper>
-        <clr-radio-wrapper *ngFor="let item of storageList" title="{{ item.name }}">
+        <clr-radio-wrapper *ngFor="let item of storageList">
           <input
             type="radio"
             clrRadio
-            name="options"
+            name="device"
             (change)="changeFunc($event)"
-            [(ngModel)]="options"
-            value="{{ item.name }}"
+            [(ngModel)]="device"
+            value="{{ item.id }}"
           />
           <label [title]="item.name">{{ item.name }}</label>
         </clr-radio-wrapper>
       </clr-radio-container>
     </div>
   `,
+  providers: [VmfsListService, StorageService],
 })
-export class DeviceFilter implements ClrDatagridFilterInterface<List>, OnInit {
+export class DeviceFilter implements ClrDatagridFilterInterface<VmfsInfo>, OnInit {
   constructor(private storageService: StorageService, private cdr: ChangeDetectorRef) {}
 
   ngOnInit(): void {
-    const deviceFilterOptionsHandler = (s: any) => {
+    const successHandler = (s: any) => {
       if (s.code === '200') {
         this.storageList = s.data;
-        this.cdr.detectChanges();
+        this.storageList.forEach(item => {
+          item.name = item.name + '(' + item.ip + ')';
+          item.id = item.id.replace(/-/g, '').toLowerCase();
+        });
       }
+      this.cdr.detectChanges();
     };
     /* TODO: */
     if (isMockData) {
-      deviceFilterOptionsHandler(genDemStorageList(100));
+      successHandler(genDemStorageList(100));
     } else {
-      this.storageService.getData(false).subscribe(deviceFilterOptionsHandler);
+      this.storageService.getData(false).subscribe(successHandler);
     }
   }
+
   changes = new Subject<any>();
-  options;
-  normal = false;
-  abnormal = false;
+  device;
   storageList: StorageList[] = [];
   readonly status: any;
 
-  accepts(item: List): boolean {
-    if (!this.options) {
+  accepts(item: VmfsInfo): boolean {
+    if (!this.device) {
       return true;
     }
     const capital = item.device;
-    if (this.options === '') {
+    if (this.device === '') {
       return true;
     } else {
-      return this.options === capital;
+      const storageId = item.deviceId.replace(/-/g, '').toLowerCase();
+      return this.device == storageId;
     }
   }
 
@@ -80,8 +86,9 @@ export class DeviceFilter implements ClrDatagridFilterInterface<List>, OnInit {
   changeFunc(value: any) {
     this.changes.next();
   }
-  initOptions() {
-    this.options = undefined;
-    this.changeFunc(this.options);
+
+  initDevice() {
+    this.device = undefined;
+    this.changeFunc(this.device);
   }
 }
