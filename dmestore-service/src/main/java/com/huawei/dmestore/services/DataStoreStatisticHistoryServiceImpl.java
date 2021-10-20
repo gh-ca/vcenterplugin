@@ -550,25 +550,6 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
         }
         return resultl;
     }
-
-
-    //Object转Map
-    private static Map<String, Object> getObjectToMap(Object obj) throws IllegalAccessException {
-        Map<String, Object> map = new LinkedHashMap<String, Object>();
-        Class<?> clazz = obj.getClass();
-        System.out.println(clazz);
-        for (Field field : clazz.getDeclaredFields()) {
-            field.setAccessible(true);
-            String fieldName = field.getName();
-            Object value = field.get(obj);
-            if (value == null){
-                value = "";
-            }
-            map.put(fieldName, value);
-        }
-        return map;
-    }
-
     @Override
     public Map<String, Object> queryCurrentStatistic(String relationOrInstance, Map<String, Object> params)
             throws DmeException {
@@ -1066,6 +1047,7 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
             indicators.add(DmeIndicatorConstants.COUNTER_ID_CONTROLLER_BANDWIDTH);
             indicators.add(DmeIndicatorConstants.COUNTER_ID_CONTROLLER_CPUUSAGE);
             indicators.add(DmeIndicatorConstants.COUNTER_ID_CONTROLLER_RESPONSETIME);
+            indicators.add(DmeIndicatorConstants.COUNTER_ID_CONTROLLER_OPS);
         } else {
             indicators.add(DmeIndicatorConstants.COUNTER_ID_CONTROLLER_READTHROUGHPUT);
             indicators.add(DmeIndicatorConstants.COUNTER_ID_CONTROLLER_WRITETHROUGHPUT);

@@ -166,12 +166,13 @@
         </select>
         <clr-control-error>{{'validations.required' | translate}}</clr-control-error>
       </clr-select-container>
-
       <!-- 主机/集群 -->
-      <clr-combobox-container>
-        <label style="color: #9F9F9F;">{{'vmfs.hostOrCluster' | translate}}</label>
-        <clr-combobox *ngIf="form.hostDataloadSuccess && form.culDataloadSuccess" [(ngModel)]="chooseDevice"
-          name="chooseDevice" formControlName="chooseDevice" required>
+      <clr-control-container [formGroup]="addForm">
+        <label style="color: #9F9F9F;">
+          {{'vmfs.hostOrCluster' | translate}}
+        </label>
+        <!--
+          <clr-combobox *ngIf="form.hostDataloadSuccess && form.culDataloadSuccess" [(ngModel)]="chooseDevice" name="chooseDevice" formControlName="chooseDevice" required>
           <clr-options style="max-height: 6.5rem;overflow: auto">
             <clr-option id="deviceSelect" *clrOptionItems="let device of deviceList; field:'deviceName'"
               [clrValue]="device">
@@ -182,17 +183,20 @@
               {{device.deviceName}}
             </clr-option>
           </clr-options>
-        </clr-combobox>
-        <clr-control-helper>
-          <clr-icon shape="info-circle"></clr-icon>{{'validations.comboboxTips' | translate}}
-        </clr-control-helper>
-        <clr-control-error>{{'validations.required' | translate}}</clr-control-error>
-      </clr-combobox-container>
+          </clr-combobox>
+        -->
+        <app-gh-tree-checkbox
+          [tree]="deviceList"
+          (valueChange)="handleChooseDeviceChange(this.addForm,'chooseDevice',$event)">
+        </app-gh-tree-checkbox>
+<!--        <app-error-tips [isShow]="!this.addForm.controls.chooseDevice.valid"-->
+<!--          [tips]="'validations.required' | translate">-->
+<!--        </app-error-tips>-->
+      </clr-control-container>
     </form>
     <ng-template clrPageButtons>
       <clr-wizard-button [type]="'cancel'" (click)="cancel();">{{'menu.cancel' | translate}}</clr-wizard-button>
-      <clr-wizard-button [clrWizardButtonDisabled]="matchErr || vmfsNameRepeatErr || volNameRepeatErr"
-        (click)="addNextPage();" [type]="'custom-next'">{{'menu.next' | translate}}</clr-wizard-button>
+      <clr-wizard-button [clrWizardButtonDisabled]="matchErr || vmfsNameRepeatErr || volNameRepeatErr" (click)="addNextPage();" [type]="'custom-next'">{{'menu.next' | translate}}</clr-wizard-button>
     </ng-template>
   </clr-wizard-page>
   <!--Page2 储存库设置-->
@@ -225,7 +229,7 @@
       <!-- TODO 创建失败提示 -->
       <!-- <div class="errorTips" readonly> -->
       <div *ngIf="isOperationErr" class="errorTips" readonly>
-        <app-vmfs-create-faild-tips></app-vmfs-create-faild-tips>
+        <app-vmfs-create-faild-tips [partSuccessData]="partSuccessData"></app-vmfs-create-faild-tips>
       </div>
       <!-- 1、选择 服务等级-->
       <ng-container *ngIf="levelCheck==='level'">
@@ -234,7 +238,8 @@
             <clr-accordion-title class="" (click)="item.show ? this.hidden:this.show" *ngIf="!item.show"
               style="height: 50px; line-height: 50px;color: #333;font-size:16px;">{{item.name}}</clr-accordion-title>
             <clr-accordion-content [(clrIfExpanded)]="item.show">
-              <table class="table table-vertical table-noborder table-compact">
+              <app-service-level-table [item]="item"></app-service-level-table>
+              <!-- <table class="table table-vertical table-noborder table-compact">
                 <tbody>
                   <tr>
                     <th hidden></th>
@@ -294,7 +299,7 @@
                         --</th>
                   </tr>
                 </tbody>
-              </table>
+              </table> -->
             </clr-accordion-content>
             <img src="./assets/images/selectDown.svg" style="position: absolute;right: 0px;bottom: 0px;" width="40px"
               height="40px">
@@ -360,13 +365,13 @@
             <label style="color: #9F9F9F;">{{'vmfs.controlPolicy' | translate}}</label>
             <!--上限-->
             <clr-checkbox-wrapper>
-              <input type="checkbox" id="control_policyUpper" clrCheckbox (change)="controlPolicyChangeFunc(true);"
+              <input type="checkbox" [(ngModel)]="isCheckUpper" id="control_policyUpper" clrCheckbox (change)="controlPolicyChangeFunc(true);"
                 name="control_policyUpper" />
               <label>{{'vmfs.upperLimitControl' | translate}}</label>
             </clr-checkbox-wrapper>
             <!--下限-->
             <clr-checkbox-wrapper *ngIf="!showLowerFlag">
-              <input type="checkbox" id="control_policyLower" clrCheckbox (change)="controlPolicyChangeFunc(false);"
+              <input type="checkbox" [(ngModel)]="isCheckLower" id="control_policyLower" clrCheckbox (change)="controlPolicyChangeFunc(false);"
                 name="control_policyLower" />
               <label>{{'vmfs.lowerLimitControl' | translate}}</label>
             </clr-checkbox-wrapper>
@@ -568,5 +573,39 @@
   <div class="modal-footer">
     <button type="submit" class="btn btn-primary"
       (click)="addSuccessShow = false;confirmActResult();">{{'menu.ok' | translate}}</button>
+  </div>
+</clr-modal>
+<!--失败提示窗口-->
+<clr-modal [(clrModalOpen)]="errorShow" [clrModalSize]="'sm'" [clrModalClosable]="false">
+  <h3 class="modal-title modelTile">{{'vmfs.reclaim.title' | translate}}</h3>
+  <div class="modal-body">
+    <!--    <p *ngIf="mountShow">{{'errorMsg.mountError' | translate}}</p>-->
+    <!--    <p *ngIf="mountShow">{{'errorMsg.unmountError' | translate}}</p>-->
+    <app-error-partsucess-tips
+      [status]="status"
+      [description]="description"
+      [partSuccessData]="partSuccessData"
+      [operatingType]="operatingType"></app-error-partsucess-tips>
+  </div>
+  <div class="modal-footer">
+    <button type="submit" class="btn btn-primary"
+            (click)="errorShow = false;confirmActResult()">{{'menu.ok' | translate}}</button>
+  </div>
+</clr-modal>
+<!--部分成功提示窗口-->
+<clr-modal [(clrModalOpen)]="partSuccessShow" [clrModalSize]="'lg'" [clrModalClosable]="false">
+  <h3 class="modal-title modelTile">{{'vmfs.reclaim.title' | translate}}</h3>
+  <div class="modal-body">
+    <!--    <p *ngIf="mountShow">{{'errorMsg.mountError' | translate}}</p>-->
+    <!--    <p *ngIf="mountShow">{{'errorMsg.unmountError' | translate}}</p>-->
+    <app-error-partsucess-tips
+      [status]="status"
+      [description]="description"
+      [partSuccessData]="partSuccessData"
+      [operatingType]="operatingType"></app-error-partsucess-tips>
+  </div>
+  <div class="modal-footer">
+    <button type="submit" class="btn btn-primary"
+            (click)="partSuccessShow = false;confirmActResult()">{{'menu.ok' | translate}}</button>
   </div>
 </clr-modal>

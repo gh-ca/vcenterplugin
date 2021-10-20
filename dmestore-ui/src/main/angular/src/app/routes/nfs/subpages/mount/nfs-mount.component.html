@@ -3,7 +3,7 @@
   <clr-modal [clrModalOpen]="viewPage=='mount_plugin'" [clrModalClosable]="false">
     <h3 class="modal-title modelTile">{{'vmfs.mount.mount' | translate}}</h3>
     <div class="modal-body">
-      <p *ngIf="errorMsg" style="color: red">{{'errorMsg.mountError' | translate}}</p>
+      <p *ngIf="errorMsg" style="color: #ff0000">{{'errorMsg.mountError' | translate}}</p>
       <div *ngIf="modalLoading" class="loadingDiv">
       <span>
         {{'vmfs.loadingTips' | translate}}<img src="./assets/images/loading.gif"  width="20px" height="20px" style="margin-left: 20px;">
@@ -53,7 +53,7 @@
     </div>
     <div class="modal-footer">
       <button type="button" class="btn btn-outline" (click)="backToNfsList()">{{'menu.cancel' | translate}}</button>
-      <button type="button" class="btn btn-primary" (click)="mountSubmit()">{{'menu.ok' | translate}}</button>
+      <button type="button" class="btn btn-primary" (click)="mountSubmit()" [disabled]="changeButtonAttrDatastore()">{{'menu.ok' | translate}}</button>
     </div>
   </clr-modal>
   <!--vcenter-datastore-->
@@ -108,7 +108,7 @@
     </div>
     <div style="float: right;" class="modal-footer">
       <button type="button" class="btn btn-outline" (click)="closeModel()">{{'menu.cancel' | translate}}</button>
-      <button type="button" class="btn btn-primary" (click)="mountSubmit()">{{'menu.ok' | translate}}</button>
+      <button type="button" class="btn btn-primary" (click)="mountSubmit()" [disabled]="changeButtonAttrDatastore()">{{'menu.ok' | translate}}</button>
     </div>
   </clr-modal>
   <!--vcenter-host-->
@@ -126,20 +126,20 @@
         {{'vmfs.dataHandleLoadingTips' | translate}}<img src="./assets/images/loading.gif"  width="20px" height="20px" style="margin-left: 20px;">
       </span>
         </div>
-        <!--虚拟网卡IP-->
-        <clr-select-container class="selectClass">
-          <label>{{'nfs.vkernel' | translate}}</label>
-          <select clrSelect (ngModelOptions)="vmkernelList" required [(ngModel)]="mountForm.hostVkernelIp" name="hostVkernelIp"
-                  class="clr-select">
-            <option *ngFor="let item of vmkernelList" value="{{item.ipAddress}}">{{item.ipAddress}}</option>
-          </select>
-        </clr-select-container>
         <!--data store-->
         <clr-select-container class="selectClass">
           <label>{{'nfs.nfsStore' | translate}}</label>
           <select clrSelect (ngModelOptions)="dataStoreList" required [(ngModel)]="mountForm.dataStoreObjectId" name="dataStoreObjectId"
-                  class="clr-select">
+                  class="clr-select" (change)="checkDatastoreHost()">
             <option *ngFor="let item of dataStoreList" value="{{item.objectId}}">{{item.name}}</option>
+          </select>
+        </clr-select-container>
+        <!--虚拟网卡IP-->
+        <clr-select-container class="selectClass">
+          <label>{{'nfs.vkernel' | translate}}</label>
+          <select clrSelect (ngModelOptions)="vmkernelList" required [(ngModel)]="mountForm.hostVkernelIp" name="hostVkernelIp"
+                  class="clr-select" (change)="checkHostObjectId()">
+            <option *ngFor="let item of vmkernelList" value="{{item.ipAddress}}">{{item.ipAddress}}</option>
           </select>
         </clr-select-container>
         <clr-select-container class="selectClass">
@@ -153,7 +153,7 @@
     </div>
     <div style="float: right;" class="modal-footer">
       <button type="button" class="btn btn-outline" (click)="closeModel()">{{'menu.cancel' | translate}}</button>
-      <button type="button" class="btn btn-primary" (click)="mountSubmit()">{{'menu.ok' | translate}}</button>
+      <button type="button" class="btn btn-primary" (click)="mountSubmit()" [disabled]="changeButtonAttrHostOrCluster()">{{'menu.ok' | translate}}</button>
     </div>
   </clr-modal>
 

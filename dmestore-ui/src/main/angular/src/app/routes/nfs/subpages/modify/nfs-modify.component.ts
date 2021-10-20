@@ -56,6 +56,8 @@ export class NfsModifyComponent implements OnInit {
   bandwidthLimitErr = false; // v6 设备 带宽 下限大于上限
   iopsLimitErr = false; // v6 设备 IOPS 下限大于上限
 
+  modifyDesc:string;//编辑失败信息
+
   constructor(
     private modifyService: NfsModifyService,
     private cdr: ChangeDetectorRef,
@@ -256,6 +258,7 @@ export class NfsModifyComponent implements OnInit {
         this.modifySuccessShow = true;
       } else {
         this.errorMsg = '1';
+        this.modifyDesc=result.description
         console.log('Delete failed:', result.description);
       }
       this.cdr.detectChanges();
@@ -414,7 +417,7 @@ export class NfsModifyComponent implements OnInit {
       return false;
     } */
     // this.oldNfsName = this.updateNfs.nfsName;
-    
+
     const inLimit = !isStringLengthByteOutRange(this.updateNfs.nfsName, 42, 'letters');
     let reg5: RegExp = regExpCollection.nfsName();
     // let reg5: RegExp = new RegExp('^[0-9a-zA-Z\u4e00-\u9fa5a"_"]*$');

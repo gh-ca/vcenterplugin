@@ -110,6 +110,35 @@ public class VmfsOperationServiceImplTest {
     }
 
     @Test
+    public void ExpandVmfs2() throws DmeException {
+        String param = "{\n" +
+                "    \"vo_add_capacity\": \"2\", \n" +
+                "    \"capacityUnit\": \"GB\", \n" +
+                "    \"volume_id\": \"d6a20f27-fe4c-4a40-ac28-529aad1a7550\", \n" +
+                "    \"ds_name\": \"Dvmfs999\", \n" +
+                "    \"obj_id\": \"urn:vmomi:Datastore:datastore-1233:674908e5-ab21-4079-9cb1-596358ee5dd1\"\n" +
+                "}";
+        String storeId = "urn:vmomi:Datastore:datastore-1233:674908e5-ab21-4079-9cb1-596358ee5dd1";
+        Map<String, Long> map1 = new HashMap<>();
+        map1.put("currentEndSector", 1l);
+        map1.put("totalEndSector", 2L);
+        map1.put("changedSecter", 3l);
+        map1.put("changedCapacity", 2l);
+        when(vcsdkUtils.queryVmfsDeviceCapacity(storeId)).thenReturn(map1);
+        Map<String,String> map = gson.fromJson(param, Map.class);
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("task_id", "123");
+        ResponseEntity<String> responseEntity = new ResponseEntity<>(gson.toJson(jsonObject), null, HttpStatus.ACCEPTED);
+        String param2 = "{\"volumes\":[{\"volume_id\":\"d6a20f27-fe4c-4a40-ac28-529aad1a7550\",\"added_capacity\":2}]}";
+        when(dmeAccessService.access("/rest/blockservice/v1/volumes/expand", HttpMethod.POST, param2)).thenReturn(responseEntity);
+        List<String> list = new ArrayList<>();
+        list.add("123");
+        when(taskService.checkTaskStatus(list)).thenReturn(true);
+        vmfsOperationService.expandVmfs2(map);
+
+    }
+
+    @Test
     public void testRecycleVmfsCapacity() throws DmeException {
         List<String> list = new ArrayList<>();
         list.add("Dvmfs999");

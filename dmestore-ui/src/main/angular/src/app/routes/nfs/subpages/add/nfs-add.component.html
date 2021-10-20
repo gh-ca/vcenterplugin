@@ -20,7 +20,7 @@
     <form clrForm #formPageOne="ngForm" [formGroup]="addFormGroup">
       <!--存储设备-->
       <clr-select-container class="selectClass">
-        <label>{{'nfs.storeageDevice' | translate}}asdfasdf</label>
+        <label>{{'nfs.storeageDevice' | translate}}</label>
         <select class="inputWidth100Percent" clrSelect (ngModelOptions)="storageList" [(ngModel)]="addForm.storagId"
           name="storagId" class="clr-select" (change)="selectStoragePool();qosV6Check('add')"
           formControlName="storagId" required>
@@ -116,17 +116,28 @@
         </clr-control-error>
       </clr-input-container>
       <!--大小-->
+
       <clr-input-container>
         <label>{{'nfs.size' | translate}}</label>
         <input style="width: 80%" clrInput class="inputOneLine" type="number" min="0" [(ngModel)]="addForm.size"
-          name="size" formControlName="size" required />
+               name="size" formControlName="size" required  (blur)="checkSize()"/>
         <select clrInput [(ngModel)]="unit" name="unit" formControlName="unit">
           <option value="TB">TB</option>
           <option value="GB">GB</option>
-          <!--<option value="MB">MB</option>-->
-          <!--<option value="KB">KB</option>-->
         </select>
-        <clr-control-error>{{'errorMsg.require' | translate}}</clr-control-error>
+        <clr-control-helper *ngIf="overSizeGB">
+          <div class="errorTips" readonly>
+            <clr-icon shape="exclamation-circle" class="is-solid"></clr-icon><span>{{'errorMsg.require' | translate}}</span>{{'nfs.overSizeGB'|translate}}
+          </div>
+        </clr-control-helper>
+        <clr-control-helper *ngIf="overSizeTB">
+          <div class="errorTips" readonly>
+            <clr-icon shape="exclamation-circle" class="is-solid"></clr-icon><span>{{'errorMsg.require' | translate}}</span>{{'nfs.overSizeTB'|translate}}
+          </div>
+        </clr-control-helper>
+        <clr-control-error>
+          <p class="clr-error clr-subtext">{{'errorMsg.require' | translate}}</p>
+        </clr-control-error>
       </clr-input-container>
       <!--字符编码-->
       <clr-select-container class="selectClass">
@@ -235,14 +246,14 @@
             <label style="color: #9F9F9F;">{{'vmfs.controlPolicy' | translate}}</label>
             <!--上限-->
             <clr-checkbox-wrapper>
-              <input type="checkbox" id="control_policyUpper" clrCheckbox
-                (change)="controlPolicyChangeFunc('control_policyUpper', 'control_policyLower', false, addForm, true);"
+              <input type="checkbox" id="control_policyUpper" clrCheckbox [(ngModel)]="isCheckUpper"
+                     (change)="controlPolicyChangeFunc('control_policyUpper', 'control_policyLower', false, addForm, true);"
                 name="control_policyUpper" />
               <label style="width: 100px;">{{'vmfs.upperLimitControl' | translate}}</label>
             </clr-checkbox-wrapper>
             <!--下限-->
             <clr-checkbox-wrapper *ngIf="!hiddenLowerFlag">
-              <input type="checkbox" id="control_policyLower" clrCheckbox
+              <input type="checkbox"  id="control_policyLower" clrCheckbox [(ngModel)]="isCheckLower"
                 (change)="controlPolicyChangeFunc('control_policyUpper', 'control_policyLower', false, addForm, false);"
                 name="control_policyLower" />
               <label style="width: 100px;">{{'vmfs.lowerLimitControl' | translate}}</label>
@@ -666,14 +677,14 @@
             <label style="color: #9F9F9F;width: 100px;">{{'vmfs.controlPolicy' | translate}}</label>
             <!--上限-->
             <clr-checkbox-wrapper>
-              <input type="checkbox" id="control_policyUpper" clrCheckbox
+              <input type="checkbox" id="control_policyUpper" clrCheckbox [(ngModel)]="isCheckUpper"
                 (change)="controlPolicyChangeFunc('control_policyUpper', 'control_policyLower', false, addForm, true);"
                 name="control_policyUpper" />
               <label style="width: 100px;">{{'vmfs.upperLimitControl' | translate}}</label>
             </clr-checkbox-wrapper>
             <!--下限-->
             <clr-checkbox-wrapper *ngIf="!hiddenLowerFlag">
-              <input type="checkbox" id="control_policyLower" clrCheckbox
+              <input type="checkbox" id="control_policyLower" clrCheckbox [(ngModel)]="isCheckLower"
                 (change)="controlPolicyChangeFunc('control_policyUpper', 'control_policyLower', false, addForm, false);"
                 name="control_policyLower" />
               <label style="width: 100px;">{{'vmfs.lowerLimitControl' | translate}}</label>

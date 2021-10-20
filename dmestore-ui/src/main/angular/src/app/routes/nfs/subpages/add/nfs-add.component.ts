@@ -100,6 +100,11 @@ export class NfsAddComponent extends NfsComponentCommon implements OnInit {
   bandwidthLimitErr = false; // v6 设备 带宽 下限大于上限
   iopsLimitErr = false; // v6 设备 IOPS 下限大于上限
 
+  isCheckUpper:boolean;
+  isCheckLower:boolean;
+  overSizeTB:boolean
+  overSizeGB:boolean
+
   // 添加页面窗口
   @ViewChild('wizard') wizard: ClrWizard;
   @ViewChild('addPageOne') addPageOne: ClrWizardPage;
@@ -385,6 +390,31 @@ export class NfsAddComponent extends NfsComponentCommon implements OnInit {
   closeModel() {
     this.modalLoading = false;
     this.gs.getClientSdk().modal.close();
+  }
+  checkSize(){
+    this.overSizeGB=false
+    this.overSizeTB=false
+    if (this.unit==='GB'){
+      if (this.addForm.size>16777216){
+        this.overSizeGB=true
+        this.addForm.size=null
+      }else if (!this.addForm.size){
+        this.overSizeGB=true
+      }
+      else {
+        this.overSizeGB=false
+      }
+    }else if (this.unit==='TB'){
+      if (this.addForm.size>16384){
+        this.overSizeTB=true
+        this.addForm.size=null
+      }else if (!this.addForm.size){
+        this.overSizeTB=true
+      }
+      else {
+        this.overSizeTB=false
+      }
+    }
   }
 
   qosBlur(type: String, operationType: string) {
@@ -750,9 +780,11 @@ export class NfsAddComponent extends NfsComponentCommon implements OnInit {
    */
   qoSFlagChange(form) {
     if (form.qosFlag) {
-      form.control_policyUpper = undefined;
-      form.maxBandwidthChoose = false;
-      form.maxIopsChoose = false;
+      form.control_policyUpper = '1';
+      this.isCheckUpper=true;
+      this.isCheckLower=false;
+      form.maxBandwidthChoose = true;
+      form.maxIopsChoose = true;
 
       form.control_policyLower = undefined;
       form.minBandwidthChoose = false;
@@ -816,11 +848,18 @@ export class NfsAddComponent extends NfsComponentCommon implements OnInit {
     if (form.control_policyUpper == undefined) {
       form.maxBandwidthChoose = false;
       form.maxIopsChoose = false;
+    }else {
+      form.maxBandwidthChoose=true;
+      form.maxIopsChoose=true;
     }
     if (form.control_policyLower == undefined) {
       form.minBandwidthChoose = false;
       form.minIopsChoose = false;
       form.latencyChoose = false;
+    }else {
+      form.minBandwidthChoose=true;
+      form.minIopsChoose=true;
+      form.latencyChoose=false
     }
     this.qosV6Check('add');
   }

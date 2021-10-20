@@ -14,10 +14,13 @@ public class DmeConstants {
      *  POST
      *  estimate connectivity of host or hostgroup on dme
      *  old
-     *  public static final String DME_ESTIMATE_CONNECTIVITY = "/rest/vmmgmt/v1/connectivity/host-storage";
      */
-    //public static final String DME_ESTIMATE_CONNECTIVITY = "/rest/vmmgmt/v1/connectivity/host-storage";
     public static final String DME_ESTIMATE_CONNECTIVITY = "/rest/hostmgmt/v1/connectivity/host-and-storage";
+    /**
+     * query oriented volume
+     * /rest/blockservice/v1/volumes/{volume_id}
+     */
+    public static final String DME_QUERY_ONE_VOLUME = "/rest/blockservice/v1/volumes/{volume_id}";
     /**
      * nfs share detail
      **/
@@ -151,12 +154,18 @@ public class DmeConstants {
     /**
      * hostgroup remove
      **/
-    public static final String HOSTGROUP_REMOVE = "/rest/hostmgmt/v1/hostgroups/{hostgroup_id}";
+    public static final String HOSTGROUP_REMOVE = "/rest/hostmgmt/v1/hostgroups/{hostgroup_id}?sync_to_storage=true";
 
     /**
      * hostgroup mapping
      **/
     public static final String MOUNT_VOLUME_TO_HOSTGROUP_URL = "/rest/blockservice/v1/volumes/hostgroup-mapping";
+
+    /**
+     * hostgroup mapping view query
+     * post
+     **/
+    public static final String QUERY_HOSTGROUP_MAPPING_VIEW_URL = "/rest/blockservice/v1/volumes/mapping-view/query";
 
     /**
      * volume expand
@@ -312,6 +321,11 @@ public class DmeConstants {
      * datasets query
      **/
     public static final String DATASETS_QUERY_URL = "/rest/metrics/v1/datasets/{dataSet}?pageSize=1000";
+
+    /**
+     * datasets query
+     **/
+    public static final String DATASETS_STATISTICS_QUERY_URL = "/rest/metrics/v1/datasets/{dataSet}/statistics?pageSize=1000";
 
     /**
      * Constant definition
@@ -553,6 +567,34 @@ public class DmeConstants {
             put("11", "RAIDTP");
         }
     };
+    public static final Map<String, String> TIER_DISK_TYPE = new HashMap() {
+        {
+            put("1", "SAS");
+            put("2", "SATA");
+            put("3", "SSD");
+            put("4", "NL_SAS");
+            put("5", "SLC SSD");
+            put("6", "MLC SSD");
+            put("7", "FC_SED");
+            put("8", "SAS_SED");
+            put("9", "SATA_SED");
+            put("10", "SSD_SED");
+            put("11", "NL_SAS_SED");
+            put("12", "SLC_SSD_SED");
+            put("13", "MLC_SSD_SED");
+            put("14", "NVMe_SSD");
+            put("15", "SMR_SATA");
+            put("16", "NVMe_SSD_SED");
+        }
+    };
+
+    public static final String LANGUAGE_CN = "CN";
+
+    public static final String LANGUAGE_EN = "EN";
+
+    public static final String TASK_DETAIL_CN = "detail_cn";
+
+    public static final String TASK_DETAIL_EN = "detail_en";
 
     private DmeConstants() {
     }

@@ -1,5 +1,6 @@
 package com.huawei.dmestore.services;
 
+import com.google.gson.reflect.TypeToken;
 import com.huawei.dmestore.constant.DmeConstants;
 import com.huawei.dmestore.constant.DpSqlFileConstants;
 import com.huawei.dmestore.dao.DmeVmwareRalationDao;
@@ -22,18 +23,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.sql.Date;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * VmfsOperationService
  *
- * @author lianqiang
+ * @author lianqiangN
  * @since 2020-09-09
  **/
 public class VmfsOperationServiceImpl implements VmfsOperationService {
@@ -43,11 +42,15 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
 
     private static final String CODE_403 = "403";
 
-    private static final String CODE_20883 = "20883";
-
     private static final String CODE_503 = "503";
 
     private static final String TASK_ID = "task_id";
+
+    private static final String CHANGE_SECTOR = "changedSector";
+
+    private static final String LUN_ADD_CAPACITY = "lunAddCapacity";
+
+    private static final String HOSTID = "hostId";
 
     private DmeAccessService dmeAccessService;
     @Autowired
@@ -257,6 +260,113 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
             throw new DmeException(CODE_503, e.getMessage());
         }
     }
+
+    @Override
+    public void expandVmfs2(Map<String, String> volumemap) throws DmeException {
+
+        String datastoreobjid = volumemap.get("obj_id");
+        int addCapacity = ToolUtils.getInt(volumemap.get("vo_add_capacity"));
+
+        try {
+            //扩容条件判断。
+            Map<String, Long> sectors = compareCapacityForExpandLun(addCapacity, datastoreobjid);
+            if (CollectionUtils.isEmpty(sectors)) {
+                LOG.error("get current vmfs datastore capacity failed!{}", datastoreobjid);
+                throw new DmeException("get current vmfs datastore capacity failed!{}", datastoreobjid);
+            }
+            Long changedSector = sectors.get(CHANGE_SECTOR);
+            Long addcapacity = sectors.get(LUN_ADD_CAPACITY);
+            if (addcapacity != null) {
+                String lunAddCapacity = ToolUtils.getStr(addcapacity);
+                //DME Lun当前容量不满足扩容vmfs存储条件，扩容Lun
+                volumemap.put("vo_add_capacity", lunAddCapacity);
+                Map<String, Object> stringObjectMap = handleParam(volumemap);
+                ResponseEntity<String> responseEntity = dmeAccessService.access(DmeConstants.API_VMFS_EXPAND,
+                        HttpMethod.POST, gson.toJson(stringObjectMap));
+                int code = responseEntity.getStatusCodeValue();
+                if (code != HttpStatus.ACCEPTED.value()) {
+                    throw new DmeException(CODE_503, "expand vmfsDatastore failed !");
+                }
+                JsonObject jsonObject = new JsonParser().parse(responseEntity.getBody()).getAsJsonObject();
+                String taskId = ToolUtils.jsonToStr(jsonObject.get(TASK_ID));
+                List<String> taskIds = new ArrayList<>(DEFAULT_CAPACITY);
+                taskIds.add(taskId);
+                if (!taskService.checkTaskStatus(taskIds)) {
+                    throw new DmeException(CODE_503, "expand volume failed !");
+                }
+                /*String listStr = vcsdkUtils.getHostsByDsObjectId(datastoreobjid, true);
+                if (!StringUtils.isEmpty(listStr)) {
+                    List<Map<String, String>> hosts = gson.fromJson(listStr,
+                            new TypeToken<List<Map<String, String>>>() {
+                            }.getType());
+                    for (Map<String, String> host : hosts) {
+                        String hostId = ToolUtils.getStr(host.get(HOSTID));
+                        vcsdkUtils.scanDataStore(null, hostId);
+                    }
+                }*/
+            }
+            if (changedSector != null) {
+                String result = vcsdkUtils.expandVmfsDatastore2(changedSector, datastoreobjid);
+                if ("failed".equals(result)) {
+                    throw new DmeException(CODE_403, "expand vmfsDatastore failed !");
+                }
+            }
+            // 刷新vCenter存储
+            vcsdkUtils.refreshDatastore(datastoreobjid);
+        } catch (DmeException e) {
+            LOG.error("expand vmfsDatastore error !", e);
+            throw new DmeException(CODE_503, e.getMessage());
+        }
+    }
+
+    private Map<String, Object> handleParam(Map<String, String> volumemap){
+        Map<String, Object> reqBody = new HashMap<>(DEFAULT_CAPACITY);
+        List<String> volumeIds = new ArrayList<>(DEFAULT_CAPACITY);
+        String volumeId = volumemap.get("volume_id");
+        String voAddCapacity = volumemap.get("vo_add_capacity");
+        if (!StringUtils.isEmpty(volumeId) && !StringUtils.isEmpty(voAddCapacity)) {
+            volumeIds.add(volumeId);
+            reqBody.put("added_capacity", Integer.valueOf(volumemap.get("vo_add_capacity")));
+        }
+        volumeIds.add(volumeId);
+        reqBody.put("volume_id", volumeId);
+        List<Object> reqList = new ArrayList<>(DEFAULT_CAPACITY);
+        reqList.add(reqBody);
+        Map<String, Object> reqMap = new HashMap<>(DEFAULT_CAPACITY);
+        reqMap.put("volumes", reqList);
+
+        return reqMap;
+    }
+
+    private Map<String,Long> compareCapacityForExpandLun(int addCapacity,String storeId){
+
+        //判断vmfs设备变化量与当前可用量之前的关系，满足条件 则不需要去扩容Lun
+        Map<String, Long> sectors = vcsdkUtils.queryVmfsDeviceCapacity(storeId);
+        if (!CollectionUtils.isEmpty(sectors)) {
+            Long addSector = addCapacity * 1l * ToolUtils.GI / ToolUtils.DISK_SECTOR_SIZE;
+            Long currentEndSector = sectors.get(ToolUtils.CURRENT_END_SECTOR);
+            Long totalCurrentSector = sectors.get(ToolUtils.TOTAL_END_SECTOR);
+            Long changedSector = addSector + currentEndSector;
+            int lunAddCapacity = addCapacity;
+            if (totalCurrentSector != null) {
+                if (Long.compare(totalCurrentSector, changedSector) != -1) {
+                    sectors.put(CHANGE_SECTOR, changedSector);
+                } else if (Long.compare(totalCurrentSector, changedSector) == -1 && Long.compare(totalCurrentSector, currentEndSector) != -1) {
+                    int available = (int) Math.floor((totalCurrentSector - currentEndSector) * ToolUtils.DISK_SECTOR_SIZE / ToolUtils.GI);
+                    if (Long.compare(available, 1) != -1) {
+                        lunAddCapacity -= available;
+                    }
+                    sectors.put(CHANGE_SECTOR, changedSector);
+                    sectors.put(LUN_ADD_CAPACITY, Long.valueOf(lunAddCapacity));
+                }
+            } else {
+                sectors.put(CHANGE_SECTOR, changedSector);
+                sectors.put(LUN_ADD_CAPACITY, Long.valueOf(lunAddCapacity));
+            }
+        }
+        return sectors;
+    }
+
 
     @Override
     public void recycleVmfsCapacity(List<String> dsObjectIds) throws DmeException {

@@ -39,6 +39,10 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
 
     private static final String CODE_503 = "503";
 
+    private static final String VOLUME_ID = "volume_id";
+
+    private static final String HOST_ID = "host_id";
+
     private DmeAccessService dmeAccessService;
 
     private DmeRelationInstanceService dmeRelationInstanceService;
@@ -128,6 +132,93 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
             throw new DmeException(CODE_503, e.getMessage());
         }
         return slis;
+    }
+
+    @Override
+    public List<SimpleServiceLevel> listServiceLevelByVmfs(String datastoreId) throws DmeException {
+        // 通过storeobjId 查volumeId
+        DmeVmwareRelation dvr = dmeVmwareRalationDao.getDmeVmwareRelationByDsId(datastoreId);
+        if (dvr == null) {
+            log.error("query service Level error, query dme vmware ralation table is error!{}", datastoreId);
+            throw new DmeException("query service Level error, query dme vmware ralation table is error!{}",datastoreId);
+        }
+
+        String volumeId = dvr.getVolumeId();
+        if (StringUtils.isEmpty(volumeId)) {
+            log.error("query service Level error, volumeId is NULL!{}", datastoreId);
+            throw new DmeException("query service Level error, volumeId is NULL!{}",datastoreId);
+        }
+
+        Volume volume = findOrientedVolumeMapping(volumeId);
+        // 通过poolrawId和storageId查询存储池、
+        StoragePool pool = new StoragePool();
+        List<StoragePool> pools = dmeStorageService.getStoragePools(volume.getStorageId(), "all");
+        for (StoragePool storagePool : pools) {
+            String poolId = storagePool.getPoolId();
+            if (poolId.equalsIgnoreCase(volume.getPoolRawId())) {
+                pool = storagePool;
+                break;
+            }
+        }
+
+        List<SimpleServiceLevel> serviceLevels = listServiceLevel(null);
+        // 通过volumeid查存储池或者所属服务等级Id
+        if (CollectionUtils.isEmpty(serviceLevels)) {
+            log.error("query service Level error, service level list is NULL!");
+            throw new DmeException("query service Level error, service level list is NULL!");
+        }
+
+        List<SimpleServiceLevel> serverLevels = new ArrayList<>();
+        List<StoragePool> storagePools = new ArrayList<>();
+        for (SimpleServiceLevel serviceLevel : serviceLevels) {
+            String serviceLevelId = serviceLevel.getId();
+            if (!StringUtils.isEmpty(serviceLevelId)) {
+                storagePools = getStoragePoolInfosByServiceLevelId(serviceLevelId);
+            }
+            if (!CollectionUtils.isEmpty(storagePools)) {
+                for (StoragePool storagePool : storagePools) {
+                    String poolId = pool.getPoolId();
+                    String id = pool.getId();
+                    String storageId = pool.getStorageId();
+                    if (!StringUtils.isEmpty(poolId) && !StringUtils.isEmpty(id) && !StringUtils.isEmpty(storageId)) {
+                        if (storagePool.getPoolId().equalsIgnoreCase(poolId) &&
+                                storagePool.getId().equals(id) &&
+                                storagePool.getStorageId().equalsIgnoreCase(storageId)) {
+                            serverLevels.add(serviceLevel);
+                            break;
+                        }
+                    } else {
+                        log.error("query service Level error, storage pool is NULL!");
+                        throw new DmeException("query service Level error, storage pool list is NULL!");
+                    }
+                }
+            }
+        }
+        return serverLevels;
+    }
+
+    private Volume findOrientedVolumeMapping(String volumeId) throws DmeException {
+        Volume volume = new Volume();
+        String url = DmeConstants.DME_QUERY_ONE_VOLUME.replace("{volume_id}", volumeId);
+        ResponseEntity<String> entity = dmeAccessService.access(url, HttpMethod.GET, null);
+        if (entity.getStatusCodeValue() == HttpStatus.OK.value()) {
+            String body = entity.getBody();
+
+            if (StringUtils.isEmpty(body)) {
+                throw new DmeException("query oriented volume is null!{}", volumeId);
+            }
+            JsonObject volumeObj = new JsonParser().parse(entity.getBody()).getAsJsonObject().get("volume").getAsJsonObject();
+            log.info("query oriented volume ,{}", volumeObj);
+            boolean attached = ToolUtils.jsonToBoo(volumeObj.get("attached"));
+            if (!attached) {
+                throw new DmeException("query oriented volume attached status is unmapping!{}", volumeId);
+            }
+            volume.setStorageId(ToolUtils.jsonToStr(volumeObj.get("storage_id")));
+            volume.setId(ToolUtils.jsonToStr(volumeObj.get("id")));
+            volume.setServiceLevelName(ToolUtils.jsonToStr(volumeObj.get("service_level_name")));
+            volume.setPoolRawId(ToolUtils.jsonToStr(volumeObj.get("pool_raw_id")));
+        }
+        return volume;
     }
 
     @Override
@@ -345,8 +436,10 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
 
         // servicLevelId对应的serviceLevelInstanceId
         Map<String, Map<String, Object>> serviceLevelMap = dmeRelationInstanceService.getServiceLevelInstance();
+        log.info("select cmdb service level resource:{}", serviceLevelMap);
         if (null != serviceLevelMap && serviceLevelMap.size() > 0) {
-            String serviceLevelInstanceId = serviceLevelMap.get(serivceLevelId).get("resId").toString();
+            String serviceLevelInstanceId = ToolUtils.getStr(serviceLevelMap.get(serivceLevelId).get("resId"));
+            log.info("extract cmdb service level resId:{}", serviceLevelInstanceId);
             if (!StringUtils.isEmpty(serviceLevelInstanceId)) {
                 id = serviceLevelInstanceId;
             }
@@ -354,12 +447,14 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
 
         // 1 获取serviceLevelId下的StoragePool实例集合
         List<String> storagePoolInstanceIds = getStoragePoolIdsByServiceLevelId(id);
+        log.info("extract cmdb storage pool instance ids:{}", storagePoolInstanceIds, "size={}", storagePoolInstanceIds.size());
 
         // 2 通过storagePoolInstanceId获取storagePoolId和storageDeviceId信息
         List<StoragePool> sps = new ArrayList<>();
         if (null != storagePoolInstanceIds && storagePoolInstanceIds.size() > 0) {
             for (String instanceId : storagePoolInstanceIds) {
                 Object object = dmeRelationInstanceService.queryInstanceByInstanceNameId("SYS_StoragePool", instanceId);
+                log.info("query cmdb SYS_StoragePool:["+instanceId+"] resource:{}",object);
                 StoragePool sp = convertInstanceToStoragePool(object);
                 sps.add(sp);
             }
@@ -388,6 +483,7 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
                     storagePools.addAll(storageDevicePools);
                 }
             }
+            log.info("query storage pools info:{}", storagePools, "size={}", storagePools.size());
         }
         return storagePools;
     }
@@ -491,6 +587,7 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
         Set<String> ids = new HashSet<>();
         List<RelationInstance> ris = dmeRelationInstanceService.queryRelationByRelationNameConditionSourceInstanceId(
             relationName, serviceLevelId);
+        log.info("query cmdb "+relationName+" resource:{}",ris);
         if (null != ris && ris.size() > 0) {
             for (RelationInstance ri : ris) {
                 ids.add(ri.getTargetInstanceId());
@@ -701,6 +798,202 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
         returnBody.add("metrics", metrics);
         log.info("数据集查询，请求body={}", returnBody.toString());
         return returnBody;
+    }
+
+    public JsonObject getDatasetsStatisticsQueryBody(String serviceLevelId, String interval, String dataSetType) {
+        Map<String, Long> timeMap = parseTime(interval);
+
+        // timeRange
+        JsonObject timeRange = new JsonObject();
+        timeRange.addProperty("beginTime", timeMap.get("beginTime"));
+        timeRange.addProperty("endTime", timeMap.get("endTime"));
+        timeRange.addProperty("granularity", "30min");
+        if ("stat-lun".equals(dataSetType) || "stat-storage-pool".equals(dataSetType)) {
+        } else if ("perf-lun".equals(dataSetType) || "perf-stat-storage-pool-details".equals(
+                dataSetType)) {
+        }
+
+        // filters
+        JsonObject filters = new JsonObject();
+        JsonArray filtersDimensions = new JsonArray();
+        JsonObject filtersDimension = new JsonObject();
+        String field = "dimensions.lun.tierNativeId";
+        if("perf-stat-storage-pool-details".equals(dataSetType)){
+            field = "dimensions.pool.tierNativeId";
+        }
+        filtersDimension.addProperty("field", field);
+        JsonArray values = new JsonArray();
+        values.add(new JsonPrimitive(serviceLevelId));
+        filtersDimension.add("values", values);
+        filtersDimensions.add(filtersDimension);
+        filters.add("dimensions", filtersDimensions);
+
+        // aggs
+        JsonObject rule1 = getRule("sum", "metrics.totalCapacity", "sum-totalCapacity");
+        JsonObject rule2 = getRule("sum", "metrics.throughput", "sum-throughput");
+        JsonObject rule3 = getRule("sum", "metrics.usedCapacity", "sum-usedCapacity");
+        JsonObject rule6 = getRule("max", "metrics.responseTime", "max-responseTime");
+        JsonObject rule7 = getRule("max", "metrics.bandwidth", "max-bandwidth");
+        List rules = new ArrayList();
+        rules.add(rule1);
+        rules.add(rule2);
+        rules.add(rule3);
+        rules.add(rule6);
+        rules.add(rule7);
+        JsonObject agg1 = getAggs(rules);
+
+        JsonObject rule4 = getRule("groupby", field, "tier-pool-sum-totalCapacity-perform", agg1);
+        JsonObject agg2 = getAggs(rule4);
+
+        String timeZoneId = TimeZone.getDefault().getID();
+        JsonObject rule5 = getRule("date_histogram", "timestamp", "30m",timeZoneId,"tier-pool-sum-totalCapacity-perform-30m", agg2);
+        JsonObject agg3 = getAggs(rule5);
+
+        JsonObject returnBody = new JsonObject();
+        returnBody.add("timeRange", timeRange);
+        returnBody.add("filters", filters);
+        returnBody.add("aggs", agg3);
+        log.info("数据集查询，请求body={}", returnBody.toString());
+        return returnBody;
+    }
+
+    @Override
+    public DmeDatasetsQueryResponse lunPer(String serviceLevelId, String interval)
+            throws DmeException {
+        String data = executeStatistics(serviceLevelId, interval, "perf-stat-lun-details");
+        if (!StringUtils.isEmpty(data)) {
+            return gson.fromJson(data, DmeDatasetsQueryResponse.class);
+        }
+
+        return null;
+    }
+
+
+    @Override
+    public DmeDatasetsQueryResponse poolPer(String serviceLevelId, String interval)
+            throws DmeException {
+        String data = executeStatistics(serviceLevelId, interval, "perf-stat-storage-pool-details");
+        if (!StringUtils.isEmpty(data)) {
+            return gson.fromJson(data, DmeDatasetsQueryResponse.class);
+        }
+
+        return null;
+    }
+
+    private String executeStatistics(String serviceLevelId, String interval, String dataSetType) throws DmeException {
+        // 封装查询body
+        JsonObject queryBody = getDatasetsStatisticsQueryBody(serviceLevelId, interval, dataSetType);
+        String url = DmeConstants.DATASETS_STATISTICS_QUERY_URL.replace("{dataSet}", dataSetType);
+        log.info("executeStatistics开始，url={}, post body={}", url, queryBody);
+        ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.POST, queryBody.toString());
+        if (responseEntity.getStatusCodeValue() == HttpStatus.OK.value()) {
+            String responseBody = responseEntity.getBody();
+            log.info("executeStatistics查询成功！返回信息:{}", responseBody);
+            return parseDataSetResult(responseBody);
+        }else {
+            log.info("executeStatistics查询失败！url={}", url);
+        }
+
+        return null;
+    }
+
+    private String parseDataSetResult(String result){
+        List<DmeDatasetBean> dmeDatasetBeans = new ArrayList<>();
+        try {
+            JsonObject re = parseJson(result);
+            JsonArray buckets = re.getAsJsonObject("aggregations").getAsJsonObject("tier-pool-sum-totalCapacity-perform-30m")
+                    .getAsJsonArray("buckets");
+            Iterator<JsonElement> iterator = buckets.iterator();
+            while (iterator.hasNext()){
+                JsonObject i = iterator.next().getAsJsonObject();
+                DmeDatasetBean dmeDatasetBean = new DmeDatasetBean();
+                dmeDatasetBean.setTimestamp(i.get("key").getAsLong());
+                JsonArray pers = i.getAsJsonObject("tier-pool-sum-totalCapacity-perform").getAsJsonArray("buckets");
+                if (pers != null && pers.size() > 0) {
+                    JsonObject per = pers.get(0).getAsJsonObject();
+                    dmeDatasetBean.setTotalCapacity(getFloatValue(per.getAsJsonObject("sum-totalCapacity").get("value")));
+                    dmeDatasetBean.setUsedCapacity(getFloatValue(per.getAsJsonObject("sum-usedCapacity").get("value")));
+                    dmeDatasetBean.setThroughput(getFloatValue(per.getAsJsonObject("sum-throughput").get("value")));
+                    dmeDatasetBean.setResponseTime(getFloatValue(per.getAsJsonObject("max-responseTime").get("value")));
+                    dmeDatasetBean.setBandwidth(getFloatValue(per.getAsJsonObject("max-bandwidth").get("value")));
+                    dmeDatasetBean.setTierNativeId(per.get("key").getAsString());
+
+                    dmeDatasetBeans.add(dmeDatasetBean);
+                }
+            }
+        } catch (Exception e) {
+            log.error("parseDataSetResult error！", e);
+        }
+        DmeDatasetsQueryResponse dmeDatasetsQueryResponse = new DmeDatasetsQueryResponse();
+        dmeDatasetsQueryResponse.setDatas(dmeDatasetBeans);
+        return gson.toJson(dmeDatasetsQueryResponse);
+    }
+
+    private float getFloatValue(JsonElement element){
+        if (element instanceof JsonNull){
+            return 0.0f;
+        } else{
+            return element.getAsFloat();
+        }
+    }
+
+
+    private JsonObject getAggs(List<JsonObject> rules){
+        JsonObject agg = new JsonObject();
+        JsonArray r = new JsonArray();
+        rules.forEach(jsonObject -> r.add(jsonObject));
+        agg.add("rules", r);
+        return agg;
+    }
+
+    private JsonObject getAggs(JsonObject rule){
+        JsonObject agg = new JsonObject();
+        JsonArray r = new JsonArray();
+        r.add(rule);
+        agg.add("rules", r);
+        return agg;
+    }
+
+    private JsonObject getRule(String aggType, String field, String ruleName){
+        JsonObject aggRuleMeta = new JsonObject();
+        aggRuleMeta.addProperty("field", field);
+        JsonObject rule = new JsonObject();
+        rule.addProperty("aggType", aggType);
+        rule.addProperty("ruleName", ruleName);
+        rule.add("aggRuleMeta", aggRuleMeta);
+
+        return rule;
+    }
+
+    private JsonObject getRule(String aggType, String field, String ruleName, JsonObject agg){
+        JsonObject aggRuleMeta = new JsonObject();
+        aggRuleMeta.addProperty("field", field);
+        JsonObject rule = new JsonObject();
+        rule.addProperty("aggType", aggType);
+        rule.addProperty("ruleName", ruleName);
+        rule.add("aggRuleMeta", aggRuleMeta);
+        rule.add("aggs", agg);
+
+        return rule;
+    }
+
+    private JsonObject getRule(String aggType, String field, String interval, String timeZone, String ruleName, JsonObject agg){
+        JsonObject aggRuleMeta = new JsonObject();
+        aggRuleMeta.addProperty("field", field);
+        aggRuleMeta.addProperty("interval", interval);
+        aggRuleMeta.addProperty("time_zone", timeZone);
+        JsonObject rule = new JsonObject();
+        rule.addProperty("aggType", aggType);
+        rule.addProperty("ruleName", ruleName);
+        rule.add("aggRuleMeta", aggRuleMeta);
+        rule.add("aggs", agg);
+        return rule;
+    }
+
+    public static JsonObject parseJson(String json){
+        JsonParser parser = new JsonParser();
+        JsonObject jsonObj = parser.parse(json).getAsJsonObject();
+        return jsonObj;
     }
 
 }

@@ -90,6 +90,7 @@ export class AdminLayoutComponent implements OnInit, OnDestroy {
       { link: './vmfs/performance', label: './vmfs/performance' },
       { link: './vmfs/attribute', label: './vmfs/attribute' },
       { link: './vmfs/unmount', label: './vmfs/unmount' },
+      { link: './vmfs/mount', label: './vmfs/mount' },
       { link: './nfs', label: 'NFS Datastore' },
       { link: './nfs/add', label: './nfs/add' },
       { link: './nfs/performance', label: './nfs/performance' },

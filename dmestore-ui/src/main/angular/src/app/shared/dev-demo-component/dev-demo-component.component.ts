@@ -7,6 +7,8 @@ import {
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { CustomValidatorFaild, helper } from '../../app.helpers';
 import { regExpCollection } from 'app/app.helpers';
+import { vmfsClusterTreeData } from './../../../mock/vmfsClusterTree';
+import { mockServerData } from './../../app.helpers';
 
 @Component({
   selector: 'app-dev-demo-component',
@@ -18,23 +20,81 @@ export class DevDemoComponentComponent implements OnInit {
   form: FormGroup;
   value;
   helper = helper;
+  vmfsTree;
+  vmfsList;
+  partSuccessData;
+  serviceItem;
+  firstData;
+  secondData;
+  thirdData;
+  buttonDisableOrNot:boolean=true;
+  mountShow:boolean=false;
+  status:string
+  description:string
+  checkbox:boolean=false
 
   constructor() {
     this.initForm();
-  }
 
+    this.serviceItem = {
+      "capabilities": {
+        "resourceType": null,
+        "compression": null,
+        "deduplication": null,
+        "smarttier": null,
+        "iopriority": null,
+        "qos": {
+          "smartQos": null,
+          "qosParam": {
+            "enabled": null,
+            "latency": 0,
+            "latencyUnit": "ms",
+            "minBandWidth": 0,
+            "minIOPS": 0,
+            "maxBandWidth": 200,
+            "maxIOPS": 500,
+            "smartQos": null
+          },
+          "enabled": true
+        }
+      },
+      "id": "292ae048-486d-4b1b-822b-0c84a99be342",
+      "name": "zg_610",
+      "description": "block service-level for dj",
+      "type": "BLOCK",
+      "protocol": null,
+      "totalCapacity": 2208768.0,
+      "freeCapacity": 2064064.0,
+      "usedCapacity": 144704.0
+    };
+
+    (async () => {
+      this.vmfsTree = await mockServerData(vmfsClusterTreeData);
+      this.vmfsList = await mockServerData(vmfsClusterTreeData,1000);
+    })();
+  }
+  // "10.12.123.1","10.23.234.1"
   initForm() {
+    this.status='PartSuccess'
+    this.description='Unmount vmfs failed .'
+    //模拟返回数据
+    this.partSuccessData=[
+     {key: "LQ_071419180000", value: "vCenter error:The operation is not allowed in the current state."},
+    {key: "zg709_4v", value: "vCenter error:The operation is not allowed in the current state."},
+     {key: "LQ_071419180000", value: "vCenter error:The operation is not allowed in the current state."},
+     {key: "zg709_4v", value: "vCenter error:The operation is not allowed in the current state."},
+    {key: "LQ_071419180000", value: "vCenter error:The operation is not allowed in the current state."},
+    {key: "zg709_4v", value: "vCenter error:The operation is not allowed in the current state."}
+    ];
+// ["10.143.133.196", "10.143.133.197"]
     /*初始化和校验规则*/
     this.form = new FormGroup({
       brave: new FormControl('', Validators.required),
+      tree: new FormControl('', Validators.required),
       firstName: new FormControl('', Validators.required),
       emailAddress: new FormControl('', [
         Validators.required,
-        CustomValidatorFaild(value => {
-          const res = regExpCollection.integer().test(value);
-          console.log('🚀DevDemoComponentComponent ', value, res);
-          return res;
-        }),
+        CustomValidatorFaild(value => regExpCollection.integer().test(value)),
       ]),
     });
 
@@ -67,7 +127,7 @@ export class DevDemoComponentComponent implements OnInit {
         validTips_i18n: ['validations.required_vmfs_name', { length: 27 }],
       }),
     ];
-    /*  
+    /*
       let firstName = 0;
       setInterval(() => {
         this.form.patchValue({firstName: ++firstName});
@@ -90,5 +150,28 @@ export class DevDemoComponentComponent implements OnInit {
     this.value = value;
   }
 
-  ngOnInit(): void {}
+  handleTreeValueChange(prop, val) {
+    this.form.patchValue({ [prop]: val });
+  }
+
+  ngOnInit(): void {
+  }
+  // ngDoCheck() {
+  //   this.changeButtonAttr()
+  // }
+
+  changeButtonAttr(){
+
+    if(this.firstData&&this.secondData&&this.thirdData){
+      return false
+    }else {
+      return true
+    }
+  }
+
+  cancel(){
+    this.mountShow=false
+  }
 }
+
+

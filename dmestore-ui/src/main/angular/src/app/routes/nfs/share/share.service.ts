@@ -21,15 +21,16 @@ export class ShareDetail{
 }
 export class AuthClient{
    accessval: string;
-   allSquash: string;
+   // allSquash: string;
    id: string;
    name: string;
-   parentId: string;
-   rootSquash: string;
+   // parentId: string;
+   // rootSquash: string;
    secure: string;
    sync: string;
    type: string;
-   vstoreIdInStorage: string;
-   vstoreName: string;
+   // vstoreIdInStorage: string;
+   // vstoreName: string;
+   clientIdInStorage:string;
 }
 

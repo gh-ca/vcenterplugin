@@ -4,6 +4,7 @@ import { HttpClient } from '@angular/common/http';
 @Injectable()
 export class AddService {
   constructor(private http: HttpClient) {}
+
   // 获取所有的主机
   getHostList() {
     return this.http.get('accessvmware/listhost');
@@ -24,7 +25,9 @@ export class AddService {
   }
   // 通过存储ID获取存储池数据 (vmfs添加mediaType为block)
   getStoragePoolsByStorId(storageId: string, mediaType: string) {
-    return this.http.get('dmestorage/storagepools?storageId='+ storageId + '&mediaType=' + mediaType);
+    return this.http.get(
+      'dmestorage/storagepools?storageId=' + storageId + '&mediaType=' + mediaType
+    );
   }
 
   /**

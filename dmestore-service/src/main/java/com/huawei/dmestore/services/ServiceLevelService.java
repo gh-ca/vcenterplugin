@@ -18,6 +18,8 @@ import java.util.Map;
 public interface ServiceLevelService {
     List<SimpleServiceLevel> listServiceLevel(Map<String, Object> params) throws DmeException;
 
+    List<SimpleServiceLevel> listServiceLevelByVmfs(String dataStoreId) throws DmeException;
+
     List<StoragePool> getStoragePoolInfosByServiceLevelId(String serviceLevelId) throws DmeException;
 
     List<Volume> getVolumeInfosByServiceLevelId(String serviceLevelId) throws DmeException;
@@ -32,4 +34,8 @@ public interface ServiceLevelService {
 
     DmeDatasetsQueryResponse storagePoolPerformanceDatasetsQuery(String serviceLevelId, String interval)
         throws DmeException;
+
+    DmeDatasetsQueryResponse lunPer(String serviceLevelId, String interval) throws DmeException;
+
+    DmeDatasetsQueryResponse poolPer(String serviceLevelId, String interval) throws DmeException;
 }

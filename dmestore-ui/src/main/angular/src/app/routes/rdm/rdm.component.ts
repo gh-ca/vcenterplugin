@@ -3,8 +3,11 @@ import { HttpClient } from '@angular/common/http';
 import { CommonService } from '../common.service';
 import { GlobalsService } from '../../shared/globals.service';
 import { ClrWizard, ClrWizardPage } from '@clr/angular';
-import { TranslatePipe } from '@ngx-translate/core';
+import { TranslatePipe ,TranslateService} from '@ngx-translate/core';
 import { getQosCheckTipsTagInfo } from 'app/app.helpers';
+import { isMockData, mockData } from 'mock/mock';
+import { handlerResponseErrorSimple } from './../../app.helpers';
+import { DATASTORE_ON_HOST } from './../../../mock/DATASTORE_ON_HOST';
 
 @Component({
   selector: 'app-rdm',
@@ -52,6 +55,11 @@ export class RdmComponent implements OnInit {
   submitLoading = false;
   rdmSuccess = false;
   rdmError = false;
+  //是否查询到DME存储设置
+  dmeStrategy=true;
+
+  createRdmErrorDesc='';
+  language='';
 
   // 归属控制器 true 支持 false 不支持
   ownershipController = false;
@@ -78,17 +86,21 @@ export class RdmComponent implements OnInit {
   bandwidthLimitErr = false; // v6 设备 带宽 下限大于上限
   iopsLimitErr = false; // v6 设备 IOPS 下限大于上限
 
+  isCheckUpper:boolean;
+  isCheckLower:boolean;
+
   constructor(
     private cdr: ChangeDetectorRef,
     private http: HttpClient,
     private commonService: CommonService,
-    private gs: GlobalsService
+    private gs: GlobalsService,
+    private translateService:TranslateService
   ) {}
 
   ngOnInit(): void {
     this.loadStorageDevice();
     // this.loadHosts();
-    this.tierFresh();
+    // this.tierFresh();
     const ctx = this.gs.getClientSdk().app.getContextObjects();
     console.log(ctx);
     if (ctx != null) {
@@ -103,33 +115,38 @@ export class RdmComponent implements OnInit {
   // 刷新服务等级列表
   tierFresh() {
     this.tierLoading = true;
-    this.http.post('servicelevel/listservicelevel', {}).subscribe(
-      (response: any) => {
-        this.tierLoading = false;
-        if (response.code == '200') {
-          this.serviceLevelsRes = this.recursiveNullDelete(response.data);
-          this.serviceLevelsRes = this.serviceLevelsRes.filter(item => item.totalCapacity !== 0);
-          for (const i of this.serviceLevelsRes) {
-            if (i.totalCapacity == 0) {
-              i.usedRate = 0.0;
-            } else {
-              i.usedRate = ((i.usedCapacity / i.totalCapacity) * 100).toFixed(2);
-            }
-            i.usedCapacity = (i.usedCapacity / 1024).toFixed(2);
-            i.totalCapacity = (i.totalCapacity / 1024).toFixed(2);
-            i.freeCapacity = (i.freeCapacity / 1024).toFixed(2);
-
-            if (!i.capabilities) {
-              i.capabilities = {};
-            }
+    const handlerListservicelevelSuccess = (response: any) => {
+      this.tierLoading = false;
+      if (response.code == '200') {
+        this.serviceLevelsRes = this.recursiveNullDelete(response.data);
+        this.serviceLevelsRes = this.serviceLevelsRes.filter(item => item.totalCapacity !== 0);
+        for (const i of this.serviceLevelsRes) {
+          if (i.totalCapacity == 0) {
+            i.usedRate = 0.0;
+          } else {
+            i.usedRate = ((i.usedCapacity / i.totalCapacity) * 100).toFixed(2);
           }
-          this.search();
+         /*  i.usedCapacity = (i.usedCapacity / 1024).toFixed(2);
+          i.totalCapacity = (i.totalCapacity / 1024).toFixed(2);
+          i.freeCapacity = (i.freeCapacity / 1024).toFixed(2); */
+
+          if (!i.capabilities) {
+            i.capabilities = {};
+          }
         }
-      },
-      err => {
-        console.error('ERROR', err);
+        this.search();
+        this.getStorageStrategy()
       }
-    );
+    };
+
+    if (isMockData) {
+      // handlerListservicelevelSuccess(mockData.SERVICELEVEL_LISTSERVICELEVEL);
+      handlerListservicelevelSuccess({code:'200',data:[]});
+    } else {
+      this.http
+        .get('servicelevel/listservicelevelByVmfs', {params:{dataStoreId:this.dataStoreObjectId}})
+        .subscribe(handlerListservicelevelSuccess, handlerResponseErrorSimple);
+    }
   }
 
   serviceLevelClick(id: string) {
@@ -148,6 +165,32 @@ export class RdmComponent implements OnInit {
     }
   }
 
+  // 当前服务列表是否有数据
+  getStorageStrategy(){
+    if (this.serviceLevels.length===0){
+      this.dmeStrategy=false;
+    }else {
+      this.dmeStrategy=true;
+    }
+  }
+
+  //检查第二页是否可以进行下一步
+  checkTabs(valid){
+    if(this.levelCheck==='storage'){
+      return !valid
+    }else {
+      if(this.serviceLevels.length===0){
+        return valid
+      }else if(this.serviceLevelId===''){
+        return valid
+      }else {
+        return !valid
+      }
+    }
+
+
+  }
+
   submit(): void {
     if (
       this.bandWidthMaxErrTips ||
@@ -160,6 +203,7 @@ export class RdmComponent implements OnInit {
     ) {
       return;
     }
+    this.language=this.translateService.currentLang==='en-US'?'EN':'CN'
     if (!this.ownershipController) {
       this.configModel.ownerController = '0';
     }
@@ -192,6 +236,7 @@ export class RdmComponent implements OnInit {
           customizeVolumes: submitForm,
         },
         compatibilityMode: this.compatibilityMode,
+        language:this.language
       };
     }
     if (submitForm.storageType == '1') {
@@ -205,6 +250,7 @@ export class RdmComponent implements OnInit {
           volumes: submitForm.volumeSpecs,
         },
         compatibilityMode: this.compatibilityMode,
+        language:this.language
       };
     }
     this.submitLoading = true;
@@ -223,6 +269,7 @@ export class RdmComponent implements OnInit {
             this.rdmSuccess = true;
           } else {
             this.rdmError = true;
+            this.createRdmErrorDesc=result.description
           }
         },
         err => {
@@ -333,43 +380,43 @@ export class RdmComponent implements OnInit {
 
   loadDataStore() {
     this.dsLoading = true;
-    this.http
-      .get('v1/vmrdm/vCenter/datastoreOnHost', { params: { vmObjectId: this.vmObjectId } })
-      .subscribe(
-        (result: any) => {
-          this.dsLoading = false;
-          let dataStores;
-          if (result.code === '200') {
-            dataStores = JSON.parse(result.data);
+    const handlerDatastoreOnHostSuccess = (result: any) => {
+      this.dsLoading = false;
+      let dataStores;
+      if (result.code === '200') {
+        dataStores = JSON.parse(result.data);
+      } else {
+        dataStores = [];
+      }
+      if (dataStores.filter(item => item.vmRootpath).length >= 1) {
+        const selectData = dataStores.filter(item => item.vmRootpath)[0];
+        this.dataStoreObjectId = selectData.objectId;
+        this.defaultStoreObjectId = selectData.objectId;
+      }
+      if (dataStores.length > 0) {
+        this.dataStores = dataStores.filter(item => !item.vmRootpath);
+      } else {
+        this.dataStores = [];
+      }
+      if (this.dataStores.length > 0) {
+        this.dataStores.forEach(item => {
+          if (item.name.length >= 15) {
+            item.shortName = item.name.substring(0, 13) + '...';
           } else {
-            dataStores = [];
+            item.shortName = item.name;
           }
-          if (dataStores.filter(item => item.vmRootpath).length >= 1) {
-            const selectData = dataStores.filter(item => item.vmRootpath)[0];
-            this.dataStoreObjectId = selectData.objectId;
-            this.defaultStoreObjectId = selectData.objectId;
-          }
-          if (dataStores.length > 0) {
-            this.dataStores = dataStores.filter(item => !item.vmRootpath);
-          } else {
-            this.dataStores = [];
-          }
-          if (this.dataStores.length > 0) {
-            this.dataStores.forEach(item => {
-              if (item.name.length >= 15) {
-                item.shortName = item.name.substring(0, 13) + '...';
-              } else {
-                item.shortName = item.name;
-              }
-            });
-          }
+        });
+      }
 
-          this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
-        },
-        err => {
-          console.error('ERROR', err);
-        }
-      );
+      this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
+    };
+    if (isMockData) {
+      handlerDatastoreOnHostSuccess(DATASTORE_ON_HOST);
+    } else {
+      this.http
+        .get('v1/vmrdm/vCenter/datastoreOnHost', { params: { vmObjectId: this.vmObjectId } })
+        .subscribe(handlerDatastoreOnHostSuccess, handlerResponseErrorSimple);
+    }
   }
 
   /**
@@ -393,6 +440,8 @@ export class RdmComponent implements OnInit {
    * add 下一页
    */
   addNextPage() {
+    // console.log(this.dataStoreObjectId)
+    this.tierFresh();
     this.wizard.next();
   }
 
@@ -404,11 +453,13 @@ export class RdmComponent implements OnInit {
    * qos开关change时间
    */
   qosChange(form) {
-    if (!this.policyEnable.qosPolicy) {
+    if (this.policyEnable.qosPolicy) {
       form.flagInfo.control_policyLower = undefined;
-      form.flagInfo.control_policyUpper = undefined;
-      form.flagInfo.maxBandwidthChoose = false;
-      form.flagInfo.maxIopsChoose = false;
+      form.flagInfo.control_policyUpper = '1';
+      this.isCheckUpper=true;
+      this.isCheckLower=false;
+      form.flagInfo.maxBandwidthChoose = true;
+      form.flagInfo.maxIopsChoose = true;
       form.flagInfo.minBandwidthChoose = false;
       form.flagInfo.minIopsChoose = false;
       form.flagInfo.latencyChoose = false;
@@ -455,10 +506,17 @@ export class RdmComponent implements OnInit {
     if (form.flagInfo.control_policyUpper == undefined) {
       form.flagInfo.maxBandwidthChoose = false;
       form.flagInfo.maxIopsChoose = false;
+    }else {
+      form.flagInfo.maxBandwidthChoose = true;
+      form.flagInfo.maxIopsChoose = true;
     }
     if (form.flagInfo.control_policyLower == undefined) {
       form.flagInfo.minBandwidthChoose = false;
       form.flagInfo.minIopsChoose = false;
+      form.flagInfo.latencyChoose = false;
+    }else {
+      form.flagInfo.minBandwidthChoose = true;
+      form.flagInfo.minIopsChoose = true;
       form.flagInfo.latencyChoose = false;
     }
     this.qosV6Check('add');
@@ -792,6 +850,15 @@ export class RdmComponent implements OnInit {
       }
     }
   }
+  /**
+   *  数量变化
+   */
+  countBlur(){
+    let count=this.configModel.volumeSpecs[0].count
+    if(!(count>0&&count<=20)){
+      this.configModel.volumeSpecs[0].count=1
+    }
+  }
 
   /**
    * 初始化IOPS错误提示
@@ -861,10 +928,10 @@ export class RdmComponent implements OnInit {
           this.bandwidthLimitErr = bandwidthLimitErr;
           this.iopsLimitErr = iopsLimitErr;
 
-          /* 
-          
-          
-          
+          /*
+
+
+
           const qosTag = chooseStorage.storageTypeShow.qosTag
           if (qosTag == 1) {
             if (this.configModel.flagInfo.minBandwidthChoose && this.configModel.flagInfo.maxBandwidthChoose) {
@@ -901,8 +968,8 @@ export class RdmComponent implements OnInit {
           if (this.configModel.flagInfo.control_policyLower == undefined) {
             this.bandwidthLimitErr = false;
           }
-        
-        
+
+
           */
         }
       }
