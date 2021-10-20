@@ -393,7 +393,7 @@ export class DetailComponent implements OnInit, AfterViewInit {
               "id":"40ed4f57-0d98-4592-884e-3c044a64172f",
               "name":"Dorado5600-203",
               "ip":"51.10.132.203",
-              "status":"1",
+              "status":"0",
               "synStatus":"2",
               "sn":"2102353GTG10L6000003",
               "vendor":"Huawei",
