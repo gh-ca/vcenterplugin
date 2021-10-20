@@ -9,10 +9,8 @@
 <app-gh-tree-checkbox
   (valueChange)="handleTreeValueChange('tree',$event)"
   [tree]="vmfsTree"
-  [vmfsMount]="true"
-  [isCreate]="true"
-  [mountType]="'host'"
-  [resType]="'mount'"
+  [resType]="'unMount'"
+  [checkNullData]="false"
 >
 </app-gh-tree-checkbox>
 <!--<h1>create</h1>-->
