@@ -5700,6 +5700,10 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 if (!CollectionUtils.isEmpty(mappedHostGroupId)){
                     hostGroupIds.removeAll(mappedHostGroupId);
                 }
+                if(CollectionUtils.isEmpty(hostGroupIds)){
+                    throw new DmeException("no need mapping hostGroup");
+
+                }
                 //maps.stream().forEach(map -> hostGroupIds.addAll(map.get("nomalCluster")));
                 if (!CollectionUtils.isEmpty(hostGroupIds)) {
                     //将lun映射给主机组，然后挂载集群
