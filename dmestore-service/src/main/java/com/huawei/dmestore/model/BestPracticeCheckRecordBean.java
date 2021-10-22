@@ -29,6 +29,8 @@ public class BestPracticeCheckRecordBean {
      */
     private int count;
 
+    private String repairAction;
+
     /**
      * hostList .
      */
@@ -122,5 +124,13 @@ public class BestPracticeCheckRecordBean {
      */
     public void setHostList(final List<BestPracticeBean> param) {
         this.hostList = param;
+    }
+
+    public String getRepairAction() {
+        return repairAction;
+    }
+
+    public void setRepairAction(String repairAction) {
+        this.repairAction = repairAction;
     }
 }

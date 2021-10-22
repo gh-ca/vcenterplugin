@@ -1,0 +1,45 @@
+<clr-datagrid>
+  <clr-dg-column [clrDgField]="'objectName'"  >{{'bestPractice.repairHistory.objectName'|translate}}</clr-dg-column>
+  <clr-dg-column>{{'bestPractice.repairHistory.violationValue'|translate}}</clr-dg-column>
+  <clr-dg-column>{{'bestPractice.repairHistory.recommendedValue'|translate}}</clr-dg-column>
+  <clr-dg-column>
+    {{'bestPractice.repairHistory.repairType'|translate}}
+    <clr-dg-filter [clrDgFilter]="repairTypeFilter">
+      <repair-type-filter #repairTypeFilter></repair-type-filter>
+    </clr-dg-filter>
+  </clr-dg-column>
+  <clr-dg-column #repairTime style="position: relative" class="hideFilter"
+                 [clrDgField]="'repairTime'" (clrDgSortedChange)="sortFunc($event)">
+    {{'bestPractice.repairHistory.repairTime'|translate}}
+    <clr-icon *ngIf="sortFunc(repairTime.sorted);" shape="arrow down" class="is-solid"
+              style="position: absolute;right: 1.1rem;"></clr-icon>
+  </clr-dg-column>
+  <clr-dg-column>
+    {{'bestPractice.repairHistory.repairResult'|translate}}
+    <clr-dg-filter [clrDgFilter]="repairResultFilter">
+      <repair-result-filter #repairResultFilter></repair-result-filter>
+    </clr-dg-filter>
+  </clr-dg-column>
+  <clr-dg-column>{{'bestPractice.repairHistory.executionLog'|translate}}</clr-dg-column>
+  <clr-dg-placeholder>{{'tips.noData'|translate}}</clr-dg-placeholder>
+
+  <clr-dg-row *clrDgItems="let item of tableData">
+    <clr-dg-cell>{{item.objectName?item.objectName:'--'}}</clr-dg-cell>
+    <clr-dg-cell>{{item.violationValue?item.violationValue:'--'}}</clr-dg-cell>
+    <clr-dg-cell>{{item.recommandValue?item.recommandValue:'--'}}</clr-dg-cell>
+    <clr-dg-cell *ngIf="item.repairType==='0'">{{'bestPractice.repairHistory.manual'|translate}}</clr-dg-cell>
+    <clr-dg-cell *ngIf="item.repairType==='1'">{{'bestPractice.repairHistory.automatic'|translate}}</clr-dg-cell>
+    <clr-dg-cell>{{item.repairTime?item.repairTime:'--'}}</clr-dg-cell>
+    <clr-dg-cell *ngIf="item.repairResult">{{'bestPractice.repairHistory.success'|translate}}</clr-dg-cell>
+    <clr-dg-cell *ngIf="!item.repairResult">{{'bestPractice.repairHistory.fail'|translate}}</clr-dg-cell>
+    <clr-dg-cell>{{item.message?item.message:'--'}}</clr-dg-cell>
+  </clr-dg-row>
+<clr-dg-footer>
+  <clr-dg-pagination #pagination [clrDgPageSize]="5" [clrDgTotalItems]="tableData.length">
+    <clr-dg-page-size [clrPageSizeOptions]="[5,10,50,100]">{{'page.perPage' | translate}}</clr-dg-page-size>
+    {{pagination.firstItem + 1}} - {{pagination.lastItem + 1}}
+    {{'page.all' | translate}}
+    {{pagination.totalItems}}
+  </clr-dg-pagination>
+  </clr-dg-footer>
+</clr-datagrid>

@@ -66,8 +66,6 @@ import java.io.StringReader;
 import java.net.URI;
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -4718,4 +4716,157 @@ public class VCSDKUtils {
         }
         return lists;
     }
+
+
+    /**
+     * 存储是否可访问
+     *
+     * @param datastoreObjId 存储objectid
+     * @return boolean boolean
+     */
+    public boolean isAccessibleOfDatastore(String datastoreObjId) {
+        try {
+            String serverguid = vcConnectionHelpers.objectId2Serverguid(datastoreObjId);
+            VmwareContext context = vcConnectionHelpers.getServerContext(serverguid);
+            ManagedObjectReference objmor = vcConnectionHelpers.objectId2Mor(datastoreObjId);
+            DatastoreMo datastoreMo = datastoreVmwareMoFactory.build(context, objmor);
+            DatastoreSummary datastoreSummary = datastoreMo.getSummary();
+            return datastoreSummary.isAccessible();
+        } catch (Exception e) {
+            logger.error("query datastore accessible by objectid error!datastoreObjId={}, error:{}", datastoreObjId,
+                e.getMessage());
+        }
+        return false;
+    }
+
+    /**
+     * 主机下的存储查询
+     *
+     * @param hostObjId 主机objectId
+     * @param datastroreType 存储类型
+     * @return List<Map<String, String>> 列表
+     */
+    public List<String> getDatastoreByHostObjIdAndType(String hostObjId, String datastroreType){
+        List<String> ids = new ArrayList<>();
+        try {
+            String serverguid = vcConnectionHelpers.objectId2Serverguid(hostObjId);
+            VmwareContext context = vcConnectionHelpers.getServerContext(serverguid);
+            ManagedObjectReference objmor = vcConnectionHelpers.objectId2Mor(hostObjId);
+            HostMo hostMo = hostVmwareFactory.build(context, objmor);
+            List<ManagedObjectReference> dataStoreMorList = hostMo.getHostDatastoreSystemMo().getDatastores();
+            List<Map<String, String>> mapList = getDataStoresByMors(datastroreType, context, dataStoreMorList);
+            mapList.forEach(map -> ids.add(map.get(OBJECT_ID)));
+        } catch (Exception ex) {
+            logger.error("query datastore by hostObjId error!hostObjId={},type={}, error:{}", hostObjId, datastroreType,
+                ex.getMessage());
+        }
+
+        return ids;
+    }
+
+    private List<Map<String, String>> getDataStoresByMors(String datastroreType, VmwareContext context,
+        List<ManagedObjectReference> dataStoreMorList) throws Exception {
+        List<Map<String, String>> mapList = new ArrayList<>();
+        for (ManagedObjectReference dataStoreMor : dataStoreMorList) {
+            DatastoreMo datastoreMo = datastoreVmwareMoFactory.build(context, dataStoreMor);
+            DatastoreSummary datastoreSummary = datastoreMo.getSummary();
+            if (!StringUtils.isEmpty(datastroreType) && !datastoreSummary.getType().equals(datastroreType)) {
+                continue;
+            }
+            Map<String, String> map = new HashMap<>();
+            String objectId = vcConnectionHelpers.mor2ObjectId(dataStoreMor, context.getServerAddress());
+            map.put(NAME, datastoreSummary.getName());
+            map.put(OBJECT_ID, objectId);
+            map.put(STATUS, ToolUtils.getStr(datastoreSummary.isAccessible()));
+            map.put(TYPE, datastoreSummary.getType());
+
+            mapList.add(map);
+        }
+
+        return mapList;
+    }
+
+    public List<Map<String, String>> getVmRdmByObjectId(String vmObjId) throws Exception{
+        String serverguid = vcConnectionHelpers.objectId2Serverguid(vmObjId);
+        VmwareContext context = vcConnectionHelpers.getServerContext(serverguid);
+        ManagedObjectReference objmor = vcConnectionHelpers.objectId2Mor(vmObjId);
+        VirtualMachineMo virtualMachineMo = virtualMachineMoFactorys.build(context, objmor);
+        VirtualDisk[] virtualDisks = virtualMachineMo.getAllDiskDevice();
+        List<Map<String, String>> rdmListMap = new ArrayList<>();
+        for (VirtualDisk virtualDisk : virtualDisks) {
+            VirtualDeviceBackingInfo backingInfo = virtualDisk.getBacking();
+            if (backingInfo instanceof VirtualDiskRawDiskMappingVer1BackingInfo) {
+                VirtualDiskRawDiskMappingVer1BackingInfo rdmBacking = (VirtualDiskRawDiskMappingVer1BackingInfo)backingInfo;
+                Map<String, String> rdmMap = new HashMap<>();
+
+                String diskObjectId = virtualDisk.getDiskObjectId();
+                long capacity = virtualDisk.getCapacityInBytes() / ToolUtils.GI;
+                String diskLabel = virtualDisk.getDeviceInfo().getLabel();
+                String physicsLun = rdmBacking.getDeviceName();
+                String sharing = rdmBacking.getSharing();
+                String diskMode = rdmBacking.getDiskMode();
+                String compatibilityMode = rdmBacking.getCompatibilityMode();
+                String lunUuid = rdmBacking.getLunUuid();
+                String wwn = lunUuid.substring(10, 42);
+
+                rdmMap.put("diskObjectId", diskObjectId);
+                rdmMap.put("capacity", String.valueOf(capacity));
+                rdmMap.put("physicsLun", physicsLun);
+                rdmMap.put("lunWwn", wwn);
+                rdmMap.put("sharing", sharing);
+                rdmMap.put("diskMode", diskMode);
+                rdmMap.put("diskLabel_cn", diskLabel);
+                rdmMap.put("diskLabel_zh", diskLabel.replace("Hard disk", "硬盘"));
+                rdmMap.put("compatibilityMode", compatibilityMode);
+                rdmMap.put("vmObjectId", vmObjId);
+
+                rdmListMap.add(rdmMap);
+            }
+        }
+
+        return rdmListMap;
+    }
+
+
+    public void delVmRdm(String vmObjId, List<String> diskObjectIds) throws Exception {
+        ManagedObjectReference morVm = vcConnectionHelpers.objectId2Mor(vmObjId);
+        String serverguid = vcConnectionHelpers.objectId2Serverguid(vmObjId);
+        VmwareContext context = vcConnectionHelpers.getServerContext(serverguid);
+        VirtualMachineMo virtualMachineMo = virtualMachineMoFactorys.build(context, morVm);
+        VirtualDisk[] virtualDisks = virtualMachineMo.getAllDiskDevice();
+        VirtualMachineConfigSpec reConfigSpec = new VirtualMachineConfigSpec();
+        for (String diskObjectId : diskObjectIds) {
+            for (VirtualDisk virtualDisk : virtualDisks) {
+                if (virtualDisk.getDiskObjectId().equals(diskObjectId)) {
+                    VirtualDeviceConfigSpec deviceConfigSpec = new VirtualDeviceConfigSpec();
+                    deviceConfigSpec.setDevice(virtualDisk);
+                    deviceConfigSpec.setOperation(VirtualDeviceConfigSpecOperation.REMOVE);
+
+                    // 从数据存储删除文件
+                    deviceConfigSpec.setFileOperation(VirtualDeviceConfigSpecFileOperation.DESTROY);
+                    reConfigSpec.getDeviceChange().add(deviceConfigSpec);
+
+                    break;
+                }
+            }
+        }
+
+        ManagedObjectReference morTask = context.getService().reconfigVMTask(morVm, reConfigSpec);
+        boolean result = context.getVimClient().waitForTask(morTask);
+
+        if (!result) {
+            throw new Exception("Failed to detach disk due to " + TaskMo.getTaskFailureInfo(context, morTask));
+        }
+
+        context.waitForTaskProgressDone(morTask);
+    }
+
+    public boolean vmIsConnected(String vmObjId) throws Exception {
+        ManagedObjectReference morVm = vcConnectionHelpers.objectId2Mor(vmObjId);
+        String serverguid = vcConnectionHelpers.objectId2Serverguid(vmObjId);
+        VmwareContext context = vcConnectionHelpers.getServerContext(serverguid);
+        VirtualMachineMo virtualMachineMo = virtualMachineMoFactorys.build(context, morVm);
+        return virtualMachineMo.isConnected();
+    }
+    
 }

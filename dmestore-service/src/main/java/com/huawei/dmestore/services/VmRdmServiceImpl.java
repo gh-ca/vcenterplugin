@@ -119,6 +119,7 @@ public class VmRdmServiceImpl implements VmRdmService {
         String compatibilityMode) throws DmeException {
         String language =  createBean.getLanguage() == null? DmeConstants.LANGUAGE_CN : createBean.getLanguage();
         String taskId = createDmeRdm(createBean, language);
+
         List<String> lunNames = taskService.getSuccessNameFromCreateTask(TASKTYPE, taskId, longTaskTimeOut);
         Map<String, Object> paramMap = initParams(createBean);
         String requestVolumeName = (String) paramMap.get("requestVolumeName");
@@ -282,10 +283,10 @@ public class VmRdmServiceImpl implements VmRdmService {
                 hostId = ToolUtils.jsonToStr(hostObject.get(ID_FIELD));
             }
         }
-        Map<String,List<Map<String, Object>>> allinitionators=vmfsAccessService.getAllInitionator();
+        Map<String, List<Map<String, Object>>> allinitionators = vmfsAccessService.getAllInitionator();
 
         if (hostId == null) {
-            hostId = vmfsAccessService.checkOrCreateToHost(hostIp, hostObjectId,allinitionators);
+            hostId = vmfsAccessService.checkOrCreateToHost(hostIp, hostObjectId, allinitionators);
         }
         return hostId;
     }
@@ -489,5 +490,117 @@ public class VmRdmServiceImpl implements VmRdmService {
     private String getStorageModel(String storageId) throws DmeException {
         StorageDetail storageDetail = dmeStorageService.getStorageDetail(storageId);
         return storageDetail.getModel() + " " + storageDetail.getProductVersion();
+    }
+
+    @Override
+    public List<Map<String, String>> getVmRdmByObjectId(String vmObjectId) throws DmeException {
+        List<Map<String, String>> reList = new ArrayList<>();
+        try {
+            List<Map<String, String>> vcRdmList = vcsdkUtils.getVmRdmByObjectId(vmObjectId);
+            for (int i = 0; i < vcRdmList.size(); i++) {
+                Map<String, String> vcRdmMap = vcRdmList.get(i);
+                String wwn = vcRdmMap.get("lunWwn");
+
+                // 根据wwn查询DME Lun信息
+                String url = DmeConstants.DME_VOLUME_BASE_URL + "?volume_wwn=" + wwn;
+                ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
+                if (responseEntity.getStatusCodeValue() / 100 == 2) {
+                    JsonObject object = new JsonParser().parse(responseEntity.getBody()).getAsJsonObject();
+                    if (object.get("count").getAsInt() == 0) {
+                        continue;
+                    }
+                    JsonObject dmeVolume = object.getAsJsonArray("volumes").get(0).getAsJsonObject();
+                    vcRdmMap.put("lunName", dmeVolume.get("name").getAsString());
+                    reList.add(vcRdmMap);
+                }
+            }
+
+        } catch (Exception exception) {
+            throw new DmeException(exception.getMessage());
+        }
+
+        return reList;
+    }
+
+    @Override
+    public String delVmRdmByObjectId(String vmObjectId, List<DelVmRdmsRequest> disks) throws DmeException {
+        JsonObject reObj = new JsonObject();
+        reObj.addProperty("code", 200);
+        reObj.add("data", null);
+        reObj.addProperty("description", "");
+        try {
+            boolean isConnected = vcsdkUtils.vmIsConnected(vmObjectId);
+            if(!isConnected){
+                reObj.addProperty("code", 500);
+                reObj.addProperty("description", "The RMD cannot be deleted in the current status!");
+                return reObj.toString();
+            }
+            List<String> diskObjectIds = disks.stream()
+                .map(DelVmRdmsRequest::getDiskObjectId)
+                .collect(Collectors.toList());
+            List<String> wwns = disks.stream().map(DelVmRdmsRequest::getLunWwn).collect(Collectors.toList());
+
+            // 调用vCenter删除RDM
+            vcsdkUtils.delVmRdm(vmObjectId, diskObjectIds);
+
+            Map<String, List<String>> unMap = new HashMap<>();
+            for (String wwn : wwns) {
+                String url = DmeConstants.DME_VOLUME_BASE_URL + "?volume_wwn=" + wwn;
+                ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
+                if (responseEntity.getStatusCodeValue() / 100 == 2) {
+                    JsonObject object = new JsonParser().parse(responseEntity.getBody()).getAsJsonObject();
+                    if (object.get("count").getAsInt() == 0) {
+                        continue;
+                    }
+                    JsonObject dmeVolume = object.getAsJsonArray("volumes").get(0).getAsJsonObject();
+                    JsonArray attachments = dmeVolume.getAsJsonArray("attachments");
+                    if (attachments == null || attachments.isJsonNull() || attachments.size() == 0) {
+                        continue;
+                    }
+                    for (int i = 0; i < attachments.size(); i++) {
+                        JsonObject attachment = attachments.get(i).getAsJsonObject();
+                        String hostId = attachment.get("host_id").getAsString();
+                        String volumeId = attachment.get("volume_id").getAsString();
+                        if (unMap.get(hostId) == null) {
+                            unMap.put(hostId, new ArrayList<>());
+                        }
+                        unMap.get(hostId).add(volumeId);
+                    }
+                }
+            }
+            int errCnt = 0;
+            JsonArray hostArray = new JsonArray();
+            JsonArray errorMsgArray = new JsonArray();
+            for ( Map.Entry<String, List<String>> entry :unMap.entrySet()){
+                String dmeHostId = entry.getKey();
+                String hostIp = null;
+                try {
+                    dmeAccessService.unMapHost(dmeHostId, entry.getValue());
+                    //根据主机ID获取主机IP后刷新vCenter vmfs存储
+                    Map<String, Object> dmeHostMap = dmeAccessService.getDmeHost(dmeHostId);
+                    hostIp = String.valueOf(dmeHostMap.get("ip"));
+                    vcsdkUtils.hostRescanVmfs(hostIp);
+                }catch (DmeException dmeException){
+                    errCnt++;
+                    hostArray.add(new JsonPrimitive(hostIp));
+                    JsonObject errorObj = new JsonObject();
+                    errorObj.addProperty("host_ip", hostIp);
+                    errorObj.addProperty("error_message", dmeException.getMessage());
+                    errorMsgArray.add(errorObj);
+                    LOG.error("host unmapping error!hostIp={},errorMsg={}", hostIp, dmeException.getMessage());
+                    continue;
+                }
+            }
+            if(errCnt > 0){
+                reObj.addProperty("code", errCnt == unMap.size()? 500: 206);
+                reObj.add("data", hostArray);
+                reObj.addProperty("description", errorMsgArray.toString());
+            }
+        } catch (Exception ex) {
+            reObj.addProperty("code", 500);
+            reObj.addProperty("description", ex.getMessage());
+        }
+
+        return reObj.toString();
     }
 }

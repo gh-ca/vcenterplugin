@@ -27,6 +27,8 @@ public class BestPracticeUpResultBase {
      */
     private boolean updateResult;
 
+    private String message;
+
     /**
      * getHostSetting .
      *
@@ -97,6 +99,14 @@ public class BestPracticeUpResultBase {
      */
     public void setUpdateResult(final boolean param) {
         this.updateResult = param;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
     }
 
     @Override

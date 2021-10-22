@@ -1,4 +1,4 @@
-<div style="height: 150px;">
+<div style="position: relative">
   <div style="height: 100%;">
     <!-- 头部按钮组 -->
     <div>
@@ -35,6 +35,8 @@
       </clr-dg-column>
       <clr-dg-column style="width: 11rem;">{{'bestPractice.description.name'|translate}}</clr-dg-column>
       <clr-dg-column>{{'bestPractice.operation'|translate}}</clr-dg-column>
+      <clr-dg-column>{{'bestPractice.repairAction'|translate}}</clr-dg-column>
+      <clr-dg-column>{{'bestPractice.repairHistoryBtn'|translate}}</clr-dg-column>
       <clr-dg-placeholder>{{'tips.noData' | translate}}</clr-dg-placeholder>
       <!--autorepare 实施最佳实践 -->
       <clr-dg-row *clrDgItems="let item of list"
@@ -42,9 +44,11 @@
         [clrDgSelectable]="item.hostSetting!=='Jumbo Frame (MTU)'&&item.hostList&&item.hostList.length>0&&item.hostList[0].autoRepair==='true'">
         <!-- MTU 单独处理 -->
         <clr-dg-cell>{{item.hostSetting}}</clr-dg-cell>
-        <clr-dg-cell>
+        <clr-dg-cell style="display: flex;justify-content: space-between">
           <!-- {{item.recommendValue}} -->
           <app-bp-cell-mul-row [items]="item.recommendValue"></app-bp-cell-mul-row>
+          <span *ngIf="item.hostSetting==='VMFS Datastore Space Utilization'" (click)="openRevise(item.hostSetting)"
+                 style="color:#00F;cursor:pointer">{{'bestPractice.repair'|translate}}</span>
         </clr-dg-cell>
         <clr-dg-cell>
           <span [hidden]="item.level != 'Critical'">
@@ -69,6 +73,19 @@
           <span *ngIf="item.count > 0" (click)="openHostList(item)"
             style="color:#00F;cursor:pointer">{{'bestPractice.implementation'|translate}}</span>
           <span *ngIf="item.count == 0" style="color:#9F9F9F;">{{'bestPractice.implementation'|translate}}</span>
+        </clr-dg-cell>
+        <!--      修复动作与修复历史-->
+        <clr-dg-cell class="bestpracticeRepairAction">
+          <clr-select-container>
+            <select class="repairAction-select" [(ngModel)]="item.repairAction" clrSelect name="repairAction"
+                    (change)="changeRepairAction(item)" [disabled]="item.hostSetting!=='VMFS Datastore Space Utilization'">
+              <option *ngFor="let i of selectedArr" value="{{i.value}}" >{{i.label|translate}}</option>
+            </select>
+          </clr-select-container>
+        </clr-dg-cell>
+        <clr-dg-cell>
+        <span  (click)="openRepairHistoryList(item.hostSetting)"
+               style="color:#00F;cursor:pointer">{{'bestPractice.log'|translate}}</span>
         </clr-dg-cell>
       </clr-dg-row>
 
@@ -105,7 +122,7 @@
           </div>
           <!-- 列表页 -->
           <clr-datagrid [(clrDgSelected)]="hostSelected" (clrDgRefresh)="hostRefresh()" [clrDgLoading]="hostIsLoading">
-            <clr-dg-column>{{'bestPractice.host'|translate}}</clr-dg-column>
+            <clr-dg-column [clrDgField]="'hostName'">{{'bestPractice.host'|translate}}</clr-dg-column>
             <clr-dg-column>{{'bestPractice.actual'|translate}}</clr-dg-column>
             <clr-dg-column>{{'bestPractice.recommend'|translate}}</clr-dg-column>
             <clr-dg-placeholder>{{'tips.noData' | translate}}</clr-dg-placeholder>
@@ -157,6 +174,42 @@
       <clr-spinner class="spinner spinner-md">Loading</clr-spinner>
     </div>
   </div>
+  <!--修复日志-->
+  <clr-modal [(clrModalOpen)]="repairLogsShow" [clrModalSize]="'lg'">
+    <div class="modal-title">
+      {{'bestPractice.repairHistoryBtn'|translate}}
+    </div>
+    <div class="modal-body">
+
+      <app-bp-repair-history-table [tableData]="repairLogs"></app-bp-repair-history-table>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-primary" (click)="repairLogsShow=false">{{'menu.ok'|translate}}</button>
+    </div>
+  </clr-modal>
+
+  <!--修改期望值-->
+  <clr-modal [(clrModalOpen)]="reviseRecommendValueShow" [clrModalSize]="'sm'" class="reviseExpectedValue">
+    <div class="modal-title">
+      {{'bestPractice.reviseRecommandValue'|translate}}
+    </div>
+    <div class="modal-body">
+
+      <clr-input-container>
+        <label for="recommandValue">{{'bestPractice.originalExpectedValue'|translate}}</label>
+        <input style="width: 60%"  clrInput [value]="recommandValue"  id="recommandValue"  disabled/>
+      </clr-input-container>
+      <clr-input-container style="display: flex">
+        <label for="newRecommandValue">{{'bestPractice.newExpectations'|translate}}</label>
+        <input style="width: 60%" type="number" min="75" (blur)="newExpectations()" clrInput [(ngModel)]="newRecommandValue" id="newRecommandValue" name="newRecommandValue" required/>
+        <clr-control-error>{{'bestPractice.expectationsError'|translate}}</clr-control-error>
+      </clr-input-container>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-primary" (click)="reviseRecommendValueShow=false">{{'menu.close'|translate}}</button>
+      <button type="button" class="btn btn-primary" [disabled]="changeNewRecommandValueBtn()" (click)="modifyExpectations()">{{'menu.ok'|translate}}</button>
+    </div>
+  </clr-modal>
 
 
   <clr-modal [(clrModalOpen)]="tipModal" [clrModalSize]="'sm'">
@@ -201,4 +254,11 @@
     </div>
   </clr-modal>
 
+
+</div>
+<div *ngIf="dataLoading" class="loadingDiv">
+        <span>
+          {{'vmfs.dataHandleLoadingTips' | translate}}<img src="./assets/images/loading.gif" width="20px" height="20px"
+                                                           style="margin-left: 20px;">
+        </span>
 </div>

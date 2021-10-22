@@ -389,3 +389,33 @@ clr-dg-cell.datagrid-cell{
     }
   }
 }
+
+.reviseExpectedValue{
+  .modal-dialog.ng-trigger.ng-trigger-fadeDown.modal-sm{
+    .modal-content-wrapper{
+      .modal-content{
+        .modal-body{
+          overflow-x: unset;
+          overflow-y: unset;
+        }
+      }
+    }
+  }
+}
+.bestpracticeRepairAction{
+  .clr-form-control{
+    margin-top: unset;
+  }
+}
+.repairAction-select{
+  flex:1;
+  width: 80%;
+  .clr-select-wrapper{
+    width: 100%;
+  }
+  .clr-select-wrapper select, .clr-multiselect-wrapper select{
+    width: 100%;
+  }
+}
+
+
