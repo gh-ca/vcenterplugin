@@ -145,7 +145,7 @@ public class VmfsAccessController extends BaseController {
         try {
             //用于衡量部分成功情况返回结果
             params.put("success", PARTIAL_SUCCESS);
-            Map<String, Object> map = vmfsAccessService.unmountVmfsNew(params);
+            Map<String, Object> map = vmfsAccessService.unmountVmfs(params);
             if (map.size() == 0) {
                 return success(null, "unmount vmfs success!");
             } else if (Boolean.valueOf(params.get("success").toString())) {

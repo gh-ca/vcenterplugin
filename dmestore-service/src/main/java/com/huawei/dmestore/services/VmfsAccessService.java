@@ -244,7 +244,4 @@ public interface VmfsAccessService {
        * @Date 2021/7/8 15:53
       */
     List<Map<String, String>> queryMountableVmfsByClusterId(String clusterObjectId, String dataStoreType) throws DmeException;
-
-    Map<String, Object> unmountVmfsNew(Map<String, Object> params) throws DmeException;
-
 }
