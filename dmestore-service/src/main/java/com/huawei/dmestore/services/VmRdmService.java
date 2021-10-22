@@ -60,5 +60,5 @@ public interface VmRdmService {
      * @param disks vCenter虚拟机RDM的Id
      * @throws DmeException DmeException
      **/
-    String delVmRdmByObjectId(String vmObjectId, List<DelVmRdmsRequest> disks) throws DmeException;
+    String delVmRdmByObjectId(String vmObjectId, List<DelVmRdmsRequest> disks, String language) throws DmeException;
 }

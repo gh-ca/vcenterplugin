@@ -523,7 +523,7 @@ public class VmRdmServiceImpl implements VmRdmService {
     }
 
     @Override
-    public String delVmRdmByObjectId(String vmObjectId, List<DelVmRdmsRequest> disks) throws DmeException {
+    public String delVmRdmByObjectId(String vmObjectId, List<DelVmRdmsRequest> disks, String language) throws DmeException {
         JsonObject reObj = new JsonObject();
         reObj.addProperty("code", 200);
         reObj.add("data", null);
@@ -575,7 +575,7 @@ public class VmRdmServiceImpl implements VmRdmService {
                 String dmeHostId = entry.getKey();
                 String hostIp = null;
                 try {
-                    dmeAccessService.unMapHost(dmeHostId, entry.getValue());
+                    dmeAccessService.unMapHost(dmeHostId, entry.getValue(), language);
                     //根据主机ID获取主机IP后刷新vCenter vmfs存储
                     Map<String, Object> dmeHostMap = dmeAccessService.getDmeHost(dmeHostId);
                     hostIp = String.valueOf(dmeHostMap.get("ip"));

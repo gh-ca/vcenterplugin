@@ -1,5 +1,6 @@
 package com.huawei.dmestore.mvc;
 
+import com.huawei.dmestore.constant.DmeConstants;
 import com.huawei.dmestore.exception.DmeException;
 import com.huawei.dmestore.model.DelVmRdmsRequest;
 import com.huawei.dmestore.model.ResponseBodyBean;
@@ -12,6 +13,7 @@ import com.google.gson.JsonObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -110,13 +112,19 @@ public class VmRdmController extends BaseController {
      * delRdms
      *
      * @param vmObjectId vmObjectId
-     * @param diskObjectIds Ҫɾ���Ĵ����б���Ϣ
+     * @param diskObjectIds RDM对象标识
+     * @param language 语言
      * @return ResponseBodyBean
      */
     @RequestMapping(value = "rdms/{vmObjectId}", method = RequestMethod.POST)
-    public ResponseBodyBean delRdms(@PathVariable("vmObjectId") String vmObjectId, @RequestBody List<DelVmRdmsRequest> diskObjectIds) {
+    public ResponseBodyBean delRdms(@PathVariable("vmObjectId") String vmObjectId,
+        @RequestBody List<DelVmRdmsRequest> diskObjectIds,
+        @RequestParam(value = "language", required = false) String language) {
         try {
-            String delResultStr = vmRdmService.delVmRdmByObjectId(vmObjectId, diskObjectIds);
+            if(StringUtils.isEmpty(language)){
+                language = DmeConstants.LANGUAGE_CN;
+            }
+            String delResultStr = vmRdmService.delVmRdmByObjectId(vmObjectId, diskObjectIds, language);
             JsonObject delResultObj = gson.fromJson(delResultStr, JsonObject.class);
             ResponseBodyBean responseBodyBean = new ResponseBodyBean();
             responseBodyBean.setCode(delResultObj.get("code").getAsString());
