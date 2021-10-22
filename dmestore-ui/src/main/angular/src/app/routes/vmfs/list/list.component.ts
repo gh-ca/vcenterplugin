@@ -48,7 +48,7 @@ import {VmfsCommon} from './VmfsCommon';
 import {AddService} from './../add/add.service';
 import {getLodash} from './../../../shared/lib';
 import {CommonService} from './../../common.service';
-import {TranslatePipe,TranslateService} from '@ngx-translate/core';
+import {TranslatePipe, TranslateService} from '@ngx-translate/core';
 
 const _ = getLodash();
 
@@ -59,7 +59,7 @@ const _ = getLodash();
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [VmfsListService, AddService, CommonService, TranslatePipe],
 })
-export class VmfsListComponent extends VmfsCommon implements OnInit ,AfterViewInit{
+export class VmfsListComponent extends VmfsCommon implements OnInit, AfterViewInit {
   get params() {
     // 对query进行处理
     const p = Object.assign({}, this.query);
@@ -72,7 +72,7 @@ export class VmfsListComponent extends VmfsCommon implements OnInit ,AfterViewIn
     public cdr: ChangeDetectorRef,
     public gs: GlobalsService,
     private router: Router,
-    private translateService:TranslateService
+    private translateService: TranslateService
   ) {
     super();
     this.form.version = '5'; // 版本
@@ -158,7 +158,7 @@ export class VmfsListComponent extends VmfsCommon implements OnInit ,AfterViewIn
   addSuccessShow = false; // 添加成功弹窗
   addPartSuccessShow = false; //添加部分成功弹窗
   partSuccessData;//添加部分成功返回数据
-  partSuccessOrFail=false; //添加部分成功展示提示
+  partSuccessOrFail = false; //添加部分成功展示提示
   connectivityFailure = false; // 主机联通性测试失败
   connFailData: ConnFaildData[]; //  主机联通性测试失败数据
   showDetail = false; // 展示主机联通异常数据
@@ -206,7 +206,7 @@ export class VmfsListComponent extends VmfsCommon implements OnInit ,AfterViewIn
   mountForm = new GetForm().getMountForm();
   chooseHost: HostList; // 已选择的主机
   chooseCluster: ClusterList; // 已选择的集群
-  mountFailHost:[]; //部分成功时挂载失败的主机
+  mountFailHost: []; //部分成功时挂载失败的主机
 
   chooseUnmountHost: HostOrCluster = null; // 已选择卸载的主机
   chooseUnmountCluster: HostOrCluster = null; // 已选择卸载的集群
@@ -224,7 +224,7 @@ export class VmfsListComponent extends VmfsCommon implements OnInit ,AfterViewIn
   modalLoading = false; // 数据加载loading
   modalHandleLoading = false; // 数据处理loading
   isOperationErr = false; // 错误信息
-  isMountPartSuccess=false; //挂载部分成功
+  isMountPartSuccess = false; //挂载部分成功
   isReclaimErr = false; // 错误信息
   nameChecking = false; // 名称校验
   capacityErr = false; // 容量错误信息
@@ -252,18 +252,18 @@ export class VmfsListComponent extends VmfsCommon implements OnInit ,AfterViewIn
   iopsLimitErr = false; // v6 设备 IOPS 下限大于上限
 
   //当前语言环境 CN为中文  EN为英文
-  language:string;
-  deleteDesc:string;//删除失败返回信息
-  unmountDesc:string;//卸载失败返回信息
-  mountFailOrPartSuccessDesc:string;//挂载失败和部分成功描述
+  language: string;
+  deleteDesc: string;//删除失败返回信息
+  unmountDesc: string;//卸载失败返回信息
+  mountFailOrPartSuccessDesc: string;//挂载失败和部分成功描述
 
   //失败提示窗口与部分成功提示窗口
-  errorShow=false;
-  partSuccessShow=false;
+  errorShow = false;
+  partSuccessShow = false;
   status;
   description;
   operatingType;
-  checkNullData=false
+  checkNullData = false
 
 
   setFormValueWhenHiden(isShowInput) {
@@ -278,14 +278,15 @@ export class VmfsListComponent extends VmfsCommon implements OnInit ,AfterViewIn
     // this.refreshVmfs();
 
   }
+
   ngAfterViewInit() {
     this.checkDmeConnect()
   }
 
   //判断进入当前页面是否自动同步
-  checkDmeConnect(){
-    let scan=localStorage.getItem("SynchronizeVmfs")
-    if (scan==='true'){
+  checkDmeConnect() {
+    let scan = localStorage.getItem("SynchronizeVmfs")
+    if (scan === 'true') {
       this.isLoading = true;
       this.statusFilter.initStatus();
       this.deviceFilter.initDevice();
@@ -295,7 +296,7 @@ export class VmfsListComponent extends VmfsCommon implements OnInit ,AfterViewIn
       this.remoteService.scanVMFS(this.storageType).subscribe((res: any) => {
         this.isLoading = false;
         // this.syncSuccessTips = true;
-        localStorage.setItem("SynchronizeVmfs","false")
+        localStorage.setItem("SynchronizeVmfs", "false")
         this.refreshVmfs()
         if (res.code === '200') {
           // this.refresh();
@@ -307,7 +308,7 @@ export class VmfsListComponent extends VmfsCommon implements OnInit ,AfterViewIn
         this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
       });
 
-    }else {
+    } else {
       this.refreshVmfs()
     }
   }
@@ -959,7 +960,7 @@ wwn: "67c1cf110058934511ba6e5a00000344"
     this.modalLoading = true;
     this.modalHandleLoading = false;
     this.isOperationErr = false;
-    this.partSuccessOrFail=false
+    this.partSuccessOrFail = false
     // 容量错误提示
     this.capacityErr = false;
     // this.gs.loading = true;
@@ -1161,21 +1162,21 @@ wwn: "67c1cf110058934511ba6e5a00000344"
           // 打开成功提示窗口setServiceLevelList
           this.addSuccessShow = true;
         } else if (result.code === '206') {
-          if(result.data.connectionResult&&result.data.connectionResult.length>0){
+          if (result.data.connectionResult && result.data.connectionResult.length > 0) {
             this.wizard.close();
             // this.partSuccessOrFail = true;
-            this.description=result.description
-            this.status='partSuccess'
-            this.operatingType='vmfsCreate'
+            this.description = result.description
+            this.status = 'partSuccess'
+            this.operatingType = 'vmfsCreate'
             this.partSuccessData = result
-            this.partSuccessShow=true
+            this.partSuccessShow = true
           } else {
             this.wizard.close();
-            this.description=result.description
-            this.status='error'
-            this.operatingType='vmfsCreateNoData'
-            this.partSuccessData=result
-            this.errorShow=true
+            this.description = result.description
+            this.status = 'error'
+            this.operatingType = 'vmfsCreateNoData'
+            this.partSuccessData = result
+            this.errorShow = true
             this.refreshVmfs()
           }
         } else if (result.code === '-60001') {
@@ -1201,10 +1202,10 @@ wwn: "67c1cf110058934511ba6e5a00000344"
           console.log('创建失败：' + result.description);
           // // 失败信息
           // this.partSuccessOrFail = true;
-          this.status='error'
-          this.description=result.description
-          this.operatingType='vmfsCreate'
-          this.errorShow=true
+          this.status = 'error'
+          this.description = result.description
+          this.operatingType = 'vmfsCreate'
+          this.errorShow = true
 
         }
         // 此方法变化检测，异步处理数据都要添加此方法
@@ -1322,10 +1323,10 @@ wwn: "67c1cf110058934511ba6e5a00000344"
   delHandleFunc() {
     const objectIds = this.rowSelected.map(item => item.objectid);
     console.log('del vmfs objectIds:' + objectIds);
-    this.language=this.translateService.currentLang==='en-US'?'EN':'CN'
+    this.language = this.translateService.currentLang === 'en-US' ? 'EN' : 'CN'
     const delInfos = {
       dataStoreObjectIds: objectIds,
-      language:this.language
+      language: this.language
     };
     this.modalHandleLoading = true;
     this.remoteService.delVmfs(delInfos).subscribe((result: any) => {
@@ -1340,12 +1341,12 @@ wwn: "67c1cf110058934511ba6e5a00000344"
         this.delSuccessShow = true;
       } else {
         console.log('DEL faild: ' + result.description);
-        this.delShow=false
-        this.description=result.description
-        this.operatingType='vmfsDelete'
-        this.status='error'
+        this.delShow = false
+        this.description = result.description
+        this.operatingType = 'vmfsDelete'
+        this.status = 'error'
         // this.deleteDesc=result.description
-        this.errorShow=true
+        this.errorShow = true
         // this.isOperationErr = true;
         this.refreshVmfs()
       }
@@ -1360,7 +1361,7 @@ wwn: "67c1cf110058934511ba6e5a00000344"
       this.modalLoading = true;
       this.modalHandleLoading = false;
       this.isOperationErr = false;
-      this.isMountPartSuccess=false;
+      this.isMountPartSuccess = false;
       this.mountErr = false;
 
       this.mountForm = new GetForm().getMountForm();
@@ -1559,27 +1560,27 @@ wwn: "67c1cf110058934511ba6e5a00000344"
             });
             this.connFailData = connFailDatas;
           }
-        }else if (result.code==='206'){
-          console.log("挂载部分成功："+result.description)
+        } else if (result.code === '206') {
+          console.log("挂载部分成功：" + result.description)
           // this.isMountPartSuccess=true
           // this.mountFailOrPartSuccessDesc=result.description
           // this.mountFailHost=result.data
-          this.mountShow=false
-          this.partSuccessShow=true
-          this.status='partSuccess'
-          this.operatingType='vmfsMount'
-          this.description=result.description
-          this.partSuccessData=result.data
-        }else {
+          this.mountShow = false
+          this.partSuccessShow = true
+          this.status = 'partSuccess'
+          this.operatingType = 'vmfsMount'
+          this.description = result.description
+          this.partSuccessData = result.data
+        } else {
           // console.log('挂载异常：' + result.description);
           // this.mountFailOrPartSuccessDesc=result.description
           // this.isOperationErr = true;
-          this.mountShow=false
-          this.errorShow=true
-          this.status='error'
-          this.operatingType='vmfsMount'
-          this.description=result.description
-          this.partSuccessData=result.data
+          this.mountShow = false
+          this.errorShow = true
+          this.status = 'error'
+          this.operatingType = 'vmfsMount'
+          this.description = result.description
+          this.partSuccessData = result.data
         }
       };
       const params = _.merge({chooseDevice}, this.mountForm);
@@ -1618,8 +1619,10 @@ wwn: "67c1cf110058934511ba6e5a00000344"
       this.deviceList = await this.commonService.remoteGetVmfsDeviceListById_unmount(
         this.rowSelected[0].objectid
       );
-      if(this.deviceList.length===0){
-        this.checkNullData=true
+      if (this.deviceList.length === 0) {
+        this.checkNullData = true
+      } else {
+        this.checkNullData = false
       }
 
       const loadUnountedHost = () => {
@@ -1711,13 +1714,14 @@ wwn: "67c1cf110058934511ba6e5a00000344"
     if (this.isDisableMountSubmit()) return;
     this.unmountTipsShow = true;
   }
+
   //卸载部分成功返回数据处理
-  unmountPartHandleFun(arr:any){
-    let obj=arr[0]
-    let str=Object.keys(obj)[0]
-    let arr1=str.split(",")
-    let arr2=[]
-    for(let item of arr1){
+  unmountPartHandleFun(arr: any) {
+    let obj = arr[0]
+    let str = Object.keys(obj)[0]
+    let arr1 = str.split(",")
+    let arr2 = []
+    for (let item of arr1) {
       item = item.trim()
       let temp = {}
       temp[item] = Object.values(obj)[0]
@@ -1725,8 +1729,9 @@ wwn: "67c1cf110058934511ba6e5a00000344"
     }
     return arr2
   }
+
   //卸载部分成功数据处理总和
-  unmountPartDataHandleFun(arr:any){
+  unmountPartDataHandleFun(arr: any) {
     let temp = []
     for (let item of arr) {
       let obj = {}
@@ -1742,6 +1747,7 @@ wwn: "67c1cf110058934511ba6e5a00000344"
     }
     return temp
   }
+
   // 卸载处理函数
   unmountHandleFunc() {
     this.unmountTipsShow = false;
@@ -1754,7 +1760,7 @@ wwn: "67c1cf110058934511ba6e5a00000344"
     );
 
     const submit = () => {
-      this.language=this.translateService.currentLang==='en-US'?'EN':'CN'
+      this.language = this.translateService.currentLang === 'en-US' ? 'EN' : 'CN'
       this.unmountForm.dataStoreObjectIds.push(this.rowSelected[0].objectid);
       if (this.unmountForm.mountType === '1') {
         this.unmountForm.hostId = this.chooseUnmountHost?.deviceId;
@@ -1765,9 +1771,19 @@ wwn: "67c1cf110058934511ba6e5a00000344"
       this.notChooseUnmountDevice = false;
 
       this.modalHandleLoading = true;
-      console.log('chooseDevice',this.addForm.value.chooseDevice)
-      console.log('unmountForm',this.unmountForm)
-      this.remoteService.unmountVMFS(_.merge(this.unmountForm,{ hostIds: this.addForm.value.chooseDevice.map(i=>i.deviceId) },{language:this.language})).subscribe((result: any) => {
+      console.log('chooseDevice', this.addForm.value.chooseDevice)
+      console.log('unmountForm', this.unmountForm)
+      let queryUnmount={}
+      queryUnmount=this.unmountForm
+      let clusterIds = this.addForm.value.chooseDevice.filter(i => i.deviceType === 'cluster')
+      let hostIds = this.addForm.value.chooseDevice.filter(i => i.deviceType === 'host')
+      if (clusterIds.length>0){
+        queryUnmount=_.merge(queryUnmount,{clusterIds:clusterIds.map(i=>i.deviceId)}, {language: this.language})
+      }
+      if (hostIds.length>0){
+        queryUnmount=_.merge(queryUnmount,{hostIds:hostIds.map(i=>i.deviceId)}, {language: this.language})
+      }
+      this.remoteService.unmountVMFS(queryUnmount).subscribe((result: any) => {
         this.modalHandleLoading = false;
         if (result.code === '200') {
           // console.log('unmount ' + this.rowSelected[0].name + ' success');
@@ -1777,64 +1793,64 @@ wwn: "67c1cf110058934511ba6e5a00000344"
           // this.scanDataStore();
           // 打开成功提示窗口
           this.unmountSuccessShow = true;
-        }else if(result.code==='206'){
-          let dmeError=[]
-          let vcError=[]
-          let bounded=[]
-          if(result.data.dmeError&&result.data.dmeError.length>0){
-            dmeError=this.unmountPartHandleFun(result.data.dmeError)
+        } else if (result.code === '206') {
+          let dmeError = []
+          let vcError = []
+          let bounded = []
+          if (result.data.dmeError && result.data.dmeError.length > 0) {
+            dmeError = this.unmountPartHandleFun(result.data.dmeError)
           }
-          if(result.data.vcError&&result.data.vcError.length>0){
-            vcError=result.data.vcError
+          if (result.data.vcError && result.data.vcError.length > 0) {
+            vcError = result.data.vcError
           }
-          if(result.data.bounded&&result.data.bounded.length>0){
-            bounded=result.data.bounded
+          if (result.data.bounded && result.data.bounded.length > 0) {
+            bounded = result.data.bounded
           }
-          this.partSuccessData=this.unmountPartDataHandleFun(dmeError.concat(vcError).concat(bounded))
-          this.description=result.description
-          this.unmountShow=false
-          this.status='partSuccess'
-          this.operatingType='vmfsUnmount'
-          this.partSuccessShow=true
+          this.partSuccessData = this.unmountPartDataHandleFun(dmeError.concat(vcError).concat(bounded))
+          this.description = result.description
+          this.unmountShow = false
+          this.status = 'partSuccess'
+          this.operatingType = 'vmfsUnmount'
+          this.partSuccessShow = true
         } else {
           // console.log('unmount ' + this.rowSelected[0].name + ' fail：' + result.description);
-          if(result.data&&Object.keys(result.data).length>0){
-            let dmeError=[]
-            let vcError=[]
-            let bounded=[]
-            if(result.data.dmeError&&result.data.dmeError.length>0){
-              dmeError=this.unmountPartHandleFun(result.data.dmeError)
+          if (result.data && Object.keys(result.data).length > 0) {
+            let dmeError = []
+            let vcError = []
+            let bounded = []
+            if (result.data.dmeError && result.data.dmeError.length > 0) {
+              dmeError = this.unmountPartHandleFun(result.data.dmeError)
             }
-            if(result.data.vcError&&result.data.vcError.length>0){
-              vcError=result.data.vcError
+            if (result.data.vcError && result.data.vcError.length > 0) {
+              vcError = result.data.vcError
             }
-            if(result.data.bounded&&result.data.bounded.length>0){
-              bounded=result.data.bounded
+            if (result.data.bounded && result.data.bounded.length > 0) {
+              bounded = result.data.bounded
             }
-            this.unmountShow=false
-            this.description=result.description
-            this.status='partSuccess'
-            this.operatingType='vmfsUnmountError'
-            this.partSuccessData=this.unmountPartDataHandleFun(dmeError.concat(vcError).concat(bounded))
-            this.partSuccessShow=true
-          }else {
-            this.unmountDesc=result.description
+            this.unmountShow = false
+            this.description = result.description
+            this.status = 'partSuccess'
+            this.operatingType = 'vmfsUnmountError'
+            this.partSuccessData = this.unmountPartDataHandleFun(dmeError.concat(vcError).concat(bounded))
+            this.partSuccessShow = true
+          } else {
+            this.unmountDesc = result.description
             // this.isOperationErr = true;
             this.unmountShow = false;
-            this.status='error'
-            this.partSuccessData=[]
-            this.description=result.description
-            this.operatingType='vmfsUnmount'
-            this.errorShow=true
+            this.status = 'error'
+            this.partSuccessData = []
+            this.description = result.description
+            this.operatingType = 'vmfsUnmount'
+            this.errorShow = true
           }
           this.refreshVmfs()
         }
         this.cdr.detectChanges();
       });
     }
-if( this.form.chooseDevice.length>0 ){
-  submit();
-}
+    if (this.form.chooseDevice.length > 0) {
+      submit();
+    }
 
 
     /* if (
@@ -2443,8 +2459,8 @@ if( this.form.chooseDevice.length>0 ){
     this.unmountSuccessShow = false;
     this.delSuccessShow = false;
     this.isFirstLoadChartData = true;
-    this.partSuccessShow=false;
-    this.errorShow=false
+    this.partSuccessShow = false;
+    this.errorShow = false
     // this.backToListPage();
     // 重新请求数据
     this.refreshVmfs();
@@ -2714,8 +2730,8 @@ if( this.form.chooseDevice.length>0 ){
   qoSAddFlagChange(form) {
     if (form.qosFlag) {
       form.control_policyUpper = '1';
-      this.modifyForm.isCheckedUpper=true
-      this.modifyForm.isCheckedlower=false
+      this.modifyForm.isCheckedUpper = true
+      this.modifyForm.isCheckedlower = false
       form.maxbandwidthChoose = true;
       form.maxiopsChoose = true;
 
@@ -3053,7 +3069,7 @@ if( this.form.chooseDevice.length>0 ){
     if (form.control_policyUpper == undefined) {
       form.maxbandwidthChoose = false;
       form.maxiopsChoose = false;
-    }else {
+    } else {
       form.maxbandwidthChoose = true;
       form.maxiopsChoose = true;
     }
@@ -3061,7 +3077,7 @@ if( this.form.chooseDevice.length>0 ){
       form.minbandwidthChoose = false;
       form.miniopsChoose = false;
       form.latencyChoose = false;
-    }else {
+    } else {
       form.minbandwidthChoose = true;
       form.miniopsChoose = true;
       form.latencyChoose = false;
