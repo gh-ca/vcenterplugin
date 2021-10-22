@@ -1146,6 +1146,49 @@ public class VCSDKUtils {
         return hosts;
     }
 
+
+    /**
+     * 获取当前存储在集群上挂载的主机
+     * @param dataStoreObjectId
+     * @param clusterId
+     * @return
+     * @throws VcenterException
+     */
+    public List<String> getMoutHostsOnCluster(String dataStoreObjectId, String clusterId)
+            throws VcenterException {
+        List<String> hostlist = new ArrayList<>();
+        try {
+            String mountHostStr = getHostsByDsObjectId(dataStoreObjectId, true);
+            List<Map<String, String>> mountHostlists = gson.fromJson(mountHostStr,
+                    new TypeToken<List<Map<String, String>>>() { }.getType());
+            List<String> mountHostIds = new ArrayList<>();
+            for (Map<String, String> mountHost : mountHostlists){
+                mountHostIds.add(mountHost.get(HOST_ID));
+            }
+
+            String hostStr = getHostsOnCluster(clusterId);
+            List<Map<String, String>> hostStrlists = gson.fromJson(hostStr,
+                    new TypeToken<List<Map<String, String>>>() { }.getType());
+            List<String> clusterHostIds = new ArrayList<>();
+            for (Map<String, String> host : hostStrlists){
+                clusterHostIds.add(host.get(HOST_ID));
+            }
+
+
+            if (hostStrlists != null && hostStrlists.size() > 0) {
+                for (String hostId : clusterHostIds) {
+                    if (mountHostIds.contains(hostId)) {
+                        hostlist.add(hostId);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            throw new VcenterException(e.getMessage());
+        }
+        return hostlist;
+    }
+
     /**
      * 得到集群下所有没有挂载的主机 20200918objectId
      *
@@ -2280,7 +2323,7 @@ public class VCSDKUtils {
         }
     }
 
-    public Map<String, String> unmountVmfsOnHost(String datastoreStr, List<String> hostObjectIds) throws VcenterException {
+    public Map<String, String> unmountVmfsOnHost(String datastoreStr, List<String> hostObjectIds, Map<String, List<String>> relation) throws VcenterException {
         String objDataStoreName = "";
         Map<String, String> vcError = new HashMap<>();
         try {
@@ -2314,6 +2357,19 @@ public class VCSDKUtils {
                             Map<String, String> map = unmountVmfs1(objDataStoreName, hostmo);
                             if (!CollectionUtils.isEmpty(map)) {
                                 return map;
+                            } else{
+                                // 如果卸载成功
+                                String dataStoreId = ToolUtils.getStr(dsmap.get(ID));
+                                String volumeId = ToolUtils.getStr(dsmap.get("volume_id"));
+                                String clusterId = hostmo.getHyperHostCluster().getValue();
+                                List<String> hostIds = this.getMoutHostsOnCluster(dataStoreId, clusterId);
+                                if (hostIds.size() == 0){
+                                    if(!relation.containsKey(clusterId)){
+                                        relation.put(clusterId, new ArrayList(){{add(volumeId);}});
+                                    } else{
+                                        relation.get(clusterId).add(volumeId);
+                                    }
+                                }
                             }
                         }
                     }
