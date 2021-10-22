@@ -112,6 +112,7 @@ public class VmRdmServiceImpl implements VmRdmService {
         String compatibilityMode) throws DmeException {
         String language =  createBean.getLanguage() == null? DmeConstants.LANGUAGE_CN : createBean.getLanguage();
         String taskId = createDmeRdm(createBean, language);
+
         List<String> lunNames = taskService.getSuccessNameFromCreateTask(TASKTYPE, taskId, longTaskTimeOut);
         Map<String, Object> paramMap = initParams(createBean);
         String requestVolumeName = (String) paramMap.get("requestVolumeName");
@@ -120,7 +121,6 @@ public class VmRdmServiceImpl implements VmRdmService {
         List<String> volumeIds = new ArrayList<>();
         for (int index = 0; index < volumeArr.size(); index++) {
             if (lunNames.contains(volumeArr.get(index).getAsJsonObject().get(NAME_FIELD).getAsString())) {
-                String asString = volumeArr.get(index).getAsJsonObject().get(ID_FIELD).getAsString();
                 volumeIds.add(volumeArr.get(index).getAsJsonObject().get(ID_FIELD).getAsString());
             }
         }
