@@ -131,6 +131,8 @@ export class NfsComponent extends NfsComponentCommon implements OnInit ,AfterVie
 
   isCheckUpper:boolean;
   isCheckLower:boolean;
+  overSizeGB=false
+  overSizeTB=false
 
   constructor(
     private mountService: NfsMountService,
@@ -333,6 +335,7 @@ export class NfsComponent extends NfsComponentCommon implements OnInit ,AfterVie
     this.createAddFormAndWatchFormChange();
 
     // 初始化form
+
     this.addFormGroup.reset(this.addForm);
     this.checkedPool = null;
     this.errorMsg = '';
@@ -854,6 +857,33 @@ export class NfsComponent extends NfsComponentCommon implements OnInit ,AfterVie
       }
     });
   }
+
+  checkSize(){
+    this.overSizeGB=false
+    this.overSizeTB=false
+    if (this.unit==='GB'){
+      if (this.addForm.size>16777216){
+        this.overSizeGB=true
+        this.addForm.size=null
+      }else if (!this.addForm.size){
+        this.overSizeGB=true
+      }
+      else {
+        this.overSizeGB=false
+      }
+    }else if (this.unit==='TB'){
+      if (this.addForm.size>16384){
+        this.overSizeTB=true
+        this.addForm.size=null
+      }else if (!this.addForm.size){
+        this.overSizeTB=true
+      }
+      else {
+        this.overSizeTB=false
+      }
+    }
+  }
+
   checkFsNameExist(name: string) {
     if ((this as any).checkFsNameExist_oldName === name) return;
     (this as any).checkFsNameExist_oldName = name;

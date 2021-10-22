@@ -56,8 +56,6 @@ public class DmeAccessServiceImpl implements DmeAccessService {
 
     private static final String PASSWORD = "password";
 
-    private static final String TASK_DETAIL_CN = "detail_cn";
-
     private static final String TASK_ID = "task_id";
 
     private static final String VOLUME_IDS = "volume_ids";
@@ -788,7 +786,7 @@ public class DmeAccessServiceImpl implements DmeAccessService {
     }
 
     @Override
-    public void deleteVolumes(List<String> ids) throws DmeException {
+    public void deleteVolumes(List<String> ids, String language) throws DmeException {
         String url = DmeConstants.DME_VOLUME_DELETE_URL;
         JsonObject body = new JsonObject();
         JsonArray array = new JsonParser().parse(gson.toJson(ids)).getAsJsonArray();
@@ -803,13 +801,16 @@ public class DmeAccessServiceImpl implements DmeAccessService {
         String taskId = task.get(TASK_ID).getAsString();
         JsonObject taskDetail = taskService.queryTaskByIdUntilFinish(taskId);
         if (taskDetail.get(DmeConstants.TASK_DETAIL_STATUS_FILE).getAsInt() != DmeConstants.TASK_SUCCESS) {
-            LOG.error("delete volumes failed!task status={}", task.get(STATUS).getAsInt());
-            throw new DmeException(task.get(TASK_DETAIL_CN).getAsString());
+            String errMessage = DmeConstants.LANGUAGE_CN.equals(language)?
+                taskDetail.get(DmeConstants.TASK_DETAIL_CN).getAsString() :
+                taskDetail.get(DmeConstants.TASK_DETAIL_EN).getAsString();
+            LOG.error("delete volumes failed!task status={},errMsg={}", task.get(STATUS).getAsInt(), errMessage);
+            throw new DmeException(errMessage);
         }
     }
 
     @Override
-    public void unMapHost(String hostId, List<String> ids) throws DmeException {
+    public void unMapHost(String hostId, List<String> ids, String language) throws DmeException {
         String url = DmeConstants.DME_HOST_UNMAPPING_URL;
         JsonObject body = new JsonObject();
         JsonArray array = new JsonParser().parse(gson.toJson(ids)).getAsJsonArray();
@@ -825,13 +826,17 @@ public class DmeAccessServiceImpl implements DmeAccessService {
         String taskId = task.get(TASK_ID).getAsString();
         JsonObject taskDetail = taskService.queryTaskByIdUntilFinish(taskId);
         if (taskDetail.get(DmeConstants.TASK_DETAIL_STATUS_FILE).getAsInt() != DmeConstants.TASK_SUCCESS) {
-            LOG.error("host unmapping failed!task status={}", task.get(STATUS).getAsInt());
-            throw new DmeException(task.get(TASK_DETAIL_CN).getAsString());
+            // 错误信息构建
+            String errMessage = DmeConstants.LANGUAGE_CN.equals(language)?
+                taskDetail.get(DmeConstants.TASK_DETAIL_CN).getAsString() :
+                taskDetail.get(DmeConstants.TASK_DETAIL_EN).getAsString();
+            LOG.error("host unmapping failed!task status={}，errMsg={}", task.get(STATUS).getAsInt(), errMessage);
+            throw new DmeException(errMessage);
         }
     }
 
     @Override
-    public void hostMapping(String hostId, List<String> volumeIds) throws DmeException {
+    public void hostMapping(String hostId, List<String> volumeIds, String language) throws DmeException {
         String url = DmeConstants.DME_HOST_MAPPING_URL;
         JsonObject body = new JsonObject();
         body.addProperty("host_id", hostId);
@@ -847,8 +852,11 @@ public class DmeAccessServiceImpl implements DmeAccessService {
         String taskId = task.get(TASK_ID).getAsString();
         JsonObject taskDetail = taskService.queryTaskByIdUntilFinish(taskId);
         if (taskDetail.get(DmeConstants.TASK_DETAIL_STATUS_FILE).getAsInt() != DmeConstants.TASK_SUCCESS) {
-            LOG.error("host mapping failed!task status={}", task.get(STATUS).getAsInt());
-            throw new DmeException(task.get(TASK_DETAIL_CN).getAsString());
+            // 错误信息构建
+            String errMessage = DmeConstants.LANGUAGE_CN.equals(language)?
+                taskDetail.get(DmeConstants.TASK_DETAIL_CN).getAsString():taskDetail.get(DmeConstants.TASK_DETAIL_EN).getAsString();
+            LOG.error("host mapping failed!task status={},errMsg:{}", task.get(STATUS).getAsInt(), errMessage);
+            throw new DmeException(errMessage);
         }
     }
 

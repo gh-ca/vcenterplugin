@@ -458,7 +458,7 @@ public class DmeAccessServiceImplTest {
         JsonObject taskDetail = new JsonObject();
         taskDetail.addProperty("status", 3);
         when(taskService.queryTaskByIdUntilFinish("1123")).thenReturn(taskDetail);
-        dmeAccessService.deleteVolumes(ids);
+        dmeAccessService.deleteVolumes(ids, "CN");
     }
 
     /**
@@ -484,7 +484,7 @@ public class DmeAccessServiceImplTest {
         taskDetail.addProperty("status", 3);
         when(taskService.queryTaskByIdUntilFinish("1123")).thenReturn(taskDetail);
 
-        dmeAccessService.unMapHost(hostId, ids);
+        dmeAccessService.unMapHost(hostId, ids, "CN");
     }
 
     /**
@@ -509,7 +509,7 @@ public class DmeAccessServiceImplTest {
         taskDetail.addProperty("status", 3);
         when(taskService.queryTaskByIdUntilFinish("1123")).thenReturn(taskDetail);
 
-        dmeAccessService.hostMapping(hostId, volumeIds);
+        dmeAccessService.hostMapping(hostId, volumeIds, "EN");
     }
 
 }

@@ -8,6 +8,11 @@ package com.huawei.dmestore.model;
  **/
 public class VmRdmCreateBean {
     /**
+     * language .
+     */
+    private String language;
+
+    /**
      * createVolumesRequest .
      */
     private CreateVolumesRequest createVolumesRequest;
@@ -63,5 +68,13 @@ public class VmRdmCreateBean {
 
     public void setCompatibilityMode(String compatibilityMode) {
         this.compatibilityMode = compatibilityMode;
+    }
+
+    public String getLanguage() {
+        return language;
+    }
+
+    public void setLanguage(String language) {
+        this.language = language;
     }
 }

@@ -51,6 +51,7 @@ export class MountComponent implements OnInit {
   deviceList_list: HostOrCluster[]; // 单主机
   deviceForm;
 
+  checkNullData=false
   //当前挂载类型：主机或集群
   selectMountType;
 
@@ -305,6 +306,9 @@ export class MountComponent implements OnInit {
         let isShowHostList = false;
         console.log('isShowHostList', isShowHostList);
         this.deviceList = await this.commonService.remoteGetVmfsDeviceListById_unmount(this.objectId);
+        if(this.deviceList.length===0){
+          this.checkNullData=true
+        }
 
         const loadUnmountHost = () => {
           const setDeviceList = (result: any) => {
