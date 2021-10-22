@@ -8,6 +8,7 @@ import com.huawei.dmestore.model.VmRdmCreateBean;
 import com.huawei.dmestore.services.VmRdmService;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import org.slf4j.Logger;
@@ -132,7 +133,8 @@ public class VmRdmController extends BaseController {
                 List<String> hostList = gson.fromJson(delResultObj.get("data"), List.class);
                 responseBodyBean.setData(hostList);
             }
-            responseBodyBean.setDescription(delResultObj.get("description").getAsString());
+            JsonElement desJsonElement = delResultObj.get("description");
+            responseBodyBean.setDescription(desJsonElement == null? "" : desJsonElement.getAsString());
             return responseBodyBean;
         } catch (DmeException e) {
             LOG.error(e.getMessage());
