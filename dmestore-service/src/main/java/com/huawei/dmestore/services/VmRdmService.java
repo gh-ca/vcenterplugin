@@ -1,7 +1,6 @@
 package com.huawei.dmestore.services;
 
 import com.huawei.dmestore.exception.DmeException;
-import com.huawei.dmestore.model.DelVmRdmsRequest;
 import com.huawei.dmestore.model.VmRdmCreateBean;
 
 import java.util.List;
@@ -43,22 +42,4 @@ public interface VmRdmService {
      **/
     List<Object> getDatastoreMountsOnHost(String vmObjectId) throws DmeException;
 
-    /**
-     * 获取虚拟机的RDM磁盘信息
-     *
-     * @param vmObjectId vCenter虚拟机objectId
-     * @return java.util.List
-     * @throws DmeException DmeException
-     **/
-    List<Map<String, String>> getVmRdmByObjectId(String vmObjectId) throws DmeException;
-
-
-    /**
-     * 虚拟机的RDM磁盘删除
-     *
-     * @param vmObjectId vCenter虚拟机objectId
-     * @param disks vCenter虚拟机RDM的Id
-     * @throws DmeException DmeException
-     **/
-    String delVmRdmByObjectId(String vmObjectId, List<DelVmRdmsRequest> disks) throws DmeException;
 }
