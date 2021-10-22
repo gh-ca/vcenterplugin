@@ -27,12 +27,15 @@ export class GhTreeCheckboxComponent implements OnInit ,AfterViewChecked{
   @Input() resType: string = 'normal';
   @Input() mountType:string;
   @Input() vmfsMount:boolean;
+  @Input() checkNullData:boolean=false;
   @Output() valueChange: EventEmitter<any>;
   treeValue;
   resValue;
   selectedHost = false;
   selectedCluster = false;
   clusterInHostMount=false;
+  treeLoading=false;
+  nullData=false;
 
   // get isList() {
   //   return _.isArray(this.list) && this.list.length > 0;
@@ -73,6 +76,8 @@ export class GhTreeCheckboxComponent implements OnInit ,AfterViewChecked{
   }
   ngAfterViewChecked() {
     this.checkMountType()
+    this.checkTreeLength()
+    this.checkTreeData()
   }
 
   // ngOnChanges(changes: { [propKey: string]: SimpleChange }) {
@@ -138,9 +143,9 @@ export class GhTreeCheckboxComponent implements OnInit ,AfterViewChecked{
 //  当前树是否有长度，判断是否展示数据加载模态框
   checkTreeLength(){
     if(this.tree&&this.tree.length>0){
-      return false
+     this.treeLoading=false
     }else {
-      return true
+      this.treeLoading=true
     }
   }
 //  挂载：当前挂载类型为主机时，集群置灰，只能选择主机进行挂载
@@ -157,4 +162,11 @@ export class GhTreeCheckboxComponent implements OnInit ,AfterViewChecked{
     }
       }
     }
+//判断当前树返回数据是否为空，为空则显示无数据提示，并关闭模态框
+  checkTreeData(){
+    if (this.checkNullData){
+      this.treeLoading=false
+      this.nullData=true
+    }
+  }
 }

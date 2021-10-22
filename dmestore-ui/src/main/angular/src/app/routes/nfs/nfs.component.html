@@ -347,12 +347,24 @@
         <clr-input-container>
           <label>{{'nfs.size' | translate}}</label>
           <input style="width: 80%" clrInput class="inputOneLine" type="number" min="0" [(ngModel)]="addForm.size"
-            name="size" formControlName="size" required />
+            name="size" formControlName="size" required  (blur)="checkSize()"/>
           <select clrInput [(ngModel)]="unit" name="unit" formControlName="unit">
             <option value="TB">TB</option>
             <option value="GB">GB</option>
           </select>
-          <clr-control-error>{{'errorMsg.require' | translate}}</clr-control-error>
+          <clr-control-helper *ngIf="overSizeGB">
+            <div class="errorTips" readonly>
+              <clr-icon shape="exclamation-circle" class="is-solid"></clr-icon><span>{{'errorMsg.require' | translate}}</span>{{'nfs.overSizeGB'|translate}}
+            </div>
+          </clr-control-helper>
+          <clr-control-helper *ngIf="overSizeTB">
+            <div class="errorTips" readonly>
+              <clr-icon shape="exclamation-circle" class="is-solid"></clr-icon><span>{{'errorMsg.require' | translate}}</span>{{'nfs.overSizeTB'|translate}}
+            </div>
+          </clr-control-helper>
+          <clr-control-error>
+            <p class="clr-error clr-subtext">{{'errorMsg.require' | translate}}</p>
+          </clr-control-error>
         </clr-input-container>
         <!--字符编码-->
         <clr-select-container class="selectClass">

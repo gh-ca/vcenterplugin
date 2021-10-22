@@ -411,7 +411,7 @@
 <clr-modal [(clrModalOpen)]="rdmError" [clrModalSize]="'sm'">
   <h3 class="modal-title">{{'menu.tip'|translate}}</h3>
   <div class="modal-body">
-    <clr-icon shape="error-standard" class="is-solid" style="color: red;margin-right: 5px;"></clr-icon>{{'rdm.createRdmError'|translate}}
+    <clr-icon shape="error-standard" class="is-solid" style="color: red;margin-right: 5px;"></clr-icon>{{createRdmErrorDesc}}
   </div>
   <div class="modal-footer">
     <button type="button" class="btn btn-danger" (click)="rdmError=false">{{'menu.ok'|translate}}</button>

@@ -393,15 +393,15 @@ export class DetailComponent implements OnInit, AfterViewInit {
               "id":"40ed4f57-0d98-4592-884e-3c044a64172f",
               "name":"Dorado5600-203",
               "ip":"51.10.132.203",
-              "status":"1",
+              "status":"0",
               "synStatus":"2",
               "sn":"2102353GTG10L6000003",
               "vendor":"Huawei",
               "model":"OceanStor Dorado 5600 V6",
-              "usedCapacity":399.1181640625,
+              "usedCapacity":1292.19,
               "usableCapacity":44584.928,
               "totalCapacity":0,
-              "totalEffectiveCapacity":209715200,
+              "totalEffectiveCapacity":1898,
               "freeEffectiveCapacity":170003.94434,
               "subscriptionCapacity":22317,
               "protectionCapacity":0.08,
@@ -442,7 +442,7 @@ export class DetailComponent implements OnInit, AfterViewInit {
                 "smartTierShow":false,
                 "prefetchStrategyShow":false,
                 "storageDetailTag":2,
-                "dorado":true
+                "dorado":false
               },
               "smartQos":null
             },
@@ -1088,7 +1088,7 @@ export class DetailComponent implements OnInit, AfterViewInit {
   }
 
   formatCapacity(c: number) {
-    if ((c < 1024&&c>1)||c===0) {
+    if ((c < 1024&&c>=1)||c===0) {
       return c.toFixed(3) + ' GB';
     } else if (c >= 1024 && c < 1048576) {
       return (c / 1024).toFixed(3) + ' TB';
@@ -1202,7 +1202,7 @@ export class DetailComponent implements OnInit, AfterViewInit {
     const handleOtherVersion = () => {
       this.cd.fileSystem = this.formatCapacity(this.detail.fileCapacity);
       this.cd.volume = this.formatCapacity(this.detail.blockCapacity);
-      freeCapacity = (this.detail.totalEffectiveCapacity - this.detail.usedCapacity).toFixed(3);
+      freeCapacity = this.detail.totalEffectiveCapacity - this.detail.usedCapacity
       /*  */
       this.cd.freeCapacity = this.formatCapacity(freeCapacity);
       title =
