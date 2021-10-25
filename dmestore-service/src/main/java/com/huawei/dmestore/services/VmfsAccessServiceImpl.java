@@ -6892,50 +6892,39 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
 
                                     }
                                 }
-                                boolean flag = false;
-                                for (String wwniqn : wwniqns) {
-                                    if (portNameList.contains(wwniqn)) {
-                                        flag = true;
-                                        break;
-                                    }
-
-                                }
-                                if (!flag) {
+                                if (portNameList.retainAll(wwniqns) && portNameList.size() == 0) {
                                     hostgroupidList.add(hostgroupid);
                                 }
-//                                if (!portNameList.containsAll(wwniqns)) {
-//                                    hostgroupidList.add(hostgroupid);
-//                                }
-                            }
-                        }
-                        if (!CollectionUtils.isEmpty(hostIdSet)) {
 
-                            for (String hostid : hostIdSet) {
-                                List<String> hostPortNameList = new ArrayList<>();
-                                List<Map<String, Object>> hostinitionators = allinitionators.get(hostid);
-                                if (!CollectionUtils.isEmpty(hostinitionators)) {
-                                    for (Map<String, Object> inimap : hostinitionators) {
-                                        String portName = ToolUtils.getStr(inimap.get(PORT_NAME));
-                                        if (!StringUtils.isEmpty(portName)) {
-                                            hostPortNameList.add(portName);
+                            }
+                            if (!CollectionUtils.isEmpty(hostIdSet)) {
+
+                                for (String hostid : hostIdSet) {
+                                    List<String> hostPortNameList = new ArrayList<>();
+                                    List<Map<String, Object>> hostinitionators = allinitionators.get(hostid);
+                                    if (!CollectionUtils.isEmpty(hostinitionators)) {
+                                        for (Map<String, Object> inimap : hostinitionators) {
+                                            String portName = ToolUtils.getStr(inimap.get(PORT_NAME));
+                                            if (!StringUtils.isEmpty(portName)) {
+                                                hostPortNameList.add(portName);
+                                            }
                                         }
                                     }
-                                }
-                                if (!hostPortNameList.containsAll(wwniqns)) {
-                                    hostidList.add(hostid);
+                                    if (hostPortNameList.retainAll(wwniqns) && hostPortNameList.size() == 0) {
+                                        hostidList.add(hostid);
+                                    }
                                 }
                             }
                         }
-                    }
-                    if (null != unMappingHost) {
-                        unMappingHost.put(volumeid, hostidList);
-                    }
-                    if (null != unMappingHostGroup) {
-                        unMappingHostGroup.put(volumeid, hostgroupidList);
+                        if (null != unMappingHost) {
+                            unMappingHost.put(volumeid, hostidList);
+                        }
+                        if (null != unMappingHostGroup) {
+                            unMappingHostGroup.put(volumeid, hostgroupidList);
+                        }
                     }
                 }
             }
         }
     }
-
 }
