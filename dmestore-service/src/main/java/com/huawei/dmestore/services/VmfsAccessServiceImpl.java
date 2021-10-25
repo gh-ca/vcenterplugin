@@ -6837,8 +6837,8 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 List<String> hostidList = new ArrayList<>();
                 List<String> hostgroupidList = new ArrayList<>();
 
-                String storeId = dmeVmwareRelation.getStoreId();
-                List<Map<String, String>> mountedHost = vcsdkUtils.getHostsByDsObjectIdNew(storeId, true);
+                String strogaeId = dmeVmwareRelation.getStoreId();
+                List<Map<String, String>> mountedHost = vcsdkUtils.getHostsByDsObjectIdNew(strogaeId, true);
                 List<Map<String, Object>> hbasList = new ArrayList<>();
                 if (!CollectionUtils.isEmpty(mountedHost)) {
                     for (Map<String, String> mountHostInfo : mountedHost) {
@@ -6867,7 +6867,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                             String hostGroupid = attch.get("attached_host_group");
                             if (!StringUtils.isEmpty(hostGroupid)) {
                                 hostGroupSet.add(hostGroupid);
-                            } else if (!StringUtils.isEmpty(attch.get(HOST_ID)) || StringUtils.isEmpty(hostGroupid)) {
+                            } else if (!StringUtils.isEmpty(attch.get(HOST_ID))) {
                                 hostIdSet.add(attch.get(HOST_ID));
                             }
 
@@ -6892,20 +6892,9 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
 
                                     }
                                 }
-                                boolean flag = false;
-                                for (String wwniqn : wwniqns) {
-                                    if (portNameList.contains(wwniqn)) {
-                                        flag = true;
-                                        break;
-                                    }
-
-                                }
-                                if (!flag) {
+                                if (portNameList.retainAll(wwniqns) && portNameList.size() == 0) {
                                     hostgroupidList.add(hostgroupid);
                                 }
-//                                if (!portNameList.containsAll(wwniqns)) {
-//                                    hostgroupidList.add(hostgroupid);
-//                                }
                             }
                         }
                         if (!CollectionUtils.isEmpty(hostIdSet)) {
@@ -6921,7 +6910,8 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                                         }
                                     }
                                 }
-                                if (!hostPortNameList.containsAll(wwniqns)) {
+
+                                if (hostPortNameList.retainAll(wwniqns) && hostPortNameList.size() == 0 ) {
                                     hostidList.add(hostid);
                                 }
                             }
