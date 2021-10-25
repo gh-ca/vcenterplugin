@@ -6892,7 +6892,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
 
                                     }
                                 }
-                                if (!portNameList.containsAll(wwniqns)) {
+                                if (portNameList.retainAll(wwniqns) && portNameList.size() == 0) {
                                     hostgroupidList.add(hostgroupid);
                                 }
                             }
@@ -6911,7 +6911,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                                     }
                                 }
 
-                                if (!hostPortNameList.containsAll(wwniqns)) {
+                                if (hostPortNameList.retainAll(wwniqns) && hostPortNameList.size() == 0 ) {
                                     hostidList.add(hostid);
                                 }
                             }
