@@ -89,47 +89,4 @@ public class VmRdmController extends BaseController {
         }
     }
 
-    /**
-     * getRdms
-     *
-     * @param vmObjectId vmObjectId
-     * @return ResponseBodyBean
-     */
-    @RequestMapping(value = "rdms/{vmObjectId}", method = RequestMethod.GET)
-    public ResponseBodyBean getRdms(@PathVariable("vmObjectId") String vmObjectId) {
-        try {
-            List<Map<String, String>> rdms = vmRdmService.getVmRdmByObjectId(vmObjectId);
-            return success(rdms);
-        } catch (DmeException e) {
-            LOG.error(e.getMessage());
-            return failure(e.getMessage());
-        }
-    }
-
-    /**
-     * delRdms
-     *
-     * @param vmObjectId vmObjectId
-     * @param diskObjectIds Ҫɾ���Ĵ����б���Ϣ
-     * @return ResponseBodyBean
-     */
-    @RequestMapping(value = "rdms/{vmObjectId}", method = RequestMethod.POST)
-    public ResponseBodyBean delRdms(@PathVariable("vmObjectId") String vmObjectId, @RequestBody List<DelVmRdmsRequest> diskObjectIds) {
-        try {
-            String delResultStr = vmRdmService.delVmRdmByObjectId(vmObjectId, diskObjectIds);
-            JsonObject delResultObj = gson.fromJson(delResultStr, JsonObject.class);
-            ResponseBodyBean responseBodyBean = new ResponseBodyBean();
-            responseBodyBean.setCode(delResultObj.get("code").getAsString());
-            if(delResultObj.get("data") != null){
-                List<String> hostList = gson.fromJson(delResultObj.get("data"), List.class);
-                responseBodyBean.setData(hostList);
-            }
-            responseBodyBean.setDescription(delResultObj.get("description").getAsString());
-            return responseBodyBean;
-        } catch (DmeException e) {
-            LOG.error(e.getMessage());
-            return failure(e.getMessage());
-        }
-    }
-
 }
