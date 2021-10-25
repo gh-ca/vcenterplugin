@@ -217,15 +217,7 @@ public interface VmfsAccessService {
       * @Date 2021/5/14 16:17
      */
     List<ClusterTree> getMountedHostGroupsAndHostReturnTree(String dataStoreObjectId) throws Exception;
-    /**
-      * @Description: vfms卸载功能新接口
-      * @Param @param null
-      * @return @return
-      * @throws
-      * @author yc
-      * @Date 2021/5/14 16:17
-     */
-   // void unmountVmfsNew(Map<String, Object> params) throws DmeException;
+
     /**
      * @Description: 查询存储设备的创建方式
      * @Param dataStoreObjectIds
