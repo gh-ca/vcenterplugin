@@ -2,7 +2,11 @@ package com.huawei.dmestore.dao;
 
 import com.huawei.dmestore.constant.DpSqlFileConstants;
 import com.huawei.dmestore.exception.DataBaseException;
+import com.huawei.dmestore.exception.DmeSqlException;
 import com.huawei.dmestore.model.BestPracticeBean;
+import com.huawei.dmestore.model.BestPracticeLog;
+import com.huawei.dmestore.model.BestPracticeRecommand;
+import com.huawei.dmestore.model.BestPracticeRecommandUpReq;
 import com.huawei.dmestore.model.BestPracticeUpResultBase;
 import com.huawei.dmestore.model.BestPracticeUpResultResponse;
 
@@ -19,10 +23,13 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * BestPracticeCheckDao
@@ -31,15 +38,19 @@ import java.util.Map;
  * @since 2020-09-15
  **/
 public class BestPracticeCheckDao extends H2DataBaseDao {
-    private static final String HOST_NAME = "HOST_NAME";
+    public static final String HOST_NAME = "HOST_NAME";
 
-    private static final String HOST_ID = "HOST_ID";
+    public static final String HOST_ID = "HOST_ID";
+
+    public static final String HOST_SETTING = "HOST_SETTING";
 
     private static final int PARAMETER_INDEX_1 = 1;
 
     private static final int PARAMETER_INDEX_2 = 2;
 
     private static final int COLLECTIONS_DEFAULT_LEN = 16;
+
+    private final SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     /**
      * save
@@ -124,22 +135,31 @@ public class BestPracticeCheckDao extends H2DataBaseDao {
      * @return Map
      * @throws SQLException SQLException
      */
-    public Map<String, String> getAllHostIds(int pageNo, int pageSize) throws SQLException {
-        Map<String, String> map = new HashMap<>(COLLECTIONS_DEFAULT_LEN);
+    public Map<String, Map<String, String>> getAllHostIds(int pageNo, int pageSize, String hostSetting)
+        throws SQLException {
+        Map<String, Map<String, String>> map = new HashMap<>(COLLECTIONS_DEFAULT_LEN);
         Connection con = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
         try {
             con = getConnection();
-            String sql = "SELECT HOST_ID,HOST_NAME from DP_DME_BEST_PRACTICE_CHECK where 1=1 ";
-            if (pageNo > 0 && pageSize > 0) {
-                int offset = (pageNo - 1) * pageSize;
-                sql = sql + " OFFSET " + offset + " ROWS FETCH FIRST " + pageSize + " ROWS ONLY";
+            String sql = "SELECT HOST_ID,HOST_NAME,HOST_SETTING from DP_DME_BEST_PRACTICE_CHECK where 1=1 ";
+            if (!StringUtils.isEmpty(hostSetting)) {
+                sql = sql + "and HOST_SETTING='" + hostSetting + "' ";
             }
+            int fetchSize = pageSize > 0 ? pageSize : 100;
+            int offset = 0;
+            if (pageNo > 0) {
+                offset = (pageNo - 1) * pageSize;
+            }
+            sql = sql + " OFFSET " + offset + " ROWS FETCH FIRST " + fetchSize + " ROWS ONLY";
             ps = con.prepareStatement(sql);
             rs = ps.executeQuery();
             while (rs.next()) {
-                map.put(rs.getString(HOST_ID), rs.getString(HOST_NAME));
+                Map<String, String> temp = new HashMap<>();
+                temp.put(HOST_NAME, rs.getString(HOST_NAME));
+                temp.put(HOST_SETTING, rs.getString(HOST_SETTING));
+                map.put(rs.getString(HOST_ID), temp);
             }
         } catch (DataBaseException | SQLException e) {
             LOGGER.error("getAllHostIds Failed! {}", e.getMessage());
@@ -157,8 +177,8 @@ public class BestPracticeCheckDao extends H2DataBaseDao {
      * @return Map
      * @throws SQLException SQLException
      */
-    public Map<String, String> getByHostIds(List<String> ids) throws SQLException {
-        Map<String, String> map = new HashMap<>(COLLECTIONS_DEFAULT_LEN);
+    public Map<String, Map<String, String>> getByHostIds(List<String> ids, String hostSetting) throws SQLException {
+        Map<String, Map<String, String>> map = new HashMap<>(COLLECTIONS_DEFAULT_LEN);
         if (ids == null || ids.size() == 0) {
             return map;
         }
@@ -167,7 +187,11 @@ public class BestPracticeCheckDao extends H2DataBaseDao {
         ResultSet rs = null;
         try {
             con = getConnection();
-            String sql = "SELECT HOST_ID,HOST_NAME from DP_DME_BEST_PRACTICE_CHECK where 1=1 AND HOST_ID in(";
+            String sql = "SELECT HOST_ID,HOST_NAME,HOST_SETTING from DP_DME_BEST_PRACTICE_CHECK where 1=1 ";
+            if (!StringUtils.isEmpty(hostSetting)) {
+                sql = sql + " AND HOST_SETTING='" + hostSetting + "' ";
+            }
+            sql = sql + " AND HOST_ID in(";
             StringBuilder stringBuilder = new StringBuilder(sql);
             for (int index = 0; index < ids.size(); index++) {
                 if (index == ids.size() - 1) {
@@ -182,7 +206,10 @@ public class BestPracticeCheckDao extends H2DataBaseDao {
             }
             rs = ps.executeQuery();
             while (rs.next()) {
-                map.put(rs.getString(HOST_ID), rs.getString(HOST_NAME));
+                Map<String, String> temp = new HashMap<>();
+                temp.put(HOST_NAME, rs.getString(HOST_NAME));
+                temp.put(HOST_SETTING, rs.getString(HOST_SETTING));
+                map.put(rs.getString(HOST_ID), temp);
             }
         } catch (DataBaseException | SQLException e) {
             LOGGER.error("getAllHostIds Failed! {}", e.getMessage());
@@ -237,15 +264,24 @@ public class BestPracticeCheckDao extends H2DataBaseDao {
         return lists;
     }
 
+    public List<BestPracticeBean> getRecordBeanByHostSetting(String hostSetting, String id) throws SQLException {
+        List<String> ids = null;
+        if (!StringUtils.isEmpty(id)) {
+            ids = new ArrayList<>();
+            ids.add(id);
+        }
+        return getRecordBeanByHostSetting(hostSetting, ids);
+    }
+
     /**
      * getRecordBeanByHostsetting
      *
      * @param hostSetting hostSetting
-     * @param id id
+     * @param ids id
      * @return List
      * @throws SQLException SQLException
      */
-    public List<BestPracticeBean> getRecordBeanByHostsetting(String hostSetting, String id) throws SQLException {
+    public List<BestPracticeBean> getRecordBeanByHostSetting(String hostSetting, List<String> ids) throws SQLException {
         List<BestPracticeBean> lists = new ArrayList<>();
         Connection con = null;
         PreparedStatement ps = null;
@@ -255,16 +291,16 @@ public class BestPracticeCheckDao extends H2DataBaseDao {
             String sql = "SELECT HOST_ID,HOST_NAME,HOST_SETTING,RECOMMEND_VALUE,ACTUAL_VALUE,HINT_LEVEL,NEED_REBOOT,"
                 + "AUTO_REPAIR from DP_DME_BEST_PRACTICE_CHECK where 1=1 ";
             if (!StringUtils.isEmpty(hostSetting)) {
-                sql = sql + " and HOST_SETTING=?";
-                boolean isId = !StringUtils.isEmpty(id);
+                sql = sql + " and HOST_SETTING='" + hostSetting + "'";
+                boolean isId = (ids != null && ids.size() > 0);
                 if (isId) {
-                    sql = sql + " and HOST_ID=?";
+                    StringBuilder stringBuilder = new StringBuilder();
+                    for (String id : ids) {
+                        stringBuilder.append("'").append(id).append("'").append(",");
+                    }
+                    sql = sql + " and HOST_ID in(" + stringBuilder.substring(0, stringBuilder.lastIndexOf(",")) + ")";
                 }
                 ps = con.prepareStatement(sql);
-                ps.setString(PARAMETER_INDEX_1, hostSetting);
-                if (isId) {
-                    ps.setString(PARAMETER_INDEX_2, id);
-                }
             } else {
                 ps = con.prepareStatement(sql);
             }
@@ -476,5 +512,235 @@ public class BestPracticeCheckDao extends H2DataBaseDao {
         } finally {
             closeConnection(con, pstm, null);
         }
+    }
+
+    public BestPracticeRecommand getRecommand(String hostsetting, String recommandValue) throws DmeSqlException {
+        BestPracticeRecommand recommand = getRecommandFromDb("HOST_SETTING", hostsetting);
+        if (recommand != null) {
+            return recommand;
+        }
+
+        // 如果没有就默认生成一条记录
+        initRecommand(hostsetting, recommandValue, "0");
+        return getRecommandFromDb("HOST_SETTING", hostsetting);
+    }
+
+    public int updateRecommendByFiled(String filedName, String filedValue, BestPracticeRecommandUpReq req)
+        throws DmeSqlException {
+        String recommandVale = req.getRecommandValue();
+        String repairAction = req.getRepairAction();
+        if (StringUtils.isEmpty(recommandVale) && StringUtils.isEmpty(repairAction)) {
+            LOGGER.error("best practice recommend update error!All parameters are null!");
+            throw new DmeSqlException("parameter error!");
+        }
+
+        BestPracticeRecommand recommand = getRecommandFromDb(filedName, String.valueOf(filedValue));
+        if (null == recommand) {
+            throw new DmeSqlException("recommend record not found!");
+        }
+
+        if (!StringUtils.isEmpty(recommandVale)) {
+            recommand.setRecommandValue(recommandVale);
+            recommand.setUpdateRecommendTime(new java.util.Date(System.currentTimeMillis()));
+        }
+
+        if (!StringUtils.isEmpty(repairAction)) {
+            recommand.setRepairAction(repairAction);
+            recommand.setUpdateRepairTime(new java.util.Date(System.currentTimeMillis()));
+        }
+
+        return updateRecommandFromDb(recommand);
+    }
+
+    private int updateRecommandFromDb(BestPracticeRecommand recommand) throws DmeSqlException {
+        Connection con = null;
+        PreparedStatement pstm = null;
+        int upDateSize;
+        try {
+            con = getConnection();
+            String sql = "UPDATE DP_DME_BEST_PRACTICE_RECOMMAND SET RECOMMEND_VALUE=?,UPDATE_RECOMMEND_TIME=?, "
+                + "REPAIR_ACTION=?,UPDATE_REPAIR_TIME=? where ID=?";
+            pstm = con.prepareStatement(sql);
+            pstm.setString(DpSqlFileConstants.DIGIT_1, recommand.getRecommandValue());
+            pstm.setString(DpSqlFileConstants.DIGIT_2, fmt.format(recommand.getUpdateRecommendTime()));
+            pstm.setString(DpSqlFileConstants.DIGIT_3, recommand.getRepairAction());
+            pstm.setString(DpSqlFileConstants.DIGIT_4, fmt.format(recommand.getUpdateRepairTime()));
+            pstm.setString(DpSqlFileConstants.DIGIT_5, recommand.getId());
+            pstm.execute();
+            upDateSize = 1;
+        } catch (SQLException ex) {
+            throw new DmeSqlException(ex.getMessage());
+        } finally {
+            closeConnection(con, pstm, null);
+        }
+
+        return upDateSize;
+    }
+
+    private BestPracticeRecommand getRecommandFromDb(String filedName, String filedValue) throws DmeSqlException {
+        Connection con = null;
+        PreparedStatement pstm = null;
+        ResultSet rs = null;
+        BestPracticeRecommand recommand = null;
+        try {
+            con = getConnection();
+            String sql = "SELECT * FROM DP_DME_BEST_PRACTICE_RECOMMAND where " + filedName + "=?";
+            pstm = con.prepareStatement(sql);
+            pstm.setString(PARAMETER_INDEX_1, filedValue);
+            rs = pstm.executeQuery();
+            if (rs.next()) {
+                recommand = new BestPracticeRecommand();
+                recommand.setId(rs.getString("ID"));
+                recommand.setHostsetting(rs.getString("HOST_SETTING"));
+                recommand.setRecommandValue(rs.getString("RECOMMEND_VALUE"));
+                recommand.setRepairAction(rs.getString("REPAIR_ACTION"));
+                recommand.setCreateTime(rs.getTimestamp("CREATE_TIME"));
+                recommand.setUpdateRecommendTime(rs.getTimestamp("UPDATE_RECOMMEND_TIME"));
+                recommand.setUpdateRepairTime(rs.getTimestamp("UPDATE_REPAIR_TIME"));
+            }
+        } catch (SQLException ex) {
+            throw new DmeSqlException(ex.getMessage());
+        } finally {
+            closeConnection(con, pstm, rs);
+        }
+
+        return recommand;
+    }
+
+    private void initRecommand(String hostSetting, String recommandVale, String repairAction) {
+        BestPracticeRecommand recommand = new BestPracticeRecommand();
+        String uuid = UUID.randomUUID().toString();
+        recommand.setId(uuid);
+        recommand.setHostsetting(hostSetting);
+        recommand.setRecommandValue(recommandVale);
+        recommand.setRepairAction(repairAction);
+        java.util.Date date = new java.util.Date(System.currentTimeMillis());
+        recommand.setCreateTime(date);
+        recommand.setUpdateRecommendTime(date);
+        recommand.setUpdateRepairTime(date);
+        saveRecommand(recommand);
+    }
+
+    private void saveRecommand(BestPracticeRecommand recommand) {
+        Connection con = null;
+        PreparedStatement pstm = null;
+        try {
+            con = getConnection();
+            String sql = "insert into DP_DME_BEST_PRACTICE_RECOMMAND(HOST_SETTING,RECOMMEND_VALUE,REPAIR_ACTION,"
+                + "CREATE_TIME,UPDATE_RECOMMEND_TIME,UPDATE_REPAIR_TIME) values(?,?,?,?,?,?)";
+            pstm = con.prepareStatement(sql);
+
+            // 不自动提交
+            con.setAutoCommit(false);
+            pstm.setString(DpSqlFileConstants.DIGIT_1, recommand.getHostsetting());
+            pstm.setString(DpSqlFileConstants.DIGIT_2, recommand.getRecommandValue());
+            pstm.setString(DpSqlFileConstants.DIGIT_3, recommand.getRepairAction());
+            String dateStr = fmt.format(recommand.getCreateTime());
+            pstm.setString(DpSqlFileConstants.DIGIT_4, dateStr);
+            pstm.setString(DpSqlFileConstants.DIGIT_5, dateStr);
+            pstm.setString(DpSqlFileConstants.DIGIT_6, dateStr);
+            pstm.execute();
+            con.commit();
+        } catch (SQLException ex) {
+            LOGGER.error("save recommand vale error!errMsg={}", ex.getMessage());
+            try {
+                // 回滚
+                con.rollback();
+            } catch (SQLException e) {
+                LOGGER.error(e.getMessage());
+            }
+        } finally {
+            closeConnection(con, pstm, null);
+        }
+    }
+
+    public void saveRepairLog(List<BestPracticeLog> logs) {
+        if (logs == null || logs.size() == 0) {
+            return;
+        }
+
+        Connection con = null;
+        PreparedStatement pstm = null;
+        try {
+            con = getConnection();
+            String sql = "insert into DP_DME_BEST_PRACTICE_LOG(OBJECT_NAME,OBJECT_ID,HOST_SETTING,RECOMMEND_VALUE,"
+                + "VIOLATION_VALUE,REPAIR_TYPE,REPAIR_RESULT,REPAIR_TIME,MESSAGE) values(?,?,?,?,?,?,?,?,?)";
+            pstm = con.prepareStatement(sql);
+
+            // 不自动提交
+            con.setAutoCommit(false);
+            for (BestPracticeLog log : logs) {
+                pstm.setString(DpSqlFileConstants.DIGIT_1, log.getObjectName());
+                pstm.setString(DpSqlFileConstants.DIGIT_2, log.getObjectId());
+                pstm.setString(DpSqlFileConstants.DIGIT_3, log.getHostsetting());
+                pstm.setString(DpSqlFileConstants.DIGIT_4, log.getRecommandValue());
+                pstm.setString(DpSqlFileConstants.DIGIT_5, log.getViolationValue());
+                pstm.setString(DpSqlFileConstants.DIGIT_6, log.getRepairType());
+                pstm.setBoolean(DpSqlFileConstants.DIGIT_7, log.getRepairResult());
+                pstm.setString(DpSqlFileConstants.DIGIT_8, fmt.format(log.getRepairTime()));
+                pstm.setCharacterStream(DpSqlFileConstants.DIGIT_9, new StringReader(log.getMessage()));
+                pstm.addBatch();
+            }
+            pstm.executeBatch();
+            con.commit();
+        } catch (SQLException ex) {
+            LOGGER.error("save best practice log error!errMsg={}", ex.getMessage());
+            try {
+                // 回滚
+                con.rollback();
+            } catch (SQLException e) {
+                LOGGER.error(e.getMessage());
+            }
+        } finally {
+            closeConnection(con, pstm, null);
+        }
+    }
+
+    public List<BestPracticeLog> getRepariLogByPage(String hostsetting, String objId, int pageNo, int pageSize)
+        throws DmeSqlException {
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        List<BestPracticeLog> logList = new ArrayList<>();
+        try {
+            con = getConnection();
+            String sql = "SELECT * from DP_DME_BEST_PRACTICE_LOG where 1=1 ";
+            if (!StringUtils.isEmpty(hostsetting)) {
+                sql = sql + " and HOST_SETTING='" + hostsetting + "' ";
+            }
+
+            if (!StringUtils.isEmpty(objId)) {
+                sql = sql + " and OBJECT_ID='" + objId + "' ";
+            }
+
+            sql = sql + " order by REPAIR_TIME DESC ";
+
+            if (pageNo > 0 && pageSize > 0) {
+                int offset = (pageNo - 1) * pageSize;
+                sql = sql + " OFFSET " + offset + " ROWS FETCH FIRST " + pageSize + " ROWS ONLY";
+            }
+            ps = con.prepareStatement(sql);
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                BestPracticeLog log = new BestPracticeLog();
+                log.setId(rs.getString("ID"));
+                log.setObjectId(rs.getString("OBJECT_ID"));
+                log.setObjectName(rs.getString("OBJECT_NAME"));
+                log.setHostsetting(rs.getString("HOST_SETTING"));
+                log.setRecommandValue(rs.getString("RECOMMEND_VALUE"));
+                log.setViolationValue(rs.getString("VIOLATION_VALUE"));
+                log.setRepairType(rs.getString("REPAIR_TYPE"));
+                log.setRepairResult(rs.getBoolean("REPAIR_RESULT"));
+                log.setRepairTime(rs.getTimestamp("REPAIR_TIME"));
+                log.setMessage(clobToString(rs.getClob("MESSAGE")));
+                logList.add(log);
+            }
+        } catch (DataBaseException | SQLException | IOException e) {
+            LOGGER.error("getAllHostIds Failed! {}", e.getMessage());
+            throw new DmeSqlException(e.getMessage());
+        } finally {
+            closeConnection(con, ps, rs);
+        }
+        return logList;
     }
 }

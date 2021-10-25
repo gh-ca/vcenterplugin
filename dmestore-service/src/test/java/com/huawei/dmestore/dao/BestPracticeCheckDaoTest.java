@@ -61,14 +61,14 @@ public class BestPracticeCheckDaoTest {
 
     @Test
     public void getAllHostIds() throws SQLException {
-        System.out.println(bestPracticeCheckDao.getAllHostIds(1, 10));
+        System.out.println(bestPracticeCheckDao.getAllHostIds(1, 10, null));
     }
 
     @Test
     public void getByHostIds() throws SQLException {
         List<String> list = new ArrayList<>();
         list.add("321");
-        bestPracticeCheckDao.getByHostIds(list);
+        bestPracticeCheckDao.getByHostIds(list, null);
     }
 
     @Test
@@ -78,7 +78,7 @@ public class BestPracticeCheckDaoTest {
 
     @Test
     public void getRecordBeanByHostsetting() throws SQLException {
-        bestPracticeCheckDao.getRecordBeanByHostsetting("321", null);
+        bestPracticeCheckDao.getRecordBeanByHostSetting("321", (String)null);
     }
 
     @Test

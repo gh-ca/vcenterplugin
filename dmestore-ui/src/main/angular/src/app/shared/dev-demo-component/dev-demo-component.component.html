@@ -5,14 +5,35 @@
 </div>
 <app-gh-dynamic-form [formInfo]='formItemInfos' [form]='form' (onPayLoadChange)='handlePayLoadChange($event)'>
 </app-gh-dynamic-form>
+<clr-select-container class="selectClass">
+  <label style="color: #9F9F9F;">修复方式</label>
+  <select  [(ngModel)]="selectedValue" clrSelect name="version" required
+           (change)="changeSelect()">
+    <option *ngFor="let item of selectedArr" value="{{item}}">{{item}}</option>
+  </select>
+  <clr-control-error>{{'validations.required' | translate}}</clr-control-error>
+</clr-select-container>
+<app-bp-repair-history-table [tableData]="table">
+</app-bp-repair-history-table>
+<clr-input-container>
+  <input
+    clrInput
+    type="number"
+    value=80
+    min="75"
+    name="recommendedValue"
+    [(ngModel)]="recommendedValue"
+    class="input40persent"
+    (blur)="checkRecommendedValue()"
+    />
+  <label>%</label>
+</clr-input-container>
 <h1>mount</h1>
 <app-gh-tree-checkbox
   (valueChange)="handleTreeValueChange('tree',$event)"
   [tree]="vmfsTree"
-  [vmfsMount]="true"
-  [isCreate]="true"
-  [mountType]="'host'"
-  [resType]="'mount'"
+  [resType]="'unMount'"
+  [checkNullData]="false"
 >
 </app-gh-tree-checkbox>
 <!--<h1>create</h1>-->

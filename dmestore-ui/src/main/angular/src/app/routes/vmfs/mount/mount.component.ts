@@ -40,7 +40,7 @@ export class MountComponent implements OnInit {
     private cdr: ChangeDetectorRef,
     private router: Router,
     private globalsService: GlobalsService,
-    private translateService:TranslateService
+    private translateService:TranslateService,
   ) {
     this.chooseDevice = [];
     this.deviceList = []; // 主机AND集群
@@ -308,6 +308,8 @@ export class MountComponent implements OnInit {
         this.deviceList = await this.commonService.remoteGetVmfsDeviceListById_unmount(this.objectId);
         if(this.deviceList.length===0){
           this.checkNullData=true
+        }else {
+          this.checkNullData=false
         }
 
         const loadUnmountHost = () => {
@@ -684,7 +686,7 @@ export class MountComponent implements OnInit {
         this.unmountForm.dataStoreObjectIds = unmountObjIds;
         this.modalHandleLoading = true;
         console.log(this.unmountForm)
-        this.remoteSrv.unmountVMFS(_.merge(this.unmountForm,{language:this.language})).subscribe((result: any) => {
+        this.remoteSrv.unmountVMFS(_.merge(this.unmountForm,{ clusterIds: [this.unmountForm.clusterId]},{language:this.language})).subscribe((result: any) => {
           this.modalHandleLoading = false;
           if (result.code === '200') {
             // console.log('unmount ' + this.rowSelected[0].name + ' success');
@@ -982,11 +984,22 @@ export class MountComponent implements OnInit {
       };
       console.log('chooseDevice',this.chooseDevice)
       console.log('unmountForm',this.unmountForm)
-      const params = _.merge(this.unmountForm,{ hostIds: this.chooseDevice.map(i=>i.deviceId) },{language:this.language});
+      let queryUnmount={}
+      queryUnmount=this.unmountForm
+      let clusterIds = this.chooseDevice.filter(i => i.deviceType === 'cluster')
+      let hostIds = this.chooseDevice.filter(i => i.deviceType === 'host')
+      if (clusterIds.length>0){
+        queryUnmount=_.merge(queryUnmount,{clusterIds:clusterIds.map(i=>i.deviceId)}, {language: this.language})
+      }
+      if (hostIds.length>0){
+        queryUnmount=_.merge(queryUnmount,{hostIds:hostIds.map(i=>i.deviceId)}, {language: this.language})
+      }
+
+
       // const res = await this.commonService.remoteVmfs_Unmount(params);
       // handlerUnmountVmfsSuccess(res);
-      console.log(params)
-      this.remoteSrv.unmountVMFS(params).subscribe(handlerUnmountVmfsSuccess);
+      console.log(queryUnmount)
+      this.remoteSrv.unmountVMFS(queryUnmount).subscribe(handlerUnmountVmfsSuccess);
     }
     if(this.chooseDevice.length>0){
       submit()
