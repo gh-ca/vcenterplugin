@@ -1403,6 +1403,7 @@
             <label style="color: #9F9F9F;">{{'vmfs.hostOrCluster' | translate}}</label>
             <app-gh-tree-checkbox
               [resType]="'unMount'"
+              [mountType]="'host'"
               [tree]="deviceList"
               [checkNullData]="checkNullData"
               (valueChange)="handleChooseDeviceChange(this.addForm,'chooseDevice',$event)"> </app-gh-tree-checkbox>

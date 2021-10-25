@@ -1771,7 +1771,7 @@ wwn: "67c1cf110058934511ba6e5a00000344"
       this.notChooseUnmountDevice = false;
 
       this.modalHandleLoading = true;
-      console.log('chooseDevice', this.addForm.value.chooseDevice)
+      /*console.log('chooseDevice', this.addForm.value.chooseDevice)
       console.log('unmountForm', this.unmountForm)
       let queryUnmount={}
       queryUnmount=this.unmountForm
@@ -1783,7 +1783,10 @@ wwn: "67c1cf110058934511ba6e5a00000344"
       if (hostIds.length>0){
         queryUnmount=_.merge(queryUnmount,{hostIds:hostIds.map(i=>i.deviceId)}, {language: this.language})
       }
-      this.remoteService.unmountVMFS(queryUnmount).subscribe((result: any) => {
+      this.remoteService.unmountVMFS(queryUnmount).subscribe((result: any) => {*/
+      console.log('chooseDevice',this.addForm.value.chooseDevice)
+      console.log('unmountForm',this.unmountForm)
+      this.remoteService.unmountVMFS(_.merge(this.unmountForm,{ hostIds: this.addForm.value.chooseDevice.map(i=>i.deviceId) },{language:this.language})).subscribe((result: any) => {
         this.modalHandleLoading = false;
         if (result.code === '200') {
           // console.log('unmount ' + this.rowSelected[0].name + ' success');

@@ -6644,7 +6644,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         List<String> taskIds = new ArrayList<>();
         List<String> dataStoreObjectIds = null;
         List<String> hostObjIds = new ArrayList<>();
-        List<String> clusterObjIds = new ArrayList<>();
+        //List<String> clusterObjIds = new ArrayList<>();
         List<String> errorStoreName = new ArrayList<>();
         List<Map<String, String>> boundVmfs = new ArrayList<>();
         Map<String, List<String>> volumeidHostids = new HashMap<>();
@@ -6663,17 +6663,15 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 if (params.get(HOSTIDS) != null && !"".equals(params.get(HOSTIDS))) {
                     hostObjIds = (List<String>) params.get(HOSTIDS);
                 }
-                if (!StringUtils.isEmpty(ToolUtils.getStr(params.get("clusterIds")))) {
-                    clusterObjIds = (List<String>) params.get("clusterIds");
-                    for (String clusterObjId : clusterObjIds) {
-                        String hosts = vcsdkUtils.getHostsOnCluster(clusterObjId);
-                        if (!StringUtils.isEmpty(hosts)) {
-                            List<Map<String, String>> list = gson.fromJson(hosts, List.class);
-                            for (Map<String, String> map : list) {
-                                String hostId = map.get(HOSTID);
-                                if (!StringUtils.isEmpty(hostId)) {
-                                    hostObjIds.add(hostId);
-                                }
+                if (!StringUtils.isEmpty(ToolUtils.getStr(params.get(CLUSTER_ID)))) {
+                    String clusterObjId = ToolUtils.getStr(params.get(CLUSTER_ID));
+                    String hosts = vcsdkUtils.getHostsOnCluster(clusterObjId);
+                    if (!StringUtils.isEmpty(hosts)) {
+                        List<Map<String, String>> list = gson.fromJson(hosts, List.class);
+                        for (Map<String, String> map : list) {
+                            String hostId = map.get(HOSTID);
+                            if (!StringUtils.isEmpty(hostId)) {
+                                hostObjIds.add(hostId);
                             }
                         }
                     }
