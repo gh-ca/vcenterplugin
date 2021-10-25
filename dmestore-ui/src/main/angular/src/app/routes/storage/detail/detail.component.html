@@ -25,7 +25,7 @@
                 <td class="left">
                   <span *ngIf="detail.status == 0">
                     <span class="color-square"
-                      style="background-color: #A9A9A9; margin-right: 10px"></span>{{'storage.list.offLine' | translate}}
+                      style="background-color: #A9A9A9; margin-right: 10px"></span>{{'storage.list.Offline' | translate}}
                   </span>
                   <span *ngIf="detail.status == 1">
                     <span class="color-square"
@@ -33,11 +33,11 @@
                   </span>
                   <span *ngIf="detail.status == 2">
                     <span class="color-square"
-                      style="background-color: red; margin-right: 10px"></span>{{'storage.list.fault' | translate}}
+                      style="background-color: red; margin-right: 10px"></span>{{'storage.list.Abnormal' | translate}}
                   </span>
                   <span *ngIf="detail.status == 9">
                     <span class="color-square"
-                      style="background-color: yellow; margin-right: 10px"></span>{{'storage.list.notMgr' | translate}}
+                      style="background-color: yellow; margin-right: 10px"></span>{{'storage.list.degraded' | translate}}
                   </span>
                   <span *ngIf="!detail.status">
                     <span class="color-square" style="background-color: #A9A9A9; margin-right: 10px"></span>--
