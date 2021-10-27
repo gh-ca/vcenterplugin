@@ -205,6 +205,11 @@ export class ExpandComponent implements OnInit{
     console.log('expand2', expand);
     this.expandForm.vo_add_capacity = expand;
   }
+
+  changeExpandUnit() {
+    this.expandForm.vo_add_capacity = null;
+    this.expandedCapacity = this.lunCapacity + this.expandForm.vo_add_capacity
+  }
   /**
    * 确认操作结果并关闭窗口
    */
