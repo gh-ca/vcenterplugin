@@ -55,6 +55,7 @@ export class NfsModifyComponent implements OnInit {
   latencyErrTips = false; // 时延错误提示
   bandwidthLimitErr = false; // v6 设备 带宽 下限大于上限
   iopsLimitErr = false; // v6 设备 IOPS 下限大于上限
+  shareId;
 
   modifyDesc:string;//编辑失败信息
 
@@ -89,6 +90,7 @@ export class NfsModifyComponent implements OnInit {
       }
       if (result.code === '200') {
         this.updateNfs = result.data;
+        this.shareId=result.data.shareId
         // this.updateNfs.sameName=true;
         this.updateNfs.dataStoreObjectId = this.objectId;
         this.oldNfsName = this.updateNfs.nfsName;
@@ -252,6 +254,7 @@ export class NfsModifyComponent implements OnInit {
         editNfsSubmitForm.compressionEnabled = null;
       }
     }
+    editNfsSubmitForm.shareId=this.shareId
     this.modifyService.updateNfs(editNfsSubmitForm).subscribe((result: any) => {
       this.modalHandleLoading = false;
       if (result.code === '200') {

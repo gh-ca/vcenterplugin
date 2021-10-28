@@ -1958,7 +1958,7 @@ wwn: "67c1cf110058934511ba6e5a00000344"
       this.expandErrTB = false
       // 初始化form表单
       this.modalLoading = true
-      this.lunCapacity = await this.commonService.getLunCapacity(this.rowSelected[0].id)
+      this.lunCapacity = await this.commonService.getLunCapacity(this.rowSelected[0].objectid)
       if (this.lunCapacity === -1) {
         this.modalLoading = false
         this.expandErrorShow = true

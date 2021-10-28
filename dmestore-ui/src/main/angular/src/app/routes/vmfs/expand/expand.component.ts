@@ -3,19 +3,21 @@ import {ExpandService} from './expand.service';
 import {ActivatedRoute, Router} from '@angular/router';
 import {GetForm, ServiceLevelList, VmfsInfo, VmfsListService} from '../list/list.service';
 import {GlobalsService} from "../../../shared/globals.service";
-import {CommonService} from "../../common.service";
+import {CommonService} from './../../common.service';
+import {TranslatePipe, TranslateService} from '@ngx-translate/core';
 
 @Component({
   selector: 'app-list',
   templateUrl: './expand.component.html',
   styleUrls: ['./expand.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [ExpandService,CommonService],
+  providers: [ExpandService, CommonService,TranslatePipe],
 })
-export class ExpandComponent implements OnInit{
 
-  constructor(private remoteSrv: ExpandService, private route: ActivatedRoute, private cdr: ChangeDetectorRef,
-              private router:Router, private globalsService: GlobalsService,private commonService:CommonService) {
+export class ExpandComponent implements OnInit {
+
+  constructor(private translateService: TranslateService, private remoteSrv: ExpandService, private route: ActivatedRoute, private cdr: ChangeDetectorRef,
+              private router: Router, private globalsService: GlobalsService, private commonService: CommonService) {
 
   }
 
@@ -51,14 +53,14 @@ export class ExpandComponent implements OnInit{
   /**
    * 初始化数据
    */
-   initData() {
+  initData() {
     this.expandShow = true;
     this.modalHandleLoading = false;
     this.modalLoading = true;
     this.expandErrGB = false;
-    this.expandErrTB=false
+    this.expandErrTB = false
     // 设备类型 操作类型初始化
-     this.route.url.subscribe(url => {
+    this.route.url.subscribe(url => {
       console.log('url', url);
       this.route.queryParams.subscribe(async queryParam => {
         this.resource = queryParam.resource;
@@ -69,11 +71,11 @@ export class ExpandComponent implements OnInit{
           this.objectId = ctx[0].id;
           // this.objectId = "urn:vmomi:Datastore:datastore-4082:674908e5-ab21-4079-9cb1-596358ee5dd1";
         }
-        this.lunCapacity=await this.commonService.getLunCapacity(this.objectId)
-        if (this.lunCapacity===-1){
-          this.modalLoading=false
-          this.expandErrorShow=true
-        }else {
+        this.lunCapacity = await this.commonService.getLunCapacity(this.objectId)
+        if (this.lunCapacity === -1) {
+          this.modalLoading = false
+          this.expandErrorShow = true
+        } else {
           this.remoteSrv.getStorageById(this.objectId).subscribe((result: any) => {
             console.log('VmfsInfo:', result);
             if (result.code === '200' && null != result.data) {
@@ -131,11 +133,11 @@ export class ExpandComponent implements OnInit{
       // 参数封装
       this.remoteSrv.expandVMFS(expandSubmitForm).subscribe((result: any) => {
         this.modalHandleLoading = false;
-        if (result.code === '200'){
+        if (result.code === '200') {
           console.log('expand success:' + name);
           this.expandSuccessShow = true; // 扩容成功提示
-        }else {
-          console.log('expand: ' + name  + ' Reason:' + result.description);
+        } else {
+          console.log('expand: ' + name + ' Reason:' + result.description);
           // 错误信息 展示
           this.isOperationErr = true;
         }
@@ -163,7 +165,7 @@ export class ExpandComponent implements OnInit{
               this.expandedCapacity = this.lunCapacity + (this.expandForm.vo_add_capacity * 1024)
               expand = null;
             } else {
-              if ((expand/1024)+this.expandForm.vo_add_capacity > 256) {
+              if ((expand / 1024) + this.expandForm.vo_add_capacity > 256) {
                 this.expandErrTB = true;
                 this.expandForm.vo_add_capacity = null
                 this.expandedCapacity = this.lunCapacity + (this.expandForm.vo_add_capacity * 1024)
@@ -183,7 +185,7 @@ export class ExpandComponent implements OnInit{
               this.expandedCapacity = this.lunCapacity + this.expandForm.vo_add_capacity
               expand = null;
             } else {
-              if (expand+this.expandForm.vo_add_capacity > 262144) {
+              if (expand + this.expandForm.vo_add_capacity > 262144) {
                 this.expandErrGB = true;
                 this.expandForm.vo_add_capacity = null
                 this.expandedCapacity = this.lunCapacity + this.expandForm.vo_add_capacity
@@ -210,6 +212,7 @@ export class ExpandComponent implements OnInit{
     this.expandForm.vo_add_capacity = null;
     this.expandedCapacity = this.lunCapacity + this.expandForm.vo_add_capacity
   }
+
   /**
    * 确认操作结果并关闭窗口
    */
