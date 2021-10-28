@@ -87,6 +87,8 @@ public class NfsOperationServiceImpl implements NfsOperationService {
 
     private static final String NFS_SHARE_ID_STR = "{nfs_share_id}";
 
+    private static final String NFS_SHARE_ID = "nfs_share_id";
+
     private final long longTaskTimeOut = 30 * 60 * 1000;
 
     private static final int DIGIT_100 = 100;
@@ -352,11 +354,12 @@ public class NfsOperationServiceImpl implements NfsOperationService {
             }
 
             //重新查询fs share更新关系表share_name
-            String newShareName = getShareNameByShareId(String.valueOf(params.get("shareId")));
+            String shareId = params.get(NFS_SHARE_ID) == null? null: String.valueOf(params.get(NFS_SHARE_ID));
+            String newShareName = getShareNameByShareId(shareId);
             if(!StringUtils.isEmpty(newShareName)){
                 dmeVmwareRelation.setShareName(newShareName);
             }else {
-                LOG.info("get share name error,the share name field of the relational table is not updated!");
+                LOG.info("get share name error,the share name field of the relational table is not updated!shareId={}", shareId);
             }
 
             // 更新表中字段
@@ -369,6 +372,9 @@ public class NfsOperationServiceImpl implements NfsOperationService {
     }
 
     private String getShareNameByShareId(String shareId){
+        if(StringUtils.isEmpty(shareId)){
+            return "";
+        }
         String url = DmeConstants.DME_NFS_SHARE_DETAIL_URL.replace(NFS_SHARE_ID_STR, shareId);
         LOG.error("getNfsDatastoreShareAttr!method=get, shareId={},url={}, body=null", shareId, url);
         try {
