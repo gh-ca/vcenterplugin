@@ -171,4 +171,10 @@ export class NfsReduceComponent implements OnInit{
     }
 
   }
+  checkNewCapacity(){
+    const req=/^[+]{0,1}(\d+)$/
+    if (!req.test(`${this.newCapacity}`)){
+      this.newCapacity=0
+    }
+  }
 }
