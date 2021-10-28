@@ -1014,8 +1014,8 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
             }
         }
     }
-    @Override
-    public void deleteNfs(String dataStorageId) throws DmeException {
+    //@Override
+    public void deleteNfs2(String dataStorageId) throws DmeException {
         // DME侧删除nfs
         dmeDeleteNfs(dataStorageId);
 
@@ -1202,5 +1202,80 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
     private String getStorageModel(String storageId) throws DmeException {
         StorageDetail storageDetail = dmeStorageService.getStorageDetail(storageId);
         return storageDetail.getModel() +" "+ storageDetail.getProductVersion();
+    }
+
+    @Override
+    public void deleteNfs(String dataStorageId) throws DmeException {
+        DmeVmwareRelation dvr = dmeVmwareRalationDao.getDmeVmwareRelationByDsId(dataStorageId);
+        if (dvr == null) {
+            LOG.info("nfs delete!dme nfs relation is null!");
+            return;
+        }
+        String shareId = dvr.getShareId();
+        //1 获取vc datastore的host
+        List<Map<String, Object>> hosts = getHostsMountDataStoreByDsObjectId(dataStorageId);
+        LOG.info("get vmware hosts success!hosts={}", gson.toJson(hosts));
+        List<String> hostIds = new ArrayList<>();
+        if (hosts != null && hosts.size() > 0) {
+            for (Map<String, Object> hostMap : hosts) {
+                String hostId = ToolUtils.getStr(hostMap.get("hostId"));
+                hostIds.add(hostId);
+            }
+        }
+        //2 获取vc host的vmkip
+        Set<String> vmkIPs = new HashSet<>();
+        for(String hostId : hostIds){
+            String listStr = vcsdkUtils.getVmKernelIpByHostObjectId(hostId);
+            JsonArray incarray=new JsonParser().parse(listStr).getAsJsonArray();
+            for (JsonElement jsonElement : incarray) {
+                String vmkIp = ToolUtils.jsonToStr(jsonElement.getAsJsonObject().get("ipAddress"));
+                vmkIPs.add(vmkIp);
+            }
+        }
+        //3 获取dme share的clients
+        Set<String> clientIps = new HashSet<>();
+        List<AuthClient> authClientList = getNfsDatastoreShareAuthClients(shareId);
+        for(AuthClient client : authClientList){
+            String ip = client.getName();
+            clientIps.add(ip);
+        }
+        //4 判断vmkips和clients取交集，判断dme侧的删除是直接删share/fs 还是只是移除share的客户端
+        List<String> shareClientIps = new ArrayList<>();
+        for(String clientIp : clientIps){
+            if(vmkIPs.contains(clientIp)){
+                continue;
+            }
+            shareClientIps.add(clientIp);
+        }
+        LOG.info("DME delete nfs, scene judge just delete shareClent size:" + shareClientIps.size());
+        if(shareClientIps.size() > 0){
+            //只移除share的客户端
+            Map<String, String> authIdIpMap = new HashMap<>();
+            for (AuthClient authClient : authClientList) {
+                authIdIpMap.put(authClient.getClientIdInStorage(), authClient.getName());
+            }
+            String taskId = deleteAuthClient(shareId, authIdIpMap);
+            if (!StringUtils.isEmpty(taskId)) {
+                List<String> taskIds = new ArrayList<>();
+                taskIds.add(taskId);
+                boolean isDeleted = taskService.checkTaskStatus(taskIds);
+                if (isDeleted) {
+                    // 关系解除
+                    dmeVmwareRalationDao.deleteByStorageId(Arrays.asList(dataStorageId));
+                    LOG.info("dme nfs delete shareClient success!");
+                } else {
+                    throw new DmeException("DME delete nfs shareClient error!");
+                }
+            }
+        }else{
+            // DME侧删除nfs
+            dmeDeleteNfs(dataStorageId);
+        }
+
+        if (hostIds.size() > 0) {
+            LOG.info("vmware deleteNfs begin!hostIds={}", gson.toJson(hostIds));
+            vcsdkUtils.deleteNfs(dataStorageId, hostIds);
+            LOG.info("vmware deleteNfs end!");
+        }
     }
 }
