@@ -42,6 +42,14 @@ public class SystemServiceImpl implements SystemService {
             systemDao.checkExistAndCreateTable(DpSqlFileConstants.DP_DME_VCENTER_INFO,
                 DpSqlFileConstants.DP_DME_VCENTER_INFO_SQL);
 
+            // 20210723 add table DP_DME_BEST_PRACTICE_RECOMMAND
+            systemDao.checkExistAndCreateTable(DpSqlFileConstants.DP_DME_BEST_PRACTICE_RECOMMAND,
+                DpSqlFileConstants.DP_DME_BEST_PRACTICE_RECOMMAND_SQL);
+
+            // 20210723 add table DP_DME_BEST_PRACTICE_RECOMMAND
+            systemDao.checkExistAndCreateTable(DpSqlFileConstants.DP_DME_BEST_PRACTICE_LOG,
+                DpSqlFileConstants.DP_DME_BEST_PRACTICE_LOG_SQL);
+
             LOGGER.info("creating table over...");
             systemDao.initData(DpSqlFileConstants.DP_DME_BEST_PRACTICE_CHECK_ALTER_SQL);
 

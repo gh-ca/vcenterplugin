@@ -118,9 +118,9 @@ export class ModifyComponent implements OnInit {
         }
         // 初始化form表单
         this.modifyForm = new GetForm().getEditForm();
-        this.modifyForm.name = this.vmfsInfo.name;
+        this.modifyForm.name = this.vmfsInfo?.name;
         this.modifyForm.volumeId = this.vmfsInfo.volumeId;
-        this.modifyForm.oldDsName = this.vmfsInfo.name;
+        this.modifyForm.oldDsName = this.vmfsInfo?.name;
         this.modifyForm.dataStoreObjectId = this.vmfsInfo.objectid;
         this.modifyForm.service_level_name = this.vmfsInfo.serviceLevelName;
         if (this.vmfsInfo.serviceLevelName === '') {

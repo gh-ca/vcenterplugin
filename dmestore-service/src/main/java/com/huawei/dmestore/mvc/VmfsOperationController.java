@@ -63,7 +63,7 @@ public class VmfsOperationController extends BaseController {
     public ResponseBodyBean expandVmfs(final @RequestBody Map<String, String> volumes) {
         LOG.info("volumes=={}", gson.toJson(volumes));
         try {
-            vmfsOperationService.expandVmfs(volumes);
+            vmfsOperationService.expandVmfs2(volumes);
             return success();
         } catch (DmeException e) {
             return failure(e.getMessage());

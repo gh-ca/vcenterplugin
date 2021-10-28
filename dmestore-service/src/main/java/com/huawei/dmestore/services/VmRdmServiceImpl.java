@@ -3,16 +3,7 @@ package com.huawei.dmestore.services;
 import com.huawei.dmestore.constant.DmeConstants;
 import com.huawei.dmestore.exception.DmeException;
 import com.huawei.dmestore.exception.VcenterException;
-import com.huawei.dmestore.model.CreateVolumesRequest;
-import com.huawei.dmestore.model.CustomizeVolumeTuningForCreate;
-import com.huawei.dmestore.model.CustomizeVolumes;
-import com.huawei.dmestore.model.CustomizeVolumesRequest;
-import com.huawei.dmestore.model.ServiceVolumeBasicParams;
-import com.huawei.dmestore.model.ServiceVolumeMapping;
-import com.huawei.dmestore.model.SmartQosForRdmCreate;
-import com.huawei.dmestore.model.StorageDetail;
-import com.huawei.dmestore.model.StorageTypeShow;
-import com.huawei.dmestore.model.VmRdmCreateBean;
+import com.huawei.dmestore.model.*;
 import com.huawei.dmestore.utils.StringUtil;
 import com.huawei.dmestore.utils.ToolUtils;
 import com.huawei.dmestore.utils.VCSDKUtils;
@@ -22,9 +13,9 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -48,6 +39,13 @@ public class VmRdmServiceImpl implements VmRdmService {
     private static final int CONSTANT_1024 = 1024;
 
     private static final int THOUSAND = 1000;
+
+    private final String TASKTYPE = "Create LUN";
+
+    /**
+     * 轮询任务状态的超值时间，这里设置超长，避免创建超多的lun超时
+     */
+    private final long longTaskTimeOut = 30 * 60 * 1000;
 
     private static final String UNITTB = "TB";
 
@@ -112,14 +110,19 @@ public class VmRdmServiceImpl implements VmRdmService {
     @Override
     public void createRdm(String dataStoreObjectId, String vmObjectId, VmRdmCreateBean createBean,
         String compatibilityMode) throws DmeException {
-        createDmeRdm(createBean);
+        String language =  createBean.getLanguage() == null? DmeConstants.LANGUAGE_CN : createBean.getLanguage();
+        String taskId = createDmeRdm(createBean, language);
+
+        List<String> lunNames = taskService.getSuccessNameFromCreateTask(TASKTYPE, taskId, longTaskTimeOut);
         Map<String, Object> paramMap = initParams(createBean);
         String requestVolumeName = (String) paramMap.get("requestVolumeName");
         int capacity = (int) paramMap.get(CAPACITY);
         JsonArray volumeArr = getDmeVolumeIdByName(requestVolumeName);
         List<String> volumeIds = new ArrayList<>();
         for (int index = 0; index < volumeArr.size(); index++) {
-            volumeIds.add(volumeArr.get(index).getAsJsonObject().get(ID_FIELD).getAsString());
+            if (lunNames.contains(volumeArr.get(index).getAsJsonObject().get(NAME_FIELD).getAsString())) {
+                volumeIds.add(volumeArr.get(index).getAsJsonObject().get(ID_FIELD).getAsString());
+            }
         }
 
         // vmware上虚拟机归属的主机查询
@@ -150,12 +153,12 @@ public class VmRdmServiceImpl implements VmRdmService {
                 String tempHostObjectId = hostListOnVmware.get(index).get("hostId");
                 String tempDmeHostId = getDmeHostId(tempHostIp, tempHostObjectId);
                 dmeMapingHostIds.add(tempDmeHostId);
-                dmeAccessService.hostMapping(tempDmeHostId, volumeIds);
+                dmeAccessService.hostMapping(tempDmeHostId, volumeIds, language);
             }
         }
         vcsdkUtils.hostRescanVmfs(hostIp);
         vcsdkUtils.hostRescanHba(hostIp);
-        Map<String, JsonObject> lunMap = getLunMap(volumeArr, volumeIds, hostIp, hostId);
+        Map<String, JsonObject> lunMap = getLunMap(volumeArr, volumeIds, hostIp, hostId, language);
         String errorMsg = "";
         int lunSize = lunMap.size();
         if (lunSize > 0) {
@@ -173,18 +176,18 @@ public class VmRdmServiceImpl implements VmRdmService {
             }
             if (failedVolumeIds.size() > 0) {
                 for (String dmeHostId : dmeMapingHostIds) {
-                    unMapping(dmeHostId, failedVolumeIds);
+                    unMapping(dmeHostId, failedVolumeIds, language);
                 }
-                deleteVolumes(failedVolumeIds);
+                deleteVolumes(failedVolumeIds, language);
                 if (failedVolumeIds.size() == lunSize) {
                     throw new DmeException(errorMsg);
                 }
             }
         } else {
             for (String dmeHostId : dmeMapingHostIds) {
-                unMapping(dmeHostId, volumeIds);
+                unMapping(dmeHostId, volumeIds, language);
             }
-            deleteVolumes(volumeIds);
+            deleteVolumes(volumeIds, language);
             throw new DmeException("No matching LUN information was found on the vCenter");
         }
     }
@@ -234,12 +237,13 @@ public class VmRdmServiceImpl implements VmRdmService {
         return volumeArr;
     }
 
-    private Map<String, JsonObject> getLunMap(JsonArray volumeArr, List<String> volumeIds, String hostIp, String hostId)
+    private Map<String, JsonObject> getLunMap(JsonArray volumeArr, List<String> volumeIds, String hostIp, String hostId,
+        String language)
         throws DmeException {
         String lunStr = vcsdkUtils.getLunsOnHost(hostIp);
         if (StringUtil.isBlank(lunStr)) {
             // 将已经创建好的卷删除
-            deleteVolumes(hostId, volumeIds);
+            deleteVolumes(hostId, volumeIds, language);
             throw new DmeException("Failed to obtain the target LUN!");
         }
         LOG.info("get LUN information succeeded!");
@@ -272,40 +276,40 @@ public class VmRdmServiceImpl implements VmRdmService {
                 hostId = ToolUtils.jsonToStr(hostObject.get(ID_FIELD));
             }
         }
-        Map<String,List<Map<String, Object>>> allinitionators=vmfsAccessService.getAllInitionator();
+        Map<String, List<Map<String, Object>>> allinitionators = vmfsAccessService.getAllInitionator();
 
         if (hostId == null) {
-            hostId = vmfsAccessService.checkOrCreateToHost(hostIp, hostObjectId,allinitionators);
+            hostId = vmfsAccessService.checkOrCreateToHost(hostIp, hostObjectId, allinitionators);
         }
         return hostId;
     }
 
-    private void deleteVolumes(String hostId, List<String> volumeIds) {
+    private void deleteVolumes(String hostId, List<String> volumeIds, String language) {
         try {
-            dmeAccessService.unMapHost(hostId, volumeIds);
-            dmeAccessService.deleteVolumes(volumeIds);
+            dmeAccessService.unMapHost(hostId, volumeIds, language);
+            dmeAccessService.deleteVolumes(volumeIds, language);
         } catch (DmeException ex) {
             LOG.error("delete volumes failed!");
         }
     }
 
-    private void deleteVolumes(List<String> volumeIds) {
+    private void deleteVolumes(List<String> volumeIds, String language) {
         try {
-            dmeAccessService.deleteVolumes(volumeIds);
+            dmeAccessService.deleteVolumes(volumeIds, language);
         } catch (DmeException ex) {
             LOG.error("delete volumes failed!");
         }
     }
 
-    private void unMapping(String hostId, List<String> volumeIds) {
+    private void unMapping(String hostId, List<String> volumeIds, String language) {
         try {
-            dmeAccessService.unMapHost(hostId, volumeIds);
+            dmeAccessService.unMapHost(hostId, volumeIds, language);
         } catch (DmeException ex) {
             LOG.error("unMapping volumes failed!");
         }
     }
 
-    public void createDmeRdm(VmRdmCreateBean vmRdmCreateBean) throws DmeException {
+    public String createDmeRdm(VmRdmCreateBean vmRdmCreateBean, String language) throws DmeException {
         String taskId;
 
         // 通过服务等级创建卷
@@ -317,9 +321,13 @@ public class VmRdmServiceImpl implements VmRdmService {
         }
         JsonObject taskDetail = taskService.queryTaskByIdUntilFinish(taskId);
         if (taskDetail.get(DmeConstants.TASK_DETAIL_STATUS_FILE).getAsInt() != DmeConstants.TASK_SUCCESS) {
+            String errMessage = DmeConstants.LANGUAGE_CN.equals(language)?
+                taskDetail.get(DmeConstants.TASK_DETAIL_CN).getAsString()
+                :taskDetail.get(DmeConstants.TASK_DETAIL_EN).getAsString();
             LOG.error("The DME volume is in abnormal condition!taskDetail={}", gson.toJson(taskDetail));
-            throw new DmeException(taskDetail.get("detail_cn").getAsString());
+            throw new DmeException(errMessage);
         }
+        return taskId;
     }
 
     private String createDmeVolumeByServiceLevel(CreateVolumesRequest createVolumesRequest) throws DmeException {

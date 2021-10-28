@@ -386,6 +386,69 @@ export class DetailComponent implements OnInit, AfterViewInit {
       const handlerGetStorageDetailSuccess = (r: any) => {
         // this.gs.loading = false; = false;
         this.detailLoading = false;
+        if(isMockData){
+          r={
+            "code":"200",
+            "data":{
+              "id":"40ed4f57-0d98-4592-884e-3c044a64172f",
+              "name":"Dorado5600-203",
+              "ip":"51.10.132.203",
+              "status":"0",
+              "synStatus":"2",
+              "sn":"2102353GTG10L6000003",
+              "vendor":"Huawei",
+              "model":"OceanStor Dorado 5600 V6",
+              "usedCapacity":1292.19,
+              "usableCapacity":44584.928,
+              "totalCapacity":0,
+              "totalEffectiveCapacity":1898,
+              "freeEffectiveCapacity":170003.94434,
+              "subscriptionCapacity":22317,
+              "protectionCapacity":0.08,
+              "fileCapacity":0,
+              "blockCapacity":0,
+              "blockFileCapacity":399.109,
+              "dedupedCapacity":1263.04,
+              "compressedCapacity":30.020000000000003,
+              "optimizeCapacity":-893.9418359375,
+              "azIds":[
+
+              ],
+              "storagePool":null,
+              "volume":null,
+              "fileSystem":null,
+              "dTrees":null,
+              "nfsShares":null,
+              "bandPorts":null,
+              "logicPorts":null,
+              "storageControllers":null,
+              "storageDisks":null,
+              "productVersion":"6.1.0.SPH2",
+              "warning":null,
+              "event":null,
+              "location":"Q",
+              "patchVersion":"SPH2",
+              "maintenanceStart":null,
+              "maintenanceOvertime":null,
+              "qosFlag":false,
+              "storageTypeShow":{
+                "qosTag":1,
+                "workLoadShow":1,
+                "ownershipController":false,
+                "allocationTypeShow":2,
+                "deduplicationShow":false,
+                "compressionShow":false,
+                "capacityInitialAllocation":false,
+                "smartTierShow":false,
+                "prefetchStrategyShow":false,
+                "storageDetailTag":2,
+                "dorado":false
+              },
+              "smartQos":null
+            },
+            "description":null
+          }
+        }
         if (r.code === '200') {
           this.detail = r.data;
           this.detail.location = this.HTMLDecode(this.detail.location);
@@ -1025,12 +1088,14 @@ export class DetailComponent implements OnInit, AfterViewInit {
   }
 
   formatCapacity(c: number) {
-    if (c < 1024) {
+    if ((c < 1024&&c>=1)||c===0) {
       return c.toFixed(3) + ' GB';
     } else if (c >= 1024 && c < 1048576) {
       return (c / 1024).toFixed(3) + ' TB';
     } else if (c >= 1048576) {
       return (c / 1024 / 1024).toFixed(3) + ' PB';
+    }else if(c<1&&c>0){
+      return (c*1024).toFixed(3)+'MB'
     }
   }
 
@@ -1124,11 +1189,11 @@ export class DetailComponent implements OnInit, AfterViewInit {
       /* 总容量-保护容量-块/文件容量 */
       // freeCapacity = (this.detail.totalEffectiveCapacity - this.detail.protectionCapacity - this.detail.blockFileCapacity).toFixed(3);
       /* FIX: v6直接使用提供的字段 */
-      freeCapacity = this.detail.freeEffectiveCapacity;
+      freeCapacity = this.detail.usableCapacity-this.detail.usedCapacity;
       /*  */
-      this.cd.freeCapacity = this.formatCapacityV6(freeCapacity);
+      this.cd.freeCapacity = this.formatCapacity(freeCapacity);
       title =
-        this.formatCapacityV6(this.detail.totalEffectiveCapacity) +
+        this.formatCapacity(this.detail.usableCapacity) +
         '\n' +
         this.translatePipe.transform('storage.chart.total');
     };
@@ -1137,7 +1202,7 @@ export class DetailComponent implements OnInit, AfterViewInit {
     const handleOtherVersion = () => {
       this.cd.fileSystem = this.formatCapacity(this.detail.fileCapacity);
       this.cd.volume = this.formatCapacity(this.detail.blockCapacity);
-      freeCapacity = (this.detail.totalEffectiveCapacity - this.detail.usedCapacity).toFixed(3);
+      freeCapacity = this.detail.totalEffectiveCapacity - this.detail.usedCapacity
       /*  */
       this.cd.freeCapacity = this.formatCapacity(freeCapacity);
       title =
@@ -1211,6 +1276,15 @@ export class DetailComponent implements OnInit, AfterViewInit {
       return this.formatCapacity(t);
     }
     return this.formatCapacity(t - u);
+  }
+  getFreeCapacityV6(t: number, u: number) {
+    if (t == null || t == 0) {
+      return this.formatCapacityV6(0);
+    }
+    if (u == null || u == 0) {
+      return this.formatCapacityV6(t);
+    }
+    return this.formatCapacityV6(t - u);
   }
 
   /**

@@ -302,7 +302,7 @@ public class DmeAccessServiceImplTest {
         Map<String, Object> hbamap = new HashMap<>(16);
         hbamap.put("type", "131");
         hbamap.put("name", "tes");
-        when(vcsdkUtils.getHbaByHostObjectId(hostId)).thenReturn(hbamap);
+        //when(vcsdkUtils.getHbaByHostObjectId(hostId)).thenReturn(hbamap);
 
         Map requestbody = new HashMap<>(16);
         requestbody.put("access_mode", "NONE");
@@ -458,7 +458,7 @@ public class DmeAccessServiceImplTest {
         JsonObject taskDetail = new JsonObject();
         taskDetail.addProperty("status", 3);
         when(taskService.queryTaskByIdUntilFinish("1123")).thenReturn(taskDetail);
-        dmeAccessService.deleteVolumes(ids);
+        dmeAccessService.deleteVolumes(ids, "CN");
     }
 
     /**
@@ -484,7 +484,7 @@ public class DmeAccessServiceImplTest {
         taskDetail.addProperty("status", 3);
         when(taskService.queryTaskByIdUntilFinish("1123")).thenReturn(taskDetail);
 
-        dmeAccessService.unMapHost(hostId, ids);
+        dmeAccessService.unMapHost(hostId, ids, "CN");
     }
 
     /**
@@ -509,7 +509,7 @@ public class DmeAccessServiceImplTest {
         taskDetail.addProperty("status", 3);
         when(taskService.queryTaskByIdUntilFinish("1123")).thenReturn(taskDetail);
 
-        dmeAccessService.hostMapping(hostId, volumeIds);
+        dmeAccessService.hostMapping(hostId, volumeIds, "EN");
     }
 
 }

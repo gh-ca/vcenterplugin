@@ -23,6 +23,11 @@ import { DevDemoComponentComponent } from './dev-demo-component/dev-demo-compone
 import { GhDynamicFormComponent } from './gh-dynamic-form/gh-dynamic-form.component';
 import { GhDynamicFormItemComponent } from './gh-dynamic-form-item/gh-dynamic-form-item.component';
 import { DynamicComponentDirectiveDirective } from './directives/dynamic-component-directive.directive';
+import { GhTreeCheckboxComponent } from './gh-tree-checkbox/gh-tree-checkbox.component';
+import { ErrorTipsComponent } from './error-tips/error-tips.component';
+import { BpRepairHistoryTableComponent } from './bp-repair-history-table/bp-repair-history-table.component';
+import {RepairTypeFilter,RepairResultFilter} from './bp-repair-history-table/bp-filtercomponent'
+import { ErrorPartsucessTipsComponent } from './error-partsucess-tips/error-partsucess-tips.component';
 
 const THIRD_MODULES = [MaterialModule, TranslateModule];
 const COMPONENTS = [
@@ -51,6 +56,11 @@ const COMPONENTS = [
   GhDynamicFormComponent,
   /* 动态表单Item */
   GhDynamicFormItemComponent,
+  /* 表单Item tree CheckBox */
+  GhTreeCheckboxComponent,
+  /* 错误提示 */
+  ErrorTipsComponent,
+  ErrorPartsucessTipsComponent
 ];
 const COMPONENTS_DYNAMIC = [];
 const DIRECTIVES = [DynamicComponentDirectiveDirective];
@@ -61,7 +71,7 @@ const FILTER = [
 ];
 
 @NgModule({
-  declarations: [...COMPONENTS, ...COMPONENTS_DYNAMIC, ...DIRECTIVES, ...PIPES, ...FILTER],
+  declarations: [...COMPONENTS, ...COMPONENTS_DYNAMIC, ...DIRECTIVES, ...PIPES, ...FILTER, BpRepairHistoryTableComponent,RepairTypeFilter,RepairResultFilter],
   imports: [CommonModule, FormsModule, RouterModule, ReactiveFormsModule, ...THIRD_MODULES],
   exports: [
     CommonModule,
@@ -73,6 +83,7 @@ const FILTER = [
     ...FILTER,
     ...DIRECTIVES,
     ...PIPES,
+    BpRepairHistoryTableComponent,
   ],
   entryComponents: COMPONENTS_DYNAMIC,
 })

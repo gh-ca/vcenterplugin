@@ -1,5 +1,91 @@
-<app-gh-dynamic-form [formInfo]='formItemInfos' [form]='form' (onPayLoadChange)='handlePayLoadChange($event)'> </app-gh-dynamic-form>
+<div>
+  <div class="s" style="margin:auto;width:600px;">
+    <app-service-level-table [item]="serviceItem"></app-service-level-table>
+  </div>
+</div>
+<app-gh-dynamic-form [formInfo]='formItemInfos' [form]='form' (onPayLoadChange)='handlePayLoadChange($event)'>
+</app-gh-dynamic-form>
+<clr-select-container class="selectClass">
+  <label style="color: #9F9F9F;">修复方式</label>
+  <select  [(ngModel)]="selectedValue" clrSelect name="version" required
+           (change)="changeSelect()">
+    <option *ngFor="let item of selectedArr" value="{{item}}">{{item}}</option>
+  </select>
+  <clr-control-error>{{'validations.required' | translate}}</clr-control-error>
+</clr-select-container>
+<app-bp-repair-history-table [tableData]="table">
+</app-bp-repair-history-table>
+<clr-input-container>
+  <input
+    clrInput
+    type="number"
+    value=80
+    min="75"
+    name="recommendedValue"
+    [(ngModel)]="recommendedValue"
+    class="input40persent"
+    (blur)="checkRecommendedValue()"
+    />
+  <label>%</label>
+</clr-input-container>
+<h1>mount</h1>
+<app-gh-tree-checkbox
+  (valueChange)="handleTreeValueChange('tree',$event)"
+  [tree]="vmfsTree"
+  [vmfsMount]="true"
+  [isCreate]="true"
+  [mountType]="'host'"
+  [resType]="'mount'"
+>
+  <!--[resType]="'unMount'"-->
+  <!--[checkNullData]="false"-->
+
+</app-gh-tree-checkbox>
+<!--<h1>create</h1>-->
+<!--<app-gh-tree-checkbox-->
+<!--  (valueChange)="handleTreeValueChange('tree',$event)"-->
+<!--  [tree]="vmfsTree"-->
+<!--  [isCreate]="true">-->
+<!--</app-gh-tree-checkbox>-->
+<!-- <pre>{{helper.print(vmfsTree)}}</pre> -->
 <div>{{helper.print(value)}}</div>
 <div>form.errors{{helper.print(form.errors)}}</div>
-<div>form.value{{helper.print(form.value)}}</div>
+<pre>form.value{{helper.print(form.value)}}</pre>
 <div>form.valid=>{{form.valid}}</div>
+<app-vmfs-create-faild-tips [partSuccessData]="partSuccessData"></app-vmfs-create-faild-tips>
+<div>
+  <div><input [(ngModel)]="firstData"></div>
+  <div><input [(ngModel)]="secondData"></div>
+  <div><input [(ngModel)]="thirdData"></div>
+</div>
+
+<!--失败提示-->
+<clr-modal [(clrModalOpen)]="mountShow" [clrModalSize]="'lg'" [clrModalClosable]="true">
+  <h3 class="modal-title modelTile">{{'vmfs.reclaim.title' | translate}}</h3>
+  <div class="modal-body">
+<!--    <p *ngIf="mountShow">{{'errorMsg.mountError' | translate}}</p>-->
+<!--    <p *ngIf="mountShow">{{'errorMsg.unmountError' | translate}}</p>-->
+    <app-error-partsucess-tips
+      [status]="status"
+      [description]="description"
+      [partSuccessData]="partSuccessData"
+    [operatingType]="'vmfsUnmountError'"></app-error-partsucess-tips>
+  </div>
+  <div class="modal-footer">
+    <button type="submit" class="btn btn-primary"
+            (click)="mountShow = false">{{'menu.ok' | translate}}</button>
+  </div>
+</clr-modal>
+<!--<button [attr.disabled]="buttonDisableOrNot===false" (click)="log111">是否可以点击当前button</button>-->
+<button [disabled]="changeButtonAttr()">是否可以点击当前button</button>
+<button (click)="mountShow=true">开启模态框</button>
+
+<input type="checkbox" clrCheckbox [(ngModel)]="checkbox" />
+<label>是否选中</label>
+
+<!--<div *ngIf="changeButtonAttr()" class="loadingDiv">-->
+<!--          <span style="color: black">-->
+<!--            {{'vmfs.dataHandleLoadingTips' | translate}}<img src="./assets/images/loading.gif" width="20px"-->
+<!--                                                             height="20px" style="margin-left: 20px;">-->
+<!--          </span>-->
+<!--</div>-->

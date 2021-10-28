@@ -82,16 +82,6 @@ public interface DmeAccessService {
      * @throws DmeException when error
      */
     List<Map<String, Object>> getDmeHosts(String hostIp) throws DmeException;
-
-    /**
-     * Query Dme Hosts
-     *
-     * @param hostIp host ip
-     * @return ResponseBodyBean
-     * @throws DmeException when error
-     */
-    List<Map<String, Object>> getDmeHosts2(String hostIp) throws DmeException;
-
     /**
      * Query Dme Host's initiators
      *
@@ -141,18 +131,20 @@ public interface DmeAccessService {
      * delete Volume
      *
      * @param ids host ids
+     * @param language language
      * @throws DmeException when error
      */
-    void deleteVolumes(List<String> ids) throws DmeException;
+    void deleteVolumes(List<String> ids, String language) throws DmeException;
 
     /**
      * unMap Host
      *
      * @param hostId host id
      * @param ids    datastore ids
+     * @param language    language
      * @throws DmeException when error
      */
-    void unMapHost(String hostId, List<String> ids) throws DmeException;
+    void unMapHost(String hostId, List<String> ids, String language) throws DmeException;
 
     /**
      * scan Datastore
@@ -194,7 +186,8 @@ public interface DmeAccessService {
      *
      * @param hostId    host Id
      * @param volumeIds task cron
+     * @param language language
      * @throws DmeException when error
      */
-    void hostMapping(String hostId, List<String> volumeIds) throws DmeException;
+    void hostMapping(String hostId, List<String> volumeIds, String language) throws DmeException;
 }

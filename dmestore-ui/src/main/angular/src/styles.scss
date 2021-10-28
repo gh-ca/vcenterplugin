@@ -309,3 +309,113 @@ clr-dg-cell.datagrid-cell{
   color: #c21d00;
   color: var(--clr-forms-invalid-color, #c21d00);
 }
+
+.clr-tree-node.disabled{
+  div.clr-treenode-content{
+    color:gray;
+    opacity: 0.5;
+    &::before{
+      content:" ";
+      width:22px;
+    }
+  }
+  input.clr-checkbox{
+    display: none;
+  }
+  label.clr-control-label {
+    display:none;
+  }
+}
+//vmfs挂载时，挂载类型为主机时，集群置灰，但其下主机可选
+.clr-tree-node.mountDisabled{
+  >div>div.clr-treenode-content{
+    color:gray;
+    opacity: 0.5;
+    &::before{
+      content:" ";
+      width:22px;
+    }
+  }
+  >div>div.clr-checkbox-wrapper {
+    input.clr-checkbox{
+      display: none;
+    }
+  }
+  >div>div.clr-checkbox-wrapper {
+    label.clr-control-label{
+      display:none;
+    }
+  }
+}
+
+
+.submit-disabled{
+  color: #666;
+  color: var(--clr-btn-primary-disabled-color, #666666);
+  cursor: not-allowed;
+  opacity: .4;
+  background-color: #ccc;
+  background-color: var(--clr-btn-primary-disabled-bg-color, #cccccc);
+  border-color: #ccc;
+  border-color: var(--clr-btn-primary-disabled-border-color, #cccccc);
+  box-shadow: none;
+}
+
+
+/* fix:vmfs 挂载 tree 选中后 选择框位移bug */
+.clr-tree-node.ng-star-inserted.disabled .clr-tree-node-content-container>.clr-checkbox-wrapper {
+  height: 1.62rem;
+  width: 0;
+  padding-top: .21rem;
+  padding-left: .41rem;
+}
+.clr-tree-node.ng-star-inserted.mountDisabled>.clr-tree-node-content-container>.clr-checkbox-wrapper {
+  height: 1.62rem;
+  width: 0;
+  padding-top: .21rem;
+  padding-left: .41rem;
+}
+
+
+
+.unMount-tips{
+  .modal-dialog.ng-trigger.ng-trigger-fadeDown.modal-sm{
+    .modal-content-wrapper{
+      .modal-content{
+        .modal-body{
+          min-height: unset;
+        }
+      }
+    }
+  }
+}
+
+.reviseExpectedValue{
+  .modal-dialog.ng-trigger.ng-trigger-fadeDown.modal-sm{
+    .modal-content-wrapper{
+      .modal-content{
+        .modal-body{
+          overflow-x: unset;
+          overflow-y: unset;
+        }
+      }
+    }
+  }
+}
+.bestpracticeRepairAction{
+  .clr-form-control{
+    margin-top: unset;
+  }
+}
+.repairAction-select{
+  flex:1;
+  width: 80%;
+  .clr-select-wrapper{
+    width: 100%;
+  }
+  .clr-select-wrapper select, .clr-multiselect-wrapper select{
+    width: 100%;
+  }
+}
+
+

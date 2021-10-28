@@ -41,4 +41,5 @@ public interface VmRdmService {
      * @throws DmeException DmeException
      **/
     List<Object> getDatastoreMountsOnHost(String vmObjectId) throws DmeException;
+
 }

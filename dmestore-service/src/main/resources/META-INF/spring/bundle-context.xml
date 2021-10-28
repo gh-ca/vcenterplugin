@@ -110,6 +110,7 @@
     </bean>
 
     <bean name="ServiceLevelServiceImpl" class="com.huawei.dmestore.services.ServiceLevelServiceImpl">
+        <property name="dmeVmwareRalationDao" ref="dmeVmwareRalationDao"/>
         <property name="dmeAccessService" ref="DmeAccessServiceImpl"/>
         <property name="dmeStorageService" ref="DmeStorageServiceImpl"/>
         <property name="dmeRelationInstanceService" ref="DmeRelationInstanceServiceImpl"/>
@@ -187,6 +188,8 @@
     <bean name="BestPracticeProcessServiceImpl" class="com.huawei.dmestore.services.BestPracticeProcessServiceImpl">
         <property name="vcsdkUtils" ref="vCSDKUtils"/>
         <property name="bestPracticeCheckDao" ref="bestPracticeCheckDao"/>
+        <property name="vmfsDatastoreSpaceUtilization" ref="VmfsDatastoreSpaceUtilizationImpl"/>
+        <property name="dmeVmwareRalationDao" ref="dmeVmwareRalationDao"/>
         <property name="bestPracticeServices">
             <list>
                 <ref bean="VMFS3EnableBlockDeleteImpl"/>
@@ -235,6 +238,12 @@
         <property name="dmeAccessService" ref="DmeAccessServiceImpl"/>
         <property name="threadPoolExecutor" ref="threadPoolTaskExecutor"/>
         <property name="vCenterInfoService" ref="VCenterInfoServiceImpl"/>
+    </bean>
+
+    <bean name="VmfsDatastoreSpaceUtilizationImpl" class="com.huawei.dmestore.services.bestpractice.VmfsDatastoreSpaceUtilizationImpl">
+        <property name="vmfsOperationService" ref="VmfsOperationServiceImpl"/>
+        <property name="dmeVmwareRalationDao" ref="dmeVmwareRalationDao"/>
+        <property name="bestPracticeCheckDao" ref="bestPracticeCheckDao"/>
     </bean>
 
     <bean name="bestPracticeCheckDao" class="com.huawei.dmestore.dao.BestPracticeCheckDao">

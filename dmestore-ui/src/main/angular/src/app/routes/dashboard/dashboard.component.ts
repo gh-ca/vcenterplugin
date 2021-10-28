@@ -143,8 +143,6 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   /* type 0 :VMFS and NFS, 1:VMFS, 2:NFS */
 
   async loadTop5DataStore(type: string, name: string) {
-    this.top5dataStoreName = this.translateService.instant(name);
-    this.top5ShowLoading = true;
     const handlerGetStoreTopNSuccess = (result: any) => {
       if (result.code === '200' && result.data && Array.isArray(result.data)) {
         this.storeageTopN = result.data.map(item => ({
@@ -155,8 +153,11 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
           utilization: item.utilization.toFixed(2),
         }));
       }
-      this.cdr.detectChanges();
+
     };
+
+    this.top5dataStoreName = this.translateService.instant(name);
+    this.top5ShowLoading = true;
 
     try {
       if (isMockData) {
@@ -169,6 +170,9 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
       handlerResponseErrorSimple(error);
     } finally {
       this.top5ShowLoading = false;
+      setTimeout(() => {
+        this.cdr.detectChanges();
+      }, 500);
     }
   }
 
@@ -301,6 +305,8 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
           this.refresh();
           this.connectAlertSuccess = true;
           this.popShow = false;
+          localStorage.setItem("SynchronizeVmfs",'true')
+          localStorage.setItem("SynchronizeNfs",'true')
         } else {
           this.connectAlertFail = true;
         }
