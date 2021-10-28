@@ -64,6 +64,23 @@ public class VmfsAccessController extends BaseController {
     }
 
     /**
+     * get lun by volume
+     *
+     * @return ResponseBodyBean
+     */
+    @RequestMapping(value = "/getLunByVmfs/{storeId}", method = RequestMethod.GET)
+    public ResponseBodyBean getLunByVmfs(@PathVariable(value = "storeId") String storeId ) {
+        String failureStr = "";
+        try {
+            Volume volume = vmfsAccessService.getLunCapacityByVmfsId(storeId);
+            return success(volume);
+        } catch (DmeException e) {
+            failureStr = e.getMessage();
+        }
+        return failure(failureStr);
+    }
+
+    /**
      * listVmfsPerformance
      *
      * @param wwns wwns
