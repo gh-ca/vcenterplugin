@@ -281,6 +281,10 @@ public class NfsOperationServiceImpl implements NfsOperationService {
             }
             // 判断存储类型
             String storageModel = getStorageModel(ToolUtils.getStr(params.get("storage_id")));
+            //v6设备不支持设置共享名称，会将共享名称和fs名称一致化
+            if (StringUtils.isEmpty(shareName)) {
+                shareName = "/"+fsName;
+            }
             saveNfsInfoToDmeVmwareRelation(result, currentPortId, logicPortName, fsId, shareName, shareId, fsName,
                     storageModel, storageId);
             LOG.info("create nfs save relation success!nfsName={}", nfsName);
