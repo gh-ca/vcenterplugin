@@ -228,7 +228,8 @@ export class VmfsListComponent extends VmfsCommon implements OnInit, AfterViewIn
   isReclaimErr = false; // 错误信息
   nameChecking = false; // 名称校验
   capacityErr = false; // 容量错误信息
-  expandErr = false; // 扩容容量错误信息
+  expandErrGB = false; // 扩容容量错误信息
+  expandErrTB = false;
   mountErr = false; // 扩容容量错误信息
 
   matchErr = false; // 名称校验 是否只由字母与数字组成 true：是 false 否
@@ -264,6 +265,9 @@ export class VmfsListComponent extends VmfsCommon implements OnInit, AfterViewIn
   description;
   operatingType;
   checkNullData = false
+  lunCapacity;
+  expandedCapacity;
+  expandErrorShow = false
 
 
   setFormValueWhenHiden(isShowInput) {
@@ -1773,15 +1777,15 @@ wwn: "67c1cf110058934511ba6e5a00000344"
       this.modalHandleLoading = true;
       /*console.log('chooseDevice', this.addForm.value.chooseDevice)
       console.log('unmountForm', this.unmountForm)
-      let queryUnmount={}
-      queryUnmount=this.unmountForm
+      let queryUnmount = {}
+      queryUnmount = this.unmountForm
       let clusterIds = this.addForm.value.chooseDevice.filter(i => i.deviceType === 'cluster')
       let hostIds = this.addForm.value.chooseDevice.filter(i => i.deviceType === 'host')
-      if (clusterIds.length>0){
-        queryUnmount=_.merge(queryUnmount,{clusterIds:clusterIds.map(i=>i.deviceId)}, {language: this.language})
+      if (clusterIds.length > 0) {
+        queryUnmount = _.merge(queryUnmount, {clusterIds: clusterIds.map(i => i.deviceId)}, {language: this.language})
       }
-      if (hostIds.length>0){
-        queryUnmount=_.merge(queryUnmount,{hostIds:hostIds.map(i=>i.deviceId)}, {language: this.language})
+      if (hostIds.length > 0) {
+        queryUnmount = _.merge(queryUnmount, {hostIds: hostIds.map(i => i.deviceId)}, {language: this.language})
       }
       this.remoteService.unmountVMFS(queryUnmount).subscribe((result: any) => {*/
       console.log('chooseDevice',this.addForm.value.chooseDevice)
@@ -1949,19 +1953,28 @@ wwn: "67c1cf110058934511ba6e5a00000344"
   }
 
   // 扩容按钮点击事件
-  expandBtnFunc() {
+  async expandBtnFunc() {
     if (this.rowSelected.length === 1) {
       // 错误信息 隐藏
       this.isOperationErr = false;
-      this.expandErr = false;
+      this.expandErrGB = false;
+      this.expandErrTB = false
       // 初始化form表单
-      this.expandForm = new GetForm().getExpandForm();
-
-      this.expandShow = true;
-      console.log(this.rowSelected[0]);
-      this.expandForm.volume_id = this.rowSelected[0].volumeId;
-      this.expandForm.ds_name = this.rowSelected[0].name;
-      this.expandForm.obj_id = this.rowSelected[0].objectid;
+      this.modalLoading = true
+      this.lunCapacity = await this.commonService.getLunCapacity(this.rowSelected[0].objectid)
+      if (this.lunCapacity === -1) {
+        this.modalLoading = false
+        this.expandErrorShow = true
+      } else {
+        this.modalLoading = false
+        this.expandForm = new GetForm().getExpandForm();
+        this.expandShow = true;
+        console.log(this.rowSelected[0]);
+        this.expandForm.volume_id = this.rowSelected[0].volumeId;
+        this.expandForm.ds_name = this.rowSelected[0].name;
+        this.expandForm.obj_id = this.rowSelected[0].objectid;
+        this.expandedCapacity = this.lunCapacity + this.expandForm.vo_add_capacity
+      }
     }
   }
 
@@ -2009,45 +2022,67 @@ wwn: "67c1cf110058934511ba6e5a00000344"
     }
   }
 
-  /**
-   * 扩容容量校验
-   */
-  expandOnblur() {
+  expandOnChange() {
     let expand = this.expandForm.vo_add_capacity;
     console.log('expand', expand);
     if (expand && expand !== null && expand !== undefined) {
       if (expand > 0) {
         switch (this.expandForm.capacityUnit) {
           case 'TB':
+            this.expandedCapacity = this.lunCapacity + (this.expandForm.vo_add_capacity * 1024)
             if ((expand * 1024).toString().indexOf('.') !== -1) {
               // 小数
-              this.expandErr = true;
+              this.expandErrTB = true;
+              this.expandForm.vo_add_capacity = null
+              this.expandedCapacity = this.lunCapacity + (this.expandForm.vo_add_capacity * 1024)
               expand = null;
             } else {
-              this.expandErr = false;
+              if ((expand/1024)+this.expandForm.vo_add_capacity > 256) {
+                this.expandErrTB = true;
+                this.expandForm.vo_add_capacity = null
+                this.expandedCapacity = this.lunCapacity + (this.expandForm.vo_add_capacity * 1024)
+                expand = null;
+              } else {
+                this.expandErrTB = false;
+              }
             }
             break;
           default:
             // 默认GB 不变
+            this.expandedCapacity = this.lunCapacity + this.expandForm.vo_add_capacity
             if (expand.toString().indexOf('.') !== -1) {
               // 小数
-              this.expandErr = true;
+              this.expandErrGB = true;
+              this.expandForm.vo_add_capacity = null
+              this.expandedCapacity = this.lunCapacity + this.expandForm.vo_add_capacity
               expand = null;
             } else {
-              this.expandErr = false;
+              if (expand+this.expandForm.vo_add_capacity > 262144) {
+                this.expandErrGB = true;
+                this.expandForm.vo_add_capacity = null
+                this.expandedCapacity = this.lunCapacity + this.expandForm.vo_add_capacity
+                expand = null;
+              } else {
+                this.expandErrGB = false;
+                this.expandErrTB = false;
+              }
             }
             break;
         }
       } else {
-        this.expandErr = true;
+        this.expandErrGB = true;
         expand = null;
       }
     } else {
       expand = null;
     }
     console.log('expand2', expand);
-    console.log('this.expandErr', this.expandErr);
     this.expandForm.vo_add_capacity = expand;
+  }
+
+  changeExpandUnit() {
+    this.expandForm.vo_add_capacity = null;
+    this.expandedCapacity = this.lunCapacity + this.expandForm.vo_add_capacity
   }
 
   // 空间回收按钮点击事件

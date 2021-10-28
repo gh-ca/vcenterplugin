@@ -16,17 +16,29 @@
         <label style="color: #9F9F9F;">{{'vmfs.expandSize' | translate}}</label>
         <div clrInput style="float: left;position: relative;">
           <input clrInput style="width: 70%;border-bottom: none" type="number" [(ngModel)]="expandForm.vo_add_capacity" name="vo_add_capacity" #number="ngModel"
-                 (blur)="expandOnblur();" min="0" required/>
-          <select class="capacity" (change)="expandForm.vo_add_capacity=null" [(ngModel)]="expandForm.capacityUnit" clrInput style="width: 30%;border: 1px solid #DDDDDD;position: absolute;bottom: 3px;"  name="capacityUnit" >
+                 (ngModelChange)="expandOnChange();" min="0" required/>
+          <select class="capacity" (change)="changeExpandUnit();" [(ngModel)]="expandForm.capacityUnit" clrInput style="width: 30%;border: 1px solid #DDDDDD;position: absolute;bottom: 3px;"  name="capacityUnit" >
             <option value="TB">TB</option>
             <option value="GB">GB</option>
           </select>
-          <clr-control-helper *ngIf="!expandErr" style="position: absolute">
-            <clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{'vmfs.expandTips' | translate}}
+          <clr-control-helper *ngIf="!expandErrGB&&expandForm.capacityUnit==='GB'" style="position: absolute">
+            <clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>
+            {{'vmfs.expandTipsGB' | translate}}
           </clr-control-helper>
-          <clr-control-helper *ngIf="expandErr">
-            <div class="errorTips" readonly >
-              <clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{'vmfs.expandTips' | translate}}
+          <clr-control-helper *ngIf="expandErrGB&&expandForm.capacityUnit==='GB'">
+            <div class="errorTips" readonly>
+              <clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>
+              {{'vmfs.expandTipsGB' | translate}}
+            </div>
+          </clr-control-helper>
+          <clr-control-helper *ngIf="!expandErrTB&&expandForm.capacityUnit==='TB'" style="position: absolute">
+            <clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>
+            {{'vmfs.expandTipsTB' | translate}}
+          </clr-control-helper>
+          <clr-control-helper *ngIf="expandErrTB&&expandForm.capacityUnit==='TB'">
+            <div class="errorTips" readonly>
+              <clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>
+              {{'vmfs.expandTipsTB' | translate}}
             </div>
           </clr-control-helper>
         </div>
@@ -47,5 +59,16 @@
   </div>
   <div class="modal-footer">
     <button type="submit" class="btn btn-primary" (click)="expandSuccessShow = false;confirmActResult();">{{'menu.ok' | translate}}</button>
+  </div>
+</clr-modal>
+<!--无法执行扩容操作窗口-->
+<clr-modal [(clrModalOpen)]="expandErrorShow" [clrModalSize]="'sm'" [clrModalClosable]="false">
+  <h3 class="modal-title modelTile">{{'vmfs.reclaim.title' | translate}}</h3>
+  <div class="modal-body">
+    <clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{'vmfs.unableExpand'|translate}}
+  </div>
+  <div class="modal-footer">
+    <button type="submit" class="btn btn-primary"
+            (click)="cancel()">{{'menu.ok' | translate}}</button>
   </div>
 </clr-modal>
