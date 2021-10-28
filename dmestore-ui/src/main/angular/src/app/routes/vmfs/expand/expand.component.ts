@@ -152,7 +152,6 @@ export class ExpandComponent implements OnInit {
    */
   expandOnChange() {
     let expand = this.expandForm.vo_add_capacity;
-    console.log('expand', expand);
     if (expand && expand !== null && expand !== undefined) {
       if (expand > 0) {
         switch (this.expandForm.capacityUnit) {
@@ -165,7 +164,7 @@ export class ExpandComponent implements OnInit {
               this.expandedCapacity = this.lunCapacity + (this.expandForm.vo_add_capacity * 1024)
               expand = null;
             } else {
-              if ((expand / 1024) + this.expandForm.vo_add_capacity > 256) {
+              if ((this.lunCapacity / 1024) + this.expandForm.vo_add_capacity > 256) {
                 this.expandErrTB = true;
                 this.expandForm.vo_add_capacity = null
                 this.expandedCapacity = this.lunCapacity + (this.expandForm.vo_add_capacity * 1024)
@@ -185,7 +184,7 @@ export class ExpandComponent implements OnInit {
               this.expandedCapacity = this.lunCapacity + this.expandForm.vo_add_capacity
               expand = null;
             } else {
-              if (expand + this.expandForm.vo_add_capacity > 262144) {
+              if ((this.lunCapacity + this.expandForm.vo_add_capacity) > 262144) {
                 this.expandErrGB = true;
                 this.expandForm.vo_add_capacity = null
                 this.expandedCapacity = this.lunCapacity + this.expandForm.vo_add_capacity
@@ -198,8 +197,16 @@ export class ExpandComponent implements OnInit {
             break;
         }
       } else {
-        this.expandErrGB = true;
-        expand = null;
+        if (this.expandForm.capacityUnit === 'GB') {
+          this.expandErrGB = true;
+          this.expandForm.vo_add_capacity = null
+          expand = null;
+        } else {
+          this.expandErrTB = true
+          this.expandForm.vo_add_capacity = null
+          expand = null
+        }
+
       }
     } else {
       expand = null;
@@ -209,8 +216,14 @@ export class ExpandComponent implements OnInit {
   }
 
   changeExpandUnit() {
-    this.expandForm.vo_add_capacity = null;
-    this.expandedCapacity = this.lunCapacity + this.expandForm.vo_add_capacity
+    this.expandForm.vo_add_capacity = 1
+    this.expandErrGB=false
+    this.expandErrTB=false
+    if (this.expandForm.capacityUnit==='GB'){
+      this.expandedCapacity=this.lunCapacity+this.expandForm.vo_add_capacity
+    }else {
+      this.expandedCapacity=this.lunCapacity+(this.expandForm.vo_add_capacity*1024)
+    }
   }
 
   /**

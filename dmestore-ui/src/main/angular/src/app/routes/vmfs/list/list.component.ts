@@ -265,7 +265,7 @@ export class VmfsListComponent extends VmfsCommon implements OnInit, AfterViewIn
   description;
   operatingType;
   checkNullData = false
-  lunCapacity;
+  lunCapacity: number;
   expandedCapacity;
   expandErrorShow = false
 
@@ -2021,7 +2021,6 @@ wwn: "67c1cf110058934511ba6e5a00000344"
 
   expandOnChange() {
     let expand = this.expandForm.vo_add_capacity;
-    console.log('expand', expand);
     if (expand && expand !== null && expand !== undefined) {
       if (expand > 0) {
         switch (this.expandForm.capacityUnit) {
@@ -2034,7 +2033,7 @@ wwn: "67c1cf110058934511ba6e5a00000344"
               this.expandedCapacity = this.lunCapacity + (this.expandForm.vo_add_capacity * 1024)
               expand = null;
             } else {
-              if ((expand/1024)+this.expandForm.vo_add_capacity > 256) {
+              if ((this.lunCapacity / 1024) + this.expandForm.vo_add_capacity > 256) {
                 this.expandErrTB = true;
                 this.expandForm.vo_add_capacity = null
                 this.expandedCapacity = this.lunCapacity + (this.expandForm.vo_add_capacity * 1024)
@@ -2054,7 +2053,7 @@ wwn: "67c1cf110058934511ba6e5a00000344"
               this.expandedCapacity = this.lunCapacity + this.expandForm.vo_add_capacity
               expand = null;
             } else {
-              if (expand+this.expandForm.vo_add_capacity > 262144) {
+              if ((this.lunCapacity + this.expandForm.vo_add_capacity) > 262144) {
                 this.expandErrGB = true;
                 this.expandForm.vo_add_capacity = null
                 this.expandedCapacity = this.lunCapacity + this.expandForm.vo_add_capacity
@@ -2067,8 +2066,16 @@ wwn: "67c1cf110058934511ba6e5a00000344"
             break;
         }
       } else {
-        this.expandErrGB = true;
-        expand = null;
+        if (this.expandForm.capacityUnit === 'GB') {
+          this.expandErrGB = true;
+          this.expandForm.vo_add_capacity = null
+          expand = null;
+        } else {
+          this.expandErrTB = true
+          this.expandForm.vo_add_capacity = null
+          expand = null
+        }
+
       }
     } else {
       expand = null;
@@ -2078,8 +2085,14 @@ wwn: "67c1cf110058934511ba6e5a00000344"
   }
 
   changeExpandUnit() {
-    this.expandForm.vo_add_capacity = null;
-    this.expandedCapacity = this.lunCapacity + this.expandForm.vo_add_capacity
+    this.expandForm.vo_add_capacity = 1
+    this.expandErrGB=false
+    this.expandErrTB=false
+    if (this.expandForm.capacityUnit==='GB'){
+      this.expandedCapacity=this.lunCapacity+this.expandForm.vo_add_capacity
+    }else {
+      this.expandedCapacity=this.lunCapacity+(this.expandForm.vo_add_capacity*1024)
+    }
   }
 
   // 空间回收按钮点击事件
