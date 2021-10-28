@@ -1014,8 +1014,8 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
             }
         }
     }
-    @Override
-    public void deleteNfs(String dataStorageId) throws DmeException {
+    //@Override
+    public void deleteNfs2(String dataStorageId) throws DmeException {
         // DME侧删除nfs
         dmeDeleteNfs(dataStorageId);
 
@@ -1204,8 +1204,8 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
         return storageDetail.getModel() +" "+ storageDetail.getProductVersion();
     }
 
-    //@Override
-    public void deleteNfs2(String dataStorageId) throws DmeException {
+    @Override
+    public void deleteNfs(String dataStorageId) throws DmeException {
         DmeVmwareRelation dvr = dmeVmwareRalationDao.getDmeVmwareRelationByDsId(dataStorageId);
         if (dvr == null) {
             LOG.info("nfs delete!dme nfs relation is null!");
