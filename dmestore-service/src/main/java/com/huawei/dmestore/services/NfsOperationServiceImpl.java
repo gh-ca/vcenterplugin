@@ -85,6 +85,8 @@ public class NfsOperationServiceImpl implements NfsOperationService {
 
     private static final String AND_FIELD = "and";
 
+    private static final String NFS_SHARE_ID_STR = "{nfs_share_id}";
+
     private final long longTaskTimeOut = 30 * 60 * 1000;
 
     private static final int DIGIT_100 = 100;
@@ -348,6 +350,15 @@ public class NfsOperationServiceImpl implements NfsOperationService {
             if (RESULT_SUCCESS.equals(result)) {
                 LOG.info("rename NFS datastore success!");
             }
+
+            //重新查询fs share更新关系表share_name
+            String newShareName = getShareNameByShareId(String.valueOf(params.get("shareId")));
+            if(!StringUtils.isEmpty(newShareName)){
+                dmeVmwareRelation.setShareName(newShareName);
+            }else {
+                LOG.info("get share name error,the share name field of the relational table is not updated!");
+            }
+
             // 更新表中字段
             LOG.info("starting update database !");
             dmeVmwareRalationDao.updateNfs(dmeVmwareRelation);
@@ -355,6 +366,21 @@ public class NfsOperationServiceImpl implements NfsOperationService {
             LOG.error("update nfs datastore error !", e);
             throw new DmeException(CODE_503, e.getMessage());
         }
+    }
+
+    private String getShareNameByShareId(String shareId){
+        String url = DmeConstants.DME_NFS_SHARE_DETAIL_URL.replace(NFS_SHARE_ID_STR, shareId);
+        LOG.error("getNfsDatastoreShareAttr!method=get, shareId={},url={}, body=null", shareId, url);
+        try {
+            ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
+            if (responseEntity.getStatusCodeValue() / DIGIT_100 == DIGIT_2) {
+               JsonObject shareDetail = gson.fromJson(responseEntity.getBody(), JsonObject.class);
+               return shareDetail.get(NAME_FIELD).getAsString();
+            }
+        } catch (DmeException e) {
+            LOG.error("get share name error!errorMsg={}",e.getMessage());
+        }
+        return "";
     }
 
     @Override
@@ -762,7 +788,9 @@ public class NfsOperationServiceImpl implements NfsOperationService {
         if (null == nfsShareId) {
             throw new DmeException("没有对应的共享");
         }
-        String url = DmeConstants.DME_NFS_SHARE_DETAIL_URL.replace("{nfs_share_id}", nfsShareId);
+
+        resultMap.put("shareId", nfsShareId);
+        String url = DmeConstants.DME_NFS_SHARE_DETAIL_URL.replace(NFS_SHARE_ID_STR, nfsShareId);
         LOG.error("deleteAuthClient!method=get, nfsShareId={},url={}, body=null", nfsShareId, url);
         ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
         if (responseEntity.getStatusCodeValue() != HttpStatus.OK.value()) {
@@ -827,7 +855,7 @@ public class NfsOperationServiceImpl implements NfsOperationService {
     // 查询指定share,获取共享在存储设备上的id
     private String getOrientedShare(String shareId) throws DmeException {
         String idInStorage = "";
-        String url = DmeConstants.DME_NFS_SHARE_DETAIL_URL.replace("{nfs_share_id}", shareId);
+        String url = DmeConstants.DME_NFS_SHARE_DETAIL_URL.replace(NFS_SHARE_ID_STR, shareId);
         ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
         LOG.info("url:" + url + "responseEntity:" + gson.toJson(responseEntity));
         if (responseEntity.getStatusCodeValue() == HttpStatus.OK.value()) {
@@ -848,7 +876,7 @@ public class NfsOperationServiceImpl implements NfsOperationService {
         reqList.add(reqObject);
         Map<String, Object> reqMap = new HashMap<>();
         reqMap.put("nfs_share_client_deletion", reqList);
-        String url = DmeConstants.DME_NFS_SHARE_DETAIL_URL.replace("{nfs_share_id}", shareId);
+        String url = DmeConstants.DME_NFS_SHARE_DETAIL_URL.replace(NFS_SHARE_ID_STR, shareId);
         LOG.info("url:" + url + ",requestBody:" + gson.toJson(reqMap));
         ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.PUT, gson.toJson(reqMap));
         LOG.info("url:" + url + ",requestBody:" + gson.toJson(responseEntity));
