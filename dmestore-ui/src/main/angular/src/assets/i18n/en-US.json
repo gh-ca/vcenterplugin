@@ -177,12 +177,17 @@
       "tips": "If all the hosts mounted by NFS are unmounted, the NFS device will be deleted automatically！"
     },
     "reduce": {
-      "success": "Successfully reduce!"
+      "success": "Successfully reduce!",
+      "reduceErr": "The current storage cannot be scaled down!",
+      "maxOpCapTips": "Maximum operating capacity limit：",
+      "minOpCapTips": "Minimum operating capacity limit：0.001GB",
+      "operateTips": "(Current storage capacity - 3.000)",
+      "reduceErrorTips": "The shrink size must not be less than the minimum operating capacity limit and must not exceed the maximum operating capacity limit！"
     },
     "expand": {
       "capacityErr": "Input exceeds capacity limit!",
-      "maxCapTip": "Maximum capacity limit：16384 TB",
-      "minCapTip": "Minimum capacity limit：",
+      "maxCapTip": "Maximum operating capacity limit：16384 TB",
+      "minCapTip": "Minimum operating capacity limit：0.001GB",
       "expandErrTips": "The minimum disk expansion capacity is 1GB, and the expanded capacity cannot be greater than 16384TB!",
       "reduceThinTips": "The disk type is Thin, and the modified capacity must not be less than ",
       "reduceThickTips": "The disk type is Thick, and the modified capacity must not be less than "
