@@ -177,12 +177,17 @@
       "tips": "若NFS所挂载的主机全部被卸载，则会自动删除此NFS设备！"
     },
     "reduce": {
-      "success": "缩容成功！"
+      "success": "缩容成功！",
+      "reduceErr": "当前存储无法进行缩容操作！",
+      "maxOpCapTips": "最大操作容量限制：",
+      "minOpCapTips": "最小操作容量限制： 0.001GB",
+      "operateTips": "(当前存储容量-3)",
+      "reduceErrorTips": "缩容大小不得小于最小操作容量限制且不得超过最大操作容量限制！"
     },
     "expand": {
       "capacityErr": "输入超过容量限制!",
-      "maxCapTip": "最大容量限制：16384 TB",
-      "minCapTip": "最小容量限制：",
+      "maxCapTip": "最大操作容量限制：16384 TB",
+      "minCapTip": "最小操作容量限制：0.001 GB",
       "expandErrTips": "磁盘扩容容量最小为1GB，且扩容后的容量不得大于16384TB！",
       "reduceThinTips": "该磁盘类型为Thin类型，修改后的容量不得小于1GB。",
       "reduceThickTips": "该磁盘类型为Thick类型，修改后的容量不得小于3GB。"
