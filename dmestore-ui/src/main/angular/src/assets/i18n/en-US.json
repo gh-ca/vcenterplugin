@@ -178,7 +178,7 @@
     },
     "reduce": {
       "success": "Successfully reduce!",
-      "reduceErr": "The current NFS storage capacity does not meet the shrinking conditions, and the shrinking operation cannot be performed!",
+      "reduceErr": "The current NFS storage capacity (less than or equal to 3GB) does not meet the shrinking conditions, and the shrinking operation cannot be performed!",
       "maxOpCapTips": "Maximum operating capacity limit (total NFS storage capacity-minimum value (3GB) after shrinking the DME file system)：",
       "minOpCapTips": "Minimum operating capacity limit：0.001GB",
       "operateTips": "(Current storage capacity - 3.000)",
