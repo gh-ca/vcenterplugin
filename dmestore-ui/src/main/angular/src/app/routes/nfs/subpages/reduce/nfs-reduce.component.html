@@ -18,8 +18,8 @@
           <label>{{'nfs.reduSize' | translate}}</label>
           <div clrInput style="float: left;position: relative;">
             <input clrInput style="width: 70%;border-bottom: none" type="number" min="0" [(ngModel)]="newCapacity" name="newCapacity" #number="ngModel"
-                   onkeyup="this.value.match(/\d+(\.\d{0,2})?/)? this.value.match(/\d+(\.\d{0,2})?/)[0] : ''" required/>
-            <select class="capacity" [(ngModel)]="unit" clrInput style="width: 30%;border: 1px solid #DDDDDD;position: absolute;bottom: 3px;"  name="unit" (change)="checkCapacity();">
+                   onkeyup="this.value.match(/\d+(\.\d{0,2})?/)? this.value.match(/\d+(\.\d{0,2})?/)[0] : ''" (ngModelChange)="checkNewCapacity()" required/>
+            <select class="capacity" [(ngModel)]="unit" clrInput style="width: 30%;border: 1px solid #DDDDDD;position: absolute;bottom: 3px;"  name="unit" (change)="checkNewCapacity();">
               <option value="TB">TB</option>
               <option value="GB">GB</option>
               <!--<option value="MB">MB</option>-->
@@ -27,17 +27,16 @@
             </select>
           </div>
         </clr-input-container>
-        <clr-control-helper *ngIf="!capacityErr">
+        <clr-control-helper *ngIf="newCapacityError">
           <div class="errorTips" readonly >
             <clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>
-            <span *ngIf="updateNfs.thin">{{'nfs.expand.reduceThinTips' | translate}}</span>
-            <span *ngIf="!updateNfs.thin">{{'nfs.expand.reduceThickTips' | translate}}</span>
+            <span>{{'nfs.reduce.reduceErrorTips' | translate}}</span>
           </div>
         </clr-control-helper>
         <clr-control-helper>
           <div readonly style="font-size: small">
-            <span style="line-height: 20px;">{{'nfs.expand.minCapTip' | translate}} {{minCapacity}} GB</span><br>
-            <span style="line-height: 20px;">{{'nfs.expand.maxCapTip' | translate}}</span>
+            <span style="line-height: 20px;">{{'nfs.reduce.minOpCapTips' | translate}}</span><br>
+            <span style="line-height: 20px;">{{'nfs.reduce.maxOpCapTips' | translate}} {{maxOpCapacity}} GB</span>
           </div>
         </clr-control-helper>
       </form>
@@ -65,24 +64,23 @@
           <label>{{'nfs.reduSize' | translate}}</label>
           <div clrInput style="float: left;position: relative;">
             <input clrInput style="width: 70%;border-bottom: none" type="number" min="0" [(ngModel)]="newCapacity" name="newCapacity" #number="ngModel"
-                   onkeyup="this.value.match(/\d+(\.\d{0,2})?/)? this.value.match(/\d+(\.\d{0,2})?/)[0] : ''" required/>
-            <select class="capacity" [(ngModel)]="unit" clrInput style="width: 30%;border: 1px solid #DDDDDD;position: absolute;bottom: 3px;"  name="unit" (change)="checkCapacity();">
+                   onkeyup="this.value.match(/\d+(\.\d{0,2})?/)? this.value.match(/\d+(\.\d{0,2})?/)[0] : ''" (ngModelChange)="checkNewCapacity()" required/>
+            <select class="capacity" [(ngModel)]="unit" clrInput style="width: 30%;border: 1px solid #DDDDDD;position: absolute;bottom: 3px;"  name="unit" (change)="checkNewCapacity();">
               <option value="TB">TB</option>
               <option value="GB">GB</option>
             </select>
           </div>
         </clr-input-container>
-        <clr-control-helper *ngIf="!capacityErr">
+        <clr-control-helper *ngIf="newCapacityError">
           <div class="errorTips" readonly >
             <clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>
-            <span *ngIf="updateNfs.thin">{{'nfs.expand.reduceThinTips' | translate}}</span>
-            <span *ngIf="!updateNfs.thin">{{'nfs.expand.reduceThickTips' | translate}}</span>
+            <span>{{'nfs.reduce.reduceErrorTips' | translate}}</span>
           </div>
         </clr-control-helper>
         <clr-control-helper>
           <div readonly style="font-size: small">
-            <span style="line-height: 20px;">{{'nfs.expand.minCapTip' | translate}} {{minCapacity}} GB</span><br>
-            <span style="line-height: 20px;">{{'nfs.expand.maxCapTip' | translate}}</span>
+            <span style="line-height: 20px;">{{'nfs.reduce.minOpCapTips' | translate}}</span><br>
+            <span style="line-height: 20px;">{{'nfs.reduce.maxOpCapTips' | translate}} {{maxOpCapacity}} GB</span>
           </div>
         </clr-control-helper>
       </form>
@@ -100,6 +98,16 @@
     </div>
     <div class="modal-footer">
       <button type="submit" class="btn btn-primary" (click)="reduceSuccessShow = false;confirmActResult();">{{'menu.ok' | translate}}</button>
+    </div>
+  </clr-modal>
+  <!--无法进行缩容操作提示-->
+  <clr-modal [(clrModalOpen)]="reduceErrorShow" [clrModalSize]="'sm'" [clrModalClosable]="false">
+    <h3 class="modal-title modelTile">{{'vmfs.reclaim.title' | translate}}</h3>
+    <div class="modal-body">
+      <p>{{'nfs.reduce.reduceErr' | translate}}</p>
+    </div>
+    <div class="modal-footer">
+      <button type="submit" class="btn btn-primary" (click)="reduceErrorShow = false;confirmActResult();">{{'menu.ok' | translate}}</button>
     </div>
   </clr-modal>
 </div>

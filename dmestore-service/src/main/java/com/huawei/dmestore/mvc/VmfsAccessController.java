@@ -389,25 +389,6 @@ public class VmfsAccessController extends BaseController {
     }
 
     /**
-     * unmountVmfs
-     *
-     * @param params params
-     * @return ResponseBodyBean
-     */
-    /*@RequestMapping(value = "/ummountvmfsnew", method = RequestMethod.POST)
-    public ResponseBodyBean unmountVmfsNew(@RequestBody Map<String, Object> params) {
-        LOG.info("accessvmfs/unmountvmfs=={}", gson.toJson(params));
-        String failureStr = "";
-        try {
-           // vmfsAccessService.unmountVmfsNew(params);
-            return success(null, "unmount vmfs success");
-        } catch (DmeException e) {
-            LOG.error("unmount vmfs failure:", e);
-            failureStr = "unmount vmfs failure:" + e.getMessage();
-        }
-        return failure(failureStr);
-    }*/
-    /**
      * queryCreationMethodByDatastore  查询存储的创建方式
      *
      * @param dataStoreObjectId

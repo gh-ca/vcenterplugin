@@ -158,13 +158,13 @@ export class NfsExpandComponent implements OnInit{
         capacity = this.newCapacity;
         break;
     }
-    if (capacity<1){
-      this.newCapacity=0;
+    if (capacity<0.001){
+      this.newCapacity=1;
       this.capacityErr=false;
       return false;
     }
     if ((capacity+this.updateNfs.capacity)>16777216){
-      this.newCapacity=0;
+      this.newCapacity=1;
       this.capacityErr=false;
       return false;
     }else{

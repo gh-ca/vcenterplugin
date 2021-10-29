@@ -112,6 +112,7 @@ export class AdminLayoutComponent implements OnInit, OnDestroy {
       /**/
       { link: './iscsi', label: './iscsi' },
       { link: './vmfs/delete', label: './vmfs/delete' },
+      { link: './vmfs/expand', label: './vmfs/expand' },
       { link: './vmfs/expand?resource=dataStore', label: './vmfs/expand?resource=dataStore' },
       { link: './vmfs/serviceLevel?resource=dataStore', label: './vmfs/serviceLevel?resource=dataStore' },
       { link: './vmfs/modify', label: './vmfs/modify' },
