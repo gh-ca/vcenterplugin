@@ -1252,7 +1252,10 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
             //只移除share的客户端
             Map<String, String> authIdIpMap = new HashMap<>();
             for (AuthClient authClient : authClientList) {
-                authIdIpMap.put(authClient.getClientIdInStorage(), authClient.getName());
+                String ip = authClient.getName();
+                if(!shareClientIps.contains(ip)){
+                    authIdIpMap.put(authClient.getClientIdInStorage(), ip);
+                }
             }
             String taskId = deleteAuthClient(shareId, authIdIpMap);
             if (!StringUtils.isEmpty(taskId)) {
