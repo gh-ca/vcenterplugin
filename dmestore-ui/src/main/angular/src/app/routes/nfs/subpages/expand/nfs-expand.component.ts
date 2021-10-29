@@ -78,7 +78,7 @@ export class NfsExpandComponent implements OnInit{
       }
       this.cdr.detectChanges();
     });
-    this.modalLoading=false
+
   }
   expandData(){
     let v=this.checkCapacity();
