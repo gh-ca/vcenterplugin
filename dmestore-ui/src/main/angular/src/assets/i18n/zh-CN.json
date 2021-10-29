@@ -178,10 +178,9 @@
     },
     "reduce": {
       "success": "缩容成功！",
-      "reduceErr": "当前存储无法进行缩容操作！",
-      "maxOpCapTips": "最大操作容量限制：",
+      "reduceErr": "当前NFS存储容量（小于等于3GB）不满足缩容条件，无法进行缩容操作！！",
+      "maxOpCapTips": "最大操作容量限制（NFS存储总容量 - DME文件系统缩容后最小值(3GB)）：",
       "minOpCapTips": "最小操作容量限制： 0.001GB",
-      "operateTips": "(当前存储容量-3)",
       "reduceErrorTips": "缩容大小不得小于最小操作容量限制且不得超过最大操作容量限制！"
     },
     "expand": {
