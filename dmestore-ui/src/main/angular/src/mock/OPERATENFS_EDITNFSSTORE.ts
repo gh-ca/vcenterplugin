@@ -13,6 +13,7 @@ export default {
     fsName: 'DnfSG91',
     thin: true,
     capacity: 5.0,
+    shareId:'4dfdsefew-4324f-32rfsdf234r'
   },
   description: null,
 };

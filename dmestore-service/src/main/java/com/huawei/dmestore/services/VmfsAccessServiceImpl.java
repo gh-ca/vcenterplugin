@@ -219,6 +219,9 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             // 整理数据
             Map<String, DmeVmwareRelation> dvrMap = getDvrMap(dvrlist);
 
+            //获取所有Lun数据
+
+
             // 取得所有的存储设备
             List<Storage> storagemap = dmeStorageService.getStorages(null);
 
@@ -271,6 +274,22 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             throw new DmeException(e.getMessage());
         }
         return relists;
+    }
+
+    @Override
+    public Volume getLunCapacityByVmfsId(String vmfsId) throws DmeException{
+        Volume volume = new Volume();
+        try {
+            DmeVmwareRelation dvr = dmeVmwareRalationDao.getDmeVmwareRelationByDsId(vmfsId);
+            if (null == dvr) {
+                scanVmfs();
+                dvr = dmeVmwareRalationDao.getDmeVmwareRelationByDsId(vmfsId);
+            }
+            volume = getVolumeById(dvr.getVolumeId());
+        } catch (DmeSqlException e) {
+            throw new DmeException(e.getMessage());
+        }
+        return volume;
     }
 
     public synchronized void getVmfsSync(Map<String, VmfsDataInfo> volIds, List<VmfsDataInfo> vmfsDataInfos, Map<String, String> stoNameMap) throws DmeException {
@@ -6924,6 +6943,26 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 }
             }
         }
+    }
+
+    private Volume getVolumeById(String id) throws DmeException {
+        Volume volume = new Volume();
+        String url = DmeConstants.DME_QUERY_ONE_VOLUME.replace("{volume_id}", id);
+        ResponseEntity<String> entity = dmeAccessService.access(url, HttpMethod.GET, null);
+        if (entity.getStatusCodeValue() == HttpStatus.OK.value()) {
+            String body = entity.getBody();
+            if (StringUtils.isEmpty(body)) {
+                volume.setCapacity(0);
+                return volume;
+            }
+            JsonObject volumeObj = new JsonParser().parse(entity.getBody()).getAsJsonObject().get("volume").getAsJsonObject();
+            volume.setId(ToolUtils.jsonToStr(volumeObj.get(ID_FIELD)));
+            volume.setName(ToolUtils.jsonToStr(volumeObj.get(NAME_FIELD)));
+            volume.setCapacity(ToolUtils.jsonToInt(volumeObj.get(CAPACITY),0));
+        } else {
+            throw new DmeException(entity.toString());
+        }
+        return volume;
     }
 
 }

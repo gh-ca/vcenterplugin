@@ -177,12 +177,16 @@
       "tips": "若NFS所挂载的主机全部被卸载，则会自动删除此NFS设备！"
     },
     "reduce": {
-      "success": "缩容成功！"
+      "success": "缩容成功！",
+      "reduceErr": "当前NFS存储容量（小于等于3GB）不满足缩容条件，无法进行缩容操作！！",
+      "maxOpCapTips": "最大操作容量限制（NFS存储总容量 - DME文件系统缩容后最小值(3GB)）：",
+      "minOpCapTips": "最小操作容量限制： 0.001GB",
+      "reduceErrorTips": "缩容大小不得小于最小操作容量限制且不得超过最大操作容量限制！"
     },
     "expand": {
       "capacityErr": "输入超过容量限制!",
-      "maxCapTip": "最大容量限制：16384 TB",
-      "minCapTip": "最小容量限制：",
+      "maxCapTip": "最大操作容量限制：16384 TB",
+      "minCapTip": "最小操作容量限制：0.001 GB",
       "expandErrTips": "磁盘扩容容量最小为1GB，且扩容后的容量不得大于16384TB！",
       "reduceThinTips": "该磁盘类型为Thin类型，修改后的容量不得小于1GB。",
       "reduceThickTips": "该磁盘类型为Thick类型，修改后的容量不得小于3GB。"
@@ -262,7 +266,10 @@
     "low": "低",
     "none": "无",
     "changeServiceLevel": "变更DME存储策略",
-    "expandSize": "扩容大小",
+    "expandSize": "扩容大小：",
+    "currentSize": "当前容量：",
+    "expanedCapacity": "扩容后总容量：",
+    "unableExpand": "查询当前VMFS存储关联卷信息失败，请去DME和存储设备上确认VMFS存储关联的LUN存在！",
     "host": "主机",
     "cluster": "集群",
     "type": "类型",
@@ -271,7 +278,8 @@
     "timeInputTips": "请输入开始-结束时间！",
     "capacityTips": "若版本为VMFS5则容量最小值为1G，若版本为VMFS6则容量最小值为2G，且容量必须为单位为G的正整数，数量必须为正整数且不超过20",
     "serviceLevelCantBeNull": "DME存储策略是必选项，且只能选择容量不为0的DME存储策略！",
-    "expandTips": "扩容容量只能单位为GB的正整数。",
+    "expandTipsGB": "扩容容量只能单位为GB的正整数,且大小不能超过262144GB",
+    "expandTipsTB": "扩容容量只能单位为TB的正整数,且大小不能超过256TB",
     "expandTipsMax": "扩容后总容量不能超过256TB。",
     "loadingTips": "数据加载中，请稍后",
     "dataHandleLoadingTips": "数据处理中，请稍后",

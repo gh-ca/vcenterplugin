@@ -1,14 +1,15 @@
-import { Injectable } from '@angular/core';
-import { ClrDatagridStateInterface } from '@clr/angular';
+import {Injectable} from '@angular/core';
+import {ClrDatagridStateInterface} from '@clr/angular';
 import * as moment from 'moment';
-import { TranslatePipe } from '@ngx-translate/core';
-import { isMockData } from 'mock/mock';
-import { vmfsClusterTreeData } from './../../mock/vmfsClusterTree';
-import { HttpClient } from '@angular/common/http';
-import { getLodash } from '@shared/lib';
-import { mockServerData } from './../app.helpers';
-import { rejects } from 'assert';
-import {logger} from "codelyzer/util/logger";
+import {TranslatePipe} from '@ngx-translate/core';
+import {isMockData} from 'mock/mock';
+import {vmfsClusterTreeData} from './../../mock/vmfsClusterTree';
+import {HttpClient} from '@angular/common/http';
+import {getLodash} from '@shared/lib';
+import {mockServerData} from './../app.helpers';
+import {rejects} from 'assert';
+
+
 const _ = getLodash();
 
 function isSingleHost(node) {
@@ -28,17 +29,18 @@ function getSelectedDateFn(label) {
 
 @Injectable()
 export class CommonService {
-  constructor(private translatePipe: TranslatePipe, private http: HttpClient) {}
+  constructor(private translatePipe: TranslatePipe, private http: HttpClient) {
+  }
 
   timeSelectorRanges_type1 = [
-    { value: 'LAST_5_MINUTE', key: 'chart.select.last5Minute' },
-    { value: 'LAST_1_HOUR', key: 'chart.select.last1Hour' },
-    { value: 'LAST_1_DAY', key: 'chart.select.last1Day' },
-    { value: 'LAST_1_WEEK', key: 'chart.select.last1Week' },
-    { value: 'LAST_1_MONTH', key: 'chart.select.last1Month' },
-    { value: 'LAST_1_QUARTER', key: 'chart.select.last1Quarter' },
-    { value: 'HALF_1_YEAR', key: 'chart.select.half1Year' },
-    { value: 'LAST_1_YEAR', key: 'chart.select.last1Year' },
+    {value: 'LAST_5_MINUTE', key: 'chart.select.last5Minute'},
+    {value: 'LAST_1_HOUR', key: 'chart.select.last1Hour'},
+    {value: 'LAST_1_DAY', key: 'chart.select.last1Day'},
+    {value: 'LAST_1_WEEK', key: 'chart.select.last1Week'},
+    {value: 'LAST_1_MONTH', key: 'chart.select.last1Month'},
+    {value: 'LAST_1_QUARTER', key: 'chart.select.last1Quarter'},
+    {value: 'HALF_1_YEAR', key: 'chart.select.half1Year'},
+    {value: 'LAST_1_YEAR', key: 'chart.select.last1Year'},
   ];
 
   /*
@@ -51,12 +53,12 @@ zh:'一个月' ,range:'LAST_1_MONTH',  interval:  "HALF_HOUR"
 zh:'一年' ,range:'LAST_1_YEAR',   interval:  "DAY"
 */
   timeSelectorRanges_type2 = [
-    { value: 'LAST_4_HOUR', key: 'chart.select.last4Hour' },
-    { value: 'LAST_12_HOUR', key: 'chart.select.last12Hour' },
-    { value: 'LAST_1_DAY', key: 'chart.select.last1Day' },
-    { value: 'LAST_1_WEEK', key: 'chart.select.last1Week' },
-    { value: 'LAST_1_MONTH', key: 'chart.select.last1Month' },
-    { value: 'LAST_1_YEAR', key: 'chart.select.last1Year' },
+    {value: 'LAST_4_HOUR', key: 'chart.select.last4Hour'},
+    {value: 'LAST_12_HOUR', key: 'chart.select.last12Hour'},
+    {value: 'LAST_1_DAY', key: 'chart.select.last1Day'},
+    {value: 'LAST_1_WEEK', key: 'chart.select.last1Week'},
+    {value: 'LAST_1_MONTH', key: 'chart.select.last1Month'},
+    {value: 'LAST_1_YEAR', key: 'chart.select.last1Year'},
   ];
 
   /**
@@ -77,7 +79,7 @@ zh:'一年' ,range:'LAST_1_YEAR',   interval:  "DAY"
    * @returns {any} {range interval begin_time?: end_time?:}
    */
   getInfoFromTimeRange(label): typeTimeInfo {
-    let info: typeTimeInfo = { range: label };
+    let info: typeTimeInfo = {range: label};
     const getSelectedDate = getSelectedDateFn(label);
     const hourExp = /LAST_(\d+)_HOUR/;
     if (hourExp.test(label)) {
@@ -131,7 +133,7 @@ zh:'一年' ,range:'LAST_1_YEAR',   interval:  "DAY"
     // 过滤器   过滤内容
     if (state.filters) {
       for (const filter of state.filters) {
-        const { property, value } = filter as { property: string; value: string };
+        const {property, value} = filter as { property: string; value: string };
         query[property] = value;
       }
     }
@@ -140,7 +142,7 @@ zh:'一年' ,range:'LAST_1_YEAR',   interval:  "DAY"
       query.page = state.page.current;
       query.per_page = state.page.size;
     }
-    const qq = { params: this.params(query) };
+    const qq = {params: this.params(query)};
     console.log(qq);
     return qq;
   }
@@ -233,7 +235,7 @@ zh:'一年' ,range:'LAST_1_YEAR',   interval:  "DAY"
       console.log(params);
       return {
         "code": "-99999",
-        "data":["21.2112.12.12"],
+        "data": ["21.2112.12.12"],
         "description": "error_args:[10.143.133.197],error_code:hostmgmt.0044,error_msg:The host (name: 10.143.133.197) to which a LUN has been mapped cannot be added to a host group to which a LUN has been mapped."
       };
     } else {
@@ -247,6 +249,7 @@ zh:'一年' ,range:'LAST_1_YEAR',   interval:  "DAY"
       }
     }
   }
+
   /**
    * @Description vmfs 挂载
    * @date 2021-05-17
@@ -311,6 +314,7 @@ zh:'一年' ,range:'LAST_1_YEAR',   interval:  "DAY"
       return data;
     }
   }
+
   async remoteGetVmfsDeviceListById_unmount(id) {
     let data: any = [];
     try {
@@ -376,6 +380,37 @@ zh:'一年' ,range:'LAST_1_YEAR',   interval:  "DAY"
       return data;
     }
   }
+
+
+  /**
+   * @description 点击扩容，获取当前vmfs存储对应的lun的容量大小
+   * @params {any} id vmfs存储ID
+   * @return {number}
+   */
+  async getLunCapacity(id) {
+    let data;
+    try {
+      if (isMockData){
+        data=3
+      }else {
+        const res:any=await new Promise((resolve, reject)=>{
+          this.http
+            .get(`accessvmfs/getLunByVmfs/${id}`)
+            .subscribe(resolve,reject);
+        });
+        if (res.code==='200'&&res.data.id){
+          data=res.data.capacity
+        }else {
+          data=-1
+        }
+      }
+    } catch (error) {
+      console.log('获取lun容量',error)
+    } finally {
+      return data;
+    }
+  }
+
   /**
    * @Description 最佳实践 查询修复日志
    * @param {any} hostSetting
@@ -545,10 +580,10 @@ zh:'一年' ,range:'LAST_1_YEAR',   interval:  "DAY"
     }catch (error){
       console.log('检查最新最佳实践项',error)
     }finally {
+
       return data
     }
   }
-}
 
 
 /*

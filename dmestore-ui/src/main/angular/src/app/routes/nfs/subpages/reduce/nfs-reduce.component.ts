@@ -24,7 +24,10 @@ export class NfsReduceComponent implements OnInit{
   capacityErr= true;
   updateNfs=new UpdateNfs();
 
-  minCapacity = null;
+  minCapacity;
+  maxOpCapacity;
+  reduceErrorShow=false
+  newCapacityError=false
 
   constructor(private reduceService: NfsReduceService, private gs: GlobalsService,
               private activatedRoute: ActivatedRoute,private router:Router, private cdr: ChangeDetectorRef){
@@ -62,26 +65,15 @@ export class NfsReduceComponent implements OnInit{
       if (result.code === '200'){
         this.updateNfs = result.data;
         const capacity =  this.updateNfs.capacity;
-        if (this.updateNfs.thin) {
-          if (capacity) {
-            if (capacity > 1) {
-              this.minCapacity = 1;
-            } else {
-              this.minCapacity = capacity;
-            }
-          }
-        } else {
-          if (capacity) {
-            if (capacity > 3) {
-              this.minCapacity = 3;
-            } else {
-              this.minCapacity = capacity;
-            }
-          }
+        if (capacity>3){
+          this.maxOpCapacity=(capacity-3).toFixed(3)
+        }else {
+          this.reduceErrorShow=true
         }
       }
       this.cdr.detectChanges();
     });
+    this.modalLoading=false
   }
   backToNfsList(){
     this.modalLoading=false;
@@ -94,7 +86,7 @@ export class NfsReduceComponent implements OnInit{
     this.gs.getClientSdk().modal.close();
   }
   reduceCommit(){
-    let v=this.checkCapacity();
+    let v=this.checkNewCapacity();
     if(!v) return;
     this.modalHandleLoading=true;
     let capacity;
@@ -150,7 +142,7 @@ export class NfsReduceComponent implements OnInit{
       this.closeModel();
     }
   }
-  checkCapacity(){
+ /* checkCapacity(){
     let capacity;
     switch (this.unit) {
       case 'TB':
@@ -161,7 +153,7 @@ export class NfsReduceComponent implements OnInit{
         break;
     }
     const lastCapacity = this.updateNfs.capacity - capacity;
-    if (lastCapacity<this.minCapacity){
+    if (lastCapacity<parseFloat(this.maxOpCapacity)){
       this.newCapacity=0;
       this.capacityErr=false;
       return false;
@@ -170,5 +162,26 @@ export class NfsReduceComponent implements OnInit{
       return true;
     }
 
+  }*/
+  checkNewCapacity(){
+    console.log('reduce',this.newCapacity)
+    console.log(typeof this.newCapacity)
+    let capacity
+    switch (this.unit) {
+      case 'TB':
+        capacity = this.newCapacity * 1024;
+        break;
+      default: // 默认GB 不变
+        capacity = this.newCapacity;
+        break;
+    }
+    if (capacity>parseFloat(this.maxOpCapacity)||capacity<0.001){
+      this.newCapacity=null
+      this.newCapacityError=true
+      return false
+    }else {
+      this.newCapacityError=false
+      return true
+    }
   }
 }

@@ -3,18 +3,21 @@ import {ExpandService} from './expand.service';
 import {ActivatedRoute, Router} from '@angular/router';
 import {GetForm, ServiceLevelList, VmfsInfo, VmfsListService} from '../list/list.service';
 import {GlobalsService} from "../../../shared/globals.service";
+import {CommonService} from './../../common.service';
+import {TranslatePipe, TranslateService} from '@ngx-translate/core';
 
 @Component({
   selector: 'app-list',
   templateUrl: './expand.component.html',
   styleUrls: ['./expand.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [ExpandService],
+  providers: [ExpandService, CommonService,TranslatePipe],
 })
-export class ExpandComponent implements OnInit{
 
-  constructor(private remoteSrv: ExpandService, private route: ActivatedRoute, private cdr: ChangeDetectorRef,
-              private router:Router, private globalsService: GlobalsService) {
+export class ExpandComponent implements OnInit {
+
+  constructor(private translateService: TranslateService, private remoteSrv: ExpandService, private route: ActivatedRoute, private cdr: ChangeDetectorRef,
+              private router: Router, private globalsService: GlobalsService, private commonService: CommonService) {
 
   }
 
@@ -36,8 +39,12 @@ export class ExpandComponent implements OnInit{
   capacityErr = false; // 扩容容量错误信息
   modalHandleLoading = false; // 数据处理loading
   modalLoading = false; // 数据加载loading
-  expandErr = false; // 扩容容量错误信息
+  expandErrGB = false; // 扩容容量错误信息
+  expandErrTB = false;
   expandSuccessShow = false; // 扩容成功提示
+  lunCapacity;
+  expandedCapacity;
+  expandErrorShow = false
 
   ngOnInit(): void {
     this.initData();
@@ -50,11 +57,12 @@ export class ExpandComponent implements OnInit{
     this.expandShow = true;
     this.modalHandleLoading = false;
     this.modalLoading = true;
-    this.expandErr = false;
+    this.expandErrGB = false;
+    this.expandErrTB = false
     // 设备类型 操作类型初始化
     this.route.url.subscribe(url => {
       console.log('url', url);
-      this.route.queryParams.subscribe(queryParam => {
+      this.route.queryParams.subscribe(async queryParam => {
         this.resource = queryParam.resource;
         if (this.resource === 'list') {
           this.objectId = queryParam.objectId;
@@ -63,16 +71,22 @@ export class ExpandComponent implements OnInit{
           this.objectId = ctx[0].id;
           // this.objectId = "urn:vmomi:Datastore:datastore-4082:674908e5-ab21-4079-9cb1-596358ee5dd1";
         }
-        this.remoteSrv.getStorageById(this.objectId).subscribe((result: any) => {
-          console.log('VmfsInfo:', result);
-          if (result.code === '200' && null != result.data) {
-            // form表单数据初始化
-            this.expandForm.volume_id = result.data.volumeId;
-            this.expandForm.ds_name = result.data.storeName;
-          }
-          this.modalLoading = false;
-          this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
-        });
+        this.lunCapacity = await this.commonService.getLunCapacity(this.objectId)
+        if (this.lunCapacity === -1) {
+          this.modalLoading = false
+          this.expandErrorShow = true
+        } else {
+          this.remoteSrv.getStorageById(this.objectId).subscribe((result: any) => {
+            console.log('VmfsInfo:', result);
+            if (result.code === '200' && null != result.data) {
+              // form表单数据初始化
+              this.expandForm.volume_id = result.data.volumeId;
+              this.expandForm.ds_name = result.data.storeName;
+            }
+            this.modalLoading = false;
+            this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
+          });
+        }
         this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
       });
     });
@@ -119,11 +133,11 @@ export class ExpandComponent implements OnInit{
       // 参数封装
       this.remoteSrv.expandVMFS(expandSubmitForm).subscribe((result: any) => {
         this.modalHandleLoading = false;
-        if (result.code === '200'){
+        if (result.code === '200') {
           console.log('expand success:' + name);
           this.expandSuccessShow = true; // 扩容成功提示
-        }else {
-          console.log('expand: ' + name  + ' Reason:' + result.description);
+        } else {
+          console.log('expand: ' + name + ' Reason:' + result.description);
           // 错误信息 展示
           this.isOperationErr = true;
         }
@@ -136,40 +150,82 @@ export class ExpandComponent implements OnInit{
   /**
    * 扩容容量校验
    */
-  expandOnblur() {
+  expandOnChange() {
     let expand = this.expandForm.vo_add_capacity;
-    console.log('expand', expand);
     if (expand && expand !== null && expand !== undefined) {
       if (expand > 0) {
         switch (this.expandForm.capacityUnit) {
           case 'TB':
-            if ((expand*1024).toString().indexOf(".")!==-1) { // 小数
-              this.expandErr = true;
+            this.expandedCapacity = this.lunCapacity + (this.expandForm.vo_add_capacity * 1024)
+            if ((expand * 1024).toString().indexOf('.') !== -1) {
+              // 小数
+              this.expandErrTB = true;
+              this.expandForm.vo_add_capacity = null
+              this.expandedCapacity = this.lunCapacity + (this.expandForm.vo_add_capacity * 1024)
               expand = null;
             } else {
-              this.expandErr = false;
+              if ((this.lunCapacity / 1024) + this.expandForm.vo_add_capacity > 256) {
+                this.expandErrTB = true;
+                this.expandForm.vo_add_capacity = null
+                this.expandedCapacity = this.lunCapacity + (this.expandForm.vo_add_capacity * 1024)
+                expand = null;
+              } else {
+                this.expandErrTB = false;
+              }
             }
             break;
-          default: // 默认GB 不变
-            if (expand.toString().indexOf(".")!==-1) { // 小数
-              this.expandErr = true;
+          default:
+            // 默认GB 不变
+            this.expandedCapacity = this.lunCapacity + this.expandForm.vo_add_capacity
+            if (expand.toString().indexOf('.') !== -1) {
+              // 小数
+              this.expandErrGB = true;
+              this.expandForm.vo_add_capacity = null
+              this.expandedCapacity = this.lunCapacity + this.expandForm.vo_add_capacity
               expand = null;
             } else {
-              this.expandErr = false;
+              if ((this.lunCapacity + this.expandForm.vo_add_capacity) > 262144) {
+                this.expandErrGB = true;
+                this.expandForm.vo_add_capacity = null
+                this.expandedCapacity = this.lunCapacity + this.expandForm.vo_add_capacity
+                expand = null;
+              } else {
+                this.expandErrGB = false;
+                this.expandErrTB = false;
+              }
             }
             break;
         }
       } else {
-        this.expandErr = true;
-        expand = null;
+        if (this.expandForm.capacityUnit === 'GB') {
+          this.expandErrGB = true;
+          this.expandForm.vo_add_capacity = null
+          expand = null;
+        } else {
+          this.expandErrTB = true
+          this.expandForm.vo_add_capacity = null
+          expand = null
+        }
+
       }
     } else {
       expand = null;
     }
     console.log('expand2', expand);
-    console.log('this.expandErr', this.expandErr);
     this.expandForm.vo_add_capacity = expand;
   }
+
+  changeExpandUnit() {
+    this.expandForm.vo_add_capacity = 1
+    this.expandErrGB=false
+    this.expandErrTB=false
+    if (this.expandForm.capacityUnit==='GB'){
+      this.expandedCapacity=this.lunCapacity+this.expandForm.vo_add_capacity
+    }else {
+      this.expandedCapacity=this.lunCapacity+(this.expandForm.vo_add_capacity*1024)
+    }
+  }
+
   /**
    * 确认操作结果并关闭窗口
    */

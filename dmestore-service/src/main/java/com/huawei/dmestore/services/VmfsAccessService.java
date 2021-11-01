@@ -22,6 +22,11 @@ public interface VmfsAccessService {
     List<VmfsDataInfo> listVmfs() throws DmeException;
 
     /**
+     * get lun capacity by vmfs datastore id
+     */
+    Volume getLunCapacityByVmfsId(String vmfsId) throws DmeException;
+
+    /**
      * List vmfs Performance
      *
      * @param wwns wwn

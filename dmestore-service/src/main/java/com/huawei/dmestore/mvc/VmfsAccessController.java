@@ -64,6 +64,23 @@ public class VmfsAccessController extends BaseController {
     }
 
     /**
+     * get lun by volume
+     *
+     * @return ResponseBodyBean
+     */
+    @RequestMapping(value = "/getLunByVmfs/{storeId}", method = RequestMethod.GET)
+    public ResponseBodyBean getLunByVmfs(@PathVariable(value = "storeId") String storeId ) {
+        String failureStr = "";
+        try {
+            Volume volume = vmfsAccessService.getLunCapacityByVmfsId(storeId);
+            return success(volume);
+        } catch (DmeException e) {
+            failureStr = e.getMessage();
+        }
+        return failure(failureStr);
+    }
+
+    /**
      * listVmfsPerformance
      *
      * @param wwns wwns
@@ -371,25 +388,6 @@ public class VmfsAccessController extends BaseController {
         }
     }
 
-    /**
-     * unmountVmfs
-     *
-     * @param params params
-     * @return ResponseBodyBean
-     */
-    /*@RequestMapping(value = "/ummountvmfsnew", method = RequestMethod.POST)
-    public ResponseBodyBean unmountVmfsNew(@RequestBody Map<String, Object> params) {
-        LOG.info("accessvmfs/unmountvmfs=={}", gson.toJson(params));
-        String failureStr = "";
-        try {
-           // vmfsAccessService.unmountVmfsNew(params);
-            return success(null, "unmount vmfs success");
-        } catch (DmeException e) {
-            LOG.error("unmount vmfs failure:", e);
-            failureStr = "unmount vmfs failure:" + e.getMessage();
-        }
-        return failure(failureStr);
-    }*/
     /**
      * queryCreationMethodByDatastore  查询存储的创建方式
      *
