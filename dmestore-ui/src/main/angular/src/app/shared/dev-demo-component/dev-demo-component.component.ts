@@ -32,6 +32,10 @@ export class DevDemoComponentComponent implements OnInit {
   status:string
   description:string
   checkbox:boolean=false
+  selectedArr:any[];
+  selectedValue:string='手动'
+  table;
+  recommendedValue:number=80
 
   constructor() {
     this.initForm();
@@ -75,18 +79,17 @@ export class DevDemoComponentComponent implements OnInit {
   }
   // "10.12.123.1","10.23.234.1"
   initForm() {
-    this.status='PartSuccess'
-    this.description='Unmount vmfs failed .'
     //模拟返回数据
-    this.partSuccessData=[
-     {key: "LQ_071419180000", value: "vCenter error:The operation is not allowed in the current state."},
-    {key: "zg709_4v", value: "vCenter error:The operation is not allowed in the current state."},
-     {key: "LQ_071419180000", value: "vCenter error:The operation is not allowed in the current state."},
-     {key: "zg709_4v", value: "vCenter error:The operation is not allowed in the current state."},
-    {key: "LQ_071419180000", value: "vCenter error:The operation is not allowed in the current state."},
-    {key: "zg709_4v", value: "vCenter error:The operation is not allowed in the current state."}
-    ];
-// ["10.143.133.196", "10.143.133.197"]
+    this.partSuccessData={
+      "code":"-99999",
+      "data":{
+        "successNo":0,
+        "failNo":1,
+        "connectionResult":null,
+        "partialSuccess":0
+      },
+      "description":"create vmfs failure:create vmfs errorFailed to perform the operation: 存储池的空闲容量不足。 请对存储池扩容后重试或者创建小于(1809)GB容量的LUN."
+    }
     /*初始化和校验规则*/
     this.form = new FormGroup({
       brave: new FormControl('', Validators.required),
@@ -155,6 +158,7 @@ export class DevDemoComponentComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.table=[{},{}]
   }
   // ngDoCheck() {
   //   this.changeButtonAttr()
@@ -169,9 +173,9 @@ export class DevDemoComponentComponent implements OnInit {
     }
   }
 
-  cancel(){
-    this.mountShow=false
-  }
+  checkRecommendedValue(){}
+  changeSelect(){}
+
 }
 
 

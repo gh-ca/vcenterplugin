@@ -19,6 +19,7 @@ import com.vmware.vim25.VirtualHardwareOption;
 import com.vmware.vim25.VirtualLsiLogicController;
 import com.vmware.vim25.VirtualMachineConfigOption;
 import com.vmware.vim25.VirtualMachineConfigSpec;
+import com.vmware.vim25.VirtualMachineConnectionState;
 import com.vmware.vim25.VirtualMachineFileInfo;
 import com.vmware.vim25.VirtualMachineRuntimeInfo;
 import com.vmware.vim25.VirtualSCSIController;
@@ -90,6 +91,18 @@ public class VirtualMachineMo extends BaseMo {
      */
     public VirtualMachineRuntimeInfo getRuntimeInfo() throws Exception {
         return (VirtualMachineRuntimeInfo) context.getVimClient().getDynamicProperty(mor, "runtime");
+    }
+
+    /**
+     * getRuntimeInfo
+     *
+     * @return VirtualMachineRuntimeInfo
+     * @throws Exception Exception
+     */
+    public boolean isConnected() throws Exception {
+        VirtualMachineRuntimeInfo runtimeInfo = getRuntimeInfo();
+        VirtualMachineConnectionState connectionState = runtimeInfo.getConnectionState();
+        return connectionState.value().equals(VirtualMachineConnectionState.CONNECTED.value());
     }
 
     /**
@@ -422,5 +435,19 @@ public class VirtualMachineMo extends BaseMo {
             }
         }
         return unitNumber;
+    }
+
+    public VirtualDisk[] getAllDiskDevice() throws Exception {
+        List<VirtualDisk> deviceList = new ArrayList<VirtualDisk>();
+        List<VirtualDevice> devices = context.getVimClient().getDynamicProperty(mor, "config.hardware.device");
+        if (devices != null && devices.size() > 0) {
+            for (VirtualDevice device : devices) {
+                if (device instanceof VirtualDisk) {
+                    deviceList.add((VirtualDisk) device);
+                }
+            }
+        }
+
+        return deviceList.toArray(new VirtualDisk[0]);
     }
 }

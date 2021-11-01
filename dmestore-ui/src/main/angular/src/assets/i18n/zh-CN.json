@@ -630,9 +630,9 @@
     "recommend": "期望值",
     "level": "级别",
     "violation": "违规数",
-    "non-compliant": "违规主机",
+    "non-compliant": "违规存储",
     "actual": "实际值",
-    "host": "主机名",
+    "host": "存储名称",
     "critical": "紧急",
     "info": "提示",
     "warning": "次要",
@@ -644,6 +644,14 @@
     "exeFail": "执行失败",
     "operation": "操作",
     "implementation": "实施",
+    "repairHistoryBtn": "修复历史",
+    "repairAction": "修复动作",
+    "log": "日志",
+    "repair": "修改",
+    "reviseRecommandValue": "修改期望值",
+    "originalExpectedValue": "原期望值：",
+    "newExpectations": "新期望值：",
+    "expectationsError": "请填写75~90之间的期望值数值",
     "description": {
       "name": "描述",
       "vmfs5": "实施后将会启用VAAI ATS Heartbeat功能。在ESXi6.5以前版本可能会导致VMFS3、VMFS5对应的数据存储丢失连接，建议关闭，其他版本推荐开启。",
@@ -658,9 +666,23 @@
       "pathSwitchPolicy": "实施后将自动为存储设备配置多路径选路策略，提高存储设备的可用性和性能。用户已创建的数据存储需要重启主机生效。",
       "jumboFrame": "实施后会启用巨型帧配置，ESXi Vmkernel适配器的MTU会设置为9000。推荐存储网络使用巨型帧。该配置需ESXi主机、存储设备和数据包链路上的所有物理网络设备均支持巨型帧，且上述设备的MTU都设置为9000。",
       "reclamation": "实施后，将为VMFS6数据存储配置自动空间回收策略。",
-      "numberOfVolInDatastore": "实施后，会将单个数据存储中卷的最大数量限制为1。这是由于虚拟机不能并发处理数据存储中多个卷的请求，当一个数据存储中包含多个卷时，某个卷的请求阻塞会影响其他卷，因此不推荐一个数据存储中包含多个卷。"
+      "numberOfVolInDatastore": "实施后，会将单个数据存储中卷的最大数量限制为1。这是由于虚拟机不能并发处理数据存储中多个卷的请求，当一个数据存储中包含多个卷时，某个卷的请求阻塞会影响其他卷，因此不推荐一个数据存储中包含多个卷。",
+      "spaceUtilization": "实施后，对于VMFS存储容量利用率高于期望值的数据存储总容量进行自动扩容，扩容比例最小为原总容量的10%向上取整。"
     },
-    "applyBestPracticeTips": "所选数据中有违规数为0的数据，请重新选择!"
+    "applyBestPracticeTips": "所选数据中有违规数为0的数据，请重新选择!",
+    "repairHistory": {
+      "objectName": "对象名",
+      "violationValue": "违规值",
+      "recommendedValue": "推荐值",
+      "repairType": "修复类型",
+      "repairTime": "修复时间",
+      "repairResult": "修复结果",
+      "executionLog": "执行日志",
+      "manual": "手动",
+      "automatic": "自动",
+      "success": "成功",
+      "fail": "失败"
+    }
   },
   "iscsi": {
     "hostIp": "主机VmKernel IP",

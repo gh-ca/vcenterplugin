@@ -9,6 +9,7 @@ import {getLodash} from '@shared/lib';
 import {mockServerData} from './../app.helpers';
 import {rejects} from 'assert';
 
+
 const _ = getLodash();
 
 function isSingleHost(node) {
@@ -240,7 +241,7 @@ zh:'一年' ,range:'LAST_1_YEAR',   interval:  "DAY"
     } else {
       try {
         const res: any = await new Promise((resolve, reject) => {
-          this.http.post('/accessvmfs/mountvmfsnew', params).subscribe(resolve, reject);
+          this.http.post('accessvmfs/mountvmfsnew', params).subscribe(resolve, reject);
         });
         return res;
       } catch (error) {
@@ -380,6 +381,7 @@ zh:'一年' ,range:'LAST_1_YEAR',   interval:  "DAY"
     }
   }
 
+
   /**
    * @description 点击扩容，获取当前vmfs存储对应的lun的容量大小
    * @params {any} id vmfs存储ID
@@ -405,10 +407,184 @@ zh:'一年' ,range:'LAST_1_YEAR',   interval:  "DAY"
     } catch (error) {
       console.log('获取lun容量',error)
     } finally {
+      return data;
+    }
+  }
+
+  /**
+   * @Description 最佳实践 查询修复日志
+   * @param {any} hostSetting
+   * @returns {Array}
+   */
+  async getBestpracticeRepairLogs(hostSetting:string){
+    let data=[]
+    try {
+      if (isMockData){
+        data=[
+          {
+            "hostsetting": "VMFS Datastore Space Utilization",
+            "message": "VMFS Datastore Space Utilization多少撒发的撒的湿答答阿三",
+            "objectId": "12321421421",
+            "objectName": "main",
+            "recommandValue": "80%",
+            "repairResult": true,
+            "repairTime": "2021-08-12 07:53:48",
+            "repairType": "0",
+            "violationValue": "90%"
+          },
+          {
+            "hostsetting": "VMFS Datastore Space Utilization",
+            "message": "",
+            "objectId": "12321421421",
+            "objectName": "test",
+            "recommandValue": "80%",
+            "repairResult": true,
+            "repairTime": "2021-08-11 07:53:48",
+            "repairType": "0",
+            "violationValue": "90%"
+          },{
+            "hostsetting": "VMFS Datastore Space Utilization",
+            "message": "",
+            "objectId": "12321421421",
+            "objectName": "test",
+            "recommandValue": "80%",
+            "repairResult": false,
+            "repairTime": "2021-08-10 07:53:48",
+            "repairType": "0",
+            "violationValue": "90%"
+          },
+          {
+            "hostsetting": "VMFS Datastore Space Utilization",
+            "message": "",
+            "objectId": "12321421421",
+            "objectName": "test",
+            "recommandValue": "80%",
+            "repairResult": true,
+            "repairTime": "2021-08-12 07:53:48",
+            "repairType": "1",
+            "violationValue": "90%"
+          },
+          {
+            "hostsetting": "VMFS Datastore Space Utilization",
+            "message": "",
+            "objectId": "12321421421",
+            "objectName": "test",
+            "recommandValue": "80%",
+            "repairResult": false,
+            "repairTime": "2021-08-12 07:53:48",
+            "repairType": "1",
+            "violationValue": "90%"
+          }
+        ]
+      }else {
+        const res:any=await new Promise((resolve,reject)=>{
+          this.http
+            .get(`v1/bestpractice/logs?hostsetting=${hostSetting}`)
+            .subscribe(resolve,reject)
+        });
+        if (res.code==='200'){
+          data=res.data
+        }
+      }
+    }catch (error){
+      console.log('查询修复日志',error)
+    }finally {
       return data
     }
   }
-}
+  /**
+   * @Description 最佳实践 查询期望值与修复方式
+   * @param {any} hostSetting
+   * @returns {Object}
+   */
+  async getBestpracticeRecommand(hostSetting:string){
+    let data={}
+    try {
+      if(isMockData){
+        await new Promise(r=>{
+          data={
+            "id": "12",
+            "hostsetting": "VMFS Datastore Space Utilization",
+            "recommandValue": "80%",
+            "repairAction": "0",
+            "createTime": "2021-08-02 16:29:20",
+            "updateRecommendTime": "2021-08-02 16:29:20",
+            "updateRepairTime": "2021-08-02 16:29:20"
+          }
+          r();
+        })
+      }else {
+        const res:any=await new Promise((resolve,reject)=>{
+          this.http
+            .get(`v1/bestpractice/recommand?hostsetting=${hostSetting}`)
+            .subscribe(resolve,reject)
+        });
+        if (res.code==='200'){
+          data=res.data
+        }
+      }
+    }catch (error){
+      console.log('查询期望值与修复方式',error)
+    }finally {
+      return data
+    }
+  }
+
+  /**
+   * @Description 最佳实践 修改期望值与修复方式
+   * @param {any} id
+   * @param {any} params:{recommandValue,repairAction}
+   * @returns {Object}
+   */
+  async changeBestpracticeRecommand(id:string,params:object){
+    let code=''
+    try {
+      if (isMockData){
+        code='200'
+      }else {
+        const res:any=await new Promise((resolve, reject)=>{
+          this.http
+            .put(`v1/bestpractice/recommand/${id}`,params)
+            .subscribe(resolve,reject)
+        })
+        code=res.code
+      }
+    }catch (error){
+      console.log('修改期望值与修复方式',error)
+    }finally {
+      return code
+    }
+  }
+
+  /**
+   * @description 检查最新最佳实践项
+   * @param ids
+   */
+  async checkVmfsBestpractice(ids){
+    let data={}
+    try {
+      if (isMockData){
+        data={
+          "code": "200",
+          "data": null,
+          "description": null
+        }
+      }else {
+        const res:any=await new Promise((resolve, reject)=>{
+          this.http
+            .post(`v1/bestpractice/check/vmfs`,ids)
+            .subscribe(resolve,reject)
+        })
+        data=res
+      }
+    }catch (error){
+      console.log('检查最新最佳实践项',error)
+    }finally {
+
+      return data
+    }
+  }
+
 
 /*
 async function getAccessvmwareListclusters(instance) {
