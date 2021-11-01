@@ -230,6 +230,38 @@ public final class DpSqlFileConstants {
         + "\"PUSH_EVENT_LEVEL\"  integer, " + "\"HOST_PORT\"  integer default 443, "
         + "CONSTRAINT UNIQUE_DP_HOST_IP UNIQUE (HOST_IP) " + ");";
 
+
+    /**
+     * DP_DME_BEST_PRACTICE_RECOMMAND.
+     */
+    public static final String DP_DME_BEST_PRACTICE_RECOMMAND = "DP_DME_BEST_PRACTICE_RECOMMAND";
+
+    /**
+     * DP_DME_BEST_PRACTICE_RECOMMAND_SQL.
+     */
+    public static final String DP_DME_BEST_PRACTICE_RECOMMAND_SQL = "DROP TABLE IF EXISTS \"DP_DME_BEST_PRACTICE_RECOMMAND\"; "
+        + "CREATE TABLE \"DP_DME_BEST_PRACTICE_RECOMMAND\" ( " + "\"ID\"  integer PRIMARY KEY AUTO_INCREMENT NOT NULL, "
+        + "\"HOST_SETTING\"  nvarchar(255) NOT NULL, " + "\"RECOMMEND_VALUE\"  nvarchar(255) NOT NULL, "
+        + "\"REPAIR_ACTION\" nvarchar(10) NOT NULL, " + "\"CREATE_TIME\"  datetime, "
+        + "\"UPDATE_RECOMMEND_TIME\"  datetime, " + "\"UPDATE_REPAIR_TIME\"  datetime " + ");";
+
+    /**
+     * DP_DME_BEST_PRACTICE_LOG.
+     */
+    public static final String DP_DME_BEST_PRACTICE_LOG = "DP_DME_BEST_PRACTICE_LOG";
+
+    /**
+     * DP_DME_BEST_PRACTICE_LOG_SQL.
+     */
+    public static final String DP_DME_BEST_PRACTICE_LOG_SQL = "DROP TABLE IF EXISTS \"DP_DME_BEST_PRACTICE_LOG\"; "
+        + "CREATE TABLE \"DP_DME_BEST_PRACTICE_LOG\" ( " + "\"ID\"  integer PRIMARY KEY AUTO_INCREMENT NOT NULL, "
+        + "\"OBJECT_NAME\"  nvarchar(512) NOT NULL, " + "\"OBJECT_ID\"  nvarchar(255) NOT NULL, "
+        + "\"HOST_SETTING\"  nvarchar(255) NOT NULL, " + "\"RECOMMEND_VALUE\"  nvarchar(255) NOT NULL, "
+        + "\"VIOLATION_VALUE\"  nvarchar(255) NOT NULL, " + "\"REPAIR_TYPE\"  nvarchar(10) NOT NULL, "
+        + "\"REPAIR_RESULT\" BOOLEAN NOT NULL, " + "\"REPAIR_TIME\"  DATETIME , "
+        + "\"MESSAGE\"  clob " + ");";
+
+
     /**
      * DPSqlFileConstant .
      */

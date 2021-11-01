@@ -116,4 +116,17 @@ public interface BestPracticeService {
     default DatastoreVmwareMoFactory getDatastoreMoFactory() {
         return DatastoreVmwareMoFactory.getInstance();
     }
+
+    /**
+     * 修复动作，默认为手动
+     * 0：手动
+     * 1：自动
+     *
+     * @return String
+     *
+     */
+    default String repairAction() {
+        return "0";
+    }
+
 }

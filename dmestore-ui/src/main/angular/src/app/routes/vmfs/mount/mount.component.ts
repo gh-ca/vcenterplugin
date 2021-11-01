@@ -40,7 +40,7 @@ export class MountComponent implements OnInit {
     private cdr: ChangeDetectorRef,
     private router: Router,
     private globalsService: GlobalsService,
-    private translateService:TranslateService
+    private translateService:TranslateService,
   ) {
     this.chooseDevice = [];
     this.deviceList = []; // 主机AND集群
