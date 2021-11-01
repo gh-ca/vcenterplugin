@@ -390,22 +390,22 @@ zh:'一年' ,range:'LAST_1_YEAR',   interval:  "DAY"
   async getLunCapacity(id) {
     let data;
     try {
-      if (isMockData){
-        data=3
-      }else {
-        const res:any=await new Promise((resolve, reject)=>{
+      if (isMockData) {
+        data = 3
+      } else {
+        const res: any = await new Promise((resolve, reject) => {
           this.http
             .get(`accessvmfs/getLunByVmfs/${id}`)
-            .subscribe(resolve,reject);
+            .subscribe(resolve, reject);
         });
-        if (res.code==='200'&&res.data.id){
-          data=res.data.capacity
-        }else {
-          data=-1
+        if (res.code === '200' && res.data.id) {
+          data = res.data.capacity
+        } else {
+          data = -1
         }
       }
     } catch (error) {
-      console.log('获取lun容量',error)
+      console.log('获取lun容量', error)
     } finally {
       return data;
     }
@@ -416,11 +416,11 @@ zh:'一年' ,range:'LAST_1_YEAR',   interval:  "DAY"
    * @param {any} hostSetting
    * @returns {Array}
    */
-  async getBestpracticeRepairLogs(hostSetting:string){
-    let data=[]
+  async getBestpracticeRepairLogs(hostSetting: string) {
+    let data = []
     try {
-      if (isMockData){
-        data=[
+      if (isMockData) {
+        data = [
           {
             "hostsetting": "VMFS Datastore Space Utilization",
             "message": "VMFS Datastore Space Utilization多少撒发的撒的湿答答阿三",
@@ -442,7 +442,7 @@ zh:'一年' ,range:'LAST_1_YEAR',   interval:  "DAY"
             "repairTime": "2021-08-11 07:53:48",
             "repairType": "0",
             "violationValue": "90%"
-          },{
+          }, {
             "hostsetting": "VMFS Datastore Space Utilization",
             "message": "",
             "objectId": "12321421421",
@@ -476,33 +476,34 @@ zh:'一年' ,range:'LAST_1_YEAR',   interval:  "DAY"
             "violationValue": "90%"
           }
         ]
-      }else {
-        const res:any=await new Promise((resolve,reject)=>{
+      } else {
+        const res: any = await new Promise((resolve, reject) => {
           this.http
             .get(`v1/bestpractice/logs?hostsetting=${hostSetting}`)
-            .subscribe(resolve,reject)
+            .subscribe(resolve, reject)
         });
-        if (res.code==='200'){
-          data=res.data
+        if (res.code === '200') {
+          data = res.data
         }
       }
-    }catch (error){
-      console.log('查询修复日志',error)
-    }finally {
+    } catch (error) {
+      console.log('查询修复日志', error)
+    } finally {
       return data
     }
   }
+
   /**
    * @Description 最佳实践 查询期望值与修复方式
    * @param {any} hostSetting
    * @returns {Object}
    */
-  async getBestpracticeRecommand(hostSetting:string){
-    let data={}
+  async getBestpracticeRecommand(hostSetting: string) {
+    let data = {}
     try {
-      if(isMockData){
-        await new Promise(r=>{
-          data={
+      if (isMockData) {
+        await new Promise(r => {
+          data = {
             "id": "12",
             "hostsetting": "VMFS Datastore Space Utilization",
             "recommandValue": "80%",
@@ -513,19 +514,19 @@ zh:'一年' ,range:'LAST_1_YEAR',   interval:  "DAY"
           }
           r();
         })
-      }else {
-        const res:any=await new Promise((resolve,reject)=>{
+      } else {
+        const res: any = await new Promise((resolve, reject) => {
           this.http
             .get(`v1/bestpractice/recommand?hostsetting=${hostSetting}`)
-            .subscribe(resolve,reject)
+            .subscribe(resolve, reject)
         });
-        if (res.code==='200'){
-          data=res.data
+        if (res.code === '200') {
+          data = res.data
         }
       }
-    }catch (error){
-      console.log('查询期望值与修复方式',error)
-    }finally {
+    } catch (error) {
+      console.log('查询期望值与修复方式', error)
+    } finally {
       return data
     }
   }
@@ -536,22 +537,22 @@ zh:'一年' ,range:'LAST_1_YEAR',   interval:  "DAY"
    * @param {any} params:{recommandValue,repairAction}
    * @returns {Object}
    */
-  async changeBestpracticeRecommand(id:string,params:object){
-    let code=''
+  async changeBestpracticeRecommand(id: string, params: object) {
+    let code = ''
     try {
-      if (isMockData){
-        code='200'
-      }else {
-        const res:any=await new Promise((resolve, reject)=>{
+      if (isMockData) {
+        code = '200'
+      } else {
+        const res: any = await new Promise((resolve, reject) => {
           this.http
-            .put(`v1/bestpractice/recommand/${id}`,params)
-            .subscribe(resolve,reject)
+            .put(`v1/bestpractice/recommand/${id}`, params)
+            .subscribe(resolve, reject)
         })
-        code=res.code
+        code = res.code
       }
-    }catch (error){
-      console.log('修改期望值与修复方式',error)
-    }finally {
+    } catch (error) {
+      console.log('修改期望值与修复方式', error)
+    } finally {
       return code
     }
   }
@@ -560,30 +561,31 @@ zh:'一年' ,range:'LAST_1_YEAR',   interval:  "DAY"
    * @description 检查最新最佳实践项
    * @param ids
    */
-  async checkVmfsBestpractice(ids){
-    let data={}
+  async checkVmfsBestpractice(ids) {
+    let data = {}
     try {
-      if (isMockData){
-        data={
+      if (isMockData) {
+        data = {
           "code": "200",
           "data": null,
           "description": null
         }
-      }else {
-        const res:any=await new Promise((resolve, reject)=>{
+      } else {
+        const res: any = await new Promise((resolve, reject) => {
           this.http
-            .post(`v1/bestpractice/check/vmfs`,ids)
-            .subscribe(resolve,reject)
+            .post(`v1/bestpractice/check/vmfs`, ids)
+            .subscribe(resolve, reject)
         })
-        data=res
+        data = res
       }
-    }catch (error){
-      console.log('检查最新最佳实践项',error)
-    }finally {
+    } catch (error) {
+      console.log('检查最新最佳实践项', error)
+    } finally {
 
       return data
     }
   }
+}
 
 
 /*
