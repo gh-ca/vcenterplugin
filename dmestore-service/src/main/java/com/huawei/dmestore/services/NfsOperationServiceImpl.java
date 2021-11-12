@@ -253,6 +253,9 @@ public class NfsOperationServiceImpl implements NfsOperationService {
                 LOG.info("DME create nfs share request params:{}", gson.toJson(nfsShareMap));
                 if (createNfsShare(nfsShareMap)) {
                     // 查询shareId
+                    if (StringUtils.isEmpty(shareName)) {
+                        shareName = "/"+fsName;
+                    }
                     shareId = getShareIdByName(shareName, fsName);
                 }
             }
