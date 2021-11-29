@@ -424,4 +424,26 @@ public class VmfsAccessController extends BaseController {
         }
         return failure(failureStr);
     }
+
+    /**
+      * @Description: 任务进度查询接口
+      * @Param uuid
+      * @return @return
+      * @throws
+      * @author yc
+      * @Date 2021/11/29 16:52
+     */
+    @RequestMapping(value = "/getProgressById", method = RequestMethod.GET)
+    public ResponseBodyBean queryMountableVmfsByClusterId(@RequestParam("uuid") String uuid) {
+        String failureStr = "";
+        try {
+            Map<String, Object> result = vmfsAccessService.getProgressByUUId(uuid);
+            LOG.info("get progress {}", gson.toJson(result));
+            return success(result);
+        } catch (DmeException e) {
+            LOG.error("get progress failure:", e);
+            failureStr = "get progress failure:" + e.toString();
+        }
+        return failure(failureStr);
+    }
 }

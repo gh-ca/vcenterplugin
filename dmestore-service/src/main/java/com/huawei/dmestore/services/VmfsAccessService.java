@@ -244,4 +244,7 @@ public interface VmfsAccessService {
 
     Map<String, Object> unmountVmfsNew(Map<String, Object> params) throws DmeException;
 
+    Map<String, Object> getProgressByUUId(String uuid) throws DmeException;
+
+
 }

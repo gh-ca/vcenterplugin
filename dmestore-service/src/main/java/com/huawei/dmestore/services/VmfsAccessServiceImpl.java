@@ -7411,4 +7411,11 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         return volume;
     }
 
+    @Override
+    public Map<String, Object> getProgressByUUId(String uuid) throws DmeException{
+
+        Map<String,Object> progress = (Map<String, Object>) DmeConstants.mapCacheUtil.get(uuid);
+        return progress;
+    }
+
 }
