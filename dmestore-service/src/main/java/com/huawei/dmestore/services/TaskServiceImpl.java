@@ -23,6 +23,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -803,4 +804,104 @@ public class TaskServiceImpl implements TaskService {
         return list;
     }
 
+    //  批量删除合批量创建任务进度展示
+    @Override
+    public TaskDetailInfoNew queryTaskByIdReturnMainTaskConstruct(String taskId,long overTime,Map<String,Object> cacheMap,
+                                                                  String uuid) {
+        String url = DmeConstants.QUERY_TASK_URL.replace("{task_id}", taskId);
+        ResponseEntity<String> responseEntity;
+        long currentmilitions=System.currentTimeMillis();
+        TaskDetailInfoNew taskDetailInfoNew = null;
+        try {
+            do{
+                try {
+                    //程序每次进入等待2秒
+                    TimeUnit.SECONDS.sleep(2);
+                } catch (InterruptedException e) {
+                    LOG.info("===wait one secend error==={}", e.getMessage());
+                }
+                //首先根据任务号查询任务状态
+                responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
+                if (responseEntity.getStatusCodeValue() != HttpStatus.OK.value() || StringUtils.isEmpty(responseEntity.getBody())) {
+                    LOG.error("queryTaskById failed!taskId={},errorMsg:{}", taskId, responseEntity.getBody());
+                    return null;
+                }
+                List<TaskDetailInfoNew> taskInfos = analyzeTaskRequestResult(responseEntity.getBody());
+                cacheMap.put("unmappingLunProgress",taskDetailInfoNew.getProgress());
+                DmeConstants.mapCacheUtil.add(uuid,cacheMap,6*60*60*1000);//默认过期时间6小时
+                taskDetailInfoNew  = getMainTaskInfo(taskId, taskInfos);
+                if (!StringUtils.isEmpty(taskDetailInfoNew) && ((3 == taskDetailInfoNew.getStatus() && 100 == taskDetailInfoNew.getProgress()) || 3 < taskDetailInfoNew.getStatus())){
+                    return taskDetailInfoNew;
+                }
+            }while (System.currentTimeMillis()-overTime < currentmilitions);
+        } catch (DmeException ex) {
+            LOG.error("queryTaskById error, errorMsg:{}", ex.getMessage());
+        }
+        return taskDetailInfoNew;
+
+    }
+
+    @Override
+    public List<TaskDetailInfoNew> getTaskInfoConstruct(String taskId, long longTaskTimeOut, Map<String,Object> cacheMap,
+                                                        String uuid, String operate) throws DmeException {
+        //首先进行参数判断
+        if(StringUtils.isEmpty(taskId)){
+            return new ArrayList<>();
+        }
+        //设置方法的默认超时时间为3分钟
+        long overTime  = 3*60*1000;
+        if (0!= longTaskTimeOut){
+            overTime = longTaskTimeOut;
+        }
+        long currentmilitions=System.currentTimeMillis();
+        //TasksResultObject result = new TasksResultObject();
+        List<TaskDetailInfoNew> taskInfos;
+        do{
+            try {
+                //程序每次进入等待2秒
+                TimeUnit.SECONDS.sleep(2);
+            } catch (InterruptedException e) {
+                LOG.info("===wait one secend error==={}", e.getMessage());
+            }
+            //首先根据任务号查询任务状态
+            taskInfos = queryTaskByIdNewReturnTaskInfos(taskId);
+            TasksResultObject resultMap = analyzeTaskDetailInfo2(taskId,taskInfos,cacheMap,uuid,operate);
+            if (StringUtils.isEmpty(resultMap)){
+                return null;
+            }else if (resultMap.isStatus()){
+                return taskInfos;
+            }
+        }while (System.currentTimeMillis()-overTime < currentmilitions);
+        return taskInfos;
+    }
+
+    private TasksResultObject analyzeTaskDetailInfo2(String taskId, List<TaskDetailInfoNew> taskInfos,
+                                                     Map<String,Object> cacheMap,String uuid, String operate) {
+        //首先判断任务集合是否为空
+        if(CollectionUtils.isEmpty(taskInfos)){
+            return null;
+        }
+        //根据taskid获取集合中对应的任务状态，如果为100，说明创建成功
+        List<TaskDetailInfoNew> taskDeatailInfos  =
+                taskInfos.stream().filter(taskDetailInfoNew -> taskId.equalsIgnoreCase(taskDetailInfoNew.getId())).collect(Collectors.toList());
+        if (CollectionUtils.isEmpty(taskDeatailInfos) || taskDeatailInfos.size()>1){
+            return null;
+        }
+        int initProgs = ToolUtils.getInt(taskDeatailInfos.get(0).getProgress());
+        BigDecimal initialProgress = new BigDecimal(initProgs);
+        //BigDecimal denominator = new BigDecimal(size);
+        //BigDecimal finallProgress = initialProgress.divide(denominator, 2, BigDecimal.ROUND_UP);
+        //double pros = ToolUtils.getDouble(cacheMap.get(operate));
+        //double progress = pros + ToolUtils.getDouble(finallProgress);
+        cacheMap.put(operate,ToolUtils.getDouble(initialProgress));
+        DmeConstants.mapCacheUtil.add(uuid,cacheMap,6*60*60*1000);
+        String description = null;
+        if ((100 == taskDeatailInfos.get(0).getProgress() && 3==taskDeatailInfos.get(0).getStatus()) || 3 < taskDeatailInfos.get(0).getStatus()){
+            TasksResultObject tasksResultObject2 = new TasksResultObject(true);
+            description = taskDeatailInfos.get(0).getDetailEn();
+            tasksResultObject2.setDescription(description);
+            return tasksResultObject2;
+        }
+        return new TasksResultObject(false);
+    }
 }

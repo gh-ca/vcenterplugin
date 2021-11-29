@@ -109,4 +109,10 @@ public interface TaskService {
      * @throws DmeException
      */
     List<String> getFailNameFromCreateTask(String taskType, String taskId, Long longTaskTimeOut) throws DmeException;
+
+
+
+    TaskDetailInfoNew queryTaskByIdReturnMainTaskConstruct(String taskId, long timeout, Map<String,Object> cacheMap,String uuid);
+    List<TaskDetailInfoNew> getTaskInfoConstruct(String taskId, long longTaskTimeOut, Map<String,Object> cacheMap,String uuid, String operate) throws DmeException;
+
 }

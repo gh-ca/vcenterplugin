@@ -1,5 +1,7 @@
 package com.huawei.dmestore.constant;
 
+import com.huawei.dmestore.utils.MapCacheUtil;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -598,4 +600,6 @@ public class DmeConstants {
 
     private DmeConstants() {
     }
+    public static final  MapCacheUtil mapCacheUtil = new MapCacheUtil();
+
 }
