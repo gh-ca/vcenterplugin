@@ -712,7 +712,7 @@ public class NfsOperationServiceImpl implements NfsOperationService {
                 if (logicPort != null && !StringUtils.isEmpty(currentPortId) &&
                         logicPort.getId().equalsIgnoreCase(currentPortId)) {
                     mgmt = logicPort.getMgmtIp();
-                    logicName = logicPort.getName();
+                    logicName = logicPort.getCurrentPortName();
                     break;
                 }
             }
