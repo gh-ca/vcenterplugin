@@ -125,7 +125,7 @@ export class NfsAddComponent extends NfsComponentCommon implements OnInit {
   }
 
   ngOnInit(): void {
-    // this.modalLoading = true;
+    this.modalLoading = true;
     this.viewPage = 'add_plugin';
     this.activatedRoute.queryParams.subscribe(queryParam => {
       this.pluginFlag = queryParam.flag;
