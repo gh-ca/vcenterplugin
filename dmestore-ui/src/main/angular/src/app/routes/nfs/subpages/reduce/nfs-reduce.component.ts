@@ -13,7 +13,7 @@ export class NfsReduceComponent implements OnInit{
   storeObjectId:string;
   viewPage: string;
   unit='GB';
-  newCapacity = 0;
+  newCapacity =1;
   pluginFlag: string;//来至插件的标记
   rowSelected = []; // 当前选中数据
   errorMsg: string;
@@ -175,7 +175,7 @@ export class NfsReduceComponent implements OnInit{
         break;
     }
     if (capacity>parseFloat(this.maxOpCapacity)||capacity<0.001){
-      this.newCapacity=null
+      this.newCapacity=1
       this.newCapacityError=true
       return false
     }else {
