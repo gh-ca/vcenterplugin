@@ -2086,12 +2086,12 @@ wwn: "67c1cf110058934511ba6e5a00000344"
 
   changeExpandUnit() {
     this.expandForm.vo_add_capacity = 1
-    this.expandErrGB=false
-    this.expandErrTB=false
-    if (this.expandForm.capacityUnit==='GB'){
-      this.expandedCapacity=this.lunCapacity+this.expandForm.vo_add_capacity
-    }else {
-      this.expandedCapacity=this.lunCapacity+(this.expandForm.vo_add_capacity*1024)
+    this.expandErrGB = false
+    this.expandErrTB = false
+    if (this.expandForm.capacityUnit === 'GB') {
+      this.expandedCapacity = this.lunCapacity + this.expandForm.vo_add_capacity
+    } else {
+      this.expandedCapacity = this.lunCapacity + (this.expandForm.vo_add_capacity * 1024)
     }
   }
 
@@ -2172,11 +2172,17 @@ wwn: "67c1cf110058934511ba6e5a00000344"
                 if (capacity < 1 / 1024) {
                   capacity = '';
                   this.capacityErr = true;
+                } else if (capacity > 256) {
+                  capacity = '';
+                  this.capacityErr = true;
                 } else {
                   this.capacityErr = false;
                 }
               } else {
                 if (capacity < 2 / 1024) {
+                  capacity = '';
+                  this.capacityErr = true;
+                } else if (capacity > 256) {
                   capacity = '';
                   this.capacityErr = true;
                 } else {
@@ -2222,11 +2228,17 @@ wwn: "67c1cf110058934511ba6e5a00000344"
                 if (capacity < 1) {
                   capacity = '';
                   this.capacityErr = true;
+                } else if (capacity > 262144) {
+                  capacity = '';
+                  this.capacityErr = true;
                 } else {
                   this.capacityErr = false;
                 }
               } else {
                 if (capacity < 2) {
+                  capacity = '';
+                  this.capacityErr = true;
+                } else if (capacity > 262144) {
                   capacity = '';
                   this.capacityErr = true;
                 } else {

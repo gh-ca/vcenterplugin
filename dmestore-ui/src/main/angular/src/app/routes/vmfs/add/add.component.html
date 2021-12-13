@@ -123,12 +123,24 @@
         <input clrInput style="width: 19%;text-align: center;" readonly value="{{'vmfs.multiply' | translate}}">
         <input clrInput min="0" (blur)="countBlur();" style="width: 27%;" type="number" [(ngModel)]="form.count"
           name="count" formControlName="count" required />
-        <clr-control-helper *ngIf="!capacityErr">
-          <clr-icon shape="exclamation-circle"></clr-icon>{{'vmfs.capacityTips' | translate}}
+        <clr-control-helper *ngIf="!capacityErr&&form.capacityUnit==='GB'">
+          <clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>
+          {{'vmfs.capacityTipsGB' | translate}}
         </clr-control-helper>
-        <clr-control-helper *ngIf="capacityErr">
+        <clr-control-helper *ngIf="capacityErr&&form.capacityUnit==='GB'">
           <div class="errorTips" readonly>
-            <clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{'vmfs.capacityTips' | translate}}
+            <clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>
+            {{'vmfs.capacityTipsGB' | translate}}
+          </div>
+        </clr-control-helper>
+        <clr-control-helper *ngIf="!capacityErr&&form.capacityUnit==='TB'">
+          <clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>
+          {{'vmfs.capacityTipsTB' | translate}}
+        </clr-control-helper>
+        <clr-control-helper *ngIf="capacityErr&&form.capacityUnit==='TB'">
+          <div class="errorTips" readonly>
+            <clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>
+            {{'vmfs.capacityTipsTB' | translate}}
           </div>
         </clr-control-helper>
         <!-- <clr-control-error>{{'validations.required' | translate}}</clr-control-error> -->

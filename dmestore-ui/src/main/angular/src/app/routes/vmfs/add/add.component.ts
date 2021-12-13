@@ -820,11 +820,17 @@ export class AddComponent extends VmfsCommon implements OnInit {
                 if (capacity < 1 / 1024) {
                   capacity = '';
                   this.capacityErr = true;
+                } else if (capacity > 256) {
+                  capacity = '';
+                  this.capacityErr = true;
                 } else {
                   this.capacityErr = false;
                 }
               } else {
                 if (capacity < 2 / 1024) {
+                  capacity = '';
+                  this.capacityErr = true;
+                } else if (capacity > 256) {
                   capacity = '';
                   this.capacityErr = true;
                 } else {
@@ -870,11 +876,17 @@ export class AddComponent extends VmfsCommon implements OnInit {
                 if (capacity < 1) {
                   capacity = '';
                   this.capacityErr = true;
+                } else if (capacity > 262144) {
+                  capacity = '';
+                  this.capacityErr = true;
                 } else {
                   this.capacityErr = false;
                 }
               } else {
                 if (capacity < 2) {
+                  capacity = '';
+                  this.capacityErr = true;
+                } else if (capacity > 262144) {
                   capacity = '';
                   this.capacityErr = true;
                 } else {
