@@ -596,8 +596,8 @@ export class NfsAddComponent extends NfsComponentCommon implements OnInit {
       }
     } else {
       //不满足的时候置空，触发错误提示
-      this.addForm.nfsName = null;
       this.matchErr = true;
+      this.addForm.nfsName = null;
       console.log('验证不通过');
     }
   }

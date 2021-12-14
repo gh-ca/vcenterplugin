@@ -6,9 +6,9 @@
       <!-- 添加 -->
       <button class="btn btn-primary" (click)="addView()">{{'menu.add' | translate}}</button>
       <button class="btn btn-primary" [disabled]="rowSelected.length !== 1"
-        (click)="modifyData()">{{'menu.modify' | translate}}</button>
+              (click)="modifyData()">{{'menu.modify' | translate}}</button>
       <button class="btn btn-primary" [disabled]="rowSelected.length !== 1"
-        (click)="expandView()">{{'menu.expand' | translate}}</button>
+              (click)="expandView()">{{'menu.expand' | translate}}</button>
       <clr-dropdown [clrCloseMenuOnItemClick]="true">
         <button clrDropdownTrigger class="btn btn-primary" aria-label="Dropdown demo button">
           {{'menu.more' | translate}}
@@ -16,15 +16,15 @@
         </button>
         <clr-dropdown-menu *clrIfOpen>
           <div aria-label="Dropdown header Action 1" [disabled]="rowSelected.length !== 1" clrDropdownItem
-            (click)="reduceView();">{{'menu.reduce' | translate}}</div>
+               (click)="reduceView();">{{'menu.reduce' | translate}}</div>
           <div class="dropdown-divider" role="separator" aria-hidden="true"></div>
           <div aria-label="Dropdown header Action 2" [disabled]="rowSelected.length !== 1" clrDropdownItem
-            (click)="mount();"> {{'menu.mount' | translate}}</div>
+               (click)="mount();"> {{'menu.mount' | translate}}</div>
           <div aria-label="Dropdown header Action 2" [disabled]="rowSelected.length !== 1" clrDropdownItem
-            (click)="unmountBtnFunc();">{{'menu.unmount' | translate}}</div>
+               (click)="unmountBtnFunc();">{{'menu.unmount' | translate}}</div>
           <div class="dropdown-divider" role="separator" aria-hidden="true"></div>
           <div aria-label="Dropdown header Action 2" [disabled]="rowSelected.length == 0" clrDropdownItem
-            (click)="delBtnFunc();">{{'menu.del' | translate}}</div>
+               (click)="delBtnFunc();">{{'menu.del' | translate}}</div>
           <div aria-label="Dropdown header Action 2" clrDropdownItem (click)="scanDataStore();">
             {{'menu.Synchronize' | translate}}</div>
         </clr-dropdown-menu>
@@ -63,28 +63,28 @@
         </clr-dg-filter>
       </clr-dg-column>
       <clr-dg-column #capacity [hidden]="radioCheck!=='list'" class="hideFilter" [clrDgField]="'capacity'"
-        style="position: relative" (clrDgSortedChange)="sortFunc($event);">
+                     style="position: relative" (clrDgSortedChange)="sortFunc($event);">
         {{'nfs.totalCapacity' | translate}}
         <clr-icon *ngIf="sortFunc(capacity.sorted);" shape="arrow down" class="is-solid"
-          style="position: absolute;right: 0.1rem;"></clr-icon>
+                  style="position: absolute;right: 0.1rem;"></clr-icon>
       </clr-dg-column>
       <clr-dg-column #freeSpace [hidden]="radioCheck!=='list'" class="hideFilter" [clrDgField]="'freeSpace'"
-        style="position: relative" (clrDgSortedChange)="sortFunc($event);">
+                     style="position: relative" (clrDgSortedChange)="sortFunc($event);">
         {{'nfs.freeCapacity' | translate}}
         <clr-icon *ngIf="sortFunc(freeSpace.sorted);" shape="arrow down" class="is-solid"
-          style="position: absolute;right: 0.1rem;"></clr-icon>
+                  style="position: absolute;right: 0.1rem;"></clr-icon>
       </clr-dg-column>
       <clr-dg-column #capacityUsage [hidden]="radioCheck!=='list'" class="hideFilter" [clrDgField]="'capacityUsage'"
-        style="min-width:11rem;position: relative" (clrDgSortedChange)="sortFunc($event);">
+                     style="min-width:11rem;position: relative" (clrDgSortedChange)="sortFunc($event);">
         {{'nfs.capacityUsage' | translate}}
         <clr-icon *ngIf="sortFunc(capacityUsage.sorted);" shape="arrow down" class="is-solid"
-          style="position: absolute;right: 0.1rem;"></clr-icon>
+                  style="position: absolute;right: 0.1rem;"></clr-icon>
       </clr-dg-column>
       <clr-dg-column #reserveCapacity [hidden]="radioCheck!=='list'" class="hideFilter" [clrDgField]="'reserveCapacity'"
-        style="position: relative" (clrDgSortedChange)="sortFunc($event);">
+                     style="position: relative" (clrDgSortedChange)="sortFunc($event);">
         {{'nfs.provisioningCapacity' | translate}}
         <clr-icon *ngIf="sortFunc(reserveCapacity.sorted);" shape="arrow down" class="is-solid"
-          style="position: absolute;right: 0.1rem;"></clr-icon>
+                  style="position: absolute;right: 0.1rem;"></clr-icon>
       </clr-dg-column>
       <clr-dg-column [hidden]="radioCheck!=='list'" [clrDgField]="'device'">
         {{'nfs.device' | translate}}
@@ -101,34 +101,36 @@
       <clr-dg-column [hidden]="radioCheck!=='list'" [clrDgField]="'fs'">{{'nfs.fileSystem' | translate}}</clr-dg-column>
 
       <clr-dg-column #ops [hidden]="radioCheck!=='chart'" class="hideFilter" [clrDgField]="'ops'"
-        style="position: relative" (clrDgSortedChange)="sortFunc($event);">
+                     style="position: relative" (clrDgSortedChange)="sortFunc($event);">
         {{'nfs.ops' | translate}}
         <clr-icon *ngIf="sortFunc(ops.sorted);" shape="arrow down" class="is-solid"
-          style="position: absolute;right: 1.1rem;"></clr-icon>
+                  style="position: absolute;right: 1.1rem;"></clr-icon>
       </clr-dg-column>
       <clr-dg-column #bandwidth [hidden]="radioCheck!=='chart'" class="hideFilter" [clrDgField]="'bandwidth'"
-        style="position: relative" (clrDgSortedChange)="sortFunc($event);">
+                     style="position: relative" (clrDgSortedChange)="sortFunc($event);">
         {{'nfs.bandwidth' | translate}}
         <clr-icon *ngIf="sortFunc(bandwidth.sorted);" shape="arrow down" class="is-solid"
-          style="position: absolute;right: 1.1rem;"></clr-icon>
+                  style="position: absolute;right: 1.1rem;"></clr-icon>
       </clr-dg-column>
       <clr-dg-column #readResponseTime [hidden]="radioCheck!=='chart'" class="hideFilter"
-        [clrDgField]="'readResponseTime'" style="position: relative" (clrDgSortedChange)="sortFunc($event);">
+                     [clrDgField]="'readResponseTime'" style="position: relative"
+                     (clrDgSortedChange)="sortFunc($event);">
         {{'nfs.respRt' | translate}}
         <clr-icon *ngIf="sortFunc(readResponseTime.sorted);" shape="arrow down" class="is-solid"
-          style="position: absolute;right: 1.1rem;"></clr-icon>
+                  style="position: absolute;right: 1.1rem;"></clr-icon>
       </clr-dg-column>
       <clr-dg-column #writeResponseTime [hidden]="radioCheck!=='chart'" class="hideFilter"
-        [clrDgField]="'writeResponseTime'" style="position: relative" (clrDgSortedChange)="sortFunc($event);">
+                     [clrDgField]="'writeResponseTime'" style="position: relative"
+                     (clrDgSortedChange)="sortFunc($event);">
         {{'nfs.respWt' | translate}}
         <clr-icon *ngIf="sortFunc(writeResponseTime.sorted);" shape="arrow down" class="is-solid"
-          style="position: absolute;right: 1.1rem;"></clr-icon>
+                  style="position: absolute;right: 1.1rem;"></clr-icon>
       </clr-dg-column>
 
       <clr-dg-placeholder>{{'tips.noData' | translate}}</clr-dg-placeholder>
       <clr-dg-row *clrDgItems="let item of list" [clrDgItem]="item">
         <clr-dg-cell class="over_flow" (click)="navigateTo(item.objectid)" style="color:#829DE6;cursor:pointer">
-          {{item.name ? item.name:'--'}}</clr-dg-cell>
+          {{item.name ? item.name : '--'}}</clr-dg-cell>
         <!-- <clr-dg-cell class="over_flow" style="width: 5%" [hidden]="radioCheck!=='list'">
           <span *ngIf="item.status == 'normal'">
                 <span class="color-square" style="background-color: #7CDFA0; margin-right: 10px"></span>
@@ -147,41 +149,42 @@
         <clr-dg-cell class="over_flow" style="width: 5%" [hidden]="radioCheck!=='list'">
           <span *ngIf="item.alarmState">
             <span class="color-square" [style.background-color]="getColor(item.alarmState)"
-              style="margin-right: 10px"></span>
-            <span>{{getLabelByValue(item.alarmState,'alarm_state_map') | translate}}</span>
+                  style="margin-right: 10px"></span>
+            <span>{{getLabelByValue(item.alarmState, 'alarm_state_map') | translate}}</span>
           </span>
           <span *ngIf="!item.alarmState">--</span>
         </clr-dg-cell>
         <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='list'" style="text-align: right">
-          {{item.capacity ? formatCapacity(item.capacity):'--'}}</clr-dg-cell>
+          {{item.capacity ? formatCapacity(item.capacity) : '--'}}</clr-dg-cell>
         <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='list'" style="text-align: right">
-          {{item.freeSpace ? formatCapacity(item.freeSpace):'--'}}</clr-dg-cell>
+          {{item.freeSpace ? formatCapacity(item.freeSpace) : '--'}}</clr-dg-cell>
         <clr-dg-cell class="over_flow" style="min-width: 11rem;" [hidden]="radioCheck!=='list'">
           <div class="progress-block" *ngIf="item.capacity && item.freeSpace">
             <clr-progress-bar clrValue="{{((item.capacity - item.freeSpace)/item.capacity * 100).toFixed(2)}}"
-              clrSuccess></clr-progress-bar>
-            <span>{{((item.capacity - item.freeSpace)/item.capacity * 100).toFixed(2)}}%</span>
+                              clrSuccess></clr-progress-bar>
+            <span>{{((item.capacity - item.freeSpace) / item.capacity * 100).toFixed(2)}}%</span>
           </div>
           <span *ngIf="!item.capacity && !item.freeSpace">--</span>
         </clr-dg-cell>
         <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='list'" style="text-align: right">
-          {{item.reserveCapacity ? formatCapacity(item.reserveCapacity):'--'}}</clr-dg-cell>
-        <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='list'">{{item.device ? item.device:'--'}}</clr-dg-cell>
-        <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='list'">{{item.logicPort ? item.logicPort:'--'}}
+          {{item.reserveCapacity ? formatCapacity(item.reserveCapacity) : '--'}}</clr-dg-cell>
+        <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='list'">{{item.device ? item.device : '--'}}</clr-dg-cell>
+        <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='list'">{{item.logicPort ? item.logicPort : '--'}}
         </clr-dg-cell>
-        <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='list'">{{item.shareIp ? item.shareIp:'--'}}</clr-dg-cell>
-        <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='list'">{{item.sharePath ? item.sharePath:'--'}}
+        <clr-dg-cell class="over_flow"
+                     [hidden]="radioCheck!=='list'">{{item.shareIp ? item.shareIp : '--'}}</clr-dg-cell>
+        <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='list'">{{item.sharePath ? item.sharePath : '--'}}
         </clr-dg-cell>
-        <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='list'">{{item.fs ? item.fs:'--'}}</clr-dg-cell>
+        <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='list'">{{item.fs ? item.fs : '--'}}</clr-dg-cell>
 
         <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='chart'" style="text-align: right">
-          {{item.ops!=null ? item.ops:'--'}}</clr-dg-cell>
+          {{item.ops != null ? item.ops : '--'}}</clr-dg-cell>
         <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='chart'" style="text-align: right">
-          {{item.bandwidth!=null ? item.bandwidth:'--'}}</clr-dg-cell>
+          {{item.bandwidth != null ? item.bandwidth : '--'}}</clr-dg-cell>
         <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='chart'" style="text-align: right">
-          {{item.readResponseTime!=null ? item.readResponseTime:'--'}}</clr-dg-cell>
+          {{item.readResponseTime != null ? item.readResponseTime : '--'}}</clr-dg-cell>
         <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='chart'" style="text-align: right">
-          {{item.writeResponseTime!=null ? item.writeResponseTime:'--'}}</clr-dg-cell>
+          {{item.writeResponseTime != null ? item.writeResponseTime : '--'}}</clr-dg-cell>
       </clr-dg-row>
       <clr-dg-footer>
         <clr-dg-pagination #pagination [clrDgPageSize]="5" [clrDgTotalItems]="total">
@@ -205,13 +208,13 @@
     <div *ngIf="modalLoading" class="loadingDiv">
       <span>
         {{'vmfs.loadingTips' | translate}}<img src="./assets/images/loading.gif" width="20px" height="20px"
-          style="margin-left: 20px;">
+                                               style="margin-left: 20px;">
       </span>
     </div>
     <div *ngIf="modalHandleLoading" class="loadingDiv">
       <span>
         {{'vmfs.dataHandleLoadingTips' | translate}}<img src="./assets/images/loading.gif" width="20px" height="20px"
-          style="margin-left: 20px;">
+                                                         style="margin-left: 20px;">
       </span>
     </div>
     <clr-wizard-page #addPageOne [clrWizardPageNextDisabled]="checkAddForm('addPageOne')&&isAddPageOneNextDisabled">
@@ -224,9 +227,9 @@
         <clr-select-container class="selectClass">
           <label>{{'nfs.storeageDevice' | translate}}</label>
           <select class="inputWidth100Percent" clrSelect (ngModelOptions)="storageList" [(ngModel)]="addForm.storagId"
-            name="storagId" class="clr-select" (change)="selectStoragePool();qosV6Check('add')"
-            formControlName="storagId" required>
-            <option *ngFor="let item of storageList" value="{{item.id}}">{{item.name+'('+item.ip+')'}}</option>
+                  name="storagId" class="clr-select" (change)="selectStoragePool();qosV6Check('add')"
+                  formControlName="storagId" required>
+            <option *ngFor="let item of storageList" value="{{item.id}}">{{item.name + '(' + item.ip + ')'}}</option>
           </select>
           <clr-control-error>{{'errorMsg.require' | translate}}</clr-control-error>
         </clr-select-container>
@@ -234,8 +237,8 @@
         <clr-select-container class="selectClass">
           <label>{{'nfs.storagePool' | translate}}</label>
           <select class="inputWidth100Percent" clrSelect (ngModelOptions)="storagePools"
-            [(ngModel)]="addForm.storagePoolId"
-            name="storagePoolId" class="clr-select" formControlName="storagePoolId" required>
+                  [(ngModel)]="addForm.storagePoolId"
+                  name="storagePoolId" class="clr-select" formControlName="storagePoolId" required>
             <option *ngFor="let item of storagePools" value="{{item.id}}">{{item.name}}</option>
           </select>
           <clr-control-error>{{'errorMsg.require' | translate}}</clr-control-error>
@@ -258,9 +261,9 @@
         <clr-select-container class="selectClass">
           <label>{{'nfs.logicPort' | translate}}</label>
           <select clrSelect (ngModelOptions)="logicPorts" [(ngModel)]="addForm.currentPortId" name="currentPortId"
-            formControlName="currentPortId" class="clr-select" required>
+                  formControlName="currentPortId" class="clr-select" required>
             <option *ngFor="let item of logicPorts" value="{{item.id}}">
-              {{item.name+'_'+item.currentPortName+'('+item.mgmtIp+')'}}</option>
+              {{item.name + '_' + item.currentPortName + '(' + item.mgmtIp + ')'}}</option>
           </select>
           <clr-control-error>{{'errorMsg.require' | translate}}</clr-control-error>
         </clr-select-container>
@@ -275,10 +278,12 @@
             formControlName="nfsName"
             (blur)="checkNfsName();"
             (change)="checkNfsName();"
-            required />
+            required/>
           <clr-control-error>
-            <p *ngIf="!oldNfsName || matchErr" class="clr-error clr-subtext">{{'errorMsg.require' | translate}}</p>
-            <p class="clr-error clr-subtext"> {{'validations.required_nfs_name' | translate:'{length:42}'}}</p>
+            <div class="clr-error clr-subtext">
+              <div style="margin-bottom: 5px">{{'errorMsg.require' | translate}}</div>
+              {{'validations.required_nfs_name' | translate:'{length:42}'}}
+            </div>
             <p *ngIf="nfsNameRepeatErr" class="clr-error clr-subtext">{{'errorMsg.fsrepeat' | translate}}</p>
             <p *ngIf="fsNameRepeatErr" class="clr-error clr-subtext">{{'errorMsg.fsrepeat' | translate}}</p>
             <p *ngIf="shareNameRepeatErr" class="clr-error clr-subtext">{{'errorMsg.sharerepeat' | translate}}</p>
@@ -289,12 +294,12 @@
           <label></label>
           <clr-checkbox-wrapper>
             <input type="checkbox" clrCheckbox *ngIf="isCheckSameName();" [(ngModel)]="addForm.sameName"
-              (change)="setSameName();" name="sameName" formControlName="sameName" />
+                   (change)="setSameName();" name="sameName" formControlName="sameName"/>
             <!-- disabled checkbox samename -->
             <input type="checkbox" clrCheckbox *ngIf="!isCheckSameName();" [(ngModel)]="addForm.sameName"
-              name="sameName" formControlName="sameName" disabled />
-              <!-- 20210510105017  -->
-            <label style="width: 280px;">{{(dorado?'nfs.modifySameName':'nfs.sameName') | translate}}</label>
+                   name="sameName" formControlName="sameName" disabled/>
+            <!-- 20210510105017  -->
+            <label style="width: 280px;">{{(dorado ? 'nfs.modifySameName' : 'nfs.sameName') | translate}}</label>
           </clr-checkbox-wrapper>
         </clr-checkbox-container>
         <!-- 如果名字可以不一样 -->
@@ -303,14 +308,14 @@
           <label>{{'nfs.fsName' | translate}}</label>
           <!-- 中文名 -->
           <input class="inputWidth100Percent"
-            maxlength="256"
-            clrInput
-            [(ngModel)]="addForm.fsName"
-            name="fsName"
-            required
-            formControlName="fsName"
-            (change)="checkFsName();"
-            (blur)="checkFsName();" />
+                 maxlength="256"
+                 clrInput
+                 [(ngModel)]="addForm.fsName"
+                 name="fsName"
+                 required
+                 formControlName="fsName"
+                 (change)="checkFsName();"
+                 (blur)="checkFsName();"/>
           <!--   <clr-control-helper *ngIf="matchErr">
             <p class="clr-error clr-subtext">{{'validations.nameRequiredTwo' | translate}}</p>
           </clr-control-helper> -->
@@ -326,20 +331,20 @@
         <clr-input-container *ngIf="!dorado&&!addForm.sameName">
           <label>{{'nfs.shareName' | translate}}</label>
           <input class="inputWidth100Percent"
-            clrInput
-            maxlength="256"
-            name="shareName"
-            [(ngModel)]="addForm.shareName"
-            formControlName="shareName"
-            (blur)="checkShareName();"
-            (change)="checkShareName();" />
+                 clrInput
+                 maxlength="256"
+                 name="shareName"
+                 [(ngModel)]="addForm.shareName"
+                 formControlName="shareName"
+                 (blur)="checkShareName();"
+                 (change)="checkShareName();"/>
           <!-- <clr-control-helper *ngIf="shareNameContainsCN">
             <p class="clr-error clr-subtext">{{'validations.shareNameRequired' | translate}}</p>
           </clr-control-helper> -->
           <clr-control-error>
             <p *ngIf="!oldShareName" class="clr-error clr-subtext">{{'errorMsg.require' | translate}}</p>
-            <!-- <p *ngIf="matchErr" class="clr-error clr-subtext">{{'errorMsg.numberAndLetter' | translate}}</p> -->
             <p class="clr-error clr-subtext">{{'validations.required_share_name' | translate:'{length:254}'}}</p>
+            <p *ngIf="matchErr" class="clr-error clr-subtext">{{'errorMsg.numberAndLetter' | translate}}</p>
             <p *ngIf="shareNameRepeatErr" class="clr-error clr-subtext">{{'errorMsg.sharerepeat' | translate}}</p>
           </clr-control-error>
         </clr-input-container>
@@ -347,19 +352,21 @@
         <clr-input-container>
           <label>{{'nfs.size' | translate}}</label>
           <input style="width: 80%" clrInput class="inputOneLine" type="number" min="0" [(ngModel)]="addForm.size"
-            name="size" formControlName="size" required  (blur)="checkSize()"/>
+                 name="size" formControlName="size" required (blur)="checkSize()"/>
           <select clrInput [(ngModel)]="unit" name="unit" formControlName="unit">
             <option value="TB">TB</option>
             <option value="GB">GB</option>
           </select>
           <clr-control-helper *ngIf="overSizeGB">
             <div class="errorTips" readonly>
-              <clr-icon shape="exclamation-circle" class="is-solid"></clr-icon><span>{{'errorMsg.require' | translate}}</span>{{'nfs.overSizeGB'|translate}}
+              <clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>
+              <span>{{'errorMsg.require' | translate}}</span>{{'nfs.overSizeGB'|translate}}
             </div>
           </clr-control-helper>
           <clr-control-helper *ngIf="overSizeTB">
             <div class="errorTips" readonly>
-              <clr-icon shape="exclamation-circle" class="is-solid"></clr-icon><span>{{'errorMsg.require' | translate}}</span>{{'nfs.overSizeTB'|translate}}
+              <clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>
+              <span>{{'errorMsg.require' | translate}}</span>{{'nfs.overSizeTB'|translate}}
             </div>
           </clr-control-helper>
           <clr-control-error>
@@ -370,7 +377,7 @@
         <clr-select-container class="selectClass">
           <label>{{'nfs.characterEncoding' | translate}}</label>
           <select clrSelect [(ngModel)]="addForm.characterEncoding" formControlName="characterEncoding"
-            name="characterEncoding" required>
+                  name="characterEncoding" required>
             <option value="utf-8">UTF-8</option>
             <option value="zh">ZH</option>
             <option value="gbk">GBK</option>
@@ -398,17 +405,17 @@
           <label>{{'nfs.securityType' | translate}}</label>
           <clr-radio-wrapper>
             <input type="radio" clrRadio name="securityType" formControlName="securityType"
-              [(ngModel)]="addForm.securityType" value="AUTH_SYS" />
+                   [(ngModel)]="addForm.securityType" value="AUTH_SYS"/>
             <label>{{'nfs.authSys' | translate}}</label>
           </clr-radio-wrapper>
           <clr-radio-wrapper>
             <input type="radio" clrRadio name="securityType" formControlName="securityType"
-              [(ngModel)]="addForm.securityType" value="SEC_KRB5" />
+                   [(ngModel)]="addForm.securityType" value="SEC_KRB5"/>
             <label>{{'nfs.secKrb5' | translate}}</label>
           </clr-radio-wrapper>
           <clr-radio-wrapper>
             <input type="radio" clrRadio name="securityType" formControlName="securityType"
-              [(ngModel)]="addForm.securityType" value="SEC_KRB5I" />
+                   [(ngModel)]="addForm.securityType" value="SEC_KRB5I"/>
             <label>{{'nfs.secKrb5i' | translate}}</label>
           </clr-radio-wrapper>
           <clr-control-helper>
@@ -420,7 +427,7 @@
         <clr-select-container class="selectClass">
           <label>{{'nfs.mountHost' | translate}}</label>
           <select clrSelect (ngModelOptions)="hostList" [(ngModel)]="addForm.hostObjectId" required name="hostObjectId"
-            formControlName="hostObjectId" class="clr-select" (change)="checkHost()">
+                  formControlName="hostObjectId" class="clr-select" (change)="checkHost()">
             <option *ngFor="let item of hostList" value="{{item.objectId}}">{{item.hostName}}</option>
           </select>
         </clr-select-container>
@@ -428,7 +435,7 @@
         <clr-select-container class="selectClass">
           <label>{{'nfs.vkernel' | translate}}</label>
           <select clrSelect (ngModelOptions)="vmkernelList" required formControlName="vkernelIp"
-            [(ngModel)]="addForm.vkernelIp" name="vkernelIp" class="clr-select">
+                  [(ngModel)]="addForm.vkernelIp" name="vkernelIp" class="clr-select">
             <option *ngFor="let item of vmkernelList" value="{{item.ipAddress}}">{{item.ipAddress}}</option>
           </select>
         </clr-select-container>
@@ -461,14 +468,14 @@
       <form clrForm #formPageTwo="ngForm">
         <clr-toggle-wrapper>
           <label style="width: 100px;">{{'nfs.add_advance' | translate}}</label>
-          <input type="checkbox" clrToggle name="advance" [(ngModel)]="addForm.advance" />
+          <input type="checkbox" clrToggle name="advance" [(ngModel)]="addForm.advance"/>
         </clr-toggle-wrapper>
         <div *ngIf="addForm.advance">
           <!--qos-->
           <clr-toggle-wrapper>
             <label style="width: 100px;">{{'nfs.qosPolicy' | translate}}</label>
             <input type="checkbox" clrToggle name="qosFlag" (change)="qoSFlagChange(addForm);"
-              [(ngModel)]="addForm.qosFlag" />
+                   [(ngModel)]="addForm.qosFlag"/>
           </clr-toggle-wrapper>
           <div *ngIf="addForm.qosFlag">
 
@@ -478,15 +485,15 @@
               <!--上限-->
               <clr-checkbox-wrapper>
                 <input type="checkbox" id="control_policyUpper" clrCheckbox [(ngModel)]="isCheckUpper"
-                  (change)="controlPolicyChangeFunc('control_policyUpper', 'control_policyLower', false, addForm, true);"
-                  name="control_policyUpper" />
+                       (change)="controlPolicyChangeFunc('control_policyUpper', 'control_policyLower', false, addForm, true);"
+                       name="control_policyUpper"/>
                 <label style="width: 100px;">{{'vmfs.upperLimitControl' | translate}}</label>
               </clr-checkbox-wrapper>
               <!--下限-->
               <clr-checkbox-wrapper *ngIf="!hiddenLowerFlag">
                 <input type="checkbox" id="control_policyLower" clrCheckbox [(ngModel)]="isCheckLower"
-                  (change)="controlPolicyChangeFunc('control_policyUpper', 'control_policyLower', false, addForm, false);"
-                  name="control_policyLower" />
+                       (change)="controlPolicyChangeFunc('control_policyUpper', 'control_policyLower', false, addForm, false);"
+                       name="control_policyLower"/>
                 <label style="width: 100px;">{{'vmfs.lowerLimitControl' | translate}}</label>
               </clr-checkbox-wrapper>
             </clr-checkbox-container>
@@ -497,14 +504,14 @@
                 <label style="color: #9F9F9F;">{{'vmfs.trafficControlObject' | translate}}</label>
                 <clr-checkbox-wrapper>
                   <input type="checkbox" [(ngModel)]="addForm.maxBandwidthChoose"
-                    (ngModelChange)="resetQosFlag(addForm.maxBandwidthChoose, 'maxbandwidth');qosV6Check('add');"
-                    name="maxbandwidthChoose" clrCheckbox />
+                         (ngModelChange)="resetQosFlag(addForm.maxBandwidthChoose, 'maxbandwidth');qosV6Check('add');"
+                         name="maxbandwidthChoose" clrCheckbox/>
                   <label style="width: 200px;">
                     {{'vmfs.bandwidthLimitUpper' | translate}}
                     <input type="number" min="0" oninput="if (value.length > 11) {value=value.slice(0,11)}"
-                      [(readOnly)]="!addForm.maxBandwidthChoose" class="inputOneLine" name="maxBandwidth"
-                      [(ngModel)]="addForm.maxBandwidth" (blur)="qosBlur('add', 'maxbandwidth');"
-                      [required]="addForm.maxBandwidthChoose" />
+                           [(readOnly)]="!addForm.maxBandwidthChoose" class="inputOneLine" name="maxBandwidth"
+                           [(ngModel)]="addForm.maxBandwidth" (blur)="qosBlur('add', 'maxbandwidth');"
+                           [required]="addForm.maxBandwidthChoose"/>
                     {{'vmfs.unitM' | translate}}
                   </label>
                 </clr-checkbox-wrapper>
@@ -520,14 +527,14 @@
                 <label></label>
                 <clr-checkbox-wrapper>
                   <input type="checkbox" [(ngModel)]="addForm.maxIopsChoose"
-                    (ngModelChange)="resetQosFlag(addForm.maxIopsChoose, 'maxiops');qosV6Check('add');"
-                    name="maxiopsChoose" clrCheckbox />
+                         (ngModelChange)="resetQosFlag(addForm.maxIopsChoose, 'maxiops');qosV6Check('add');"
+                         name="maxiopsChoose" clrCheckbox/>
                   <label style="width: 200px;">
                     {{'vmfs.IOPSLimitUpper' | translate}}
                     <input type="number" min="0" oninput="if (value.length > 11) {value=value.slice(0,11)}"
-                      [(readOnly)]="!addForm.maxIopsChoose" class="inputOneLine" name="maxIops"
-                      [(ngModel)]="addForm.maxIops" (blur)="qosBlur('add', 'maxiops');"
-                      [required]="addForm.maxIopsChoose" />
+                           [(readOnly)]="!addForm.maxIopsChoose" class="inputOneLine" name="maxIops"
+                           [(ngModel)]="addForm.maxIops" (blur)="qosBlur('add', 'maxiops');"
+                           [required]="addForm.maxIopsChoose"/>
                   </label>
                 </clr-checkbox-wrapper>
                 <clr-control-helper *ngIf="iopsMaxErrTips" class="clr-error clr-subtext">
@@ -542,19 +549,20 @@
                 <!-- 交通管制对象 带宽 下限-->
                 <clr-checkbox-container *ngIf="addForm.control_policyLower == '0'">
                   <label *ngIf="addForm.control_policyLower == '0' && addForm.control_policyUpper != '1'"
-                    style="color: #9F9F9F;">{{'vmfs.trafficControlObject' | translate}}</label>
+                         style="color: #9F9F9F;">{{'vmfs.trafficControlObject' | translate}}</label>
                   <label *ngIf="addForm.control_policyLower == '0' && addForm.control_policyUpper == '1'"
-                    style="color: #9F9F9F;"></label>
+                         style="color: #9F9F9F;"></label>
                   <clr-checkbox-wrapper *ngIf="addForm.control_policyLower == '0'">
                     <input type="checkbox" [(ngModel)]="addForm.minBandwidthChoose"
-                      (ngModelChange)="resetQosFlag(addForm.minBandwidthChoose, 'minbandwidth');qosV6Check('add');"
-                      name="minbandwidthChoose" clrCheckbox />
+                           (ngModelChange)="resetQosFlag(addForm.minBandwidthChoose, 'minbandwidth');qosV6Check('add');"
+                           name="minbandwidthChoose" clrCheckbox/>
                     <label style="width: 200px;">
                       {{'vmfs.bandwidthLimitLower' | translate}}
                       <input type="number" min="0" oninput="if (value.length > 11) {value=value.slice(0,11)}"
-                        [(readOnly)]="!addForm.minBandwidthChoose" class="inputOneLine"
-                        name="minBandwidth" [(ngModel)]="addForm.minBandwidth" (blur)="qosBlur('add', 'minbandwidth');"
-                        [required]="addForm.minBandwidthChoose" />
+                             [(readOnly)]="!addForm.minBandwidthChoose" class="inputOneLine"
+                             name="minBandwidth" [(ngModel)]="addForm.minBandwidth"
+                             (blur)="qosBlur('add', 'minbandwidth');"
+                             [required]="addForm.minBandwidthChoose"/>
                       {{'vmfs.unitM' | translate}}
                     </label>
                   </clr-checkbox-wrapper>
@@ -571,14 +579,14 @@
                   <label></label>
                   <clr-checkbox-wrapper>
                     <input type="checkbox" [(ngModel)]="addForm.minIopsChoose"
-                      (ngModelChange)="resetQosFlag(addForm.minIopsChoose, 'miniops');qosV6Check('add');"
-                      name="minIopsChoose" clrCheckbox />
+                           (ngModelChange)="resetQosFlag(addForm.minIopsChoose, 'miniops');qosV6Check('add');"
+                           name="minIopsChoose" clrCheckbox/>
                     <label style="width: 200px;">
                       {{'vmfs.IOPSLimitLower' | translate}}
                       <input type="number" min="0" oninput="if (value.length > 11) {value=value.slice(0,11)}"
-                        [(readOnly)]="!addForm.minIopsChoose" class="inputOneLine" name="minIops"
-                        [(ngModel)]="addForm.minIops" (blur)="qosBlur('add', 'miniops');"
-                        [required]="addForm.minIopsChoose" />
+                             [(readOnly)]="!addForm.minIopsChoose" class="inputOneLine" name="minIops"
+                             [(ngModel)]="addForm.minIops" (blur)="qosBlur('add', 'miniops');"
+                             [required]="addForm.minIopsChoose"/>
                     </label>
                   </clr-checkbox-wrapper>
                   <clr-control-helper *ngIf="iopsMinErrTips" class="clr-error clr-subtext">
@@ -593,22 +601,22 @@
                   <label></label>
                   <clr-checkbox-wrapper *ngIf="!latencyIsSelect">
                     <input type="checkbox" [(ngModel)]="addForm.latencyChoose"
-                      (ngModelChange)="resetQosFlag(addForm.latencyChoose, 'latency')" name="latencyChoose"
-                      clrCheckbox />
+                           (ngModelChange)="resetQosFlag(addForm.latencyChoose, 'latency')" name="latencyChoose"
+                           clrCheckbox/>
                     <label style="width: 200px;">
                       {{'vmfs.latencyMax' | translate}}
                       <input type="number" min="0" oninput="if (value.length > 11) {value=value.slice(0,11)}"
-                        [(readOnly)]="!addForm.latencyChoose" class="inputOneLine" name="latency"
-                        [(ngModel)]="addForm.latency" (blur)="qosBlur('add', 'latency');"
-                        [required]="addForm.latencyChoose" />{{'vmfs.latencyUnit' | translate}}
+                             [(readOnly)]="!addForm.latencyChoose" class="inputOneLine" name="latency"
+                             [(ngModel)]="addForm.latency" (blur)="qosBlur('add', 'latency');"
+                             [required]="addForm.latencyChoose"/>{{'vmfs.latencyUnit' | translate}}
                     </label>
                   </clr-checkbox-wrapper>
                   <clr-checkbox-wrapper *ngIf="latencyIsSelect">
-                    <input type="checkbox" [(ngModel)]="addForm.latencyChoose" name="latencyChoose" clrCheckbox />
+                    <input type="checkbox" [(ngModel)]="addForm.latencyChoose" name="latencyChoose" clrCheckbox/>
                     <label style="width: 200px;">
                       {{'vmfs.latencyMax' | translate}}
                       <select [(disabled)]="!addForm.latencyChoose" [(ngModel)]="addForm.latency" name="latency"
-                        style="height: 1.2rem;width: 54%;border: none;border-bottom: 1px solid;border-bottom-color: var(--clr-forms-border-color, #b3b3b3);">
+                              style="height: 1.2rem;width: 54%;border: none;border-bottom: 1px solid;border-bottom-color: var(--clr-forms-border-color, #b3b3b3);">
                         <option value="500">500</option>
                         <option value="1500">1500</option>
                       </select>
@@ -631,7 +639,7 @@
                 <clr-checkbox-container *ngIf="iopsLimitErr">
                   <clr-control-helper class="clr-error clr-subtext">
                     <clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>
-                    {{(dorado?'tips.iopsLimitErr':'tips.iopsLimitErrNotV6') | translate}}
+                    {{(dorado ? 'tips.iopsLimitErr' : 'tips.iopsLimitErrNotV6') | translate}}
                   </clr-control-helper>
                 </clr-checkbox-container>
               </div>
@@ -640,7 +648,7 @@
           <div *ngIf="!dorado">
             <clr-toggle-wrapper>
               <label style="width: 100px;"> {{'nfs.thin' | translate}}</label>
-              <input type="checkbox" name="thin" clrToggle [(ngModel)]="addForm.thin" />
+              <input type="checkbox" name="thin" clrToggle [(ngModel)]="addForm.thin"/>
             </clr-toggle-wrapper>
             <!--重删-->
             <clr-select-container class="selectClass" *ngIf="deduplicationShow && addForm.thin">
@@ -663,7 +671,7 @@
           </div>
           <clr-toggle-wrapper *ngIf="!dorado">
             <label style="width: 100px;">{{'nfs.capAuto' | translate}}</label>
-            <input type="checkbox" clrToggle [(ngModel)]="addForm.autoSizeEnable" name="autoSizeEnable" />
+            <input type="checkbox" clrToggle [(ngModel)]="addForm.autoSizeEnable" name="autoSizeEnable"/>
           </clr-toggle-wrapper>
         </div>
       </form>
@@ -684,40 +692,40 @@
         <!--名称-->
         <clr-input-container>
           <label>{{'nfs.name' | translate}}</label>
-          <input clrInput name="nfsName" maxlength="256" [(ngModel)]="updateNfs.nfsName" />
+          <input clrInput name="nfsName" maxlength="256" [(ngModel)]="updateNfs.nfsName"/>
         </clr-input-container>
         <clr-checkbox-container>
           <label></label>
           <clr-checkbox-wrapper>
-            <input type="checkbox" clrCheckbox [(ngModel)]="updateNfs.sameName" name="sameName" />
+            <input type="checkbox" clrCheckbox [(ngModel)]="updateNfs.sameName" name="sameName"/>
             <label>{{'nfs.sameName' | translate}}</label>
           </clr-checkbox-wrapper>
         </clr-checkbox-container>
         <clr-input-container *ngIf="!updateNfs.sameName">
           <label>{{'nfs.fsName' | translate}}</label>
-          <input clrInput [(ngModel)]="updateNfs.fsName" maxlength="256" name="fsName" />
+          <input clrInput [(ngModel)]="updateNfs.fsName" maxlength="256" name="fsName"/>
         </clr-input-container>
         <clr-input-container *ngIf="!updateNfs.sameName">
           <label>{{'nfs.shareName' | translate}}</label>
-          <input clrInput [(ngModel)]="updateNfs.shareName" maxlength="256" name="shareName" />
+          <input clrInput [(ngModel)]="updateNfs.shareName" maxlength="256" name="shareName"/>
         </clr-input-container>
         <!--qos-->
         <clr-toggle-wrapper>
           <label>{{'nfs.qosPolicy' | translate}}</label>
           <input type="checkbox" clrToggle name="qosFlag" (change)="qoSFlagChange(updateNfs);"
-            [(ngModel)]="updateNfs.qosFlag" />
+                 [(ngModel)]="updateNfs.qosFlag"/>
         </clr-toggle-wrapper>
         <div *ngIf="updateNfs.qosFlag">
           <clr-radio-container clrInline>
             <label class="floatleft">{{'nfs.controlPolicy' | translate}}</label>
             <clr-radio-wrapper>
               <input type="radio" clrRadio name="controlPolicy" required value="up"
-                [(ngModel)]="updateNfs.contolPolicy" />
+                     [(ngModel)]="updateNfs.contolPolicy"/>
               <label>{{'nfs.ulc' | translate}}</label>
             </clr-radio-wrapper>
             <clr-radio-wrapper>
               <input type="radio" clrRadio name="controlPolicy" required value="low"
-                [(ngModel)]="updateNfs.contolPolicy" />
+                     [(ngModel)]="updateNfs.contolPolicy"/>
               <label>{{'nfs.llc' | translate}}</label>
             </clr-radio-wrapper>
           </clr-radio-container>
@@ -725,33 +733,36 @@
             <clr-radio-container *ngIf="updateNfs.contolPolicy==='up'">
               <label>{{'nfs.tfo' | translate}}</label>
               <clr-radio-wrapper>
-                <input type="radio" clrRadio required value="1" />
+                <input type="radio" clrRadio required value="1"/>
                 <label>{{'nfs.qos_bandwidth' | translate}}<=<input class="inputOneLine" type="text" name="maxBandwidth"
-                    [(ngModel)]="updateNfs.maxBandwidth"> MB/s</label>
+                                                                   [(ngModel)]="updateNfs.maxBandwidth"> MB/s</label>
               </clr-radio-wrapper>
               <clr-radio-wrapper>
-                <input type="radio" clrRadio name="tfo" required value="2" />
+                <input type="radio" clrRadio name="tfo" required value="2"/>
                 <label>{{'nfs.qos_iops' | translate}}<=<input class="inputOneLine" type="text"
-                    [(ngModel)]="updateNfs.maxIops" name="maxIops"> MB/s</label>
+                                                              [(ngModel)]="updateNfs.maxIops" name="maxIops">
+                  MB/s</label>
               </clr-radio-wrapper>
             </clr-radio-container>
 
             <clr-radio-container *ngIf="updateNfs.contolPolicy==='low'">
               <label>{{'nfs.tfo' | translate}}</label>
               <clr-radio-wrapper>
-                <input type="radio" clrRadio name="tfo" required value="1" />
+                <input type="radio" clrRadio name="tfo" required value="1"/>
                 <label>{{'nfs.qos_bandwidth' | translate}}>=<input class="inputOneLine" type="text" name="minBandwidth"
-                    [(ngModel)]="updateNfs.minBandwidth"> MB/s</label>
+                                                                   [(ngModel)]="updateNfs.minBandwidth"> MB/s</label>
               </clr-radio-wrapper>
               <clr-radio-wrapper>
-                <input type="radio" clrRadio name="tfo" required />
+                <input type="radio" clrRadio name="tfo" required/>
                 <label>{{'nfs.qos_iops' | translate}}>=<input class="inputOneLine" type="text"
-                    [(ngModel)]="updateNfs.minIops" name="minIops"> MB/s</label>
+                                                              [(ngModel)]="updateNfs.minIops" name="minIops">
+                  MB/s</label>
               </clr-radio-wrapper>
               <clr-radio-wrapper>
-                <input type="radio" clrRadio name="tfo" required value="3" />
+                <input type="radio" clrRadio name="tfo" required value="3"/>
                 <label>{{'nfs.qos_latency' | translate}}<=<input class="inputOneLine" type="text"
-                    [(ngModel)]="updateNfs.latency" name="latency"> ms</label>
+                                                                 [(ngModel)]="updateNfs.latency" name="latency">
+                  ms</label>
               </clr-radio-wrapper>
             </clr-radio-container>
           </div>
@@ -760,7 +771,7 @@
           <!--thin-->
           <clr-toggle-wrapper>
             <label> {{'nfs.thin' | translate}}</label>
-            <input type="checkbox" name="thin" clrToggle [(ngModel)]="updateNfs.thin" />
+            <input type="checkbox" name="thin" clrToggle [(ngModel)]="updateNfs.thin"/>
           </clr-toggle-wrapper>
           <!--重删-->
           <clr-select-container>
@@ -781,7 +792,7 @@
         </div>
         <clr-toggle-wrapper *ngIf="!dorado">
           <label>{{'nfs.capAuto' | translate}}</label>
-          <input type="checkbox" clrToggle [(ngModel)]="updateNfs.autoSizeEnable" name="autoSizeEnable" />
+          <input type="checkbox" clrToggle [(ngModel)]="updateNfs.autoSizeEnable" name="autoSizeEnable"/>
         </clr-toggle-wrapper>
       </form>
     </div>
@@ -793,7 +804,7 @@
 
   <!--操作成功提示-->
   <clr-modal [(clrModalOpen)]="addSuccessShow || modifySuccessShow || syncSuccessTips" [clrModalSize]="'sm'"
-    [clrModalClosable]="false">
+             [clrModalClosable]="false">
     <h3 class="modal-title modelTile">{{'vmfs.reclaim.title' | translate}}</h3>
     <div class="modal-body">
       <p *ngIf="addSuccessShow">{{'vmfs.add.success' | translate}}</p>
@@ -802,7 +813,7 @@
     </div>
     <div class="modal-footer">
       <button type="submit" class="btn btn-primary"
-        (click)="syncSuccessTips = false;addSuccessShow = false;modifySuccessShow = false;confirmActResult();">{{'menu.ok' | translate}}</button>
+              (click)="syncSuccessTips = false;addSuccessShow = false;modifySuccessShow = false;confirmActResult();">{{'menu.ok' | translate}}</button>
     </div>
   </clr-modal>
 </div>
