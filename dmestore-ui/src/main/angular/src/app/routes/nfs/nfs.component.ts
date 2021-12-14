@@ -738,9 +738,9 @@ export class NfsComponent extends NfsComponentCommon implements OnInit ,AfterVie
         this.checkNfsNameExist(this.addForm.nfsName);
       }
     } else {
+      this.matchErr = true;
       //不满足的时候置空，触发错误提示
       this.addForm.nfsName = null;
-      this.matchErr = true;
       console.log('验证不通过');
     }
   }
