@@ -13,7 +13,7 @@ export class NfsReduceComponent implements OnInit{
   storeObjectId:string;
   viewPage: string;
   unit='GB';
-  newCapacity = 0;
+  newCapacity =1;
   pluginFlag: string;//来至插件的标记
   rowSelected = []; // 当前选中数据
   errorMsg: string;
@@ -142,27 +142,26 @@ export class NfsReduceComponent implements OnInit{
       this.closeModel();
     }
   }
- /* checkCapacity(){
-    let capacity;
-    switch (this.unit) {
-      case 'TB':
-        capacity = this.newCapacity * 1024;
-        break;
-      default: // 默认GB 不变
-        capacity = this.newCapacity;
-        break;
-    }
-    const lastCapacity = this.updateNfs.capacity - capacity;
-    if (lastCapacity<parseFloat(this.maxOpCapacity)){
-      this.newCapacity=0;
-      this.capacityErr=false;
-      return false;
-    }else {
-      this.capacityErr=true;
-      return true;
-    }
-
-  }*/
+  /* checkCapacity(){
+     let capacity;
+     switch (this.unit) {
+       case 'TB':
+         capacity = this.newCapacity * 1024;
+         break;
+       default: // 默认GB 不变
+         capacity = this.newCapacity;
+         break;
+     }
+     const lastCapacity = this.updateNfs.capacity - capacity;
+     if (lastCapacity<parseFloat(this.maxOpCapacity)){
+       this.newCapacity=0;
+       this.capacityErr=false;
+       return false;
+     }else {
+       this.capacityErr=true;
+       return true;
+     }
+   }*/
   checkNewCapacity(){
     console.log('reduce',this.newCapacity)
     console.log(typeof this.newCapacity)
@@ -176,7 +175,7 @@ export class NfsReduceComponent implements OnInit{
         break;
     }
     if (capacity>parseFloat(this.maxOpCapacity)||capacity<0.001){
-      this.newCapacity=null
+      this.newCapacity=1
       this.newCapacityError=true
       return false
     }else {
