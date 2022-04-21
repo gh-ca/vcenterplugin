@@ -294,7 +294,7 @@ public class VmwareAccessController extends BaseController {
     public ResponseBodyBean listIndependenceHosts() {
         String failureStr = "";
         try {
-            return success(vmwareAccessService.listHostsAndClusterReturnTree());
+            return success(vmwareAccessService.listHostsAndClusterReturnTree1());
         } catch (DmeException e) {
             LOG.error("list vmware host failure:", e);
             failureStr = "list vmware host failure:" + e.toString();

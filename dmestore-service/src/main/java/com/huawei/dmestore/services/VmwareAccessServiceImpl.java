@@ -6,6 +6,7 @@ import com.huawei.dmestore.exception.DmeException;
 import com.huawei.dmestore.exception.DmeSqlException;
 import com.huawei.dmestore.exception.VcenterException;
 import com.huawei.dmestore.model.ClusterTree;
+import com.huawei.dmestore.model.EsxiInstanceTree;
 import com.huawei.dmestore.utils.ToolUtils;
 import com.huawei.dmestore.utils.VCSDKUtils;
 
@@ -14,6 +15,7 @@ import com.google.gson.reflect.TypeToken;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
@@ -512,6 +514,8 @@ public class VmwareAccessServiceImpl implements VmwareAccessService {
         List<String> clusteridList = null;
         try {
             // 取得vcenter中的所有host。
+            EsxiInstanceTree instanceTree = vcsdkUtils.getInstanceTree();
+
             String hostListStr = vcsdkUtils.getAllHosts();
             clusteridList = vcsdkUtils.getAllClusterIds();
             if (!StringUtils.isEmpty(hostListStr)) {
@@ -529,6 +533,20 @@ public class VmwareAccessServiceImpl implements VmwareAccessService {
             if (!CollectionUtils.isEmpty(hostList)) {
                 temp = getHostTempList(hostList);
                 //todo 查询主机是否属于集群，如果属于集群就不返回
+                if (!CollectionUtils.isEmpty(clusteridList)) {
+                    for(String clusterid : clusteridList){
+                        List<String> hosts = vcsdkUtils.getHostidsOnCluster(clusterid);
+                        for (Map<String, String> hostidMap : hostList) {
+                            if (!CollectionUtils.isEmpty(hosts) && hosts.contains(hostidMap.get(HOST_ID))) {
+                                temp.remove(hostidMap.get(HOST_ID));
+                            }
+                            if (temp.size() == 0) {
+                                break;
+                            }
+                        }
+                    }
+                }
+
                 for (Map<String, String> hostidMap : hostList) {
                     if (!CollectionUtils.isEmpty(clusteridList)) {
                         for (String clusterid : clusteridList) {
@@ -575,6 +593,38 @@ public class VmwareAccessServiceImpl implements VmwareAccessService {
             throw new DmeException(e.getMessage());
         }
         return treeList;
+    }
+
+    @Override
+    public List<ClusterTree> listHostsAndClusterReturnTree1() throws DmeException {
+        LOG.info("Create VMFS --> Start querying the host list!");
+        long startTime = System.currentTimeMillis();
+        EsxiInstanceTree instanceTree = new EsxiInstanceTree();
+        try {
+            instanceTree = vcsdkUtils.getInstanceTree();
+            // 取得独立主机id
+            if (instanceTree.getHostIds().size() > 0) {
+                for (String hostId : instanceTree.getHostIds()) {
+                    if (!instanceTree.getHostIdsOnCluster().contains(hostId)) {
+                        instanceTree.getHostIdsIndependence().add(hostId);
+                    }
+                }
+            }
+            List<ClusterTree> clusters = instanceTree.getClusters();
+            if (instanceTree.getHosts().size() > 0) {
+                for (ClusterTree host : instanceTree.getHosts()) {
+                    if (instanceTree.getHostIdsIndependence().contains(host.getClusterId())) {
+                        instanceTree.getClusters().add(host);
+                    }
+                }
+            }
+            long endTime = System.currentTimeMillis();
+            LOG.info("Create VMFS --> End host list query , time consuming: " + (endTime - startTime)+ " ms.");
+        } catch (Exception e) {
+            LOG.error("list hosts And clusters return tree error:", e);
+            throw new DmeException(e.getMessage());
+        }
+        return instanceTree.getClusters();
     }
 
     @Override
