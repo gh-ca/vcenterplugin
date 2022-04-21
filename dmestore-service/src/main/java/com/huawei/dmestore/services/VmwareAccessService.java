@@ -139,5 +139,7 @@ public interface VmwareAccessService {
      */
     List<ClusterTree>  listHostsAndClusterReturnTree() throws DmeException;
 
+    List<ClusterTree>  listHostsAndClusterReturnTree1() throws DmeException;
+
     List<Map<String, String>> getNoMountedHostByDsObj(List<Map<String, String>> lists,String datastoreObjectId) throws DmeException;
 }

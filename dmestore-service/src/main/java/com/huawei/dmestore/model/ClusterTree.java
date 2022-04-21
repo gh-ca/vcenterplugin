@@ -1,6 +1,7 @@
 package com.huawei.dmestore.model;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -14,7 +15,7 @@ public class ClusterTree implements Serializable {
     private String clusterId;
     private String clusterName;
     private boolean flag = true;
-    private List<ClusterTree> children;
+    private List<ClusterTree> children = new ArrayList<>();
 
     public ClusterTree(String clusterId, String clusterName, List<ClusterTree> children) {
         this.clusterId = clusterId;
@@ -58,11 +59,13 @@ public class ClusterTree implements Serializable {
         this.flag = flag;
     }
 
+
     @Override
     public String toString() {
         return "ClusterTree{" +
                 "clusterId='" + clusterId + '\'' +
                 ", clusterName='" + clusterName + '\'' +
+                ", flag=" + flag +
                 ", children=" + children +
                 '}';
     }

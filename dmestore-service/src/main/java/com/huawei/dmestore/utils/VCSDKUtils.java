@@ -6,6 +6,8 @@ import com.huawei.dmestore.entity.DmeVmwareRelation;
 import com.huawei.dmestore.entity.VCenterInfo;
 import com.huawei.dmestore.exception.DmeException;
 import com.huawei.dmestore.exception.VcenterException;
+import com.huawei.dmestore.model.ClusterTree;
+import com.huawei.dmestore.model.EsxiInstanceTree;
 import com.huawei.dmestore.model.UpHostVnicRequestBean;
 import com.huawei.vmware.VcConnectionHelpers;
 import com.huawei.vmware.autosdk.SessionHelper;
@@ -438,6 +440,77 @@ public class VCSDKUtils {
      */
     public String getHostsByDsObjectId(String dataStoreObjectId) throws VcenterException {
         return getHostsByDsObjectId(dataStoreObjectId, false);
+    }
+
+    /**
+     * 查询所有主机，集群，集群上主机的信息
+     * @return
+     */
+    public EsxiInstanceTree getInstanceTree() throws Exception {
+        EsxiInstanceTree esxiInstanceTree = new EsxiInstanceTree();
+
+        List<String> clusterIds = new ArrayList<>();
+        //集群上主机id
+        List<String> hostIdsOnCluster = new ArrayList<>();
+        //独立主机id
+        List<String> hostIds = new ArrayList();
+        try{
+            VmwareContext[] vmwareContexts = vcConnectionHelpers.getAllContext();
+            for (VmwareContext vmwareContext : vmwareContexts) {
+                RootFsMo rootFsMo = rootVmwareMoFactory.build(vmwareContext, vmwareContext.getRootFolder());
+                List<Pair<ManagedObjectReference, String>> cls = rootFsMo.getAllClusterOnRootFs();
+                if (cls != null && cls.size() > 0) {
+                    for (Pair<ManagedObjectReference, String> cl : cls) {
+                        ClusterTree cluster = new ClusterTree();
+                        ClusterMo cl1 = clusterVmwareMoFactory.build(vmwareContext, cl.first());
+                        String objectId = vcConnectionHelpers.mor2ObjectId(cl1.getMor(), vmwareContext.getServerAddress());
+                        clusterIds.add(objectId);
+                        cluster.setClusterId(objectId);
+                        cluster.setClusterName(cl1.getName());
+
+                        String serverguid = vcConnectionHelpers.objectId2Serverguid(objectId);
+                        VmwareContext context = vcConnectionHelpers.getServerContext(serverguid);
+                        //获取所有集群上的主机
+                        List<Pair<ManagedObjectReference, String>> clusterHosts = cl1.getClusterHosts();
+                        if (clusterHosts != null && clusterHosts.size() > 0) {
+                            for (Pair<ManagedObjectReference, String> host : clusterHosts) {
+                                ClusterTree cluster1 = new ClusterTree();
+                                HostMo host1 = hostVmwareFactory.build(context, host.first());
+                                String hostId = vcConnectionHelpers.mor2ObjectId(host1.getMor(), context.getServerAddress());
+                                if (!StringUtils.isEmpty(hostId)) {
+                                    cluster1.setClusterId(hostId);
+                                    cluster1.setClusterName(host1.getName());
+                                    hostIdsOnCluster.add(hostId);
+                                }
+                                cluster.getChildren().add(cluster1);
+                            }
+                            esxiInstanceTree.getClusters().add(cluster);
+                        }
+                        //获取所有独立主机
+                        List<Pair<ManagedObjectReference, String>> hosts = rootFsMo.getAllHostOnRootFs();
+                        if (hosts != null && hosts.size() > 0) {
+                            for (Pair<ManagedObjectReference, String> host : hosts) {
+                                ClusterTree cluster1 = new ClusterTree();
+                                HostMo host1 = hostVmwareFactory.build(context, host.first());
+                                String hostId = vcConnectionHelpers.mor2ObjectId(host1.getMor(), context.getServerAddress());
+                                if (!hostIdsOnCluster.contains(hostId)&&!hostIds.contains(hostId)) {
+                                    hostIds.add(hostId);
+                                    cluster1.setClusterId(hostId);
+                                    cluster1.setClusterName(host1.getName());
+                                    esxiInstanceTree.getHosts().add(cluster1);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            esxiInstanceTree.setClusterIds(clusterIds);
+            esxiInstanceTree.setHostIds(hostIds);
+            esxiInstanceTree.setHostIdsOnCluster(hostIdsOnCluster);
+        }catch(Exception e){
+            throw new VcenterException(e.getMessage());
+        }
+        return esxiInstanceTree;
     }
 
     /**
@@ -1030,6 +1103,7 @@ public class VCSDKUtils {
                         map.put(HOST_NAME, host1.getName());
                         lists.add(map);
                     }
+
                 }
                 if (lists.size() > 0) {
                     listStr = gson.toJson(lists);
@@ -1096,6 +1170,7 @@ public class VCSDKUtils {
         }
         return hostIds;
     }
+
     /**
      * 得到指定集群下的所有主机,以及指定主机所属集群下的所有主机 20200918objectId
      *
